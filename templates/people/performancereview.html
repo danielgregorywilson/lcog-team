@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+    <p>Performance Review for {{ object.employee }}</p>
+    <p>Scheduled for {{ object.date|date }}</p>
+    {% if object.performanceevaluation.evaluation %}
+        <h3>Current Evaluation</h3>
+        {% if object.performanceevaluation.discussion_date %}
+            <p>Discussion with {{ object.employee }} set for {{ object.performanceevaluation.discussion_date }}</p>
+        {% endif %}
+        <p>{{ object.performanceevaluation.evaluation }}</p>
+    {% endif %}
+    <h3>Modify Evaluation</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Submit Evaluation">
+    </form>
+{% endblock %}

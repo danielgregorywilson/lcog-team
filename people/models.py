@@ -54,7 +54,7 @@ class Employee(models.Model):
             if any([
                 review.status == PerformanceReview.NEEDS_EVALUATION,
                 review.status == PerformanceReview.EVALUATION_WRITTEN_AND_DATE_SET and not review.performanceevaluation.manager_discussed,
-                review.status == PerformanceReview.EVALUATION_APPROVED
+                review.status == PerformanceReview.EVALUATION_DENIED
             ]):
                 reviews.append(review)
         return reviews
@@ -65,7 +65,7 @@ class Employee(models.Model):
             if any([
                 review.status == PerformanceReview.EVALUATION_WRITTEN_AND_DATE_SET and review.performanceevaluation.manager_discussed,
                 review.status == PerformanceReview.EVALUATION_COMPLETED,
-                review.status == PerformanceReview.EVALUATION_DENIED
+                review.status == PerformanceReview.EVALUATION_APPROVED
             ]):
                 reviews.append(review)
         return reviews
@@ -78,6 +78,27 @@ class Employee(models.Model):
                 if review.days_until_due() < SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE:
                     reviews.append(review)
         return sorted(reviews, key=lambda review: review.date)
+    
+    def upper_manager_upcoming_reviews_action_required(self):
+        reviews = []
+        for review in self.upper_manager_upcoming_reviews():
+            if any([
+                review.status == PerformanceReview.EVALUATION_COMPLETED
+            ]):
+                reviews.append(review)
+        return reviews
+    
+    def upper_manager_upcoming_reviews_no_action_required(self):
+        reviews = []
+        for review in self.upper_manager_upcoming_reviews():
+            if any([
+                review.status == PerformanceReview.NEEDS_EVALUATION,
+                review.status == PerformanceReview.EVALUATION_WRITTEN_AND_DATE_SET,
+                review.status == PerformanceReview.EVALUATION_DENIED,
+                review.status == PerformanceReview.EVALUATION_APPROVED
+            ]):
+                reviews.append(review)
+        return reviews
 
 
 class PerformanceReview(models.Model):

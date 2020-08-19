@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Performance Review Detail{% endblock %}
+{% block title %}Performance Review Review{% endblock %}
 
 {% block content %}
     <p>Performance Review for {{ object.employee }}</p>
@@ -12,10 +12,10 @@
         {% endif %}
         <p>{{ object.performanceevaluation.evaluation }}</p>
     {% endif %}
-    <h3>Modify Evaluation</h3>
+    <h3>Approve or Deny Evaluation</h3>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <input type="submit" value="Submit Evaluation">
+        <input type="submit" value="Submit">
     </form>
 {% endblock %}

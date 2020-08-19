@@ -1,4 +1,5 @@
-from django.forms import CharField, DateField, SelectDateWidget, Form, Textarea
+from django.core.exceptions import ValidationError
+from django.forms import BooleanField, CharField, DateField, SelectDateWidget, Form, Textarea
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views import View
@@ -37,9 +38,60 @@ class PerformanceReviewView(FormView):
         if pr.status == PerformanceReview.NEEDS_EVALUATION:
             pr.status = PerformanceReview.EVALUATION_WRITTEN_AND_DATE_SET
             pr.save()
-        
+        if pr.status == PerformanceReview.EVALUATION_DENIED:
+            pr.status = PerformanceReview.EVALUATION_COMPLETED
+            pr.save()
         
         # Send notification emails
+        return super().form_valid(form)
+
+
+class PerformanceReviewApprovalForm(Form):
+    approved = BooleanField(required=False)
+    denied = BooleanField(required=False)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        approved = cleaned_data.get("approved")
+        denied = cleaned_data.get("denied")
+
+        if not approved and not denied:
+            raise ValidationError("Please select either approved or denied")
+
+        if approved and denied:
+            raise ValidationError("Please select only one")
+
+
+class PerformanceReviewApprovalView(FormView):
+    template_name = "people/performancereviewapproval.html"
+    form_class = PerformanceReviewApprovalForm
+    success_url = "/"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['object'] = PerformanceReview.objects.get(pk=self.kwargs['pk'])
+        return context
+
+    def form_valid(self, form):
+        # Set evaluation value
+        pr = PerformanceReview.objects.get(pk=self.kwargs['pk'])
+        try:
+            pe = pr.performanceevaluation
+        except PerformanceEvaluation.DoesNotExist:
+            # TODO
+            pass
+        if form.cleaned_data['approved']:
+            pe.upper_manager_accepted = True
+            pe.save()
+            pr.status = PerformanceReview.EVALUATION_APPROVED
+            pr.save()
+        else:
+            pe.upper_manager_accepted = False
+            pe.save()
+            pr.status = PerformanceReview.EVALUATION_DENIED
+            pr.save()
+        
+        # TODO: Send notification emails
         return super().form_valid(form)
 
 

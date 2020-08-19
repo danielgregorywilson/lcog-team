@@ -98,26 +98,52 @@
     {% if user.is_authenticated and user.employee.get_direct_reports_descendants %}
         <h2>All Current Evaluations (For Upper Managers)</h2>
         {% if user.employee.upper_manager_upcoming_reviews %}
-            <table>
-                <tr>
-                    <th>Employee Name</th>
-                    <th>Manager Name</th>
-                    <th>Date of Review</th>
-                    <th>Days Until Review</th>
-                    <th>Status</th>
-                    <th>Date of Discussion</th>
-                </tr>
-                {% for review in user.employee.upper_manager_upcoming_reviews %}
+            {% if user.employee.upper_manager_upcoming_reviews_action_required %}
+                <h3>Action Required</h3>
+                <table>
                     <tr>
-                        <td><a href="{% url 'performancereview-view' review.pk %}">{{ review.employee }}</a></td>
-                        <td>{{ review.employee.manager }}</td>
-                        <td>{{ review.date }}</td>
-                        <td {% if review.overdue %}class="overdue"{% endif %}>{{ review.days_until_due }}</td>
-                        <td>{{ review.get_status_display }}</td>
-                        <td>{{ review.performanceevaluation.discussion_date }}</td>
+                        <th>Employee Name</th>
+                        <th>Manager Name</th>
+                        <th>Date of Review</th>
+                        <th>Days Until Review</th>
+                        <th>Status</th>
+                        <th>Date of Discussion</th>
                     </tr>
-                {% endfor %}
-            </table>
+                    {% for review in user.employee.upper_manager_upcoming_reviews_action_required %}
+                        <tr>
+                            <td><a href="{% url 'performancereview-approval-view' review.pk %}">{{ review.employee }}</a></td>
+                            <td>{{ review.employee.manager }}</td>
+                            <td>{{ review.date }}</td>
+                            <td {% if review.overdue %}class="overdue"{% endif %}>{{ review.days_until_due }}</td>
+                            <td>{{ review.get_status_display }}</td>
+                            <td>{{ review.performanceevaluation.discussion_date }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+            {% if user.employee.upper_manager_upcoming_reviews_no_action_required %}
+                <h3>No Action Required</h3>
+                <table>
+                    <tr>
+                        <th>Employee Name</th>
+                        <th>Manager Name</th>
+                        <th>Date of Review</th>
+                        <th>Days Until Review</th>
+                        <th>Status</th>
+                        <th>Date of Discussion</th>
+                    </tr>
+                    {% for review in user.employee.upper_manager_upcoming_reviews_no_action_required %}
+                        <tr>
+                            <td><a href="{% url 'performancereview-approval-view' review.pk %}">{{ review.employee }}</a></td>
+                            <td>{{ review.employee.manager }}</td>
+                            <td>{{ review.date }}</td>
+                            <td {% if review.overdue %}class="overdue"{% endif %}>{{ review.days_until_due }}</td>
+                            <td>{{ review.get_status_display }}</td>
+                            <td>{{ review.performanceevaluation.discussion_date }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
         {% else %}
             <p>You do not have any upcoming evaluations</p>
         {% endif %}

@@ -2,6 +2,8 @@ branch-defaults:
   default:
     environment: lcog-internal-env
     group_suffix: null
+  master:
+    environment: lcog-internal-env
 global:
   application_name: lcog-internal
   branch: null

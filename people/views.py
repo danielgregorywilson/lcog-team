@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.core.mail import send_mail
 from django.forms import BooleanField, CharField, DateField, SelectDateWidget, Form, Textarea
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -43,6 +44,13 @@ class PerformanceReviewView(FormView):
             pr.save()
         
         # Send notification emails
+        send_mail(
+            f'Updated performance evaluation',
+            f'Your manager {pr.employee.manager.user.get_full_name()} has updated your information for an upcoming performance review.',
+            'dwilson@lcog.org',
+            [pr.employee.user.email]
+        )
+
         return super().form_valid(form)
 
 

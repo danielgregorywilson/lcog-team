@@ -12,6 +12,12 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 
+try:
+    from .settings_local import *
+except ImportError:
+    pass
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -133,7 +139,7 @@ STATICFILES_DIRS = [
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'dashboard'
 
-EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+EMAIL_BACKEND = 'django_ses.SESBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
 
 REST_FRAMEWORK = {

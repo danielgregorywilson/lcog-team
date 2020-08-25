@@ -61,17 +61,22 @@ class PerformanceReviewView(FormView):
 class PerformanceReviewApprovalForm(Form):
     approved = BooleanField(required=False)
     denied = BooleanField(required=False)
+    note = CharField(widget=Textarea, required=False)
 
     def clean(self):
         cleaned_data = super().clean()
         approved = cleaned_data.get("approved")
         denied = cleaned_data.get("denied")
+        note = cleaned_data.get("note")
 
         if not approved and not denied:
             raise ValidationError("Please select either approved or denied")
 
         if approved and denied:
             raise ValidationError("Please select only one")
+
+        if denied and not note:
+            raise ValidationError("Please provide a note for the manager")
 
 
 class PerformanceReviewApprovalView(FormView):

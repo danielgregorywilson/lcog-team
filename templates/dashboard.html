@@ -8,6 +8,7 @@
     <h2>Your Next Review</h2>
     {% if user.employee.employee_next_review %}
       <p>Your Next Review is scheduled for {{ user.employee.employee_next_review.date }}</p>
+      <p>Current Status: {{ user.employee.employee_next_review.get_status_display }}</p>
       {% if user.employee.employee_next_review.performanceevaluation %}
         <p>Your manager {{ user.employee.manager }} has written an evaluation:</p>
         <p>{{ user.employee.employee_next_review.performanceevaluation.evaluation }}</p>

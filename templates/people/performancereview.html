@@ -21,6 +21,13 @@
     <p>{{ object.performanceevaluation.evaluation }}</p>
   {% endif %}
 
+  {{ object }}
+  {% if is_denied and object.performanceevaluation.upper_manager_note %}
+    <h3>Upper Manager Note</h3>
+    <p>{{ object.employee.manager.manager }} says:</p>
+    <p>{{ object.performanceevaluation.upper_manager_note }}</p>
+  {% endif %}
+
   <h3>Modify Evaluation</h3>
   <form method="post">
     {% csrf_token %}

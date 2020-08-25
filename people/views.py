@@ -27,6 +27,7 @@ class PerformanceReviewView(FormView):
         pr = PerformanceReview.objects.get(pk=self.kwargs['pk'])
         context['object'] = pr
         context['notes'] = ReviewNote.objects.filter(employee=pr.employee, manager__user=User(pk=self.request.user.pk))
+        context['is_denied'] = pr.status == PerformanceReview.EVALUATION_DENIED
         return context
 
     def form_valid(self, form):
@@ -99,14 +100,14 @@ class PerformanceReviewApprovalView(FormView):
             pass
         if form.cleaned_data['approved']:
             pe.upper_manager_accepted = True
-            pe.save()
             pr.status = PerformanceReview.EVALUATION_APPROVED
-            pr.save()
         else:
             pe.upper_manager_accepted = False
-            pe.save()
             pr.status = PerformanceReview.EVALUATION_DENIED
-            pr.save()
+        if form.cleaned_data['note']:
+            pe.upper_manager_note = form.cleaned_data['note']
+        pe.save()
+        pr.save()
         
         # TODO: Send notification emails
         return super().form_valid(form)

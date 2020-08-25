@@ -12,6 +12,12 @@
         {% endif %}
         <p>{{ object.performanceevaluation.evaluation }}</p>
     {% endif %}
+
+    {% if object.performanceevaluation.upper_manager_note %}
+      <h3>Your Note</h3>
+      <p>{{ object.performanceevaluation.upper_manager_note }}</p>
+    {% endif %}
+
     <h3>Approve or Deny Evaluation</h3>
     <form method="post">
         {% csrf_token %}

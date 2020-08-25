@@ -1,12 +1,13 @@
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
-from django.forms import BooleanField, CharField, DateField, SelectDateWidget, Form, Textarea
+from django.forms import BooleanField, CharField, DateField, ModelForm, SelectDateWidget, Form, Textarea
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic.edit import FormView
+from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
-from .models import PerformanceEvaluation, PerformanceReview
+from .models import PerformanceEvaluation, PerformanceReview, ReviewNote
 from .serializers import PerformanceReviewSerializer
 
 
@@ -129,3 +130,18 @@ class PerformanceReviewManagerMetConfirmView(View):
             review.status = PerformanceReview.EVALUATION_COMPLETED
             review.save()
         return HttpResponse('Success')
+
+
+class ReviewNoteCreateView(CreateView):
+    model = ReviewNote
+    fields = ['employee', 'note']
+
+
+class ReviewNoteUpdateView(UpdateView):
+    model = ReviewNote
+    fields = ['employee', 'note']
+
+
+class ReviewNoteDeleteView(DeleteView):
+    model = ReviewNote
+    success_url = reverse_lazy('dashboard')

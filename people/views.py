@@ -1,13 +1,14 @@
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
-from django.forms import BooleanField, CharField, DateField, ModelForm, SelectDateWidget, Form, Textarea
+from django.forms import BooleanField, CharField, ChoiceField, DateField, ModelForm, SelectDateWidget, Form, Textarea
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
-from .models import PerformanceEvaluation, PerformanceReview, ReviewNote
+from .models import Employee, PerformanceEvaluation, PerformanceReview, ReviewNote
 from .serializers import PerformanceReviewSerializer
 
 
@@ -23,7 +24,9 @@ class PerformanceReviewView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['object'] = PerformanceReview.objects.get(pk=self.kwargs['pk'])
+        pr = PerformanceReview.objects.get(pk=self.kwargs['pk'])
+        context['object'] = pr
+        context['notes'] = ReviewNote.objects.filter(employee=pr.employee, manager__user=User(pk=self.request.user.pk))
         return context
 
     def form_valid(self, form):
@@ -132,16 +135,22 @@ class PerformanceReviewManagerMetConfirmView(View):
         return HttpResponse('Success')
 
 
-class ReviewNoteCreateView(CreateView):
+class ReviewNoteEditBase(View):
+    template_name = "people/reviewnote_form.html"
     model = ReviewNote
     fields = ['employee', 'note']
+    success_url = reverse_lazy('dashboard')
 
 
-class ReviewNoteUpdateView(UpdateView):
-    model = ReviewNote
-    fields = ['employee', 'note']
+class ReviewNoteCreateView(ReviewNoteEditBase, CreateView):
+    pass
+
+
+class ReviewNoteUpdateView(ReviewNoteEditBase, UpdateView):
+    pass
 
 
 class ReviewNoteDeleteView(DeleteView):
+    template_name = "people/reviewnote_confirm_delete.html"
     model = ReviewNote
     success_url = reverse_lazy('dashboard')

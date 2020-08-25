@@ -1,6 +1,7 @@
 import datetime
 
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import gettext as _
 
 SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE = 60
@@ -163,7 +164,12 @@ class ReviewNote(models.Model):
         verbose_name_plural = _("Performance Review Notes")
 
     def get_absolute_url(self):
-        return reverse("review_note_detail", kwargs={"pk": self.pk})
+        return reverse("note-update", kwargs={"pk": self.pk})
+
+    def save(self, *args, **kwargs):
+        if not hasattr(self, 'manager'):
+            self.manager = self.employee.manager
+        super().save(*args, **kwargs)
 
     manager = models.ForeignKey("Employee", related_name="notes_written", verbose_name=_("manager"), on_delete=models.CASCADE)
     employee = models.ForeignKey("Employee", related_name="notes", verbose_name=_("employee"), on_delete=models.CASCADE)

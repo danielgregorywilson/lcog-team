@@ -32,18 +32,20 @@
         <tr>
           <th>Employee Name</th>
           <th>Date</th>
+          <th>Delete?</th>
         </tr>
-        {% for note in user.employee.notes_written %}
+        {% for note in user.employee.notes_written.all %}
           <tr>
             <td><a href="{% url 'note-update' note.pk %}">{{ note.employee }}</a></td>
             <td>{{ note.date }}</td>
+            <td><a href="{% url 'note-delete' note.pk %}">X</a></td>
           </tr>
         {% endfor %}
       </table>
     {% else %}
       <p>You do not have any review notes</p>
     {% endif %}
-    <a href="">Add a review note</a>
+    <a href="{% url 'note-create' %}">Add a review note</a>
 
 
     <h2>Current Evaluations (For Managers)</h2>

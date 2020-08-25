@@ -156,6 +156,7 @@ class PerformanceEvaluation(models.Model):
     employee_discussed = models.BooleanField(_("employee discussed the evaluation"), default=False)
     manager_discussed = models.BooleanField(_("manager discussed the evaluation"), default=False)
     upper_manager_accepted = models.BooleanField(_("upper manager accepted the evaluation"), default=False)
+    upper_manager_note = models.TextField(_("upper manager note"), default="")
 
 
 class ReviewNote(models.Model):

@@ -10,7 +10,7 @@ from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateVi
 
 from .models import Employee, PerformanceEvaluation, PerformanceReview, ReviewNote
 from .serializers import PerformanceReviewSerializer
-from mainsite.helpers import send_email, send_evaluation_complete_email
+from mainsite.helpers import get_host_url, send_email, send_evaluation_complete_email
 
 
 class PerformanceReviewForm(Form):
@@ -50,10 +50,11 @@ class PerformanceReviewView(FormView):
             pr.save()
         
         # Send notification emails
-        host = self.request.get_host()
+        host = get_host_url(self.request)
         send_email(
             [pr.employee.user.email],
             f'{pr.employee.manager.user.get_full_name()} has updated your performance evaluation',
+            f'Your manager {pr.employee.manager.user.get_full_name()} has updated your information for an upcoming performance review. View here: {host}',
             f'Your manager {pr.employee.manager.user.get_full_name()} has updated your information for an upcoming performance review. View here: <a href="{host}">{host}</a>',
         )
 
@@ -111,17 +112,19 @@ class PerformanceReviewApprovalView(FormView):
         pr.save()
         
         # Send notification emails
-        url = self.request.get_host() + reverse('performancereview-view', args=[pr.pk])
+        url = get_host_url(self.request) + reverse('performancereview-view', args=[pr.pk])
         if form.cleaned_data['approved']:
             send_email(
                 [pr.employee.manager.user.email],
                 f'A Performance Evaluation has been completed',
+                f'{self.request.user.get_full_name()} has approved a performance evaluation for {pr.employee.user.get_full_name()}. Please review it here: {url}',
                 f'{self.request.user.get_full_name()} has approved a performance evaluation for {pr.employee.user.get_full_name()}. Please review it here: <a href="{url}">{url}</a>',
             )
         else:
             send_email(
                 [pr.employee.manager.user.email],
                 f'A Performance Evaluation has been denied and requires revision',
+                f'{self.request.user.get_full_name()} has denied a performance evaluation you wrote for {pr.employee.user.get_full_name()}. Please review their notes and revise it here: {url}',
                 f'{self.request.user.get_full_name()} has denied a performance evaluation you wrote for {pr.employee.user.get_full_name()}. Please review their notes and revise it here: <a href="{url}">{url}</a>',
             )
 
@@ -139,7 +142,7 @@ class PerformanceReviewEmployeeMetConfirmView(View):
         if evaluation.manager_discussed:
             review.status = PerformanceReview.EVALUATION_COMPLETED
             review.save()
-            send_evaluation_complete_email([review.employee.manager.manager.user.email], review, self.request.get_host())
+            send_evaluation_complete_email([review.employee.manager.manager.user.email], review, get_host_url(self.request))
         return HttpResponse('Success')
         
 
@@ -154,7 +157,7 @@ class PerformanceReviewManagerMetConfirmView(View):
         if evaluation.employee_discussed:
             review.status = PerformanceReview.EVALUATION_COMPLETED
             review.save()
-            send_evaluation_complete_email([review.employee.manager.manager.user.email], review, self.request.get_host())
+            send_evaluation_complete_email([review.employee.manager.manager.user.email], review, get_host_url(self.request))
         return HttpResponse('Success')
 
 

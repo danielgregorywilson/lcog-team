@@ -118,12 +118,14 @@ class PerformanceReview(models.Model):
     EVALUATION_COMPLETED = 'EC'
     EVALUATION_DENIED = 'ED'
     EVALUATION_APPROVED = 'EA'
+    EVALUATION_HR_PROCESSED = 'EP'
     STATUS_CHOICE = [
         (NEEDS_EVALUATION, 'Needs evaluation'),
         (EVALUATION_WRITTEN_AND_DATE_SET, 'Evaluation written and date for discussion set'),
         (EVALUATION_COMPLETED, 'Evaluation discussed with employee'),
         (EVALUATION_DENIED, 'Evaluation denied'),
         (EVALUATION_APPROVED, 'Evaluation approved'),
+        (EVALUATION_HR_PROCESSED, 'Evaluation processed by HR'),
     ]
     employee = models.ForeignKey("Employee", verbose_name=_("employee"), on_delete=models.CASCADE)
     date = models.DateField(_("review date"), auto_now=False, auto_now_add=False)

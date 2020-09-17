@@ -9,7 +9,6 @@ from django.views import View
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
 from .models import Employee, PerformanceEvaluation, PerformanceReview, ReviewNote
-from .serializers import PerformanceReviewSerializer
 from mainsite.helpers import get_host_url, send_email, send_evaluation_complete_email
 
 

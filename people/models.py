@@ -102,6 +102,39 @@ class Employee(models.Model):
         return reviews
 
 
+
+class ManagerUpcomingReviewsActionRequiredManager(models.Manager):
+    def get_queryset(self, user):
+        queryset = super().get_queryset()
+        desired_pks = [pr.pk for pr in user.employee.manager_upcoming_reviews_action_required()]
+        queryset = queryset.filter(pk__in=desired_pks)
+        return queryset
+
+
+class ManagerUpcomingReviewsNoActionRequiredManager(models.Manager):
+    def get_queryset(self, user):
+        queryset = super().get_queryset()
+        desired_pks = [pr.pk for pr in user.employee.manager_upcoming_reviews_no_action_required()]
+        queryset = queryset.filter(pk__in=desired_pks)
+        return queryset
+
+
+class UpperManagerUpcomingReviewsActionRequiredManager(models.Manager):
+    def get_queryset(self, user):
+        queryset = super().get_queryset()
+        desired_pks = [pr.pk for pr in user.employee.upper_manager_upcoming_reviews_action_required()]
+        queryset = queryset.filter(pk__in=desired_pks)
+        return queryset
+
+
+class UpperManagerUpcomingReviewsNoActionRequiredManager(models.Manager):
+    def get_queryset(self, user):
+        queryset = super().get_queryset()
+        desired_pks = [pr.pk for pr in user.employee.upper_manager_upcoming_reviews_no_action_required()]
+        queryset = queryset.filter(pk__in=desired_pks)
+        return queryset
+
+
 class PerformanceReview(models.Model):
     class Meta:
         verbose_name = _("Performance Review")
@@ -112,6 +145,13 @@ class PerformanceReview(models.Model):
 
     def get_absolute_url(self):
         return reverse("performance_review_detail", kwargs={"pk": self.pk})
+
+    # Managers for filtering PRs
+    objects = models.Manager()
+    manager_upcoming_reviews_action_required = ManagerUpcomingReviewsActionRequiredManager()
+    manager_upcoming_reviews_no_action_required = ManagerUpcomingReviewsNoActionRequiredManager()
+    upper_manager_upcoming_reviews_action_required = UpperManagerUpcomingReviewsActionRequiredManager()
+    upper_manager_upcoming_reviews_no_action_required = UpperManagerUpcomingReviewsNoActionRequiredManager()
 
     NEEDS_EVALUATION = 'N'
     EVALUATION_WRITTEN_AND_DATE_SET = 'EW'
@@ -158,7 +198,7 @@ class PerformanceEvaluation(models.Model):
     employee_discussed = models.BooleanField(_("employee discussed the evaluation"), default=False)
     manager_discussed = models.BooleanField(_("manager discussed the evaluation"), default=False)
     upper_manager_accepted = models.BooleanField(_("upper manager accepted the evaluation"), default=False)
-    upper_manager_note = models.TextField(_("upper manager note"), default="")
+    upper_manager_note = models.TextField(_("upper manager note"), default="", blank=True, null=True)
 
 
 class ReviewNote(models.Model):

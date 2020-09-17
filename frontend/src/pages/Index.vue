@@ -1,49 +1,122 @@
 <template>
-  <q-page class="row items-center justify-evenly">
-    <example-component
-      title="Example component"
-      active
-      :todos="todos"
-      :meta="meta"
-    ></example-component>
+  <q-page class="q-pa-md">
+    <div class="q-py-md">
+      <div class="text-h4">Your Next Review</div>
+      <div class="text-body1">You do not have a scheduled upcoming review</div>
+    </div>
+    <div class="q-py-md">
+      <div class="text-h4">Review Notes</div>
+      <div class="q-py-sm">
+        <q-table
+          :data="reviewNotes.results"
+          :columns="reviewNotesColumns"
+          row-key="name"
+        />
+      </div>
+    </div>
+    <div class="q-py-md">
+      <div class="text-h4">Current Evaluations (For Managers)</div>
+      <div class="text-h6">Action Required</div>
+        <q-table
+            :data="prsActionRequired"
+            :columns="evaluations_columns"
+            row-key="name"
+          />
+      <div class="text-h6">No Action Required</div>
+        <q-table
+            :data="prsNoActionRequired"
+            :columns="evaluations_columns"
+            row-key="name"
+          />
+    </div>
   </q-page>
 </template>
 
 <script lang="ts">
-import { Todo, Meta } from 'components/models';
-import ExampleComponent from 'components/CompositionComponent.vue';
-import { defineComponent, ref } from '@vue/composition-api';
+import { defineComponent } from '@vue/composition-api';
+import ExampleComponent from '../components/CompositionComponent.vue';
+import PerformanceReviewDataService from '../services/PerformanceReviewDataService';
+import ReveiwNoteService from '../services/ReviewNoteDataService';
+
 
 export default defineComponent({
   name: 'PageIndex',
   components: { ExampleComponent },
+  data() {
+    return {
+      reviewNotes: [],
+      prs: [],
+      prsActionRequired: [],
+      prsNoActionRequired: [],
+      currentIndex: -1,
+      title: '',
+      reviewNotesColumns: [
+        {
+          name: 'employeeName',
+          required: true,
+          label: 'Employee Name',
+          align: 'left',
+          field: 'employee_name',
+          format: val => `${val}`,
+          sortable: true
+        },
+        { name: 'date', label: 'Date', field: 'date', sortable: true },
+        { name: 'delete', label: 'Delete?' },
+      ],
+      evaluations_columns: [
+        {
+          name: 'employeeName',
+          required: true,
+          label: 'Employee Name',
+          align: 'left',
+          field: 'employee_name',
+          format: val => `${val}`,
+          sortable: true
+        },
+        { name: 'dateOfReview', align: 'center', label: 'Date of Review', field: 'date_of_review', sortable: true },
+        { name: 'daysUntilReview', label: 'Days Until Review', field: 'days_until_review', sortable: true },
+        { name: 'status', label: 'Status', field: 'status' },
+        { name: 'dateOfDiscussion', label: 'Date of Discussion', field: 'date_of_discussion' },
+        { name: 'discussionTookPlace', label: 'Discussion took place', field: 'discussion_took_place' }
+      ],
+    };
+  },
+  computed: {
+    managerPerformanceReviewsActionRequired() {
+      return this.prs.results
+    }
+  },
+  methods: {
+    retrievePerformanceReviews() {
+      ReveiwNoteService.getAll()
+        .then(response => {
+          this.reviewNotes = response.data;
+          console.log(response.data);
+        })
+        .catch(e => {
+          console.log(e);
+        });
+      PerformanceReviewDataService.getAllManagerUpcomingActionRequired()
+        .then(response => {
+          this.prsActionRequired = response.data.results;
+        })
+        .catch(e => {
+          console.log(e);
+        });
+      PerformanceReviewDataService.getAllManagerUpcomingNoActionRequired()
+        .then(response => {
+          this.prsNoActionRequired = response.data.results;
+        })
+        .catch(e => {
+          console.log(e);
+        });
+    },
+  },
+  mounted() {
+    this.retrievePerformanceReviews();
+  },
   setup() {
-    const todos = ref<Todo[]>([
-      {
-        id: 1,
-        content: 'ct1'
-      },
-      {
-        id: 2,
-        content: 'ct2'
-      },
-      {
-        id: 3,
-        content: 'ct3'
-      },
-      {
-        id: 4,
-        content: 'ct4'
-      },
-      {
-        id: 5,
-        content: 'ct5'
-      }
-    ]);
-    const meta = ref<Meta>({
-      totalCount: 1200
-    });
-    return { todos, meta };
+    return {  };
   }
 });
 </script>

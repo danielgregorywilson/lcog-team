@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title>
-          Quasar App
+          LCOG HR App - Hi --NAME--
         </q-toolbar-title>
 
         <div>Quasar v{{ $q.version }}</div>
@@ -51,16 +51,16 @@ import EssentialLink from 'components/EssentialLink.vue'
 
 const linksData = [
   {
-    title: 'Docs',
-    caption: 'quasar.dev',
+    title: 'Dashboard',
+    caption: '',
     icon: 'school',
-    link: 'https://quasar.dev'
+    link: '/'
   },
   {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
+    title: 'Time off Requests',
+    caption: '',
     icon: 'code',
-    link: 'https://github.com/quasarframework'
+    link: '/time-off'
   },
   {
     title: 'Discord Chat Channel',

@@ -7,9 +7,11 @@ from people.models import Employee, PerformanceReview, ReviewNote
 
 # Serializers define the API representation.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
+    name = serializers.CharField(source='get_full_name')
+    
     class Meta:
         model = User
-        fields = ['url', 'username', 'email', 'groups', 'is_staff',]
+        fields = ['url', 'username', 'email', 'name', 'groups', 'is_staff',]
 
 
 class EmployeeSerializer(serializers.HyperlinkedModelSerializer):

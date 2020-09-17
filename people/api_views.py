@@ -1,9 +1,18 @@
 from rest_framework import permissions, viewsets
+from rest_framework.generics import RetrieveAPIView
 
 from django.contrib.auth.models import User
 
 from people.models import Employee, PerformanceReview, ReviewNote
 from people.serializers import EmployeeSerializer, PerformanceReviewSerializer, ReviewNoteSerializer, UserSerializer
+
+
+class CurrentUserView(RetrieveAPIView):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+
+    def get_object(self):
+        return self.request.user
 
 
 class UserViewSet(viewsets.ModelViewSet):

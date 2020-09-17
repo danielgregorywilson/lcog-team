@@ -34,7 +34,9 @@
 
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
+
 import ExampleComponent from '../components/CompositionComponent.vue';
+
 import PerformanceReviewDataService from '../services/PerformanceReviewDataService';
 import ReveiwNoteService from '../services/ReviewNoteDataService';
 

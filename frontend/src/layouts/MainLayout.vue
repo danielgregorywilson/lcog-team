@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title>
-          LCOG HR App - Hi --NAME--
+          LCOG HR App - Hi {{ name }}
         </q-toolbar-title>
 
         <div>Quasar v{{ $q.version }}</div>
@@ -87,14 +87,15 @@ const linksData = [
     link: 'https://facebook.quasar.dev'
   },
   {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
+    title: 'Log Out',
     icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
+    link: '/auth/login'
   }
 ];
 
 import { defineComponent, ref } from '@vue/composition-api';
+
+import CurrentUserDataService from '../services/CurrentUserDataService';
 
 export default defineComponent({
   name: 'MainLayout',
@@ -104,6 +105,26 @@ export default defineComponent({
     const essentialLinks = ref(linksData);
 
     return {leftDrawerOpen, essentialLinks}
+  },
+  data() {
+    return {
+      name: null,
+    }
+  },
+  methods: {
+    getCurrentUser() {
+      CurrentUserDataService.get()
+        .then(response => {
+          this.name = response.data.name;
+          console.log(response.data);
+        })
+        .catch(e => {
+          console.log(e);
+        })
+    }
+  },
+  mounted() {
+    this.getCurrentUser();
   }
 });
 </script>

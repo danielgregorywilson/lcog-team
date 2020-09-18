@@ -47,7 +47,6 @@ export default defineComponent({
   data() {
     return {
       reviewNotes: [],
-      prs: [],
       prsActionRequired: [],
       prsNoActionRequired: [],
       currentIndex: -1,
@@ -59,7 +58,6 @@ export default defineComponent({
           label: 'Employee Name',
           align: 'left',
           field: 'employee_name',
-          format: val => `${val}`,
           sortable: true
         },
         { name: 'date', label: 'Date', field: 'date', sortable: true },
@@ -72,7 +70,6 @@ export default defineComponent({
           label: 'Employee Name',
           align: 'left',
           field: 'employee_name',
-          format: val => `${val}`,
           sortable: true
         },
         { name: 'dateOfReview', align: 'center', label: 'Date of Review', field: 'date_of_review', sortable: true },
@@ -84,9 +81,7 @@ export default defineComponent({
     };
   },
   computed: {
-    managerPerformanceReviewsActionRequired() {
-      return this.prs.results
-    }
+
   },
   methods: {
     retrievePerformanceReviews() {

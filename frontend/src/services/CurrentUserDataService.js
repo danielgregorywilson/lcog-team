@@ -1,7 +1,7 @@
 import http from '../http-common';
 
 class CurrentUserDataService {
-  get(pk) {
+  get() {
     return http.get('api/v1/current-user/');
   }
 }

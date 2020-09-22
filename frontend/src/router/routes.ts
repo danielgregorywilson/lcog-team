@@ -2,8 +2,9 @@ import { Route, RouteConfig } from 'vue-router';
 
 import authState from '../store/modules/auth/state'
 
+type Next = (path?: string) => void
 
-const ifNotAuthenticated = (to: Route, from: Route, next: Function) => {
+const ifNotAuthenticated = (to: Route, from: Route, next: Next) => { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!authState.token) { // TODO: This should use the isAuthenticated getter
     next()
     return
@@ -11,7 +12,7 @@ const ifNotAuthenticated = (to: Route, from: Route, next: Function) => {
   next('/')
 }
 
-const ifAuthenticated = (to: Route, from: Route, next: Function) => {
+const ifAuthenticated = (to: Route, from: Route, next: Next) => { // eslint-disable-line @typescript-eslint/no-explicit-any
   if (!!authState.token) { // TODO: This should use the isAuthenticated getter
     next()
     return

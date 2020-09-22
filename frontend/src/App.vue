@@ -5,14 +5,14 @@
 </template>
 <script lang="ts">
 import axios from 'axios';
-import { defineComponent } from '@vue/composition-api';
+
+import { Component, Vue } from 'vue-property-decorator'
 
 const token = localStorage.getItem('user-token')
 if (token) {
-  axios.defaults.headers.common['Authorization'] = 'Token ' + token
+  axios.defaults.headers.common['Authorization'] = `Token ${ token }` // eslint-disable-line @typescript-eslint/no-unsafe-member-access
 }
 
-export default defineComponent({
-  name: 'App',
-});
+@Component
+export default class App extends Vue{};
 </script>

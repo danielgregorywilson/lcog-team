@@ -17,31 +17,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
+import { Component, Vue } from 'vue-property-decorator'
 
-
-export default defineComponent({
-  name: 'Login',
-  components: { },
-  data() {
-    return {
-      username: null,
-      password: null,
-    }
-  },
-  computed: {
-
-  },
-  methods: {
-    login: function () {
-      const { username, password } = this
-      this.$store.dispatch('authModule/authRequest', { username, password })
-        .then(() => this.$router.push('/'))
-        .catch((err) => console.log(err))
-    }
-  },
-  setup() {
-  return {  };
+@Component
+export default class Login extends Vue{
+  private username = ''
+  private password = ''
+  public login(): void {
+    const { username, password } = this
+    this.$store.dispatch('authModule/authRequest', { username, password })
+      .then(() => this.$router.push('/'))
+      .catch((err) => console.log(err))
   }
-});
+}
 </script>

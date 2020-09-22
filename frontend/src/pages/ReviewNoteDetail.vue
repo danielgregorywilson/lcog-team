@@ -5,13 +5,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
+import { Component, Vue } from 'vue-property-decorator'
 
-export default defineComponent({
-  name: 'ReviewNoteDetail',
-  components: { },
-  setup() {
-    return { };
-  }
-});
+@Component
+export default class ReviewNoteDetail extends Vue{}
 </script>

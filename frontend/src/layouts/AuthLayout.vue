@@ -17,13 +17,8 @@
 </template>
 
 <script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
 
-import { defineComponent } from '@vue/composition-api';
-
-export default defineComponent({
-  name: 'MainLayout',
-  setup() {
-    return {}
-  }
-});
+@Component
+export default class AuthLayout extends Vue{}
 </script>

@@ -3,5 +3,6 @@
   "compilerOptions": {
     "baseUrl": ".",
     "target": "es5",
-  }
+    "experimentalDecorators": true,
+  },
 }

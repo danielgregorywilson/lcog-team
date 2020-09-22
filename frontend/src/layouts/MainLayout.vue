@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title>
-          LCOG HR App - Hi {{ name }}
+          Hi {{ name }}
         </q-toolbar-title>
 
         <div>Quasar v{{ $q.version }}</div>
@@ -31,10 +31,10 @@
           header
           class="text-grey-8"
         >
-          Essential Links
+          LCOG HR App
         </q-item-label>
-        <EssentialLink
-          v-for="link in essentialLinks"
+        <NavLink
+          v-for="link in navLinks"
           :key="link.title"
           v-bind="link"
         />
@@ -59,9 +59,20 @@
 </template>
 
 <script lang="ts">
-import EssentialLink from 'components/EssentialLink.vue'
+import NavLink from 'components/NavLink.vue'
 
-const linksData = [
+import { Component, Vue } from 'vue-property-decorator'
+
+import CurrentUserDataService from '../services/CurrentUserDataService';
+
+interface LinkData {
+  title: string;
+  caption: string;
+  icon: string;
+  link: string;
+}
+
+const linksData: Array<LinkData> = [
   {
     title: 'Dashboard',
     caption: '',
@@ -76,44 +87,41 @@ const linksData = [
   },
 ];
 
-import { defineComponent, ref } from '@vue/composition-api';
+interface LayoutData {
+  name: string
+}
 
-import CurrentUserDataService from '../services/CurrentUserDataService';
+@Component({
+  components: { NavLink }
+})
+export default class MainLayout extends Vue{
+  private leftDrawerOpen = false;
+  private navLinks: Array<LinkData> = linksData;
+  private name = ''
 
-export default defineComponent({
-  name: 'MainLayout',
-  components: { EssentialLink },
-  setup() {
-    const leftDrawerOpen = ref(false);
-    const essentialLinks = ref(linksData);
-
-    return {leftDrawerOpen, essentialLinks}
-  },
-  data() {
-    return {
-      name: null,
-    }
-  },
-  methods: {
-    getCurrentUser() {
-      CurrentUserDataService.get()
-        .then(response => {
-          this.name = response.data.name;
-          console.log(response.data);
-        })
-        .catch(e => {
-          console.log(e);
-        })
-    },
-    logout: function () {
-      this.$store.dispatch('authModule/authLogout')
-      .then(() => {
-        this.$router.push('/auth/login')
+  public getCurrentUser(): void {
+    CurrentUserDataService.get()
+      .then(response => {
+        this.name = response.data.name; // eslint-disable-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       })
-    }
-  },
+      .catch(e => {
+        console.log(e);
+      })
+  }
+  public logout(): void {
+    this.$store.dispatch('authModule/authLogout')
+    .then(() => {
+      this.$router.push('/auth/login')
+        .catch(e => {
+          console.log(e)
+        })
+    })
+    .catch(e => {
+      console.log(e);
+    })
+  }
   mounted() {
     this.getCurrentUser();
   }
-});
+};
 </script>

@@ -18,41 +18,45 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
+import { Component, Vue } from 'vue-property-decorator'
+
 import ReveiwNoteService from '../services/ReviewNoteDataService';
+
 import { ReviewNote } from '../store/types'
 
-export default defineComponent({
-  name: 'ReviewNoteTable',
-  data() {
-    return {
-      reviewNotes: [],
-      columns: [
-        { name: 'employeeName', label: 'Employee Name', align: 'left', field: 'employee_name', sortable: true },
-        { name: 'date', label: 'Date', field: 'date', sortable: true },
-        { name: 'delete', label: 'Delete?' },
-      ],
-    };
-  },
-  methods: {
-    retrieveReviewNotes() {
-      ReveiwNoteService.getAll()
-        .then(response => {
-          this.reviewNotes = response.data;
-          console.log(response.data);
-        })
-        .catch(e => {
-          console.log(e);
-        });
-    },
-    onRowClick (evt: MouseEvent, row: ReviewNote) {
-      debugger
-      console.log('clicked on', evt, row)
-      this.$router.push('note/' + row.pk)
-    }
-  },
+interface ReviewNoteColumn {
+  name: string,
+  label: string,
+  align?: string,
+  field?: string,
+  sortable?: boolean
+}
+
+@Component
+export default class ReviewNoteTable extends Vue {
+  private reviewNotes: Array<ReviewNote> = []
+  private columns: Array<ReviewNoteColumn> = [
+    { name: 'employeeName', label: 'Employee Name', align: 'left', field: 'employee_name', sortable: true },
+    { name: 'date', label: 'Date', field: 'date', sortable: true },
+    { name: 'delete', label: 'Delete?' },
+  ]
+  public retrieveReviewNotes(): void {
+    ReveiwNoteService.getAll()
+      .then(response => {
+        this.reviewNotes = response.data; // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+      })
+      .catch(e => {
+        console.log(e);
+      });
+  }
+  public onRowClick(evt: MouseEvent, row: ReviewNote): void {
+    this.$router.push(`note/${ row.pk }`)
+      .catch(e => {
+        console.log(e)
+      })
+  }
   mounted() {
     this.retrieveReviewNotes();
-  },
-});
+  }
+}
 </script>

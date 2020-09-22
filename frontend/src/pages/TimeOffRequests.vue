@@ -5,13 +5,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api';
+import { Component, Vue } from 'vue-property-decorator'
 
-export default defineComponent({
-  name: 'TimeOffRequests',
-  components: { },
-  setup() {
-    return { };
-  }
-});
+@Component
+export default class TimeOffRequests extends Vue{}
 </script>

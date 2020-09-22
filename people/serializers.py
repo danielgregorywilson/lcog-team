@@ -21,6 +21,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
+    pk = serializers.IntegerField()
     employee_name = serializers.CharField(source='employee.user.get_full_name')
     date_of_review = serializers.DateField(source='date')
     days_until_review = serializers.SerializerMethodField()
@@ -30,7 +31,7 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = PerformanceReview
-        fields = ['employee_name', 'date_of_review', 'days_until_review', 'status', 'date_of_discussion', 'discussion_took_place',]
+        fields = ['pk', 'employee_name', 'date_of_review', 'days_until_review', 'status', 'date_of_discussion', 'discussion_took_place',]
     
     @staticmethod
     def get_days_until_review(pr):

@@ -5,6 +5,16 @@ export interface ReviewNote {
   note: string;
 }
 
+export interface ReviewNoteUpdate {
+  employee_pk?: number;
+  note?: string;
+}
+
+export interface ReviewNoteCreate {
+  employee_pk: number;
+  note: string;
+}
+
 export interface PerformanceReview {
   pk: number;
   employee_name: string;

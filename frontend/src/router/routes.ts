@@ -33,6 +33,12 @@ const routes: RouteConfig[] = [
         beforeEnter: ifAuthenticated,
       },
       {
+        path: 'note/new',
+        name: 'note-create',
+        component: () => import('pages/ReviewNoteCreate.vue'),
+        beforeEnter: ifAuthenticated,
+      },
+      {
         path: 'note/:pk',
         name: 'note-details',
         component: () => import('pages/ReviewNoteDetail.vue'),

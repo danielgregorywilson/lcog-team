@@ -43,7 +43,7 @@
           @click='logout'
         >
           <q-item-section avatar>
-            <q-icon name='public' />
+            <q-icon name='west' />
           </q-item-section>
           <q-item-section>
             <q-item-label>Log Out</q-item-label>
@@ -76,13 +76,13 @@ const linksData: Array<LinkData> = [
   {
     title: 'Dashboard',
     caption: '',
-    icon: 'school',
+    icon: 'dashboard',
     link: '/'
   },
   {
     title: 'Time off Requests',
     caption: '',
-    icon: 'code',
+    icon: 'schedule',
     link: '/time-off'
   },
 ];

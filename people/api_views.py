@@ -1,5 +1,7 @@
 from rest_framework import permissions, viewsets
 from rest_framework.generics import RetrieveAPIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from django.contrib.auth.models import User
 
@@ -31,6 +33,20 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
     permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        """
+        Return a list of all employees. Optionally filter by direct reports
+        """
+        queryset = Employee.objects.all() # Default queryset
+
+        # Optionally filter by direct reports
+        user = self.request.user
+        direct_reports = self.request.query_params.get('direct-reports', None)
+        if direct_reports is not None and direct_reports == "True":
+            queryset = Employee.objects.filter(manager__user=user)
+
+        return queryset
 
 
 class PerformanceReviewViewSet(viewsets.ModelViewSet):
@@ -67,6 +83,7 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
 class ReviewNoteViewSet(viewsets.ModelViewSet):
     queryset = ReviewNote.objects.all()
     serializer_class = ReviewNoteSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         """
@@ -74,3 +91,21 @@ class ReviewNoteViewSet(viewsets.ModelViewSet):
         """
         user = self.request.user
         return ReviewNote.objects.filter(manager__user=user)
+
+    def create(self, request):
+        employee = Employee.objects.get(pk=request.data['employee_pk'])
+        manager = employee.manager
+        note = request.data['note']
+        new_review_note = ReviewNote.objects.create(manager=manager, employee=employee, note=note)
+        serialized_note = ReviewNoteSerializer(new_review_note, context={'request': request})
+        return Response(serialized_note.data)
+    
+    def update(self, request, pk=None):
+        employee = Employee.objects.get(pk=request.data['employee_pk'])
+        note = request.data['note']
+        review_note = ReviewNote.objects.get(pk=pk)
+        review_note.employeee = employee
+        review_note.note = note
+        review_note.save()
+        serialized_note = ReviewNoteSerializer(review_note, context={'request': request})
+        return Response(serialized_note.data)

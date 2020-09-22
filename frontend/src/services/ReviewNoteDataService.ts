@@ -1,6 +1,6 @@
 import http from '../http-common';
 
-import { ReviewNote } from '../store/types'
+import { ReviewNoteCreate, ReviewNoteUpdate } from '../store/types'
 
 
 class ReviewNoteDataService {
@@ -8,28 +8,28 @@ class ReviewNoteDataService {
     return http.get('api/v1/reviewnote/');
   }
 
-  get(pk: number) {
-    return http.get(`api/v1//reviewnote/{${pk}}`);
+  get(pk: string) {
+    return http.get(`api/v1/reviewnote/${pk}/`);
   }
 
-  create(data: ReviewNote) {
-    return http.post('api/v1//reviewnote', data);
+  create(data: ReviewNoteCreate) {
+    return http.post('api/v1/reviewnote/', data);
   }
 
-  update(pk: number, data: ReviewNote) {
-    return http.put(`api/v1//reviewnote/${pk}`, data);
+  update(pk: string, data: ReviewNoteUpdate) {
+    return http.put(`api/v1/reviewnote/${pk}/`, data);
   }
 
-  delete(pk: number) {
-    return http.delete(`api/v1//reviewnote/${pk}`);
+  delete(pk: string) {
+    return http.delete(`api/v1/reviewnote/${pk}/`);
   }
 
   deleteAll() {
-    return http.delete('api/v1//reviewnote');
+    return http.delete('api/v1/reviewnote/');
   }
 
   findByTitle(title: string) {
-    return http.get(`api/v1//reviewnote?title=${title}`);
+    return http.get(`api/v1/reviewnote?title=${title}`);
   }
 }
 

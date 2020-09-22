@@ -15,9 +15,11 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
+    employee_name = serializers.CharField(source='user.get_full_name')
+    
     class Meta:
         model = Employee
-        fields = ['user', 'manager', 'hire_date', 'salary',]
+        fields = ['url', 'pk', 'employee_name', 'user', 'manager', 'hire_date', 'salary',]
 
 
 class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
@@ -31,7 +33,7 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = PerformanceReview
-        fields = ['pk', 'employee_name', 'date_of_review', 'days_until_review', 'status', 'date_of_discussion', 'discussion_took_place',]
+        fields = ['url', 'pk', 'employee_name', 'date_of_review', 'days_until_review', 'status', 'date_of_discussion', 'discussion_took_place',]
     
     @staticmethod
     def get_days_until_review(pr):
@@ -68,10 +70,11 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
 
 class ReviewNoteSerializer(serializers.HyperlinkedModelSerializer):
     pk = serializers.IntegerField()
+    employee_pk = serializers.IntegerField(source='employee.pk')
     employee_name = serializers.CharField(source='employee.user.get_full_name')
     date = serializers.DateField()
     note = serializers.CharField()
     
     class Meta:
         model = ReviewNote
-        fields = ['pk', 'employee_name', 'date', 'note']
+        fields = ['url', 'pk', 'employee_pk', 'employee_name', 'date', 'note']

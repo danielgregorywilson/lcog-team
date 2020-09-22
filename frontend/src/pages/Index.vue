@@ -6,13 +6,7 @@
     </div>
     <div class="q-py-md">
       <div class="text-h4">Review Notes</div>
-      <div class="q-py-sm">
-        <q-table
-          :data="reviewNotes.results"
-          :columns="reviewNotesColumns"
-          row-key="name"
-        />
-      </div>
+      <review-note-table />
     </div>
     <div class="q-py-md">
       <div class="text-h4">Current Evaluations (For Managers)</div>
@@ -36,33 +30,39 @@
 import { defineComponent } from '@vue/composition-api';
 
 import ExampleComponent from '../components/CompositionComponent.vue';
+import ReviewNoteTable from '../components/ReviewNoteTable.vue';
 
 import PerformanceReviewDataService from '../services/PerformanceReviewDataService';
-import ReveiwNoteService from '../services/ReviewNoteDataService';
 
+import { PerformanceReview } from '../store/types';
+
+
+interface EvaluationColumn {
+  name: string,
+  required?: boolean,
+  label: string,
+  align?: string,
+  field: string,
+  sortable?: boolean
+}
+
+interface ComponentData {
+  prsActionRequired: Array<PerformanceReview>
+  prsNoActionRequired: Array<PerformanceReview>
+  currentIndex: number
+  title: string
+  evaluations_columns: Array<EvaluationColumn>
+}
 
 export default defineComponent({
   name: 'PageIndex',
-  components: { ExampleComponent },
-  data() {
+  components: { ExampleComponent, ReviewNoteTable },
+  data(): ComponentData {
     return {
-      reviewNotes: [],
       prsActionRequired: [],
       prsNoActionRequired: [],
       currentIndex: -1,
       title: '',
-      reviewNotesColumns: [
-        {
-          name: 'employeeName',
-          required: true,
-          label: 'Employee Name',
-          align: 'left',
-          field: 'employee_name',
-          sortable: true
-        },
-        { name: 'date', label: 'Date', field: 'date', sortable: true },
-        { name: 'delete', label: 'Delete?' },
-      ],
       evaluations_columns: [
         {
           name: 'employeeName',
@@ -85,24 +85,16 @@ export default defineComponent({
   },
   methods: {
     retrievePerformanceReviews() {
-      ReveiwNoteService.getAll()
-        .then(response => {
-          this.reviewNotes = response.data;
-          console.log(response.data);
-        })
-        .catch(e => {
-          console.log(e);
-        });
       PerformanceReviewDataService.getAllManagerUpcomingActionRequired()
         .then(response => {
-          this.prsActionRequired = response.data.results;
+          this.prsActionRequired = response.data.results; // eslint-disable-line @typescript-eslint/no-unsafe-member-access
         })
         .catch(e => {
           console.log(e);
         });
       PerformanceReviewDataService.getAllManagerUpcomingNoActionRequired()
         .then(response => {
-          this.prsNoActionRequired = response.data.results;
+          this.prsNoActionRequired = response.data.results; // eslint-disable-line @typescript-eslint/no-unsafe-member-access
         })
         .catch(e => {
           console.log(e);

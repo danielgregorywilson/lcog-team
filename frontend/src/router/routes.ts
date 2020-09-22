@@ -1,18 +1,18 @@
-import { RouteConfig } from 'vue-router';
+import { Route, RouteConfig } from 'vue-router';
 
-import authStore from '../store/modules/auth' // Vuex Store
+import authState from '../store/modules/auth/state'
 
 
-const ifNotAuthenticated = (to, from, next) => {
-  if (!authStore?.state?.token) { // TODO: This should use the isAuthenticated getter
+const ifNotAuthenticated = (to: Route, from: Route, next: Function) => {
+  if (!authState.token) { // TODO: This should use the isAuthenticated getter
     next()
     return
   }
   next('/')
 }
 
-const ifAuthenticated = (to, from, next) => {
-  if (!!authStore?.state?.token) { // TODO: This should use the isAuthenticated getter
+const ifAuthenticated = (to: Route, from: Route, next: Function) => {
+  if (!!authState.token) { // TODO: This should use the isAuthenticated getter
     next()
     return
   }
@@ -29,6 +29,12 @@ const routes: RouteConfig[] = [
         alias: '/dashboard',
         name: 'dashboard',
         component: () => import('pages/Index.vue'),
+        beforeEnter: ifAuthenticated,
+      },
+      {
+        path: 'note/:pk',
+        name: 'note-details',
+        component: () => import('pages/ReviewNoteDetail.vue'),
         beforeEnter: ifAuthenticated,
       },
       {

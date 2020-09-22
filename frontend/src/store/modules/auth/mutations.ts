@@ -13,7 +13,7 @@ const mutation: MutationTree<AuthStateInterface> = {
     state.status = 'error'
   },
   authLogout: state => {
-    state.token = "";
+    state.token = '';
   }
 };
 

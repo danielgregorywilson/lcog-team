@@ -66,10 +66,11 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ReviewNoteSerializer(serializers.HyperlinkedModelSerializer):
+    pk = serializers.IntegerField()
     employee_name = serializers.CharField(source='employee.user.get_full_name')
     date = serializers.DateField()
     note = serializers.CharField()
     
     class Meta:
         model = ReviewNote
-        fields = ['employee_name', 'date', 'note']
+        fields = ['pk', 'employee_name', 'date', 'note']

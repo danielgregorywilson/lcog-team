@@ -1,31 +1,34 @@
 import http from '../http-common';
 
+import { ReviewNote } from '../store/types'
+
+
 class ReviewNoteDataService {
   getAll() {
     return http.get('api/v1/reviewnote/');
   }
 
-  get(pk) {
-    return http.get(`api/v1//reviewnote/{${parseInt(pk, 10)}}`);
+  get(pk: number) {
+    return http.get(`api/v1//reviewnote/{${pk}}`);
   }
 
-  create(data) {
+  create(data: ReviewNote) {
     return http.post('api/v1//reviewnote', data);
   }
 
-  update(pk, data) {
-    return http.put(`api/v1//reviewnote/${parseInt(pk, 10)}`, data);
+  update(pk: number, data: ReviewNote) {
+    return http.put(`api/v1//reviewnote/${pk}`, data);
   }
 
-  delete(pk) {
-    return http.delete(`api/v1//reviewnote/${parseInt(pk, 10)}`);
+  delete(pk: number) {
+    return http.delete(`api/v1//reviewnote/${pk}`);
   }
 
   deleteAll() {
     return http.delete('api/v1//reviewnote');
   }
 
-  findByTitle(title) {
+  findByTitle(title: string) {
     return http.get(`api/v1//reviewnote?title=${title}`);
   }
 }

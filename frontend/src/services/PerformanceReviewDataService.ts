@@ -1,5 +1,7 @@
 import http from '../http-common';
 
+import { PerformanceReview } from '../store/types'
+
 class PerformanceReviewDataService {
   getAll() {
     return http.get('api/v1/performancereview/');
@@ -21,27 +23,27 @@ class PerformanceReviewDataService {
     return http.get('api/v1/performancereview/?action_required=False&upper_manager=True');
   }
 
-  get(pk) {
-    return http.get(`api/v1//performancereview/{${parseInt(pk, 10)}}`);
+  get(pk: number) {
+    return http.get(`api/v1//performancereview/{${pk}}`);
   }
 
-  create(data) {
+  create(data: PerformanceReview) {
     return http.post('api/v1//performancereview', data);
   }
 
-  update(pk, data) {
-    return http.put(`api/v1//performancereview/${parseInt(pk, 10)}`, data);
+  update(pk: number, data: PerformanceReview) {
+    return http.put(`api/v1//performancereview/${pk}`, data);
   }
 
-  delete(pk) {
-    return http.delete(`api/v1//performancereview/${parseInt(pk, 10)}`);
+  delete(pk: number) {
+    return http.delete(`api/v1//performancereview/${pk}`);
   }
 
   deleteAll() {
     return http.delete('api/v1//performancereview');
   }
 
-  findByTitle(title) {
+  findByTitle(title: string) {
     return http.get(`api/v1//performancereview?title=${title}`);
   }
 }

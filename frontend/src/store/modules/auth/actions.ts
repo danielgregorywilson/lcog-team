@@ -7,11 +7,11 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
   authRequest: ({commit, dispatch}, user) => {
     return new Promise((resolve, reject) => { // The Promise used for router redirect in login
       commit('authRequest')
-      axios({url: 'http://localhost:8000/api/api-token-auth/', data: user, method: 'POST' })
+      axios({url: 'http://localhost:8000/api/api-token-auth/', data: user, method: 'POST' }) // eslint-disable-line @typescript-eslint/no-unsafe-assignment
         .then(resp => {
-          const token = resp.data.token
+          const token: string = resp.data.token // eslint-disable-line
           localStorage.setItem('user-token', token) // store the token in localstorage
-          axios.defaults.headers.common['Authorization'] = 'Token ' + token
+          axios.defaults.headers.common['Authorization'] = `Token ${token}` // eslint-disable-line @typescript-eslint/no-unsafe-member-access
           commit('authSuccess', token)
           // you have your token, now log in your user :)
           dispatch('userModule/userRequest', null, { root: true })
@@ -25,8 +25,8 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
       })
     })
   },
-  authLogout: ({commit, dispatch}) => {
-    return new Promise((resolve, reject) => {
+  authLogout: ({commit}) => {
+    return new Promise((resolve) => {
       commit('authLogout')
       localStorage.removeItem('user-token') // clear your user's token from localstorage
       resolve()

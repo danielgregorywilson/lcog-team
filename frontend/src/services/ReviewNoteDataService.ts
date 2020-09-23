@@ -5,27 +5,27 @@ import { ReviewNoteCreate, ReviewNoteUpdate } from '../store/types'
 
 class ReviewNoteDataService {
   getAll() {
-    return http.get('api/v1/reviewnote/');
+    return http.get('api/v1/reviewnote');
   }
 
   get(pk: string) {
-    return http.get(`api/v1/reviewnote/${pk}/`);
+    return http.get(`api/v1/reviewnote/${pk}`);
   }
 
   create(data: ReviewNoteCreate) {
-    return http.post('api/v1/reviewnote/', data);
+    return http.post('api/v1/reviewnote', data);
   }
 
   update(pk: string, data: ReviewNoteUpdate) {
-    return http.put(`api/v1/reviewnote/${pk}/`, data);
+    return http.put(`api/v1/reviewnote/${pk}`, data);
   }
 
   delete(pk: string) {
-    return http.delete(`api/v1/reviewnote/${pk}/`);
+    return http.delete(`api/v1/reviewnote/${pk}`);
   }
 
   deleteAll() {
-    return http.delete('api/v1/reviewnote/');
+    return http.delete('api/v1/reviewnote');
   }
 
   findByTitle(title: string) {

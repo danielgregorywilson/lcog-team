@@ -2,11 +2,11 @@ import http from '../http-common';
 
 class EmployeeDataService {
   getAll() {
-    return http.get('api/v1/employee/');
+    return http.get('api/v1/employee');
   }
 
   getDirectReports() {
-    return http.get('api/v1/employee/?direct-reports=True');
+    return http.get('api/v1/employee?direct-reports=True');
   }
 }
 

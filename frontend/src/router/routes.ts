@@ -25,34 +25,40 @@ const routes: RouteConfig[] = [
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
+      { path: '/', redirect: '/dashboard' },
       {
-        path: '',
-        alias: '/dashboard',
+        path: '/dashboard',
         name: 'dashboard',
-        component: () => import('pages/Index.vue'),
+        component: () => import('pages/Dashboard.vue'),
         beforeEnter: ifAuthenticated,
       },
       {
-        path: 'note/new',
+        path: '/reviews',
+        name: 'reviews',
+        component: () => import('pages/PerformanceReviews.vue'),
+        beforeEnter: ifAuthenticated,
+      },
+      {
+        path: '/note/new',
         name: 'note-create',
         component: () => import('pages/ReviewNoteCreate.vue'),
         beforeEnter: ifAuthenticated,
       },
       {
-        path: 'note/:pk',
+        path: '/note/:pk',
         name: 'note-details',
         component: () => import('pages/ReviewNoteDetail.vue'),
         beforeEnter: ifAuthenticated,
       },
       {
-        path: 'pr/:pk',
+        path: '/pr/:pk',
         name: 'pr-details',
         component: () => import('pages/PerformanceReviewDetail.vue'),
         beforeEnter: ifAuthenticated,
       },
       {
-        path: '/time-off',
-        name: 'time-off',
+        path: '/timeoff',
+        name: 'timeoff',
         component: () => import('pages/TimeOffRequests.vue'),
         beforeEnter: ifAuthenticated,
       }

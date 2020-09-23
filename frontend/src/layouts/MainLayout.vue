@@ -67,7 +67,6 @@ import CurrentUserDataService from '../services/CurrentUserDataService';
 
 interface LinkData {
   title: string;
-  caption: string;
   icon: string;
   link: string;
 }
@@ -75,15 +74,18 @@ interface LinkData {
 const linksData: Array<LinkData> = [
   {
     title: 'Dashboard',
-    caption: '',
     icon: 'dashboard',
-    link: '/'
+    link: '/dashboard'
+  },
+  {
+    title: 'Performance Reviews',
+    icon: 'assignment_turned_in',
+    link: '/reviews'
   },
   {
     title: 'Time off Requests',
-    caption: '',
     icon: 'schedule',
-    link: '/time-off'
+    link: '/timeoff'
   },
 ];
 

@@ -27,7 +27,7 @@ import EvaluationTable from '../components/EvaluationTable.vue';
 @Component({
   components: { EvaluationTable, ReviewNoteTable }
 })
-export default class PageIndex extends Vue {
+export default class PerformanceReviews extends Vue {
   private currentIndex = -1;
   private title = '';
 };

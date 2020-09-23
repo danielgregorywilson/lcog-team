@@ -1,4 +1,32 @@
+import { AxiosResponse } from 'axios';
 import { Url } from 'url';
+
+/////////////////////////////////////////////////////
+// Auth Users Structure from Django Rest Framework //
+/////////////////////////////////////////////////////
+
+export interface AxiosAuthResponse extends AxiosResponse {
+  data: {
+    token: string;
+  }
+}
+
+export interface UserRetrieve {
+  url: Url;
+  username: string;
+  email: string;
+  name: string;
+  // groups: Array<Group>;
+  groups: unknown; // TODO: Set
+  is_staff: boolean;
+}
+
+export interface AxiosUserRetrieveOneServerResponse {
+  data: UserRetrieve
+}
+
+// TODO: Complete
+// export interface Group {}
 
 ///////////////////////////////////////////////////
 // Employee Structure from Django Rest Framework //
@@ -33,6 +61,12 @@ export interface PerformanceReviewRetrieve {
   status: string;
   date_of_discussion: Date;
   discussion_took_place: boolean;
+}
+
+export interface AxiosPerformanceReviewRetrieveManyServerResponse {
+  data: {
+    results: Array<PerformanceReviewRetrieve>
+  }
 }
 
 // TODO: Update
@@ -74,6 +108,12 @@ export interface ReviewNoteRetrieve {
 
 export interface AxiosReviewNoteRetrieveOneServerResponse {
   data: ReviewNoteRetrieve
+}
+
+export interface AxiosReviewNotwRetrieveManyServerResponse {
+  data: {
+    results: Array<ReviewNoteRetrieve>
+  }
 }
 
 export interface ReviewNoteUpdate {

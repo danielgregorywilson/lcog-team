@@ -1,7 +1,7 @@
 <template>
   <div class="q-py-sm">
     <q-table
-      :data="reviewNotes.results"
+      :data="reviewNotes"
       :columns="columns"
       row-key="name"
     >
@@ -62,7 +62,7 @@ import ReviewNoteDataService from '../services/ReviewNoteDataService';
 
 import ReveiwNoteService from '../services/ReviewNoteDataService';
 
-import { ReviewNoteRetrieve } from '../store/types'
+import { AxiosReviewNotwRetrieveManyServerResponse, ReviewNoteRetrieve } from '../store/types'
 
 interface ReviewNoteColumn {
   name: string;
@@ -92,8 +92,8 @@ export default class ReviewNoteTable extends Vue {
 
   private retrieveReviewNotes(): void {
     ReveiwNoteService.getAll()
-      .then(response => {
-        this.reviewNotes = response.data; // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+      .then((response: AxiosReviewNotwRetrieveManyServerResponse) => {
+        this.reviewNotes = response.data.results;
       })
       .catch(e => {
         console.log(e);

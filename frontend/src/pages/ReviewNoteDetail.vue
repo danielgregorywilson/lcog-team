@@ -59,8 +59,8 @@ export default class ReviewNoteDetail extends Vue{
     ReviewNoteDataService.get(this.$route.params.pk)
       .then((response: AxiosReviewNoteRetrieveOneServerResponse) => {
         this.pk = response.data.pk.toString()
-        this.employee = {label: response.data.employee_name, value: response.data.employee_pk}; // eslint-disable-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-        this.note = response.data.note; // eslint-disable-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+        this.employee = {label: response.data.employee_name, value: response.data.employee_pk};
+        this.note = response.data.note;
         this.employeeCurrentVal = this.employee
         this.noteCurrentVal = this.note
       })

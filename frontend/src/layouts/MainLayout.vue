@@ -63,6 +63,8 @@ import NavLink from 'components/NavLink.vue'
 
 import { Component, Vue } from 'vue-property-decorator'
 
+import { AxiosUserRetrieveOneServerResponse } from '../store/types'
+
 import CurrentUserDataService from '../services/CurrentUserDataService';
 
 interface LinkData {
@@ -103,8 +105,8 @@ export default class MainLayout extends Vue{
 
   public getCurrentUser(): void {
     CurrentUserDataService.get()
-      .then(response => {
-        this.name = response.data.name; // eslint-disable-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      .then((response: AxiosUserRetrieveOneServerResponse) => {
+        this.name = response.data.name;
       })
       .catch(e => {
         console.log(e);

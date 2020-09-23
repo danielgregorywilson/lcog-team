@@ -13,6 +13,8 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
+import { AxiosPerformanceReviewRetrieveManyServerResponse } from '../store/types'
+
 import PerformanceReviewDataService from '../services/PerformanceReviewDataService';
 
 import { PerformanceReviewRetrieve } from '../store/types'
@@ -41,16 +43,16 @@ export default class EvaluationTable extends Vue {
   public retrievePerformanceReviews(): void {
     if (this.actionRequired) {
       PerformanceReviewDataService.getAllManagerUpcomingActionRequired()
-        .then(response => {
-          this.performanceReviews = response.data.results; // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+        .then((response: AxiosPerformanceReviewRetrieveManyServerResponse) => {
+          this.performanceReviews = response.data.results;
         })
         .catch(e => {
           console.log(e);
         });
     } else {
       PerformanceReviewDataService.getAllManagerUpcomingNoActionRequired()
-        .then(response => {
-          this.performanceReviews = response.data.results; // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+        .then((response: AxiosPerformanceReviewRetrieveManyServerResponse) => {
+          this.performanceReviews = response.data.results;
         })
         .catch(e => {
           console.log(e);

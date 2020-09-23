@@ -2,14 +2,15 @@ import { ActionTree } from 'vuex';
 import { StateInterface } from '../../index';
 import { AuthStateInterface } from './state';
 import axios from 'axios';
+import { AxiosAuthResponse, UserRetrieve } from 'src/store/types';
 
 const actions: ActionTree<AuthStateInterface, StateInterface> = {
-  authRequest: ({commit, dispatch}, user) => {
+  authRequest: ({commit, dispatch}, user: UserRetrieve) => {
     return new Promise((resolve, reject) => { // The Promise used for router redirect in login
       commit('authRequest')
-      axios({url: 'http://localhost:8000/api/api-token-auth/', data: user, method: 'POST' }) // eslint-disable-line @typescript-eslint/no-unsafe-assignment
-        .then(resp => {
-          const token: string = resp.data.token // eslint-disable-line
+      axios({url: 'http://localhost:8000/api/api-token-auth/', data: user, method: 'POST' })
+        .then((resp: AxiosAuthResponse) => {
+          const token = resp.data.token
           localStorage.setItem('user-token', token) // store the token in localstorage
           axios.defaults.headers.common['Authorization'] = `Token ${token}` // eslint-disable-line @typescript-eslint/no-unsafe-member-access
           commit('authSuccess', token)

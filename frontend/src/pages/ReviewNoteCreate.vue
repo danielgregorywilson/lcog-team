@@ -18,11 +18,10 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 
-import { EmployeeRetrieve } from '../store/types'
+import { AxiosEmployeeRetrieveManyServerResponse } from '../store/types'
 
 import EmployeeDataService from '../services/EmployeeDataService'
 import ReviewNoteDataService from '../services/ReviewNoteDataService'
-import ReveiwNoteService from '../services/ReviewNoteDataService'
 
 interface EmployeeOption {
   label: string;
@@ -37,10 +36,13 @@ export default class ReviewNoteCreate extends Vue{
 
   private getOptions(): void {
     EmployeeDataService.getDirectReports()
-      .then(response => {
-        this.options = response.data.results.map((obj: EmployeeRetrieve) => {
+      .then((response: AxiosEmployeeRetrieveManyServerResponse) => {
+        this.options = response.data.results.map(obj => {
           return {label: obj.employee_name, value: obj.pk}
         })
+      })
+      .catch(e => {
+        console.log(e)
       })
   }
 
@@ -58,7 +60,12 @@ export default class ReviewNoteCreate extends Vue{
       note: this.note
     })
       .then(response => {
+        // TODO: Show a toast
+        console.log(response)
         this.$router.push('/')
+          .catch(e => {
+            console.log(e)
+          })
       })
       .catch(e => {
         console.log(e)

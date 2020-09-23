@@ -15,7 +15,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 
 import PerformanceReviewDataService from '../services/PerformanceReviewDataService';
 
-import { PerformanceReview } from '../store/types'
+import { PerformanceReviewRetrieve } from '../store/types'
 
 interface EvaluationColumn {
   name: string,
@@ -29,7 +29,7 @@ interface EvaluationColumn {
 @Component
 export default class EvaluationTable extends Vue {
   @Prop({required: true}) readonly actionRequired!: boolean
-  private performanceReviews: Array<PerformanceReview> = []
+  private performanceReviews: Array<PerformanceReviewRetrieve> = []
   private columns: Array<EvaluationColumn> = [
     { name: 'employeeName', required: true, label: 'Employee Name', align: 'left', field: 'employee_name', sortable: true },
     { name: 'dateOfReview', align: 'center', label: 'Date of Review', field: 'date_of_review', sortable: true },
@@ -57,7 +57,7 @@ export default class EvaluationTable extends Vue {
         });
     }
   }
-  public onRowClick(evt: MouseEvent, row: PerformanceReview): void {
+  public onRowClick(evt: MouseEvent, row: PerformanceReviewRetrieve): void {
     this.$router.push(`pr/${ row.pk }`)
       .catch(e => {
         console.log(e)

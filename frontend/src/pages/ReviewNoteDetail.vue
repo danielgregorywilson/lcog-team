@@ -18,11 +18,10 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 
-import { ReviewNoteRetrieve } from '../store/types'
+import { AxiosEmployeeRetrieveManyServerResponse, AxiosReviewNoteRetrieveOneServerResponse, AxiosReviewNoteUpdateServerResponse } from '../store/types'
 
 import EmployeeDataService from '../services/EmployeeDataService'
 import ReviewNoteDataService from '../services/ReviewNoteDataService'
-import ReveiwNoteService from '../services/ReviewNoteDataService'
 
 
 @Component
@@ -47,9 +46,9 @@ export default class ReviewNoteDetail extends Vue{
       employee_pk: this.employee.value,
       note: this.note
     })
-      .then(response => {
-        this.employeeCurrentVal = this.employee
-        this.noteCurrentVal = this.note
+      .then((response: AxiosReviewNoteUpdateServerResponse) => {
+        this.employeeCurrentVal = {label: response.data.employee_name, value: response.data.employee_pk}
+        this.noteCurrentVal = response.data.note
       })
       .catch(e => {
         console.log(e)
@@ -57,9 +56,9 @@ export default class ReviewNoteDetail extends Vue{
   }
 
   private retrieveReviewNote(): void {
-    ReveiwNoteService.get(this.$route.params.pk)
-      .then(response => {
-        this.pk = response.data.pk
+    ReviewNoteDataService.get(this.$route.params.pk)
+      .then((response: AxiosReviewNoteRetrieveOneServerResponse) => {
+        this.pk = response.data.pk.toString()
         this.employee = {label: response.data.employee_name, value: response.data.employee_pk}; // eslint-disable-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         this.note = response.data.note; // eslint-disable-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
         this.employeeCurrentVal = this.employee
@@ -72,10 +71,13 @@ export default class ReviewNoteDetail extends Vue{
 
   private getOptions(): void {
     EmployeeDataService.getDirectReports()
-      .then(response => {
-        this.options = response.data.results.map((obj: ReviewNoteRetrieve) => {
-          return {label: obj.employee_name, value: obj.pk}
+      .then((response: AxiosEmployeeRetrieveManyServerResponse) => {
+        this.options = response.data.results.map(obj => {
+          return {label: obj.employee_name, value: obj.pk.toString()}
         })
+      })
+      .catch(e => {
+        console.log(e)
       })
   }
 

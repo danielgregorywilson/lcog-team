@@ -1,4 +1,4 @@
-import { Url } from "url";
+import { Url } from 'url';
 
 ///////////////////////////////////////////////////
 // Employee Structure from Django Rest Framework //
@@ -12,6 +12,12 @@ export interface EmployeeRetrieve {
   manager: Url;
   hire_date: Date;
   salary: number;
+}
+
+export interface AxiosEmployeeRetrieveManyServerResponse {
+  data: {
+    results: Array<EmployeeRetrieve>
+  }
 }
 
 ////////////////////////////////////////////////////////////
@@ -66,9 +72,17 @@ export interface ReviewNoteRetrieve {
   note: string;
 }
 
+export interface AxiosReviewNoteRetrieveOneServerResponse {
+  data: ReviewNoteRetrieve
+}
+
 export interface ReviewNoteUpdate {
   employee_pk?: number;
   note?: string;
+}
+
+export interface AxiosReviewNoteUpdateServerResponse {
+  data: ReviewNoteRetrieve
 }
 
 export interface ReviewNoteCreate {

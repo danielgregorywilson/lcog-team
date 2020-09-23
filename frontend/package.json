@@ -6,14 +6,16 @@
   "author": "Daniel Wilson <daniel.gregory.wilson@gmail.com>",
   "private": true,
   "scripts": {
-    "lint": "eslint --ext .js,.ts,.vue ./",
+    "lint": "eslint --ext .js,.ts,.vue --ignore-path .gitignore ./",
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
     "axios": "^0.18.1",
     "core-js": "^3.6.5",
-    "quasar": "^1.0.0"
+    "quasar": "^1.9.15",
+    "vue-class-component": "^7.2.2",
+    "vue-property-decorator": "^8.3.0"
   },
   "devDependencies": {
     "@quasar/app": "^2.0.0",
@@ -22,9 +24,9 @@
     "@typescript-eslint/parser": "^3.3.0",
     "babel-eslint": "^10.0.1",
     "eslint": "^6.8.0",
-    "eslint-config-prettier": "^6.9.0",
+    "eslint-config-prettier": "^6.10.0",
     "eslint-loader": "^3.0.3",
-    "eslint-plugin-vue": "^6.1.2",
+    "eslint-plugin-vue": "^6.2.1",
     "vue-class-component": "^7.2.6",
     "vue-property-decorator": "^9.0.0"
   },

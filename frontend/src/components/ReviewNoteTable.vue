@@ -65,11 +65,16 @@ import ReveiwNoteService from '../services/ReviewNoteDataService';
 import { ReviewNoteRetrieve } from '../store/types'
 
 interface ReviewNoteColumn {
-  name: string,
-  label: string,
-  align?: string,
-  field?: string,
-  sortable?: boolean
+  name: string;
+  label: string;
+  align?: string;
+  field?: string;
+  sortable?: boolean;
+}
+
+interface QuasarReviewNoteTableRowClickActionProps {
+  evt: MouseEvent;
+  row: ReviewNoteRetrieve;
 }
 
 @Component
@@ -95,16 +100,15 @@ export default class ReviewNoteTable extends Vue {
       });
   }
 
-  private editNote(props): void {
+  private editNote(props: QuasarReviewNoteTableRowClickActionProps): void {
     this.$router.push(`note/${ props.row.pk }`)
       .catch(e => {
         console.log(e)
       })
   }
 
-  private showDeleteDialog(props): void {
-    debugger
-    this.rowPkToDelete = props.row.pk
+  private showDeleteDialog(props: QuasarReviewNoteTableRowClickActionProps): void {
+    this.rowPkToDelete = props.row.pk.toString()
     this.deleteDialogEmployeeName = props.row.employee_name
     this.deleteDialogNoteText = props.row.note
     this.deleteDialogVisible = true;
@@ -113,6 +117,8 @@ export default class ReviewNoteTable extends Vue {
   private deleteRow(): void {
     ReviewNoteDataService.delete(this.rowPkToDelete)
       .then(response => {
+        // TODO: Show a toast
+        console.log(response)
         this.retrieveReviewNotes()
       })
       .catch(e => {
@@ -122,6 +128,9 @@ export default class ReviewNoteTable extends Vue {
 
   private clickAddNote(): void {
     this.$router.push('note/new')
+      .catch(e => {
+        console.log(e)
+      })
   }
 
   mounted() {

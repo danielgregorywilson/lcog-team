@@ -1,6 +1,6 @@
 import http from '../http-common';
 
-import { PerformanceReview } from '../store/types'
+import { PerformanceReviewCreate, PerformanceReviewUpdate } from '../store/types'
 
 class PerformanceReviewDataService {
   getAll() {
@@ -27,11 +27,11 @@ class PerformanceReviewDataService {
     return http.get(`api/v1/performancereview/${pk}`);
   }
 
-  create(data: PerformanceReview) {
+  create(data: PerformanceReviewCreate) {
     return http.post('api/v1/performancereview', data);
   }
 
-  update(pk: number, data: PerformanceReview) {
+  update(pk: number, data: PerformanceReviewUpdate) {
     return http.put(`api/v1/performancereview/${pk}`, data);
   }
 

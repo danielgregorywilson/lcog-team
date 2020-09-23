@@ -18,6 +18,8 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 
+import { ReviewNoteRetrieve } from '../store/types'
+
 import EmployeeDataService from '../services/EmployeeDataService'
 import ReviewNoteDataService from '../services/ReviewNoteDataService'
 import ReveiwNoteService from '../services/ReviewNoteDataService'
@@ -26,9 +28,9 @@ import ReveiwNoteService from '../services/ReviewNoteDataService'
 @Component
 export default class ReviewNoteDetail extends Vue{
   private pk = ''
-  private employeeCurrentVal: {label: string, value: number} = {label: '', value: null}
+  private employeeCurrentVal: {label: string, value: number} = {label: '', value: -1}
   private noteCurrentVal = ''
-  private employee: {label: string, value: number} = {label: '', value: null}
+  private employee: {label: string, value: number} = {label: '', value: -1}
   private note = ''
   private options: Array<{label: string; value: string}> = []
 
@@ -71,7 +73,7 @@ export default class ReviewNoteDetail extends Vue{
   private getOptions(): void {
     EmployeeDataService.getDirectReports()
       .then(response => {
-        this.options = response.data.results.map(obj => {
+        this.options = response.data.results.map((obj: ReviewNoteRetrieve) => {
           return {label: obj.employee_name, value: obj.pk}
         })
       })

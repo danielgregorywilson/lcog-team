@@ -21,7 +21,7 @@
     </q-table>
 
 
-    <q-dialog v-model="confirm" persistent>
+    <q-dialog persistent>
       <q-card>
         <q-card-section class="row items-center">
           <q-avatar icon="signal_wifi_off" color="primary" text-color="white" />
@@ -62,7 +62,7 @@ import ReviewNoteDataService from '../services/ReviewNoteDataService';
 
 import ReveiwNoteService from '../services/ReviewNoteDataService';
 
-import { ReviewNote } from '../store/types'
+import { ReviewNoteRetrieve } from '../store/types'
 
 interface ReviewNoteColumn {
   name: string,
@@ -74,7 +74,7 @@ interface ReviewNoteColumn {
 
 @Component
 export default class ReviewNoteTable extends Vue {
-  private reviewNotes: Array<ReviewNote> = []
+  private reviewNotes: Array<ReviewNoteRetrieve> = []
   private columns: Array<ReviewNoteColumn> = [
     { name: 'employeeName', label: 'Employee Name', align: 'left', field: 'employee_name', sortable: true },
     { name: 'date', label: 'Date', field: 'date', sortable: true },
@@ -83,7 +83,7 @@ export default class ReviewNoteTable extends Vue {
   private deleteDialogVisible = false
   private deleteDialogEmployeeName = ''
   private deleteDialogNoteText = ''
-  private rowPkToDelete = null
+  private rowPkToDelete = ''
 
   private retrieveReviewNotes(): void {
     ReveiwNoteService.getAll()
@@ -103,6 +103,7 @@ export default class ReviewNoteTable extends Vue {
   }
 
   private showDeleteDialog(props): void {
+    debugger
     this.rowPkToDelete = props.row.pk
     this.deleteDialogEmployeeName = props.row.employee_name
     this.deleteDialogNoteText = props.row.note

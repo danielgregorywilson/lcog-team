@@ -18,21 +18,27 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 
+import { EmployeeRetrieve } from '../store/types'
+
 import EmployeeDataService from '../services/EmployeeDataService'
 import ReviewNoteDataService from '../services/ReviewNoteDataService'
 import ReveiwNoteService from '../services/ReviewNoteDataService'
 
+interface EmployeeOption {
+  label: string;
+  value: number;
+}
 
 @Component
 export default class ReviewNoteCreate extends Vue{
-  private options: Array<{label: string; value: string}> = []
-  private employee: {label: string, value: number} = {label: '', value: null}
+  private options: Array<EmployeeOption> = []
+  private employee: EmployeeOption = {label: '', value: -1}
   private note = ''
 
   private getOptions(): void {
     EmployeeDataService.getDirectReports()
       .then(response => {
-        this.options = response.data.results.map(obj => {
+        this.options = response.data.results.map((obj: EmployeeRetrieve) => {
           return {label: obj.employee_name, value: obj.pk}
         })
       })

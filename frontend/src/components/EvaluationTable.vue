@@ -7,7 +7,7 @@
     >
       <template v-slot:body-cell-dateOfReview="props">
         <q-td key="dateOfReview" :props="props">
-          {{ new Date(props.row.date_of_review).toLocaleDateString() }}
+          {{ props.row.date_of_review | readableDate }}
         </q-td>
       </template>
       <template v-slot:body-cell-status="props">
@@ -17,8 +17,7 @@
       </template>
       <template v-slot:body-cell-dateOfDiscussion="props">
         <q-td key="dateOfDiscussion" :props="props" >
-          {{ new Date(props.row.date_of_discussion).toLocaleDateString('en-us') + new Date(props.row.date_of_discussion).getTimezoneOffset() * 60000 }}
-          <!-- {{ new Date(props.row.date_of_discussion).getTimezoneOffset() }} -->
+          {{ props.row.date_of_discussion | readableDate }}
         </q-td>
       </template>
       <template v-slot:body-cell-actions="props">

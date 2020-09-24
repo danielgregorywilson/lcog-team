@@ -7,7 +7,7 @@
     >
       <template v-slot:body-cell-date="props">
         <q-td key="date" :props="props">
-          {{ new Date(props.row.date).toLocaleDateString() }}
+          {{ props.row.date | readableDate }}
         </q-td>
       </template>
       <template v-slot:body-cell-actions="props">

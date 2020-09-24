@@ -5,11 +5,17 @@
       <div class="text-body1">You do not have a scheduled upcoming review</div>
     </div>
     <div class="q-py-md">
-      <div class="text-h4">Review Notes</div>
+      <div class="row items-center">
+        <q-avatar icon="insert_chart_outlined" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
+        <div class="text-h4">Review Notes</div>
+      </div>
       <review-note-table />
     </div>
     <div class="q-py-md">
-      <div class="text-h4">Current Evaluations (For Managers)</div>
+      <div class="row items-center">
+        <q-avatar icon="assignment_ind" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
+        <div class="text-h4">Current Evaluations (For Managers)</div>
+      </div>
       <div class="text-h6">Action Required</div>
         <evaluation-table :actionRequired="true" />
       <div class="text-h6">No Action Required</div>

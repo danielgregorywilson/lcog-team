@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth.models import User
 
 from rest_framework import serializers
@@ -27,7 +29,7 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     employee_name = serializers.CharField(source='employee.user.get_full_name')
     date_of_review = serializers.DateField(source='date')
     days_until_review = serializers.SerializerMethodField()
-    status = serializers.CharField()
+    status = serializers.CharField(source='get_status_display')
     date_of_discussion = serializers.DateField(source='performanceevaluation.discussion_date')
     discussion_took_place = serializers.SerializerMethodField()
     
@@ -37,19 +39,9 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     
     @staticmethod
     def get_days_until_review(pr):
-        out = None
-        return 1
-
-        if assignment and assignment.status == Assignment.STATUS_DONE:
-            take = assignment.latest_submitted_take()
-            if take:
-                out = {
-                    'correct': int(take.score),
-                    'possible': int(take.total_score),
-                    'teacherViewResultsUrl': "{0}?takeId={1}".format(reverse('assessment_quiz_results_teacher', kwargs={'pk': assignment.id}), take.id),
-                    'studentViewResultsUrl': "{0}?takeId={1}".format(reverse('assessment_quiz_results_student', kwargs={'pk': assignment.id}), take.id)
-                }
-        return out
+        today = datetime.date.today()
+        delta = pr.date - today
+        return delta.days
     
     @staticmethod
     def get_discussion_took_place(pr):

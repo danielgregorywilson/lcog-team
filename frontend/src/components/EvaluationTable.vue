@@ -11,7 +11,7 @@
         </q-td>
       </template>
       <template v-slot:body-cell-status="props">
-        <q-td key="status" :props="props">
+        <q-td key="status" class="td-status" :props="props">
           {{ props.row.status }}
         </q-td>
       </template>
@@ -20,9 +20,18 @@
           {{ props.row.date_of_discussion | readableDate }}
         </q-td>
       </template>
+      <template v-slot:body-cell-discussionTookPlace="props">
+        <q-td key="discussionTookPlace" :props="props">
+          <!-- <q-btn v-if="props.row.discussion_took_place=='No'" color="white" text-color="black" label="Mark as Discussed" /> -->
+          {{ props.row.discussion_took_place }}
+        </q-td>
+      </template>
       <template v-slot:body-cell-actions="props">
-        <q-td :props="props">
-          <q-btn dense round flat color="grey" @click="editEvaluation(props)" icon="edit"></q-btn>
+        <q-td :props="props" :class="{ 'wide-actions' : props.row.discussion_took_place == 'No'}">
+          <div class="row">
+            <q-btn class="col" dense round flat color="grey" @click="editEvaluation(props)" icon="edit"></q-btn>
+            <q-btn class="col" v-if="props.row.discussion_took_place=='No'" color="white" text-color="black" label="Mark as Discussed" @click="managerMarkDiscussed(props)" />
+          </div>
         </q-td>
       </template>
     </q-table>
@@ -30,20 +39,23 @@
 </template>
 
 <style scoped>
-.q-table tbody td {
+.q-table tbody td.td-status {
     min-width: 135px;
+    white-space: normal;
+}
+.q-table tbody td.wide-actions {
+    min-width: 200px;
     white-space: normal;
 }
 </style>
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-
-import { AxiosPerformanceReviewRetrieveManyServerResponse } from '../store/types'
-
+import { AxiosPerformanceReviewManagerMarkDiscussedServerResponse, AxiosPerformanceReviewRetrieveManyServerResponse } from '../store/types'
+import { bus } from '../App.vue'
 import PerformanceReviewDataService from '../services/PerformanceReviewDataService';
-
 import { PerformanceReviewRetrieve } from '../store/types'
+import '../filters'
 
 interface EvaluationColumn {
   name: string;
@@ -71,10 +83,11 @@ export default class EvaluationTable extends Vue {
     { name: 'daysUntilReview', label: 'Days Until Review', field: 'days_until_review', sortable: true },
     { name: 'status', label: 'Status', field: 'status' },
     { name: 'dateOfDiscussion', label: 'Date of Discussion', field: 'date_of_discussion' },
-    { name: 'discussionTookPlace', label: 'Discussion took place', field: 'discussion_took_place' },
-    { name: 'actions', label: 'Actions' },
+    { name: 'discussionTookPlace', label: 'Discussion took place', field: 'discussion_took_place', align: 'left' },
+    { name: 'actions', label: 'Actions', align: 'around', },
   ]
-  public retrievePerformanceReviews(): void {
+
+  private retrievePerformanceReviews(): void {
     if (this.actionRequired) {
       PerformanceReviewDataService.getAllManagerUpcomingActionRequired()
         .then((response: AxiosPerformanceReviewRetrieveManyServerResponse) => {
@@ -99,6 +112,24 @@ export default class EvaluationTable extends Vue {
       .catch(e => {
         console.log(e)
       })
+  }
+
+  private managerMarkDiscussed(props: QuasarEvaluationTableRowClickActionProps): void {
+    PerformanceReviewDataService.managerMarkDiscussed(props.row.pk)
+      .then((response: AxiosPerformanceReviewManagerMarkDiscussedServerResponse) => {
+        console.log(response.data.status)
+        bus.$emit('updateEvaluationTables', 'updated table') // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      })
+      .catch(e => {
+        console.log(e)
+      })
+  }
+
+  created() {
+    bus.$on('updateEvaluationTables', (data: string) => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      console.log(data)
+      this.retrievePerformanceReviews()
+    })
   }
 
   mounted() {

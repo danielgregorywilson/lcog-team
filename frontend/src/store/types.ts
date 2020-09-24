@@ -93,6 +93,12 @@ export interface PerformanceReviewUpdate {
   discussion_took_place: boolean;
 }
 
+export interface AxiosPerformanceReviewManagerMarkDiscussedServerResponse {
+  data: {
+    status: string
+  }
+}
+
 /////////////////////////////////////////////////////
 // ReviewNote Structure from Django Rest Framework //
 /////////////////////////////////////////////////////

@@ -45,19 +45,10 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     
     @staticmethod
     def get_discussion_took_place(pr):
-        out = None
-        return "Yes"
-
-        if assignment and assignment.status == Assignment.STATUS_DONE:
-            take = assignment.latest_submitted_take()
-            if take:
-                out = {
-                    'correct': int(take.score),
-                    'possible': int(take.total_score),
-                    'teacherViewResultsUrl': "{0}?takeId={1}".format(reverse('assessment_quiz_results_teacher', kwargs={'pk': assignment.id}), take.id),
-                    'studentViewResultsUrl': "{0}?takeId={1}".format(reverse('assessment_quiz_results_student', kwargs={'pk': assignment.id}), take.id)
-                }
-        return out
+        if hasattr(pr, 'performanceevaluation'):
+            return "Yes" if pr.performanceevaluation.manager_discussed else "No"
+        else:
+            return "No"
 
 
 class ReviewNoteSerializer(serializers.HyperlinkedModelSerializer):

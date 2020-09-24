@@ -1,9 +1,12 @@
 from rest_framework import permissions, viewsets
+from rest_framework.decorators import action
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from django.contrib.auth.models import User
+
+from mainsite.helpers import get_host_url, send_evaluation_complete_email
 
 from people.models import Employee, PerformanceReview, ReviewNote
 from people.serializers import EmployeeSerializer, PerformanceReviewSerializer, ReviewNoteSerializer, UserSerializer
@@ -78,6 +81,18 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
             elif action_required == "False":
                 queryset = PerformanceReview.manager_upcoming_reviews_no_action_required.get_queryset(user)
         return queryset
+    
+    @action(detail=True, methods=['put'])
+    def manager_mark_discussed(self, request, pk=None):
+        review = self.get_object()
+        evaluation = review.performanceevaluation
+        evaluation.manager_discussed = True
+        evaluation.save()
+        if evaluation.employee_discussed:
+            review.status = PerformanceReview.EVALUATION_COMPLETED
+            review.save()
+            send_evaluation_complete_email([review.employee.manager.manager.user.email], review, get_host_url(self.request))
+        return Response({'status': 'performance review marked as discussed by manager'})
 
 
 class ReviewNoteViewSet(viewsets.ModelViewSet):

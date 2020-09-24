@@ -35,6 +35,10 @@ class PerformanceReviewDataService {
     return http.put(`api/v1/performancereview/${pk}`, data);
   }
 
+  managerMarkDiscussed(pk: number) {
+    return http.put(`api/v1/performancereview/${pk}/manager_mark_discussed`)
+  }
+
   delete(pk: number) {
     return http.delete(`api/v1/performancereview/${pk}`);
   }

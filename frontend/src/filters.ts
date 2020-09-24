@@ -1,4 +1,3 @@
-import { off } from 'process'
 import Vue from 'vue'
 
 Vue.filter('first4Chars', (str: string) => str.substring(0, 4))

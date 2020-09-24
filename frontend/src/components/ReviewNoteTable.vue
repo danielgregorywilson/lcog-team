@@ -48,10 +48,9 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import ReviewNoteDataService from '../services/ReviewNoteDataService';
-
 import ReveiwNoteService from '../services/ReviewNoteDataService';
-
 import { AxiosReviewNotwRetrieveManyServerResponse, ReviewNoteRetrieve } from '../store/types'
+import '../filters'
 
 interface ReviewNoteColumn {
   name: string;

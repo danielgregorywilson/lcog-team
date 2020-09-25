@@ -55,6 +55,7 @@ export interface AxiosEmployeeRetrieveManyServerResponse {
 export interface PerformanceReviewRetrieve {
   url: Url;
   pk: number;
+  employee_pk: number;
   employee_name: string;
   date_of_review: Date;
   days_until_review: number;

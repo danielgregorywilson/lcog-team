@@ -132,3 +132,9 @@ class ReviewNoteViewSet(viewsets.ModelViewSet):
         review_note.save()
         serialized_note = ReviewNoteSerializer(review_note, context={'request': request})
         return Response(serialized_note.data)
+      
+    @action(detail=True, methods=['get'])
+    def notes_for_employee(self, request, pk=None):
+        review_notes = ReviewNote.objects.filter(manager=request.user.employee.pk, employee=pk)
+        serialized_notes = [ReviewNoteSerializer(note, context={'request': request}).data for note in review_notes]
+        return Response(serialized_notes)

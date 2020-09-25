@@ -12,6 +12,10 @@ class ReviewNoteDataService {
     return http.get(`api/v1/reviewnote/${pk}`);
   }
 
+  getAllManagerNotesForEmployee(pk: number) {
+    return http.get(`api/v1/reviewnote/${pk}/notes_for_employee`)
+  }
+
   create(data: ReviewNoteCreate) {
     return http.post('api/v1/reviewnote', data);
   }

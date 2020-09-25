@@ -5,7 +5,18 @@
       <h4>Performance Review for {{ employeeName }}</h4>
       <div>Scheduled for {{ date | readableDate }}</div>
       <h5>Your Notes for {{ employeeName }}</h5>
-      <h5>Current Evaluation</h5>
+      <div class="q-pa-md row items-start q-gutter-md">
+        <!-- TODO: Click card to edit note -->
+        <!-- TODO: Style cards -->
+        <q-card v-for="note in this.reviewNotes" :key="note.pk" class="my-card">
+          <q-card-section>
+            {{ note.date | readableDate }}
+          </q-card-section>
+           <q-card-section>
+            {{ note.note }}
+          </q-card-section>
+        </q-card>
+      </div>
       <h5>Modify Evaluation</h5>
       <div class="text-weight-bold q-pb-md">Discussion currently scheduled for {{ discussionDateCurrentVal | readableDate }}</div>
       <div>
@@ -32,23 +43,23 @@
 import { date as quasarDate } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
 import PerformanceReviewDataService from '../services/PerformanceReviewDataService'
-import { AxiosPerformanceReviewRetrieveOneServerResponse, AxiosPerformanceReviewUpdateServerResponse } from '../store/types'
+import { AxiosPerformanceReviewRetrieveOneServerResponse, AxiosPerformanceReviewUpdateServerResponse, ReviewNoteRetrieve } from '../store/types'
 import '../filters'
+import ReviewNoteDataService from '../services/ReviewNoteDataService'
 
 @Component
 export default class PerformanceReviewDetail extends Vue{
   private pk = ''
+  private employeePk = -1
   private employeeName = ''
   private date: Date = new Date()
   private discussionDateCurrentVal = ''
   private discussionDate = ''
   private evaluationCurrentVal = ''
   private evaluation = ''
+  private reviewNotes: Array<ReviewNoteRetrieve> = []
 
   private valuesAreChanged(): boolean {
-    // console.log("VALUESSAME?", this.discussionDate == this.discussionDateCurrentVal && this.evaluation == this.evaluationCurrentVal)
-    console.log("datesSame", this.discussionDate == this.discussionDateCurrentVal)
-    console.log("evaluationsSame", this.evaluation == this.evaluationCurrentVal)
     if (this.discussionDate == this.discussionDateCurrentVal && this.evaluation == this.evaluationCurrentVal) {
       return false
     } else {
@@ -59,6 +70,8 @@ export default class PerformanceReviewDetail extends Vue{
   private retrievePerformanceReview(): void {
     PerformanceReviewDataService.get(this.$route.params.pk)
       .then((response: AxiosPerformanceReviewRetrieveOneServerResponse) => {
+        this.employeePk = response.data.employee_pk
+        this.retrieveReviewNotes()
         this.pk = response.data.pk.toString()
         this.employeeName = response.data.employee_name
         this.date = response.data.date_of_review;
@@ -68,8 +81,18 @@ export default class PerformanceReviewDetail extends Vue{
         this.evaluationCurrentVal = this.evaluation
       })
       .catch(e => {
-        console.log(e);
+        console.log(e)
       });
+  }
+
+  private retrieveReviewNotes(): void {
+    ReviewNoteDataService.getAllManagerNotesForEmployee(this.employeePk)
+      .then((response) => {
+        this.reviewNotes = response.data
+      })
+      .catch(e => {
+        console.log(e)
+      })
   }
 
   private updatePerformanceReview(): void {

@@ -9,7 +9,7 @@
       <h5>Modify Evaluation</h5>
       <div>
         <div class="row q-mb-md q-gutter-md items-start">
-          <q-date v-model="discussionDate" class="col-4" />
+          <q-date v-model="discussionDate" :options="noWeekends" class="col-4" />
           <q-input
             v-model="evaluation"
             label="Evaluation"
@@ -17,7 +17,7 @@
             class="q-pb-md col"
           />
         </div>
-        <q-btn color="white" text-color="black" label="Update" :disabled="!valuesAreChanged()" @click="updateReviewNote()" />
+        <q-btn color="white" text-color="black" label="Update" :disabled="!valuesAreChanged()" @click="updatePerformanceReview()" />
       </div>
 
     </div>
@@ -25,21 +25,26 @@
 </template>
 
 <script lang="ts">
+import { date as quasarDate } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
 import PerformanceReviewDataService from '../services/PerformanceReviewDataService'
-import { AxiosPerformanceReviewRetrieveOneServerResponse } from '../store/types'
+import { AxiosPerformanceReviewRetrieveOneServerResponse, AxiosPerformanceReviewUpdateServerResponse } from '../store/types'
 import '../filters'
 
 @Component
 export default class PerformanceReviewDetail extends Vue{
-  private employeeName: string = ''
-  private date: Date
-  private discussionDateCurrentVal: string
-  private discussionDate: string
+  private pk = ''
+  private employeeName = ''
+  private date: Date = new Date()
+  private discussionDateCurrentVal = ''
+  private discussionDate = ''
   private evaluationCurrentVal = ''
   private evaluation = ''
 
   private valuesAreChanged(): boolean {
+    // console.log("VALUESSAME?", this.discussionDate == this.discussionDateCurrentVal && this.evaluation == this.evaluationCurrentVal)
+    console.log("datesSame", this.discussionDate == this.discussionDateCurrentVal)
+    console.log("evaluationsSame", this.evaluation == this.evaluationCurrentVal)
     if (this.discussionDate == this.discussionDateCurrentVal && this.evaluation == this.evaluationCurrentVal) {
       return false
     } else {
@@ -47,34 +52,39 @@ export default class PerformanceReviewDetail extends Vue{
     }
   }
 
-  // private updateReviewNote(): void {
-  //   ReviewNoteDataService.update(this.pk, {
-  //     employee_pk: this.employee.value,
-  //     note: this.note
-  //   })
-  //     .then((response: AxiosReviewNoteUpdateServerResponse) => {
-  //       this.employeeCurrentVal = {label: response.data.employee_name, value: response.data.employee_pk}
-  //       this.noteCurrentVal = response.data.note
-  //     })
-  //     .catch(e => {
-  //       console.log(e)
-  //     })
-  // }
-
   private retrievePerformanceReview(): void {
     PerformanceReviewDataService.get(this.$route.params.pk)
       .then((response: AxiosPerformanceReviewRetrieveOneServerResponse) => {
+        this.pk = response.data.pk.toString()
         this.employeeName = response.data.employee_name
         this.date = response.data.date_of_review;
-        this.discussionDate = response.data.date_of_discussion.toString()
-
+        this.discussionDate = response.data.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
         this.discussionDateCurrentVal = this.discussionDate
-        this.evaluation = '' // TODO
+        this.evaluation = response.data.evaluation
         this.evaluationCurrentVal = this.evaluation
       })
       .catch(e => {
         console.log(e);
       });
+  }
+
+  private updatePerformanceReview(): void {
+    PerformanceReviewDataService.update(this.pk, {
+      date_of_discussion: this.discussionDate.split('/').join('-'), // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
+      evaluation: this.evaluation
+    })
+      .then((response: AxiosPerformanceReviewUpdateServerResponse) => {
+        this.discussionDateCurrentVal = response.data.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
+        this.evaluationCurrentVal = response.data.evaluation
+      })
+      .catch(e => {
+        console.log(e)
+      })
+  }
+
+  private noWeekends(date: string): boolean {
+    const day = quasarDate.getDayOfWeek(new Date(date))
+    return day !== 6 && day !== 7
   }
 
   private goBack(): void {

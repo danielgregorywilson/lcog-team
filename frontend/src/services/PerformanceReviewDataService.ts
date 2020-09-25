@@ -35,7 +35,7 @@ class PerformanceReviewDataService {
     return http.put(`api/v1/performancereview/${pk}`, data);
   }
 
-  managerMarkDiscussed(pk: string) {
+  managerMarkDiscussed(pk: number) {
     return http.put(`api/v1/performancereview/${pk}/manager_mark_discussed`)
   }
 

@@ -82,6 +82,15 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
                 queryset = PerformanceReview.manager_upcoming_reviews_no_action_required.get_queryset(user)
         return queryset
     
+    def update(self, request, pk=None):
+        performance_review = PerformanceReview.objects.get(pk=pk)
+        performance_evaluation = performance_review.performanceevaluation
+        performance_evaluation.discussion_date = request.data['date_of_discussion']
+        performance_evaluation.evaluation = request.data['evaluation']
+        performance_evaluation.save()
+        serialized_review = PerformanceReviewSerializer(performance_review, context={'request': request})
+        return Response(serialized_review.data)
+
     @action(detail=True, methods=['put'])
     def manager_mark_discussed(self, request, pk=None):
         review = self.get_object()
@@ -117,10 +126,9 @@ class ReviewNoteViewSet(viewsets.ModelViewSet):
     
     def update(self, request, pk=None):
         employee = Employee.objects.get(pk=request.data['employee_pk'])
-        note = request.data['note']
         review_note = ReviewNote.objects.get(pk=pk)
         review_note.employeee = employee
-        review_note.note = note
+        review_note.note = request.data['note']
         review_note.save()
         serialized_note = ReviewNoteSerializer(review_note, context={'request': request})
         return Response(serialized_note.data)

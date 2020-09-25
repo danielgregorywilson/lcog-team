@@ -60,6 +60,7 @@ export interface PerformanceReviewRetrieve {
   days_until_review: number;
   status: string;
   date_of_discussion: Date;
+  evaluation: string;
   discussion_took_place: boolean;
 }
 
@@ -85,16 +86,13 @@ export interface PerformanceReviewCreate {
   discussion_took_place: boolean;
 }
 
-// TODO: Update
 export interface PerformanceReviewUpdate {
-  url: Url;
-  pk: number;
-  employee_name: string;
-  date_of_review: Date;
-  days_until_review: number;
-  status: string;
-  date_of_discussion: Date;
-  discussion_took_place: boolean;
+  date_of_discussion?: string;
+  evaluation?: string;
+}
+
+export interface AxiosPerformanceReviewUpdateServerResponse {
+  data: PerformanceReviewRetrieve
 }
 
 export interface AxiosPerformanceReviewManagerMarkDiscussedServerResponse {

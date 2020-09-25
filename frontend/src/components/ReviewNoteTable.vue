@@ -49,7 +49,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import ReviewNoteDataService from '../services/ReviewNoteDataService';
 import ReveiwNoteService from '../services/ReviewNoteDataService';
-import { AxiosReviewNotwRetrieveManyServerResponse, ReviewNoteRetrieve } from '../store/types'
+import { AxiosReviewNoteRetrieveManyServerResponse, ReviewNoteRetrieve } from '../store/types'
 import '../filters'
 
 interface ReviewNoteColumn {
@@ -80,7 +80,7 @@ export default class ReviewNoteTable extends Vue {
 
   private retrieveReviewNotes(): void {
     ReveiwNoteService.getAll()
-      .then((response: AxiosReviewNotwRetrieveManyServerResponse) => {
+      .then((response: AxiosReviewNoteRetrieveManyServerResponse) => {
         this.reviewNotes = response.data.results;
       })
       .catch(e => {

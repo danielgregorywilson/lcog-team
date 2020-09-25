@@ -31,11 +31,12 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     days_until_review = serializers.SerializerMethodField()
     status = serializers.CharField(source='get_status_display')
     date_of_discussion = serializers.DateField(source='performanceevaluation.discussion_date')
+    evaluation = serializers.SerializerMethodField()
     discussion_took_place = serializers.SerializerMethodField()
     
     class Meta:
         model = PerformanceReview
-        fields = ['url', 'pk', 'employee_name', 'date_of_review', 'days_until_review', 'status', 'date_of_discussion', 'discussion_took_place',]
+        fields = ['url', 'pk', 'employee_name', 'date_of_review', 'days_until_review', 'status', 'date_of_discussion', 'evaluation', 'discussion_took_place',]
     
     @staticmethod
     def get_days_until_review(pr):
@@ -43,6 +44,13 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
         delta = pr.date - today
         return delta.days
     
+    @staticmethod
+    def get_evaluation(pr):
+        if hasattr(pr, 'performanceevaluation'):
+            return pr.performanceevaluation.evaluation
+        else:
+            return ""
+
     @staticmethod
     def get_discussion_took_place(pr):
         if hasattr(pr, 'performanceevaluation'):

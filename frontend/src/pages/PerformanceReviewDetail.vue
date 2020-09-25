@@ -10,7 +10,7 @@
       <div class="text-weight-bold q-pb-md">Discussion currently scheduled for {{ discussionDateCurrentVal | readableDate }}</div>
       <div>
         <div class="row q-mb-md q-gutter-md items-start">
-          <div class="col col-sm-auto col-xs-12">
+          <div class="col col-md-auto col-sm-12">
             <div>Date of Discussion</div>
             <q-date v-model="discussionDate" :options="noWeekends" />
           </div>

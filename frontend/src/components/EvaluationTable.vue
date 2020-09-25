@@ -9,26 +9,29 @@
     >
       <!-- Slots for header cells: Shrink the width when the screen is too small to see the whole table width -->
       <template v-slot:header-cell-employeeName="props">
-        <th v-if="$q.screen.lt.lg" style="max-width: 84px; white-space: normal;">{{props.col.label}}</th>
+        <th v-if="$q.screen.lt.lg" style="white-space: normal;">{{props.col.label}}</th>
         <th v-else>{{props.col.label}}</th>
       </template>
       <template v-slot:header-cell-daysUntilReview="props">
-        <th v-if="$q.screen.lt.lg" style="max-width: 84px; white-space: normal;">{{props.col.label}}</th>
+        <th v-if="$q.screen.lt.lg" style="white-space: normal;">{{props.col.label}}</th>
         <th v-else>{{props.col.label}}</th>
       </template>
       <template v-slot:header-cell-dateOfDiscussion="props">
-        <th v-if="$q.screen.lt.lg" style="max-width: 200px; white-space: normal;">{{props.col.label}}</th>
+        <th v-if="$q.screen.lt.lg" style="white-space: normal;">{{props.col.label}}</th>
         <th v-else>{{props.col.label}}</th>
       </template>
       <template v-slot:header-cell-discussionTookPlace="props">
-        <th v-if="$q.screen.lt.lg" style="max-width: 70px; white-space: normal;">{{props.col.label}}</th>
+        <th v-if="$q.screen.lt.lg" style="white-space: normal;">{{props.col.label}}</th>
         <th v-else>{{props.col.label}}</th>
       </template>
-      <!-- Slots for body cells: Show dates in a familiar format and display action buttons -->
+      <!-- Slots for body cells: Show dates in a familiar format; make sure status can wrap, and display action buttons -->
       <template v-slot:body-cell-dateOfReview="props">
         <q-td key="dateOfReview" :props="props">
           {{ props.row.date_of_review | readableDate }}
         </q-td>
+      </template>
+      <template v-slot:body-cell-status="props">
+        <q-td style="white-space: normal;" :props="props">{{ props.row.status }}</q-td>
       </template>
       <template v-slot:body-cell-dateOfDiscussion="props">
         <q-td key="dateOfDiscussion" :props="props" >

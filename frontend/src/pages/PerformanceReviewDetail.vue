@@ -7,9 +7,13 @@
       <h5>Your Notes for {{ employeeName }}</h5>
       <h5>Current Evaluation</h5>
       <h5>Modify Evaluation</h5>
+      <div class="text-weight-bold q-pb-md">Discussion currently scheduled for {{ discussionDateCurrentVal | readableDate }}</div>
       <div>
         <div class="row q-mb-md q-gutter-md items-start">
-          <q-date v-model="discussionDate" :options="noWeekends" class="col-4" />
+          <div class="col col-sm-auto col-xs-12">
+            <div>Date of Discussion</div>
+            <q-date v-model="discussionDate" :options="noWeekends" />
+          </div>
           <q-input
             v-model="evaluation"
             label="Evaluation"

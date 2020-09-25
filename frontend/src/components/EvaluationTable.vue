@@ -3,27 +3,36 @@
     <q-table
       :data="performanceReviews"
       :columns="columns"
+      :dense="$q.screen.lt.lg"
+      :grid="$q.screen.lt.md"
       row-key="name"
     >
+      <!-- Slots for header cells: Shrink the width when the screen is too small to see the whole table width -->
+      <template v-slot:header-cell-employeeName="props">
+        <th v-if="$q.screen.lt.lg" style="max-width: 84px; white-space: normal;">{{props.col.label}}</th>
+        <th v-else>{{props.col.label}}</th>
+      </template>
+      <template v-slot:header-cell-daysUntilReview="props">
+        <th v-if="$q.screen.lt.lg" style="max-width: 84px; white-space: normal;">{{props.col.label}}</th>
+        <th v-else>{{props.col.label}}</th>
+      </template>
+      <template v-slot:header-cell-dateOfDiscussion="props">
+        <th v-if="$q.screen.lt.lg" style="max-width: 200px; white-space: normal;">{{props.col.label}}</th>
+        <th v-else>{{props.col.label}}</th>
+      </template>
+      <template v-slot:header-cell-discussionTookPlace="props">
+        <th v-if="$q.screen.lt.lg" style="max-width: 70px; white-space: normal;">{{props.col.label}}</th>
+        <th v-else>{{props.col.label}}</th>
+      </template>
+      <!-- Slots for body cells: Show dates in a familiar format and display action buttons -->
       <template v-slot:body-cell-dateOfReview="props">
         <q-td key="dateOfReview" :props="props">
           {{ props.row.date_of_review | readableDate }}
         </q-td>
       </template>
-      <template v-slot:body-cell-status="props">
-        <q-td key="status" class="td-status" :props="props">
-          {{ props.row.status }}
-        </q-td>
-      </template>
       <template v-slot:body-cell-dateOfDiscussion="props">
         <q-td key="dateOfDiscussion" :props="props" >
           {{ props.row.date_of_discussion | readableDate }}
-        </q-td>
-      </template>
-      <template v-slot:body-cell-discussionTookPlace="props">
-        <q-td key="discussionTookPlace" :props="props">
-          <!-- <q-btn v-if="props.row.discussion_took_place=='No'" color="white" text-color="black" label="Mark as Discussed" /> -->
-          {{ props.row.discussion_took_place }}
         </q-td>
       </template>
       <template v-slot:body-cell-actions="props">
@@ -33,6 +42,27 @@
             <q-btn class="col" v-if="props.row.discussion_took_place=='No'" color="white" text-color="black" label="Mark as Discussed" @click="managerMarkDiscussed(props)" />
           </div>
         </q-td>
+      </template>
+      <!-- For grid mode, we need to specify everything in order for our action buttons to render -->
+      <template v-slot:item="props">
+        <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
+          <q-card class="q-py-sm">
+            <q-list dense>
+              <q-item v-for="col in props.cols" :key="col.name">
+                <div class="q-table__grid-item-row">
+                  <div class="q-table__grid-item-title">{{ col.label }}</div>
+                  <div class="q-table__grid-item-value" v-if="col.label != 'Actions'">
+                    {{ col.value }}
+                  </div>
+                  <div class="q-table__grid-item-value row q-gutter-sm" v-else>
+                    <q-btn class="col" dense round flat color="grey" @click="editEvaluation(props)" icon="edit"></q-btn>
+                    <q-btn class="col" v-if="props.row.discussion_took_place=='No'" color="white" text-color="black" label="Mark as Discussed" @click="managerMarkDiscussed(props)" />
+                  </div>
+                </div>
+              </q-item>
+            </q-list>
+          </q-card>
+        </div>
       </template>
     </q-table>
   </div>
@@ -78,12 +108,12 @@ export default class EvaluationTable extends Vue {
   @Prop({required: true}) readonly actionRequired!: boolean
   private performanceReviews: Array<PerformanceReviewRetrieve> = []
   private columns: Array<EvaluationColumn> = [
-    { name: 'employeeName', required: true, label: 'Employee Name', align: 'left', field: 'employee_name', sortable: true },
+    { name: 'employeeName', required: true, label: 'Employee Name', align: 'center', field: 'employee_name', sortable: true },
     { name: 'dateOfReview', align: 'center', label: 'Date of Review', field: 'date_of_review', sortable: true },
-    { name: 'daysUntilReview', label: 'Days Until Review', field: 'days_until_review', sortable: true },
-    { name: 'status', label: 'Status', field: 'status' },
-    { name: 'dateOfDiscussion', label: 'Date of Discussion', field: 'date_of_discussion' },
-    { name: 'discussionTookPlace', label: 'Discussion took place', field: 'discussion_took_place', align: 'left' },
+    { name: 'daysUntilReview', align: 'center', label: 'Days Until Review', field: 'days_until_review', sortable: true },
+    { name: 'status', align: 'center', label: 'Status', field: 'status' },
+    { name: 'dateOfDiscussion', align: 'center', label: 'Date of Discussion', field: 'date_of_discussion' },
+    { name: 'discussionTookPlace', align: 'center', label: 'Discussion took place', field: 'discussion_took_place' },
     { name: 'actions', label: 'Actions', align: 'around', },
   ]
 

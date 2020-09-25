@@ -63,6 +63,10 @@ export interface PerformanceReviewRetrieve {
   discussion_took_place: boolean;
 }
 
+export interface AxiosPerformanceReviewRetrieveOneServerResponse {
+  data: PerformanceReviewRetrieve
+}
+
 export interface AxiosPerformanceReviewRetrieveManyServerResponse {
   data: {
     results: Array<PerformanceReviewRetrieve>
@@ -116,7 +120,7 @@ export interface AxiosReviewNoteRetrieveOneServerResponse {
   data: ReviewNoteRetrieve
 }
 
-export interface AxiosReviewNotwRetrieveManyServerResponse {
+export interface AxiosReviewNoteRetrieveManyServerResponse {
   data: {
     results: Array<ReviewNoteRetrieve>
   }

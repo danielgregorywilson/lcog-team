@@ -23,7 +23,7 @@ class PerformanceReviewDataService {
     return http.get('api/v1/performancereview?action_required=False&upper_manager=True');
   }
 
-  get(pk: number) {
+  get(pk: string) {
     return http.get(`api/v1/performancereview/${pk}`);
   }
 
@@ -31,15 +31,15 @@ class PerformanceReviewDataService {
     return http.post('api/v1/performancereview', data);
   }
 
-  update(pk: number, data: PerformanceReviewUpdate) {
+  update(pk: string, data: PerformanceReviewUpdate) {
     return http.put(`api/v1/performancereview/${pk}`, data);
   }
 
-  managerMarkDiscussed(pk: number) {
+  managerMarkDiscussed(pk: string) {
     return http.put(`api/v1/performancereview/${pk}/manager_mark_discussed`)
   }
 
-  delete(pk: number) {
+  delete(pk: string) {
     return http.delete(`api/v1/performancereview/${pk}`);
   }
 

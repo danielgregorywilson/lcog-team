@@ -6,14 +6,14 @@
       <div>Scheduled for {{ date | readableDate }}</div>
       <h5>Your Notes for {{ employeeName }}</h5>
       <div class="q-pa-md row items-start q-gutter-md">
-        <!-- TODO: Click card to edit note -->
-        <!-- TODO: Style cards -->
-        <q-card v-for="note in this.reviewNotes" :key="note.pk" class="my-card">
+        <q-card v-for="note in this.reviewNotes" :key="note.pk" class="note-card" @click="onClickNoteCard(note.pk)">
           <q-card-section>
-            {{ note.date | readableDate }}
-          </q-card-section>
-           <q-card-section>
-            {{ note.note }}
+            <div class="text-bold">
+              {{ note.date | readableDate }}
+            </div>
+            <div>
+              {{ note.note }}
+            </div>
           </q-card-section>
         </q-card>
       </div>
@@ -38,6 +38,13 @@
     </div>
   </q-page>
 </template>
+
+<style scoped>
+  .note-card:hover {
+    background-color: lightgray;
+    cursor: pointer;
+  }
+</style>
 
 <script lang="ts">
 import { date as quasarDate } from 'quasar'
@@ -112,6 +119,10 @@ export default class PerformanceReviewDetail extends Vue{
   private noWeekends(date: string): boolean {
     const day = quasarDate.getDayOfWeek(new Date(date))
     return day !== 6 && day !== 7
+  }
+
+  private onClickNoteCard(pk: number): void {
+    this.$router.push(`/note/${ pk }`)
   }
 
   private goBack(): void {

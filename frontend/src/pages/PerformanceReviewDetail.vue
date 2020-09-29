@@ -50,7 +50,7 @@
 import { date as quasarDate } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
 import PerformanceReviewDataService from '../services/PerformanceReviewDataService'
-import { AxiosPerformanceReviewRetrieveOneServerResponse, AxiosPerformanceReviewUpdateServerResponse, ReviewNoteRetrieve } from '../store/types'
+import { AxiosManagerReviewNotesForEmployeeServerResponse, AxiosPerformanceReviewRetrieveOneServerResponse, AxiosPerformanceReviewUpdateServerResponse, ReviewNoteRetrieve } from '../store/types'
 import '../filters'
 import ReviewNoteDataService from '../services/ReviewNoteDataService'
 
@@ -94,7 +94,7 @@ export default class PerformanceReviewDetail extends Vue{
 
   private retrieveReviewNotes(): void {
     ReviewNoteDataService.getAllManagerNotesForEmployee(this.employeePk)
-      .then((response) => {
+      .then((response: AxiosManagerReviewNotesForEmployeeServerResponse) => {
         this.reviewNotes = response.data
       })
       .catch(e => {
@@ -123,6 +123,9 @@ export default class PerformanceReviewDetail extends Vue{
 
   private onClickNoteCard(pk: number): void {
     this.$router.push(`/note/${ pk }`)
+      .catch(e => {
+        console.log(e)
+      })
   }
 
   private goBack(): void {

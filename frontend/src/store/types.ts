@@ -19,6 +19,8 @@ export interface UserRetrieve {
   // groups: Array<Group>;
   groups: unknown; // TODO: Set
   is_staff: boolean;
+  is_manager: boolean;
+  is_upper_manager: boolean;
 }
 
 export interface AxiosUserRetrieveOneServerResponse {
@@ -117,6 +119,10 @@ export interface ReviewNoteRetrieve {
 
 export interface AxiosReviewNoteRetrieveOneServerResponse {
   data: ReviewNoteRetrieve
+}
+
+export interface AxiosManagerReviewNotesForEmployeeServerResponse {
+  data: Array<ReviewNoteRetrieve>
 }
 
 export interface AxiosReviewNoteRetrieveManyServerResponse {

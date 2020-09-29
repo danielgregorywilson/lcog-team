@@ -1,3 +1,4 @@
+import { EmployeeRetrieve } from 'src/store/types';
 import Vue from 'vue';
 
 import { MutationTree } from 'vuex';
@@ -8,15 +9,15 @@ const mutation: MutationTree<UserStateInterface> = {
   userRequest: (state) => {
     state.status = 'loading'
   },
-  userSuccess: (state, resp) => {
+  userSuccess: (state, resp: {data: EmployeeRetrieve}) => {
     state.status = 'success';
-    Vue.set(state, 'profile', resp);
+    Vue.set(state, 'profile', resp.data);
   },
   userError: (state) => {
     state.status = 'error'
   },
   authLogout: (state) => {
-    state.profile = {name: ''}
+    state.profile = {username: '', email: '', name: '', is_manager: false, is_upper_manager: false}
   }
 };
 

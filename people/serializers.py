@@ -10,10 +10,20 @@ from people.models import Employee, PerformanceReview, ReviewNote
 # Serializers define the API representation.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     name = serializers.CharField(source='get_full_name')
+    is_manager = serializers.SerializerMethodField()
+    is_upper_manager = serializers.SerializerMethodField()
     
     class Meta:
         model = User
-        fields = ['url', 'username', 'email', 'name', 'groups', 'is_staff',]
+        fields = ['url', 'username', 'email', 'name', 'groups', 'is_staff', 'is_manager', 'is_upper_manager']
+
+    @staticmethod
+    def get_is_manager(user):
+        return user.employee.get_direct_reports().count() != 0
+
+    @staticmethod
+    def get_is_upper_manager(user):
+        return user.employee.get_direct_reports_descendants().count() != 0
 
 
 class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
@@ -21,7 +31,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['url', 'pk', 'employee_name', 'user', 'manager', 'hire_date', 'salary',]
+        fields = ['url', 'pk', 'employee_name', 'user', 'manager', 'hire_date', 'salary']
 
 
 class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):

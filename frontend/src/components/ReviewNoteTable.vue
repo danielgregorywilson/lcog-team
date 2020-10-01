@@ -1,7 +1,7 @@
 <template>
   <div class="q-py-sm">
     <q-table
-      :data="reviewNotes"
+      :data="reviewNotes()"
       :columns="columns"
       row-key="name"
     >
@@ -67,7 +67,10 @@ interface QuasarReviewNoteTableRowClickActionProps {
 
 @Component
 export default class ReviewNoteTable extends Vue {
-  private reviewNotes: Array<ReviewNoteRetrieve> = []
+  // private reviewNotes: Array<ReviewNoteRetrieve> = []
+  private reviewNotes(): Array<ReviewNoteRetrieve> {
+    return this.$store.state.userModule.allReviewNotes.results
+  }
   private columns: Array<ReviewNoteColumn> = [
     { name: 'employeeName', label: 'Employee Name', align: 'left', field: 'employee_name', sortable: true },
     { name: 'date', label: 'Date', field: 'date', sortable: true },
@@ -79,13 +82,18 @@ export default class ReviewNoteTable extends Vue {
   private rowPkToDelete = ''
 
   private retrieveReviewNotes(): void {
-    ReveiwNoteService.getAll()
-      .then((response: AxiosReviewNoteRetrieveManyServerResponse) => {
-        this.reviewNotes = response.data.results;
-      })
+    this.$store.dispatch('userModule/getAllReviewNotes')
       .catch(e => {
-        console.log(e);
-      });
+        console.log(e)
+      })
+
+    // ReveiwNoteService.getAll()
+    //   .then((response: AxiosReviewNoteRetrieveManyServerResponse) => {
+    //     this.reviewNotes = response.data.results;
+    //   })
+    //   .catch(e => {
+    //     console.log(e);
+    //   });
   }
 
   private editNote(props: QuasarReviewNoteTableRowClickActionProps): void {

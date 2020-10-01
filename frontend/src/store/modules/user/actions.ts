@@ -18,16 +18,12 @@ const actions: ActionTree<UserStateInterface, StateInterface> = {
       });
   },
   getAllReviewNotes: ({ commit, dispatch }) => {
-    commit('getAllReviewNotes');
-    axios({ url: 'http://localhost:8000/api/v1/current-user/' })
+    axios({ url: 'http://localhost:8000/api/v1/reviewnote' })
       .then(resp => {
-        commit('userSuccess', resp);
+        commit('setAllReviewNotes', resp);
       })
-      .catch(() => {
-        commit('userError');
-        // if resp is unauthorized, logout, to
-        dispatch('authLogout')
-          .catch(err => console.log(err))
+      .catch(e => {
+        console.log(e)
       });
   }
 };

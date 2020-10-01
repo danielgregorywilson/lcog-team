@@ -4,12 +4,21 @@ interface ReviewNoteInterface {
   note: string
 }
 
+interface PerformanceReviewInterface {
+  employee: unknown
+  note: string
+}
+
 export interface PerformanceReviewStateInterface {
   allReviewNotes: Array<ReviewNoteInterface>
+  allPerformanceReviewsActionRequired: Array<PerformanceReviewInterface>
+  allPerformanceReviewsActionNotRequired: Array<PerformanceReviewInterface>
 }
 
 const state: PerformanceReviewStateInterface = {
-  allReviewNotes: []
+  allReviewNotes: [],
+  allPerformanceReviewsActionRequired: [],
+  allPerformanceReviewsActionNotRequired: []
 };
 
 export default state;

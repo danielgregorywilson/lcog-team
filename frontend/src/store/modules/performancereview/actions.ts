@@ -25,7 +25,25 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
       .catch(e => {
         console.log(e)
       });
-  }
+  },
+  getAllPerformanceReviewsActionRequired: ({ commit }) => {
+    axios({ url: 'http://localhost:8000/api/v1/performancereview?action_required=True' })
+      .then(resp => {
+        commit('setAllPerformanceReviewsActionRequired', resp);
+      })
+      .catch(e => {
+        console.log(e)
+      });
+  },
+  getAllPerformanceReviewsActionNotRequired: ({ commit }) => {
+    axios({ url: 'http://localhost:8000/api/v1/performancereview?action_required=False' })
+      .then(resp => {
+        commit('setAllPerformanceReviewsActionNotRequired', resp);
+      })
+      .catch(e => {
+        console.log(e)
+      });
+  },
 };
 
 export default actions;

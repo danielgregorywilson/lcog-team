@@ -1,7 +1,7 @@
 <template>
   <div class="q-py-sm">
     <q-table
-      :data="performanceReviews"
+      :data="performanceReviews()"
       :columns="columns"
       :dense="$q.screen.lt.lg"
       :grid="$q.screen.lt.md"
@@ -84,7 +84,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { AxiosPerformanceReviewManagerMarkDiscussedServerResponse, AxiosPerformanceReviewRetrieveManyServerResponse } from '../store/types'
+import { AxiosPerformanceReviewManagerMarkDiscussedServerResponse, ReviewNoteRetrieve } from '../store/types'
 import { bus } from '../App.vue'
 import PerformanceReviewDataService from '../services/PerformanceReviewDataService';
 import { PerformanceReviewRetrieve } from '../store/types'
@@ -109,7 +109,13 @@ interface QuasarEvaluationTableRowClickActionProps {
 @Component
 export default class EvaluationTable extends Vue {
   @Prop({required: true}) readonly actionRequired!: boolean
-  private performanceReviews: Array<PerformanceReviewRetrieve> = []
+  private performanceReviews(): Array<ReviewNoteRetrieve> {
+    if (this.actionRequired) {
+      return this.$store.getters['performanceReviewModule/allPerformanceReviewsActionRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+    } else {
+      return this.$store.getters['performanceReviewModule/allPerformanceReviewsActionNotRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+    }
+  }
   private columns: Array<EvaluationColumn> = [
     { name: 'employeeName', required: true, label: 'Employee Name', align: 'center', field: 'employee_name', sortable: true },
     { name: 'dateOfReview', align: 'center', label: 'Date of Review', field: 'date_of_review', sortable: true },
@@ -122,21 +128,15 @@ export default class EvaluationTable extends Vue {
 
   private retrievePerformanceReviews(): void {
     if (this.actionRequired) {
-      PerformanceReviewDataService.getAllManagerUpcomingActionRequired()
-        .then((response: AxiosPerformanceReviewRetrieveManyServerResponse) => {
-          this.performanceReviews = response.data.results;
-        })
-        .catch(e => {
-          console.log(e);
-        });
+      this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
+      .catch(e => {
+        console.log(e)
+      })
     } else {
-      PerformanceReviewDataService.getAllManagerUpcomingNoActionRequired()
-        .then((response: AxiosPerformanceReviewRetrieveManyServerResponse) => {
-          this.performanceReviews = response.data.results;
-        })
-        .catch(e => {
-          console.log(e);
-        });
+      this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionNotRequired')
+      .catch(e => {
+        console.log(e)
+      })
     }
   }
 
@@ -166,7 +166,9 @@ export default class EvaluationTable extends Vue {
   }
 
   mounted() {
-    this.retrievePerformanceReviews();
+    if (this.performanceReviews() == undefined) {
+      this.retrievePerformanceReviews();
+    }
   }
 }
 </script>

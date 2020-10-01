@@ -1,4 +1,4 @@
-import { EmployeeRetrieve, ReviewNoteRetrieve } from 'src/store/types';
+import { EmployeeRetrieve } from 'src/store/types';
 import Vue from 'vue';
 
 import { MutationTree } from 'vuex';
@@ -18,10 +18,7 @@ const mutation: MutationTree<UserStateInterface> = {
   },
   authLogout: (state) => {
     state.profile = {username: '', email: '', name: '', is_manager: false, is_upper_manager: false}
-  },
-  setAllReviewNotes: (state, resp: {data: Array<ReviewNoteRetrieve>}) => {
-    Vue.set(state, 'allReviewNotes', resp.data);
-  },
+  }
 };
 
 export default mutation;

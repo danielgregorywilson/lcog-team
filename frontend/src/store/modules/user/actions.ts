@@ -16,15 +16,6 @@ const actions: ActionTree<UserStateInterface, StateInterface> = {
         dispatch('authLogout')
           .catch(err => console.log(err))
       });
-  },
-  getAllReviewNotes: ({ commit, dispatch }) => {
-    axios({ url: 'http://localhost:8000/api/v1/reviewnote' })
-      .then(resp => {
-        commit('setAllReviewNotes', resp);
-      })
-      .catch(e => {
-        console.log(e)
-      });
   }
 };
 

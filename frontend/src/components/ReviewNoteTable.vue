@@ -48,8 +48,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import ReviewNoteDataService from '../services/ReviewNoteDataService';
-import ReveiwNoteService from '../services/ReviewNoteDataService';
-import { AxiosReviewNoteRetrieveManyServerResponse, ReviewNoteRetrieve } from '../store/types'
+import { ReviewNoteRetrieve } from '../store/types'
 import '../filters'
 
 interface ReviewNoteColumn {
@@ -67,9 +66,8 @@ interface QuasarReviewNoteTableRowClickActionProps {
 
 @Component
 export default class ReviewNoteTable extends Vue {
-  // private reviewNotes: Array<ReviewNoteRetrieve> = []
   private reviewNotes(): Array<ReviewNoteRetrieve> {
-    return this.$store.state.userModule.allReviewNotes.results
+    return this.$store.getters['performanceReviewModule/allReviewNotes'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
   }
   private columns: Array<ReviewNoteColumn> = [
     { name: 'employeeName', label: 'Employee Name', align: 'left', field: 'employee_name', sortable: true },
@@ -82,18 +80,10 @@ export default class ReviewNoteTable extends Vue {
   private rowPkToDelete = ''
 
   private retrieveReviewNotes(): void {
-    this.$store.dispatch('userModule/getAllReviewNotes')
+    this.$store.dispatch('performanceReviewModule/getAllReviewNotes')
       .catch(e => {
         console.log(e)
       })
-
-    // ReveiwNoteService.getAll()
-    //   .then((response: AxiosReviewNoteRetrieveManyServerResponse) => {
-    //     this.reviewNotes = response.data.results;
-    //   })
-    //   .catch(e => {
-    //     console.log(e);
-    //   });
   }
 
   private editNote(props: QuasarReviewNoteTableRowClickActionProps): void {
@@ -130,7 +120,9 @@ export default class ReviewNoteTable extends Vue {
   }
 
   mounted() {
-    this.retrieveReviewNotes();
+    if (this.reviewNotes() == null) {
+      this.retrieveReviewNotes();
+    }
   }
 }
 </script>

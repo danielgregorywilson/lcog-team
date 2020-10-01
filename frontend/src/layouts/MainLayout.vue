@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title>
-          Hi {{ name }}
+          Hi {{ name() }}
         </q-toolbar-title>
 
         <div>Quasar v{{ $q.version }}</div>
@@ -63,10 +63,6 @@ import NavLink from 'components/NavLink.vue'
 
 import { Component, Vue } from 'vue-property-decorator'
 
-import { AxiosUserRetrieveOneServerResponse } from '../store/types'
-
-import CurrentUserDataService from '../services/CurrentUserDataService';
-
 interface LinkData {
   title: string;
   icon: string;
@@ -101,16 +97,17 @@ interface LayoutData {
 export default class MainLayout extends Vue{
   private leftDrawerOpen = false;
   private navLinks: Array<LinkData> = linksData;
-  private name = ''
+  private name() {
+    return this.$store.getters['userModule/getEmployeeProfile'].name // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+  }
 
   public getCurrentUser(): void {
-    CurrentUserDataService.get()
-      .then((response: AxiosUserRetrieveOneServerResponse) => {
-        this.name = response.data.name;
-      })
-      .catch(e => {
-        console.log(e);
-      })
+    if (!this.$store.getters['userModule/isProfileLoaded']) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access
+      this.$store.dispatch('userModule/userRequest')
+        .catch(e => {
+          console.log(e)
+        })
+    }
   }
   public logout(): void {
     this.$store.dispatch('authModule/authLogout')

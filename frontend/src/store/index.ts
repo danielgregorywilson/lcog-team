@@ -1,6 +1,7 @@
 import { store } from 'quasar/wrappers';
 import Vuex from 'vuex';
 import authModule from './modules/auth'
+import performanceReviewModule from './modules/performancereview'
 import userModule from './modules/user'
 
 // import example from './module-example';
@@ -24,7 +25,8 @@ export default store(function ({ Vue }) {
   const Store = new Vuex.Store<StateInterface>({
     modules: {
       authModule,
-      userModule
+      userModule,
+      performanceReviewModule,
     },
 
     // enable strict mode (adds overhead!)

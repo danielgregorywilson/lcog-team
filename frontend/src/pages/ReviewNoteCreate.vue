@@ -17,11 +17,9 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-
 import { AxiosEmployeeRetrieveManyServerResponse } from '../store/types'
-
 import EmployeeDataService from '../services/EmployeeDataService'
-import ReviewNoteDataService from '../services/ReviewNoteDataService'
+
 
 interface EmployeeOption {
   label: string;
@@ -55,10 +53,7 @@ export default class ReviewNoteCreate extends Vue{
   }
 
   private createReviewNote(): void {
-    ReviewNoteDataService.create({
-      employee_pk: this.employee.value,
-      note: this.note
-    })
+    this.$store.dispatch('performanceReviewModule/createReviewNote', {employee_pk: this.employee.value, note: this.note})
       .then(response => {
         // TODO: Show a toast
         console.log(response)

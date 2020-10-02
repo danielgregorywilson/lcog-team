@@ -67,6 +67,7 @@ interface LinkData {
   title: string;
   icon: string;
   link: string;
+  managerOnly?: boolean;
 }
 
 const linksData: Array<LinkData> = [
@@ -78,7 +79,8 @@ const linksData: Array<LinkData> = [
   {
     title: 'Performance Reviews',
     icon: 'assignment_turned_in',
-    link: '/reviews'
+    link: '/reviews',
+    managerOnly: true
   },
   {
     title: 'Time off Requests',

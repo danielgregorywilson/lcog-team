@@ -1,6 +1,8 @@
+import { debug } from 'console';
 import { Route, RouteConfig } from 'vue-router';
 
 import authState from '../store/modules/auth/state'
+import userState from '../store/modules/user/state'
 
 type Next = (path?: string) => void
 
@@ -20,6 +22,14 @@ const ifAuthenticated = (to: Route, from: Route, next: Next) => {
   next('auth/login')
 }
 
+const ifManager = (to: Route, from: Route, next: Next) => {
+  if (userState.profile.is_manager) {
+    next()
+    return
+  }
+  next('dashboard')
+}
+
 const routes: RouteConfig[] = [
   {
     path: '/',
@@ -36,25 +46,25 @@ const routes: RouteConfig[] = [
         path: '/reviews',
         name: 'reviews',
         component: () => import('pages/PerformanceReviews.vue'),
-        beforeEnter: ifAuthenticated,
+        beforeEnter: ifManager,
       },
       {
         path: '/note/new',
         name: 'note-create',
         component: () => import('pages/ReviewNoteCreate.vue'),
-        beforeEnter: ifAuthenticated,
+        beforeEnter: ifManager,
       },
       {
         path: '/note/:pk',
         name: 'note-details',
         component: () => import('pages/ReviewNoteDetail.vue'),
-        beforeEnter: ifAuthenticated,
+        beforeEnter: ifManager,
       },
       {
         path: '/pr/:pk',
         name: 'pr-details',
         component: () => import('pages/PerformanceReviewDetail.vue'),
-        beforeEnter: ifAuthenticated,
+        beforeEnter: ifManager,
       },
       {
         path: '/timeoff',

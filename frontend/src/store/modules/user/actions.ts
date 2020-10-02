@@ -7,8 +7,10 @@ const actions: ActionTree<UserStateInterface, StateInterface> = {
   userRequest: ({ commit, dispatch }) => {
     commit('userRequest');
     axios({ url: 'http://localhost:8000/api/v1/current-user/' })
-      .then(resp => {
+      .then((resp: {data: {pk: number}}) => {
         commit('userSuccess', resp);
+        dispatch('performanceReviewModule/getNextPerformanceReview', {pk: resp.data.pk}, { root: true })
+            .catch(err => console.log(err))
       })
       .catch(() => {
         commit('userError');

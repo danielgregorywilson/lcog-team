@@ -1,9 +1,5 @@
 <template>
   <q-page class="q-pa-md">
-    <div class="q-py-md">
-      <div class="text-h4">Your Next Review</div>
-      <div class="text-body1">You do not have a scheduled upcoming review</div>
-    </div>
     <div class="q-py-md" v-if="isManager()">
       <div class="row items-center q-mb-md">
         <q-avatar icon="insert_chart_outlined" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />

@@ -150,7 +150,6 @@ export default class EvaluationTable extends Vue {
   private managerMarkDiscussed(props: QuasarEvaluationTableRowClickActionProps): void {
     PerformanceReviewDataService.managerMarkDiscussed(props.row.pk)
       .then((response: AxiosPerformanceReviewManagerMarkDiscussedServerResponse) => {
-        console.log(response.data.status)
         bus.$emit('updateEvaluationTables', 'updated table') // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       })
       .catch(e => {

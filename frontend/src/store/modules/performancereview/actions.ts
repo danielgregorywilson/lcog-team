@@ -5,6 +5,18 @@ import axios from 'axios';
 import { ReviewNoteCreate } from 'src/store/types';
 
 const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
+  getNextPerformanceReview: ({ commit }, data: {pk: number}) => {
+    axios({ url: `http://localhost:8000/api/v1/employee/${data.pk}/employee_next_performance_review`})
+      .then(resp => {
+        commit('setNextPerformanceReview', resp)
+      })
+      .catch(e => {
+        console.log(e)
+      })
+  },
+  employeeMarkDiscussed: ({ commit }) => {
+    commit('employeeMarkDiscussed')
+  },
   getAllReviewNotes: ({ commit }) => {
     axios({ url: 'http://localhost:8000/api/v1/reviewnote' })
       .then(resp => {

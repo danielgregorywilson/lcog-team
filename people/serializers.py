@@ -15,7 +15,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = User
-        fields = ['url', 'username', 'email', 'name', 'groups', 'is_staff', 'is_manager', 'is_upper_manager']
+        fields = ['pk', 'url', 'username', 'email', 'name', 'groups', 'is_staff', 'is_manager', 'is_upper_manager']
 
     @staticmethod
     def get_is_manager(user):
@@ -43,11 +43,16 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     status = serializers.CharField(source='get_status_display')
     date_of_discussion = serializers.DateField(source='performanceevaluation.discussion_date')
     evaluation = serializers.SerializerMethodField()
+    employee_marked_discussed = serializers.BooleanField(source='performanceevaluation.employee_discussed')
     discussion_took_place = serializers.SerializerMethodField()
     
     class Meta:
         model = PerformanceReview
-        fields = ['url', 'pk', 'employee_pk', 'employee_name', 'date_of_review', 'days_until_review', 'status', 'date_of_discussion', 'evaluation', 'discussion_took_place',]
+        fields = [
+            'url', 'pk', 'employee_pk', 'employee_name', 'date_of_review',
+            'days_until_review', 'status', 'date_of_discussion', 'evaluation',
+            'employee_marked_discussed', 'discussion_took_place'
+        ]
     
     @staticmethod
     def get_days_until_review(pr):

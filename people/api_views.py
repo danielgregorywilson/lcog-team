@@ -48,8 +48,13 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         direct_reports = self.request.query_params.get('direct-reports', None)
         if direct_reports is not None and direct_reports == "True":
             queryset = Employee.objects.filter(manager__user=user)
-
         return queryset
+    
+    @action(detail=True, methods=['get'])
+    def employee_next_performance_review(self, request, pk=None):
+        next_review = request.user.employee.employee_next_review()
+        serialized_review = PerformanceReviewSerializer(next_review, context={'request': request})
+        return Response(serialized_review.data)
 
 
 class PerformanceReviewViewSet(viewsets.ModelViewSet):
@@ -61,10 +66,6 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
     queryset = PerformanceReview.objects.all()
     serializer_class = PerformanceReviewSerializer
     permission_classes = [permissions.AllowAny]
-
-    # def get_queryset(self):
-    #     self.request.user.accounts.all()
-    #     return PerformanceReview.objects.all()
 
     def get_queryset(self):
         """
@@ -102,6 +103,18 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
             review.save()
             send_evaluation_complete_email([review.employee.manager.manager.user.email], review, get_host_url(self.request))
         return Response({'status': 'performance review marked as discussed by manager'})
+    
+    @action(detail=True, methods=['put'])
+    def employee_mark_discussed(self, request, pk=None):
+        review = PerformanceReview.objects.get(pk=pk)
+        evaluation = review.performanceevaluation
+        evaluation.employee_discussed = True
+        evaluation.save()
+        if evaluation.manager_discussed:
+            review.status = PerformanceReview.EVALUATION_COMPLETED
+            review.save()
+            send_evaluation_complete_email([review.employee.manager.manager.user.email], review, get_host_url(self.request))
+        return Response({'status': 'performance review marked as discussed by employee'})
 
 
 class ReviewNoteViewSet(viewsets.ModelViewSet):
@@ -133,6 +146,7 @@ class ReviewNoteViewSet(viewsets.ModelViewSet):
         serialized_note = ReviewNoteSerializer(review_note, context={'request': request})
         return Response(serialized_note.data)
       
+    # TODO: Detail false?
     @action(detail=True, methods=['get'])
     def notes_for_employee(self, request, pk=None):
         review_notes = ReviewNote.objects.filter(manager=request.user.employee.pk, employee=pk)

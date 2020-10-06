@@ -30,6 +30,8 @@ const ifManager = (to: Route, from: Route, next: Next) => {
   next('dashboard')
 }
 
+// TODO: Add API guards to notes and PRs
+// TODO: Add a reset password view as in Django version
 const routes: RouteConfig[] = [
   {
     path: '/',

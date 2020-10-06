@@ -25,10 +25,10 @@ export default class NavLink extends Vue{
   @Prop({required: true}) readonly title!: string
   @Prop({default: '#'}) readonly link!: string
   @Prop({default: ''}) readonly icon!: string
-  @Prop({default: false}) readonly managerOnly: boolean
+  @Prop({default: false}) readonly managerOnly!: boolean
 
   private isVisible(): boolean {
-    if (this.managerOnly && !this.$store.getters['userModule/getEmployeeProfile'].is_manager) {
+    if (this.managerOnly && !this.$store.getters['userModule/getEmployeeProfile'].is_manager) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access
       return false
     } else {
       return true

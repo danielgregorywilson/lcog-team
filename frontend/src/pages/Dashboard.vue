@@ -44,7 +44,7 @@ import { Component, Vue } from 'vue-property-decorator'
 import ReviewNoteTable from '../components/ReviewNoteTable.vue';
 import EvaluationTable from '../components/EvaluationTable.vue';
 import PerformanceReviewDataService from '../services/PerformanceReviewDataService'
-import { AxiosPerformanceReviewManagerMarkDiscussedServerResponse } from '../store/types'
+import { AxiosPerformanceReviewManagerMarkDiscussedServerResponse, PerformanceReviewRetrieve } from '../store/types'
 
 @Component({
   components: { EvaluationTable, ReviewNoteTable }
@@ -53,11 +53,11 @@ export default class Dashboard extends Vue {
   private currentIndex = -1
   private title = ''
   private nextReviewDate?: Date
-  private isManager() {
+  private isManager(): boolean {
     return this.$store.getters['userModule/getEmployeeProfile'].is_manager // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
   }
 
-  private getNextReview() {
+  private getNextReview(): PerformanceReviewRetrieve {
     return this.$store.getters['performanceReviewModule/nextPerformanceReview'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
   }
 
@@ -66,6 +66,9 @@ export default class Dashboard extends Vue {
       .then((response: AxiosPerformanceReviewManagerMarkDiscussedServerResponse) => {
         console.log(response.data.status)
         this.$store.dispatch('performanceReviewModule/employeeMarkDiscussed')
+          .catch(e => {
+            console.log(e)
+          })
       })
       .catch(e => {
         console.log(e)

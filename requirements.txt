@@ -1,3 +1,4 @@
+# TODO: Clean this up - should just have required packages, not all second-order requirements
 appdirs==1.4.4
 asgiref==3.2.7
 astroid==2.4.2
@@ -63,3 +64,6 @@ wcwidth==0.1.9
 websocket-client==0.57.0
 wrapt==1.12.1
 zipp==3.1.0
+
+# To access API from Vue frontend
+django-cors-headers==3.5.0

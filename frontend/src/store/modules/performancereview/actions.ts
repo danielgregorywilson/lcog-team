@@ -6,7 +6,8 @@ import { ReviewNoteCreate } from 'src/store/types';
 
 const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
   getNextPerformanceReview: ({ commit }, data: {pk: number}) => {
-    axios({ url: `http://localhost:8000/api/v1/employee/${data.pk}/employee_next_performance_review`})
+    // axios({ url: `http://localhost:8000/api/v1/employee/${data.pk}/employee_next_performance_review`})
+    axios({ url: `http://lcog-internal-env.eba-4t9yrmiu.us-west-2.elasticbeanstalk.com/api/v1/employee/${data.pk}/employee_next_performance_review`})
       .then(resp => {
         commit('setNextPerformanceReview', resp)
       })
@@ -18,7 +19,8 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
     commit('employeeMarkDiscussed')
   },
   getAllReviewNotes: ({ commit }) => {
-    axios({ url: 'http://localhost:8000/api/v1/reviewnote' })
+    // axios({ url: 'http://localhost:8000/api/v1/reviewnote' })
+    axios({ url: 'http://lcog-internal-env.eba-4t9yrmiu.us-west-2.elasticbeanstalk.com/api/v1/reviewnote' })
       .then(resp => {
         commit('setAllReviewNotes', resp);
       })
@@ -27,7 +29,8 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
       });
   },
   createReviewNote: ({ dispatch }, reviewNote: ReviewNoteCreate) => {
-    axios({ url: 'http://localhost:8000/api/v1/reviewnote', data: reviewNote, method: 'POST' })
+    // axios({ url: 'http://localhost:8000/api/v1/reviewnote', data: reviewNote, method: 'POST' })
+    axios({ url: 'http://lcog-internal-env.eba-4t9yrmiu.us-west-2.elasticbeanstalk.com/api/v1/reviewnote', data: reviewNote, method: 'POST' })
       .then(() => {
         dispatch('getAllReviewNotes')
           .catch(e => {
@@ -39,7 +42,8 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
       });
   },
   getAllPerformanceReviewsActionRequired: ({ commit }) => {
-    axios({ url: 'http://localhost:8000/api/v1/performancereview?action_required=True' })
+    // axios({ url: 'http://localhost:8000/api/v1/performancereview?action_required=True' })
+    axios({ url: 'http://lcog-internal-env.eba-4t9yrmiu.us-west-2.elasticbeanstalk.com/api/v1/performancereview?action_required=True' })
       .then(resp => {
         commit('setAllPerformanceReviewsActionRequired', resp);
       })
@@ -48,7 +52,8 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
       });
   },
   getAllPerformanceReviewsActionNotRequired: ({ commit }) => {
-    axios({ url: 'http://localhost:8000/api/v1/performancereview?action_required=False' })
+    // axios({ url: 'http://localhost:8000/api/v1/performancereview?action_required=False' })
+    axios({ url: 'http://lcog-internal-env.eba-4t9yrmiu.us-west-2.elasticbeanstalk.com/api/v1/performancereview?action_required=False' })
       .then(resp => {
         commit('setAllPerformanceReviewsActionNotRequired', resp);
       })

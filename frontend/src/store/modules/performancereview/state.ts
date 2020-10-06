@@ -4,7 +4,7 @@ interface ReviewNoteInterface {
   note: string
 }
 
-interface PerformanceReviewInterface {
+export interface PerformanceReviewInterface {
   pk?: number
   employee_pk?: number
   employee_name: string

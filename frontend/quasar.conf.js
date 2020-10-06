@@ -50,6 +50,9 @@ module.exports = configure(function (ctx) {
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       vueRouterMode: 'history', // available values: 'hash', 'history'
+      env: {
+        API_URL: ctx.dev ? 'http://localhost:8000/' : 'http://lcog-internal-env.eba-4t9yrmiu.us-west-2.elasticbeanstalk.com/'
+      },
 
       // transpile: false,
 

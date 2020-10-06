@@ -6,8 +6,7 @@ import axios from 'axios';
 const actions: ActionTree<UserStateInterface, StateInterface> = {
   userRequest: ({ commit, dispatch }) => {
     commit('userRequest');
-    // axios({ url: 'http://localhost:8000/api/v1/current-user/' })
-    axios({ url: 'http://lcog-internal-env.eba-4t9yrmiu.us-west-2.elasticbeanstalk.com/api/v1/current-user/' })
+    axios({ url: `${ process.env.API_URL }api/v1/current-user/` }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
       .then((resp: {data: {pk: number}}) => {
         commit('userSuccess', resp);
         dispatch('performanceReviewModule/getNextPerformanceReview', {pk: resp.data.pk}, { root: true })

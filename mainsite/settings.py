@@ -33,8 +33,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'localhost',
-    'lcog-internal-env.eba-4t9yrmiu.us-west-2.elasticbeanstalk.com',
-    'lcog-hr-frontend.s3-website-us-west-2.amazonaws.com'
+    'lcog-internal-env.eba-4t9yrmiu.us-west-2.elasticbeanstalk.com'
 ]
 
 
@@ -45,7 +44,6 @@ INSTALLED_APPS = [
     'people',
     'rest_framework',
     'rest_framework.authtoken',
-    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -55,7 +53,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'mainsite.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

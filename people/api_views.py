@@ -120,7 +120,9 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
 class ReviewNoteViewSet(viewsets.ModelViewSet):
     queryset = ReviewNote.objects.all()
     serializer_class = ReviewNoteSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+    # TODO
+    permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
         """

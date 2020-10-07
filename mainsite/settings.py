@@ -33,6 +33,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'localhost',
+    'lcog-hr-frontend.s3-website-us-west-2.amazonaws.com',
     'lcog-internal-env.eba-4t9yrmiu.us-west-2.elasticbeanstalk.com'
 ]
 
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'people',
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -53,14 +55,24 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'mainsite.middleware.Test1Middleware',
     'mainsite.middleware.CorsMiddleware',
+    'mainsite.middleware.Test2Middleware',
+    # 'corsheaders.middleware.CorsMiddleware', # Allow CORS
     'django.middleware.security.SecurityMiddleware',
+    'mainsite.middleware.Test3Middleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'mainsite.middleware.Test4Middleware',
     'django.middleware.common.CommonMiddleware',
+    'mainsite.middleware.Test5Middleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'mainsite.middleware.Test6Middleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'mainsite.middleware.Test7Middleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'mainsite.middleware.Test8Middleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'mainsite.middleware.Test9Middleware',
 ]
 
 ROOT_URLCONF = 'mainsite.urls'
@@ -162,4 +174,26 @@ REST_FRAMEWORK = {
 }
 
 # django-cors-headers
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://lcog-internal-env.eba-4t9yrmiu.us-west-2.elasticbeanstalk.com",
+    "http://lcog-hr-frontend.s3-website-us-west-2.amazonaws.com",
+    "http://localhost:8080"
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'accept-language',
+    'authorization',
+    'connection',
+    'content-length',
+    'content-type',
+    'host',
+    'dnt',
+    'origin',
+    'referer',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]

@@ -2,9 +2,9 @@
   <q-page>
     <q-btn color="white" text-color="black" icon="west" label="Go Back" class="q-mx-md q-mt-md" @click="goBack()" />
     <div class="q-px-md">
-      <h4>Performance Review for {{ employeeName }}</h4>
-      <div>Scheduled for {{ date | readableDate }}</div>
-      <h5>Your Notes for {{ employeeName }}</h5>
+      <h4>Performance Review for {{ review().employee_name }}</h4>
+      <div>Scheduled for {{ review().date_of_review | readableDate }}</div>
+      <h5>Your Notes for {{ review().employee_name }}</h5>
       <div class="q-pa-md row items-start q-gutter-md">
         <q-card v-for="note in this.reviewNotes" :key="note.pk" class="note-card" @click="onClickNoteCard(note.pk)">
           <q-card-section>
@@ -47,10 +47,11 @@
 </style>
 
 <script lang="ts">
+import axios from 'axios';
 import { date as quasarDate } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
 import PerformanceReviewDataService from '../services/PerformanceReviewDataService'
-import { AxiosManagerReviewNotesForEmployeeServerResponse, AxiosPerformanceReviewRetrieveOneServerResponse, AxiosPerformanceReviewUpdateServerResponse, ReviewNoteRetrieve } from '../store/types'
+import { AxiosManagerReviewNotesForEmployeeServerResponse, AxiosPerformanceReviewRetrieveOneServerResponse, AxiosPerformanceReviewUpdateServerResponse, PerformanceReviewRetrieve, ReviewNoteRetrieve } from '../store/types'
 import '../filters'
 import ReviewNoteDataService from '../services/ReviewNoteDataService'
 
@@ -66,6 +67,10 @@ export default class PerformanceReviewDetail extends Vue{
   private evaluation = ''
   private reviewNotes: Array<ReviewNoteRetrieve> = []
 
+  private review(): PerformanceReviewRetrieve {
+    return this.$store.getters['performanceReviewModule/performanceReview'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+  }
+
   private valuesAreChanged(): boolean {
     if (this.discussionDate == this.discussionDateCurrentVal && this.evaluation == this.evaluationCurrentVal) {
       return false
@@ -75,25 +80,33 @@ export default class PerformanceReviewDetail extends Vue{
   }
 
   private retrievePerformanceReview(): void {
-    PerformanceReviewDataService.get(this.$route.params.pk)
-      .then((response: AxiosPerformanceReviewRetrieveOneServerResponse) => {
-        this.employeePk = response.data.employee_pk
+    this.$store.dispatch('performanceReviewModule/getPerformanceReview', {pk: this.$route.params.pk})
+      .then(() => {
         this.retrieveReviewNotes()
-        this.pk = response.data.pk.toString()
-        this.employeeName = response.data.employee_name
-        this.date = response.data.date_of_review;
-        this.discussionDate = response.data.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
-        this.discussionDateCurrentVal = this.discussionDate
-        this.evaluation = response.data.evaluation
-        this.evaluationCurrentVal = this.evaluation
       })
       .catch(e => {
         console.log(e)
-      });
+      })
+
+    // PerformanceReviewDataService.get(this.$route.params.pk)
+    //   .then((response: AxiosPerformanceReviewRetrieveOneServerResponse) => {
+    //     this.employeePk = response.data.employee_pk
+    //     this.retrieveReviewNotes()
+    //     this.pk = response.data.pk.toString()
+    //     this.employeeName = response.data.employee_name
+    //     this.date = response.data.date_of_review;
+    //     this.discussionDate = response.data.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
+    //     this.discussionDateCurrentVal = this.discussionDate
+    //     this.evaluation = response.data.evaluation
+    //     this.evaluationCurrentVal = this.evaluation
+    //   })
+    //   .catch(e => {
+    //     console.log(e)
+    //   });
   }
 
   private retrieveReviewNotes(): void {
-    ReviewNoteDataService.getAllManagerNotesForEmployee(this.employeePk)
+    ReviewNoteDataService.getAllManagerNotesForEmployee(this.review().employee_pk)
       .then((response: AxiosManagerReviewNotesForEmployeeServerResponse) => {
         this.reviewNotes = response.data
       })

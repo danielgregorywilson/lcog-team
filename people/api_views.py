@@ -65,13 +65,14 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
 
     queryset = PerformanceReview.objects.all()
     serializer_class = PerformanceReviewSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.AllowAny] # TODO
 
     def get_queryset(self):
         """
         This view should return a list of all performance reviews for which
         the currently authenticated user is the manager.
         """
+        # import pdb; pdb.set_trace()
         user = self.request.user
         queryset = PerformanceReview.objects.filter(employee__manager__user=user) # Default queryset
         # TODO: Should be able to filter by upper/manager upcoming PRs which require/don't require action
@@ -90,6 +91,13 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
         performance_evaluation.evaluation = request.data['evaluation']
         performance_evaluation.save()
         serialized_review = PerformanceReviewSerializer(performance_review, context={'request': request})
+        return Response(serialized_review.data)
+
+    # TODO: Don't use this - use the ModelViewSet get
+    @action(detail=True, methods=['get'])
+    def get_a_performance_review(self, request, pk=None):
+        review = PerformanceReview.objects.get(pk=pk)
+        serialized_review = PerformanceReviewSerializer(review, context={'request': request})
         return Response(serialized_review.data)
 
     @action(detail=True, methods=['put'])
@@ -121,15 +129,18 @@ class ReviewNoteViewSet(viewsets.ModelViewSet):
     queryset = ReviewNote.objects.all()
     serializer_class = ReviewNoteSerializer
     # permission_classes = [IsAuthenticated]
-    # TODO
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.AllowAny] # TODO
 
     def get_queryset(self):
         """
         This view should return a list of all review notes written by this user.
         """
         user = self.request.user
-        return ReviewNote.objects.filter(manager__user=user)
+        # TODO: Don't do this. There is an issue where the detail view doesn't have the user
+        if user.is_anonymous:
+            return ReviewNote.objects.all()
+        else:
+            return ReviewNote.objects.filter(manager__user=user)
 
     def create(self, request):
         employee = Employee.objects.get(pk=request.data['employee_pk'])

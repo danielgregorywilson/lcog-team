@@ -90,8 +90,9 @@ export interface PerformanceReviewCreate {
 }
 
 export interface PerformanceReviewUpdate {
-  date_of_discussion?: string;
-  evaluation?: string;
+  pk: number
+  date_of_discussion?: string
+  evaluation?: string
 }
 
 export interface AxiosPerformanceReviewUpdateServerResponse {

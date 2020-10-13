@@ -19,6 +19,7 @@ export interface PerformanceReviewInterface {
 
 export interface PerformanceReviewStateInterface {
   nextPerformanceReview: PerformanceReviewInterface
+  allPerformanceReviews: Array<PerformanceReviewInterface>
   allPerformanceReviewsActionRequired: Array<PerformanceReviewInterface>
   allPerformanceReviewsActionNotRequired: Array<PerformanceReviewInterface>
   performanceReviewDetails: { [id: string]: PerformanceReviewInterface }
@@ -27,6 +28,7 @@ export interface PerformanceReviewStateInterface {
 
 const state: PerformanceReviewStateInterface = {
   nextPerformanceReview: {pk: undefined, employee_pk: undefined, employee_name: '', date_of_review: '', days_until_review: '', status: '', date_of_discussion: '', evaluation: '', employee_marked_discussed: false, discussion_took_place: false},
+  allPerformanceReviews: [],
   allPerformanceReviewsActionRequired: [],
   allPerformanceReviewsActionNotRequired: [],
   performanceReviewDetails: {},

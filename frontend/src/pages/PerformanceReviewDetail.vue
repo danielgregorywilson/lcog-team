@@ -1,10 +1,12 @@
 <template>
   <q-page>
     <q-btn color="white" text-color="black" icon="west" label="Go Back" class="q-mx-md q-mt-md" @click="goBack()" />
+    <!-- {{ performanceReviews() }} -->
+    <!-- {{ performanceReview() }} -->
     <div class="q-px-md">
-      <h4>Performance Review for {{ review().employee_name }}</h4>
-      <div>Scheduled for {{ review().date_of_review | readableDate }}</div>
-      <h5>Your Notes for {{ review().employee_name }}</h5>
+      <h4>Performance Review for {{ employeeName }}</h4>
+      <div>Scheduled for {{ date | readableDate }}</div>
+      <h5>Your Notes for {{ employeeName }}</h5>
       <div class="q-pa-md row items-start q-gutter-md">
         <q-card v-for="note in this.reviewNotes" :key="note.pk" class="note-card" @click="onClickNoteCard(note.pk)">
           <q-card-section>
@@ -67,8 +69,25 @@ export default class PerformanceReviewDetail extends Vue{
   private evaluation = ''
   private reviewNotes: Array<ReviewNoteRetrieve> = []
 
-  private review(): PerformanceReviewRetrieve {
-    return this.$store.getters['performanceReviewModule/performanceReview'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+  private performanceReviews(): Array<PerformanceReviewRetrieve> {
+    return this.$store.getters['performanceReviewModule/allPerformanceReviews'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+  }
+
+  private performanceReview(): PerformanceReviewRetrieve {
+    return this.performanceReviews().filter(review => {
+      return review.pk.toString() == this.$route.params.pk
+    })[0]
+  }
+
+  private review(): void {
+    const prs = this.$store.getters['performanceReviewModule/allPerformanceReviews'].results // eslint-disable-line
+    if (!!prs) {
+      debugger
+
+      // return prs.filter(pr => pr.pk == this.$route.params.pk)[0] // eslint-disable-line
+    } else {
+      // return {pk: undefined, employee_pk: undefined, employee_name: '', date_of_review: new Date(), days_until_review: 0, status: '', date_of_discussion: new Date(), evaluation: '', employee_marked_discussed: false, discussion_took_place: false} // TODO: This seems bad. Don't do this.
+    }
   }
 
   private valuesAreChanged(): boolean {
@@ -79,10 +98,30 @@ export default class PerformanceReviewDetail extends Vue{
     }
   }
 
+  private retrievePerformanceReviews(): void {
+    this.$store.dispatch('performanceReviewModule/getAllPerformanceReviews')
+      .catch(e => {
+        console.log(e)
+      })
+  }
+
   private retrievePerformanceReview(): void {
-    this.$store.dispatch('performanceReviewModule/getPerformanceReview', {pk: this.$route.params.pk})
+    this.$store.dispatch('performanceReviewModule/getAllPerformanceReviews')
       .then(() => {
+        // this.retrieveReviewNotes()
+        const prs = this.$store.getters['performanceReviewModule/allPerformanceReviews'].results // eslint-disable-line
+        const pr: PerformanceReviewRetrieve = prs.filter((pr: PerformanceReviewDetail) => pr.pk == this.$route.params.pk)[0] // eslint-disable-line
+
+        this.employeePk = pr.employee_pk
         this.retrieveReviewNotes()
+        this.pk = pr.pk.toString()
+        this.employeeName = pr.employee_name
+        this.date = pr.date_of_review;
+        this.discussionDate = pr.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
+        this.discussionDateCurrentVal = this.discussionDate
+        this.evaluation = pr.evaluation
+        this.evaluationCurrentVal = this.evaluation
+
       })
       .catch(e => {
         console.log(e)
@@ -106,7 +145,7 @@ export default class PerformanceReviewDetail extends Vue{
   }
 
   private retrieveReviewNotes(): void {
-    ReviewNoteDataService.getAllManagerNotesForEmployee(this.review().employee_pk)
+    ReviewNoteDataService.getAllManagerNotesForEmployee(this.employeePk)
       .then((response: AxiosManagerReviewNotesForEmployeeServerResponse) => {
         this.reviewNotes = response.data
       })
@@ -116,7 +155,13 @@ export default class PerformanceReviewDetail extends Vue{
   }
 
   private updatePerformanceReview(): void {
+    // this.$store.dispatch('performanceReviewModule/updatePerformanceReview', {
+    //   pk: this.pk,
+    //   date_of_discussion: this.discussionDate.split('/').join('-'), // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
+    //   evaluation: this.evaluation
+    // })
     PerformanceReviewDataService.update(this.pk, {
+      pk: parseInt(this.pk, 10),
       date_of_discussion: this.discussionDate.split('/').join('-'), // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
       evaluation: this.evaluation
     })
@@ -146,7 +191,10 @@ export default class PerformanceReviewDetail extends Vue{
   }
 
   mounted() {
-    this.retrievePerformanceReview();
+    // if (this.performanceReviews() == null) {
+    //   this.retrievePerformanceReviews();
+    // }
+    this.retrievePerformanceReview()
   }
 }
 </script>

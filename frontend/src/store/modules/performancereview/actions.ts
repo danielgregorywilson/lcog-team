@@ -2,7 +2,7 @@ import { ActionTree } from 'vuex';
 import { StateInterface } from '../../index';
 import { PerformanceReviewStateInterface } from './state';
 import axios from 'axios';
-import { ReviewNoteCreate } from 'src/store/types';
+import { PerformanceReviewUpdate, ReviewNoteCreate } from 'src/store/types';
 
 const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
   getNextPerformanceReview: ({ commit }, data: {pk: number}) => {
@@ -38,28 +38,41 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
         console.log(e)
       });
   },
-  getPerformanceReview: ({ commit }, data: {pk: number}) => {
-    // TODO: Don't do this - use api/v1/performancereview/${data.pk}
-    axios.get(`${ process.env.API_URL }api/v1/performancereview/${data.pk}/get_a_performance_review`, {
-      headers: {
-        'Authorization': 'Token 05c5ab7d90b00e4278ec37ffb8394953e4a8c97e'
-      }
-    })
-    // axios.get(`${ process.env.API_URL }api/v1/performancereview/${data.pk}`, {
-    //   headers: {
-    //     'Authorization': 'Token 05c5ab7d90b00e4278ec37ffb8394953e4a8c97e'
-    //   }
-    // })
-    // axios({ url: `${ process.env.API_URL }api/v1/performancereview/${data.pk}`, headers: {
-    //   'Authorization': 'Token 05c5ab7d90b00e4278ec37ffb8394953e4a8c97e'
-    //   // 'TestTestTestTestTestTestTestTest': 'FooFooFooFooFooFooFooFoo'
-    // }})
+  // getPerformanceReview: ({ commit }, data: {pk: number}) => {
+  //   // TODO: Don't do this - use api/v1/performancereview/${data.pk}
+  //   axios.get(`${ process.env.API_URL }api/v1/performancereview/${data.pk}/get_a_performance_review`, {
+  //     headers: {
+  //       'Authorization': 'Token 05c5ab7d90b00e4278ec37ffb8394953e4a8c97e'
+  //     }
+  //   })
+  //   // axios.get(`${ process.env.API_URL }api/v1/performancereview/${data.pk}`, {
+  //   //   headers: {
+  //   //     'Authorization': 'Token 05c5ab7d90b00e4278ec37ffb8394953e4a8c97e'
+  //   //   }
+  //   // })
+  //   // axios({ url: `${ process.env.API_URL }api/v1/performancereview/${data.pk}`, headers: {
+  //   //   'Authorization': 'Token 05c5ab7d90b00e4278ec37ffb8394953e4a8c97e'
+  //   //   // 'TestTestTestTestTestTestTestTest': 'FooFooFooFooFooFooFooFoo'
+  //   // }})
+  //     .then(resp => {
+  //       commit('setPerformanceReviewDetail', resp);
+  //     })
+  //     .catch(e => {
+  //       console.log(e)
+  //     });
+  // },
+  getAllPerformanceReviews: ({ commit }) => {
+    return new Promise((resolve, reject) => {
+      axios({ url: `${ process.env.API_URL }api/v1/performancereview` }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
       .then(resp => {
-        commit('setPerformanceReviewDetail', resp);
+        commit('setAllPerformanceReviews', resp);
+        resolve(resp);
       })
       .catch(e => {
         console.log(e)
+        reject(e)
       });
+    })
   },
   getAllPerformanceReviewsActionRequired: ({ commit }) => {
     axios({ url: `${ process.env.API_URL }api/v1/performancereview?action_required=True` }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
@@ -79,6 +92,35 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
         console.log(e)
       });
   },
+  updatePerformanceReview: ({ dispatch }, performanceReview: PerformanceReviewUpdate) => {
+    const token = localStorage.getItem('user-token')
+    return new Promise((resolve, reject) => {
+      axios({ url: `${ process.env.API_URL }api/v1/performancereview/${performanceReview.pk}`, data: performanceReview, method: 'PUT', headers: { 'Authorization': `Token ${ token }`} }) // eslint-disable-line
+      .then(resp => {
+        dispatch('getAllPerformanceReviews')
+          .catch(e => {
+            console.log(e)
+          })
+        resolve(resp);
+      })
+      .catch(e => {
+        console.log(e)
+        reject(e)
+      });
+    })
+  },
+  // updatePeformanceReview: ({ dispatch }, performanceReview: PerformanceReviewUpdate) => {
+  //   axios({ url: `${ process.env.API_URL }api/v1/performancereview/${performanceReview.pk}`, data: performanceReview, method: 'PUT' }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
+  //     .then(() => {
+  //       dispatch('getAllPerformanceReviews')
+  //         .catch(e => {
+  //           console.log(e)
+  //         })
+  //     })
+  //     .catch(e => {
+  //       console.log(e)
+  //     });
+  // },
 };
 
 export default actions;

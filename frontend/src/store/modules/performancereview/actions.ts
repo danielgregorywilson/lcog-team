@@ -109,18 +109,6 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
       });
     })
   },
-  // updatePeformanceReview: ({ dispatch }, performanceReview: PerformanceReviewUpdate) => {
-  //   axios({ url: `${ process.env.API_URL }api/v1/performancereview/${performanceReview.pk}`, data: performanceReview, method: 'PUT' }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
-  //     .then(() => {
-  //       dispatch('getAllPerformanceReviews')
-  //         .catch(e => {
-  //           console.log(e)
-  //         })
-  //     })
-  //     .catch(e => {
-  //       console.log(e)
-  //     });
-  // },
 };
 
 export default actions;

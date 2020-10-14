@@ -20,7 +20,7 @@
         </q-card>
       </div>
       <h5>Modify Evaluation</h5>
-      <div class="text-weight-bold q-pb-md">Discussion currently scheduled for {{ discussionDateCurrentVal | readableDate }}</div>
+      <div v-if="discussionDateCurrentVal" class="text-weight-bold q-pb-md">Discussion currently scheduled for {{ discussionDateCurrentVal | readableDate }}</div>
       <div>
         <div class="row q-mb-md q-gutter-md items-start">
           <div class="col col-md-auto col-sm-12">
@@ -58,7 +58,7 @@ import '../filters'
 import ReviewNoteDataService from '../services/ReviewNoteDataService'
 
 @Component
-export default class PerformanceReviewDetail extends Vue{
+export default class PerformanceReviewDetail extends Vue {
   private pk = ''
   private employeePk = -1
   private employeeName = ''
@@ -117,7 +117,9 @@ export default class PerformanceReviewDetail extends Vue{
         this.pk = pr.pk.toString()
         this.employeeName = pr.employee_name
         this.date = pr.date_of_review;
-        this.discussionDate = pr.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
+        if (pr.date_of_discussion) {
+          this.discussionDate = pr.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
+        }
         this.discussionDateCurrentVal = this.discussionDate
         this.evaluation = pr.evaluation
         this.evaluationCurrentVal = this.evaluation

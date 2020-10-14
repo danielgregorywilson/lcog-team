@@ -66,10 +66,6 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
     queryset = PerformanceReview.objects.all()
     serializer_class = PerformanceReviewSerializer
     permission_classes = [permissions.AllowAny] # TODO
-    http_method_names = ['get', 'post', 'put', 'delete', 'options']
-
-    # def perform_authentication(self, request):
-    #     request.user = User.objects.get(pk=4) # TODO: Figure out why Token authentication doesn't work on PUT requests
 
     def get_queryset(self):
         """
@@ -77,14 +73,17 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
         the currently authenticated user is the manager.
         """
         user = self.request.user
-        queryset = PerformanceReview.objects.filter(employee__manager__user=user) # Default queryset
-        # TODO: Should be able to filter by upper/manager upcoming PRs which require/don't require action
-        action_required = self.request.query_params.get('action_required', None)
-        if action_required is not None:
-            if action_required == "True":
-                queryset = PerformanceReview.manager_upcoming_reviews_action_required.get_queryset(user)
-            elif action_required == "False":
-                queryset = PerformanceReview.manager_upcoming_reviews_no_action_required.get_queryset(user)
+        if user.is_authenticated:
+            queryset = PerformanceReview.objects.filter(employee__manager__user=user) # Default queryset
+            # TODO: Should be able to filter by upper/manager upcoming PRs which require/don't require action
+            action_required = self.request.query_params.get('action_required', None)
+            if action_required is not None:
+                if action_required == "True":
+                    queryset = PerformanceReview.manager_upcoming_reviews_action_required.get_queryset(user)
+                elif action_required == "False":
+                    queryset = PerformanceReview.manager_upcoming_reviews_no_action_required.get_queryset(user)
+        else:
+            queryset = PerformanceReview.objects.all()
         return queryset
 
     def update(self, request, pk=None):

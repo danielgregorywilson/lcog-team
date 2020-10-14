@@ -49,11 +49,10 @@
 </style>
 
 <script lang="ts">
-import axios from 'axios';
 import { date as quasarDate } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
 import PerformanceReviewDataService from '../services/PerformanceReviewDataService'
-import { AxiosManagerReviewNotesForEmployeeServerResponse, AxiosPerformanceReviewRetrieveOneServerResponse, AxiosPerformanceReviewUpdateServerResponse, PerformanceReviewRetrieve, ReviewNoteRetrieve } from '../store/types'
+import { AxiosManagerReviewNotesForEmployeeServerResponse, AxiosPerformanceReviewUpdateServerResponse, PerformanceReviewRetrieve, ReviewNoteRetrieve } from '../store/types'
 import '../filters'
 import ReviewNoteDataService from '../services/ReviewNoteDataService'
 
@@ -77,17 +76,6 @@ export default class PerformanceReviewDetail extends Vue {
     return this.performanceReviews().filter(review => {
       return review.pk.toString() == this.$route.params.pk
     })[0]
-  }
-
-  private review(): void {
-    const prs = this.$store.getters['performanceReviewModule/allPerformanceReviews'].results // eslint-disable-line
-    if (!!prs) {
-      debugger
-
-      // return prs.filter(pr => pr.pk == this.$route.params.pk)[0] // eslint-disable-line
-    } else {
-      // return {pk: undefined, employee_pk: undefined, employee_name: '', date_of_review: new Date(), days_until_review: 0, status: '', date_of_discussion: new Date(), evaluation: '', employee_marked_discussed: false, discussion_took_place: false} // TODO: This seems bad. Don't do this.
-    }
   }
 
   private valuesAreChanged(): boolean {
@@ -128,22 +116,6 @@ export default class PerformanceReviewDetail extends Vue {
       .catch(e => {
         console.log(e)
       })
-
-    // PerformanceReviewDataService.get(this.$route.params.pk)
-    //   .then((response: AxiosPerformanceReviewRetrieveOneServerResponse) => {
-    //     this.employeePk = response.data.employee_pk
-    //     this.retrieveReviewNotes()
-    //     this.pk = response.data.pk.toString()
-    //     this.employeeName = response.data.employee_name
-    //     this.date = response.data.date_of_review;
-    //     this.discussionDate = response.data.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
-    //     this.discussionDateCurrentVal = this.discussionDate
-    //     this.evaluation = response.data.evaluation
-    //     this.evaluationCurrentVal = this.evaluation
-    //   })
-    //   .catch(e => {
-    //     console.log(e)
-    //   });
   }
 
   private retrieveReviewNotes(): void {
@@ -157,11 +129,6 @@ export default class PerformanceReviewDetail extends Vue {
   }
 
   private updatePerformanceReview(): void {
-    // this.$store.dispatch('performanceReviewModule/updatePerformanceReview', {
-    //   pk: this.pk,
-    //   date_of_discussion: this.discussionDate.split('/').join('-'), // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
-    //   evaluation: this.evaluation
-    // })
     PerformanceReviewDataService.update(this.pk, {
       pk: parseInt(this.pk, 10),
       date_of_discussion: this.discussionDate.split('/').join('-'), // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
@@ -193,9 +160,6 @@ export default class PerformanceReviewDetail extends Vue {
   }
 
   mounted() {
-    // if (this.performanceReviews() == null) {
-    //   this.retrievePerformanceReviews();
-    // }
     this.retrievePerformanceReview()
   }
 }

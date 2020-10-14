@@ -20,4 +20,6 @@ Start the server
 # Deploy frontend
 `cd frontend`
 `quasar build`
-Navidate to 
+Navigate to https://s3.console.aws.amazon.com/s3/buckets/lcog-hr-frontend/
+Under the overview tab is the list of files
+Drag the contents of frontend/dist/spa to the window to upload the build

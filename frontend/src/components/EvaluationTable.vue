@@ -5,6 +5,7 @@
       :columns="columns"
       :dense="$q.screen.lt.lg"
       :grid="$q.screen.lt.md"
+      :no-data-label="noDataLabel()"
       row-key="name"
     >
       <!-- Slots for header cells: Shrink the width when the screen is too small to see the whole table width -->
@@ -126,6 +127,14 @@ export default class EvaluationTable extends Vue {
     { name: 'actions', label: 'Actions', align: 'around', },
   ]
 
+  private noDataLabel(): string {
+    if (this.actionRequired) {
+      return "Great work! All done here."
+    } else {
+      return "Nothing to show."
+    }
+  }
+
   private retrievePerformanceReviews(): void {
     if (this.actionRequired) {
       this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
@@ -166,9 +175,11 @@ export default class EvaluationTable extends Vue {
   }
 
   mounted() {
-    if (this.performanceReviews() == undefined) {
-      this.retrievePerformanceReviews();
-    }
+    this.retrievePerformanceReviews();
+    // TODO: Was only loading them once, but we need to update them if changes have occurred
+    // if (this.performanceReviews() == undefined) {
+    //   this.retrievePerformanceReviews();
+    // }
   }
 }
 </script>

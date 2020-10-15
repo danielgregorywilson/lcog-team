@@ -182,6 +182,14 @@ class PerformanceReview(models.Model):
         if self.days_until_due() <= 0:
             return True
         return False
+      
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # If no related PerformanceEvaluation, create one
+        try:
+            self.performanceevaluation
+        except PerformanceEvaluation.DoesNotExist:
+            PerformanceEvaluation.objects.create(review=self)
 
 
 class PerformanceEvaluation(models.Model):

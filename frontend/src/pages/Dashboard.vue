@@ -74,12 +74,5 @@ export default class Dashboard extends Vue {
         console.log(e)
       })
   }
-
-  mounted() {
-
-    // console.log("ISMANAGER", this.$store.getters['userModule/isManager'])
-    // console.log("ISMANAGER", this.$store.getters['userModule/getEmployeeProfile'].is_manager)
-    // console.log(this.$store.getters['performanceReviewModule/allReviewNotes'])
-  }
 };
 </script>

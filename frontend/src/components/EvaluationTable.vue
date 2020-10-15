@@ -2,7 +2,7 @@
   <div class="q-py-sm">
     <q-table
       :data="performanceReviews()"
-      :columns="columns"
+      :columns="columns()"
       :dense="$q.screen.lt.lg"
       :grid="$q.screen.lt.md"
       :no-data-label="noDataLabel()"
@@ -43,7 +43,7 @@
         <q-td :props="props" :class="{ 'wide-actions' : props.row.discussion_took_place == 'No'}">
           <div class="row">
             <q-btn class="col" dense round flat color="grey" @click="editEvaluation(props)" icon="edit"></q-btn>
-            <q-btn class="col" v-if="props.row.discussion_took_place=='No'" color="white" text-color="black" label="Mark as Discussed" @click="managerMarkDiscussed(props)" />
+            <q-btn class="col" v-if="!upperManager && props.row.discussion_took_place=='No'" color="white" text-color="black" label="Mark as Discussed" @click="managerMarkDiscussed(props)" />
           </div>
         </q-td>
       </template>
@@ -109,43 +109,80 @@ interface QuasarEvaluationTableRowClickActionProps {
 
 @Component
 export default class EvaluationTable extends Vue {
+  @Prop() readonly upperManager!: boolean
   @Prop({required: true}) readonly actionRequired!: boolean
   private performanceReviews(): Array<ReviewNoteRetrieve> {
-    if (this.actionRequired) {
-      return this.$store.getters['performanceReviewModule/allPerformanceReviewsActionRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+    if (this.upperManager) {
+      if (this.actionRequired) {
+        return this.$store.getters['performanceReviewModule/allUpperManagerPerformanceReviewsActionRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+      } else {
+        return this.$store.getters['performanceReviewModule/allUpperManagerPerformanceReviewsActionNotRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+      }
     } else {
-      return this.$store.getters['performanceReviewModule/allPerformanceReviewsActionNotRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+      if (this.actionRequired) {
+        return this.$store.getters['performanceReviewModule/allPerformanceReviewsActionRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+      } else {
+        return this.$store.getters['performanceReviewModule/allPerformanceReviewsActionNotRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+      }
     }
   }
-  private columns: Array<EvaluationColumn> = [
-    { name: 'employeeName', required: true, label: 'Employee Name', align: 'center', field: 'employee_name', sortable: true },
-    { name: 'dateOfReview', align: 'center', label: 'Date of Review', field: 'date_of_review', sortable: true },
-    { name: 'daysUntilReview', align: 'center', label: 'Days Until Review', field: 'days_until_review', sortable: true },
-    { name: 'status', align: 'center', label: 'Status', field: 'status' },
-    { name: 'dateOfDiscussion', align: 'center', label: 'Date of Discussion', field: 'date_of_discussion' },
-    { name: 'discussionTookPlace', align: 'center', label: 'Discussion took place', field: 'discussion_took_place' },
-    { name: 'actions', label: 'Actions', align: 'around', },
-  ]
+  private columns(): Array<EvaluationColumn> {
+    if (this.upperManager) {
+      return [
+        { name: 'employeeName', label: 'Employee Name', align: 'center', field: 'employee_name', sortable: true },
+        { name: 'managerName', label: 'Manager Name', align: 'center', field: 'manager_name', sortable: true },
+        { name: 'dateOfReview', align: 'center', label: 'Date of Review', field: 'date_of_review', sortable: true },
+        { name: 'daysUntilReview', align: 'center', label: 'Days Until Review', field: 'days_until_review', sortable: true },
+        { name: 'status', align: 'center', label: 'Status', field: 'status' },
+        { name: 'dateOfDiscussion', align: 'center', label: 'Date of Discussion', field: 'date_of_discussion' },
+        { name: 'actions', label: 'Actions', align: 'around', },
+      ]
+    } else {
+      return [
+        { name: 'employeeName', label: 'Employee Name', align: 'center', field: 'employee_name', sortable: true },
+        { name: 'dateOfReview', align: 'center', label: 'Date of Review', field: 'date_of_review', sortable: true },
+        { name: 'daysUntilReview', align: 'center', label: 'Days Until Review', field: 'days_until_review', sortable: true },
+        { name: 'status', align: 'center', label: 'Status', field: 'status' },
+        { name: 'dateOfDiscussion', align: 'center', label: 'Date of Discussion', field: 'date_of_discussion' },
+        { name: 'discussionTookPlace', align: 'center', label: 'Discussion took place', field: 'discussion_took_place' },
+        { name: 'actions', label: 'Actions', align: 'around', },
+      ]
+    }
+  }
 
   private noDataLabel(): string {
     if (this.actionRequired) {
-      return "Great work! All done here."
+      return 'Great work! All done here.'
     } else {
-      return "Nothing to show."
+      return 'Nothing to show.'
     }
   }
 
   private retrievePerformanceReviews(): void {
-    if (this.actionRequired) {
-      this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
-      .catch(e => {
-        console.log(e)
-      })
+    if (this.upperManager) {
+      if (this.actionRequired) {
+        this.$store.dispatch('performanceReviewModule/getAllUpperManagerPerformanceReviewsActionRequired')
+        .catch(e => {
+          console.log(e)
+        })
+      } else {
+        this.$store.dispatch('performanceReviewModule/getAllUpperManagerPerformanceReviewsActionNotRequired')
+        .catch(e => {
+          console.log(e)
+        })
+      }
     } else {
-      this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionNotRequired')
-      .catch(e => {
-        console.log(e)
-      })
+      if (this.actionRequired) {
+        this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
+        .catch(e => {
+          console.log(e)
+        })
+      } else {
+        this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionNotRequired')
+        .catch(e => {
+          console.log(e)
+        })
+      }
     }
   }
 

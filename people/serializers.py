@@ -38,6 +38,7 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     pk = serializers.IntegerField()
     employee_pk = serializers.CharField(source='employee.pk')
     employee_name = serializers.CharField(source='employee.user.get_full_name')
+    manager_name = serializers.CharField(source='employee.manager.user.get_full_name')
     date_of_review = serializers.DateField(source='date')
     days_until_review = serializers.SerializerMethodField()
     status = serializers.CharField(source='get_status_display')
@@ -49,9 +50,10 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = PerformanceReview
         fields = [
-            'url', 'pk', 'employee_pk', 'employee_name', 'date_of_review',
-            'days_until_review', 'status', 'date_of_discussion', 'evaluation',
-            'employee_marked_discussed', 'discussion_took_place'
+            'url', 'pk', 'employee_pk', 'employee_name', 'manager_name',
+            'date_of_review', 'days_until_review', 'status',
+            'date_of_discussion', 'evaluation', 'employee_marked_discussed',
+            'discussion_took_place'
         ]
     
     @staticmethod

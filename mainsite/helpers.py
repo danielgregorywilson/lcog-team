@@ -19,3 +19,8 @@ def send_evaluation_complete_email(to_addresses, review, host):
         f'A review meeting between {review.employee.user.get_full_name()} and {review.employee.manager.user.get_full_name()} took place on {review.performanceevaluation.discussion_date}. Please review it here: {url}',
         f'A review meeting between {review.employee.user.get_full_name()} and {review.employee.manager.user.get_full_name()} took place on {review.performanceevaluation.discussion_date}. Please review it here: <a href="{url}">{url}</a>',
     )
+
+def is_true_string(str):
+    if str in ['true', 'True']:
+        return True
+    return False

@@ -1,7 +1,7 @@
 import { Route, RouteConfig } from 'vue-router';
 
 import authState from '../store/modules/auth/state'
-import userState from '../store/modules/user/state'
+// import userState from '../store/modules/user/state'
 
 type Next = (path?: string) => void
 
@@ -21,13 +21,14 @@ const ifAuthenticated = (to: Route, from: Route, next: Next) => {
   next('auth/login')
 }
 
-const ifManager = (to: Route, from: Route, next: Next) => {
-  if (userState.profile.is_manager) {
-    next()
-    return
-  }
-  next('dashboard')
-}
+// TODO: Implement
+// const ifManager = (to: Route, from: Route, next: Next) => {
+//   if (userState.profile.is_manager) {
+//     next()
+//     return
+//   }
+//   next('dashboard')
+// }
 
 // TODO: Add API guards to notes and PRs
 // TODO: Add a reset password view as in Django version

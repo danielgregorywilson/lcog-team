@@ -102,6 +102,13 @@ class Employee(models.Model):
         return reviews
 
 
+class ManagerUpcomingReviewsManager(models.Manager):
+    def get_queryset(self, user):
+        queryset = super().get_queryset()
+        desired_pks = [pr.pk for pr in user.employee.manager_upcoming_reviews()]
+        queryset = queryset.filter(pk__in=desired_pks)
+        return queryset
+
 
 class ManagerUpcomingReviewsActionRequiredManager(models.Manager):
     def get_queryset(self, user):
@@ -115,6 +122,14 @@ class ManagerUpcomingReviewsNoActionRequiredManager(models.Manager):
     def get_queryset(self, user):
         queryset = super().get_queryset()
         desired_pks = [pr.pk for pr in user.employee.manager_upcoming_reviews_no_action_required()]
+        queryset = queryset.filter(pk__in=desired_pks)
+        return queryset
+
+
+class UpperManagerUpcomingReviewsManager(models.Manager):
+    def get_queryset(self, user):
+        queryset = super().get_queryset()
+        desired_pks = [pr.pk for pr in user.employee.upper_manager_upcoming_reviews()]
         queryset = queryset.filter(pk__in=desired_pks)
         return queryset
 
@@ -148,8 +163,10 @@ class PerformanceReview(models.Model):
 
     # Managers for filtering PRs
     objects = models.Manager()
+    manager_upcoming_reviews = ManagerUpcomingReviewsManager()
     manager_upcoming_reviews_action_required = ManagerUpcomingReviewsActionRequiredManager()
     manager_upcoming_reviews_no_action_required = ManagerUpcomingReviewsNoActionRequiredManager()
+    upper_manager_upcoming_reviews = UpperManagerUpcomingReviewsManager()
     upper_manager_upcoming_reviews_action_required = UpperManagerUpcomingReviewsActionRequiredManager()
     upper_manager_upcoming_reviews_no_action_required = UpperManagerUpcomingReviewsNoActionRequiredManager()
 

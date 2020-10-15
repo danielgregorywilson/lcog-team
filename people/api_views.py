@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from django.contrib.auth.models import User
 
-from mainsite.helpers import get_host_url, send_evaluation_complete_email
+from mainsite.helpers import get_host_url, is_true_string, send_evaluation_complete_email
 
 from people.models import Employee, PerformanceReview, ReviewNote
 from people.serializers import EmployeeSerializer, PerformanceReviewSerializer, ReviewNoteSerializer, UserSerializer
@@ -75,13 +75,23 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_authenticated:
             queryset = PerformanceReview.objects.filter(employee__manager__user=user) # Default queryset
-            # TODO: Should be able to filter by upper/manager upcoming PRs which require/don't require action
+            upper_manager = self.request.query_params.get('upper_manager', None)
             action_required = self.request.query_params.get('action_required', None)
-            if action_required is not None:
-                if action_required == "True":
+            if is_true_string(upper_manager):
+                if action_required is not None:
+                    if is_true_string(action_required):
+                        queryset = PerformanceReview.upper_manager_upcoming_reviews_action_required.get_queryset(user)
+                    else:
+                        queryset = PerformanceReview.upper_manager_upcoming_reviews_no_action_required.get_queryset(user)    
+                else:
+                    queryset = PerformanceReview.upper_manager_upcoming_reviews.get_queryset(user)
+            elif action_required is not None:
+                if is_true_string(action_required):
                     queryset = PerformanceReview.manager_upcoming_reviews_action_required.get_queryset(user)
-                elif action_required == "False":
+                else:
                     queryset = PerformanceReview.manager_upcoming_reviews_no_action_required.get_queryset(user)
+            else:
+                queryset = PerformanceReview.manager_upcoming_reviews.get_queryset(user)
         else:
             queryset = PerformanceReview.objects.all()
         return queryset

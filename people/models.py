@@ -194,7 +194,7 @@ class PerformanceEvaluation(models.Model):
     
     review = models.OneToOneField("people.PerformanceReview", verbose_name=_("performance review"), on_delete=models.CASCADE)
     evaluation = models.TextField(_("performance evaluation"), blank=True, null=True)
-    discussion_date = models.DateField(_("discussion date"), auto_now=False, auto_now_add=False, null=True)
+    discussion_date = models.DateField(_("discussion date"), auto_now=False, auto_now_add=False, blank=True, null=True)
     employee_discussed = models.BooleanField(_("employee discussed the evaluation"), default=False)
     manager_discussed = models.BooleanField(_("manager discussed the evaluation"), default=False)
     upper_manager_accepted = models.BooleanField(_("upper manager accepted the evaluation"), default=False)

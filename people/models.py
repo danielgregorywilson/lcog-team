@@ -193,7 +193,7 @@ class PerformanceEvaluation(models.Model):
         return reverse("performance_evaluation_detail", kwargs={"pk": self.pk})
     
     review = models.OneToOneField("people.PerformanceReview", verbose_name=_("performance review"), on_delete=models.CASCADE)
-    evaluation = models.TextField(_("performance evaluation"))
+    evaluation = models.TextField(_("performance evaluation"), blank=True, null=True)
     discussion_date = models.DateField(_("discussion date"), auto_now=False, auto_now_add=False, null=True)
     employee_discussed = models.BooleanField(_("employee discussed the evaluation"), default=False)
     manager_discussed = models.BooleanField(_("manager discussed the evaluation"), default=False)

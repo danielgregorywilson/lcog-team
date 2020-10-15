@@ -2,6 +2,7 @@ import { Route, RouteConfig } from 'vue-router';
 
 import authState from '../store/modules/auth/state'
 import userState from '../store/modules/user/state'
+import userGetters from '../store/modules/user/getters'
 
 type Next = (path?: string) => void
 
@@ -22,6 +23,10 @@ const ifAuthenticated = (to: Route, from: Route, next: Next) => {
 }
 
 const ifManager = (to: Route, from: Route, next: Next) => {
+  // debugger
+  console.log(authState.token)
+  console.log(userState.profile)
+  console.log(userState.profile.is_manager)
   if (userState.profile.is_manager) {
     next()
     return
@@ -47,25 +52,33 @@ const routes: RouteConfig[] = [
         path: '/reviews',
         name: 'reviews',
         component: () => import('pages/PerformanceReviews.vue'),
-        beforeEnter: ifManager,
+        // TODO
+        // beforeEnter: ifManager,
+        beforeEnter: ifAuthenticated,
       },
       {
         path: '/note/new',
         name: 'note-create',
         component: () => import('pages/ReviewNoteCreate.vue'),
-        beforeEnter: ifManager,
+        // TODO
+        // beforeEnter: ifManager,
+        beforeEnter: ifAuthenticated,
       },
       {
         path: '/note/:pk',
         name: 'note-details',
         component: () => import('pages/ReviewNoteDetail.vue'),
-        beforeEnter: ifManager,
+        // TODO
+        // beforeEnter: ifManager,
+        beforeEnter: ifAuthenticated,
       },
       {
         path: '/pr/:pk',
         name: 'pr-details',
         component: () => import('pages/PerformanceReviewDetail.vue'),
-        beforeEnter: ifManager,
+        // TODO
+        // beforeEnter: ifManager,
+        beforeEnter: ifAuthenticated,
       },
       {
         path: '/timeoff',

@@ -47,6 +47,10 @@ export default class ReviewNoteDetail extends Vue{
       .then((response: AxiosReviewNoteUpdateServerResponse) => {
         this.employeeCurrentVal = {label: response.data.employee_name, value: response.data.employee_pk}
         this.noteCurrentVal = response.data.note
+        this.$store.dispatch('performanceReviewModule/getAllReviewNotes')
+          .catch(e => {
+            console.log(e)
+          })
       })
       .catch(e => {
         console.log(e)

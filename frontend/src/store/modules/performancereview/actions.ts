@@ -38,29 +38,6 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
         console.log(e)
       });
   },
-  // getPerformanceReview: ({ commit }, data: {pk: number}) => {
-  //   // TODO: Don't do this - use api/v1/performancereview/${data.pk}
-  //   axios.get(`${ process.env.API_URL }api/v1/performancereview/${data.pk}/get_a_performance_review`, {
-  //     headers: {
-  //       'Authorization': 'Token 05c5ab7d90b00e4278ec37ffb8394953e4a8c97e'
-  //     }
-  //   })
-  //   // axios.get(`${ process.env.API_URL }api/v1/performancereview/${data.pk}`, {
-  //   //   headers: {
-  //   //     'Authorization': 'Token 05c5ab7d90b00e4278ec37ffb8394953e4a8c97e'
-  //   //   }
-  //   // })
-  //   // axios({ url: `${ process.env.API_URL }api/v1/performancereview/${data.pk}`, headers: {
-  //   //   'Authorization': 'Token 05c5ab7d90b00e4278ec37ffb8394953e4a8c97e'
-  //   //   // 'TestTestTestTestTestTestTestTest': 'FooFooFooFooFooFooFooFoo'
-  //   // }})
-  //     .then(resp => {
-  //       commit('setPerformanceReviewDetail', resp);
-  //     })
-  //     .catch(e => {
-  //       console.log(e)
-  //     });
-  // },
   getAllPerformanceReviews: ({ commit }) => {
     return new Promise((resolve, reject) => {
       axios({ url: `${ process.env.API_URL }api/v1/performancereview` }) // eslint-disable-line @typescript-eslint/restrict-template-expressions

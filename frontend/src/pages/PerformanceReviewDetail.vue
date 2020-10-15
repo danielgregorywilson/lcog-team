@@ -137,6 +137,15 @@ export default class PerformanceReviewDetail extends Vue {
       .then((response: AxiosPerformanceReviewUpdateServerResponse) => {
         this.discussionDateCurrentVal = response.data.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
         this.evaluationCurrentVal = response.data.evaluation
+        // TODO: This is bad. We should only get the reviews of type that we need
+        this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
+          .catch(e => {
+            console.log(e)
+          })
+        this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionNotRequired')
+          .catch(e => {
+            console.log(e)
+          })
       })
       .catch(e => {
         console.log(e)

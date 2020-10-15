@@ -2,7 +2,6 @@ import { Route, RouteConfig } from 'vue-router';
 
 import authState from '../store/modules/auth/state'
 import userState from '../store/modules/user/state'
-import userGetters from '../store/modules/user/getters'
 
 type Next = (path?: string) => void
 
@@ -23,10 +22,6 @@ const ifAuthenticated = (to: Route, from: Route, next: Next) => {
 }
 
 const ifManager = (to: Route, from: Route, next: Next) => {
-  // debugger
-  console.log(authState.token)
-  console.log(userState.profile)
-  console.log(userState.profile.is_manager)
   if (userState.profile.is_manager) {
     next()
     return

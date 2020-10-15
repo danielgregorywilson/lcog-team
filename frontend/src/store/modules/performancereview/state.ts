@@ -22,7 +22,6 @@ export interface PerformanceReviewStateInterface {
   allPerformanceReviews: Array<PerformanceReviewInterface>
   allPerformanceReviewsActionRequired: Array<PerformanceReviewInterface>
   allPerformanceReviewsActionNotRequired: Array<PerformanceReviewInterface>
-  allUpperManagerPerformanceReviews: Array<PerformanceReviewInterface>
   allUpperManagerPerformanceReviewsActionRequired: Array<PerformanceReviewInterface>
   allUpperManagerPerformanceReviewsActionNotRequired: Array<PerformanceReviewInterface>
   performanceReviewDetails: { [id: string]: PerformanceReviewInterface }
@@ -34,7 +33,6 @@ const state: PerformanceReviewStateInterface = {
   allPerformanceReviews: [],
   allPerformanceReviewsActionRequired: [],
   allPerformanceReviewsActionNotRequired: [],
-  allUpperManagerPerformanceReviews: [],
   allUpperManagerPerformanceReviewsActionRequired: [],
   allUpperManagerPerformanceReviewsActionNotRequired: [],
   performanceReviewDetails: {},

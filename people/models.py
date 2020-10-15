@@ -71,7 +71,24 @@ class Employee(models.Model):
                 reviews.append(review)
         return reviews
 
+    def upper_manager_all_relevant_upcoming_reviews(self):
+        # Returns all upcoming reviews for a manager's direct reports and their
+        # descendants. For detail views.
+        reviews = []
+        for employee in self.get_direct_reports():
+            employee_reviews = employee.performancereview_set.all()
+            for review in employee_reviews:
+                if review.days_until_due() < SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE:
+                    reviews.append(review)
+        for employee in self.get_direct_reports_descendants():
+            employee_reviews = employee.performancereview_set.all()
+            for review in employee_reviews:
+                if review.days_until_due() < SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE:
+                    reviews.append(review)
+        return sorted(reviews, key=lambda review: review.date)
+    
     def upper_manager_upcoming_reviews(self):
+        # Returns all upcoming reviews for a manager's direct reports.
         reviews = []
         for employee in self.get_direct_reports_descendants():
             employee_reviews = employee.performancereview_set.all()
@@ -81,6 +98,8 @@ class Employee(models.Model):
         return sorted(reviews, key=lambda review: review.date)
     
     def upper_manager_upcoming_reviews_action_required(self):
+        # Returns all upcoming reviews for a manager's direct reports which
+        # require action from the manager to proceed. For list views.
         reviews = []
         for review in self.upper_manager_upcoming_reviews():
             if any([
@@ -90,6 +109,8 @@ class Employee(models.Model):
         return reviews
     
     def upper_manager_upcoming_reviews_no_action_required(self):
+        # Returns all upcoming reviews for a manager's direct reports which do
+        # not require action from the manager to proceed. For list views.
         reviews = []
         for review in self.upper_manager_upcoming_reviews():
             if any([
@@ -126,10 +147,10 @@ class ManagerUpcomingReviewsNoActionRequiredManager(models.Manager):
         return queryset
 
 
-class UpperManagerUpcomingReviewsManager(models.Manager):
+class UpperManagerAllRelevantUpcomingReviewsManager(models.Manager):
     def get_queryset(self, user):
         queryset = super().get_queryset()
-        desired_pks = [pr.pk for pr in user.employee.upper_manager_upcoming_reviews()]
+        desired_pks = [pr.pk for pr in user.employee.upper_manager_all_relevant_upcoming_reviews()]
         queryset = queryset.filter(pk__in=desired_pks)
         return queryset
 
@@ -166,7 +187,7 @@ class PerformanceReview(models.Model):
     manager_upcoming_reviews = ManagerUpcomingReviewsManager()
     manager_upcoming_reviews_action_required = ManagerUpcomingReviewsActionRequiredManager()
     manager_upcoming_reviews_no_action_required = ManagerUpcomingReviewsNoActionRequiredManager()
-    upper_manager_upcoming_reviews = UpperManagerUpcomingReviewsManager()
+    upper_manager_all_relevant_upcoming_reviews = UpperManagerAllRelevantUpcomingReviewsManager()
     upper_manager_upcoming_reviews_action_required = UpperManagerUpcomingReviewsActionRequiredManager()
     upper_manager_upcoming_reviews_no_action_required = UpperManagerUpcomingReviewsNoActionRequiredManager()
 

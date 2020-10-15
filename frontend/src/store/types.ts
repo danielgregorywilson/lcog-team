@@ -38,6 +38,7 @@ export interface EmployeeRetrieve {
   url: string;
   pk: number;
   employee_name: string;
+  employee_pk: number
   user: Url;
   manager: Url;
   hire_date: Date;
@@ -59,6 +60,8 @@ export interface PerformanceReviewRetrieve {
   pk: number;
   employee_pk: number;
   employee_name: string;
+  manager_pk: number;
+  manager_name: string;
   date_of_review: Date;
   days_until_review: number;
   status: string;

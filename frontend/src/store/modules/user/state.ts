@@ -1,4 +1,5 @@
 export interface EmployeeProfileInterface {
+  employee_pk: number
   username: ''
   email: ''
   name: ''
@@ -13,7 +14,7 @@ export interface UserStateInterface {
 
 const state: UserStateInterface = {
   status: '',
-  profile: {username: '', email: '', name: '', is_manager: false, is_upper_manager: false}
+  profile: {employee_pk: -1, username: '', email: '', name: '', is_manager: false, is_upper_manager: false}
 };
 
 export default state;

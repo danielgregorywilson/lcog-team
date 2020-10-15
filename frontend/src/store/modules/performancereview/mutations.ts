@@ -24,9 +24,6 @@ const mutation: MutationTree<PerformanceReviewStateInterface> = {
   setAllPerformanceReviewsActionNotRequired: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
     Vue.set(state, 'allPerformanceReviewsActionNotRequired', resp.data)
   },
-  setAllUpperManagerPerformanceReviews: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
-    Vue.set(state, 'allUpperManagerPerformanceReviews', resp.data)
-  },
   setAllUpperManagerPerformanceReviewsActionRequired: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
     Vue.set(state, 'allUpperManagerPerformanceReviewsActionRequired', resp.data)
   },

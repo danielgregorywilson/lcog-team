@@ -84,7 +84,7 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
                     else:
                         queryset = PerformanceReview.upper_manager_upcoming_reviews_no_action_required.get_queryset(user)    
                 else:
-                    queryset = PerformanceReview.upper_manager_upcoming_reviews.get_queryset(user)
+                    queryset = PerformanceReview.upper_manager_all_relevant_upcoming_reviews.get_queryset(user)
             elif action_required is not None:
                 if is_true_string(action_required):
                     queryset = PerformanceReview.manager_upcoming_reviews_action_required.get_queryset(user)

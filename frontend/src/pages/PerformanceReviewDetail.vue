@@ -6,37 +6,40 @@
     <div class="q-px-md">
       <h4>Performance Review for {{ employeeName }}</h4>
       <div>Scheduled for {{ date | readableDate }}</div>
-      <h5>Your Notes for {{ employeeName }}</h5>
-      <div class="q-pa-md row items-start q-gutter-md">
-        <q-card v-for="note in this.reviewNotes" :key="note.pk" class="note-card" @click="onClickNoteCard(note.pk)">
-          <q-card-section>
-            <div class="text-bold">
-              {{ note.date | readableDate }}
-            </div>
-            <div>
-              {{ note.note }}
-            </div>
-          </q-card-section>
-        </q-card>
-      </div>
-      <h5>Modify Evaluation</h5>
-      <div v-if="discussionDateCurrentVal" class="text-weight-bold q-pb-md">Discussion currently scheduled for {{ discussionDateCurrentVal | readableDate }}</div>
-      <div>
-        <div class="row q-mb-md q-gutter-md items-start">
-          <div class="col col-md-auto col-sm-12">
-            <div>Date of Discussion</div>
-            <q-date v-model="discussionDate" :options="noWeekends" />
-          </div>
-          <q-input
-            v-model="evaluation"
-            label="Evaluation"
-            type="textarea"
-            class="q-pb-md col"
-          />
+      <div v-if="currentUserIsUpperManagerOfEmployee()">
+        <h5>Your Notes for {{ employeeName }}</h5>
+        <div class="q-pa-md row items-start q-gutter-md">
+          <q-card v-for="note in this.reviewNotes" :key="note.pk" class="note-card" @click="onClickNoteCard(note.pk)">
+            <q-card-section>
+              <div class="text-bold">
+                {{ note.date | readableDate }}
+              </div>
+              <div>
+                {{ note.note }}
+              </div>
+            </q-card-section>
+          </q-card>
         </div>
-        <q-btn color="white" text-color="black" label="Update" :disabled="!valuesAreChanged()" @click="updatePerformanceReview()" />
       </div>
-
+      <div v-if="currentUserIsUpperManagerOfEmployee()">
+        <h5>Modify Evaluation</h5>
+        <div v-if="discussionDateCurrentVal" class="text-weight-bold q-pb-md">Discussion currently scheduled for {{ discussionDateCurrentVal | readableDate }}</div>
+        <div>
+          <div class="row q-mb-md q-gutter-md items-start">
+            <div class="col col-md-auto col-sm-12">
+              <div>Date of Discussion</div>
+              <q-date v-model="discussionDate" :options="noWeekends" />
+            </div>
+            <q-input
+              v-model="evaluation"
+              label="Evaluation"
+              type="textarea"
+              class="q-pb-md col"
+            />
+          </div>
+          <q-btn color="white" text-color="black" label="Update" :disabled="!valuesAreChanged()" @click="updatePerformanceReview()" />
+        </div>
+      </div>
     </div>
   </q-page>
 </template>
@@ -68,14 +71,36 @@ export default class PerformanceReviewDetail extends Vue {
   private evaluation = ''
   private reviewNotes: Array<ReviewNoteRetrieve> = []
 
-  private performanceReviews(): Array<PerformanceReviewRetrieve> {
-    return this.$store.getters['performanceReviewModule/allPerformanceReviews'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+  private performanceReviews() {
+    return new Promise((resolve) => {
+      this.$store.getters['performanceReviewModule/allPerformanceReviews'].results // eslint-disable-line
+      resolve()
+    })
   }
 
-  private performanceReview(): PerformanceReviewRetrieve {
-    return this.performanceReviews().filter(review => {
-      return review.pk.toString() == this.$route.params.pk
-    })[0]
+  private performanceReview() {
+    let prs
+    new Promise((resolve) => {
+      prs = this.$store.getters['performanceReviewModule/allPerformanceReviews'].results // eslint-disable-line
+      resolve()
+    }).then(() => {
+      debugger
+      prs.filter(review => {
+        return review.pk.toString() == this.$route.params.pk
+      })[0]
+    })
+
+    // return this.performanceReviews().filter(review => {
+    //   return review.pk.toString() == this.$route.params.pk
+    // })[0]
+  }
+
+  private isUpperManager(): boolean {
+    return this.$store.getters['userModule/getEmployeeProfile'].is_upper_manager // eslint-disable-line
+  }
+
+  private currentUserIsUpperManagerOfEmployee(): boolean {
+    return this.performanceReview().manager_pk == this.$store.getters['userModule/getEmployeeProfile'].employee_pk
   }
 
   private valuesAreChanged(): boolean {
@@ -86,15 +111,12 @@ export default class PerformanceReviewDetail extends Vue {
     }
   }
 
-  private retrievePerformanceReviews(): void {
-    this.$store.dispatch('performanceReviewModule/getAllPerformanceReviews')
-      .catch(e => {
-        console.log(e)
-      })
-  }
-
   private retrievePerformanceReview(): void {
-    this.$store.dispatch('performanceReviewModule/getAllPerformanceReviews')
+    let data = {}
+    if (this.isUpperManager()) {
+      data = {'isUpperManager': true}
+    }
+    this.$store.dispatch('performanceReviewModule/getAllPerformanceReviews', data)
       .then(() => {
         // this.retrieveReviewNotes()
         const prs = this.$store.getters['performanceReviewModule/allPerformanceReviews'].results // eslint-disable-line

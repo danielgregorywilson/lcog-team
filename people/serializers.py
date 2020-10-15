@@ -10,12 +10,17 @@ from people.models import Employee, PerformanceReview, ReviewNote
 # Serializers define the API representation.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     name = serializers.CharField(source='get_full_name')
+    employee_pk = serializers.SerializerMethodField()
     is_manager = serializers.SerializerMethodField()
     is_upper_manager = serializers.SerializerMethodField()
     
     class Meta:
         model = User
-        fields = ['pk', 'url', 'username', 'email', 'name', 'groups', 'is_staff', 'is_manager', 'is_upper_manager']
+        fields = ['pk', 'employee_pk', 'url', 'username', 'email', 'name', 'groups', 'is_staff', 'is_manager', 'is_upper_manager']
+
+    @staticmethod
+    def get_employee_pk(user):
+        return user.employee.pk
 
     @staticmethod
     def get_is_manager(user):
@@ -36,8 +41,9 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
 
 class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     pk = serializers.IntegerField()
-    employee_pk = serializers.CharField(source='employee.pk')
+    employee_pk = serializers.CharField(source='employee.pk') #TODO: Make IntegerField
     employee_name = serializers.CharField(source='employee.user.get_full_name')
+    manager_pk = serializers.IntegerField(source='employee.manager.pk')
     manager_name = serializers.CharField(source='employee.manager.user.get_full_name')
     date_of_review = serializers.DateField(source='date')
     days_until_review = serializers.SerializerMethodField()
@@ -50,8 +56,8 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = PerformanceReview
         fields = [
-            'url', 'pk', 'employee_pk', 'employee_name', 'manager_name',
-            'date_of_review', 'days_until_review', 'status',
+            'url', 'pk', 'employee_pk', 'employee_name', 'manager_pk',
+            'manager_name', 'date_of_review', 'days_until_review', 'status',
             'date_of_discussion', 'evaluation', 'employee_marked_discussed',
             'discussion_took_place'
         ]

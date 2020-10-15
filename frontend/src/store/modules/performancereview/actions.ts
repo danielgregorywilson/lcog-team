@@ -38,9 +38,16 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
         console.log(e)
       });
   },
-  getAllPerformanceReviews: ({ commit }) => {
+  // All performance reviews for your direct reports as well as their descendants
+  getAllPerformanceReviews: ({ commit }, data: {isUpperManager: boolean}) => {
+    let targetUrl: string
+    if (data.isUpperManager) {
+      targetUrl = `${ process.env.API_URL }api/v1/performancereview?upper_manager=true` // eslint-disable-line
+    } else {
+      targetUrl = `${ process.env.API_URL }api/v1/performancereview` // eslint-disable-line
+    }
     return new Promise((resolve, reject) => {
-      axios({ url: `${ process.env.API_URL }api/v1/performancereview` }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
+      axios({ url: targetUrl })
       .then(resp => {
         commit('setAllPerformanceReviews', resp);
         resolve(resp);
@@ -68,19 +75,6 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
       .catch(e => {
         console.log(e)
       });
-  },
-  getAllUpperManagerPerformanceReviews: ({ commit }) => {
-    return new Promise((resolve, reject) => {
-      axios({ url: `${ process.env.API_URL }api/v1/performancereview?upper_manager=True` }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
-      .then(resp => {
-        commit('setAllUpperManagerPerformanceReviews', resp);
-        resolve(resp);
-      })
-      .catch(e => {
-        console.log(e)
-        reject(e)
-      });
-    })
   },
   getAllUpperManagerPerformanceReviewsActionRequired: ({ commit }) => {
     axios({ url: `${ process.env.API_URL }api/v1/performancereview?upper_manager=True&action_required=True` }) // eslint-disable-line @typescript-eslint/restrict-template-expressions

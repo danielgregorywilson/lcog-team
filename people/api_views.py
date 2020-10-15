@@ -87,12 +87,20 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
         return queryset
 
     def update(self, request, pk=None):
-        performance_review = PerformanceReview.objects.get(pk=pk)
-        performance_evaluation = performance_review.performanceevaluation
-        performance_evaluation.discussion_date = request.data['date_of_discussion']
-        performance_evaluation.evaluation = request.data['evaluation']
-        performance_evaluation.save()
-        serialized_review = PerformanceReviewSerializer(performance_review, context={'request': request})
+        pr = PerformanceReview.objects.get(pk=pk)
+        pe = pr.performanceevaluation
+        pe.discussion_date = request.data['date_of_discussion']
+        pe.evaluation = request.data['evaluation']
+        pe.save()
+        if pr.status == PerformanceReview.NEEDS_EVALUATION and pe.evaluation and pe.discussion_date:
+            pr.status = PerformanceReview.EVALUATION_WRITTEN_AND_DATE_SET
+            pr.save()
+        if pr.status == PerformanceReview.EVALUATION_DENIED:
+            import pdb; pdb.set_trace()
+            # TODO: Update if the evaluation has been changed
+            pr.status = PerformanceReview.EVALUATION_COMPLETED
+            pr.save()
+        serialized_review = PerformanceReviewSerializer(pr, context={'request': request})
         return Response(serialized_review.data)
 
     # TODO: Don't use this - use the ModelViewSet get

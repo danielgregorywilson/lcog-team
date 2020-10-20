@@ -63,6 +63,7 @@ import ReviewNoteDataService from '../services/ReviewNoteDataService'
 export default class PerformanceReviewDetail extends Vue {
   private pk = ''
   private employeePk = -1
+  private managerPk = -1
   private employeeName = ''
   private date: Date = new Date()
   private discussionDateCurrentVal = ''
@@ -71,36 +72,46 @@ export default class PerformanceReviewDetail extends Vue {
   private evaluation = ''
   private reviewNotes: Array<ReviewNoteRetrieve> = []
 
-  private performanceReviews() {
-    return new Promise((resolve) => {
-      this.$store.getters['performanceReviewModule/allPerformanceReviews'].results // eslint-disable-line
-      resolve()
-    })
-  }
+  // private performanceReviews() {
+  //   return new Promise((resolve) => {
+  //     this.$store.getters['performanceReviewModule/allPerformanceReviews'].results // eslint-disable-line
+  //     resolve()
+  //   })
+  // }
 
-  private performanceReview() {
-    let prs
-    new Promise((resolve) => {
-      prs = this.$store.getters['performanceReviewModule/allPerformanceReviews'].results // eslint-disable-line
-      resolve()
-    }).then(() => {
-      debugger
-      prs.filter(review => {
-        return review.pk.toString() == this.$route.params.pk
-      })[0]
-    })
+  // private performanceReview() {
+  //   debugger
+  //   let prs
+  //   return new Promise((resolve) => {
+  //     prs = this.$store.getters['performanceReviewModule/allPerformanceReviews'].results // eslint-disable-line
+  //     resolve()
+  //   }).then(() => {
+  //     if (prs) {
+  //       debugger
+  //       let pr = prs.filter(review => {
+  //         debugger
+  //         this.managerPk = review.manager_pk
+  //         return review.pk.toString() == this.$route.params.pk
+  //       })[0]
+  //       debugger
+  //       return pr
+  //     } else {
+  //       return null
+  //     }
 
-    // return this.performanceReviews().filter(review => {
-    //   return review.pk.toString() == this.$route.params.pk
-    // })[0]
-  }
+  //   })
+
+  //   // return this.performanceReviews().filter(review => {
+  //   //   return review.pk.toString() == this.$route.params.pk
+  //   // })[0]
+  // }
 
   private isUpperManager(): boolean {
     return this.$store.getters['userModule/getEmployeeProfile'].is_upper_manager // eslint-disable-line
   }
 
   private currentUserIsUpperManagerOfEmployee(): boolean {
-    return this.performanceReview().manager_pk == this.$store.getters['userModule/getEmployeeProfile'].employee_pk
+    return this.managerPk == this.$store.getters['userModule/getEmployeeProfile'].employee_pk
   }
 
   private valuesAreChanged(): boolean {
@@ -123,6 +134,7 @@ export default class PerformanceReviewDetail extends Vue {
         const pr: PerformanceReviewRetrieve = prs.filter((pr: PerformanceReviewDetail) => pr.pk == this.$route.params.pk)[0] // eslint-disable-line
 
         this.employeePk = pr.employee_pk
+        this.managerPk = pr.manager_pk
         this.retrieveReviewNotes()
         this.pk = pr.pk.toString()
         this.employeeName = pr.employee_name

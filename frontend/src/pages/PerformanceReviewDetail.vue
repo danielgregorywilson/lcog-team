@@ -111,7 +111,7 @@ export default class PerformanceReviewDetail extends Vue {
   }
 
   private currentUserIsUpperManagerOfEmployee(): boolean {
-    return this.managerPk == this.$store.getters['userModule/getEmployeeProfile'].employee_pk
+    return this.managerPk == this.$store.getters['userModule/getEmployeeProfile'].employee_pk // eslint-disable-line
   }
 
   private valuesAreChanged(): boolean {

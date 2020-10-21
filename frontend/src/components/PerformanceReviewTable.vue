@@ -102,13 +102,13 @@ interface EvaluationColumn {
   headerStyle?: string;
 }
 
-interface QuasarEvaluationTableRowClickActionProps {
+interface QuasarPerformanceReviewTableRowClickActionProps {
   evt: MouseEvent;
   row: PerformanceReviewRetrieve;
 }
 
 @Component
-export default class EvaluationTable extends Vue {
+export default class PerformanceReviewTable extends Vue {
   @Prop() readonly upperManager!: boolean
   @Prop({required: true}) readonly actionRequired!: boolean
   private performanceReviews(): Array<ReviewNoteRetrieve> {
@@ -186,18 +186,18 @@ export default class EvaluationTable extends Vue {
     }
   }
 
-  private editEvaluation(props: QuasarEvaluationTableRowClickActionProps): void {
+  private editEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {
     this.$router.push(`pr/${ props.row.pk }`)
       .catch(e => {
         console.log(e)
       })
   }
 
-  private managerMarkDiscussed(props: QuasarEvaluationTableRowClickActionProps): void {
+  private managerMarkDiscussed(props: QuasarPerformanceReviewTableRowClickActionProps): void {
     PerformanceReviewDataService.managerMarkDiscussed(props.row.pk)
       .then((response: AxiosPerformanceReviewManagerMarkDiscussedServerResponse) => {
         console.log(response.data.status)
-        bus.$emit('updateEvaluationTables', 'updated table') // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+        bus.$emit('updatePerformanceReviewTables', 'updated table') // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       })
       .catch(e => {
         console.log(e)
@@ -205,7 +205,7 @@ export default class EvaluationTable extends Vue {
   }
 
   created() {
-    bus.$on('updateEvaluationTables', (data: string) => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    bus.$on('updatePerformanceReviewTables', (data: string) => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       console.log(data)
       this.retrievePerformanceReviews()
     })

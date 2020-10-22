@@ -219,11 +219,13 @@ class PerformanceReview(models.Model):
     EVALUATION_WRITTEN = 'EW'
     EVALUATION_APPROVED = 'EA'
     EVALUATION_HR_PROCESSED = 'EP'
+    EVALUATION_ED_APPROVED = 'ED'
     STATUS_CHOICE = [
         (NEEDS_EVALUATION, 'Needs evaluation'),
         (EVALUATION_WRITTEN, 'Evaluation written'),
-        (EVALUATION_APPROVED, 'Evaluation approved'),
+        (EVALUATION_APPROVED, 'Evaluation approved up to division director'),
         (EVALUATION_HR_PROCESSED, 'Evaluation processed by HR'),
+        (EVALUATION_ED_APPROVED, 'Evaluation approved by executive director'),
     ]
 
     PROBATIONARY_EVALUATION = 'P'

@@ -8,7 +8,7 @@ from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 
-from .models import Employee, PerformanceEvaluation, PerformanceReview, ReviewNote
+from .models import Employee, PerformanceReview, ReviewNote
 from mainsite.helpers import get_host_url, send_email, send_evaluation_complete_email
 
 
@@ -33,14 +33,14 @@ class PerformanceReviewView(FormView):
     def form_valid(self, form):
         # Set evaluation value
         pr = PerformanceReview.objects.get(pk=self.kwargs['pk'])
-        try:
-            pe = pr.performanceevaluation
-        except PerformanceEvaluation.DoesNotExist:
-            pe = PerformanceEvaluation.objects.create(review=pr)
-        if form.cleaned_data['evaluation']:
-            pe.evaluation = form.cleaned_data['evaluation']
-        pe.discussion_date = form.cleaned_data['discussion_date']
-        pe.save()
+        # try:
+        #     pe = pr.performanceevaluation
+        # except PerformanceEvaluation.DoesNotExist:
+        #     pe = PerformanceEvaluation.objects.create(review=pr)
+        # if form.cleaned_data['evaluation']:
+        #     pe.evaluation = form.cleaned_data['evaluation']
+        # pe.discussion_date = form.cleaned_data['discussion_date']
+        # pe.save()
         if pr.status == PerformanceReview.NEEDS_EVALUATION:
             pr.status = PerformanceReview.EVALUATION_WRITTEN_AND_DATE_SET
             pr.save()
@@ -94,20 +94,20 @@ class PerformanceReviewApprovalView(FormView):
     def form_valid(self, form):
         # Set evaluation value
         pr = PerformanceReview.objects.get(pk=self.kwargs['pk'])
-        try:
-            pe = pr.performanceevaluation
-        except PerformanceEvaluation.DoesNotExist:
-            # TODO
-            pass
+        # try:
+        #     pe = pr.performanceevaluation
+        # except PerformanceEvaluation.DoesNotExist:
+        #     # TODO
+        #     pass
         if form.cleaned_data['approved']:
-            pe.upper_manager_accepted = True
+            # pe.upper_manager_accepted = True
             pr.status = PerformanceReview.EVALUATION_APPROVED
         else:
-            pe.upper_manager_accepted = False
+            # pe.upper_manager_accepted = False
             pr.status = PerformanceReview.EVALUATION_DENIED
         if form.cleaned_data['note']:
             pe.upper_manager_note = form.cleaned_data['note']
-        pe.save()
+        # pe.save()
         pr.save()
         
         # Send notification emails

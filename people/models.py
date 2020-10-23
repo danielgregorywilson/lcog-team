@@ -150,8 +150,9 @@ class Employee(models.Model):
 class ManagerUpcomingReviewsManager(models.Manager):
     def get_queryset(self, user):
         queryset = super().get_queryset()
-        desired_pks = [pr.pk for pr in user.employee.manager_upcoming_reviews()]
-        queryset = queryset.filter(pk__in=desired_pks)
+        if hasattr(user, 'employee'):
+            desired_pks = [pr.pk for pr in user.employee.manager_upcoming_reviews()]
+            queryset = queryset.filter(pk__in=desired_pks)
         return queryset
 
 

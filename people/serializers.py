@@ -10,62 +10,63 @@ from people.models import Employee, PerformanceReview, ReviewNote
 # Serializers define the API representation.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     name = serializers.CharField(source='get_full_name')
-    employee_pk = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = User
+        fields = ['pk', 'url', 'username', 'email', 'name', 'groups', 'is_staff']
+
+
+class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
+    name = serializers.CharField(source='user.get_full_name')
+    email = serializers.EmailField(source='user.email')
     is_manager = serializers.SerializerMethodField()
     is_upper_manager = serializers.SerializerMethodField()
     
     class Meta:
-        model = User
-        fields = ['pk', 'employee_pk', 'url', 'username', 'email', 'name', 'groups', 'is_staff', 'is_manager', 'is_upper_manager']
-
-    @staticmethod
-    def get_employee_pk(user):
-        return user.employee.pk
-
-    @staticmethod
-    def get_is_manager(user):
-        return user.employee.get_direct_reports().count() != 0
-
-    @staticmethod
-    def get_is_upper_manager(user):
-        return user.employee.get_direct_reports_descendants().count() != 0
-
-
-class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
-    employee_name = serializers.CharField(source='user.get_full_name')
-    
-    class Meta:
         model = Employee
-        fields = ['url', 'pk', 'employee_name', 'user', 'manager', 'hire_date', 'salary']
+        fields = ['url', 'pk', 'name', 'user', 'email', 'manager', 'is_manager', 'is_upper_manager']
+
+    @staticmethod
+    def get_is_manager(employee):
+        return employee.get_direct_reports().count() != 0
+
+    @staticmethod
+    def get_is_upper_manager(employee):
+        return employee.get_direct_reports_descendants().count() != 0
 
 
 class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
-    pk = serializers.IntegerField()
     employee_pk = serializers.CharField(source='employee.pk') #TODO: Make IntegerField
     employee_name = serializers.CharField(source='employee.user.get_full_name')
     manager_pk = serializers.IntegerField(source='employee.manager.pk')
     manager_name = serializers.CharField(source='employee.manager.user.get_full_name')
-    date_of_review = serializers.DateField(source='date')
     days_until_review = serializers.SerializerMethodField()
     status = serializers.CharField(source='get_status_display')
-    date_of_discussion = serializers.DateField(source='performanceevaluation.discussion_date')
-    evaluation = serializers.SerializerMethodField()
-    employee_marked_discussed = serializers.BooleanField(source='performanceevaluation.employee_discussed')
-    discussion_took_place = serializers.SerializerMethodField()
     
     class Meta:
         model = PerformanceReview
         fields = [
             'url', 'pk', 'employee_pk', 'employee_name', 'manager_pk',
-            'manager_name', 'date_of_review', 'days_until_review', 'status',
-            'date_of_discussion', 'evaluation', 'employee_marked_discussed',
-            'discussion_took_place'
+            'manager_name', 'days_until_review', 'status', 'period_start_date', 
+            'period_end_date', 'effective_date', 'evaluation_type',
+            'probationary_evaluation_type', 'step_increase', 'top_step_bonus',
+
+            'factor_job_knowledge', 'factor_work_quality',
+            'factor_work_quantity', 'factor_work_habits', 'factor_analysis',
+            'factor_initiative', 'factor_interpersonal',
+            'factor_communication', 'factor_dependability',
+            'factor_professionalism', 'factor_management',
+            'factor_supervision', 'evaluation_successes',
+            'evaluation_opportunities', 'evaluation_goals_manager',
+            'evaluation_goals_employee','evaluation_comments_employee',
+
+            'description_reviewed_employee'
         ]
     
     @staticmethod
     def get_days_until_review(pr):
         today = datetime.date.today()
-        delta = pr.date - today
+        delta = pr.period_end_date - today
         return delta.days
     
     @staticmethod

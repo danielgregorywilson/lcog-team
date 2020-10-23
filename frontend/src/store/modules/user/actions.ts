@@ -18,6 +18,12 @@ const actions: ActionTree<UserStateInterface, StateInterface> = {
         dispatch('authLogout')
           .catch(err => console.log(err))
       });
+  },
+  authLogout: ({commit}) => {
+    return new Promise((resolve) => {
+      commit('authLogout')
+      resolve()
+    })
   }
 };
 

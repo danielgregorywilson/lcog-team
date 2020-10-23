@@ -316,8 +316,8 @@ class Signature(models.Model):
 
 class ReviewNote(models.Model):
     class Meta:
-        verbose_name = _("Performance Review Note")
-        verbose_name_plural = _("Performance Review Notes")
+        verbose_name = _("Review Note")
+        verbose_name_plural = _("Review Notes")
 
     def get_absolute_url(self):
         return reverse("note-update", kwargs={"pk": self.pk})

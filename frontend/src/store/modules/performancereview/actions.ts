@@ -111,6 +111,12 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
       });
     })
   },
+  authLogout: ({commit}) => {
+    return new Promise((resolve) => {
+      commit('authLogout')
+      resolve()
+    })
+  }
 };
 
 export default actions;

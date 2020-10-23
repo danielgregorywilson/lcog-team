@@ -13,11 +13,11 @@ from people.serializers import EmployeeSerializer, PerformanceReviewSerializer, 
 
 
 class CurrentUserView(RetrieveAPIView):
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
+    serializer_class = EmployeeSerializer
+    queryset = Employee.objects.all()
 
     def get_object(self):
-        return self.request.user
+        return getattr(self.request.user, 'employee', None)
 
 
 class UserViewSet(viewsets.ModelViewSet):

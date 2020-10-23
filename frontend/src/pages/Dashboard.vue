@@ -3,7 +3,7 @@
     <div class="q-py-md">
       <div class="text-h4">Your Next Review</div>
       <div v-if="getNextReview()">
-        <div>Your Next Review is scheduled for {{ getNextReview().date_of_review | readableDate }}</div>
+        <div>Your Next Review is scheduled for {{ getNextReview().period_end_date | readableDate }}</div>
         <div>Current Status: {{ getNextReview().status }}</div>
         <div v-if="getNextReview().evaluation">
           <div>Your manager manager has written an evaluation:</div>

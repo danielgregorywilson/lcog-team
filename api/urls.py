@@ -13,7 +13,6 @@ urlpatterns = [
 ]
 
 router = routers.DefaultRouter(trailing_slash=False)
-# router.register('v1/current-user', CurrentUserView)
 router.register('v1/user', UserViewSet)
 router.register('v1/employee', EmployeeViewSet)
 router.register('v1/performancereview', PerformanceReviewViewSet)

@@ -31,7 +31,7 @@
               <q-date v-model="discussionDate" :options="noWeekends" />
             </div>
             <q-input
-              v-model="evaluation"
+              v-model="evaluationSuccesses"
               label="Evaluation"
               type="textarea"
               class="q-pb-md col"
@@ -68,8 +68,8 @@ export default class PerformanceReviewDetail extends Vue {
   private date: Date = new Date()
   private discussionDateCurrentVal = ''
   private discussionDate = ''
-  private evaluationCurrentVal = ''
-  private evaluation = ''
+  private evaluationSuccessesCurrentVal = ''
+  private evaluationSuccesses = ''
   private reviewNotes: Array<ReviewNoteRetrieve> = []
 
   // private performanceReviews() {
@@ -111,11 +111,11 @@ export default class PerformanceReviewDetail extends Vue {
   }
 
   private currentUserIsUpperManagerOfEmployee(): boolean {
-    return this.managerPk == this.$store.getters['userModule/getEmployeeProfile'].employee_pk // eslint-disable-line
+    return this.managerPk == this.$store.getters['userModule/getEmployeeProfile'].pk // eslint-disable-line
   }
 
   private valuesAreChanged(): boolean {
-    if (this.discussionDate == this.discussionDateCurrentVal && this.evaluation == this.evaluationCurrentVal) {
+    if (this.discussionDate == this.discussionDateCurrentVal && this.evaluationSuccesses == this.evaluationSuccessesCurrentVal) {
       return false
     } else {
       return true
@@ -143,8 +143,8 @@ export default class PerformanceReviewDetail extends Vue {
           this.discussionDate = pr.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
         }
         this.discussionDateCurrentVal = this.discussionDate
-        this.evaluation = pr.evaluation
-        this.evaluationCurrentVal = this.evaluation
+        this.evaluationSuccesses = pr.evaluation_successes
+        this.evaluationSuccessesCurrentVal = this.evaluationSuccesses
 
       })
       .catch(e => {
@@ -166,11 +166,11 @@ export default class PerformanceReviewDetail extends Vue {
     PerformanceReviewDataService.update(this.pk, {
       pk: parseInt(this.pk, 10),
       date_of_discussion: this.discussionDate.split('/').join('-'), // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
-      evaluation: this.evaluation
+      evaluation: this.evaluationSuccesses
     })
       .then((response: AxiosPerformanceReviewUpdateServerResponse) => {
-        this.discussionDateCurrentVal = response.data.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
-        this.evaluationCurrentVal = response.data.evaluation
+        // this.discussionDateCurrentVal = response.data.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
+        this.evaluationSuccessesCurrentVal = response.data.evaluationSuccesses
         // TODO: This is bad. We should only get the reviews of type that we need
         this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
           .catch(e => {

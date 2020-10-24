@@ -4,7 +4,8 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
-SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE = 60
+# SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE = 60
+SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE = 360
 
 class Division(models.Model):
     class Meta:
@@ -76,22 +77,14 @@ class Employee(models.Model):
     def manager_upcoming_reviews_action_required(self):
         reviews = []
         for review in self.manager_upcoming_reviews():
-            if any([
-                review.status == PerformanceReview.NEEDS_EVALUATION,
-                review.status == PerformanceReview.EVALUATION_WRITTEN_AND_DATE_SET and not review.performanceevaluation.manager_discussed,
-                review.status == PerformanceReview.EVALUATION_DENIED
-            ]):
+            if review.status == PerformanceReview.NEEDS_EVALUATION:
                 reviews.append(review)
         return reviews
     
     def manager_upcoming_reviews_no_action_required(self):
         reviews = []
         for review in self.manager_upcoming_reviews():
-            if any([
-                review.status == PerformanceReview.EVALUATION_WRITTEN_AND_DATE_SET and review.performanceevaluation.manager_discussed,
-                review.status == PerformanceReview.EVALUATION_COMPLETED,
-                review.status == PerformanceReview.EVALUATION_APPROVED
-            ]):
+            if review.status != PerformanceReview.NEEDS_EVALUATION:
                 reviews.append(review)
         return reviews
 
@@ -124,10 +117,11 @@ class Employee(models.Model):
     def upper_manager_upcoming_reviews_action_required(self):
         # Returns all upcoming reviews for a manager's direct reports which
         # require action from the manager to proceed. For list views.
+        # TODO: When needs signature
         reviews = []
         for review in self.upper_manager_upcoming_reviews():
             if any([
-                review.status == PerformanceReview.EVALUATION_COMPLETED
+                # review.status == PerformanceReview.EVALUATION_COMPLETED
             ]):
                 reviews.append(review)
         return reviews

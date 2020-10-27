@@ -98,7 +98,10 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk=None):
         pr = PerformanceReview.objects.get(pk=pk)
-        pr.evaluation_successes = request.data['evaluation']
+        pr.evaluation_successes = request.data['evaluationSuccesses']
+        pr.evaluation_opportunities = request.data['evaluationOpportunities']
+        pr.evaluation_goals_manager = request.data['evaluationGoalsManager']
+        pr.evaluation_comments_employee = request.data['evaluationCommentsEmployee']
         if pr.status == PerformanceReview.NEEDS_EVALUATION and pr.evaluation_successes:
             pr.status = PerformanceReview.EVALUATION_WRITTEN
         pr.save()

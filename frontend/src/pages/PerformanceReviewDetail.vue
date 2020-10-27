@@ -1,12 +1,9 @@
 <template>
   <q-page>
     <q-btn color="white" text-color="black" icon="west" label="Go Back" class="q-mx-md q-mt-md" @click="goBack()" />
-    <!-- {{ performanceReviews() }} -->
-    <!-- {{ performanceReview() }} -->
     <div class="q-px-md">
-      <h4>Performance Review for {{ employeeName }}</h4>
-      <div>Scheduled for {{ date | readableDate }}</div>
-      <div v-if="currentUserIsUpperManagerOfEmployee()">
+      <h4>Performance Evaluation Report for {{ employeeName }}</h4>
+      <div v-if="currentUserIsManagerOfEmployee()">
         <h5>Your Notes for {{ employeeName }}</h5>
         <div class="q-pa-md row items-start q-gutter-md">
           <q-card v-for="note in this.reviewNotes" :key="note.pk" class="note-card" @click="onClickNoteCard(note.pk)">
@@ -21,9 +18,47 @@
           </q-card>
         </div>
       </div>
-      <div v-if="currentUserIsUpperManagerOfEmployee()">
+      <div v-if="currentUserIsManagerOfEmployee()">
         <h5>Modify Evaluation</h5>
-        <div v-if="discussionDateCurrentVal" class="text-weight-bold q-pb-md">Discussion currently scheduled for {{ discussionDateCurrentVal | readableDate }}</div>
+        <div class="">
+          <div class="row">
+            <div class="col eval-box">
+              <div class="row">Employee:</div>
+              <div class="row">{{ employeeName }}</div>
+            </div>
+            <div class="col eval-box">
+              <div class="row">Manager:</div>
+              <div class="row">{{ managerName }}</div>
+            </div>
+            <div class="col eval-box">
+              <div class="row">Performance Period:</div>
+              <div class="row"></div>
+            </div>
+            <div class="col eval-box">
+              <div class="row">Effective Date:</div>
+              <div class="row"></div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col eval-box">
+              <div class="row">Division:</div>
+              <div class="row"></div>
+            </div>
+            <div class="col eval-box">
+              <div class="row">Unit/Program:</div>
+              <div class="row"></div>
+            </div>
+            <div class="col eval-box">
+              <div class="row">Job Title:</div>
+              <div class="row"></div>
+            </div>
+          </div>
+          <div class="row eval-box text-uppercase">Evaluation Type:</div>
+          <div class="row eval-box text-uppercase">Action:</div>
+        </div>
+
+        <h6 class="text-uppercase">Rating Scale</h6>
+
         <div>
           <div class="row q-mb-md q-gutter-md items-start">
             <div class="col col-md-auto col-sm-12">
@@ -49,6 +84,10 @@
     background-color: lightgray;
     cursor: pointer;
   }
+  .eval-box {
+    border: black 2px solid;
+    padding: 5px;
+  }
 </style>
 
 <script lang="ts">
@@ -65,6 +104,7 @@ export default class PerformanceReviewDetail extends Vue {
   private employeePk = -1
   private managerPk = -1
   private employeeName = ''
+  private managerName = ''
   private date: Date = new Date()
   private discussionDateCurrentVal = ''
   private discussionDate = ''
@@ -72,45 +112,11 @@ export default class PerformanceReviewDetail extends Vue {
   private evaluationSuccesses = ''
   private reviewNotes: Array<ReviewNoteRetrieve> = []
 
-  // private performanceReviews() {
-  //   return new Promise((resolve) => {
-  //     this.$store.getters['performanceReviewModule/allPerformanceReviews'].results // eslint-disable-line
-  //     resolve()
-  //   })
-  // }
-
-  // private performanceReview() {
-  //   debugger
-  //   let prs
-  //   return new Promise((resolve) => {
-  //     prs = this.$store.getters['performanceReviewModule/allPerformanceReviews'].results // eslint-disable-line
-  //     resolve()
-  //   }).then(() => {
-  //     if (prs) {
-  //       debugger
-  //       let pr = prs.filter(review => {
-  //         debugger
-  //         this.managerPk = review.manager_pk
-  //         return review.pk.toString() == this.$route.params.pk
-  //       })[0]
-  //       debugger
-  //       return pr
-  //     } else {
-  //       return null
-  //     }
-
-  //   })
-
-  //   // return this.performanceReviews().filter(review => {
-  //   //   return review.pk.toString() == this.$route.params.pk
-  //   // })[0]
-  // }
-
   private isUpperManager(): boolean {
     return this.$store.getters['userModule/getEmployeeProfile'].is_upper_manager // eslint-disable-line
   }
 
-  private currentUserIsUpperManagerOfEmployee(): boolean {
+  private currentUserIsManagerOfEmployee(): boolean {
     return this.managerPk == this.$store.getters['userModule/getEmployeeProfile'].pk // eslint-disable-line
   }
 
@@ -138,6 +144,7 @@ export default class PerformanceReviewDetail extends Vue {
         this.retrieveReviewNotes()
         this.pk = pr.pk.toString()
         this.employeeName = pr.employee_name
+        this.managerName = pr.manager_name
         this.date = pr.date_of_review;
         if (pr.date_of_discussion) {
           this.discussionDate = pr.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet

@@ -66,6 +66,7 @@ export interface PerformanceReviewRetrieve {
   days_until_review: number;
   status: string;
   date_of_discussion: Date;
+  factor_job_knowledge: string;
   evaluation_successes: string;
   evaluation_opportunities: string;
   evaluation_goals_manager: string;
@@ -98,10 +99,11 @@ export interface PerformanceReviewCreate {
 export interface PerformanceReviewUpdate {
   pk: number
   date_of_discussion?: string
-  evaluationSuccesses: string
-  evaluationOpportunities: string
-  evaluationGoalsManager: string
-  evaluationCommentsEmployee: string
+  factor_job_knowledge: string
+  evaluation_successes: string
+  evaluation_opportunities: string
+  evaluation_goals_manager: string
+  evaluation_comments_employee: string
 }
 
 export interface AxiosPerformanceReviewUpdateServerResponse {

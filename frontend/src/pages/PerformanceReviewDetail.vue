@@ -78,10 +78,10 @@
               <div class="row">Job Knowledge</div>
               <div class="row">Present knowledge of techniques, skills, procedures, technologies, equipment, rules and policies of position.</div>
           </div>
-          <div class="factors-box"><q-checkbox /></div>
-          <div class="factors-box"><q-checkbox /></div>
-          <div class="factors-box"><q-checkbox /></div>
-          <div class="factors-box"><q-checkbox /></div>
+          <div class="factors-box"><q-radio v-model="factorJobKnowledge" val="N" /></div>
+          <div class="factors-box"><q-radio v-model="factorJobKnowledge" val="M" /></div>
+          <div class="factors-box"><q-radio v-model="factorJobKnowledge" val="E" /></div>
+          <div class="factors-box"><q-radio v-model="factorJobKnowledge" val="NA" /></div>
         </div>
 
         <h5 class="text-uppercase">II. Employee's Successes</h5>
@@ -242,6 +242,9 @@ export default class PerformanceReviewDetail extends Vue {
   private discussionDateCurrentVal = ''
   private discussionDate = ''
 
+  private factorJobKnowledgeCurrentVal = ''
+  private factorJobKnowledge = ''
+
   private evaluationSuccessesCurrentVal = ''
   private evaluationSuccesses = ''
   private evaluationOpportunitiesCurrentVal = ''
@@ -264,6 +267,7 @@ export default class PerformanceReviewDetail extends Vue {
   private valuesAreChanged(): boolean {
     if (
       // this.discussionDate == this.discussionDateCurrentVal && // TODO: Remove
+      this.factorJobKnowledge == this.factorJobKnowledgeCurrentVal &&
       this.evaluationSuccesses == this.evaluationSuccessesCurrentVal &&
       this.evaluationOpportunities == this.evaluationOpportunitiesCurrentVal &&
       this.evaluationGoalsManager == this.evaluationGoalsManagerCurrentVal &&
@@ -298,6 +302,9 @@ export default class PerformanceReviewDetail extends Vue {
         }
         this.discussionDateCurrentVal = this.discussionDate
 
+        this.factorJobKnowledge = pr.factor_job_knowledge
+        this.factorJobKnowledgeCurrentVal = this.factorJobKnowledge
+
         this.evaluationSuccesses = pr.evaluation_successes
         this.evaluationSuccessesCurrentVal = this.evaluationSuccesses
         this.evaluationOpportunities = pr.evaluation_opportunities
@@ -327,13 +334,16 @@ export default class PerformanceReviewDetail extends Vue {
     PerformanceReviewDataService.update(this.pk, {
       pk: parseInt(this.pk, 10),
       date_of_discussion: this.discussionDate.split('/').join('-'), // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
-      evaluationSuccesses: this.evaluationSuccesses,
-      evaluationOpportunities: this.evaluationOpportunities,
-      evaluationGoalsManager: this.evaluationGoalsManager,
-      evaluationCommentsEmployee: this.evaluationCommentsEmployee
+      factor_job_knowledge: this.factorJobKnowledge,
+      evaluation_successes: this.evaluationSuccesses,
+      evaluation_opportunities: this.evaluationOpportunities,
+      evaluation_goals_manager: this.evaluationGoalsManager,
+      evaluation_comments_employee: this.evaluationCommentsEmployee
     })
       .then((response: AxiosPerformanceReviewUpdateServerResponse) => {
         // this.discussionDateCurrentVal = response.data.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
+        this.factorJobKnowledgeCurrentVal = response.data.factor_job_knowledge
+
         this.evaluationSuccessesCurrentVal = response.data.evaluation_successes
         this.evaluationOpportunitiesCurrentVal = response.data.evaluation_opportunities
         this.evaluationGoalsManagerCurrentVal = response.data.evaluation_goals_manager

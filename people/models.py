@@ -120,9 +120,7 @@ class Employee(models.Model):
         # TODO: When needs signature
         reviews = []
         for review in self.upper_manager_upcoming_reviews():
-            if any([
-                # review.status == PerformanceReview.EVALUATION_COMPLETED
-            ]):
+            if review.status == PerformanceReview.EVALUATION_WRITTEN:
                 reviews.append(review)
         return reviews
     
@@ -131,12 +129,7 @@ class Employee(models.Model):
         # not require action from the manager to proceed. For list views.
         reviews = []
         for review in self.upper_manager_upcoming_reviews():
-            if any([
-                review.status == PerformanceReview.NEEDS_EVALUATION,
-                review.status == PerformanceReview.EVALUATION_WRITTEN_AND_DATE_SET,
-                review.status == PerformanceReview.EVALUATION_DENIED,
-                review.status == PerformanceReview.EVALUATION_APPROVED
-            ]):
+            if review.status != PerformanceReview.EVALUATION_WRITTEN:
                 reviews.append(review)
         return reviews
 

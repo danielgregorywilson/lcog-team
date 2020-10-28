@@ -67,6 +67,17 @@ export interface PerformanceReviewRetrieve {
   status: string;
   date_of_discussion: Date;
   factor_job_knowledge: string;
+  factor_work_quality: string;
+  factor_work_quantity: string;
+  factor_work_habits: string;
+  factor_analysis: string;
+  factor_initiative: string;
+  factor_interpersonal: string;
+  factor_communication: string;
+  factor_dependability: string;
+  factor_professionalism: string;
+  factor_management: string;
+  factor_supervision: string;
   evaluation_successes: string;
   evaluation_opportunities: string;
   evaluation_goals_manager: string;
@@ -99,7 +110,18 @@ export interface PerformanceReviewCreate {
 export interface PerformanceReviewUpdate {
   pk: number
   date_of_discussion?: string
-  factor_job_knowledge: string
+  factor_job_knowledge: string;
+  factor_work_quality: string;
+  factor_work_quantity: string;
+  factor_work_habits: string;
+  factor_analysis: string;
+  factor_initiative: string;
+  factor_interpersonal: string;
+  factor_communication: string;
+  factor_dependability: string;
+  factor_professionalism: string;
+  factor_management: string;
+  factor_supervision: string;
   evaluation_successes: string
   evaluation_opportunities: string
   evaluation_goals_manager: string

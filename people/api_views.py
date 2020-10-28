@@ -99,6 +99,17 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
     def update(self, request, pk=None):
         pr = PerformanceReview.objects.get(pk=pk)
         pr.factor_job_knowledge = request.data['factor_job_knowledge']
+        pr.factor_work_quality = request.data['factor_work_quality']
+        pr.factor_work_quantity = request.data['factor_work_quantity']
+        pr.factor_work_habits = request.data['factor_work_habits']
+        pr.factor_analysis = request.data['factor_analysis']
+        pr.factor_initiative = request.data['factor_initiative']
+        pr.factor_interpersonal = request.data['factor_interpersonal']
+        pr.factor_communication = request.data['factor_communication']
+        pr.factor_dependability = request.data['factor_dependability']
+        pr.factor_professionalism = request.data['factor_professionalism']
+        pr.factor_management = request.data['factor_management']
+        pr.factor_supervision = request.data['factor_supervision']
         pr.evaluation_successes = request.data['evaluation_successes']
         pr.evaluation_opportunities = request.data['evaluation_opportunities']
         pr.evaluation_goals_manager = request.data['evaluation_goals_manager']

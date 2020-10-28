@@ -69,19 +69,107 @@
 
         <h5 class="text-uppercase">I. Performance Factors Reviewed</h5>
         <div class="factors-grid-container">
-          <div class="factors-box">Performance Factors Reviewed</div>
-          <div class="factors-box">Needs Improvement</div>
-          <div class="factors-box">Meets Job Requirments</div>
-          <div class="factors-box">Exceeds Job Requirements</div>
-          <div class="factors-box">Not Applicable</div>
+          <div class="factors-header-box text-bold text-center">Performance Factors Reviewed</div>
+          <div class="factors-header-box text-bold text-center">Needs Improvement</div>
+          <div class="factors-header-box text-bold text-center">Meets Job Requirments</div>
+          <div class="factors-header-box text-bold text-center">Exceeds Job Requirements</div>
+          <div class="factors-header-box text-bold text-center">Not Applicable</div>
           <div class="factors-box">
-              <div class="row">Job Knowledge</div>
+              <div class="row text-bold"><u>Job Knowledge</u></div>
               <div class="row">Present knowledge of techniques, skills, procedures, technologies, equipment, rules and policies of position.</div>
           </div>
-          <div class="factors-box"><q-radio v-model="factorJobKnowledge" val="N" /></div>
-          <div class="factors-box"><q-radio v-model="factorJobKnowledge" val="M" /></div>
-          <div class="factors-box"><q-radio v-model="factorJobKnowledge" val="E" /></div>
-          <div class="factors-box"><q-radio v-model="factorJobKnowledge" val="NA" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorJobKnowledge" val="N" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorJobKnowledge" val="M" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorJobKnowledge" val="E" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorJobKnowledge" val="NA" /></div>
+          <div class="factors-box">
+              <div class="row text-bold"><u>Quality of Work</u></div>
+              <div class="row">Turns in high quality work and very seldom makes errors.</div>
+          </div>
+          <div class="factors-radio-box"><q-radio v-model="factorWorkQuality" val="N" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorWorkQuality" val="M" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorWorkQuality" val="E" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorWorkQuality" val="NA" /></div>
+          <div class="factors-box">
+              <div class="row text-bold"><u>Quantity of Work</u></div>
+              <div class="row">Accomplishes stated goals and expectations.</div>
+          </div>
+          <div class="factors-radio-box"><q-radio v-model="factorWorkQuantity" val="N" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorWorkQuantity" val="M" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorWorkQuantity" val="E" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorWorkQuantity" val="NA" /></div>
+          <div class="factors-box">
+              <div class="row text-bold"><u>Work Habits</u></div>
+              <div class="row">Uses equipment, supplies and time efficiently; punctual and on time.</div>
+          </div>
+          <div class="factors-radio-box"><q-radio v-model="factorWorkHabits" val="N" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorWorkHabits" val="M" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorWorkHabits" val="E" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorWorkHabits" val="NA" /></div>
+          <div class="factors-box">
+              <div class="row text-bold"><u>Analysis and Decision-Making</u></div>
+              <div class="row">Has strong analytical abilities and makes sound judgements.</div>
+          </div>
+          <div class="factors-radio-box"><q-radio v-model="factorAnalysis" val="N" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorAnalysis" val="M" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorAnalysis" val="E" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorAnalysis" val="NA" /></div>
+          <div class="factors-box">
+              <div class="row text-bold"><u>Initiative and Creativity</u></div>
+              <div class="row">A self-starter and seeks new responsibilities and opportunities for leadership; demonstrates creativity in performing tasks and identifying resolutions.</div>
+          </div>
+          <div class="factors-radio-box"><q-radio v-model="factorInitiative" val="N" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorInitiative" val="M" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorInitiative" val="E" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorInitiative" val="NA" /></div>
+          <div class="factors-box">
+              <div class="row text-bold"><u>Interpersonal Relations</u></div>
+              <div class="row">Presents good attitude, works well in teams, cooperates with others, and is thoughtful and courteous/polite.</div>
+          </div>
+          <div class="factors-radio-box"><q-radio v-model="factorInterpersonal" val="N" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorInterpersonal" val="M" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorInterpersonal" val="E" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorInterpersonal" val="NA" /></div>
+          <div class="factors-box">
+              <div class="row text-bold"><u>Communication</u></div>
+              <div class="row">Effectively communicates (oral and written) and keeps others appropriately informed.</div>
+          </div>
+          <div class="factors-radio-box"><q-radio v-model="factorCommunication" val="N" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorCommunication" val="M" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorCommunication" val="E" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorCommunication" val="NA" /></div>
+          <div class="factors-box">
+              <div class="row text-bold"><u>Dependability and Responsibility</u></div>
+              <div class="row">Completes assigned work within prescribed timelines; rarely needs direct supervision.</div>
+          </div>
+          <div class="factors-radio-box"><q-radio v-model="factorDependability" val="N" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorDependability" val="M" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorDependability" val="E" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorDependability" val="NA" /></div>
+          <div class="factors-box">
+              <div class="row text-bold"><u>Professionalism and Customer Service</u></div>
+              <div class="row">Presents and represents oneself and the agency in a positive manner; provides and delivers professional, helpful, high quality service and assistance.</div>
+          </div>
+          <div class="factors-radio-box"><q-radio v-model="factorProfessionalism" val="N" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorProfessionalism" val="M" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorProfessionalism" val="E" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorProfessionalism" val="NA" /></div>
+          <div class="factors-box">
+              <div class="row text-bold"><u>Project Management</u></div>
+              <div class="row">Coordinates, delegates tasks to team members, and communicates internally and externally about projects; projects are high quality and are completed within timelines.</div>
+          </div>
+          <div class="factors-radio-box"><q-radio v-model="factorManagement" val="N" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorManagement" val="M" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorManagement" val="E" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorManagement" val="NA" /></div>
+          <div class="factors-box">
+              <div class="row text-bold"><u>Supervision</u></div>
+              <div class="row">Provides support/guidance and motivation with open communication and transparency.</div>
+          </div>
+          <div class="factors-radio-box"><q-radio v-model="factorSupervision" val="N" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorSupervision" val="M" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorSupervision" val="E" /></div>
+          <div class="factors-radio-box"><q-radio v-model="factorSupervision" val="NA" /></div>
         </div>
 
         <h5 class="text-uppercase">II. Employee's Successes</h5>
@@ -141,7 +229,7 @@
   </q-page>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
   .note-card:hover {
     background-color: lightgray;
     cursor: pointer;
@@ -210,9 +298,18 @@
     grid-gap: 2px;
     grid-template-columns: auto auto auto auto auto;
   }
+  .factors-header-box {
+    background-color: white;
+    padding: 10px;
+  }
   .factors-box {
     background-color: white;
     padding: 5px;
+  }
+  .factors-radio-box {
+    background-color: white;
+    display: flex;
+    justify-content: center;
   }
   #sticky-footer {
     padding: 10px;
@@ -244,6 +341,28 @@ export default class PerformanceReviewDetail extends Vue {
 
   private factorJobKnowledgeCurrentVal = ''
   private factorJobKnowledge = ''
+  private factorWorkQualityCurrentVal = ''
+  private factorWorkQuality = ''
+  private factorWorkQuantityCurrentVal = ''
+  private factorWorkQuantity = ''
+  private factorWorkHabitsCurrentVal = ''
+  private factorWorkHabits = ''
+  private factorAnalysisCurrentVal = ''
+  private factorAnalysis = ''
+  private factorInitiativeCurrentVal = ''
+  private factorInitiative = ''
+  private factorInterpersonalCurrentVal = ''
+  private factorInterpersonal = ''
+  private factorCommunicationCurrentVal = ''
+  private factorCommunication = ''
+  private factorDependabilityCurrentVal = ''
+  private factorDependability = ''
+  private factorProfessionalismCurrentVal = ''
+  private factorProfessionalism = ''
+  private factorManagementCurrentVal = ''
+  private factorManagement = ''
+  private factorSupervisionCurrentVal = ''
+  private factorSupervision = ''
 
   private evaluationSuccessesCurrentVal = ''
   private evaluationSuccesses = ''
@@ -268,6 +387,17 @@ export default class PerformanceReviewDetail extends Vue {
     if (
       // this.discussionDate == this.discussionDateCurrentVal && // TODO: Remove
       this.factorJobKnowledge == this.factorJobKnowledgeCurrentVal &&
+      this.factorWorkQuality == this.factorWorkQualityCurrentVal &&
+      this.factorWorkQuantity == this.factorWorkQuantityCurrentVal &&
+      this.factorWorkHabits == this.factorWorkHabitsCurrentVal &&
+      this.factorAnalysis == this.factorAnalysisCurrentVal &&
+      this.factorInitiative == this.factorInitiativeCurrentVal &&
+      this.factorInterpersonal == this.factorInterpersonalCurrentVal &&
+      this.factorCommunication == this.factorCommunicationCurrentVal &&
+      this.factorDependability == this.factorDependabilityCurrentVal &&
+      this.factorProfessionalism == this.factorProfessionalismCurrentVal &&
+      this.factorManagement == this.factorManagementCurrentVal &&
+      this.factorSupervision == this.factorSupervisionCurrentVal &&
       this.evaluationSuccesses == this.evaluationSuccessesCurrentVal &&
       this.evaluationOpportunities == this.evaluationOpportunitiesCurrentVal &&
       this.evaluationGoalsManager == this.evaluationGoalsManagerCurrentVal &&
@@ -304,6 +434,28 @@ export default class PerformanceReviewDetail extends Vue {
 
         this.factorJobKnowledge = pr.factor_job_knowledge
         this.factorJobKnowledgeCurrentVal = this.factorJobKnowledge
+        this.factorWorkQuality = pr.factor_work_quality
+        this.factorWorkQualityCurrentVal = this.factorJobKnowledge
+        this.factorWorkQuantity = pr.factor_work_quantity
+        this.factorWorkQuantityCurrentVal = this.factorWorkQuantity
+        this.factorWorkHabits = pr.factor_work_habits
+        this.factorWorkHabitsCurrentVal = this.factorWorkHabits
+        this.factorAnalysis = pr.factor_analysis
+        this.factorAnalysisCurrentVal = this.factorAnalysis
+        this.factorInitiative = pr.factor_initiative
+        this.factorInitiativeCurrentVal = this.factorInitiative
+        this.factorInterpersonal = pr.factor_interpersonal
+        this.factorInterpersonalCurrentVal = this.factorInterpersonal
+        this.factorCommunication = pr.factor_communication
+        this.factorCommunicationCurrentVal = this.factorCommunication
+        this.factorDependability = pr.factor_dependability
+        this.factorDependabilityCurrentVal = this.factorDependability
+        this.factorProfessionalism = pr.factor_professionalism
+        this.factorProfessionalismCurrentVal = this.factorProfessionalism
+        this.factorManagement = pr.factor_management
+        this.factorManagementCurrentVal = this.factorManagement
+        this.factorSupervision = pr.factor_supervision
+        this.factorSupervisionCurrentVal = this.factorSupervision
 
         this.evaluationSuccesses = pr.evaluation_successes
         this.evaluationSuccessesCurrentVal = this.evaluationSuccesses
@@ -335,6 +487,17 @@ export default class PerformanceReviewDetail extends Vue {
       pk: parseInt(this.pk, 10),
       date_of_discussion: this.discussionDate.split('/').join('-'), // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
       factor_job_knowledge: this.factorJobKnowledge,
+      factor_work_quality: this.factorWorkQuality,
+      factor_work_quantity: this.factorWorkQuantity,
+      factor_work_habits: this.factorWorkHabits,
+      factor_analysis: this.factorAnalysis,
+      factor_initiative: this.factorInitiative,
+      factor_interpersonal: this.factorInterpersonal,
+      factor_communication: this.factorCommunication,
+      factor_dependability: this.factorDependability,
+      factor_professionalism: this.factorProfessionalism,
+      factor_management: this.factorManagement,
+      factor_supervision: this.factorSupervision,
       evaluation_successes: this.evaluationSuccesses,
       evaluation_opportunities: this.evaluationOpportunities,
       evaluation_goals_manager: this.evaluationGoalsManager,
@@ -343,6 +506,17 @@ export default class PerformanceReviewDetail extends Vue {
       .then((response: AxiosPerformanceReviewUpdateServerResponse) => {
         // this.discussionDateCurrentVal = response.data.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
         this.factorJobKnowledgeCurrentVal = response.data.factor_job_knowledge
+        this.factorWorkQualityCurrentVal = response.data.factor_work_quality
+        this.factorWorkQuantityCurrentVal = response.data.factor_work_quantity
+        this.factorWorkHabitsCurrentVal = response.data.factor_work_habits
+        this.factorAnalysisCurrentVal = response.data.factor_analysis
+        this.factorInitiativeCurrentVal = response.data.factor_initiative
+        this.factorInterpersonalCurrentVal = response.data.factor_interpersonal
+        this.factorCommunicationCurrentVal = response.data.factor_communication
+        this.factorDependabilityCurrentVal = response.data.factor_dependability
+        this.factorProfessionalismCurrentVal = response.data.factor_professionalism
+        this.factorManagementCurrentVal = response.data.factor_management
+        this.factorSupervisionCurrentVal = response.data.factor_supervision
 
         this.evaluationSuccessesCurrentVal = response.data.evaluation_successes
         this.evaluationOpportunitiesCurrentVal = response.data.evaluation_opportunities

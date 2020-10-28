@@ -1,5 +1,5 @@
-import { AxiosResponse } from 'axios';
-import { Url } from 'url';
+import { AxiosResponse } from 'axios'
+import { Url } from 'url'
 
 /////////////////////////////////////////////////////
 // Auth Users Structure from Django Rest Framework //
@@ -7,20 +7,20 @@ import { Url } from 'url';
 
 export interface AxiosAuthResponse extends AxiosResponse {
   data: {
-    token: string;
+    token: string
   }
 }
 
 export interface UserRetrieve {
-  url: Url;
-  username: string;
-  email: string;
-  name: string;
-  // groups: Array<Group>;
-  groups: unknown; // TODO: Set
-  is_staff: boolean;
-  is_manager: boolean;
-  is_upper_manager: boolean;
+  url: Url
+  username: string
+  email: string
+  name: string
+  // groups: Array<Group>
+  groups: unknown // TODO: Set
+  is_staff: boolean
+  is_manager: boolean
+  is_upper_manager: boolean
 }
 
 export interface AxiosUserRetrieveOneServerResponse {
@@ -35,14 +35,14 @@ export interface AxiosUserRetrieveOneServerResponse {
 ///////////////////////////////////////////////////
 
 export interface EmployeeRetrieve {
-  url: string;
-  pk: number;
-  employee_name: string;
+  url: string
+  pk: number
+  employee_name: string
   employee_pk: number
-  user: Url;
-  manager: Url;
-  hire_date: Date;
-  salary: number;
+  user: Url
+  manager: Url
+  hire_date: Date
+  salary: number
 }
 
 export interface AxiosEmployeeRetrieveManyServerResponse {
@@ -56,33 +56,33 @@ export interface AxiosEmployeeRetrieveManyServerResponse {
 ////////////////////////////////////////////////////////////
 
 export interface PerformanceReviewRetrieve {
-  url: Url;
-  pk: number;
-  employee_pk: number;
-  employee_name: string;
-  manager_pk: number;
-  manager_name: string;
-  date_of_review: Date;
-  days_until_review: number;
-  status: string;
-  date_of_discussion: Date;
-  factor_job_knowledge: string;
-  factor_work_quality: string;
-  factor_work_quantity: string;
-  factor_work_habits: string;
-  factor_analysis: string;
-  factor_initiative: string;
-  factor_interpersonal: string;
-  factor_communication: string;
-  factor_dependability: string;
-  factor_professionalism: string;
-  factor_management: string;
-  factor_supervision: string;
-  evaluation_successes: string;
-  evaluation_opportunities: string;
-  evaluation_goals_manager: string;
-  evaluation_comments_employee: string;
-  discussion_took_place: boolean;
+  url: Url
+  pk: number
+  employee_pk: number
+  employee_name: string
+  manager_pk: number
+  manager_name: string
+  date_of_review: Date
+  days_until_review: number
+  status: string
+  date_of_discussion: Date
+  factor_job_knowledge: string
+  factor_work_quality: string
+  factor_work_quantity: string
+  factor_work_habits: string
+  factor_analysis: string
+  factor_initiative: string
+  factor_interpersonal: string
+  factor_communication: string
+  factor_dependability: string
+  factor_professionalism: string
+  factor_management: string
+  factor_supervision: string
+  evaluation_successes: string
+  evaluation_opportunities: string
+  evaluation_goals_manager: string
+  evaluation_comments_employee: string
+  description_reviewed_employee: boolean
 }
 
 export interface AxiosPerformanceReviewRetrieveOneServerResponse {
@@ -97,35 +97,36 @@ export interface AxiosPerformanceReviewRetrieveManyServerResponse {
 
 // TODO: Update
 export interface PerformanceReviewCreate {
-  url: Url;
-  pk: number;
-  employee_name: string;
-  date_of_review: Date;
-  days_until_review: number;
-  status: string;
-  date_of_discussion: Date;
-  discussion_took_place: boolean;
+  url: Url
+  pk: number
+  employee_name: string
+  date_of_review: Date
+  days_until_review: number
+  status: string
+  date_of_discussion: Date
+  discussion_took_place: boolean
 }
 
 export interface PerformanceReviewUpdate {
   pk: number
   date_of_discussion?: string
-  factor_job_knowledge: string;
-  factor_work_quality: string;
-  factor_work_quantity: string;
-  factor_work_habits: string;
-  factor_analysis: string;
-  factor_initiative: string;
-  factor_interpersonal: string;
-  factor_communication: string;
-  factor_dependability: string;
-  factor_professionalism: string;
-  factor_management: string;
-  factor_supervision: string;
+  factor_job_knowledge: string
+  factor_work_quality: string
+  factor_work_quantity: string
+  factor_work_habits: string
+  factor_analysis: string
+  factor_initiative: string
+  factor_interpersonal: string
+  factor_communication: string
+  factor_dependability: string
+  factor_professionalism: string
+  factor_management: string
+  factor_supervision: string
   evaluation_successes: string
   evaluation_opportunities: string
   evaluation_goals_manager: string
   evaluation_comments_employee: string
+  description_reviewed_employee: boolean
 }
 
 export interface AxiosPerformanceReviewUpdateServerResponse {
@@ -143,12 +144,12 @@ export interface AxiosPerformanceReviewManagerMarkDiscussedServerResponse {
 /////////////////////////////////////////////////////
 
 export interface ReviewNoteRetrieve {
-  url: Url;
-  pk: number;
-  employee_pk: number;
-  employee_name: string;
-  date: Date;
-  note: string;
+  url: Url
+  pk: number
+  employee_pk: number
+  employee_name: string
+  date: Date
+  note: string
 }
 
 export interface AxiosReviewNoteRetrieveOneServerResponse {
@@ -166,8 +167,8 @@ export interface AxiosReviewNoteRetrieveManyServerResponse {
 }
 
 export interface ReviewNoteUpdate {
-  employee_pk?: number;
-  note?: string;
+  employee_pk?: number
+  note?: string
 }
 
 export interface AxiosReviewNoteUpdateServerResponse {
@@ -175,6 +176,6 @@ export interface AxiosReviewNoteUpdateServerResponse {
 }
 
 export interface ReviewNoteCreate {
-  employee_pk: number;
-  note: string;
+  employee_pk: number
+  note: string
 }

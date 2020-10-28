@@ -203,7 +203,7 @@
         />
 
         <h5 class="text-uppercase">VI. Position Description Review</h5>
-        <q-checkbox />Position Description has been reviewed with employee.
+        <q-checkbox v-model="descriptionReviewedEmployee" />Position Description has been reviewed with employee.
 
         <div>
           <div class="row q-mb-md q-gutter-md items-start">
@@ -211,12 +211,6 @@
               <div>Date of Discussion</div>
               <q-date v-model="discussionDate" :options="noWeekends" />
             </div>
-            <q-input
-              v-model="evaluationSuccesses"
-              label="Evaluation"
-              type="textarea"
-              class="q-pb-md col"
-            />
           </div>
         </div>
 
@@ -373,6 +367,9 @@ export default class PerformanceReviewDetail extends Vue {
   private evaluationCommentsEmployeeCurrentVal = ''
   private evaluationCommentsEmployee = ''
 
+  private descriptionReviewedEmployeeCurrentVal = false
+  private descriptionReviewedEmployee = false
+
   private reviewNotes: Array<ReviewNoteRetrieve> = []
 
   private isUpperManager(): boolean {
@@ -401,7 +398,8 @@ export default class PerformanceReviewDetail extends Vue {
       this.evaluationSuccesses == this.evaluationSuccessesCurrentVal &&
       this.evaluationOpportunities == this.evaluationOpportunitiesCurrentVal &&
       this.evaluationGoalsManager == this.evaluationGoalsManagerCurrentVal &&
-      this.evaluationCommentsEmployee == this.evaluationCommentsEmployeeCurrentVal
+      this.evaluationCommentsEmployee == this.evaluationCommentsEmployeeCurrentVal &&
+      this.descriptionReviewedEmployee == this.descriptionReviewedEmployeeCurrentVal
     ) {
       return false
     } else {
@@ -435,7 +433,7 @@ export default class PerformanceReviewDetail extends Vue {
         this.factorJobKnowledge = pr.factor_job_knowledge
         this.factorJobKnowledgeCurrentVal = this.factorJobKnowledge
         this.factorWorkQuality = pr.factor_work_quality
-        this.factorWorkQualityCurrentVal = this.factorJobKnowledge
+        this.factorWorkQualityCurrentVal = this.factorWorkQuality
         this.factorWorkQuantity = pr.factor_work_quantity
         this.factorWorkQuantityCurrentVal = this.factorWorkQuantity
         this.factorWorkHabits = pr.factor_work_habits
@@ -465,6 +463,9 @@ export default class PerformanceReviewDetail extends Vue {
         this.evaluationGoalsManagerCurrentVal = this.evaluationGoalsManager
         this.evaluationCommentsEmployee = pr.evaluation_comments_employee
         this.evaluationCommentsEmployeeCurrentVal = this.evaluationCommentsEmployee
+
+        this.descriptionReviewedEmployee = pr.description_reviewed_employee
+        this.descriptionReviewedEmployeeCurrentVal = this.descriptionReviewedEmployee
 
       })
       .catch(e => {
@@ -501,7 +502,8 @@ export default class PerformanceReviewDetail extends Vue {
       evaluation_successes: this.evaluationSuccesses,
       evaluation_opportunities: this.evaluationOpportunities,
       evaluation_goals_manager: this.evaluationGoalsManager,
-      evaluation_comments_employee: this.evaluationCommentsEmployee
+      evaluation_comments_employee: this.evaluationCommentsEmployee,
+      description_reviewed_employee: this.descriptionReviewedEmployee
     })
       .then((response: AxiosPerformanceReviewUpdateServerResponse) => {
         // this.discussionDateCurrentVal = response.data.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
@@ -522,6 +524,8 @@ export default class PerformanceReviewDetail extends Vue {
         this.evaluationOpportunitiesCurrentVal = response.data.evaluation_opportunities
         this.evaluationGoalsManagerCurrentVal = response.data.evaluation_goals_manager
         this.evaluationCommentsEmployeeCurrentVal = response.data.evaluation_comments_employee
+
+        this.descriptionReviewedEmployeeCurrentVal = response.data.description_reviewed_employee
         // TODO: This is bad. We should only get the reviews of type that we need
         this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
           .catch(e => {

@@ -114,6 +114,7 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
         pr.evaluation_opportunities = request.data['evaluation_opportunities']
         pr.evaluation_goals_manager = request.data['evaluation_goals_manager']
         pr.evaluation_comments_employee = request.data['evaluation_comments_employee']
+        pr.description_reviewed_employee = request.data['description_reviewed_employee']
         if pr.status == PerformanceReview.NEEDS_EVALUATION and pr.evaluation_successes:
             pr.status = PerformanceReview.EVALUATION_WRITTEN
         pr.save()

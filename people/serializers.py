@@ -38,8 +38,8 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
 class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     employee_pk = serializers.CharField(source='employee.pk') #TODO: Make IntegerField
     employee_name = serializers.CharField(source='employee.user.get_full_name')
-    employee_division = serializers.CharField(source='employee.unit_or_program.division.name')
-    employee_unit_or_program = serializers.CharField(source='employee.unit_or_program.name')
+    employee_division = serializers.SerializerMethodField()
+    employee_unit_or_program = serializers.SerializerMethodField()
     employee_job_title = serializers.CharField(source='employee.job_title.name')
     manager_pk = serializers.IntegerField(source='employee.manager.pk')
     manager_name = serializers.CharField(source='employee.manager.user.get_full_name')
@@ -67,6 +67,20 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
             'description_reviewed_employee'
         ]
     
+    @staticmethod
+    def get_employee_division(pr):
+        if pr.employee.unit_or_program and pr.employee.unit_or_program.division:
+            return pr.employee.unit_or_program.division.name
+        else:
+            return ''
+    
+    @staticmethod
+    def get_employee_unit_or_program(pr):
+        if pr.employee.unit_or_program:
+            return pr.employee.unit_or_program.name
+        else:
+            return ''
+
     @staticmethod
     def get_days_until_review(pr):
         today = datetime.date.today()

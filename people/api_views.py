@@ -98,6 +98,10 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk=None):
         pr = PerformanceReview.objects.get(pk=pk)
+        pr.evaluation_type = request.data['evaluation_type']
+        pr.probationary_evaluation_type = request.data['probationary_evaluation_type']
+        pr.step_increase = request.data['step_increase']
+        pr.top_step_bonus = request.data['top_step_bonus']
         pr.factor_job_knowledge = request.data['factor_job_knowledge']
         pr.factor_work_quality = request.data['factor_work_quality']
         pr.factor_work_quantity = request.data['factor_work_quantity']

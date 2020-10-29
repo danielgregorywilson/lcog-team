@@ -239,6 +239,13 @@ class PerformanceReview(models.Model):
         (NON_SEIU_PROBATIONARY_EVALUATION, 'Non-SEIU (6 month)'),
     ]
 
+    YES = 'Y'
+    NO = 'N'
+    NULLABLE_BOOLEAN_CHOICE = [
+        (YES, 'Yes'),
+        (NO, 'No')
+    ]
+
     NEEDS_IMPROVEMENT = 'N'
     MEETS_JOB_REQUIREMENTS = 'M'
     EXCEEDS_JOB_REQUIREMENTS = 'E'
@@ -260,8 +267,8 @@ class PerformanceReview(models.Model):
     evaluation_type = models.CharField(_("evaluation type"), max_length=1, choices=EVALUATION_TYPE_CHOICE, default=ANNUAL_EVALUATION, blank=True, null=True)
     probationary_evaluation_type = models.CharField(_("probationary evaluation type"), max_length=1, choices=PROBATIONARY_EVALUATION_TYPE_CHOICE, blank=True, null=True)
 
-    step_increase = models.BooleanField(_("step increase"), null=True)
-    top_step_bonus = models.BooleanField(_("top step bonus"), null=True)
+    step_increase = models.CharField(_("step increase"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+    top_step_bonus = models.CharField(_("top step bonus"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
     
     factor_job_knowledge = models.CharField(_("job knowledge"), max_length=2, choices=PERFORMANCE_FACTOR_CHOICE, blank=True, null=True)
     factor_work_quality = models.CharField(_("quality of work"), max_length=2, choices=PERFORMANCE_FACTOR_CHOICE, blank=True, null=True)

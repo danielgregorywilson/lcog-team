@@ -68,10 +68,14 @@ export interface PerformanceReviewRetrieve {
   employee_division: string
   employee_unit_or_program: string
   employee_job_title: string
+  evaluation_type: string
+  probationary_evaluation_type: string
+  step_increase: string
+  top_step_bonus: string
 
   date_of_review: Date
   days_until_review: number
-  
+
   status: string
   date_of_discussion: Date
   factor_job_knowledge: string
@@ -117,6 +121,10 @@ export interface PerformanceReviewCreate {
 
 export interface PerformanceReviewUpdate {
   pk: number
+  evaluation_type: string
+  probationary_evaluation_type: string
+  step_increase: string
+  top_step_bonus: string
   date_of_discussion?: string
   factor_job_knowledge: string
   factor_work_quality: string

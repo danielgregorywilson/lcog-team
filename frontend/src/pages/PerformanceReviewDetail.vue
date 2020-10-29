@@ -18,7 +18,7 @@
         </div>
       </div>
       <div v-if="currentUserIsManagerOfEmployee()">
-        <h4>Performance Evaluation Report for {{ employeeName }}</h4>
+        <h4 class="text-bold text-center">Performance Evaluation Report for {{ employeeName }}</h4>
         <div class="eval-grid-container">
             <div class="eval-box eval-box-1">
                 <div class="row text-bold">Employee:</div>
@@ -48,33 +48,47 @@
                 <div class="row text-bold">Job Title:</div>
                 <div class="row">{{ jobTitle }}</div>
             </div>
-            <div class="row eval-box eval-box-full">
-              <div class="text-uppercase text-bold">Evaluation Type:</div>
-              <q-radio v-model="factorJobKnowledge" val="N" />
-              <div>Probationary:</div>
-              <q-radio v-model="factorJobKnowledge" val="N" />
-              <div>SEIU (180 day)</div>
-              <q-radio v-model="factorJobKnowledge" val="N" />
-              <div>Non-SEIU (6 month)</div>
-              <q-radio v-model="factorJobKnowledge" val="N" />
-              <div>Annual</div>
+            <div class="row eval-box eval-box-full text-bold">
+              <div class="text-uppercase">Evaluation Type:</div>
+              <div class="eval-box-full-1-probationary">
+                <div class="label-radio-pair">
+                  <q-radio v-model="evaluationType" val="P" />
+                  <div class="text-uppercase">Probationary:</div>
+                </div>
+                <div class="label-radio-pair">
+                  <q-radio v-model="probationaryEvaluationType" val="S" :disable="evaluationType != 'P'" />
+                  <div>SEIU (180 day)</div>
+                </div>
+                <div class="label-radio-pair">
+                  <q-radio v-model="probationaryEvaluationType" val="N" :disable="evaluationType != 'P'" />
+                  <div>Non-SEIU (6 month)</div>
+                </div>
+              </div>
+              <div class="label-radio-pair">
+                <q-radio v-model="evaluationType" val="A" @input="() => this.probationaryEvaluationType = ''" />
+                <div class="text-uppercase">Annual</div>
+              </div>
             </div>
-            <div class="row eval-box eval-box-full text-uppercase">
+            <div class="row eval-box eval-box-full">
               <div class="text-uppercase text-bold">Action:</div>
-              <div class="text-bold">Step Increase:</div>
-              <q-radio v-model="factorJobKnowledge" val="N" />
-              <div>Yes</div>
-              <q-radio v-model="factorJobKnowledge" val="N" />
-              <div>No</div>
-              <div class="text-bold">Top-Step Bonus</div>
-              <q-radio v-model="factorJobKnowledge" val="N" />
-              <div>Yes</div>
-              <q-radio v-model="factorJobKnowledge" val="N" />
-              <div>No</div>
+              <div class="label-radio-triplet">
+                <div class="text-bold">Step Increase:</div>
+                <q-radio v-model="stepIncrease" val="Y" />
+                <div>Yes</div>
+                <q-radio v-model="stepIncrease" val="N" />
+                <div>No</div>
+              </div>
+              <div class="label-radio-triplet">
+                <div class="text-bold">Top-Step Bonus</div>
+                <q-radio v-model="topStepBonus" val="Y" />
+                <div>Yes</div>
+                <q-radio v-model="topStepBonus" val="N" />
+                <div>No</div>
+              </div>
             </div>
         </div>
 
-        <h5 class="text-uppercase text-center">Rating Scale</h5>
+        <h5 class="text-uppercase text-center text-bold"><u>Rating Scale</u></h5>
         <div class="rating-grid-container">
           <div class="rating-box">(1)* Needs Improvement</div>
           <div class="rating-box">The employee’s work performance does not consistently meet the standards of the position. Serious effort is needed to improve performance.</div>
@@ -89,7 +103,7 @@
 
         <hr />
 
-        <h5 class="text-uppercase">I. Performance Factors Reviewed</h5>
+        <h5 class="text-uppercase text-bold"><u>I. Performance Factors Reviewed</u></h5>
         <div class="factors-grid-container">
           <div class="factors-header-box text-bold text-center">Performance Factors Reviewed</div>
           <div class="factors-header-box text-bold text-center">Needs Improvement</div>
@@ -194,19 +208,19 @@
           <div class="factors-radio-box"><q-radio v-model="factorSupervision" val="NA" /></div>
         </div>
 
-        <h5 class="text-uppercase">II. Employee's Successes</h5>
+        <h5 class="text-uppercase text-bold"><u>II. Employee's Successes</u></h5>
         <q-input
           v-model="evaluationSuccesses"
           type="textarea"
         />
 
-        <h5 class="text-uppercase">III. Opportunities for Growth</h5>
+        <h5 class="text-uppercase text-bold"><u>III. Opportunities for Growth</u></h5>
         <q-input
           v-model="evaluationOpportunities"
           type="textarea"
         />
 
-        <h5 class="text-uppercase">IV. Goals for the Coming Year (to be discussed and determined during the evaluation)</h5>
+        <h5><span class="text-uppercase text-bold"><u>IV. Goals for the Coming Year</u></span> (to be discussed and determined during the evaluation)</h5>
         <q-input
           v-model="evaluationGoalsManager"
           type="textarea"
@@ -218,24 +232,26 @@
           type="textarea"
         /> -->
 
-        <h5 class="text-uppercase">V. Employee Comments</h5>
+        <h5 class="text-uppercase text-bold"><u>V. Employee Comments</u></h5>
         <q-input
           v-model="evaluationCommentsEmployee"
           type="textarea"
         />
 
-        <h5 class="text-uppercase">VI. Position Description Review</h5>
+        <h5 class="text-uppercase text-bold"><u>VI. Position Description Review</u></h5>
         <q-checkbox v-model="descriptionReviewedEmployee" />Position Description has been reviewed with employee.
 
-        <div>
+        <h5 class="text-uppercase text-center text-bold"><u>Signatures</u></h5>
+
+        <!-- <div>
           <div class="row q-mb-md q-gutter-md items-start">
             <div class="col col-md-auto col-sm-12">
               <div>Date of Discussion</div>
               <q-date v-model="discussionDate" :options="noWeekends" />
             </div>
           </div>
-        </div>
-
+        </div> -->
+        <div style="height: 50px;"></div>
         <div id="sticky-footer" >
           <q-btn color="white" text-color="black" label="Update" :disabled="!valuesAreChanged()" @click="updatePerformanceReview()" />
         </div>
@@ -291,10 +307,28 @@
   .eval-box-full {
     grid-column-start: 1;
     grid-column-end: 13;
+    display: grid;
+    justify-content: space-between;
+    align-items: center;
+    grid-template-columns: auto auto auto;
   }
-  .eval-box-full {
-    grid-column-start: 1;
-    grid-column-end: 13;
+  .eval-box-full-1-probationary {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    grid-template-columns: auto auto auto;
+  }
+  .label-radio-pair {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    grid-template-columns: auto auto;
+  }
+  .label-radio-triplet {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    grid-template-columns: auto auto auto auto auto;
   }
   .rating-grid-container {
     display: grid;
@@ -359,6 +393,15 @@ export default class PerformanceReviewDetail extends Vue {
   private unitOrProgram = ''
   private jobTitle = ''
 
+  private evaluationTypeCurrentVal = ''
+  private evaluationType = ''
+  private probationaryEvaluationTypeCurrentVal = ''
+  private probationaryEvaluationType = ''
+  private stepIncreaseCurrentVal = ''
+  private stepIncrease = ''
+  private topStepBonusCurrentVal = ''
+  private topStepBonus = ''
+
   private discussionDateCurrentVal = ''
   private discussionDate = ''
 
@@ -412,6 +455,10 @@ export default class PerformanceReviewDetail extends Vue {
   private valuesAreChanged(): boolean {
     if (
       // this.discussionDate == this.discussionDateCurrentVal && // TODO: Remove
+      this.evaluationType == this.evaluationTypeCurrentVal &&
+      this.probationaryEvaluationType == this.probationaryEvaluationTypeCurrentVal &&
+      this.stepIncrease == this.stepIncreaseCurrentVal &&
+      this.topStepBonus == this.topStepBonusCurrentVal &&
       this.factorJobKnowledge == this.factorJobKnowledgeCurrentVal &&
       this.factorWorkQuality == this.factorWorkQualityCurrentVal &&
       this.factorWorkQuantity == this.factorWorkQuantityCurrentVal &&
@@ -460,11 +507,20 @@ export default class PerformanceReviewDetail extends Vue {
         this.division = pr.employee_division
         this.unitOrProgram = pr.employee_unit_or_program
         this.jobTitle = pr.employee_job_title
-        
+
         if (pr.date_of_discussion) {
           this.discussionDate = pr.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
         }
         this.discussionDateCurrentVal = this.discussionDate
+
+        this.evaluationType = pr.evaluation_type
+        this.evaluationTypeCurrentVal = this.evaluationType
+        this.probationaryEvaluationType = pr.probationary_evaluation_type
+        this.probationaryEvaluationTypeCurrentVal = this.probationaryEvaluationType
+        this.stepIncrease = pr.step_increase
+        this.stepIncreaseCurrentVal = this.stepIncrease
+        this.topStepBonus = pr.top_step_bonus
+        this.topStepBonusCurrentVal = this.topStepBonus
 
         this.factorJobKnowledge = pr.factor_job_knowledge
         this.factorJobKnowledgeCurrentVal = this.factorJobKnowledge
@@ -523,6 +579,10 @@ export default class PerformanceReviewDetail extends Vue {
     PerformanceReviewDataService.update(this.pk, {
       pk: parseInt(this.pk, 10),
       date_of_discussion: this.discussionDate.split('/').join('-'), // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
+      evaluation_type: this.evaluationType,
+      probationary_evaluation_type: this.probationaryEvaluationType,
+      step_increase: this.stepIncrease,
+      top_step_bonus: this.topStepBonus,
       factor_job_knowledge: this.factorJobKnowledge,
       factor_work_quality: this.factorWorkQuality,
       factor_work_quantity: this.factorWorkQuantity,
@@ -543,6 +603,11 @@ export default class PerformanceReviewDetail extends Vue {
     })
       .then((response: AxiosPerformanceReviewUpdateServerResponse) => {
         // this.discussionDateCurrentVal = response.data.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
+        this.evaluationTypeCurrentVal = response.data.evaluation_type
+        this.probationaryEvaluationTypeCurrentVal = response.data.probationary_evaluation_type
+        this.stepIncreaseCurrentVal = response.data.step_increase
+        this.topStepBonusCurrentVal = response.data.top_step_bonus
+
         this.factorJobKnowledgeCurrentVal = response.data.factor_job_knowledge
         this.factorWorkQualityCurrentVal = response.data.factor_work_quality
         this.factorWorkQuantityCurrentVal = response.data.factor_work_quantity

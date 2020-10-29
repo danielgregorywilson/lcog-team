@@ -38,6 +38,9 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
 class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     employee_pk = serializers.CharField(source='employee.pk') #TODO: Make IntegerField
     employee_name = serializers.CharField(source='employee.user.get_full_name')
+    employee_division = serializers.CharField(source='employee.unit_or_program.division.name')
+    employee_unit_or_program = serializers.CharField(source='employee.unit_or_program.name')
+    employee_job_title = serializers.CharField(source='employee.job_title.name')
     manager_pk = serializers.IntegerField(source='employee.manager.pk')
     manager_name = serializers.CharField(source='employee.manager.user.get_full_name')
     days_until_review = serializers.SerializerMethodField()
@@ -46,7 +49,8 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = PerformanceReview
         fields = [
-            'url', 'pk', 'employee_pk', 'employee_name', 'manager_pk',
+            'url', 'pk', 'employee_pk', 'employee_name', 'employee_division',
+            'employee_unit_or_program', 'employee_job_title', 'manager_pk',
             'manager_name', 'days_until_review', 'status', 'period_start_date', 
             'period_end_date', 'effective_date', 'evaluation_type',
             'probationary_evaluation_type', 'step_increase', 'top_step_bonus',

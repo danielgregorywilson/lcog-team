@@ -21,35 +21,57 @@
         <h4>Performance Evaluation Report for {{ employeeName }}</h4>
         <div class="eval-grid-container">
             <div class="eval-box eval-box-1">
-                <div class="row">Employee:</div>
+                <div class="row text-bold">Employee:</div>
                 <div class="row">{{ employeeName }}</div>
             </div>
             <div class="eval-box eval-box-2">
-                <div class="row">Manager:</div>
+                <div class="row text-bold">Manager:</div>
                 <div class="row">{{ managerName }}</div>
             </div>
             <div class="eval-box eval-box-3">
-                <div class="row">Performance Period:</div>
-                <div class="row"></div>
+                <div class="row text-bold">Performance Period:</div>
+                <div class="row">{{ periodStartDate | readableDate }} - {{ periodEndDate | readableDate }}</div>
             </div>
             <div class="eval-box eval-box-4">
-                <div class="row">Effective Date:</div>
-                <div class="row"></div>
+                <div class="row text-bold">Effective Date:</div>
+                <div class="row">{{ effectiveDate | readableDate }}</div>
             </div>
             <div class="eval-box eval-box-5">
-                <div class="row">Division:</div>
-                <div class="row"></div>
+                <div class="row text-bold">Division:</div>
+                <div class="row">{{ division }}</div>
             </div>
             <div class="eval-box eval-box-6">
-                <div class="row">Unit/Program:</div>
-                <div class="row"></div>
+                <div class="row text-bold">Unit/Program:</div>
+                <div class="row">{{ unitOrProgram }}</div>
             </div>
             <div class="eval-box eval-box-7">
-                <div class="row">Job Title:</div>
-                <div class="row"></div>
+                <div class="row text-bold">Job Title:</div>
+                <div class="row">{{ jobTitle }}</div>
             </div>
-            <div class="row eval-box eval-box-full text-uppercase">Evaluation Type:</div>
-            <div class="row eval-box eval-box-full text-uppercase">Action:</div>
+            <div class="row eval-box eval-box-full">
+              <div class="text-uppercase text-bold">Evaluation Type:</div>
+              <q-radio v-model="factorJobKnowledge" val="N" />
+              <div>Probationary:</div>
+              <q-radio v-model="factorJobKnowledge" val="N" />
+              <div>SEIU (180 day)</div>
+              <q-radio v-model="factorJobKnowledge" val="N" />
+              <div>Non-SEIU (6 month)</div>
+              <q-radio v-model="factorJobKnowledge" val="N" />
+              <div>Annual</div>
+            </div>
+            <div class="row eval-box eval-box-full text-uppercase">
+              <div class="text-uppercase text-bold">Action:</div>
+              <div class="text-bold">Step Increase:</div>
+              <q-radio v-model="factorJobKnowledge" val="N" />
+              <div>Yes</div>
+              <q-radio v-model="factorJobKnowledge" val="N" />
+              <div>No</div>
+              <div class="text-bold">Top-Step Bonus</div>
+              <q-radio v-model="factorJobKnowledge" val="N" />
+              <div>Yes</div>
+              <q-radio v-model="factorJobKnowledge" val="N" />
+              <div>No</div>
+            </div>
         </div>
 
         <h5 class="text-uppercase text-center">Rating Scale</h5>
@@ -324,12 +346,19 @@ import ReviewNoteDataService from '../services/ReviewNoteDataService'
 
 @Component
 export default class PerformanceReviewDetail extends Vue {
+  private date: Date = new Date()
   private pk = ''
   private employeePk = -1
   private managerPk = -1
   private employeeName = ''
   private managerName = ''
-  private date: Date = new Date()
+  private periodStartDate?: Date
+  private periodEndDate?: Date
+  private effectiveDate?: Date
+  private division = ''
+  private unitOrProgram = ''
+  private jobTitle = ''
+
   private discussionDateCurrentVal = ''
   private discussionDate = ''
 
@@ -425,6 +454,13 @@ export default class PerformanceReviewDetail extends Vue {
         this.employeeName = pr.employee_name
         this.managerName = pr.manager_name
         this.date = pr.date_of_review;
+        this.periodStartDate = pr.period_start_date
+        this.periodEndDate = pr.period_end_date
+        this.effectiveDate = pr.effective_date
+        this.division = pr.employee_division
+        this.unitOrProgram = pr.employee_unit_or_program
+        this.jobTitle = pr.employee_job_title
+        
         if (pr.date_of_discussion) {
           this.discussionDate = pr.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
         }

@@ -62,8 +62,16 @@ export interface PerformanceReviewRetrieve {
   employee_name: string
   manager_pk: number
   manager_name: string
+  period_start_date: Date
+  period_end_date: Date
+  effective_date: Date
+  employee_division: string
+  employee_unit_or_program: string
+  employee_job_title: string
+
   date_of_review: Date
   days_until_review: number
+  
   status: string
   date_of_discussion: Date
   factor_job_knowledge: string

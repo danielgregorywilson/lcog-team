@@ -14,6 +14,9 @@ class Division(models.Model):
 
     name = models.CharField(_("name"), max_length=100)
 
+    def __str__(self):
+        return self.name
+
 
 class UnitOrProgram(models.Model):
     class Meta:
@@ -23,6 +26,9 @@ class UnitOrProgram(models.Model):
     division = models.ForeignKey("people.Division", verbose_name=_("division"), on_delete=models.CASCADE)
     name = models.CharField(_("name"), max_length=100)
 
+    def __str__(self):
+        return f"{self.division.name} : {self.name}"
+
 
 class JobTitle(models.Model):
     class Meta:
@@ -30,6 +36,9 @@ class JobTitle(models.Model):
         verbose_name_plural = _("Job Titles")
 
     name = models.CharField(_("name"), max_length=100)
+
+    def __str__(self):
+        return self.name
 
 
 class Employee(models.Model):

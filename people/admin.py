@@ -1,10 +1,29 @@
 from django.contrib import admin
 
-from .models import Employee, PerformanceReview, ReviewNote
+from .models import (
+    Division, Employee, JobTitle, PerformanceReview, ReviewNote, UnitOrProgram
+)
+
+
+class UnitOrProgramInline(admin.TabularInline):
+    model = UnitOrProgram
+    extra = 0
+
+
+@admin.register(Division)
+class DivisionAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+    inlines = (UnitOrProgramInline,)
+
+
+@admin.register(JobTitle)
+class JobTitleAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ("username", "manager",)
+    list_display = ("username", "job_title", "unit_or_program", "manager",)
 
 
 @admin.register(PerformanceReview)

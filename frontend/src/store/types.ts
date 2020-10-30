@@ -95,6 +95,8 @@ export interface PerformanceReviewRetrieve {
   evaluation_goals_manager: string
   evaluation_comments_employee: string
   description_reviewed_employee: boolean
+
+  all_required_signatures: Array<[string, string, string]>
 }
 
 export interface AxiosPerformanceReviewRetrieveOneServerResponse {
@@ -149,15 +151,63 @@ export interface AxiosPerformanceReviewUpdateServerResponse {
   data: PerformanceReviewRetrieve
 }
 
+export interface AxiosPerformanceReviewSignServerResponse {
+  data: {
+    signatures: Array<[string, string, string]>
+  }
+}
+
 export interface AxiosPerformanceReviewManagerMarkDiscussedServerResponse {
   data: {
     status: string
   }
 }
 
+
+/////////////////////////////////////////////////////
+// Signature Structure from Django Rest Framework //
+/////////////////////////////////////////////////////
+
+export interface SignatureCreate {
+  review_pk: number
+  employee_pk: number
+}
+
+export interface SignatureRetrieve {
+  url: Url
+  pk: number
+  review: Url
+  employee: Url
+  date: Date
+}
+
+// export interface AxiosReviewNoteRetrieveOneServerResponse {
+//   data: ReviewNoteRetrieve
+// }
+
+// export interface AxiosManagerReviewNotesForEmployeeServerResponse {
+//   data: Array<ReviewNoteRetrieve>
+// }
+
+// export interface AxiosReviewNoteRetrieveManyServerResponse {
+//   data: {
+//     results: Array<ReviewNoteRetrieve>
+//   }
+// }
+
+// export interface AxiosReviewNoteUpdateServerResponse {
+//   data: ReviewNoteRetrieve
+// }
+
+
 /////////////////////////////////////////////////////
 // ReviewNote Structure from Django Rest Framework //
 /////////////////////////////////////////////////////
+
+export interface ReviewNoteCreate {
+  employee_pk: number
+  note: string
+}
 
 export interface ReviewNoteRetrieve {
   url: Url
@@ -166,6 +216,11 @@ export interface ReviewNoteRetrieve {
   employee_name: string
   date: Date
   note: string
+}
+
+export interface ReviewNoteUpdate {
+  employee_pk?: number
+  note?: string
 }
 
 export interface AxiosReviewNoteRetrieveOneServerResponse {
@@ -182,16 +237,8 @@ export interface AxiosReviewNoteRetrieveManyServerResponse {
   }
 }
 
-export interface ReviewNoteUpdate {
-  employee_pk?: number
-  note?: string
-}
-
 export interface AxiosReviewNoteUpdateServerResponse {
   data: ReviewNoteRetrieve
 }
 
-export interface ReviewNoteCreate {
-  employee_pk: number
-  note: string
-}
+

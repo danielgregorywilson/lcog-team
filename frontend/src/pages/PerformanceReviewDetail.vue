@@ -243,6 +243,22 @@
 
         <h5 class="text-uppercase text-center text-bold"><u>Signatures</u></h5>
 
+        <div v-for="(signature, index) in signatures" :key="index" class="row signature-block">
+          <div class="col">
+            <div v-if="signature[1]" class="signature"><span class="signature-text">{{ signature[1] }}</span></div>
+            <div v-else class="signature">
+              <q-btn v-if="signature[3] == managerPk" color="white" text-color="black" label="Click to Sign" @click="signPerformanceReview()" class="signature-button" />
+              <div v-else>&nbsp;</div>
+            </div>
+            <span class="text-bold">{{ signature[0] }} Signature</span>
+          </div>
+          <div class="col">
+            <div v-if="signature[2]" class="signature-date">{{ signature[2] }}</div>
+            <div v-else class="signature-date">&nbsp;</div>
+            <span>Date</span>
+          </div>
+        </div>
+
         <!-- <div>
           <div class="row q-mb-md q-gutter-md items-start">
             <div class="col col-md-auto col-sm-12">
@@ -251,7 +267,9 @@
             </div>
           </div>
         </div> -->
-        <div style="height: 50px;"></div>
+        <!-- Spacing for footer -->
+        <div style="height: 80px;"></div>
+
         <div id="sticky-footer" >
           <q-btn color="white" text-color="black" label="Update" :disabled="!valuesAreChanged()" @click="updatePerformanceReview()" />
         </div>
@@ -361,6 +379,28 @@
     display: flex;
     justify-content: center;
   }
+  .signature-block {
+    margin-bottom: 20px;
+  }
+  .signature {
+    width: 300px;
+    height: 36px;
+    border-bottom: 1px black solid;
+    display: flex;
+  }
+  .signature-text {
+    font-family: cursive, serif;
+    height: 36px;
+    align-self: flex-end;
+  }
+  .signature-button {
+    // position: fixed;
+  }
+  .signature-date {
+    width: 100px;
+    height: 36px;
+    border-bottom: 1px black solid;
+  }
   #sticky-footer {
     padding: 10px;
     background-color: rgb(25, 118, 210);
@@ -441,6 +481,8 @@ export default class PerformanceReviewDetail extends Vue {
 
   private descriptionReviewedEmployeeCurrentVal = false
   private descriptionReviewedEmployee = false
+
+  private signatures = []
 
   private reviewNotes: Array<ReviewNoteRetrieve> = []
 
@@ -559,6 +601,8 @@ export default class PerformanceReviewDetail extends Vue {
         this.descriptionReviewedEmployee = pr.description_reviewed_employee
         this.descriptionReviewedEmployeeCurrentVal = this.descriptionReviewedEmployee
 
+        this.signatures = pr.all_required_signatures
+
       })
       .catch(e => {
         console.log(e)
@@ -627,6 +671,26 @@ export default class PerformanceReviewDetail extends Vue {
         this.evaluationCommentsEmployeeCurrentVal = response.data.evaluation_comments_employee
 
         this.descriptionReviewedEmployeeCurrentVal = response.data.description_reviewed_employee
+        // TODO: This is bad. We should only get the reviews of type that we need
+        this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
+          .catch(e => {
+            console.log(e)
+          })
+        this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionNotRequired')
+          .catch(e => {
+            console.log(e)
+          })
+      })
+      .catch(e => {
+        console.log(e)
+      })
+  }
+
+  private signPerformanceReview(): void {
+    // PerformanceReviewDataService.signPerformanceReview(parseInt(this.pk), this.managerPk)
+    this.$store.dispatch('performanceReviewModule/createSignature', {review_pk: this.pk, employee_pk: this.managerPk})
+      .then((response: any) => {
+        this.retrievePerformanceReview()
         // TODO: This is bad. We should only get the reviews of type that we need
         this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
           .catch(e => {

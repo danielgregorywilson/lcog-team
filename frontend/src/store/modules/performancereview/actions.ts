@@ -2,7 +2,7 @@ import { ActionTree } from 'vuex';
 import { StateInterface } from '../../index';
 import { PerformanceReviewStateInterface } from './state';
 import axios from 'axios';
-import { PerformanceReviewUpdate, ReviewNoteCreate } from 'src/store/types';
+import { PerformanceReviewUpdate, ReviewNoteCreate, SignatureCreate } from 'src/store/types';
 
 const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
   getNextPerformanceReview: ({ commit }, data: {pk: number}) => {
@@ -34,6 +34,12 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
             console.log(e)
           })
       })
+      .catch(e => {
+        console.log(e)
+      });
+  },
+  createSignature: ({ dispatch }, signature: SignatureCreate) => {
+    axios({ url: `${ process.env.API_URL }api/v1/signature`, data: signature, method: 'POST' }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
       .catch(e => {
         console.log(e)
       });

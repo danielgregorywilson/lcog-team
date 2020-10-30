@@ -8,8 +8,11 @@ from django.contrib.auth.models import User
 
 from mainsite.helpers import get_host_url, is_true_string, send_evaluation_complete_email
 
-from people.models import Employee, PerformanceReview, ReviewNote
-from people.serializers import EmployeeSerializer, PerformanceReviewSerializer, ReviewNoteSerializer, UserSerializer
+from people.models import Employee, PerformanceReview, ReviewNote, Signature
+from people.serializers import (
+    EmployeeSerializer, PerformanceReviewSerializer, ReviewNoteSerializer,
+    SignatureSerializer, UserSerializer
+)
 
 
 class CurrentUserView(RetrieveAPIView):
@@ -155,6 +158,33 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
             review.save()
             send_evaluation_complete_email([review.employee.manager.manager.user.email], review, get_host_url(self.request))
         return Response({'status': 'performance review marked as discussed by employee'})
+
+
+class SignatureViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows signatures to be created.
+    """
+    queryset = Signature.objects.all()
+    serializer_class = SignatureSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_queryset(self):
+        """
+        This view should return a list of all signatures made by this user.
+        """
+        user = self.request.user
+        # TODO: Don't do this. There is an issue where the detail view doesn't have the user
+        if user.is_anonymous:
+            return Signature.objects.all()
+        else:
+            return Signature.objects.filter(employee__user=user)
+    
+    def create(self, request):
+        pr = PerformanceReview.objects.get(pk=request.data['review_pk'])
+        employee = Employee.objects.get(pk=request.data['employee_pk'])
+        new_signature = Signature.objects.create(review=pr, employee=employee)
+        serialized_signature = SignatureSerializer(new_signature, context={'request': request})
+        return Response(serialized_signature.data)
 
 
 class ReviewNoteViewSet(viewsets.ModelViewSet):

@@ -60,6 +60,33 @@ class Employee(models.Model):
     unit_or_program = models.ForeignKey("people.UnitOrProgram", verbose_name=_("unit/program"), on_delete=models.SET_NULL, blank=True, null=True)
     job_title = models.ForeignKey("people.JobTitle", verbose_name=_("job title"), on_delete=models.SET_NULL, blank=True, null=True)
 
+    is_division_director = models.BooleanField(_("is a division director"), default=False)
+    
+    # These are UNIQUELY TRUE, enforced in model save
+    is_hr_manager = models.BooleanField(_("is the HR manager"), default=False)
+    is_executive_director = models.BooleanField(_("is the executive director"), default=False)
+
+    def save(self, *args, **kwargs):
+        # is_hr_manager can only apply to ONE Employee
+        if self.is_hr_manager:
+            try:
+                old_manager = Employee.objects.get(is_hr_manager=True)
+                if self != old_manager:
+                    old_manager.is_hr_manager = False
+                    old_manager.save()
+            except Employee.DoesNotExist:
+                pass
+        # is_executive_director can only apply to ONE Employee
+        if self.is_executive_director:
+            try:
+                old_director = Employee.objects.get(is_executive_director=True)
+                if self != old_director:
+                    old_director.is_executive_director = False
+                    old_director.save()
+            except Employee.DoesNotExist:
+                pass
+        super().save(*args, **kwargs)
+
     def employee_next_review(self):
         return self.performancereview_set.all().order_by("period_end_date").first()
 
@@ -303,6 +330,58 @@ class PerformanceReview(models.Model):
             return True
         return False
 
+    def all_required_signatures(self):
+        """
+        Returns a list of tuples of the form ("Title", Signature) such that
+        each tuple represents a signature required or already created for the
+        Performance Review to be completed. Starts with the Employee and
+        proceeds up the management chain until it gets to the Division
+        Director. And then we add HR Manager and Executive Director.
+        """
+        signatures = []
+        employee = self.employee
+        while True:
+            # Try to get the current Employee's signature and add it to the
+            # signature list
+            
+            if len(signatures) == 0:
+                title = "Employee"
+            elif len(signatures) == 1:
+                title = "Manager"
+            else:
+                if employee.job_title:
+                    title = employee.job_title.name
+                else:
+                    title = None
+            signature = Signature.objects.filter(review=self, employee=employee).first()
+            if signature:
+                signatures.append([title, signature.employee.user.get_full_name(), signature.date, None])
+            else:
+                signatures.append([title, None, None, employee.pk])
+            
+            # Get the next manager in the chain
+            if employee.is_division_director:
+                break
+            if employee.manager:
+                employee = employee.manager
+            else:
+                break
+        
+        # Finally, add the HR Manager and Executive Director Signatures
+        hr_manager = Employee.objects.filter(is_hr_manager=True).first()
+        hr_signature = Signature.objects.filter(review=self, employee=hr_manager).first()
+        if hr_signature:
+            signatures.append(["Human Resources Manager", hr_manager.user.get_full_name(), hr_signature.date, None])
+        else:
+            signatures.append(["Human Resources Manager", None, None, hr_manager.pk])
+        ed = Employee.objects.filter(is_executive_director=True).first()
+        ed_signature = Signature.objects.filter(review=self, employee=ed).first()
+        if ed_signature:
+            signatures.append(["Executive Director", ed.user.get_full_name(), ed_signature.date, None])
+        else:
+            signatures.append(["Executive Director", None, None, ed.pk])
+        return signatures
+
 
 class Signature(models.Model):
     class Meta:
@@ -311,10 +390,7 @@ class Signature(models.Model):
 
     review = models.ForeignKey("people.PerformanceReview", verbose_name=_("performance review"), on_delete=models.CASCADE)
     employee = models.ForeignKey("people.Employee", on_delete=models.CASCADE)
-    date = models.DateField(_("signatur date"), auto_now=False, auto_now_add=True)
-    is_employee = models.BooleanField(_("employee signature"), default=False)
-    is_manager = models.BooleanField(_("manager signature"), default=False)
-    is_final_signature = models.BooleanField(_("final signature"), default=False)
+    date = models.DateField(_("signature date"), auto_now=False, auto_now_add=True)
 
 
 class ReviewNote(models.Model):

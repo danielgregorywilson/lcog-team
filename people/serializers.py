@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 from rest_framework import serializers
 
-from people.models import Employee, PerformanceReview, ReviewNote
+from people.models import Employee, PerformanceReview, ReviewNote, Signature
 
 
 # Serializers define the API representation.
@@ -45,7 +45,8 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     manager_name = serializers.CharField(source='employee.manager.user.get_full_name')
     days_until_review = serializers.SerializerMethodField()
     status = serializers.CharField(source='get_status_display')
-    
+    all_required_signatures = serializers.SerializerMethodField()
+ 
     class Meta:
         model = PerformanceReview
         fields = [
@@ -64,7 +65,7 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
             'evaluation_opportunities', 'evaluation_goals_manager',
             'evaluation_goals_employee','evaluation_comments_employee',
 
-            'description_reviewed_employee'
+            'description_reviewed_employee', 'all_required_signatures'
         ]
     
     @staticmethod
@@ -100,6 +101,18 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
             return "Yes" if pr.performanceevaluation.manager_discussed else "No"
         else:
             return "No"
+    
+    @staticmethod
+    def get_all_required_signatures(pr):
+        return pr.all_required_signatures()
+
+
+class SignatureSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Signature
+        fields = [
+            'url', 'pk', 'review', 'employee', 'date'
+        ]
 
 
 class ReviewNoteSerializer(serializers.HyperlinkedModelSerializer):

@@ -35,6 +35,10 @@ class PerformanceReviewDataService {
     return http.put(`api/v1/performancereview/${pk}`, data);
   }
 
+  signPerformanceReview(performanceReviewPk: number, employeePk: number) {
+    return http.put(`api/v1/performancereview/${performanceReviewPk}/sign/${employeePk}`)
+  }
+
   managerMarkDiscussed(pk: number) {
     return http.put(`api/v1/performancereview/${pk}/manager_mark_discussed`)
   }

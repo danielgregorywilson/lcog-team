@@ -252,8 +252,8 @@
             </div>
             <span class="text-bold">{{ signature[0] }} Signature</span>
           </div>
-          <div class="col">
-            <div v-if="signature[2]" class="signature-date">{{ signature[2] }}</div>
+          <div class="col signature-date-block">
+            <div v-if="signature[2]" class="signature-date"><span class="signature-date-text">{{ signature[2] | readableDate }}</span></div>
             <div v-else class="signature-date">&nbsp;</div>
             <span>Date</span>
           </div>
@@ -390,16 +390,16 @@
   }
   .signature-text {
     font-family: cursive, serif;
-    height: 36px;
     align-self: flex-end;
-  }
-  .signature-button {
-    // position: fixed;
   }
   .signature-date {
     width: 100px;
     height: 36px;
     border-bottom: 1px black solid;
+    display: flex;
+  }
+  .signature-date-text {
+    align-self: flex-end;
   }
   #sticky-footer {
     padding: 10px;

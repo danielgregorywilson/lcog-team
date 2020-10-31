@@ -388,6 +388,9 @@ class Signature(models.Model):
         verbose_name = _("Signature")
         verbose_name_plural = _("Signatures")
 
+    def __str__(self):
+        return f"{self.employee.user.get_full_name()}'s approval of {self.review.employee.user.get_full_name()}'s performance review"
+
     review = models.ForeignKey("people.PerformanceReview", verbose_name=_("performance review"), on_delete=models.CASCADE)
     employee = models.ForeignKey("people.Employee", on_delete=models.CASCADE)
     date = models.DateField(_("signature date"), auto_now=False, auto_now_add=True)

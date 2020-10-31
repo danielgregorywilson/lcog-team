@@ -53,7 +53,7 @@
               <div class="eval-box-full-1-probationary">
                 <div class="label-radio-pair">
                   <q-radio v-model="evaluationType" val="P" />
-                  <div class="text-uppercase">Probationary:</div>
+                  <div class="text-uppercase">Probat&shy;ionary:</div>
                 </div>
                 <div class="label-radio-pair">
                   <q-radio v-model="probationaryEvaluationType" val="S" :disable="evaluationType != 'P'" />
@@ -96,7 +96,7 @@
           <div class="rating-box">The employee’s work performance consistently meets the standards of the position.</div>
           <div class="rating-box">(3) Exceeds Job Requirments</div>
           <div class="rating-box">The employee’s work performance is frequently or consistently above the level of a satisfactory employee.</div>
-          <div class="rating-box">(N/A> Not Applicable</div>
+          <div class="rating-box">(N/A) Not Applicable</div>
           <div class="rating-box">Does not pertain to the employee’s actual job duties.</div>
         </div>
         <div>*Factors rated (1) Needs improvement must be addressed with a Performance Agreement for improvement.</div>
@@ -105,11 +105,21 @@
 
         <h5 class="text-uppercase text-bold"><u>I. Performance Factors Reviewed</u></h5>
         <div class="factors-grid-container">
-          <div class="factors-header-box text-bold text-center">Performance Factors Reviewed</div>
-          <div class="factors-header-box text-bold text-center">Needs Improvement</div>
-          <div class="factors-header-box text-bold text-center">Meets Job Requirments</div>
-          <div class="factors-header-box text-bold text-center">Exceeds Job Requirements</div>
-          <div class="factors-header-box text-bold text-center">Not Applicable</div>
+
+          <!-- Desktop/Tablet Headers -->
+          <div class="factors-header-box text-bold text-center factors-header-desktop factors-header-sticky">Performance Factors Reviewed</div>
+          <div class="factors-header-box text-bold text-center factors-header-desktop factors-header-sticky">Needs Improvement</div>
+          <div class="factors-header-box text-bold text-center factors-header-desktop factors-header-sticky">Meets Job Requirements</div>
+          <div class="factors-header-box text-bold text-center factors-header-desktop factors-header-sticky">Exceeds Job Requirements</div>
+          <div class="factors-header-box text-bold text-center factors-header-desktop factors-header-sticky">Not Applicable</div>
+
+          <!-- Mobile Headers -->
+          <div class="factors-header-box text-bold text-center factors-header-mobile factors-header-sticky">Performance Factors Reviewed</div>
+          <div class="factors-header-box text-bold text-center factors-header-mobile factors-header-sticky">Needs Improv&shy;ement</div>
+          <div class="factors-header-box text-bold text-center factors-header-mobile factors-header-sticky">Meets Job Require&shy;ments</div>
+          <div class="factors-header-box text-bold text-center factors-header-mobile factors-header-sticky">Exceeds Job Require&shy;ments</div>
+          <div class="factors-header-box text-bold text-center factors-header-mobile factors-header-sticky">Not Appli&shy;cable</div>
+
           <div class="factors-box">
               <div class="row text-bold"><u>Job Knowledge</u></div>
               <div class="row">Present knowledge of techniques, skills, procedures, technologies, equipment, rules and policies of position.</div>
@@ -364,7 +374,29 @@
     background-color: black;
     padding: 2px;
     grid-gap: 2px;
-    grid-template-columns: auto auto auto auto auto;
+    grid-template-columns: auto 115px 115px 115px 115px;
+  }
+  .factors-header-mobile {
+    display: none;
+  }
+  @media only screen and (max-width: 640px) {
+    .factors-grid-container {
+      grid-template-columns: auto 68px 68px 68px 68px;
+    }
+    .factors-header-desktop {
+      display: none;
+    }
+    .factors-header-mobile {
+      display: block;
+    }
+
+  }
+  // Sticky header
+  .factors-header-sticky {
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    top: 50px;
+    z-index: 1;
   }
   .factors-header-box {
     background-color: white;

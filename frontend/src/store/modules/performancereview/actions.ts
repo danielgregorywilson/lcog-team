@@ -41,6 +41,19 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
         console.log(e)
       });
   },
+  getPerformanceReview: ({ commit }, data: {pk: number}) => {
+    return new Promise((resolve, reject) => {
+      axios({ url: `${ process.env.API_URL }api/v1/performancereview/${ data.pk }` })  // eslint-disable-line @typescript-eslint/restrict-template-expressions
+      .then(resp => {
+        commit('setPerformanceReview', resp);
+        resolve(resp);
+      })
+      .catch(e => {
+        console.log(e)
+        reject(e)
+      });
+    })
+  },
   // All performance reviews for your direct reports as well as their descendants
   getAllPerformanceReviews: ({ commit }, data: {isUpperManager: boolean}) => {
     let targetUrl: string

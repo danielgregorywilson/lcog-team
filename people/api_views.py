@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 
 from mainsite.helpers import get_host_url, is_true_string, send_evaluation_complete_email
 
@@ -77,7 +78,9 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
         """
         user = self.request.user
         if user.is_authenticated:
-            queryset = PerformanceReview.objects.filter(employee__manager__user=user) # Default queryset
+            manager_prs = PerformanceReview.objects.filter(employee__manager__user=user)
+            employee_prs = PerformanceReview.objects.filter(employee__user=user)
+            queryset = manager_prs | employee_prs # Default queryset
             upper_manager = self.request.query_params.get('upper_manager', None)
             action_required = self.request.query_params.get('action_required', None)
             if is_true_string(upper_manager):
@@ -98,6 +101,12 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
         else:
             queryset = PerformanceReview.objects.all()
         return queryset
+
+    def retrieve(self, request, pk=None):
+        queryset = PerformanceReview.objects.all()
+        pr = get_object_or_404(queryset, pk=pk)
+        serializer = PerformanceReviewSerializer(pr, context={'request': request})
+        return Response(serializer.data)
 
     def update(self, request, pk=None):
         pr = PerformanceReview.objects.get(pk=pk)
@@ -145,6 +154,14 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
             pr.description_reviewed_employee
         ]):
             pr.status = PerformanceReview.EVALUATION_WRITTEN
+        pr.save()
+        serialized_review = PerformanceReviewSerializer(pr, context={'request': request})
+        return Response(serialized_review.data)
+    
+    def partial_update(self, request, pk=None):
+        # TODO: Currently just updates the employee's comments. This might need to be more general to accept any partial updates.
+        pr = PerformanceReview.objects.get(pk=pk)
+        pr.evaluation_comments_employee = request.data['evaluation_comments_employee']
         pr.save()
         serialized_review = PerformanceReviewSerializer(pr, context={'request': request})
         return Response(serialized_review.data)

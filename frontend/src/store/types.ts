@@ -117,7 +117,6 @@ export interface PerformanceReviewCreate {
 }
 
 export interface PerformanceReviewUpdate {
-  pk: number
   evaluation_type: string
   probationary_evaluation_type: string
   step_increase: string
@@ -139,6 +138,30 @@ export interface PerformanceReviewUpdate {
   evaluation_goals_manager: string
   evaluation_comments_employee: string
   description_reviewed_employee: boolean
+}
+
+export interface PerformanceReviewUpdatePartial {
+  evaluation_type?: string
+  probationary_evaluation_type?: string
+  step_increase?: string
+  top_step_bonus?: string
+  factor_job_knowledge?: string
+  factor_work_quality?: string
+  factor_work_quantity?: string
+  factor_work_habits?: string
+  factor_analysis?: string
+  factor_initiative?: string
+  factor_interpersonal?: string
+  factor_communication?: string
+  factor_dependability?: string
+  factor_professionalism?: string
+  factor_management?: string
+  factor_supervision?: string
+  evaluation_successes?: string
+  evaluation_opportunities?: string
+  evaluation_goals_manager?: string
+  evaluation_comments_employee?: string
+  description_reviewed_employee?: boolean
 }
 
 export interface AxiosPerformanceReviewUpdateServerResponse {

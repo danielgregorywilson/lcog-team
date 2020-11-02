@@ -12,6 +12,9 @@ const mutation: MutationTree<PerformanceReviewStateInterface> = {
   setAllReviewNotes: (state, resp: {data: Array<ReviewNoteRetrieve>}) => {
     Vue.set(state, 'allReviewNotes', resp.data)
   },
+  setPerformanceReview: (state, resp: {data: PerformanceReviewRetrieve}) => {
+    Vue.set(state, 'performanceReview', resp.data)
+  },
   setAllPerformanceReviews: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
     Vue.set(state, 'allPerformanceReviews', resp.data)
   },
@@ -30,6 +33,7 @@ const mutation: MutationTree<PerformanceReviewStateInterface> = {
   authLogout: (state) => {
     // Clean up state
     state.nextPerformanceReview = {pk: undefined, employee_pk: undefined, employee_name: '', performance_period: '', days_until_review: '', status: '', evaluation: ''}
+    state.performanceReview = {pk: undefined, employee_pk: undefined, employee_name: '', performance_period: '', days_until_review: '', status: '', evaluation: ''}
     state.allPerformanceReviews = []
     state.allPerformanceReviewsActionRequired = []
     state.allPerformanceReviewsActionNotRequired = []

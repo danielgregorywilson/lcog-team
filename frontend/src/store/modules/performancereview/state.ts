@@ -16,23 +16,25 @@ export interface PerformanceReviewInterface {
 
 export interface PerformanceReviewStateInterface {
   nextPerformanceReview: PerformanceReviewInterface
+  performanceReview: PerformanceReviewInterface
   allPerformanceReviews: Array<PerformanceReviewInterface>
   allPerformanceReviewsActionRequired: Array<PerformanceReviewInterface>
   allPerformanceReviewsActionNotRequired: Array<PerformanceReviewInterface>
   allUpperManagerPerformanceReviewsActionRequired: Array<PerformanceReviewInterface>
   allUpperManagerPerformanceReviewsActionNotRequired: Array<PerformanceReviewInterface>
-  performanceReviewDetails: { [id: string]: PerformanceReviewInterface }
+  performanceReviewDetails: { [id: string]: PerformanceReviewInterface } // TODO: Use this instead of performanceReview
   allReviewNotes: Array<ReviewNoteInterface>
 }
 
 const state: PerformanceReviewStateInterface = {
-  nextPerformanceReview: {pk: undefined, employee_pk: undefined, employee_name: '', performance_period: '', days_until_review: '', status: '', evaluation: ''},
+  nextPerformanceReview: {pk: undefined, employee_pk: undefined, employee_name: '', performance_period: '', days_until_review: '', status: '', evaluation: ''}, // TODO: This is wrong shape of PR
+  performanceReview: {pk: undefined, employee_pk: undefined, employee_name: '', performance_period: '', days_until_review: '', status: '', evaluation: ''}, // TODO: This is wrong shape of PR
   allPerformanceReviews: [],
   allPerformanceReviewsActionRequired: [],
   allPerformanceReviewsActionNotRequired: [],
   allUpperManagerPerformanceReviewsActionRequired: [],
   allUpperManagerPerformanceReviewsActionNotRequired: [],
-  performanceReviewDetails: {},
+  performanceReviewDetails: {}, // TODO: Use this instead of performanceReview
   allReviewNotes: []
 };
 

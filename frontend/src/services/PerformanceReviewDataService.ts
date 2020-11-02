@@ -1,6 +1,6 @@
 import http from '../http-common';
 
-import { PerformanceReviewCreate, PerformanceReviewUpdate } from '../store/types'
+import { PerformanceReviewCreate, PerformanceReviewUpdate, PerformanceReviewUpdatePartial } from '../store/types'
 
 class PerformanceReviewDataService {
   getAll() {
@@ -33,6 +33,10 @@ class PerformanceReviewDataService {
 
   update(pk: string, data: PerformanceReviewUpdate) {
     return http.put(`api/v1/performancereview/${pk}`, data);
+  }
+
+  updatePartial(pk: string, data: PerformanceReviewUpdatePartial) {
+    return http.patch(`api/v1/performancereview/${pk}`, data);
   }
 
   signPerformanceReview(performanceReviewPk: number, employeePk: number) {

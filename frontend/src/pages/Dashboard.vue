@@ -5,6 +5,8 @@
       <div v-if="getNextReview()">
         <div>Your Next Review is scheduled for {{ getNextReview().period_end_date | readableDate }}</div>
         <div>Current Status: {{ getNextReview().status }}</div>
+        <q-btn @click="viewReview(getNextReview().pk)">View Review</q-btn>
+        {{ getNextReview() }}
         <div v-if="getNextReview().evaluation">
           <div>Your manager manager has written an evaluation:</div>
           <div>{{ getNextReview().evaluation }}</div>
@@ -67,6 +69,12 @@ export default class Dashboard extends Vue {
 
   private getNextReview(): PerformanceReviewRetrieve {
     return this.$store.getters['performanceReviewModule/nextPerformanceReview'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+  }
+  private viewReview(pk: number): void {
+    this.$router.push(`pr/${ pk }`)
+      .catch(e => {
+        console.log(e)
+      })
   }
 };
 </script>

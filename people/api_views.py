@@ -156,31 +156,6 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
         serialized_review = PerformanceReviewSerializer(review, context={'request': request})
         return Response(serialized_review.data)
 
-    @action(detail=True, methods=['put'])
-    def manager_mark_discussed(self, request, pk=None):
-        review = self.get_object()
-        evaluation = review.performanceevaluation
-        evaluation.manager_discussed = True
-        evaluation.save()
-        if evaluation.employee_discussed:
-            review.status = PerformanceReview.EVALUATION_COMPLETED
-            review.save()
-            send_evaluation_complete_email([review.employee.manager.manager.user.email], review, get_host_url(self.request))
-        return Response({'status': 'performance review marked as discussed by manager'})
-    
-    @action(detail=True, methods=['put'])
-    def employee_mark_discussed(self, request, pk=None):
-        review = PerformanceReview.objects.get(pk=pk)
-        evaluation = review.performanceevaluation
-        evaluation.employee_discussed = True
-        evaluation.save()
-        if evaluation.manager_discussed:
-            review.status = PerformanceReview.EVALUATION_COMPLETED
-            review.save()
-            send_evaluation_complete_email([review.employee.manager.manager.user.email], review, get_host_url(self.request))
-        return Response({'status': 'performance review marked as discussed by employee'})
-
-
 class SignatureViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows signatures to be created.

@@ -582,8 +582,11 @@ export default class PerformanceReviewDetail extends Vue {
         const prs = this.$store.getters['performanceReviewModule/allPerformanceReviews'].results // eslint-disable-line
         const pr: PerformanceReviewRetrieve = prs.filter((pr: PerformanceReviewRetrieve) => pr.pk == parseInt(this.$route.params.pk))[0] // eslint-disable-line
         if (!pr) {
-          console.log("PR does not seem to exist. Redirecting...")
+          console.log('PR does not seem to exist. Redirecting...')
           this.$router.push('/')
+            .catch(e => {
+              console.log(e)
+            })
           return
         }
 
@@ -742,7 +745,7 @@ export default class PerformanceReviewDetail extends Vue {
   private signPerformanceReview(): void {
     // PerformanceReviewDataService.signPerformanceReview(parseInt(this.pk), this.managerPk)
     this.$store.dispatch('performanceReviewModule/createSignature', {review_pk: this.pk, employee_pk: this.managerPk})
-      .then((response: any) => {
+      .then(() => {
         this.retrievePerformanceReview()
         // TODO: This is bad. We should only get the reviews of type that we need
         this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')

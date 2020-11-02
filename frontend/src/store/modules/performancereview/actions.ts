@@ -14,9 +14,6 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
         console.log(e)
       })
   },
-  employeeMarkDiscussed: ({ commit }) => {
-    commit('employeeMarkDiscussed')
-  },
   getAllReviewNotes: ({ commit }) => {
     axios({ url: `${ process.env.API_URL }api/v1/reviewnote` }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
       .then(resp => {
@@ -38,7 +35,7 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
         console.log(e)
       });
   },
-  createSignature: ({ dispatch }, signature: SignatureCreate) => {
+  createSignature: ({}, signature: SignatureCreate) => {
     axios({ url: `${ process.env.API_URL }api/v1/signature`, data: signature, method: 'POST' }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
       .catch(e => {
         console.log(e)

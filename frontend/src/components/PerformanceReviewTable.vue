@@ -70,9 +70,8 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { AxiosPerformanceReviewManagerMarkDiscussedServerResponse, ReviewNoteRetrieve } from '../store/types'
+import { ReviewNoteRetrieve } from '../store/types'
 import { bus } from '../App.vue'
-import PerformanceReviewDataService from '../services/PerformanceReviewDataService';
 import { PerformanceReviewRetrieve } from '../store/types'
 import '../filters'
 
@@ -170,17 +169,6 @@ export default class PerformanceReviewTable extends Vue {
 
   private editEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {
     this.$router.push(`pr/${ props.row.pk }`)
-      .catch(e => {
-        console.log(e)
-      })
-  }
-
-  private managerMarkDiscussed(props: QuasarPerformanceReviewTableRowClickActionProps): void {
-    PerformanceReviewDataService.managerMarkDiscussed(props.row.pk)
-      .then((response: AxiosPerformanceReviewManagerMarkDiscussedServerResponse) => {
-        console.log(response.data.status)
-        bus.$emit('updatePerformanceReviewTables', 'updated table') // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      })
       .catch(e => {
         console.log(e)
       })

@@ -8,11 +8,6 @@
         <div v-if="getNextReview().evaluation">
           <div>Your manager manager has written an evaluation:</div>
           <div>{{ getNextReview().evaluation }}</div>
-          <div v-if="getNextReview().employee_marked_discussed">You have marked this evaluation as discussed</div>
-          <div v-else>
-            <div>Evaluation is currently not marked as discussed</div>
-            <q-btn @click="employeeMarkDiscussed">Mark as discussed</q-btn>
-          </div>
         </div>
       </div>
       <div v-else>
@@ -53,8 +48,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import ReviewNoteTable from '../components/ReviewNoteTable.vue';
 import PerformanceReviewTable from '../components/PerformanceReviewTable.vue';
-import PerformanceReviewDataService from '../services/PerformanceReviewDataService'
-import { AxiosPerformanceReviewManagerMarkDiscussedServerResponse, PerformanceReviewRetrieve } from '../store/types'
+import { PerformanceReviewRetrieve } from '../store/types'
 
 @Component({
   components: { PerformanceReviewTable, ReviewNoteTable }
@@ -73,20 +67,6 @@ export default class Dashboard extends Vue {
 
   private getNextReview(): PerformanceReviewRetrieve {
     return this.$store.getters['performanceReviewModule/nextPerformanceReview'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
-  }
-
-  private employeeMarkDiscussed(): void {
-    PerformanceReviewDataService.employeeMarkDiscussed(this.getNextReview().pk)
-      .then((response: AxiosPerformanceReviewManagerMarkDiscussedServerResponse) => {
-        console.log(response.data.status)
-        this.$store.dispatch('performanceReviewModule/employeeMarkDiscussed')
-          .catch(e => {
-            console.log(e)
-          })
-      })
-      .catch(e => {
-        console.log(e)
-      })
   }
 };
 </script>

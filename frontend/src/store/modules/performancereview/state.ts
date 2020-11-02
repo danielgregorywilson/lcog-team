@@ -13,7 +13,6 @@ export interface PerformanceReviewInterface {
   status: string
   date_of_discussion: string
   evaluation: string
-  employee_marked_discussed: boolean
   discussion_took_place: boolean
 }
 
@@ -29,7 +28,7 @@ export interface PerformanceReviewStateInterface {
 }
 
 const state: PerformanceReviewStateInterface = {
-  nextPerformanceReview: {pk: undefined, employee_pk: undefined, employee_name: '', date_of_review: '', days_until_review: '', status: '', date_of_discussion: '', evaluation: '', employee_marked_discussed: false, discussion_took_place: false},
+  nextPerformanceReview: {pk: undefined, employee_pk: undefined, employee_name: '', date_of_review: '', days_until_review: '', status: '', date_of_discussion: '', evaluation: '', discussion_took_place: false},
   allPerformanceReviews: [],
   allPerformanceReviewsActionRequired: [],
   allPerformanceReviewsActionNotRequired: [],

@@ -157,12 +157,6 @@ export interface AxiosPerformanceReviewSignServerResponse {
   }
 }
 
-export interface AxiosPerformanceReviewManagerMarkDiscussedServerResponse {
-  data: {
-    status: string
-  }
-}
-
 
 /////////////////////////////////////////////////////
 // Signature Structure from Django Rest Framework //

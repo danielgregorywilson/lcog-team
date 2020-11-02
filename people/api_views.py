@@ -122,7 +122,28 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
         pr.evaluation_goals_manager = request.data['evaluation_goals_manager']
         pr.evaluation_comments_employee = request.data['evaluation_comments_employee']
         pr.description_reviewed_employee = request.data['description_reviewed_employee']
-        if pr.status == PerformanceReview.NEEDS_EVALUATION and pr.evaluation_successes:
+        if pr.status == PerformanceReview.NEEDS_EVALUATION and all([
+            (pr.evaluation_type == 'A' or (pr.evaluation_type == 'P' and pr.probationary_evaluation_type != None)),
+            pr.step_increase != None,
+            pr.top_step_bonus != None,
+            pr.factor_job_knowledge != None,
+            pr.factor_work_quality != None,
+            pr.factor_work_quantity != None,
+            pr.factor_work_habits != None,
+            pr.factor_analysis != None,
+            pr.factor_initiative != None,
+            pr.factor_interpersonal != None,
+            pr.factor_communication != None,
+            pr.factor_dependability != None,
+            pr.factor_professionalism != None,
+            pr.factor_management != None,
+            pr.factor_supervision != None,
+            len(pr.evaluation_successes) > 0,
+            len(pr.evaluation_opportunities) > 0,
+            len(pr.evaluation_goals_manager) > 0,
+            len(pr.evaluation_comments_employee) > 0,
+            pr.description_reviewed_employee
+        ]):
             pr.status = PerformanceReview.EVALUATION_WRITTEN
         pr.save()
         serialized_review = PerformanceReviewSerializer(pr, context={'request': request})

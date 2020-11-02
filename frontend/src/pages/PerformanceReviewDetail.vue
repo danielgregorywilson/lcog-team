@@ -280,8 +280,9 @@
         <!-- Spacing for footer -->
         <div style="height: 80px;"></div>
 
-        <div id="sticky-footer" >
-          <q-btn color="white" text-color="black" label="Update" :disabled="!valuesAreChanged()" @click="updatePerformanceReview()" />
+        <div id="sticky-footer" class="row justify-between">
+          <q-btn class="col-1" color="white" text-color="black" label="Update" :disabled="!valuesAreChanged()" @click="updatePerformanceReview()" />
+          <div class="col-3 self-center status">Current Status: {{ status }}</div>
         </div>
 
       </div>
@@ -438,7 +439,18 @@
     background-color: rgb(25, 118, 210);
     position: fixed;
     bottom: 0;
-    width: 100%
+    right: 0;
+    left: 0;
+    z-index: 2;
+
+    .status {
+      color: white;
+    }
+  }
+  @media only screen and (min-width: 1024px) {
+    #sticky-footer {
+      left: 209px;
+    }
   }
 </style>
 
@@ -454,6 +466,8 @@ import ReviewNoteDataService from '../services/ReviewNoteDataService'
 export default class PerformanceReviewDetail extends Vue {
   private date: Date = new Date()
   private pk = ''
+  private status = ''
+
   private employeePk = -1
   private managerPk = -1
   private employeeName = ''
@@ -567,7 +581,13 @@ export default class PerformanceReviewDetail extends Vue {
         // this.retrieveReviewNotes()
         const prs = this.$store.getters['performanceReviewModule/allPerformanceReviews'].results // eslint-disable-line
         const pr: PerformanceReviewRetrieve = prs.filter((pr: PerformanceReviewRetrieve) => pr.pk == parseInt(this.$route.params.pk))[0] // eslint-disable-line
+        if (!pr) {
+          console.log("PR does not seem to exist. Redirecting...")
+          this.$router.push('/')
+          return
+        }
 
+        this.status = pr.status
         this.employeePk = pr.employee_pk
         this.managerPk = pr.manager_pk
         this.retrieveReviewNotes()
@@ -678,7 +698,8 @@ export default class PerformanceReviewDetail extends Vue {
       description_reviewed_employee: this.descriptionReviewedEmployee
     })
       .then((response: AxiosPerformanceReviewUpdateServerResponse) => {
-        // this.discussionDateCurrentVal = response.data.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
+        this.status = response.data.status
+
         this.evaluationTypeCurrentVal = response.data.evaluation_type
         this.probationaryEvaluationTypeCurrentVal = response.data.probationary_evaluation_type
         this.stepIncreaseCurrentVal = response.data.step_increase

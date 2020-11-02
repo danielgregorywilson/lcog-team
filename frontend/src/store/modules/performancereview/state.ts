@@ -8,12 +8,10 @@ export interface PerformanceReviewInterface {
   pk?: number
   employee_pk?: number
   employee_name: string
-  date_of_review: string
+  performance_period: string
   days_until_review: string
   status: string
-  date_of_discussion: string
   evaluation: string
-  discussion_took_place: boolean
 }
 
 export interface PerformanceReviewStateInterface {
@@ -28,7 +26,7 @@ export interface PerformanceReviewStateInterface {
 }
 
 const state: PerformanceReviewStateInterface = {
-  nextPerformanceReview: {pk: undefined, employee_pk: undefined, employee_name: '', date_of_review: '', days_until_review: '', status: '', date_of_discussion: '', evaluation: '', discussion_took_place: false},
+  nextPerformanceReview: {pk: undefined, employee_pk: undefined, employee_name: '', performance_period: '', days_until_review: '', status: '', evaluation: ''},
   allPerformanceReviews: [],
   allPerformanceReviewsActionRequired: [],
   allPerformanceReviewsActionNotRequired: [],

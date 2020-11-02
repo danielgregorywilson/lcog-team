@@ -464,7 +464,6 @@ import ReviewNoteDataService from '../services/ReviewNoteDataService'
 
 @Component
 export default class PerformanceReviewDetail extends Vue {
-  private date: Date = new Date()
   private pk = ''
   private status = ''
 
@@ -487,9 +486,6 @@ export default class PerformanceReviewDetail extends Vue {
   private stepIncrease = ''
   private topStepBonusCurrentVal = ''
   private topStepBonus = ''
-
-  private discussionDateCurrentVal = ''
-  private discussionDate = ''
 
   private factorJobKnowledgeCurrentVal = ''
   private factorJobKnowledge = ''
@@ -542,7 +538,6 @@ export default class PerformanceReviewDetail extends Vue {
 
   private valuesAreChanged(): boolean {
     if (
-      // this.discussionDate == this.discussionDateCurrentVal && // TODO: Remove
       this.evaluationType == this.evaluationTypeCurrentVal &&
       this.probationaryEvaluationType == this.probationaryEvaluationTypeCurrentVal &&
       this.stepIncrease == this.stepIncreaseCurrentVal &&
@@ -597,18 +592,12 @@ export default class PerformanceReviewDetail extends Vue {
         this.pk = pr.pk.toString()
         this.employeeName = pr.employee_name
         this.managerName = pr.manager_name
-        this.date = pr.date_of_review;
         this.periodStartDate = pr.period_start_date
         this.periodEndDate = pr.period_end_date
         this.effectiveDate = pr.effective_date
         this.division = pr.employee_division
         this.unitOrProgram = pr.employee_unit_or_program
         this.jobTitle = pr.employee_job_title
-
-        if (pr.date_of_discussion) {
-          this.discussionDate = pr.date_of_discussion.toString().split('-').join('/') // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
-        }
-        this.discussionDateCurrentVal = this.discussionDate
 
         this.evaluationType = pr.evaluation_type
         this.evaluationTypeCurrentVal = this.evaluationType
@@ -677,7 +666,6 @@ export default class PerformanceReviewDetail extends Vue {
   private updatePerformanceReview(): void {
     PerformanceReviewDataService.update(this.pk, {
       pk: parseInt(this.pk, 10),
-      date_of_discussion: this.discussionDate.split('/').join('-'), // TODO: Replace with .replaceAll() - new as of 8/2020 and not in Vetur yet
       evaluation_type: this.evaluationType,
       probationary_evaluation_type: this.probationaryEvaluationType,
       step_increase: this.stepIncrease,

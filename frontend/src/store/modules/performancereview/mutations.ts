@@ -29,7 +29,7 @@ const mutation: MutationTree<PerformanceReviewStateInterface> = {
   },
   authLogout: (state) => {
     // Clean up state
-    state.nextPerformanceReview = {pk: undefined, employee_pk: undefined, employee_name: '', date_of_review: '', days_until_review: '', status: '', date_of_discussion: '', evaluation: '', discussion_took_place: false}
+    state.nextPerformanceReview = {pk: undefined, employee_pk: undefined, employee_name: '', performance_period: '', days_until_review: '', status: '', evaluation: ''}
     state.allPerformanceReviews = []
     state.allPerformanceReviewsActionRequired = []
     state.allPerformanceReviewsActionNotRequired = []

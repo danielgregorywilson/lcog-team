@@ -18,9 +18,9 @@
         <th v-else>{{props.col.label}}</th>
       </template>
       <!-- Slots for body cells: Show dates in a familiar format; make sure status can wrap, and display action buttons -->
-      <template v-slot:body-cell-dateOfReview="props">
-        <q-td key="dateOfReview" :props="props">
-          {{ props.row.date_of_review | readableDate }}
+      <template v-slot:body-cell-performancePeriod="props">
+        <q-td key="performancePeriod" :props="props">
+          {{ props.row.period_start_date | readableDate }} - {{ props.row.period_end_date | readableDate }}
         </q-td>
       </template>
       <template v-slot:body-cell-status="props">
@@ -113,17 +113,17 @@ export default class PerformanceReviewTable extends Vue {
   private columns(): Array<EvaluationColumn> {
     if (this.upperManager) {
       return [
-        { name: 'employeeName', label: 'Employee Name', align: 'center', field: 'employee_name', sortable: true },
-        { name: 'managerName', label: 'Manager Name', align: 'center', field: 'manager_name', sortable: true },
-        { name: 'dateOfReview', align: 'center', label: 'Date of Review', field: 'date_of_review', sortable: true },
+        { name: 'employeeName', label: 'Employee', align: 'center', field: 'employee_name', sortable: true },
+        { name: 'managerName', label: 'Manager', align: 'center', field: 'manager_name', sortable: true },
+        { name: 'performancePeriod', align: 'center', label: 'Performance Period', field: 'performance_period', sortable: true },
         { name: 'daysUntilReview', align: 'center', label: 'Days Until Review', field: 'days_until_review', sortable: true },
         { name: 'status', align: 'center', label: 'Status', field: 'status' },
         { name: 'actions', label: 'Actions', align: 'around', },
       ]
     } else {
       return [
-        { name: 'employeeName', label: 'Employee Name', align: 'center', field: 'employee_name', sortable: true },
-        { name: 'dateOfReview', align: 'center', label: 'Date of Review', field: 'date_of_review', sortable: true },
+        { name: 'employeeName', label: 'Employee', align: 'center', field: 'employee_name', sortable: true },
+        { name: 'performancePeriod', align: 'center', label: 'Performance Period', field: 'performance_period', sortable: true },
         { name: 'daysUntilReview', align: 'center', label: 'Days Until Review', field: 'days_until_review', sortable: true },
         { name: 'status', align: 'center', label: 'Status', field: 'status' },
         { name: 'actions', label: 'Actions', align: 'around', },

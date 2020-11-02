@@ -17,14 +17,6 @@
         <th v-if="$q.screen.lt.lg" style="white-space: normal;">{{props.col.label}}</th>
         <th v-else>{{props.col.label}}</th>
       </template>
-      <template v-slot:header-cell-dateOfDiscussion="props">
-        <th v-if="$q.screen.lt.lg" style="white-space: normal;">{{props.col.label}}</th>
-        <th v-else>{{props.col.label}}</th>
-      </template>
-      <template v-slot:header-cell-discussionTookPlace="props">
-        <th v-if="$q.screen.lt.lg" style="white-space: normal;">{{props.col.label}}</th>
-        <th v-else>{{props.col.label}}</th>
-      </template>
       <!-- Slots for body cells: Show dates in a familiar format; make sure status can wrap, and display action buttons -->
       <template v-slot:body-cell-dateOfReview="props">
         <q-td key="dateOfReview" :props="props">
@@ -34,16 +26,10 @@
       <template v-slot:body-cell-status="props">
         <q-td style="white-space: normal;" :props="props">{{ props.row.status }}</q-td>
       </template>
-      <template v-slot:body-cell-dateOfDiscussion="props">
-        <q-td key="dateOfDiscussion" :props="props" >
-          {{ props.row.date_of_discussion | readableDate }}
-        </q-td>
-      </template>
       <template v-slot:body-cell-actions="props">
-        <q-td :props="props" :class="{ 'wide-actions' : props.row.discussion_took_place == 'No'}">
+        <q-td :props="props">
           <div class="row">
             <q-btn class="col" dense round flat color="grey" @click="editEvaluation(props)" icon="edit"></q-btn>
-            <q-btn class="col" v-if="!upperManager && props.row.discussion_took_place=='No'" color="white" text-color="black" label="Mark as Discussed" @click="managerMarkDiscussed(props)" />
           </div>
         </q-td>
       </template>
@@ -60,7 +46,6 @@
                   </div>
                   <div class="q-table__grid-item-value row q-gutter-sm" v-else>
                     <q-btn class="col" dense round flat color="grey" @click="editEvaluation(props)" icon="edit"></q-btn>
-                    <q-btn class="col" v-if="props.row.discussion_took_place=='No'" color="white" text-color="black" label="Mark as Discussed" @click="managerMarkDiscussed(props)" />
                   </div>
                 </div>
               </q-item>
@@ -134,7 +119,6 @@ export default class PerformanceReviewTable extends Vue {
         { name: 'dateOfReview', align: 'center', label: 'Date of Review', field: 'date_of_review', sortable: true },
         { name: 'daysUntilReview', align: 'center', label: 'Days Until Review', field: 'days_until_review', sortable: true },
         { name: 'status', align: 'center', label: 'Status', field: 'status' },
-        { name: 'dateOfDiscussion', align: 'center', label: 'Date of Discussion', field: 'date_of_discussion' },
         { name: 'actions', label: 'Actions', align: 'around', },
       ]
     } else {
@@ -143,8 +127,6 @@ export default class PerformanceReviewTable extends Vue {
         { name: 'dateOfReview', align: 'center', label: 'Date of Review', field: 'date_of_review', sortable: true },
         { name: 'daysUntilReview', align: 'center', label: 'Days Until Review', field: 'days_until_review', sortable: true },
         { name: 'status', align: 'center', label: 'Status', field: 'status' },
-        { name: 'dateOfDiscussion', align: 'center', label: 'Date of Discussion', field: 'date_of_discussion' },
-        { name: 'discussionTookPlace', align: 'center', label: 'Discussion took place', field: 'discussion_took_place' },
         { name: 'actions', label: 'Actions', align: 'around', },
       ]
     }

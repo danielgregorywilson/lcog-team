@@ -249,6 +249,7 @@
         <q-input
           v-model="evaluationCommentsEmployee"
           type="textarea"
+          :disable="!currentUserIsEmployee()"
         />
         <q-btn v-if="currentUserIsEmployee()" color="white" text-color="black" label="Save comments" @click="updateEmployeeComments()" class="q-mt-sm" :disable="!employeeCommentsIsChanged()" />
 
@@ -680,8 +681,9 @@ export default class PerformanceReviewDetail extends Vue {
       })
   }
 
-  private updatePerformanceReview(): void {
-    PerformanceReviewDataService.update(this.prPk, {
+  private updatePerformanceReview() {
+    return new Promise((resolve, reject) => {
+      PerformanceReviewDataService.update(this.prPk, {
       evaluation_type: this.evaluationType,
       probationary_evaluation_type: this.probationaryEvaluationType,
       step_increase: this.stepIncrease,
@@ -731,19 +733,24 @@ export default class PerformanceReviewDetail extends Vue {
         this.evaluationCommentsEmployeeCurrentVal = response.data.evaluation_comments_employee
 
         this.descriptionReviewedEmployeeCurrentVal = response.data.description_reviewed_employee
+        resolve()
         // TODO: This is bad. We should only get the reviews of type that we need
         this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
           .catch(e => {
             console.log(e)
+            reject(e)
           })
         this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionNotRequired')
           .catch(e => {
             console.log(e)
+            reject(e)
           })
       })
       .catch(e => {
         console.log(e)
+        reject(e)
       })
+    })
   }
 
   private updateEmployeeComments(): void {
@@ -762,13 +769,19 @@ export default class PerformanceReviewDetail extends Vue {
     // PerformanceReviewDataService.signPerformanceReview(parseInt(this.pk), this.managerPk)
     this.$store.dispatch('performanceReviewModule/createSignature', {review_pk: this.prPk, employee_pk: this.currentUserPk()})
       .then(() => {
-        this.retrievePerformanceReview()
-        // TODO: This is bad. We should only get the reviews of type that we need
-        this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
-          .catch(e => {
-            console.log(e)
+        this.updatePerformanceReview()
+          .then(() => {
+            this.retrievePerformanceReview()
+            // TODO: This is bad. We should only get the reviews of type that we need
+            this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
+              .catch(e => {
+                console.log(e)
+              })
+            this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionNotRequired')
+              .catch(e => {
+                console.log(e)
+              })
           })
-        this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionNotRequired')
           .catch(e => {
             console.log(e)
           })

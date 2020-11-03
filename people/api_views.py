@@ -150,7 +150,6 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
             len(pr.evaluation_successes) > 0,
             len(pr.evaluation_opportunities) > 0,
             len(pr.evaluation_goals_manager) > 0,
-            len(pr.evaluation_comments_employee) > 0,
             pr.description_reviewed_employee
         ]):
             pr.status = PerformanceReview.EVALUATION_WRITTEN

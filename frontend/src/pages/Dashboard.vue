@@ -1,16 +1,16 @@
 <template>
   <q-page class="q-pa-md">
     <div class="q-py-md">
-      <div class="text-h4">Your Next Review</div>
-      <div v-if="getNextReview()">
-        <div>Your Next Review is scheduled for {{ getNextReview().period_end_date | readableDate }}</div>
-        <div>Current Status: {{ getNextReview().status }}</div>
-        <q-btn @click="viewReview(getNextReview().pk)">View Review</q-btn>
-        {{ getNextReview() }}
-        <div v-if="getNextReview().evaluation">
-          <div>Your manager manager has written an evaluation:</div>
-          <div>{{ getNextReview().evaluation }}</div>
+      <div class="text-h4 q-mb-md">Your Next Review</div>
+      <div v-if="getNextReview().employee_pk">
+        <div class="q-mb-sm">Current Perforance Period: {{ getNextReview().period_start_date | readableDate }} - {{ getNextReview().period_end_date | readableDate }}</div>
+        <div v-if="nextReviewNeedsEvaluation()">Your manager has not yet completed their evaluation.</div>
+        <div v-if="!nextReviewNeedsEvaluation() && !userSignedNextEvaluation()">
+          <div>Your manager has completed their evaluation and it is ready for your review.</div>
+          <q-btn @click="viewReview(getNextReview().pk)">View and Sign Evaluation</q-btn>
         </div>
+        <q-btn v-if="!nextReviewNeedsEvaluation() && userSignedNextEvaluation()" @click="viewReview(getNextReview().pk)">View Evaluation</q-btn>
+        
       </div>
       <div v-else>
         <div class="text-body1">You do not have a scheduled upcoming review</div>
@@ -70,6 +70,20 @@ export default class Dashboard extends Vue {
   private getNextReview(): PerformanceReviewRetrieve {
     return this.$store.getters['performanceReviewModule/nextPerformanceReview'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
   }
+
+  private nextReviewNeedsEvaluation(): boolean {
+    return this.getNextReview().status == 'Needs evaluation'
+  }
+
+  private userSignedNextEvaluation(): boolean {
+    // Return if there is a date for the employee's signature on the review
+    if (this.getNextReview().all_required_signatures) {
+      return !!this.getNextReview().all_required_signatures[0][2]
+    } else {
+      return false
+    }
+  }
+
   private viewReview(pk: number): void {
     this.$router.push(`pr/${ pk }`)
       .catch(e => {

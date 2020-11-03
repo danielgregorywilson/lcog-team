@@ -262,7 +262,6 @@
           <div class="col">
             <div v-if="signature[1]" class="signature"><span class="signature-text">{{ signature[1] }}</span></div>
             <div v-else class="signature">
-              {{ }}
               <q-btn v-if="signature[3] == currentUserPk()" color="white" text-color="black" label="Click to Sign" @click="signPerformanceReview()" class="signature-button" />
               <div v-else>&nbsp;</div>
             </div>
@@ -530,7 +529,7 @@ export default class PerformanceReviewDetail extends Vue {
   private descriptionReviewedEmployeeCurrentVal = false
   private descriptionReviewedEmployee = false
 
-  private signatures = []
+  private signatures = [['', '', '']]
 
   private reviewNotes: Array<ReviewNoteRetrieve> = []
 

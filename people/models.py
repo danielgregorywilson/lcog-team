@@ -93,12 +93,24 @@ class Employee(models.Model):
     def get_direct_reports(self):
         return self.direct_reports.all()
     
+    def get_descendants_of_employee(self, employee):
+        employee_and_descendants = [employee]
+        descendants = employee.direct_reports.all()
+        for descendant in descendants:
+            employee_and_descendants += self.get_descendants_of_employee(descendant)
+        return employee_and_descendants
+
     def get_direct_reports_descendants(self):
-        direct_reports_descendants = []
-        for direct_report in self.get_direct_reports():
-            for descendant in direct_report.direct_reports.all():
-                direct_reports_descendants.append(descendant.pk)
-        unique_descendant_pks = list(set(direct_reports_descendants))
+        direct_reports_descendants = [self.get_descendants_of_employee(employee) for employee in self.get_direct_reports()]
+        flat_list = [item for sublist in direct_reports_descendants for item in sublist] # Flatten the 2-D list
+        pk_list = [item.pk for item in flat_list]
+        
+        
+        # direct_reports_descendants = []
+        # for direct_report in self.get_direct_reports():
+        #     for descendant in direct_report.direct_reports.all():
+        #         direct_reports_descendants.append(descendant.pk)
+        unique_descendant_pks = list(set(pk_list))
         return Employee.objects.filter(pk__in=unique_descendant_pks)
 
     def manager_upcoming_reviews(self):

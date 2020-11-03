@@ -2,7 +2,7 @@ import { ActionTree } from 'vuex';
 import { StateInterface } from '../../index';
 import { PerformanceReviewStateInterface } from './state';
 import axios from 'axios';
-import { PerformanceReviewUpdate, ReviewNoteCreate, SignatureCreate } from 'src/store/types';
+import { ReviewNoteCreate, SignatureCreate } from 'src/store/types';
 
 const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
   getNextPerformanceReview: ({ commit }, data: {pk: number}) => {
@@ -110,23 +110,26 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
         console.log(e)
       });
   },
-  updatePerformanceReview: ({ dispatch }, performanceReview: PerformanceReviewUpdate) => {
-    const token = localStorage.getItem('user-token')
-    return new Promise((resolve, reject) => {
-      axios({ url: `${ process.env.API_URL }api/v1/performancereview/${performanceReview.pk}`, data: performanceReview, method: 'PUT', headers: { 'Authorization': `Token ${ token }`} }) // eslint-disable-line
-      .then(resp => {
-        dispatch('getAllPerformanceReviews')
-          .catch(e => {
-            console.log(e)
-          })
-        resolve(resp);
-      })
-      .catch(e => {
-        console.log(e)
-        reject(e)
-      });
-    })
-  },
+  // TODO: Still needed?
+  // updatePerformanceReview: ({ dispatch }, performanceReview: PerformanceReviewUpdate) => {
+  //   const token = localStorage.getItem('user-token')
+  //   console.log('TODO:UPDATE')
+  //   return new Promise((resolve, reject) => {
+  //     debugger
+  //     axios({ url: `${ process.env.API_URL }api/v1/performancereview/${performanceReview.pk}`, data: performanceReview, method: 'PUT', headers: { 'Authorization': `Token ${ token }`} }) // eslint-disable-line
+  //     .then(resp => {
+  //       dispatch('getAllPerformanceReviews')
+  //         .catch(e => {
+  //           console.log(e)
+  //         })
+  //       resolve(resp);
+  //     })
+  //     .catch(e => {
+  //       console.log(e)
+  //       reject(e)
+  //     });
+  //   })
+  // },
   authLogout: ({commit}) => {
     return new Promise((resolve) => {
       commit('authLogout')

@@ -26,7 +26,7 @@
     <div class="q-py-md" v-if="isManager()">
       <div class="row items-center q-mb-md">
         <q-avatar icon="assignment_ind" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
-        <div class="text-h4">Current Reviews (For Managers)</div>
+        <div class="text-h4">Reviews for your Direct Reports</div>
       </div>
       <div class="text-h6">Action Required</div>
         <performance-review-table :actionRequired="true" />
@@ -36,11 +36,11 @@
     <div class="q-py-md" v-if="isUpperManager()">
       <div class="row items-center q-mb-md">
         <q-avatar icon="assignment_ind" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
-        <div class="text-h4">All Current Reviews (For Upper Managers)</div>
+        <div class="text-h4">Reviews to Sign</div>
       </div>
-      <div class="text-h6">Action Required</div>
+      <div class="text-h6">Signature Required</div>
         <performance-review-table :upperManager="true" :actionRequired="true" />
-      <div class="text-h6">No Action Required</div>
+      <div class="text-h6">Signed</div>
         <performance-review-table :upperManager="true" :actionRequired="false" />
     </div>
   </q-page>

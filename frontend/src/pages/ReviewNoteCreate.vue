@@ -19,6 +19,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { AxiosEmployeeRetrieveManyServerResponse } from '../store/types'
 import EmployeeDataService from '../services/EmployeeDataService'
+import { debug } from 'util'
 
 
 interface EmployeeOption {
@@ -36,7 +37,7 @@ export default class ReviewNoteCreate extends Vue{
     EmployeeDataService.getDirectReports()
       .then((response: AxiosEmployeeRetrieveManyServerResponse) => {
         this.options = response.data.results.map(obj => {
-          return {label: obj.employee_name, value: obj.pk}
+          return {label: obj.name, value: obj.pk}
         })
       })
       .catch(e => {

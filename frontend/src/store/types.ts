@@ -37,7 +37,7 @@ export interface AxiosUserRetrieveOneServerResponse {
 export interface EmployeeRetrieve {
   url: string
   pk: number
-  employee_name: string
+  name: string
   employee_pk: number
   user: Url
   manager: Url

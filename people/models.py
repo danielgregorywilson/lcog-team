@@ -104,12 +104,6 @@ class Employee(models.Model):
         direct_reports_descendants = [self.get_descendants_of_employee(employee) for employee in self.get_direct_reports()]
         flat_list = [item for sublist in direct_reports_descendants for item in sublist] # Flatten the 2-D list
         pk_list = [item.pk for item in flat_list]
-        
-        
-        # direct_reports_descendants = []
-        # for direct_report in self.get_direct_reports():
-        #     for descendant in direct_report.direct_reports.all():
-        #         direct_reports_descendants.append(descendant.pk)
         unique_descendant_pks = list(set(pk_list))
         return Employee.objects.filter(pk__in=unique_descendant_pks)
 
@@ -165,10 +159,12 @@ class Employee(models.Model):
     def upper_manager_upcoming_reviews_action_required(self):
         # Returns all upcoming reviews for a manager's direct reports which
         # require action from the manager to proceed. For list views.
-        # TODO: When needs signature
         reviews = []
         for review in self.upper_manager_upcoming_reviews():
-            if review.status == PerformanceReview.EVALUATION_WRITTEN:
+            if (
+                review.status == PerformanceReview.EVALUATION_WRITTEN and
+                review.signature_set.filter(employee=self.pk).count() == 0
+            ):
                 reviews.append(review)
         return reviews
     
@@ -177,7 +173,7 @@ class Employee(models.Model):
         # not require action from the manager to proceed. For list views.
         reviews = []
         for review in self.upper_manager_upcoming_reviews():
-            if review.status != PerformanceReview.EVALUATION_WRITTEN:
+            if review.signature_set.filter(employee=self.pk).count() > 0:
                 reviews.append(review)
         return reviews
 

@@ -75,7 +75,7 @@ export default class ReviewNoteDetail extends Vue{
     EmployeeDataService.getDirectReports()
       .then((response: AxiosEmployeeRetrieveManyServerResponse) => {
         this.options = response.data.results.map(obj => {
-          return {label: obj.employee_name, value: obj.pk.toString()}
+          return {label: obj.name, value: obj.pk.toString()}
         })
       })
       .catch(e => {

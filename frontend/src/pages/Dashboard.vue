@@ -10,7 +10,7 @@
           <q-btn @click="viewReview(getNextReview().pk)">View and Sign Evaluation</q-btn>
         </div>
         <q-btn v-if="!nextReviewNeedsEvaluation() && userSignedNextEvaluation()" @click="viewReview(getNextReview().pk)">View Evaluation</q-btn>
-        
+
       </div>
       <div v-else>
         <div class="text-body1">You do not have a scheduled upcoming review</div>
@@ -33,7 +33,7 @@
       <div class="text-h6">No Action Required</div>
         <performance-review-table :actionRequired="false" />
     </div>
-    <div class="q-py-md" v-if="isUpperManager()">
+    <div class="q-py-md" v-if="isUpperManager() || isTheHRManager() || isTheExecutiveDirector()">
       <div class="row items-center q-mb-md">
         <q-avatar icon="assignment_ind" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
         <div class="text-h4">Reviews to Sign</div>
@@ -65,6 +65,14 @@ export default class Dashboard extends Vue {
 
   private isUpperManager(): boolean {
     return this.$store.getters['userModule/getEmployeeProfile'].is_upper_manager // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+  }
+
+  private isTheHRManager(): boolean {
+    return this.$store.getters['userModule/getEmployeeProfile'].is_hr_manager // eslint-disable-line
+  }
+
+  private isTheExecutiveDirector(): boolean {
+    return this.$store.getters['userModule/getEmployeeProfile'].is_executive_director // eslint-disable-line
   }
 
   private getNextReview(): PerformanceReviewRetrieve {

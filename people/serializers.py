@@ -24,7 +24,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['url', 'pk', 'name', 'user', 'email', 'manager', 'is_manager', 'is_upper_manager']
+        fields = ['url', 'pk', 'name', 'user', 'email', 'manager', 'is_manager', 'is_upper_manager', 'is_hr_manager', 'is_executive_director']
 
     @staticmethod
     def get_is_manager(employee):

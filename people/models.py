@@ -148,8 +148,16 @@ class Employee(models.Model):
     
     def upper_manager_upcoming_reviews(self):
         # Returns all upcoming reviews for a manager's direct reports.
+        # HR Manager and Executive Director should see upcoming reviews for all
+        # Employees.
         reviews = []
-        for employee in self.get_direct_reports_descendants():
+        if self.is_hr_manager:
+            employees = Employee.objects.all()
+        elif self.is_hr_manager:
+            employees = Employee.objects.all()
+        else:
+            employees = self.get_direct_reports_descendants()
+        for employee in employees:
             employee_reviews = employee.performancereview_set.all()
             for review in employee_reviews:
                 if review.days_until_due() < SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE:

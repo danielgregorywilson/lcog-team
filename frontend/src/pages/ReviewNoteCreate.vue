@@ -19,7 +19,6 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { AxiosEmployeeRetrieveManyServerResponse } from '../store/types'
 import EmployeeDataService from '../services/EmployeeDataService'
-import { debug } from 'util'
 
 
 interface EmployeeOption {

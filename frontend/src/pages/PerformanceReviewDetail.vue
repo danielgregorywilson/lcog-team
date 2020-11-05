@@ -127,7 +127,7 @@
         <div class="factors-radio-box"><q-radio v-model="factorJobKnowledge" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorJobKnowledge" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorJobKnowledge" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorJobKnowledge" val="NA" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Quality of Work</u></div>
             <div class="row">Turns in high quality work and very seldom makes errors.</div>
@@ -135,7 +135,7 @@
         <div class="factors-radio-box"><q-radio v-model="factorWorkQuality" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorWorkQuality" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorWorkQuality" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorWorkQuality" val="NA" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Quantity of Work</u></div>
             <div class="row">Accomplishes stated goals and expectations.</div>
@@ -143,7 +143,7 @@
         <div class="factors-radio-box"><q-radio v-model="factorWorkQuantity" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorWorkQuantity" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorWorkQuantity" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorWorkQuantity" val="NA" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Work Habits</u></div>
             <div class="row">Uses equipment, supplies and time efficiently; punctual and on time.</div>
@@ -151,7 +151,7 @@
         <div class="factors-radio-box"><q-radio v-model="factorWorkHabits" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorWorkHabits" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorWorkHabits" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorWorkHabits" val="NA" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Analysis and Decision-Making</u></div>
             <div class="row">Has strong analytical abilities and makes sound judgements.</div>
@@ -159,7 +159,7 @@
         <div class="factors-radio-box"><q-radio v-model="factorAnalysis" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorAnalysis" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorAnalysis" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorAnalysis" val="NA" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Initiative and Creativity</u></div>
             <div class="row">A self-starter and seeks new responsibilities and opportunities for leadership; demonstrates creativity in performing tasks and identifying resolutions.</div>
@@ -167,7 +167,7 @@
         <div class="factors-radio-box"><q-radio v-model="factorInitiative" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorInitiative" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorInitiative" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorInitiative" val="NA" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Interpersonal Relations</u></div>
             <div class="row">Presents good attitude, works well in teams, cooperates with others, and is thoughtful and courteous/polite.</div>
@@ -175,7 +175,7 @@
         <div class="factors-radio-box"><q-radio v-model="factorInterpersonal" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorInterpersonal" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorInterpersonal" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorInterpersonal" val="NA" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Communication</u></div>
             <div class="row">Effectively communicates (oral and written) and keeps others appropriately informed.</div>
@@ -183,7 +183,7 @@
         <div class="factors-radio-box"><q-radio v-model="factorCommunication" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorCommunication" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorCommunication" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorCommunication" val="NA" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Dependability and Responsibility</u></div>
             <div class="row">Completes assigned work within prescribed timelines; rarely needs direct supervision.</div>
@@ -191,7 +191,7 @@
         <div class="factors-radio-box"><q-radio v-model="factorDependability" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorDependability" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorDependability" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorDependability" val="NA" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Professionalism and Customer Service</u></div>
             <div class="row">Presents and represents oneself and the agency in a positive manner; provides and delivers professional, helpful, high quality service and assistance.</div>
@@ -199,7 +199,7 @@
         <div class="factors-radio-box"><q-radio v-model="factorProfessionalism" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorProfessionalism" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorProfessionalism" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorProfessionalism" val="NA" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Project Management</u></div>
             <div class="row">Coordinates, delegates tasks to team members, and communicates internally and externally about projects; projects are high quality and are completed within timelines.</div>

@@ -1,6 +1,5 @@
 <template>
   <q-page>
-    <q-btn color="white" text-color="black" icon="west" label="Go Back" class="q-mx-md q-mt-md" @click="goBack()" />
     <div class="q-px-md">
       <h4>Edit this Note</h4>
       <q-select v-model="employee" :options="options" label="Employee" class="q-pb-md" />
@@ -81,10 +80,6 @@ export default class ReviewNoteDetail extends Vue{
       .catch(e => {
         console.log(e)
       })
-  }
-
-  private goBack(): void {
-    this.$router.back()
   }
 
   mounted() {

@@ -1,6 +1,5 @@
 <template>
   <q-page>
-    <q-btn color="white" text-color="black" icon="west" label="Go Back" class="q-mx-md q-mt-md" @click="goBack()" />
     <div class="q-px-md">
       <div v-if="currentUserIsManagerOfEmployee()">
         <h5>Your Notes for {{ employeeName }}</h5>
@@ -800,10 +799,6 @@ export default class PerformanceReviewDetail extends Vue {
       .catch(e => {
         console.log(e)
       })
-  }
-
-  private goBack(): void {
-    this.$router.back()
   }
 
   mounted() {

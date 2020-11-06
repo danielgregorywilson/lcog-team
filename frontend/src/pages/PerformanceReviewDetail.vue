@@ -256,14 +256,16 @@
       <h5 class="text-uppercase text-bold q-my-md"><u>VI. Position Description Review</u></h5>
       <div class="q-mb-lg"><q-checkbox v-model="descriptionReviewedEmployee" :disable="!currentUserIsManagerOfEmployee()" />Position Description has been reviewed with employee.</div>
 
+      {{ signatures }}
+
       <div v-for="(signature, index) in signatures" :key="index" class="row signature-block">
         <div class="col">
           <div v-if="signature[1]" class="signature"><span class="signature-text">{{ signature[1] }}</span></div>
           <div v-else class="signature">
-            <q-btn v-if="signature[3] == currentUserPk()" color="white" text-color="black" label="Click to Sign" @click="signPerformanceReview()" class="signature-button" />
+            <q-btn v-if="userCanSign(signature[3])" color="white" text-color="black" label="Click to Sign" @click="signPerformanceReview()" class="signature-button" />
             <div v-else>&nbsp;</div>
           </div>
-          <div class="signature-type"><span class="text-bold">{{ signature[0] }} Signature</span><span v-if="signature[0] == 'Employee'">I have reviewed this evaluation and discussed it further with my manager. Signing does not necessarily indicate agreement.</span></div>
+          <div class="signature-type"><span class="text-bold">{{ signature[0] }} Signature</span><span v-if="signature[0] == 'Employee'"><b>:</b><i class="q-ml-xs">I have reviewed this evaluation and discussed it further with my manager. Signing does not necessarily indicate agreement.</i></span></div>
         </div>
         <div class="col signature-date-block">
           <div v-if="signature[2]" class="signature-date"><span class="signature-date-text">{{ signature[2] | readableDate }}</span></div>
@@ -532,7 +534,7 @@ export default class PerformanceReviewDetail extends Vue {
 
   private reviewNotes: Array<ReviewNoteRetrieve> = []
 
-  private currentUserPk(): boolean {
+  private currentUserPk(): number {
     return this.$store.getters['userModule/getEmployeeProfile'].pk // eslint-disable-line
   }
 
@@ -761,6 +763,13 @@ export default class PerformanceReviewDetail extends Vue {
       .catch(e => {
         console.log(e)
       })
+  }
+
+  private userCanSign(employeePk: number): boolean {
+    const employeeIsCurrentUser = employeePk == this.currentUserPk()
+    // debugger
+    const employeeIsReadyToSign = true // TODO: Get this from the API list
+    return employeeIsCurrentUser && employeeIsReadyToSign
   }
 
   private signPerformanceReview(): void {

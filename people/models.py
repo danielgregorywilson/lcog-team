@@ -169,13 +169,31 @@ class Employee(models.Model):
     def upper_manager_upcoming_reviews_action_required(self):
         # Returns all upcoming reviews for a manager's direct reports which
         # require action from the manager to proceed. For list views.
+        # TODO: Change to signature required
         reviews = []
         for review in self.upper_manager_upcoming_reviews():
-            if (
-                review.status == PerformanceReview.EVALUATION_WRITTEN and
-                review.signature_set.filter(employee=self.pk).count() == 0
-            ):
-                reviews.append(review)
+            if self.is_executive_director:
+                if (
+                    review.status == PerformanceReview.EVALUATION_HR_PROCESSED and
+                    review.signature_set.filter(employee=self).count() == 0
+                ):
+                    reviews.append(review)
+            elif self.is_hr_manager:
+                if (
+                    review.status == PerformanceReview.EVALUATION_APPROVED and
+                    review.signature_set.filter(employee=self).count() == 0
+                ):
+                    reviews.append(review)
+            else:
+                direct_report = review.employee
+                while direct_report.manager != self:
+                    direct_report = direct_report.manager
+                if (
+                    review.status == PerformanceReview.EVALUATION_WRITTEN and
+                    review.signature_set.filter(employee=direct_report).count() == 1 and
+                    review.signature_set.filter(employee=self).count() == 0
+                ):
+                    reviews.append(review)
         return reviews
     
     def upper_manager_upcoming_reviews_no_action_required(self):
@@ -441,6 +459,18 @@ class Signature(models.Model):
     review = models.ForeignKey("people.PerformanceReview", verbose_name=_("performance review"), on_delete=models.CASCADE)
     employee = models.ForeignKey("people.Employee", on_delete=models.CASCADE)
     date = models.DateField(_("signature date"), auto_now=False, auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if self.employee.is_division_director:
+            self.review.status = PerformanceReview.EVALUATION_APPROVED
+            self.review.save()
+        elif self.employee.is_hr_manager:
+            self.review.status = PerformanceReview.EVALUATION_HR_PROCESSED
+            self.review.save()
+        elif self.employee.is_executive_director:
+            self.review.status = PerformanceReview.EVALUATION_ED_APPROVED
+            self.review.save()
+        super().save(*args, **kwargs)
 
 
 class ReviewNote(models.Model):

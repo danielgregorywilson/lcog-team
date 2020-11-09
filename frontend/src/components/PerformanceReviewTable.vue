@@ -30,6 +30,7 @@
         <q-td :props="props">
           <div class="row">
             <q-btn class="col" dense round flat color="grey" @click="editEvaluation(props)" icon="edit"></q-btn>
+            <q-btn class="col" dense round flat color="grey" @click="printEvaluation(props)" icon="print"></q-btn>
           </div>
         </q-td>
       </template>
@@ -46,6 +47,7 @@
                   </div>
                   <div class="q-table__grid-item-value row q-gutter-sm" v-else>
                     <q-btn class="col" dense round flat color="grey" @click="editEvaluation(props)" icon="edit"></q-btn>
+                    <q-btn class="col" dense round flat color="grey" @click="printEvaluation(props)" icon="print"></q-btn>
                   </div>
                 </div>
               </q-item>
@@ -169,6 +171,13 @@ export default class PerformanceReviewTable extends Vue {
 
   private editEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {
     this.$router.push(`pr/${ props.row.pk }`)
+      .catch(e => {
+        console.log(e)
+      })
+  }
+
+  private printEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {
+    this.$router.push(`print/pr/${ props.row.pk }`)
       .catch(e => {
         console.log(e)
       })

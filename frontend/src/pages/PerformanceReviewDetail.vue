@@ -456,6 +456,18 @@
       left: 209px;
     }
   }
+
+  @media print {
+    h4 {
+      font-size: 20px;
+    }
+    h5 {
+      font-size: 16px;
+    }
+    .factors-grid-container {
+      grid-template-columns: auto 68px 68px 68px 68px;
+    }
+  }
 </style>
 
 <script lang="ts">

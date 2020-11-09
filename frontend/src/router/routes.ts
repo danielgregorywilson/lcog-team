@@ -85,6 +85,20 @@ const routes: RouteConfig[] = [
     ]
   },
   {
+    path: '/print',
+    component: () => import('layouts/PrintLayout.vue'),
+    children: [
+      {
+        path: 'pr/:pk',
+        name: 'pr-print',
+        component: () => import('pages/PerformanceReviewDetail.vue'),
+        // TODO
+        // beforeEnter: ifManager,
+        beforeEnter: ifAuthenticated,
+      }
+    ]
+  },
+  {
     path: '/auth',
     component: () => import('layouts/AuthLayout.vue'),
     children: [

@@ -10,8 +10,8 @@ const getters: GetterTree<PerformanceReviewStateInterface, StateInterface> = {
   allPerformanceReviews: state => state.allPerformanceReviews,
   allPerformanceReviewsActionRequired: state => state.allPerformanceReviewsActionRequired,
   allPerformanceReviewsActionNotRequired: state => state.allPerformanceReviewsActionNotRequired,
-  allUpperManagerPerformanceReviewsActionRequired: state => state.allUpperManagerPerformanceReviewsActionRequired,
-  allUpperManagerPerformanceReviewsActionNotRequired: state => state.allUpperManagerPerformanceReviewsActionNotRequired,
+  allSignaturePerformanceReviewsActionRequired: state => state.allSignaturePerformanceReviewsActionRequired,
+  allSignaturePerformanceReviewsActionNotRequired: state => state.allSignaturePerformanceReviewsActionNotRequired,
 };
 
 export default getters;

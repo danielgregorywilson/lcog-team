@@ -24,11 +24,11 @@ const mutation: MutationTree<PerformanceReviewStateInterface> = {
   setAllPerformanceReviewsActionNotRequired: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
     Vue.set(state, 'allPerformanceReviewsActionNotRequired', resp.data)
   },
-  setAllUpperManagerPerformanceReviewsActionRequired: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
-    Vue.set(state, 'allUpperManagerPerformanceReviewsActionRequired', resp.data)
+  setAllSignaturePerformanceReviewsActionRequired: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
+    Vue.set(state, 'allSignaturePerformanceReviewsActionRequired', resp.data)
   },
-  setAllUpperManagerPerformanceReviewsActionNotRequired: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
-    Vue.set(state, 'allUpperManagerPerformanceReviewsActionNotRequired', resp.data)
+  setAllSignaturePerformanceReviewsActionNotRequired: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
+    Vue.set(state, 'allSignaturePerformanceReviewsActionNotRequired', resp.data)
   },
   authLogout: (state) => {
     // Clean up state
@@ -37,8 +37,8 @@ const mutation: MutationTree<PerformanceReviewStateInterface> = {
     state.allPerformanceReviews = []
     state.allPerformanceReviewsActionRequired = []
     state.allPerformanceReviewsActionNotRequired = []
-    state.allUpperManagerPerformanceReviewsActionRequired = []
-    state.allUpperManagerPerformanceReviewsActionNotRequired = []
+    state.allSignaturePerformanceReviewsActionRequired = []
+    state.allSignaturePerformanceReviewsActionNotRequired = []
     state.performanceReviewDetails = {}
     state.allReviewNotes = []
   }

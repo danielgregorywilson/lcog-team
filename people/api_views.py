@@ -81,16 +81,16 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
             manager_prs = PerformanceReview.objects.filter(employee__manager__user=user)
             employee_prs = PerformanceReview.objects.filter(employee__user=user)
             queryset = manager_prs | employee_prs # Default queryset
-            upper_manager = self.request.query_params.get('upper_manager', None)
+            signature = self.request.query_params.get('signature', None)
             action_required = self.request.query_params.get('action_required', None)
-            if is_true_string(upper_manager):
+            if is_true_string(signature):
                 if action_required is not None:
                     if is_true_string(action_required):
-                        queryset = PerformanceReview.upper_manager_upcoming_reviews_action_required.get_queryset(user)
+                        queryset = PerformanceReview.signature_upcoming_reviews_action_required.get_queryset(user)
                     else:
-                        queryset = PerformanceReview.upper_manager_upcoming_reviews_no_action_required.get_queryset(user)    
+                        queryset = PerformanceReview.signature_upcoming_reviews_no_action_required.get_queryset(user)    
                 else:
-                    queryset = PerformanceReview.upper_manager_all_relevant_upcoming_reviews.get_queryset(user)
+                    queryset = PerformanceReview.signature_all_relevant_upcoming_reviews.get_queryset(user)
             elif action_required is not None:
                 if is_true_string(action_required):
                     queryset = PerformanceReview.manager_upcoming_reviews_action_required.get_queryset(user)

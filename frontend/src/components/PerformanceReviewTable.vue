@@ -93,14 +93,14 @@ interface QuasarPerformanceReviewTableRowClickActionProps {
 
 @Component
 export default class PerformanceReviewTable extends Vue {
-  @Prop() readonly upperManager!: boolean
+  @Prop() readonly signature!: boolean
   @Prop({required: true}) readonly actionRequired!: boolean
   private performanceReviews(): Array<ReviewNoteRetrieve> {
-    if (this.upperManager) {
+    if (this.signature) {
       if (this.actionRequired) {
-        return this.$store.getters['performanceReviewModule/allUpperManagerPerformanceReviewsActionRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+        return this.$store.getters['performanceReviewModule/allSignaturePerformanceReviewsActionRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
       } else {
-        return this.$store.getters['performanceReviewModule/allUpperManagerPerformanceReviewsActionNotRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+        return this.$store.getters['performanceReviewModule/allSignaturePerformanceReviewsActionNotRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
       }
     } else {
       if (this.actionRequired) {
@@ -111,7 +111,7 @@ export default class PerformanceReviewTable extends Vue {
     }
   }
   private columns(): Array<EvaluationColumn> {
-    if (this.upperManager) {
+    if (this.signature) {
       return [
         { name: 'employeeName', label: 'Employee', align: 'center', field: 'employee_name', sortable: true },
         { name: 'managerName', label: 'Manager', align: 'center', field: 'manager_name', sortable: true },
@@ -140,14 +140,14 @@ export default class PerformanceReviewTable extends Vue {
   }
 
   private retrievePerformanceReviews(): void {
-    if (this.upperManager) {
+    if (this.signature) {
       if (this.actionRequired) {
-        this.$store.dispatch('performanceReviewModule/getAllUpperManagerPerformanceReviewsActionRequired')
+        this.$store.dispatch('performanceReviewModule/getAllSignaturePerformanceReviewsActionRequired')
         .catch(e => {
           console.log(e)
         })
       } else {
-        this.$store.dispatch('performanceReviewModule/getAllUpperManagerPerformanceReviewsActionNotRequired')
+        this.$store.dispatch('performanceReviewModule/getAllSignaturePerformanceReviewsActionNotRequired')
         .catch(e => {
           console.log(e)
         })

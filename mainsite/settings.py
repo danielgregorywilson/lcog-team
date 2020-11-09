@@ -33,6 +33,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'localhost',
+    'lcog-hr',
     'lcog-hr-frontend.s3-website-us-west-2.amazonaws.com',
     'lcog-internal-env.eba-4t9yrmiu.us-west-2.elasticbeanstalk.com'
 ]

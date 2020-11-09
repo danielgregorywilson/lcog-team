@@ -55,10 +55,10 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
     })
   },
   // All performance reviews for your direct reports as well as their descendants
-  getAllPerformanceReviews: ({ commit }, data: {isUpperManager: boolean}) => {
+  getAllPerformanceReviews: ({ commit }, data: {signature: boolean}) => {
     let targetUrl: string
-    if (data.isUpperManager) {
-      targetUrl = `${ process.env.API_URL }api/v1/performancereview?upper_manager=true` // eslint-disable-line
+    if (data.signature) {
+      targetUrl = `${ process.env.API_URL }api/v1/performancereview?signature=true` // eslint-disable-line
     } else {
       targetUrl = `${ process.env.API_URL }api/v1/performancereview` // eslint-disable-line
     }
@@ -92,19 +92,19 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
         console.log(e)
       });
   },
-  getAllUpperManagerPerformanceReviewsActionRequired: ({ commit }) => {
-    axios({ url: `${ process.env.API_URL }api/v1/performancereview?upper_manager=True&action_required=True` }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
+  getAllSignaturePerformanceReviewsActionRequired: ({ commit }) => {
+    axios({ url: `${ process.env.API_URL }api/v1/performancereview?signature=True&action_required=True` }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
       .then(resp => {
-        commit('setAllUpperManagerPerformanceReviewsActionRequired', resp);
+        commit('setAllSignaturePerformanceReviewsActionRequired', resp);
       })
       .catch(e => {
         console.log(e)
       });
   },
-  getAllUpperManagerPerformanceReviewsActionNotRequired: ({ commit }) => {
-    axios({ url: `${ process.env.API_URL }api/v1/performancereview?upper_manager=True&action_required=False` }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
+  getAllSignaturePerformanceReviewsActionNotRequired: ({ commit }) => {
+    axios({ url: `${ process.env.API_URL }api/v1/performancereview?signature=True&action_required=False` }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
       .then(resp => {
-        commit('setAllUpperManagerPerformanceReviewsActionNotRequired', resp);
+        commit('setAllSignaturePerformanceReviewsActionNotRequired', resp);
       })
       .catch(e => {
         console.log(e)

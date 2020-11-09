@@ -39,9 +39,9 @@
         <div class="text-h4">Reviews to Sign</div>
       </div>
       <div class="text-h6">Signature Required</div>
-        <performance-review-table :upperManager="true" :actionRequired="true" />
+        <performance-review-table :signature="true" :actionRequired="true" />
       <div class="text-h6">Signed</div>
-        <performance-review-table :upperManager="true" :actionRequired="false" />
+        <performance-review-table :signature="true" :actionRequired="false" />
     </div>
   </q-page>
 </template>

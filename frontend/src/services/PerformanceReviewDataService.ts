@@ -15,12 +15,12 @@ class PerformanceReviewDataService {
     return http.get('api/v1/performancereview?action_required=False');
   }
 
-  getAllUpperManagerUpcomingActionRequired() {
-    return http.get('api/v1/performancereview?action_required=True&upper_manager=True');
+  getAllSignatureUpcomingActionRequired() {
+    return http.get('api/v1/performancereview?action_required=True&signature=True');
   }
 
-  getAllUpperManagerUpcomingNoActionRequired() {
-    return http.get('api/v1/performancereview?action_required=False&upper_manager=True');
+  getAllSignatureUpcomingNoActionRequired() {
+    return http.get('api/v1/performancereview?action_required=False&signature=True');
   }
 
   get(pk: string) {

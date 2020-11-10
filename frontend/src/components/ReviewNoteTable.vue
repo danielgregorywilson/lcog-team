@@ -46,6 +46,7 @@
 </template>
 
 <script lang="ts">
+import { Notify } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
 import ReviewNoteDataService from '../services/ReviewNoteDataService';
 import { ReviewNoteRetrieve } from '../store/types'
@@ -103,8 +104,7 @@ export default class ReviewNoteTable extends Vue {
   private deleteRow(): void {
     ReviewNoteDataService.delete(this.rowPkToDelete)
       .then(response => {
-        // TODO: Show a toast
-        console.log(response)
+        Notify.create('Deleted a review note.')
         this.retrieveReviewNotes()
       })
       .catch(e => {

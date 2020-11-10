@@ -192,10 +192,6 @@ export default class PerformanceReviewTable extends Vue {
 
   mounted() {
     this.retrievePerformanceReviews();
-    // TODO: Was only loading them once, but we need to update them if changes have occurred
-    // if (this.performanceReviews() == undefined) {
-    //   this.retrievePerformanceReviews();
-    // }
   }
 }
 </script>

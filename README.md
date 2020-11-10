@@ -14,7 +14,9 @@ Start the server
 
 
 # Deploy backend
+In mainsite/middleware/CorsMiddleware, make sure the correct response["Access-Control-Allow-Origin"] is commented out.
 `eb deploy --profile lcog`
+
 
 
 # Deploy frontend

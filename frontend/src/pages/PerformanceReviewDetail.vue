@@ -1,7 +1,11 @@
 <template>
   <q-page>
     <div class="q-px-md">
-      <h4 class="text-bold text-center">Performance Evaluation Report for {{ employeeName }}</h4>
+      <q-img
+        id="lcog-logo"
+        src="../assets/lcog-banner.png"
+      />
+      <h4 class="text-bold text-center">Performance Evaluation Report</h4>
       <div class="eval-grid-container">
         <div class="eval-box eval-box-1">
             <div class="row text-bold">Employee:</div>
@@ -73,18 +77,18 @@
 
       <h5 class="text-uppercase text-center text-bold"><u>Rating Scale</u></h5>
       <div class="rating-grid-container">
-        <div class="rating-box">(1)* Needs Improvement</div>
+        <div class="rating-box"><span class="text-bold">(1)*</span> Needs Improvement</div>
         <div class="rating-box">The employee’s work performance does not consistently meet the standards of the position. Serious effort is needed to improve performance.</div>
-        <div class="rating-box">(2) Meets Job Requirments</div>
+        <div class="rating-box"><span class="text-bold">(2)</span> Meets Job Requirments</div>
         <div class="rating-box">The employee’s work performance consistently meets the standards of the position.</div>
-        <div class="rating-box">(3) Exceeds Job Requirments</div>
+        <div class="rating-box"><span class="text-bold">(3)</span> Exceeds Job Requirments</div>
         <div class="rating-box">The employee’s work performance is frequently or consistently above the level of a satisfactory employee.</div>
-        <div class="rating-box">(N/A) Not Applicable</div>
+        <div class="rating-box"><span class="text-bold">(N/A)</span> Not Applicable</div>
         <div class="rating-box">Does not pertain to the employee’s actual job duties.</div>
       </div>
-      <div>*Factors rated (1) Needs improvement must be addressed with a Performance Agreement for improvement.</div>
+      <div>*Factors rated <span class="text-bold">(1)</span> Needs improvement must be addressed with a Performance Agreement for improvement.</div>
 
-      <div v-if="currentUserIsManagerOfEmployee()">
+      <div v-if="currentUserIsManagerOfEmployee()" id="notes">
         <hr />
         <h5 class="text-h5 text-uppercase text-bold q-my-md"><u>Your Notes for {{ employeeName }}</u></h5>
         <div class="q-pa-md row items-start q-gutter-md">
@@ -292,6 +296,10 @@
 </template>
 
 <style scoped lang="scss">
+  #lcog-logo {
+    max-width: 300px;
+    display: none;
+  }
   .note-card:hover {
     background-color: lightgray;
     cursor: pointer;
@@ -458,21 +466,54 @@
   }
 
   @media print {
+    // Ask the browser nicely to display table borders and images
+    * {
+      -webkit-print-color-adjust: exact !important;   /* Chrome, Safari */
+      color-adjust: exact !important;                 /*Firefox*/
+    }
+    #lcog-logo {
+      display: block;
+    }
     h4 {
       font-size: 20px;
+      margin: 0;
     }
     h5 {
       font-size: 16px;
+      margin: 0;
+    }
+    #notes {
+      display: none;
+    }
+    .rating-box {
+      padding: 0;
+    }
+    .factors-header-sticky {
+      position: block;
+    }
+    .factors-header-box {
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+    .factors-box {
+      padding-top: 0;
+      padding-bottom: 0;
     }
     .factors-grid-container {
-      grid-template-columns: auto 68px 68px 68px 68px;
+      grid-template-columns: auto 72px 72px 72px 72px;
+    }
+    .signature-block {
+      margin: 0;
+    }
+    #sticky-footer {
+      display: none;
     }
   }
 </style>
 
 <script lang="ts">
 import { date as quasarDate } from 'quasar'
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import PerformanceReviewDataService from '../services/PerformanceReviewDataService'
 import { AxiosManagerReviewNotesForEmployeeServerResponse, AxiosPerformanceReviewUpdateServerResponse, PerformanceReviewRetrieve, ReviewNoteRetrieve } from '../store/types'
 import '../filters'
@@ -480,6 +521,8 @@ import ReviewNoteDataService from '../services/ReviewNoteDataService'
 
 @Component
 export default class PerformanceReviewDetail extends Vue {
+  @Prop({default: false}) readonly print!: boolean
+
   private prPk = ''
   private status = ''
 
@@ -598,87 +641,92 @@ export default class PerformanceReviewDetail extends Vue {
     }
   }
 
-  private retrievePerformanceReview(): void {
-    this.$store.dispatch('performanceReviewModule/getPerformanceReview', {pk: this.$route.params.pk})
-      .then(() => {
-        // this.retrieveReviewNotes()
-        // const prs = this.$store.getters['performanceReviewModule/allPerformanceReviews'].results // eslint-disable-line
-        // const pr: PerformanceReviewRetrieve = prs.filter((pr: PerformanceReviewRetrieve) => pr.pk == parseInt(this.$route.params.pk))[0] // eslint-disable-line
-        const pr: PerformanceReviewRetrieve = this.$store.getters['performanceReviewModule/performanceReview'] // eslint-disable-line
-        if (!pr) {
-          console.log('PR does not seem to exist. Redirecting...')
-          this.$router.push('/')
-            .catch(e => {
-              console.log(e)
-            })
-          return
-        }
-        this.status = pr.status
-        this.employeePk = pr.employee_pk
-        this.managerPk = pr.manager_pk
-        this.retrieveReviewNotes()
-        this.prPk = pr.pk.toString()
-        this.employeeName = pr.employee_name
-        this.managerName = pr.manager_name
-        this.periodStartDate = pr.period_start_date
-        this.periodEndDate = pr.period_end_date
-        this.effectiveDate = pr.effective_date
-        this.division = pr.employee_division
-        this.unitOrProgram = pr.employee_unit_or_program
-        this.jobTitle = pr.employee_job_title
+  private retrievePerformanceReview() {
+    return new Promise((resolve, reject) => {
+      this.$store.dispatch('performanceReviewModule/getPerformanceReview', {pk: this.$route.params.pk})
+        .then(() => {
+          // this.retrieveReviewNotes()
+          // const prs = this.$store.getters['performanceReviewModule/allPerformanceReviews'].results // eslint-disable-line
+          // const pr: PerformanceReviewRetrieve = prs.filter((pr: PerformanceReviewRetrieve) => pr.pk == parseInt(this.$route.params.pk))[0] // eslint-disable-line
+          const pr: PerformanceReviewRetrieve = this.$store.getters['performanceReviewModule/performanceReview'] // eslint-disable-line
+          if (!pr) {
+            console.log('PR does not seem to exist. Redirecting...')
+            this.$router.push('/')
+              .catch(e => {
+                console.log(e)
+                reject(e)
+              })
+            return
+          }
+          this.status = pr.status
+          this.employeePk = pr.employee_pk
+          this.managerPk = pr.manager_pk
+          this.retrieveReviewNotes()
+          this.prPk = pr.pk.toString()
+          this.employeeName = pr.employee_name
+          this.managerName = pr.manager_name
+          this.periodStartDate = pr.period_start_date
+          this.periodEndDate = pr.period_end_date
+          this.effectiveDate = pr.effective_date
+          this.division = pr.employee_division
+          this.unitOrProgram = pr.employee_unit_or_program
+          this.jobTitle = pr.employee_job_title
 
-        this.evaluationType = pr.evaluation_type
-        this.evaluationTypeCurrentVal = this.evaluationType
-        this.probationaryEvaluationType = pr.probationary_evaluation_type
-        this.probationaryEvaluationTypeCurrentVal = this.probationaryEvaluationType
-        this.stepIncrease = pr.step_increase
-        this.stepIncreaseCurrentVal = this.stepIncrease
-        this.topStepBonus = pr.top_step_bonus
-        this.topStepBonusCurrentVal = this.topStepBonus
+          this.evaluationType = pr.evaluation_type
+          this.evaluationTypeCurrentVal = this.evaluationType
+          this.probationaryEvaluationType = pr.probationary_evaluation_type
+          this.probationaryEvaluationTypeCurrentVal = this.probationaryEvaluationType
+          this.stepIncrease = pr.step_increase
+          this.stepIncreaseCurrentVal = this.stepIncrease
+          this.topStepBonus = pr.top_step_bonus
+          this.topStepBonusCurrentVal = this.topStepBonus
 
-        this.factorJobKnowledge = pr.factor_job_knowledge
-        this.factorJobKnowledgeCurrentVal = this.factorJobKnowledge
-        this.factorWorkQuality = pr.factor_work_quality
-        this.factorWorkQualityCurrentVal = this.factorWorkQuality
-        this.factorWorkQuantity = pr.factor_work_quantity
-        this.factorWorkQuantityCurrentVal = this.factorWorkQuantity
-        this.factorWorkHabits = pr.factor_work_habits
-        this.factorWorkHabitsCurrentVal = this.factorWorkHabits
-        this.factorAnalysis = pr.factor_analysis
-        this.factorAnalysisCurrentVal = this.factorAnalysis
-        this.factorInitiative = pr.factor_initiative
-        this.factorInitiativeCurrentVal = this.factorInitiative
-        this.factorInterpersonal = pr.factor_interpersonal
-        this.factorInterpersonalCurrentVal = this.factorInterpersonal
-        this.factorCommunication = pr.factor_communication
-        this.factorCommunicationCurrentVal = this.factorCommunication
-        this.factorDependability = pr.factor_dependability
-        this.factorDependabilityCurrentVal = this.factorDependability
-        this.factorProfessionalism = pr.factor_professionalism
-        this.factorProfessionalismCurrentVal = this.factorProfessionalism
-        this.factorManagement = pr.factor_management
-        this.factorManagementCurrentVal = this.factorManagement
-        this.factorSupervision = pr.factor_supervision
-        this.factorSupervisionCurrentVal = this.factorSupervision
+          this.factorJobKnowledge = pr.factor_job_knowledge
+          this.factorJobKnowledgeCurrentVal = this.factorJobKnowledge
+          this.factorWorkQuality = pr.factor_work_quality
+          this.factorWorkQualityCurrentVal = this.factorWorkQuality
+          this.factorWorkQuantity = pr.factor_work_quantity
+          this.factorWorkQuantityCurrentVal = this.factorWorkQuantity
+          this.factorWorkHabits = pr.factor_work_habits
+          this.factorWorkHabitsCurrentVal = this.factorWorkHabits
+          this.factorAnalysis = pr.factor_analysis
+          this.factorAnalysisCurrentVal = this.factorAnalysis
+          this.factorInitiative = pr.factor_initiative
+          this.factorInitiativeCurrentVal = this.factorInitiative
+          this.factorInterpersonal = pr.factor_interpersonal
+          this.factorInterpersonalCurrentVal = this.factorInterpersonal
+          this.factorCommunication = pr.factor_communication
+          this.factorCommunicationCurrentVal = this.factorCommunication
+          this.factorDependability = pr.factor_dependability
+          this.factorDependabilityCurrentVal = this.factorDependability
+          this.factorProfessionalism = pr.factor_professionalism
+          this.factorProfessionalismCurrentVal = this.factorProfessionalism
+          this.factorManagement = pr.factor_management
+          this.factorManagementCurrentVal = this.factorManagement
+          this.factorSupervision = pr.factor_supervision
+          this.factorSupervisionCurrentVal = this.factorSupervision
 
-        this.evaluationSuccesses = pr.evaluation_successes
-        this.evaluationSuccessesCurrentVal = this.evaluationSuccesses
-        this.evaluationOpportunities = pr.evaluation_opportunities
-        this.evaluationOpportunitiesCurrentVal = this.evaluationOpportunities
-        this.evaluationGoalsManager = pr.evaluation_goals_manager
-        this.evaluationGoalsManagerCurrentVal = this.evaluationGoalsManager
-        this.evaluationCommentsEmployee = pr.evaluation_comments_employee
-        this.evaluationCommentsEmployeeCurrentVal = this.evaluationCommentsEmployee
+          this.evaluationSuccesses = pr.evaluation_successes
+          this.evaluationSuccessesCurrentVal = this.evaluationSuccesses
+          this.evaluationOpportunities = pr.evaluation_opportunities
+          this.evaluationOpportunitiesCurrentVal = this.evaluationOpportunities
+          this.evaluationGoalsManager = pr.evaluation_goals_manager
+          this.evaluationGoalsManagerCurrentVal = this.evaluationGoalsManager
+          this.evaluationCommentsEmployee = pr.evaluation_comments_employee
+          this.evaluationCommentsEmployeeCurrentVal = this.evaluationCommentsEmployee
 
-        this.descriptionReviewedEmployee = pr.description_reviewed_employee
-        this.descriptionReviewedEmployeeCurrentVal = this.descriptionReviewedEmployee
+          this.descriptionReviewedEmployee = pr.description_reviewed_employee
+          this.descriptionReviewedEmployeeCurrentVal = this.descriptionReviewedEmployee
 
-        this.signatures = pr.all_required_signatures
+          this.signatures = pr.all_required_signatures
 
-      })
-      .catch(e => {
-        console.log(e)
-      })
+          resolve()
+        })
+        .catch(e => {
+          console.log(e)
+          reject(e)
+        })
+    })
   }
 
   private retrieveReviewNotes(): void {
@@ -746,7 +794,6 @@ export default class PerformanceReviewDetail extends Vue {
 
         this.signatures = response.data.all_required_signatures
 
-        resolve()
         // TODO: This is bad. We should only get the reviews of type that we need
         this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
           .catch(e => {
@@ -758,6 +805,8 @@ export default class PerformanceReviewDetail extends Vue {
             console.log(e)
             reject(e)
           })
+
+        resolve()
       })
       .catch(e => {
         console.log(e)
@@ -790,6 +839,9 @@ export default class PerformanceReviewDetail extends Vue {
         this.updatePerformanceReview()
           .then(() => {
             this.retrievePerformanceReview()
+              .catch(e => {
+                console.log(e)
+              })
             // TODO: This is bad. We should only get the reviews of type that we need
             this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
               .catch(e => {
@@ -823,6 +875,14 @@ export default class PerformanceReviewDetail extends Vue {
 
   mounted() {
     this.retrievePerformanceReview()
+      .then(() => {
+        if (this.print) {
+          setTimeout(() => window.print(), 200) // Wait briefly for logo image to load
+        }
+      })
+      .catch(e => {
+        console.log(e)
+      })
   }
 }
 </script>

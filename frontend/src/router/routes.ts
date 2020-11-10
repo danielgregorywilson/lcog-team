@@ -95,6 +95,9 @@ const routes: RouteConfig[] = [
         // TODO
         // beforeEnter: ifManager,
         beforeEnter: ifAuthenticated,
+        props: {
+          print: true
+        }
       }
     ]
   },

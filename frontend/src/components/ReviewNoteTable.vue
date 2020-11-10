@@ -103,7 +103,7 @@ export default class ReviewNoteTable extends Vue {
 
   private deleteRow(): void {
     ReviewNoteDataService.delete(this.rowPkToDelete)
-      .then(response => {
+      .then(() => {
         Notify.create('Deleted a review note.')
         this.retrieveReviewNotes()
       })

@@ -54,7 +54,7 @@ export default class ReviewNoteCreate extends Vue{
 
   private createReviewNote(): void {
     this.$store.dispatch('performanceReviewModule/createReviewNote', {employee_pk: this.employee.value, note: this.note})
-      .then(response => {
+      .then(() => {
         Notify.create('Created a review note.')
         this.$router.push('/')
           .catch(e => {

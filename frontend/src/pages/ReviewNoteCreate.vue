@@ -15,6 +15,7 @@
 </template>
 
 <script lang="ts">
+import { Notify } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
 import { AxiosEmployeeRetrieveManyServerResponse } from '../store/types'
 import EmployeeDataService from '../services/EmployeeDataService'
@@ -54,8 +55,7 @@ export default class ReviewNoteCreate extends Vue{
   private createReviewNote(): void {
     this.$store.dispatch('performanceReviewModule/createReviewNote', {employee_pk: this.employee.value, note: this.note})
       .then(response => {
-        // TODO: Show a toast
-        console.log(response)
+        Notify.create('Created a review note.')
         this.$router.push('/')
           .catch(e => {
             console.log(e)

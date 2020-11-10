@@ -158,7 +158,10 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
         return Response(serialized_review.data)
     
     def partial_update(self, request, pk=None):
-        # TODO: Currently just updates the employee's comments. This might need to be more general to accept any partial updates.
+        """
+        Currently just updates the employee's comments. This might need to be
+        more general to accept any partial updates.
+        """
         pr = PerformanceReview.objects.get(pk=pk)
         pr.evaluation_comments_employee = request.data['evaluation_comments_employee']
         pr.save()

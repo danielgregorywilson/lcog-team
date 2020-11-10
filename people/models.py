@@ -169,7 +169,6 @@ class Employee(models.Model):
     def signature_upcoming_reviews_action_required(self):
         # Returns all upcoming reviews for a manager's direct reports which
         # require action from the manager to proceed. For list views.
-        # TODO: Change to signature required
         reviews = []
         for review in self.signature_upcoming_reviews():
             if self.is_executive_director:

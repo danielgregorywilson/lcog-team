@@ -1,12 +1,17 @@
 import { Route, RouteConfig } from 'vue-router';
 
 import authState from '../store/modules/auth/state'
-// import userState from '../store/modules/user/state'
+import userState from '../store/modules/user/state'
+
+// import authStore from '../store/modules/auth'
+import userStore from '../store/modules/user'
+// import getters from '../store/modules/auth/getters'
 
 type Next = (path?: string) => void
 
 const ifNotAuthenticated = (to: Route, from: Route, next: Next) => {
-  if (!authState.token) { // TODO: This should use the isAuthenticated getter
+  if (!authState.token) { // TODO: Use the isAuthenticated getter?
+  // if (getters['authModule/isAuthenticated']) {
     next()
     return
   }
@@ -14,7 +19,60 @@ const ifNotAuthenticated = (to: Route, from: Route, next: Next) => {
 }
 
 const ifAuthenticated = (to: Route, from: Route, next: Next) => {
-  if (!!authState.token) { // TODO: This should use the isAuthenticated getter
+  // /*
+  //   Determines where we should send the user.
+  // */
+  // function proceed () {
+  //   /*
+  //     If the user has been loaded determine where we should
+  //     send the user.
+  //   */
+  //   if ( authStore.getters.getAuthLoadStatus() == 2 ) {
+  //     /*
+  //       If the user is not empty, that means there's a user
+  //       authenticated we allow them to continue. Otherwise, we
+  //       send the user back to the home page.
+  //     */
+  //     if( authStore.getters.getUser != '' ){
+  //       next();
+  //     }else{
+  //       next('/auth/login');
+  //     }
+  //   }
+  // }
+  
+  // /*
+  // Confirms the user has been loaded
+  // */
+  // if ( authStore.getters.getAuthLoadStatus != 2 ) {
+  //   /*
+  //     If not, load the user
+  //   */
+  //   authStore.dispatch( 'loadUser' );
+
+  //   /*
+  //     Watch for the user to be loaded. When it's finished, then
+  //     we proceed.
+  //   */
+  //   authStore.watch( authStore.getters.getUserLoadStatus, function(){
+  //     if( authStore.getters.getUserLoadStatus() == 2 ){
+  //       proceed();
+  //     }
+  //   });
+  // } else {
+  //   /*
+  //     User call completed, so we proceed
+  //   */
+  //   proceed()
+  // }
+
+  
+  
+  
+  // CURRENT IMPLEMENTATION
+  // console.log(authStore.state.token)
+  if (!!authState.token) { // TODO: Use the isAuthenticated getter?
+  // if (!getters['authModule/isAuthenticated']) {
     next()
     return
   }
@@ -22,12 +80,31 @@ const ifAuthenticated = (to: Route, from: Route, next: Next) => {
 }
 
 // TODO: Implement
-// const ifManager = (to: Route, from: Route, next: Next) => {
-//   if (userState.profile.is_manager) {
-//     next()
-//     return
+// const ifManager = async (to: Route, from: Route, next: Next) => {
+//   console.log('CHECK IF MANAGER')
+//   console.log('userState', userState)
+//   console.log('profile', userState.profile)
+//   console.log('isManager', userState.profile.is_manager)
+//   // debugger
+//   var hasPermission = await userStore.dispatch("auth/hasPermission") //eslint-disable-line
+//     if (hasPermission) {
+//       next()
+//     }
+  
+//   next()
+//   if (userState.profile.employee_pk == -1) {
+//     // Profile is not loaded yet, so load it
+//     console.log('profile not yet loaded')
+//     console.log(authState.status)
+//     console.log(authState.token)
+//   } else {
+//     if (userState.profile.is_manager) {
+//       next()
+//       return
+//     }
+//     next('dashboard')
 //   }
-//   next('dashboard')
+  
 // }
 
 // TODO: Add API guards to notes and PRs

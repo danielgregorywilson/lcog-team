@@ -143,8 +143,8 @@ STATICFILES_DIRS = [
 # Where to build static files
 # STATIC_ROOT = 'static'
 
-LOGIN_REDIRECT_URL = 'dashboard'
-LOGOUT_REDIRECT_URL = 'dashboard'
+# LOGIN_REDIRECT_URL = '/dashboard'
+# LOGOUT_REDIRECT_URL = '/dashboard'
 
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
@@ -157,7 +157,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication'
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
         'rest_framework.permissions.AllowAny'
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',

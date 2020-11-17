@@ -4,6 +4,12 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
+from mainsite.helpers import (
+    send_completed_email_to_hr_manager,
+    send_signature_email_to_executive_director,
+    send_signature_email_to_hr_manager
+)
+
 # SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE = 60
 SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE = 360
 
@@ -463,12 +469,18 @@ class Signature(models.Model):
         if self.employee.is_division_director:
             self.review.status = PerformanceReview.EVALUATION_APPROVED
             self.review.save()
+            # Send notification to next manager in the chain (HR manager)
+            send_signature_email_to_hr_manager(self.review,)
         elif self.employee.is_hr_manager:
             self.review.status = PerformanceReview.EVALUATION_HR_PROCESSED
             self.review.save()
+            # Send notification to next manager in the chain (executive director)
+            send_signature_email_to_executive_director(self.review)
         elif self.employee.is_executive_director:
             self.review.status = PerformanceReview.EVALUATION_ED_APPROVED
             self.review.save()
+            # Send notification to HR manager
+            send_completed_email_to_hr_manager(self.review)
         super().save(*args, **kwargs)
 
 

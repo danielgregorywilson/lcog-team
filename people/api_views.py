@@ -11,7 +11,8 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 
 from mainsite.helpers import (
-    get_host_url, is_true_string, send_evaluation_complete_email
+    is_true_string, send_evaluation_written_email_to_employee,
+    send_signature_email_to_manager
 )
 
 from people.models import Employee, PerformanceReview, ReviewNote, Signature
@@ -203,6 +204,7 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
             pr.description_reviewed_employee
         ]):
             pr.status = PerformanceReview.EVALUATION_WRITTEN
+            send_evaluation_written_email_to_employee([pr.employee.user.email], pr)
         pr.save()
         serialized_review = PerformanceReviewSerializer(pr,
             context={'request': request})
@@ -252,6 +254,16 @@ class SignatureViewSet(viewsets.ModelViewSet):
         pr = PerformanceReview.objects.get(pk=request.data['review_pk'])
         employee = Employee.objects.get(pk=request.data['employee_pk'])
         new_signature = Signature.objects.create(review=pr, employee=employee)
+        
+        # Send notification to next manager in the chain
+        pr_employee_has_signed = Signature.objects.filter(employee=pr.employee).count() == 1
+        pr_manager_has_signed = Signature.objects.filter(employee=pr.employee.manager).count() == 1
+        if pr_employee_has_signed and pr_manager_has_signed and pr.status == PerformanceReview.EVALUATION_WRITTEN:
+            if employee == pr.employee:
+                send_signature_email_to_manager([employee.manager.manager.user.email], pr)
+            else:
+                send_signature_email_to_manager([employee.manager.user.email], pr)
+        
         serialized_signature = SignatureSerializer(new_signature,
             context={'request': request})
         return Response(serialized_signature.data)

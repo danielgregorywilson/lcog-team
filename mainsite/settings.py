@@ -44,6 +44,7 @@ ALLOWED_HOSTS = [
 
 INSTALLED_APPS = [
     'api',
+    'mainsite',
     'people',
     'rest_framework',
     'rest_framework.authtoken',

@@ -55,6 +55,19 @@ def send_completed_email_to_hr_manager(review):
         f'{executive_director.user.get_full_name()} has approved a performance evaluation for {review.employee.user.get_full_name()}. Please print it here: {url}'
     )
 
+SEND_MANAGER_FIRST_REMINDER_NEW_PR_DAYS_BEFORE = 60
+SEND_MANAGER_SECOND_REMINDER_NEW_PR_DAYS_BEFORE = 45
+SEND_MANAGER_PERSISTENT_REMINDERS_NEW_PR_DAYS_BEFORE = 30
+
+def send_pr_reminder_emails():
+    PerformanceReview = apps.get_model('people.PerformanceReview')
+    import pdb; pdb.set_trace()
+    for pr in PerformanceReview.objects.filter(status=PerformanceReview.NEEDS_EVALUATION):
+        import pdb; pdb.set_trace()
+        pr.effective_date
+    return
+
+
 def is_true_string(str):
     if str in ['true', 'True']:
         return True

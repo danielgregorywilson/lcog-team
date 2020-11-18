@@ -363,7 +363,7 @@ class PerformanceReview(models.Model):
         return self.employee.user.username
 
     def days_until_due(self):
-        timedelta = self.period_end_date - datetime.date.today()
+        timedelta = self.effective_date - datetime.date.today()
         return timedelta.days
 
     def overdue(self):
@@ -373,6 +373,7 @@ class PerformanceReview(models.Model):
 
     def employeeHasSigned(self, employee_pk):
         import pdb; pdb.set_trace()
+        # TODO: Remove?
         return True
 
     def all_required_signatures(self):

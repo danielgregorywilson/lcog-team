@@ -36,7 +36,7 @@ class SignatureInline(admin.TabularInline):
 
 @admin.register(PerformanceReview)
 class PerformanceReviewAdmin(admin.ModelAdmin):
-    list_display = ("username", "period_end_date")
+    list_display = ("username", "status", "effective_date")
     inlines = (SignatureInline,)
 
 

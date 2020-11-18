@@ -60,11 +60,50 @@ SEND_MANAGER_SECOND_REMINDER_NEW_PR_DAYS_BEFORE = 45
 SEND_MANAGER_PERSISTENT_REMINDERS_NEW_PR_DAYS_BEFORE = 30
 
 def send_pr_reminder_emails():
+    current_site = Site.objects.get_current()
     PerformanceReview = apps.get_model('people.PerformanceReview')
-    import pdb; pdb.set_trace()
+    users = {}
+    notifications = {
+        'review_to_write': [], 'review_to_write_other': [],
+        'signature_required': [], 'signature_required_other': []
+    }
+    
+    def add_reminder(email, notification_type, subject, text_body, html_body):
+        if not email in users.keys():
+            users[email] = {
+                'review_to_write': [], 'review_to_write_other': [],
+                'signature_required': [], 'signature_required_other': []
+            }
+        users[email][notification_type].append([subject, text_body, html_body])
+    
     for pr in PerformanceReview.objects.filter(status=PerformanceReview.NEEDS_EVALUATION):
-        import pdb; pdb.set_trace()
-        pr.effective_date
+        days_until_due = pr.days_until_due()
+        if days_until_due in [60, 45]:
+            url = current_site.domain + '/pr/' + str(pr.pk)
+            add_reminder(pr.employee.manager.user.email, 'review_to_write', 'Upcoming performance review', f'A review for {pr.employee.user.get_full_name()} is due in {pr.days_until_due()} days on {pr.effective_date}. Write an evaluation here: {url}', f'A review for {pr.employee.user.get_full_name()} is due in {pr.days_until_due()} days on {pr.effective_date}. Write an evaluation here: <a href="{url}">{url}</a>')
+        if days_until_due <= 30:
+            url = current_site.domain + '/pr/' + str(pr.pk)
+            add_reminder(pr.employee.manager.user.email, 'review_to_write', 'Performance review behind schedule', f'A review for {pr.employee.user.get_full_name()} is due in {pr.days_until_due()} days on {pr.effective_date}. Write an evaluation here: {url}', f'A review for {pr.employee.user.get_full_name()} is due in {pr.days_until_due()} days on {pr.effective_date}. Write an evaluation here: <a href="{url}">{url}</a>')
+            add_reminder(pr.employee.manager.manager.user.email, 'review_to_write_other', 'Performance review behind schedule', f'A review for {pr.employee.user.get_full_name()} is due from {pr.employee.manager.user.get_full_name()} in {pr.days_until_due()} days on {pr.effective_date}. Contact them here: {pr.employee.manager.user.email}', f'A review for {pr.employee.user.get_full_name()} is due from {pr.employee.manager.user.get_full_name()} in {pr.days_until_due()} days on {pr.effective_date}. Contact them here: {pr.employee.manager.user.email}')
+    for user in users.items():
+        print('\n')
+        print('USER:', user[0])
+        if len(user[1]['review_to_write']):
+            print('REVIEW_TO_WRITE')
+            for notification in user[1]['review_to_write']:
+                print(notification)
+        if len(user[1]['review_to_write_other']):
+            print('REVIEW_TO_WRITE_OTHER')
+            for notification in user[1]['review_to_write_other']:
+                print(notification)
+        if len(user[1]['signature_required']):
+            print('SIGNATURE_REQUIRED')
+            for notification in user[1]['signature_required']:
+                print(notification)
+        if len(user[1]['signature_required_other']):
+            print('SIGNATURE_REQUIRED_OTHER')
+            for notification in user[1]['signature_required_other']:
+                print(notification)
     return
 
 

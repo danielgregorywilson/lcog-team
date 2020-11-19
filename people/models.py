@@ -454,7 +454,25 @@ class PerformanceReview(models.Model):
         return signatures
 
 
-class Signature(models.Model):
+class SignatureReminder(models.Model):
+    """
+    Represents the last time an employee was reminded to sign a Performance
+    Evaluation. We can use this to remind them again a specific amount of time
+    in the future.
+    """
+    
+    class Meta:
+        verbose_name = _("Most Recent Signature Reminder")
+        verbose_name_plural = _("Most Recent Signature Reminders")
+    
+    unique_together = ['review', 'employee']
+
+    review = models.ForeignKey("people.PerformanceReview", verbose_name=_("performance review"), on_delete=models.CASCADE)
+    employee = models.ForeignKey("people.Employee", on_delete=models.CASCADE)
+    date = models.DateField(_("most recent reminder date"), auto_now=True, auto_now_add=False)
+
+
+class Signature(models.Model):    
     class Meta:
         verbose_name = _("Signature")
         verbose_name_plural = _("Signatures")

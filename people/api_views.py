@@ -204,7 +204,7 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
             pr.description_reviewed_employee
         ]):
             pr.status = PerformanceReview.EVALUATION_WRITTEN
-            send_evaluation_written_email_to_employee([pr.employee.user.email], pr)
+            send_evaluation_written_email_to_employee(pr.employee, pr)
         pr.save()
         serialized_review = PerformanceReviewSerializer(pr,
             context={'request': request})
@@ -260,9 +260,9 @@ class SignatureViewSet(viewsets.ModelViewSet):
         pr_manager_has_signed = Signature.objects.filter(employee=pr.employee.manager).count() == 1
         if pr_employee_has_signed and pr_manager_has_signed and pr.status == PerformanceReview.EVALUATION_WRITTEN:
             if employee == pr.employee:
-                send_signature_email_to_manager([employee.manager.manager.user.email], pr)
+                send_signature_email_to_manager(employee.manager.manager, pr)
             else:
-                send_signature_email_to_manager([employee.manager.user.email], pr)
+                send_signature_email_to_manager(employee.manager, pr)
         
         serialized_signature = SignatureSerializer(new_signature,
             context={'request': request})

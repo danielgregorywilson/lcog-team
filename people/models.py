@@ -464,12 +464,11 @@ class SignatureReminder(models.Model):
     class Meta:
         verbose_name = _("Most Recent Signature Reminder")
         verbose_name_plural = _("Most Recent Signature Reminders")
-    
-    unique_together = ['review', 'employee']
 
     review = models.ForeignKey("people.PerformanceReview", verbose_name=_("performance review"), on_delete=models.CASCADE)
     employee = models.ForeignKey("people.Employee", on_delete=models.CASCADE)
     date = models.DateField(_("most recent reminder date"), auto_now=True, auto_now_add=False)
+    next_date = models.DateField(_("planned reminder date"))
 
 
 class Signature(models.Model):    

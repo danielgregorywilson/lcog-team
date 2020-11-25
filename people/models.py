@@ -462,14 +462,22 @@ class SignatureReminder(models.Model):
     """
     
     class Meta:
-        verbose_name = _("Most Recent Signature Reminder")
-        verbose_name_plural = _("Most Recent Signature Reminders")
+        verbose_name = _("Signature Reminder")
+        verbose_name_plural = _("Signature Reminders")
         get_latest_by = ("date")
+
+    def __str__(self):
+        if self.employee == self.review.employee:
+            return f"Reminder for {self.employee.user.username} on {self.date} to sign their own review"
+        elif self.employee == self.review.employee.manager:
+            return f"Reminder for {self.employee.user.username} on {self.date} to sign a review for {self.review.employee.user.username} that they wrote"
+        else:
+            return f"Reminder for {self.employee.user.username} on {self.date} to sign a review for {self.review.employee.user.username}"
 
     review = models.ForeignKey("people.PerformanceReview", verbose_name=_("performance review"), on_delete=models.CASCADE)
     employee = models.ForeignKey("people.Employee", on_delete=models.CASCADE)
-    date = models.DateField(_("most recent reminder date"), auto_now=True, auto_now_add=False)
-    next_date = models.DateField(_("planned reminder date"))
+    date = models.DateField(_("reminder date"), auto_now=True, auto_now_add=False)
+    next_date = models.DateField(_("planned next reminder date"))
 
 
 class Signature(models.Model):    

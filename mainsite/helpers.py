@@ -201,7 +201,6 @@ def send_pr_reminder_emails():
                     earliest_reminder = reminders.earliest()
                     if today >= earliest_reminder.date + datetime.timedelta(days=ESCALATION_TO_NEXT_MANAGER_REMINDER):
                         url = current_site.domain + '/pr/' + str(pr.pk)
-                        employee = pr.employee
                         # Notification #9, Notification #12: Escalate to manager's manager to get manager to sign evaluation
                         add_reminder(employee.manager.user.email, 'signature_required_other', f'A performance review is behind schedule', f'A signature is required by {employee.user.get_full_name()} for their evaluation. Contact them here: {employee.user.email}', f'A signature is required by {employee.user.get_full_name()} for their evaluation. Contact them here: {employee.user.email}')
                         # We don't need to make another reminder because this same reminder will trigger every subsequent day

@@ -464,6 +464,7 @@ class SignatureReminder(models.Model):
     class Meta:
         verbose_name = _("Most Recent Signature Reminder")
         verbose_name_plural = _("Most Recent Signature Reminders")
+        get_latest_by = ("date")
 
     review = models.ForeignKey("people.PerformanceReview", verbose_name=_("performance review"), on_delete=models.CASCADE)
     employee = models.ForeignKey("people.Employee", on_delete=models.CASCADE)

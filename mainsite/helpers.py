@@ -91,7 +91,7 @@ def send_pr_reminder_emails():
     PerformanceReview = apps.get_model('people.PerformanceReview')
     Signature = apps.get_model('people.Signature')
     SignatureReminder = apps.get_model('people.SignatureReminder')
-    today = datetime.date.today()
+    today = datetime.date.today() + datetime.timedelta(days=7)
 
     users = {}
     notifications = {
@@ -126,7 +126,7 @@ def send_pr_reminder_emails():
     for pr in PerformanceReview.objects.filter(status=PerformanceReview.EVALUATION_WRITTEN):
         # Reminder to employee
         reminder = SignatureReminder.objects.filter(review=pr, employee=pr.employee).latest()
-        if reminder.count():
+        if reminder:
             if today >= reminder.next_date:
                 url = current_site.domain + '/pr/' + str(pr.pk)
                 employee = pr.employee
@@ -141,8 +141,8 @@ def send_pr_reminder_emails():
             SignatureReminder.objects.create(review=pr, employee=employee, next_date=next_reminder)
         
         # Reminder to their manager
-        if reminder.count():
-            if today >= reminder.date + ESCALATION_TO_NEXT_MANAGER_REMINDER:
+        if reminder:
+            if today >= reminder.date + datetime.timedelta(days=ESCALATION_TO_NEXT_MANAGER_REMINDER):
                 url = current_site.domain + '/pr/' + str(pr.pk)
                 employee = pr.employee
                 # Notification #7: Escalate to employee's manager to get employee to sign their evaluation
@@ -206,6 +206,38 @@ def send_pr_reminder_emails():
             print('SIGNATURE_REQUIRED_OTHER')
             for notification in user[1]['signature_required_other']:
                 print(notification)
+        
+        review_to_write_notifications = user[1]['review_to_write']
+        review_to_write_other_notifications = user[1]['review_to_write_other']
+        signature_required_notifications = user[1]['signature_required']
+        signature_required_other_notifications = user[1]['signature_required_other']
+
+        total_num_notifications = len(review_to_write_notifications) + len(review_to_write_other_notifications) + len(signature_required_notifications) + len(signature_required_other_notifications)
+        
+        if total_num_notifications == 1:
+            # Single Notification Email
+            notifications = review_to_write_notifications + review_to_write_other_notifications + signature_required_notifications + signature_required_other_notifications
+            notification = notifications[0]
+            send_email(user[0], notification[0], notification[1], notification[2])
+        elif total_num_notifications > 1:
+            # Batch Notification Email
+            subject = 'LCOG Performance Review To-Dos'
+            text_body = 'There are multiple performance reviews that require your attention:\n'
+            html_body = '<div>There are multiple performance reviews that require your attention:</div>'
+            for notification_type in ['review_to_write', 'review_to_write_other', 'signature_required', 'signature_required_other']:
+                notifications = user[1][notification_type]
+                if len(notifications):
+                    cleaned_header = " ".join([s.capitalize() for s in notification_type.split('_')])
+                    text_body += '\n' + cleaned_header
+                    html_body += f'<div>{cleaned_header}</div><table>'
+                    for notification in notifications:
+                        text_body += '\n' + notification[1]
+                        html_body += f'<tr><th>{notification[0]}</th><td>{notification[2]}</td></tr>'
+                    text_body += '\n'
+                    html_body += '</table>'
+            send_email(user[0], subject, text_body, html_body)
+
+        
     return
 
 

@@ -51,7 +51,7 @@ module.exports = configure(function (ctx) {
     build: {
       vueRouterMode: 'history', // available values: 'hash', 'history'
       env: {
-        API_URL: ctx.dev ? 'http://localhost:8000/' : 'http://lcog-internal-env.eba-4t9yrmiu.us-west-2.elasticbeanstalk.com/'
+        API_URL: ctx.dev ? 'http://lcog-hr:8000/' : 'http://lcog-internal-env.eba-4t9yrmiu.us-west-2.elasticbeanstalk.com/'
         // API_URL: 'http://lcog-internal-env.eba-4t9yrmiu.us-west-2.elasticbeanstalk.com/'
       },
 

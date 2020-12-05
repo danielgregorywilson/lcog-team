@@ -371,11 +371,6 @@ class PerformanceReview(models.Model):
             return True
         return False
 
-    def employeeHasSigned(self, employee_pk):
-        import pdb; pdb.set_trace()
-        # TODO: Remove?
-        return True
-
     def all_required_signatures(self):
         """
         Returns a list of lists of the form:
@@ -453,6 +448,14 @@ class PerformanceReview(models.Model):
             signatures.append(["Executive Director", None, None, ed.pk, ready_to_sign])
         return signatures
 
+    def create_next_review_for_employee(self):
+        PerformanceReview.objects.create(
+            employee=self.employee,
+            period_start_date=self.period_end_date + datetime.timedelta(days=1),
+            period_end_date=self.period_end_date + datetime.timedelta(days=365),
+            effective_date=self.effective_date + datetime.timedelta(days=365),
+            evaluation_type=self.ANNUAL_EVALUATION
+        )
 
 class SignatureReminder(models.Model):
     """
@@ -508,6 +511,8 @@ class Signature(models.Model):
             self.review.save()
             # Send notification to HR manager
             send_completed_email_to_hr_manager(self.review)
+            # Create new Performance Review for employee
+            self.review.create_next_review_for_employee()
         super().save(*args, **kwargs)
 
 

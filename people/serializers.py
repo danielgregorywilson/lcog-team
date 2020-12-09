@@ -21,10 +21,11 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     email = serializers.EmailField(source='user.email')
     is_manager = serializers.SerializerMethodField()
     is_upper_manager = serializers.SerializerMethodField()
+    prs_can_view = serializers.SerializerMethodField()
     
     class Meta:
         model = Employee
-        fields = ['url', 'pk', 'name', 'user', 'email', 'manager', 'is_manager', 'is_upper_manager', 'is_hr_manager', 'is_executive_director']
+        fields = ['url', 'pk', 'name', 'user', 'email', 'manager', 'is_manager', 'is_upper_manager', 'is_hr_manager', 'is_executive_director', 'prs_can_view']
 
     @staticmethod
     def get_is_manager(employee):
@@ -33,6 +34,11 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     @staticmethod
     def get_is_upper_manager(employee):
         return employee.get_direct_reports_descendants().count() != 0
+    
+    @staticmethod
+    def get_prs_can_view(employee):
+        import pdb; pdb.set_trace()
+        return employee.prs_can_view
 
 
 class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):

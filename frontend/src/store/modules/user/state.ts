@@ -7,6 +7,7 @@ export interface EmployeeProfileInterface {
   is_upper_manager: boolean
   is_hr_manager: boolean
   is_executive_director: boolean
+  prs_can_view: Array<number>
 }
 
 export interface UserStateInterface {
@@ -16,7 +17,7 @@ export interface UserStateInterface {
 
 const state: UserStateInterface = {
   status: '',
-  profile: {employee_pk: -1, username: '', email: '', name: '', is_manager: false, is_upper_manager: false, is_hr_manager: false, is_executive_director: false}
+  profile: {employee_pk: -1, username: '', email: '', name: '', is_manager: false, is_upper_manager: false, is_hr_manager: false, is_executive_director: false, prs_can_view: [6]}
 };
 
 export default state;

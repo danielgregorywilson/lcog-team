@@ -1,7 +1,7 @@
 import { Route, RouteConfig } from 'vue-router';
 
 import authState from '../store/modules/auth/state'
-// import userState from '../store/modules/user/state'
+import userState from '../store/modules/user/state'
 
 type Next = (path?: string) => void
 
@@ -21,14 +21,22 @@ const ifAuthenticated = (to: Route, from: Route, next: Next) => {
   next('auth/login')
 }
 
-// TODO: Implement
-// const ifManager = (to: Route, from: Route, next: Next) => {
-//   if (userState.profile.is_manager) {
-//     next()
-//     return
-//   }
-//   next('dashboard')
-// }
+const ifManager = (to: Route, from: Route, next: Next) => {
+  if (userState.profile.is_manager) {
+    next()
+    return
+  }
+  next('dashboard')
+}
+
+const ifManagerOrOwnReview = (to: Route, from: Route, next: Next) => {
+  //TODO: Should be ifCanViewReview
+  if (userState.profile.is_manager || userState.profile.prs_can_view.indexOf(parseInt(to.params.pk)) != -1) {
+    next()
+    return
+  }
+  next('dashboard')
+}
 
 // TODO: Add API guards to notes and PRs
 // TODO: Add a reset password view as in Django version
@@ -48,33 +56,29 @@ const routes: RouteConfig[] = [
         path: '/reviews',
         name: 'reviews',
         component: () => import('pages/PerformanceReviews.vue'),
-        // TODO
-        // beforeEnter: ifManager,
-        beforeEnter: ifAuthenticated,
+        beforeEnter: ifManager,
       },
       {
         path: '/note/new',
         name: 'note-create',
         component: () => import('pages/ReviewNoteCreate.vue'),
-        // TODO
-        // beforeEnter: ifManager,
-        beforeEnter: ifAuthenticated,
+        beforeEnter: ifManager,
       },
       {
         path: '/note/:pk',
         name: 'note-details',
         component: () => import('pages/ReviewNoteDetail.vue'),
-        // TODO
-        // beforeEnter: ifManager,
-        beforeEnter: ifAuthenticated,
+        // TODO: Only view if you have permission (wrote it)
+        beforeEnter: ifManager,
       },
       {
         path: '/pr/:pk',
         name: 'pr-details',
         component: () => import('pages/PerformanceReviewDetail.vue'),
-        // TODO
+        // TODO: Only view your own
+        beforeEnter: ifManagerOrOwnReview,
         // beforeEnter: ifManager,
-        beforeEnter: ifAuthenticated,
+        // beforeEnter: ifAuthenticated,
       },
       {
         path: '/timeoff',

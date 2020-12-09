@@ -93,12 +93,26 @@ WSGI_APPLICATION = 'mainsite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+# Test SQLite DB
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+# Development MySQL DB
+# Production MySQL DB
+# https://www.digitalocean.com/community/tutorials/how-to-create-a-django-app-and-connect-it-to-a-database#prerequisites
+# NOT WORKING
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'OPTIONS': {
+#             'read_default_file': '/etc/mysql/my.cnf',
+#         },
+#     }
+# }
 
 
 # Password validation

@@ -29,16 +29,24 @@ const ifManager = (to: Route, from: Route, next: Next) => {
   next('dashboard')
 }
 
-const ifManagerOrOwnReview = (to: Route, from: Route, next: Next) => {
-  //TODO: Should be ifCanViewReview
-  if (userState.profile.is_manager || userState.profile.prs_can_view.indexOf(parseInt(to.params.pk)) != -1) {
+const ifCanViewReview = (to: Route, from: Route, next: Next) => {
+  if (userState.profile.prs_can_view.indexOf(parseInt(to.params.pk)) != -1) {
     next()
     return
+  } else {
+    next('dashboard')
   }
-  next('dashboard')
 }
 
-// TODO: Add API guards to notes and PRs
+const ifCanViewNote = (to: Route, from: Route, next: Next) => {
+  if (userState.profile.notes_can_view.indexOf(parseInt(to.params.pk)) != -1) {
+    next()
+    return
+  } else {
+    next('dashboard')
+  }
+}
+
 // TODO: Add a reset password view as in Django version
 const routes: RouteConfig[] = [
   {
@@ -68,17 +76,13 @@ const routes: RouteConfig[] = [
         path: '/note/:pk',
         name: 'note-details',
         component: () => import('pages/ReviewNoteDetail.vue'),
-        // TODO: Only view if you have permission (wrote it)
-        beforeEnter: ifManager,
+        beforeEnter: ifCanViewNote,
       },
       {
         path: '/pr/:pk',
         name: 'pr-details',
         component: () => import('pages/PerformanceReviewDetail.vue'),
-        // TODO: Only view your own
-        beforeEnter: ifManagerOrOwnReview,
-        // beforeEnter: ifManager,
-        // beforeEnter: ifAuthenticated,
+        beforeEnter: ifCanViewReview,
       },
       {
         path: '/timeoff',
@@ -96,9 +100,7 @@ const routes: RouteConfig[] = [
         path: 'pr/:pk',
         name: 'pr-print',
         component: () => import('pages/PerformanceReviewDetail.vue'),
-        // TODO
-        // beforeEnter: ifManager,
-        beforeEnter: ifAuthenticated,
+        beforeEnter: ifManager,
         props: {
           print: true
         }

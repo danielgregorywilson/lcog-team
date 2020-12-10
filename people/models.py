@@ -106,12 +106,14 @@ class Employee(models.Model):
             employee_and_descendants += self.get_descendants_of_employee(descendant)
         return employee_and_descendants
 
-    def get_direct_reports_descendants(self):
+    def get_direct_reports_descendants(self, include_self=False):
         # Return all descendant direct reports, including the user's direct
         # reports.
         direct_reports_descendants = [self.get_descendants_of_employee(employee) for employee in self.get_direct_reports()]
         flat_list = [item for sublist in direct_reports_descendants for item in sublist] # Flatten the 2-D list
         pk_list = [item.pk for item in flat_list]
+        if include_self:
+            pk_list.append(self.pk)
         unique_descendant_pks = list(set(pk_list))
         return Employee.objects.filter(pk__in=unique_descendant_pks)
 
@@ -209,6 +211,21 @@ class Employee(models.Model):
             if review.signature_set.filter(employee=self.pk).count() > 0:
                 reviews.append(review)
         return reviews
+
+    def prs_can_view(self):
+        # You can view all PRs for which either you are the employee or the
+        # employee is your direct report or a descendant direct report.
+        self_and_direct_reports = self.get_direct_reports_descendants(include_self=True)
+        pr_ids = []
+        for employee in self_and_direct_reports:
+            employee_pr_ids = map(lambda pr: pr.id, PerformanceReview.objects.filter(employee=employee))
+            pr_ids += employee_pr_ids
+        return list(pr_ids)
+    
+    def notes_can_view(self):
+        # You can view all notes you wrote.
+        note_ids = map(lambda note: note.id, ReviewNote.objects.filter(manager=self))
+        return list(note_ids)
 
 
 class ManagerUpcomingReviewsManager(models.Manager):
@@ -456,6 +473,7 @@ class PerformanceReview(models.Model):
             effective_date=self.effective_date + datetime.timedelta(days=365),
             evaluation_type=self.ANNUAL_EVALUATION
         )
+
 
 class SignatureReminder(models.Model):
     """

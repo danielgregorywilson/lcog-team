@@ -44,11 +44,11 @@
             </div>
             <div class="label-radio-pair">
               <q-radio v-model="probationaryEvaluationType" val="S" :disable="evaluationType != 'P' || !currentUserIsManagerOfEmployee()" />
-              <div>SEIU (180 day)</div>
+              <div>180 days</div>
             </div>
             <div class="label-radio-pair">
               <q-radio v-model="probationaryEvaluationType" val="N" :disable="evaluationType != 'P' || !currentUserIsManagerOfEmployee()" />
-              <div>Non-SEIU (6 month)</div>
+              <div>6 months</div>
             </div>
           </div>
           <div class="label-radio-pair">

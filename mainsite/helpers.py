@@ -348,8 +348,7 @@ def send_pr_reminder_emails():
             print('HTML_BODY')
             print(html_body)
             send_email(user[0], subject, text_body, html_body)
-
-        
+    
     return
 
 

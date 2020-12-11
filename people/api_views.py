@@ -187,7 +187,6 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
             ),
             pr.step_increase != None,
             pr.top_step_bonus != None,
-            pr.action_other != None,
             pr.factor_job_knowledge != None,
             pr.factor_work_quality != None,
             pr.factor_work_quantity != None,

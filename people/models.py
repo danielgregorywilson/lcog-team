@@ -405,10 +405,10 @@ class PerformanceReview(models.Model):
         employee = self.employee
         employee_signature = Signature.objects.filter(review=self, employee=self.employee).first()
         last_employee_in_chain = employee # Keep track of the last employee so we can check if they signed
+        added_hr_manager = False
+        added_executive_director = False
         while True:
-            # Try to get the current Employee's signature and add it to the
-            # signature list
-            
+            # Try to get the current Employee's signature and add it to the signature list
             if len(signatures) == 0:
                 title = "Employee"
             elif len(signatures) == 1:
@@ -433,6 +433,12 @@ class PerformanceReview(models.Model):
                         ready_to_sign = True
                 signatures.append([title, None, None, employee.pk, ready_to_sign])
             
+            # Keep track of whether we're already adding HR manager and ED signatures
+            if employee.is_hr_manager:
+                added_hr_manager = True
+            if employee.is_executive_director:
+                added_executive_director = True
+
             # Get the next manager in the chain
             if employee.is_division_director:
                 break
@@ -442,28 +448,30 @@ class PerformanceReview(models.Model):
             else:
                 break
         
-        # Finally, add the HR Manager and Executive Director Signatures
-        hr_manager = Employee.objects.filter(is_hr_manager=True).first()
-        hr_signature = Signature.objects.filter(review=self, employee=hr_manager).first()
-        if hr_signature:
-            signatures.append(["Human Resources Manager", hr_manager.user.get_full_name(), hr_signature.date, None, False]) # Not ready to sign because there is a signature
-        else:
-            # If last manager has signed, we are ready
-            direct_report_signature = Signature.objects.filter(review=self, employee=last_employee_in_chain).first()
-            ready_to_sign = False
-            if direct_report_signature:
-                ready_to_sign = True
-            signatures.append(["Human Resources Manager", None, None, hr_manager.pk, ready_to_sign])
-        ed = Employee.objects.filter(is_executive_director=True).first()
-        ed_signature = Signature.objects.filter(review=self, employee=ed).first()
-        if ed_signature:
-            signatures.append(["Executive Director", ed.user.get_full_name(), ed_signature.date, None, False]) # Not ready to sign because there is a signature
-        else:
-            # If HR manager has signed, we are ready
-            ready_to_sign = False
+        # Finally, add the HR Manager and Executive Director Signatures if still needed
+        if not added_hr_manager:
+            hr_manager = Employee.objects.filter(is_hr_manager=True).first()
+            hr_signature = Signature.objects.filter(review=self, employee=hr_manager).first()
             if hr_signature:
-                ready_to_sign = True
-            signatures.append(["Executive Director", None, None, ed.pk, ready_to_sign])
+                signatures.append(["Human Resources Manager", hr_manager.user.get_full_name(), hr_signature.date, None, False]) # Not ready to sign because there is a signature
+            else:
+                # If last manager has signed, we are ready
+                direct_report_signature = Signature.objects.filter(review=self, employee=last_employee_in_chain).first()
+                ready_to_sign = False
+                if direct_report_signature:
+                    ready_to_sign = True
+                signatures.append(["Human Resources Manager", None, None, hr_manager.pk, ready_to_sign])
+        if not added_executive_director:
+            ed = Employee.objects.filter(is_executive_director=True).first()
+            ed_signature = Signature.objects.filter(review=self, employee=ed).first()
+            if ed_signature:
+                signatures.append(["Executive Director", ed.user.get_full_name(), ed_signature.date, None, False]) # Not ready to sign because there is a signature
+            else:
+                # If HR manager has signed, we are ready
+                ready_to_sign = False
+                if hr_signature:
+                    ready_to_sign = True
+                signatures.append(["Executive Director", None, None, ed.pk, ready_to_sign])
         return signatures
 
     def create_next_review_for_employee(self):

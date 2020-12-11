@@ -252,7 +252,7 @@
         type="textarea"
       /> -->
 
-      <h5 class="text-uppercase text-bold q-my-md"><u>V. Employee Comments</u></h5>
+      <h5><span class="text-uppercase text-bold q-my-md"><u>V. Employee Comments</u></span> (e.g. self-evaluation and goals)</h5>
       <q-input
         v-model="evaluationCommentsEmployee"
         type="textarea"

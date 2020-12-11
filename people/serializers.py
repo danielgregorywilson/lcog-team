@@ -65,6 +65,7 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
             'manager_name', 'days_until_review', 'status', 'period_start_date', 
             'period_end_date', 'effective_date', 'evaluation_type',
             'probationary_evaluation_type', 'step_increase', 'top_step_bonus',
+            'action_other',
 
             'factor_job_knowledge', 'factor_work_quality',
             'factor_work_quantity', 'factor_work_habits', 'factor_analysis',

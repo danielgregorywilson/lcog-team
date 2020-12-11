@@ -72,6 +72,9 @@
             <q-radio v-model="topStepBonus" val="N" :disable="!currentUserIsManagerOfEmployee()" />
             <div>No</div>
           </div>
+          <div>
+            <q-input outlined v-model="actionOther" label="Other" />
+          </div>
         </div>
       </div>
 
@@ -348,7 +351,7 @@
     display: grid;
     justify-content: space-between;
     align-items: center;
-    grid-template-columns: auto auto auto;
+    grid-template-columns: auto auto auto auto;
   }
   .eval-box-full-1-probationary {
     display: grid;
@@ -545,6 +548,8 @@ export default class PerformanceReviewDetail extends Vue {
   private stepIncrease = ''
   private topStepBonusCurrentVal = ''
   private topStepBonus = ''
+  private actionOtherCurrentVal = ''
+  private actionOther = ''
 
   private factorJobKnowledgeCurrentVal = ''
   private factorJobKnowledge = ''
@@ -609,6 +614,7 @@ export default class PerformanceReviewDetail extends Vue {
       this.probationaryEvaluationType == this.probationaryEvaluationTypeCurrentVal &&
       this.stepIncrease == this.stepIncreaseCurrentVal &&
       this.topStepBonus == this.topStepBonusCurrentVal &&
+      this.actionOther == this.actionOtherCurrentVal &&
       this.factorJobKnowledge == this.factorJobKnowledgeCurrentVal &&
       this.factorWorkQuality == this.factorWorkQualityCurrentVal &&
       this.factorWorkQuantity == this.factorWorkQuantityCurrentVal &&
@@ -680,6 +686,8 @@ export default class PerformanceReviewDetail extends Vue {
           this.stepIncreaseCurrentVal = this.stepIncrease
           this.topStepBonus = pr.top_step_bonus
           this.topStepBonusCurrentVal = this.topStepBonus
+          this.actionOther = pr.action_other
+          this.actionOtherCurrentVal = this.actionOther
 
           this.factorJobKnowledge = pr.factor_job_knowledge
           this.factorJobKnowledgeCurrentVal = this.factorJobKnowledge
@@ -746,6 +754,7 @@ export default class PerformanceReviewDetail extends Vue {
       probationary_evaluation_type: this.probationaryEvaluationType,
       step_increase: this.stepIncrease,
       top_step_bonus: this.topStepBonus,
+      action_other: this.actionOther,
       factor_job_knowledge: this.factorJobKnowledge,
       factor_work_quality: this.factorWorkQuality,
       factor_work_quantity: this.factorWorkQuantity,
@@ -771,6 +780,7 @@ export default class PerformanceReviewDetail extends Vue {
         this.probationaryEvaluationTypeCurrentVal = response.data.probationary_evaluation_type
         this.stepIncreaseCurrentVal = response.data.step_increase
         this.topStepBonusCurrentVal = response.data.top_step_bonus
+        this.actionOtherCurrentVal = response.data.action_other
 
         this.factorJobKnowledgeCurrentVal = response.data.factor_job_knowledge
         this.factorWorkQualityCurrentVal = response.data.factor_work_quality

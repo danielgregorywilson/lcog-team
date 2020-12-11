@@ -72,6 +72,7 @@ export interface PerformanceReviewRetrieve {
   probationary_evaluation_type: string
   step_increase: string
   top_step_bonus: string
+  action_other: string
 
   days_until_review: number
 
@@ -121,6 +122,7 @@ export interface PerformanceReviewUpdate {
   probationary_evaluation_type: string
   step_increase: string
   top_step_bonus: string
+  action_other: string
   factor_job_knowledge: string
   factor_work_quality: string
   factor_work_quantity: string
@@ -145,6 +147,7 @@ export interface PerformanceReviewUpdatePartial {
   probationary_evaluation_type?: string
   step_increase?: string
   top_step_bonus?: string
+  action_other?: string
   factor_job_knowledge?: string
   factor_work_quality?: string
   factor_work_quantity?: string

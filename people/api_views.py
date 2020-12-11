@@ -159,6 +159,7 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
             request.data['probationary_evaluation_type']
         pr.step_increase = request.data['step_increase']
         pr.top_step_bonus = request.data['top_step_bonus']
+        pr.action_other = request.data['action_other']
         pr.factor_job_knowledge = request.data['factor_job_knowledge']
         pr.factor_work_quality = request.data['factor_work_quality']
         pr.factor_work_quantity = request.data['factor_work_quantity']
@@ -186,6 +187,7 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
             ),
             pr.step_increase != None,
             pr.top_step_bonus != None,
+            pr.action_other != None,
             pr.factor_job_knowledge != None,
             pr.factor_work_quality != None,
             pr.factor_work_quantity != None,

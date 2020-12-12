@@ -72,7 +72,7 @@
             <q-radio v-model="topStepBonus" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
             <div>No</div>
           </div>
-          <div>
+          <div id="action-other">
             <q-input outlined v-model="actionOther" label="Other" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
           </div>
         </div>
@@ -393,6 +393,12 @@
     display: none;
   }
   @media only screen and (max-width: 640px) {
+    .eval-box-full {
+      grid-template-columns: auto auto auto;
+      #action-other {
+        grid-column-start: span 3;
+      }
+    }
     .factors-grid-container {
       grid-template-columns: auto 68px 68px 68px 68px;
     }

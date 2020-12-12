@@ -39,20 +39,20 @@
           <div class="text-uppercase">Evaluation Type:</div>
           <div class="eval-box-full-1-probationary">
             <div class="label-radio-pair">
-              <q-radio v-model="evaluationType" val="P" :disable="!currentUserIsManagerOfEmployee()" />
+              <q-radio v-model="evaluationType" val="P" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
               <div class="text-uppercase">Probat&shy;ionary:</div>
             </div>
             <div class="label-radio-pair">
-              <q-radio v-model="probationaryEvaluationType" val="S" :disable="evaluationType != 'P' || !currentUserIsManagerOfEmployee()" />
+              <q-radio v-model="probationaryEvaluationType" val="S" :disable="evaluationType != 'P' || !currentUserIsManagerOfEmployee() || employeeHasSigned()" />
               <div>180 days</div>
             </div>
             <div class="label-radio-pair">
-              <q-radio v-model="probationaryEvaluationType" val="N" :disable="evaluationType != 'P' || !currentUserIsManagerOfEmployee()" />
+              <q-radio v-model="probationaryEvaluationType" val="N" :disable="evaluationType != 'P' || !currentUserIsManagerOfEmployee() || employeeHasSigned()" />
               <div>6 months</div>
             </div>
           </div>
           <div class="label-radio-pair">
-            <q-radio v-model="evaluationType" val="A" @input="() => this.probationaryEvaluationType = ''" :disable="!currentUserIsManagerOfEmployee()" />
+            <q-radio v-model="evaluationType" val="A" @input="() => this.probationaryEvaluationType = ''" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
             <div class="text-uppercase">Annual</div>
           </div>
         </div>
@@ -60,20 +60,20 @@
           <div class="text-uppercase text-bold">Action:</div>
           <div class="label-radio-triplet">
             <div class="text-bold">Step Increase:</div>
-            <q-radio v-model="stepIncrease" val="Y" :disable="!currentUserIsManagerOfEmployee()" />
+            <q-radio v-model="stepIncrease" val="Y" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
             <div>Yes</div>
-            <q-radio v-model="stepIncrease" val="N" :disable="!currentUserIsManagerOfEmployee()" />
+            <q-radio v-model="stepIncrease" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
             <div>No</div>
           </div>
           <div class="label-radio-triplet">
             <div class="text-bold">Top-Step Bonus</div>
-            <q-radio v-model="topStepBonus" val="Y" :disable="!currentUserIsManagerOfEmployee()" />
+            <q-radio v-model="topStepBonus" val="Y" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
             <div>Yes</div>
-            <q-radio v-model="topStepBonus" val="N" :disable="!currentUserIsManagerOfEmployee()" />
+            <q-radio v-model="topStepBonus" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
             <div>No</div>
           </div>
           <div>
-            <q-input outlined v-model="actionOther" label="Other" />
+            <q-input outlined v-model="actionOther" label="Other" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
           </div>
         </div>
       </div>
@@ -131,119 +131,119 @@
             <div class="row text-bold"><u>Job Knowledge</u></div>
             <div class="row">Present knowledge of techniques, skills, procedures, technologies, equipment, rules and policies of position.</div>
         </div>
-        <div class="factors-radio-box"><q-radio v-model="factorJobKnowledge" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorJobKnowledge" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorJobKnowledge" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorJobKnowledge" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorJobKnowledge" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorJobKnowledge" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Quality of Work</u></div>
             <div class="row">Turns in high quality work and very seldom makes errors.</div>
         </div>
-        <div class="factors-radio-box"><q-radio v-model="factorWorkQuality" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorWorkQuality" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorWorkQuality" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorWorkQuality" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorWorkQuality" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorWorkQuality" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Quantity of Work</u></div>
             <div class="row">Accomplishes stated goals and expectations.</div>
         </div>
-        <div class="factors-radio-box"><q-radio v-model="factorWorkQuantity" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorWorkQuantity" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorWorkQuantity" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorWorkQuantity" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorWorkQuantity" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorWorkQuantity" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Work Habits</u></div>
             <div class="row">Uses equipment, supplies and time efficiently; punctual and on time.</div>
         </div>
-        <div class="factors-radio-box"><q-radio v-model="factorWorkHabits" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorWorkHabits" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorWorkHabits" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorWorkHabits" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorWorkHabits" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorWorkHabits" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Analysis and Decision-Making</u></div>
             <div class="row">Has strong analytical abilities and makes sound judgements.</div>
         </div>
-        <div class="factors-radio-box"><q-radio v-model="factorAnalysis" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorAnalysis" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorAnalysis" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorAnalysis" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorAnalysis" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorAnalysis" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Initiative and Creativity</u></div>
             <div class="row">A self-starter and seeks new responsibilities and opportunities for leadership; demonstrates creativity in performing tasks and identifying resolutions.</div>
         </div>
-        <div class="factors-radio-box"><q-radio v-model="factorInitiative" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorInitiative" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorInitiative" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorInitiative" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorInitiative" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorInitiative" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Interpersonal Relations</u></div>
             <div class="row">Presents good attitude, works well in teams, cooperates with others, and is thoughtful and courteous/polite.</div>
         </div>
-        <div class="factors-radio-box"><q-radio v-model="factorInterpersonal" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorInterpersonal" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorInterpersonal" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorInterpersonal" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorInterpersonal" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorInterpersonal" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Communication</u></div>
             <div class="row">Effectively communicates (oral and written) and keeps others appropriately informed.</div>
         </div>
-        <div class="factors-radio-box"><q-radio v-model="factorCommunication" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorCommunication" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorCommunication" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorCommunication" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorCommunication" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorCommunication" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Dependability and Responsibility</u></div>
             <div class="row">Completes assigned work within prescribed timelines; rarely needs direct supervision.</div>
         </div>
-        <div class="factors-radio-box"><q-radio v-model="factorDependability" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorDependability" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorDependability" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorDependability" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorDependability" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorDependability" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Professionalism and Customer Service</u></div>
             <div class="row">Presents and represents oneself and the agency in a positive manner; provides and delivers professional, helpful, high quality service and assistance.</div>
         </div>
-        <div class="factors-radio-box"><q-radio v-model="factorProfessionalism" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorProfessionalism" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorProfessionalism" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorProfessionalism" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorProfessionalism" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorProfessionalism" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Project Management</u></div>
             <div class="row">Coordinates, delegates tasks to team members, and communicates internally and externally about projects; projects are high quality and are completed within timelines.</div>
         </div>
-        <div class="factors-radio-box"><q-radio v-model="factorManagement" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorManagement" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorManagement" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorManagement" val="NA" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorManagement" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorManagement" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorManagement" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorManagement" val="NA" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-box">
             <div class="row text-bold"><u>Supervision</u></div>
             <div class="row">Provides support/guidance and motivation with open communication and transparency.</div>
         </div>
-        <div class="factors-radio-box"><q-radio v-model="factorSupervision" val="N" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorSupervision" val="M" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorSupervision" val="E" :disable="!currentUserIsManagerOfEmployee()" /></div>
-        <div class="factors-radio-box"><q-radio v-model="factorSupervision" val="NA" :disable="!currentUserIsManagerOfEmployee()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorSupervision" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorSupervision" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorSupervision" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+        <div class="factors-radio-box"><q-radio v-model="factorSupervision" val="NA" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
       </div>
 
       <h5 class="text-uppercase text-bold q-my-md"><u>II. Employee's Successes</u></h5>
       <q-input
         v-model="evaluationSuccesses"
         type="textarea"
-        :disable="!currentUserIsManagerOfEmployee()"
+        :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
       />
 
       <h5 class="text-uppercase text-bold q-my-md"><u>III. Opportunities for Growth</u></h5>
       <q-input
         v-model="evaluationOpportunities"
         type="textarea"
-        :disable="!currentUserIsManagerOfEmployee()"
+        :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
       />
 
       <h5><span class="text-uppercase text-bold q-my-md"><u>IV. Goals for the Coming Year</u></span> (to be discussed and determined during the evaluation)</h5>
       <q-input
         v-model="evaluationGoalsManager"
         type="textarea"
-        :disable="!currentUserIsManagerOfEmployee()"
+        :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
       />
 
       <!-- <h5 class="text-uppercase">V. Goals for the Coming Year (Employee)</h5>
@@ -256,12 +256,12 @@
       <q-input
         v-model="evaluationCommentsEmployee"
         type="textarea"
-        :disable="!currentUserIsEmployee()"
+        :disable="!currentUserIsEmployee() || employeeHasSigned()"
       />
       <q-btn v-if="currentUserIsEmployee()" color="white" text-color="black" label="Save comments" @click="updateEmployeeComments()" class="q-mt-sm" :disable="!employeeCommentsIsChanged()" />
 
       <h5 class="text-uppercase text-bold q-my-md"><u>VI. Position Description Review</u></h5>
-      <div class="q-mb-lg"><q-checkbox v-model="descriptionReviewedEmployee" :disable="!currentUserIsManagerOfEmployee()" />Position Description has been reviewed with employee.</div>
+      <div class="q-mb-lg"><q-checkbox v-model="descriptionReviewedEmployee" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />Position Description has been reviewed with employee.</div>
 
       <div v-for="(signature, index) in signatures" :key="index" class="row signature-block">
         <div class="col">
@@ -602,6 +602,10 @@ export default class PerformanceReviewDetail extends Vue {
 
   private currentUserIsManagerOfEmployee(): boolean {
     return this.managerPk == this.$store.getters['userModule/getEmployeeProfile'].pk // eslint-disable-line
+  }
+
+  private employeeHasSigned(): boolean {
+    return !!this.signatures[0][2]
   }
 
   private currentUserIsEmployee(): boolean {

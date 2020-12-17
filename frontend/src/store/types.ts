@@ -16,8 +16,6 @@ export interface UserRetrieve {
   username: string
   email: string
   name: string
-  // groups: Array<Group>
-  groups: unknown // TODO: Set
   is_staff: boolean
   is_manager: boolean
   is_upper_manager: boolean
@@ -27,9 +25,6 @@ export interface AxiosUserRetrieveOneServerResponse {
   data: UserRetrieve
 }
 
-// TODO: Complete
-// export interface Group {}
-
 ///////////////////////////////////////////////////
 // Employee Structure from Django Rest Framework //
 ///////////////////////////////////////////////////
@@ -38,11 +33,15 @@ export interface EmployeeRetrieve {
   url: string
   pk: number
   name: string
-  employee_pk: number
   user: Url
+  email: string
   manager: Url
-  hire_date: Date
-  salary: number
+  is_manager: boolean
+  is_upper_manager: boolean
+  is_hr_manager: boolean
+  is_executive_director: boolean
+  prs_can_view: Array<number>
+  notes_can_view: Array<number>
 }
 
 export interface AxiosEmployeeRetrieveManyServerResponse {
@@ -60,23 +59,22 @@ export interface PerformanceReviewRetrieve {
   pk: number
   employee_pk: number
   employee_name: string
-  manager_pk: number
-  manager_name: string
-  period_start_date: Date
-  period_end_date: Date
-  effective_date: Date
   employee_division: string
   employee_unit_or_program: string
   employee_job_title: string
+  manager_pk: number
+  manager_name: string
+  days_until_review: number
+  status: string
+  period_start_date: Date
+  period_end_date: Date
+  effective_date: Date
   evaluation_type: string
   probationary_evaluation_type: string
   step_increase: string
   top_step_bonus: string
   action_other: string
 
-  days_until_review: number
-
-  status: string
   factor_job_knowledge: string
   factor_work_quality: string
   factor_work_quantity: string
@@ -93,8 +91,8 @@ export interface PerformanceReviewRetrieve {
   evaluation_opportunities: string
   evaluation_goals_manager: string
   evaluation_comments_employee: string
+  
   description_reviewed_employee: boolean
-
   all_required_signatures: Array<[string, string, string]>
 }
 
@@ -108,7 +106,6 @@ export interface AxiosPerformanceReviewRetrieveManyServerResponse {
   }
 }
 
-// TODO: Update
 export interface PerformanceReviewCreate {
   url: Url
   pk: number
@@ -254,5 +251,3 @@ export interface AxiosReviewNoteRetrieveManyServerResponse {
 export interface AxiosReviewNoteUpdateServerResponse {
   data: ReviewNoteRetrieve
 }
-
-

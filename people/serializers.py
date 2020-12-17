@@ -1,6 +1,6 @@
 import datetime
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 
 from rest_framework import serializers
 
@@ -14,6 +14,13 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
         fields = ['pk', 'url', 'username', 'email', 'name', 'groups', 'is_staff']
+
+
+class GroupSerializer(serializers.HyperlinkedModelSerializer):
+    
+    class Meta:
+        model = Group
+        fields = ['pk', 'url']
 
 
 class EmployeeSerializer(serializers.HyperlinkedModelSerializer):

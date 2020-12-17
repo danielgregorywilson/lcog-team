@@ -7,7 +7,7 @@ from rest_framework.permissions import (
 )
 from rest_framework.response import Response
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.shortcuts import get_object_or_404
 
 from mainsite.helpers import (
@@ -17,8 +17,8 @@ from mainsite.helpers import (
 
 from people.models import Employee, PerformanceReview, ReviewNote, Signature
 from people.serializers import (
-    EmployeeSerializer, PerformanceReviewSerializer, ReviewNoteSerializer,
-    SignatureSerializer, UserSerializer
+    EmployeeSerializer, GroupSerializer, PerformanceReviewSerializer,
+    ReviewNoteSerializer, SignatureSerializer, UserSerializer
 )
 
 
@@ -51,6 +51,15 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
+    # permission_classes = [IsAdminOrReadOnly]
+
+
+class GroupViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
     # permission_classes = [IsAdminOrReadOnly]
 
 

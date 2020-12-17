@@ -661,9 +661,6 @@ export default class PerformanceReviewDetail extends Vue {
     return new Promise((resolve, reject) => {
       this.$store.dispatch('performanceReviewModule/getPerformanceReview', {pk: this.$route.params.pk})
         .then(() => {
-          // this.retrieveReviewNotes()
-          // const prs = this.$store.getters['performanceReviewModule/allPerformanceReviews'].results // eslint-disable-line
-          // const pr: PerformanceReviewRetrieve = prs.filter((pr: PerformanceReviewRetrieve) => pr.pk == parseInt(this.$route.params.pk))[0] // eslint-disable-line
           const pr: PerformanceReviewRetrieve = this.$store.getters['performanceReviewModule/performanceReview'] // eslint-disable-line
           if (!pr) {
             console.log('PR does not seem to exist. Redirecting...')
@@ -814,7 +811,6 @@ export default class PerformanceReviewDetail extends Vue {
 
         this.signatures = response.data.all_required_signatures
 
-        // TODO: This is bad. We should only get the reviews of type that we need
         this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
           .catch(e => {
             console.log(e)
@@ -862,7 +858,6 @@ export default class PerformanceReviewDetail extends Vue {
               .catch(e => {
                 console.log(e)
               })
-            // TODO: This is bad. We should only get the reviews of type that we need
             this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
               .catch(e => {
                 console.log(e)

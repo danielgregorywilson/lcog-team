@@ -47,7 +47,7 @@ const ifCanViewNote = (to: Route, from: Route, next: Next) => {
   }
 }
 
-// TODO: Add a reset password view as in Django version
+// TODO: Add a reset password view as in Django version, unless we're authenticating with LDAP
 const routes: RouteConfig[] = [
   {
     path: '/',

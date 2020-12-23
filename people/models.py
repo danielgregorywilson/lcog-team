@@ -506,7 +506,7 @@ class SignatureReminder(models.Model):
 
     review = models.ForeignKey("people.PerformanceReview", verbose_name=_("performance review"), on_delete=models.CASCADE)
     employee = models.ForeignKey("people.Employee", on_delete=models.CASCADE)
-    date = models.DateField(_("reminder date"), auto_now=True, auto_now_add=False)
+    date = models.DateField(_("reminder date"), auto_now=False, auto_now_add=True)
     next_date = models.DateField(_("planned next reminder date"))
 
 
@@ -527,7 +527,7 @@ class Signature(models.Model):
             self.review.status = PerformanceReview.EVALUATION_APPROVED
             self.review.save()
             # Send notification to next manager in the chain (HR manager)
-            send_signature_email_to_hr_manager(self.review,)
+            send_signature_email_to_hr_manager(self.review)
         elif self.employee.is_hr_manager:
             self.review.status = PerformanceReview.EVALUATION_HR_PROCESSED
             self.review.save()

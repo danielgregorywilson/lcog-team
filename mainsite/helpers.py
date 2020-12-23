@@ -139,6 +139,7 @@ def send_pr_reminder_emails():
     ### Reminders to get an employee to sign their own evaluation ###
     #################################################################
     for pr in PerformanceReview.objects.filter(status=PerformanceReview.EVALUATION_WRITTEN):
+        url = current_site.domain + '/pr/' + str(pr.pk)
         employee = pr.employee
         employee_signatures = Signature.objects.filter(review=pr, employee=employee)
         if employee_signatures.count() == 0:
@@ -152,7 +153,6 @@ def send_pr_reminder_emails():
             # Reminder to employee
             if employee_reminder:
                 if today >= employee_reminder.next_date:
-                    url = current_site.domain + '/pr/' + str(pr.pk)
                     # Notification #6: Remind employee a subsequent time to sign own evaluation
                     add_reminder(employee.user.email, 'signature_required', f'Signature required: {employee.manager.user.get_full_name()} has completed your performance evaluation', f'Your manager {employee.manager.user.get_full_name()} has completed your evaluation for an upcoming performance review, which requires your signature. View and sign here: {url}', f'Your manager {employee.manager.user.get_full_name()} has completed your evaluation for an upcoming performance review, which requires your signature. View and sign here: <a href="{url}">{url}</a>')
                     next_reminder = datetime.datetime.today() + datetime.timedelta(days=EMPLOYEE_SIGNATURE_REMINDER)
@@ -349,7 +349,7 @@ def send_pr_reminder_emails():
             print(html_body)
             send_email(user[0], subject, text_body, html_body)
     
-    return
+    return users
 
 
 def is_true_string(str):

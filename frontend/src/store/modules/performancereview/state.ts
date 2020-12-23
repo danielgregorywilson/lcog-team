@@ -4,6 +4,7 @@ interface ReviewNoteInterface {
   note: string
 }
 
+// TODO: Update to match shape of frontend/src.store/types/PerformanceReviewRetrieve
 export interface PerformanceReviewInterface {
   pk?: number
   employee_pk?: number

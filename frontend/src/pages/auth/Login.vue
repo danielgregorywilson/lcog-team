@@ -4,11 +4,11 @@
       <h4>Sign in</h4>
       <div class="row q-pa-xs">
         <label class="q-pr-sm">User name</label>
-        <input required v-model="username" type="text" placeholder="Snoopy"/>
+        <input required v-model="username" id="username" type="text" placeholder="Snoopy"/>
       </div>
       <div class="row q-pa-xs">
         <label class="q-pr-sm">Password</label>
-        <input required v-model="password" type="password" placeholder="Password"/>
+        <input required v-model="password" id="password" type="password" placeholder="Password"/>
       </div>
       <hr/>
       <button type="submit">Login</button>

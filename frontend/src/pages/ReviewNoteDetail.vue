@@ -10,7 +10,7 @@
         type="textarea"
         class="q-pb-md"
       />
-      <q-btn color="white" text-color="black" label="Update" :disabled="!valuesAreChanged()" @click="updateReviewNote()" />
+      <q-btn color="white" id="review-note-update-button" text-color="black" label="Update" :disabled="!valuesAreChanged()" @click="updateReviewNote()" />
     </div>
   </q-page>
 </template>

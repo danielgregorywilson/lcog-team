@@ -45,7 +45,11 @@ describe('Manager Basic Workflow', () => {
   })
 
   it('can add, edit, and delete a note', () => {
-    const note = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 30)
+    // const note = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 30)
+    const note = "A note"
+    const updatedNote = "An updated note"
+    
+    // Create
     cy.contains('Add a note').click()
     cy.url().should('include', '/note/new')
     cy.get('#review-note-create-button').should('be.disabled')
@@ -59,12 +63,25 @@ describe('Manager Basic Workflow', () => {
     cy.get('#review-note-create-button').click()
     cy.url().should('include', '/dashboard')
     
+    // Update
+    // TODO: Finish this
+    // cy.contains('Date').click().click()
+    // cy.get('.edit-note:first').click()
+    // cy.get('#review-note-update-button').should('be.disabled')
+    // cy.get('.review-note').should('have.value', note)
+    // cy.get('.review-note')
+    //   .clear()  
+    //   .type(updatedNote)  
+    // cy.get('.review-note')
+    //   .should('have.value', updatedNote)
+    // cy.pause()
+    // cy.get('#review-note-update-button').should('be.enabled')
+    // cy.get('#review-note-update-button').click()
+    
+    // Delete
     cy.contains('Date').click().click()
-    cy.get('.edit-note:first').click()
-    cy.get('#review-note-update-button').should('be.disabled')
-    cy.get('.review-note')
-      .should('have.value', note)
-    cy.pause()
+    cy.get('.delete-note:first').click()
+    cy.contains('Yes, delete it').click()
   })
 
   // it.only('can view evaluation and add comments', () => {

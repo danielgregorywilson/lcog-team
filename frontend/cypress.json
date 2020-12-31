@@ -1,4 +1,9 @@
 {
   "projectId": "3osi6n",
-  "baseUrl": "http://lcog-hr:8080"
+  "baseUrl": "http://lcog-hr:8080",
+  "ignoreTestFiles": ["actions*", "aliasing*", "assertions*", "connectors*",
+    "cookies*", "cypress_api*", "files*", "local_storage*", "location*",
+    "misc*", "navigation*", "network_requests*", "querying*",
+    "spies_stubs_clocks*", "traversal*", "utilities*", "viewport*", "waiting*",
+    "window*"]
 }

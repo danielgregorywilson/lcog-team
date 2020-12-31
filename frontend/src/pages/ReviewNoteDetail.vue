@@ -4,6 +4,7 @@
       <h4>Edit this Note</h4>
       <q-select v-model="employee" :options="options" label="Employee" class="q-pb-md" />
       <q-input
+        input-class="review-note"
         v-model="note"
         label="Review Note"
         type="textarea"

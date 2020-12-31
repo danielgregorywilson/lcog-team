@@ -8,7 +8,8 @@
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue --ignore-path .gitignore ./",
     "test": "echo \"No test specified\" && exit 0",
-    "cypress:open": "cypress open"
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run --record --key e438df23-d7a8-4f60-8007-95ff4b7c2536"
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",

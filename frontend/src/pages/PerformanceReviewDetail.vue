@@ -254,11 +254,12 @@
 
       <h5><span class="text-uppercase text-bold q-my-md"><u>V. Employee Comments</u></span> (e.g. self-evaluation and goals)</h5>
       <q-input
+        input-class="evaluation-comments-employee"
         v-model="evaluationCommentsEmployee"
         type="textarea"
         :disable="!currentUserIsEmployee() || employeeHasSigned()"
       />
-      <q-btn v-if="currentUserIsEmployee()" color="white" text-color="black" label="Save comments" @click="updateEmployeeComments()" class="q-mt-sm" :disable="!employeeCommentsIsChanged()" />
+      <q-btn v-if="currentUserIsEmployee()" id="save-comments-employee" color="white" text-color="black" label="Save comments" @click="updateEmployeeComments()" class="q-mt-sm" :disable="!employeeCommentsIsChanged()" />
 
       <h5 class="text-uppercase text-bold q-my-md"><u>VI. Position Description Review</u></h5>
       <div class="q-mb-lg"><q-checkbox v-model="descriptionReviewedEmployee" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />Position Description has been reviewed with employee.</div>

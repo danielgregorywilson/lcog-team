@@ -12,8 +12,8 @@
       </template>
       <template v-slot:body-cell-actions="props">
         <q-td :props="props">
-          <q-btn dense round flat color="grey" @click="editNote(props)" icon="edit"></q-btn>
-          <q-btn dense round flat color="grey" @click="showDeleteDialog(props)" icon="delete"></q-btn>
+          <q-btn dense round flat color="grey" class="edit-note" @click="editNote(props)" icon="edit"></q-btn>
+          <q-btn dense round flat color="grey" class="delete-note" @click="showDeleteDialog(props)" icon="delete"></q-btn>
         </q-td>
       </template>
       <template v-slot:bottom-row>

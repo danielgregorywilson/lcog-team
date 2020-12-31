@@ -4,12 +4,13 @@
       <h4>Add a New Note</h4>
       <q-select v-model="employee" :options="options" label="Employee" class="q-pb-md" />
       <q-input
+        input-class="review-note"
         v-model="note"
         label="Review Note"
         type="textarea"
         class="q-pb-md"
       />
-      <q-btn color="white" text-color="black" label="Update" :disabled="!formIsFilled()" @click="createReviewNote()" />
+      <q-btn id="review-note-create-button" color="white" text-color="black" label="Create" :disabled="!formIsFilled()" @click="createReviewNote()" />
     </div>
   </q-page>
 </template>

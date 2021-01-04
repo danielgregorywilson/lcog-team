@@ -15,17 +15,17 @@
 /**
  * @type {Cypress.PluginConfig}
  */
-module.exports = (on, config) => {
+module.exports = (on, config) => { // eslint-disable-line
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
   on('task', {
     'db:teardown': () => {
-      const teardown = require('../../db/teardown.js')
-      return teardown()
+      const teardown = require('../../db/teardown.js') // eslint-disable-line
+      return teardown() // eslint-disable-line
     },
     'db:seed': () => {
-      const seed = require('../../db/seed.js')
-      return seed()
+      const seed = require('../../db/seed.js') // eslint-disable-line
+      return seed() // eslint-disable-line
     },
   })
 }

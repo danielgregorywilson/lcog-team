@@ -46,8 +46,8 @@ describe('Manager Basic Workflow', () => {
 
   it('can add, edit, and delete a note', () => {
     // const note = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 30)
-    const note = "A note"
-    const updatedNote = "An updated note"
+    const note = 'A note'
+    // const updatedNote = 'An updated note'
     
     // Create
     cy.contains('Add a note').click()

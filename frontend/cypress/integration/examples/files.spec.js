@@ -1,3 +1,4 @@
+/* eslint-disable */
 /// <reference types="cypress" />
 
 /// JSON fixture file can be loaded directly using

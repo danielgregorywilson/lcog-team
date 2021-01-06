@@ -58,6 +58,9 @@ export default class ReviewNoteCreate extends Vue{
       .then(() => {
         Notify.create('Created a review note.')
         this.$router.push('/')
+          .then(() => {
+            location.reload() // TODO: This seems to be necessary in order to immediately edit a review note after creating it.
+          })
           .catch(e => {
             console.log(e)
           })

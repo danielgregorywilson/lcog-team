@@ -1,6 +1,7 @@
 <template>
   <q-page>
     <div class="q-px-md">
+      <!-- Logo appears in print view only -->
       <q-img
         id="lcog-logo"
         src="../assets/lcog-banner.png"
@@ -35,7 +36,7 @@
             <div class="row text-bold">Job Title:</div>
             <div class="row">{{ jobTitle }}</div>
         </div>
-        <div class="row eval-box eval-box-full text-bold">
+        <div class="row eval-box eval-box-full eval-box-full-1 text-bold">
           <div class="text-uppercase">Evaluation Type:</div>
           <div class="eval-box-full-1-probationary">
             <div class="label-radio-pair">
@@ -51,12 +52,14 @@
               <div>6 months</div>
             </div>
           </div>
-          <div class="label-radio-pair">
-            <q-radio v-model="evaluationType" val="A" @input="() => this.probationaryEvaluationType = ''" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
-            <div class="text-uppercase">Annual</div>
+          <div class="eval-box-full-1-annual">
+            <div class="label-radio-pair">
+              <q-radio v-model="evaluationType" val="A" @input="() => this.probationaryEvaluationType = ''" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
+              <div class="text-uppercase">Annual</div>
+            </div>
           </div>
         </div>
-        <div class="row eval-box eval-box-full">
+        <div class="row eval-box eval-box-full eval-box-full-2">
           <div class="text-uppercase text-bold">Action:</div>
           <div class="label-radio-triplet">
             <div class="text-bold">Step Increase:</div>
@@ -292,7 +295,7 @@
       <div style="height: 80px;"></div>
 
       <div id="sticky-footer" class="row justify-between" v-if="currentUserIsManagerOfEmployee()">
-        <q-btn class="col-1" color="white" text-color="black" label="Update" :disabled="!valuesAreChanged()" @click="updatePerformanceReview()" />
+        <q-btn id="update-button" class="col-1" color="white" text-color="black" label="Update" :disabled="!valuesAreChanged()" @click="updatePerformanceReview()" />
         <div class="col-3 self-center status">Current Status: {{ status }}</div>
       </div>
     </div>
@@ -393,15 +396,59 @@
   .factors-header-mobile {
     display: none;
   }
+  #update-button {
+    min-width: 60px;
+  }
+
   @media only screen and (max-width: 640px) {
+    .eval-box-1 {
+      grid-column-start: 1;
+      grid-column-end: 13;
+    }
+    .eval-box-2 {
+      grid-column-start: 1;
+      grid-column-end: 6;
+    }
+    .eval-box-3 {
+      grid-column-start: 6;
+      grid-column-end: 13;
+    }
+    .eval-box-4 {
+      grid-column-start: 1;
+      grid-column-end: 6;
+    }
+    .eval-box-5 {
+      grid-column-start: 6;
+      grid-column-end: 13;
+    }
+    .eval-box-6 {
+      grid-column-start: 1;
+      grid-column-end: 6;
+    }
+    .eval-box-7 {
+      grid-column-start: 6;
+      grid-column-end: 13;
+    } 
     .eval-box-full {
-      grid-template-columns: auto auto auto;
+      grid-template-columns: auto;
+    }
+    .eval-box-full-1 {
+
+    }
+    .eval-box-full-2 {
+
       #action-other {
-        grid-column-start: span 3;
+        // grid-column-start: span 3;
       }
     }
+    .label-radio-pair {
+      justify-content: start;
+    }
+    .label-radio-triplet {
+      justify-content: start;
+    }
     .factors-grid-container {
-      grid-template-columns: auto 68px 68px 68px 68px;
+      grid-template-columns: auto 66px 66px 66px 65px;
     }
     .factors-header-desktop {
       display: none;

@@ -10,6 +10,12 @@ Start the server
 `cd frontend`
 `quasar dev`
 
+# Cypress e2e tests
+Open Cypress launcher to run individual tests
+`npm run cypress:open`
+Run Cypress tests in the background and upload results to https://dashboard.cypress.io/
+`npm run cypress:run`
+
 # Deploy backend
 In mainsite/middleware/CorsMiddleware, make sure the correct response["Access-Control-Allow-Origin"] is commented out.
 `eb deploy --profile lcog`

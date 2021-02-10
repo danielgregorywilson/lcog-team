@@ -92,7 +92,7 @@
         <div class="rating-box"><span class="text-bold">(N/A)</span> Not Applicable</div>
         <div class="rating-box">Does not pertain to the employee’s actual job duties.</div>
       </div>
-      <div>*Factors rated <span class="text-bold">(1)</span> Needs improvement must be addressed with a Performance Agreement for improvement.</div>
+      <div>*Factors rated <span class="text-bold">(1)</span> Needs improvement must be addressed with a plan for improvement.</div>
 
       <div v-if="currentUserIsManagerOfEmployee()" id="notes">
         <hr />
@@ -242,7 +242,7 @@
         :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
       />
 
-      <h5><span class="text-uppercase text-bold q-my-md"><u>IV. Goals for the Coming Year</u></span> (to be discussed and determined during the evaluation)</h5>
+      <h5 class="text-uppercase text-bold q-my-md"><u>IV. Goals for the Coming Year</u></h5>
       <q-input
         v-model="evaluationGoalsManager"
         type="textarea"

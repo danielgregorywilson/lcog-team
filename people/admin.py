@@ -19,7 +19,7 @@ class DivisionAdmin(admin.ModelAdmin):
 
 @admin.register(JobTitle)
 class JobTitleAdmin(admin.ModelAdmin):
-    list_display = ("name",)
+    list_display = ("name", "position_description_link")
 
 
 @admin.register(Employee)

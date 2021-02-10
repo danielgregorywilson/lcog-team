@@ -30,10 +30,11 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     is_upper_manager = serializers.SerializerMethodField()
     prs_can_view = serializers.SerializerMethodField()
     notes_can_view = serializers.SerializerMethodField()
+    position_description_link = serializers.SerializerMethodField()
     
     class Meta:
         model = Employee
-        fields = ['url', 'pk', 'name', 'user', 'email', 'manager', 'is_manager', 'is_upper_manager', 'is_hr_manager', 'is_executive_director', 'prs_can_view', 'notes_can_view']
+        fields = ['url', 'pk', 'name', 'user', 'email', 'manager', 'is_manager', 'is_upper_manager', 'is_hr_manager', 'is_executive_director', 'prs_can_view', 'notes_can_view', 'position_description_link']
 
     @staticmethod
     def get_is_manager(employee):
@@ -50,6 +51,10 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     @staticmethod
     def get_notes_can_view(employee):
         return employee.notes_can_view()
+    
+    @staticmethod
+    def get_position_description_link(employee):
+        return employee.position_description_link()
 
 
 class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):

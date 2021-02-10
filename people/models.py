@@ -42,6 +42,7 @@ class JobTitle(models.Model):
         verbose_name_plural = _("Job Titles")
 
     name = models.CharField(_("name"), max_length=100)
+    position_description_link = models.URLField(_("position description link"), blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -65,6 +66,7 @@ class Employee(models.Model):
     manager = models.ForeignKey("self", related_name="direct_reports", blank=True, null=True, verbose_name=_("manager"), on_delete=models.SET_NULL)
     unit_or_program = models.ForeignKey("people.UnitOrProgram", verbose_name=_("unit/program"), on_delete=models.SET_NULL, blank=True, null=True)
     job_title = models.ForeignKey("people.JobTitle", verbose_name=_("job title"), on_delete=models.SET_NULL, blank=True, null=True)
+    position_description_link_override = models.URLField(_("position description link override"), blank=True, null=True)
 
     is_division_director = models.BooleanField(_("is a division director"), default=False)
     
@@ -226,6 +228,14 @@ class Employee(models.Model):
         # You can view all notes you wrote.
         note_ids = map(lambda note: note.id, ReviewNote.objects.filter(manager=self))
         return list(note_ids)
+
+    def position_description_link(self):
+        # Returns override link if provided, otherwise the link from job title if there is a job title
+        if self.position_description_link_override:
+            return self.position_description_link_override
+        elif self.job_title and self.job_title.position_description_link:
+            return self.job_title.position_description_link
+        return None
 
 
 class ManagerUpcomingReviewsManager(models.Manager):

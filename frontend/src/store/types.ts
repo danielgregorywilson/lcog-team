@@ -92,6 +92,7 @@ export interface PerformanceReviewRetrieve {
   evaluation_goals_manager: string
   evaluation_comments_employee: string
   
+  position_description_link: string
   description_reviewed_employee: boolean
   all_required_signatures: Array<[string, string, string]>
 }

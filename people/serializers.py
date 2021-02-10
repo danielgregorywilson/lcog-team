@@ -30,11 +30,10 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     is_upper_manager = serializers.SerializerMethodField()
     prs_can_view = serializers.SerializerMethodField()
     notes_can_view = serializers.SerializerMethodField()
-    position_description_link = serializers.SerializerMethodField()
     
     class Meta:
         model = Employee
-        fields = ['url', 'pk', 'name', 'user', 'email', 'manager', 'is_manager', 'is_upper_manager', 'is_hr_manager', 'is_executive_director', 'prs_can_view', 'notes_can_view', 'position_description_link']
+        fields = ['url', 'pk', 'name', 'user', 'email', 'manager', 'is_manager', 'is_upper_manager', 'is_hr_manager', 'is_executive_director', 'prs_can_view', 'notes_can_view']
 
     @staticmethod
     def get_is_manager(employee):
@@ -51,10 +50,6 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     @staticmethod
     def get_notes_can_view(employee):
         return employee.notes_can_view()
-    
-    @staticmethod
-    def get_position_description_link(employee):
-        return employee.position_description_link()
 
 
 class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
@@ -68,6 +63,7 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     days_until_review = serializers.SerializerMethodField()
     status = serializers.CharField(source='get_status_display')
     all_required_signatures = serializers.SerializerMethodField()
+    position_description_link = serializers.SerializerMethodField()
  
     class Meta:
         model = PerformanceReview
@@ -88,7 +84,8 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
             'evaluation_opportunities', 'evaluation_goals_manager',
             'evaluation_goals_employee','evaluation_comments_employee',
 
-            'description_reviewed_employee', 'all_required_signatures'
+            'position_description_link', 'description_reviewed_employee',
+            'all_required_signatures'
         ]
     
     @staticmethod
@@ -117,6 +114,10 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
             return pr.performanceevaluation.evaluation
         else:
             return ""
+
+    @staticmethod
+    def get_position_description_link(pr):
+        return pr.employee.position_description_link()
 
     @staticmethod
     def get_discussion_took_place(pr):

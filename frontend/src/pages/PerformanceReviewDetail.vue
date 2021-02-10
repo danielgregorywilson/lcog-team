@@ -265,7 +265,13 @@
       <q-btn v-if="currentUserIsEmployee()" id="save-comments-employee" color="white" text-color="black" label="Save comments" @click="updateEmployeeComments()" class="q-mt-sm" :disable="!employeeCommentsIsChanged()" />
 
       <h5 class="text-uppercase text-bold q-my-md"><u>VI. Position Description Review</u></h5>
-      <div class="q-mb-lg"><q-checkbox v-model="descriptionReviewedEmployee" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />Position Description has been reviewed with employee.</div>
+      <div>Position Description: <a v-if="positionDescriptionLink" :href="positionDescriptionLink" target="_blank">{{ positionDescriptionLink }}</a><span v-else>No link provided</span></div>
+      <div><q-checkbox v-model="descriptionReviewedEmployee" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />Position Description has been reviewed and signed by employee and manager</div>
+      <q-file :disable="!descriptionReviewedEmployee" outlined v-model="signedDescription" class="q-mb-lg" style="max-width: 300px">
+        <template v-slot:prepend>
+          <q-icon name="attach_file" />
+        </template>
+      </q-file>
 
       <div v-for="(signature, index) in signatures" :key="index" class="row signature-block">
         <div class="col">
@@ -639,6 +645,7 @@ export default class PerformanceReviewDetail extends Vue {
   private evaluationCommentsEmployeeCurrentVal = ''
   private evaluationCommentsEmployee = ''
 
+  private positionDescriptionLink = ''
   private descriptionReviewedEmployeeCurrentVal = false
   private descriptionReviewedEmployee = false
 
@@ -778,6 +785,7 @@ export default class PerformanceReviewDetail extends Vue {
           this.evaluationCommentsEmployee = pr.evaluation_comments_employee
           this.evaluationCommentsEmployeeCurrentVal = this.evaluationCommentsEmployee
 
+          this.positionDescriptionLink = pr.position_description_link
           this.descriptionReviewedEmployee = pr.description_reviewed_employee
           this.descriptionReviewedEmployeeCurrentVal = this.descriptionReviewedEmployee
 

@@ -39,6 +39,10 @@ class PerformanceReviewDataService {
     return http.patch(`api/v1/performancereview/${pk}`, data);
   }
 
+  uploadSignedPositionDescription(data: FormData) {
+    return http.post('api/v1/fileupload', data)
+  }
+
   signPerformanceReview(performanceReviewPk: number, employeePk: number) {
     return http.put(`api/v1/performancereview/${performanceReviewPk}/sign/${employeePk}`)
   }

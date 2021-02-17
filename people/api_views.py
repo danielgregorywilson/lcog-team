@@ -1,6 +1,7 @@
 from rest_framework import permissions, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import RetrieveAPIView
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import (
     BasePermission, DjangoModelPermissionsOrAnonReadOnly, IsAuthenticated,
     IsAuthenticatedOrReadOnly, SAFE_METHODS
@@ -17,7 +18,8 @@ from mainsite.helpers import (
 
 from people.models import Employee, PerformanceReview, ReviewNote, Signature
 from people.serializers import (
-    EmployeeSerializer, GroupSerializer, PerformanceReviewSerializer,
+    EmployeeSerializer, FileUploadSerializer, GroupSerializer,
+    PerformanceReviewFileUploadSerializer, PerformanceReviewSerializer,
     ReviewNoteSerializer, SignatureSerializer, UserSerializer
 )
 
@@ -240,6 +242,37 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
         serialized_review = PerformanceReviewSerializer(review,
             context={'request': request})
         return Response(serialized_review.data)
+
+
+class FileUploadViewSet(viewsets.ViewSet):
+    serializer_class = FileUploadSerializer
+
+    def list(self, request):
+        queryset = PerformanceReview.objects.all()
+        serializer = PerformanceReviewFileUploadSerializer(queryset, many=True, context={'request': request})
+        return Response(serializer.data)
+    
+    def retrieve(self, request, pk=None):
+        queryset = PerformanceReview.objects.all()
+        pr = get_object_or_404(queryset, pk=pk)
+        serializer = PerformanceReviewFileUploadSerializer(pr, context={'request': request})
+        return Response(serializer.data)
+    
+    def create(self, request):
+        file_upload = request.FILES.get('file')
+        if not file_upload:
+            return Response(data="Missing file", status=400)
+        pr_pk = request.data.get('pk')
+        if not pr_pk:
+            return Response(data="Missing PR PK", status=400)
+        try:
+            pr = PerformanceReview.objects.get(pk=pr_pk)
+        except PerformanceReview.DoesNotExist:
+            return Response(data="Invalid PR PK", status=400)
+        pr.signed_position_description = file_upload
+        pr.save()
+        return Response(data=request.build_absolute_uri(pr.signed_position_description.url), status=200)
+
 
 class SignatureViewSet(viewsets.ModelViewSet):
     """

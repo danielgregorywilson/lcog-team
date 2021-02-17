@@ -64,6 +64,7 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     status = serializers.CharField(source='get_status_display')
     all_required_signatures = serializers.SerializerMethodField()
     position_description_link = serializers.SerializerMethodField()
+    signed_position_description = serializers.FileField()
  
     class Meta:
         model = PerformanceReview
@@ -85,7 +86,7 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
             'evaluation_goals_employee','evaluation_comments_employee',
 
             'position_description_link', 'description_reviewed_employee',
-            'all_required_signatures'
+            'signed_position_description', 'all_required_signatures'
         ]
     
     @staticmethod
@@ -129,6 +130,23 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     @staticmethod
     def get_all_required_signatures(pr):
         return pr.all_required_signatures()
+
+
+class PerformanceReviewFileUploadSerializer(serializers.HyperlinkedModelSerializer):
+    signed_position_description = serializers.FileField()
+
+    class Meta:
+        model = PerformanceReview
+        fields = [
+            'url', 'signed_position_description'
+        ]
+
+
+class FileUploadSerializer(serializers.Serializer):
+    file_upload = serializers.FileField()
+
+    class Meta:
+        fields = ['file_upload']
 
 
 class SignatureSerializer(serializers.HyperlinkedModelSerializer):

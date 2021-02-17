@@ -94,6 +94,7 @@ export interface PerformanceReviewRetrieve {
   
   position_description_link: string
   description_reviewed_employee: boolean
+  signed_position_description: string
   all_required_signatures: Array<[string, string, string]>
 }
 
@@ -173,6 +174,17 @@ export interface AxiosPerformanceReviewSignServerResponse {
   data: {
     signatures: Array<[string, string, string]>
   }
+}
+
+export interface SignedPositionDescriptionUpload {
+  pk: string
+  file: File
+}
+
+export interface SignedPositionDescriptionUploadServerResponse {
+  data: string
+  status: number
+  statusText: string
 }
 
 

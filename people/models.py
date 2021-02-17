@@ -386,7 +386,7 @@ class PerformanceReview(models.Model):
     evaluation_comments_employee = models.TextField(_("employee comments"), blank=True, null=True)
 
     description_reviewed_employee = models.BooleanField(_("position description has been reviewed with employee"), default=False)
-    signed_position_description = models.FileField(_("signed position description"), blank=True, null=True)
+    signed_position_description = models.FileField(_("signed position description"), upload_to="uploads/signed-position-descriptions", blank=True, null=True)
 
     def username(self):
         return self.employee.user.username

@@ -267,11 +267,61 @@
       <h5 class="text-uppercase text-bold q-my-md"><u>VI. Position Description Review</u></h5>
       <div>Position Description: <a v-if="positionDescriptionLink" :href="positionDescriptionLink" target="_blank">{{ positionDescriptionLink }}</a><span v-else>No link provided</span></div>
       <div><q-checkbox v-model="descriptionReviewedEmployee" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />Position Description has been reviewed and signed by employee and manager</div>
-      <q-file :disable="!descriptionReviewedEmployee" outlined v-model="signedDescription" class="q-mb-lg" style="max-width: 300px">
-        <template v-slot:prepend>
-          <q-icon name="attach_file" />
+      
+      <q-uploader
+        ref="fileuploader"
+        url=""
+        @added="file_selected"
+        style="max-width: 300px"
+      >
+        <template v-slot:header="scope">
+          <div class="row no-wrap items-center q-pa-sm q-gutter-xs">
+            <div class="col">
+              <div class="q-uploader__title">Upload signed position description</div>
+            </div>
+            <q-btn v-if="scope.canAddFiles" type="a" icon="add_box" round dense flat>
+              <q-uploader-add-trigger />
+              <q-tooltip>Pick File</q-tooltip>
+            </q-btn>
+            <q-btn v-if="scope.canUpload" icon="cloud_upload" @click="uploadFile()" round dense flat >
+              <q-tooltip>Upload File</q-tooltip>
+            </q-btn>
+
+            <q-btn v-if="scope.isUploading" icon="clear" @click="scope.abort" round dense flat >
+              <q-tooltip>Abort Upload</q-tooltip>
+            </q-btn>
+          </div>
         </template>
-      </q-file>
+        <template v-slot:list="scope">
+          <q-list separator>
+            <q-item v-for="file in scope.files" :key="file.name">
+              <q-item-section>
+                <q-item-label class="full-width ellipsis">
+                  {{ file.name }}
+                </q-item-label>
+                <q-item-label caption>
+                  {{ file.__sizeLabel }}
+                </q-item-label>
+              </q-item-section>
+              <q-item-section top side>
+                <q-btn
+                  class="gt-xs"
+                  size="12px"
+                  flat
+                  dense
+                  round
+                  icon="delete"
+                  @click="scope.removeFile(file)"
+                />
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </template>
+      </q-uploader>
+
+      <div v-if="this.fileSuccessfullyUploaded" class="text-green">Successfully uploaded</div>
+
+      <div v-if="uploadedPositionDescriptionUrl"> <a :href="uploadedPositionDescriptionUrl" target="_blank">Current uploaded position description</a></div>
 
       <div v-for="(signature, index) in signatures" :key="index" class="row signature-block">
         <div class="col">
@@ -578,7 +628,7 @@
 import { date as quasarDate } from 'quasar'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import PerformanceReviewDataService from '../services/PerformanceReviewDataService'
-import { AxiosManagerReviewNotesForEmployeeServerResponse, AxiosPerformanceReviewUpdateServerResponse, PerformanceReviewRetrieve, ReviewNoteRetrieve } from '../store/types'
+import { AxiosManagerReviewNotesForEmployeeServerResponse, AxiosPerformanceReviewUpdateServerResponse, PerformanceReviewRetrieve, ReviewNoteRetrieve, SignedPositionDescriptionUploadServerResponse } from '../store/types'
 import '../filters'
 import ReviewNoteDataService from '../services/ReviewNoteDataService'
 
@@ -648,6 +698,9 @@ export default class PerformanceReviewDetail extends Vue {
   private positionDescriptionLink = ''
   private descriptionReviewedEmployeeCurrentVal = false
   private descriptionReviewedEmployee = false
+  private uploadedPositionDescriptionUrl = ''
+  private selectedFile: File = new File([''], '')
+  private fileSuccessfullyUploaded = false
 
   private signatures = [['', '', '']]
 
@@ -788,6 +841,7 @@ export default class PerformanceReviewDetail extends Vue {
           this.positionDescriptionLink = pr.position_description_link
           this.descriptionReviewedEmployee = pr.description_reviewed_employee
           this.descriptionReviewedEmployeeCurrentVal = this.descriptionReviewedEmployee
+          this.uploadedPositionDescriptionUrl = pr.signed_position_description
 
           this.signatures = pr.all_required_signatures
 
@@ -813,29 +867,29 @@ export default class PerformanceReviewDetail extends Vue {
   private updatePerformanceReview() {
     return new Promise((resolve, reject) => {
       PerformanceReviewDataService.update(this.prPk, {
-      evaluation_type: this.evaluationType,
-      probationary_evaluation_type: this.probationaryEvaluationType,
-      step_increase: this.stepIncrease,
-      top_step_bonus: this.topStepBonus,
-      action_other: this.actionOther,
-      factor_job_knowledge: this.factorJobKnowledge,
-      factor_work_quality: this.factorWorkQuality,
-      factor_work_quantity: this.factorWorkQuantity,
-      factor_work_habits: this.factorWorkHabits,
-      factor_analysis: this.factorAnalysis,
-      factor_initiative: this.factorInitiative,
-      factor_interpersonal: this.factorInterpersonal,
-      factor_communication: this.factorCommunication,
-      factor_dependability: this.factorDependability,
-      factor_professionalism: this.factorProfessionalism,
-      factor_management: this.factorManagement,
-      factor_supervision: this.factorSupervision,
-      evaluation_successes: this.evaluationSuccesses,
-      evaluation_opportunities: this.evaluationOpportunities,
-      evaluation_goals_manager: this.evaluationGoalsManager,
-      evaluation_comments_employee: this.evaluationCommentsEmployee,
-      description_reviewed_employee: this.descriptionReviewedEmployee
-    })
+        evaluation_type: this.evaluationType,
+        probationary_evaluation_type: this.probationaryEvaluationType,
+        step_increase: this.stepIncrease,
+        top_step_bonus: this.topStepBonus,
+        action_other: this.actionOther,
+        factor_job_knowledge: this.factorJobKnowledge,
+        factor_work_quality: this.factorWorkQuality,
+        factor_work_quantity: this.factorWorkQuantity,
+        factor_work_habits: this.factorWorkHabits,
+        factor_analysis: this.factorAnalysis,
+        factor_initiative: this.factorInitiative,
+        factor_interpersonal: this.factorInterpersonal,
+        factor_communication: this.factorCommunication,
+        factor_dependability: this.factorDependability,
+        factor_professionalism: this.factorProfessionalism,
+        factor_management: this.factorManagement,
+        factor_supervision: this.factorSupervision,
+        evaluation_successes: this.evaluationSuccesses,
+        evaluation_opportunities: this.evaluationOpportunities,
+        evaluation_goals_manager: this.evaluationGoalsManager,
+        evaluation_comments_employee: this.evaluationCommentsEmployee,
+        description_reviewed_employee: this.descriptionReviewedEmployee
+      })
       .then((response: AxiosPerformanceReviewUpdateServerResponse) => {
         this.status = response.data.status
 
@@ -942,6 +996,31 @@ export default class PerformanceReviewDetail extends Vue {
       .catch(e => {
         console.log(e)
       })
+  }
+
+  private file_selected(file: Array<File>) {
+    this.selectedFile = file[0];
+  }
+
+  private uploadFile() {
+    let fd = new FormData();
+    fd.append('pk', this.prPk)
+    fd.append('file', this.selectedFile)
+    
+    PerformanceReviewDataService.uploadSignedPositionDescription(fd)
+      .then((response: SignedPositionDescriptionUploadServerResponse) => {
+        if (response.statusText == 'OK') {
+          // @ts-ignore: Quasar component method
+          this.$refs.fileuploader.reset() // eslint-disable-line
+          this.uploadedPositionDescriptionUrl = response.data // eslint-disable-line
+          this.fileSuccessfullyUploaded = true
+          setTimeout(() => this.fileSuccessfullyUploaded = false, 5000)
+        }
+      })
+      .catch(e => {
+        console.log(e)
+      })
+
   }
 
   mounted() {

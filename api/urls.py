@@ -4,8 +4,8 @@ from rest_framework.authtoken.views import obtain_auth_token
 from django.urls import include, path
 
 from people.api_views import (
-    CurrentUserView, EmployeeViewSet, GroupViewSet, PerformanceReviewViewSet,
-    ReviewNoteViewSet, SignatureViewSet, UserViewSet
+    CurrentUserView, EmployeeViewSet, FileUploadViewSet, GroupViewSet,
+    PerformanceReviewViewSet, ReviewNoteViewSet, SignatureViewSet, UserViewSet
 )
 
 
@@ -20,6 +20,7 @@ router.register('v1/user', UserViewSet)
 router.register('v1/groups', GroupViewSet)
 router.register('v1/employee', EmployeeViewSet)
 router.register('v1/performancereview', PerformanceReviewViewSet)
+router.register('v1/fileupload', FileUploadViewSet, basename='fileupload')
 router.register('v1/signature', SignatureViewSet)
 router.register('v1/reviewnote', ReviewNoteViewSet)
 

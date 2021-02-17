@@ -269,6 +269,7 @@
       <div><q-checkbox v-model="descriptionReviewedEmployee" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />Position Description has been reviewed and signed by employee and manager</div>
       
       <q-uploader
+        v-if="descriptionReviewedEmployee"
         ref="fileuploader"
         url=""
         @added="file_selected"
@@ -321,7 +322,7 @@
 
       <div v-if="this.fileSuccessfullyUploaded" class="text-green">Successfully uploaded</div>
 
-      <div v-if="uploadedPositionDescriptionUrl"> <a :href="uploadedPositionDescriptionUrl" target="_blank">Current uploaded position description</a></div>
+      <div v-if="descriptionReviewedEmployee && uploadedPositionDescriptionUrl"> <a :href="uploadedPositionDescriptionUrl" target="_blank">Current uploaded position description</a></div>
 
       <div v-for="(signature, index) in signatures" :key="index" class="row signature-block">
         <div class="col">
@@ -347,6 +348,7 @@
           </div>
         </div>
       </div> -->
+
       <!-- Spacing for footer -->
       <div style="height: 80px;"></div>
 

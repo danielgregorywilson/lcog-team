@@ -20,6 +20,7 @@ Run Cypress tests in the background and upload results to https://dashboard.cypr
 
 # Deploy backend
 In mainsite/middleware/CorsMiddleware, make sure the correct response["Access-Control-Allow-Origin"] is commented out.
+`source ../env/bin/activate`
 `eb deploy --profile lcog`
 
 # Deploy frontend

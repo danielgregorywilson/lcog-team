@@ -708,6 +708,10 @@ export default class PerformanceReviewDetail extends Vue {
 
   private reviewNotes: Array<ReviewNoteRetrieve> = []
 
+  $refs!: {
+    fileuploader: HTMLFormElement
+  }
+
   private currentUserPk(): number {
     return this.$store.getters['userModule/getEmployeeProfile'].pk // eslint-disable-line
   }
@@ -1012,7 +1016,6 @@ export default class PerformanceReviewDetail extends Vue {
     PerformanceReviewDataService.uploadSignedPositionDescription(fd)
       .then((response: SignedPositionDescriptionUploadServerResponse) => {
         if (response.statusText == 'OK') {
-          // @ts-ignore: Quasar component method
           this.$refs.fileuploader.reset() // eslint-disable-line
           this.uploadedPositionDescriptionUrl = response.data // eslint-disable-line
           this.fileSuccessfullyUploaded = true

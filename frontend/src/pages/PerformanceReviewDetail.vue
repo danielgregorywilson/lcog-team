@@ -265,64 +265,64 @@
       <q-btn v-if="currentUserIsEmployee()" id="save-comments-employee" color="white" text-color="black" label="Save comments" @click="updateEmployeeComments()" class="q-mt-sm" :disable="!employeeCommentsIsChanged()" />
 
       <h5 class="text-uppercase text-bold q-my-md"><u>VI. Position Description Review</u></h5>
-      <div>Position Description: <a v-if="positionDescriptionLink" :href="positionDescriptionLink" target="_blank">{{ positionDescriptionLink }}</a><span v-else>No link provided</span></div>
-      <div><q-checkbox v-model="descriptionReviewedEmployee" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />Position Description has been reviewed and signed by employee and manager</div>
       
-      <q-uploader
-        v-if="descriptionReviewedEmployee"
-        ref="fileuploader"
-        url=""
-        @added="file_selected"
-        style="max-width: 300px"
-      >
-        <template v-slot:header="scope">
-          <div class="row no-wrap items-center q-pa-sm q-gutter-xs">
-            <div class="col">
-              <div class="q-uploader__title">Upload signed position description</div>
+      <div class="q-my-md">
+        <div>Position Description: <a v-if="positionDescriptionLink" :href="positionDescriptionLink" target="_blank">{{ positionDescriptionLink }}</a><span v-else>No link provided</span></div>
+        <div><q-checkbox v-model="descriptionReviewedEmployee" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />Position Description has been reviewed and signed by employee and manager</div>
+        <q-uploader
+          v-if="currentUserIsManagerOfEmployee() && descriptionReviewedEmployee"
+          ref="fileuploader"
+          url=""
+          @added="file_selected"
+          style="max-width: 300px"
+        >
+          <template v-slot:header="scope">
+            <div class="row no-wrap items-center q-pa-sm q-gutter-xs">
+              <div class="col">
+                <div class="q-uploader__title">Upload signed position description</div>
+              </div>
+              <q-btn v-if="scope.canAddFiles" type="a" icon="add_box" round dense flat>
+                <q-uploader-add-trigger />
+                <q-tooltip>Pick File</q-tooltip>
+              </q-btn>
+              <q-btn v-if="scope.canUpload" icon="cloud_upload" @click="uploadFile()" round dense flat >
+                <q-tooltip>Upload File</q-tooltip>
+              </q-btn>
+
+              <q-btn v-if="scope.isUploading" icon="clear" @click="scope.abort" round dense flat >
+                <q-tooltip>Abort Upload</q-tooltip>
+              </q-btn>
             </div>
-            <q-btn v-if="scope.canAddFiles" type="a" icon="add_box" round dense flat>
-              <q-uploader-add-trigger />
-              <q-tooltip>Pick File</q-tooltip>
-            </q-btn>
-            <q-btn v-if="scope.canUpload" icon="cloud_upload" @click="uploadFile()" round dense flat >
-              <q-tooltip>Upload File</q-tooltip>
-            </q-btn>
-
-            <q-btn v-if="scope.isUploading" icon="clear" @click="scope.abort" round dense flat >
-              <q-tooltip>Abort Upload</q-tooltip>
-            </q-btn>
-          </div>
-        </template>
-        <template v-slot:list="scope">
-          <q-list separator>
-            <q-item v-for="file in scope.files" :key="file.name">
-              <q-item-section>
-                <q-item-label class="full-width ellipsis">
-                  {{ file.name }}
-                </q-item-label>
-                <q-item-label caption>
-                  {{ file.__sizeLabel }}
-                </q-item-label>
-              </q-item-section>
-              <q-item-section top side>
-                <q-btn
-                  class="gt-xs"
-                  size="12px"
-                  flat
-                  dense
-                  round
-                  icon="delete"
-                  @click="scope.removeFile(file)"
-                />
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </template>
-      </q-uploader>
-
-      <div v-if="this.fileSuccessfullyUploaded" class="text-green">Successfully uploaded</div>
-
-      <div v-if="descriptionReviewedEmployee && uploadedPositionDescriptionUrl"> <a :href="uploadedPositionDescriptionUrl" target="_blank">Current uploaded position description</a></div>
+          </template>
+          <template v-slot:list="scope">
+            <q-list separator>
+              <q-item v-for="file in scope.files" :key="file.name">
+                <q-item-section>
+                  <q-item-label class="full-width ellipsis">
+                    {{ file.name }}
+                  </q-item-label>
+                  <q-item-label caption>
+                    {{ file.__sizeLabel }}
+                  </q-item-label>
+                </q-item-section>
+                <q-item-section top side>
+                  <q-btn
+                    class="gt-xs"
+                    size="12px"
+                    flat
+                    dense
+                    round
+                    icon="delete"
+                    @click="scope.removeFile(file)"
+                  />
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </template>
+        </q-uploader>
+        <div v-if="this.fileSuccessfullyUploaded" class="text-green">Successfully uploaded</div>
+        <div v-if="descriptionReviewedEmployee && uploadedPositionDescriptionUrl"> <a :href="uploadedPositionDescriptionUrl" target="_blank">Current uploaded position description</a></div>
+      </div>
 
       <div v-for="(signature, index) in signatures" :key="index" class="row signature-block">
         <div class="col">

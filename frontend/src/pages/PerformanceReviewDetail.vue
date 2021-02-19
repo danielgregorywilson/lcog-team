@@ -364,7 +364,7 @@
 
       <div id="sticky-footer" class="row justify-between" v-if="currentUserIsManagerOfEmployee()">
         <q-btn id="update-button" class="col-1" color="white" text-color="black" label="Update" :disabled="!valuesAreChanged()" @click="updatePerformanceReview()" />
-        <q-btn label="Bottom" icon="keyboard_arrow_down" color="primary" @click="openErrorDialog('right')" />
+        <q-btn v-if="showErrorButton" label="Show missing fields" icon="check" color="warning" @click="openErrorDialog('right')" />
         <div class="col-3 self-center status">Current Status: {{ status }}</div>
       </div>
     </div>
@@ -718,6 +718,7 @@ export default class PerformanceReviewDetail extends Vue {
 
   private signatures = [['', '', '']]
 
+  private showErrorButton = false
   private showErrorDialog = false
   private errorDialogPosition = 'top'
 
@@ -997,6 +998,10 @@ export default class PerformanceReviewDetail extends Vue {
         this.descriptionReviewedEmployeeCurrentVal = response.data.description_reviewed_employee
 
         this.signatures = response.data.all_required_signatures
+
+        if (this.formErrorItems().length) {
+          this.showErrorButton = true
+        }
 
         this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
           .catch(e => {

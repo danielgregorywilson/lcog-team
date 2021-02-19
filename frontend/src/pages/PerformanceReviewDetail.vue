@@ -1,5 +1,5 @@
 <template>
-  <q-page>
+  <q-page id="performance-review-detail-page">
     <div class="q-px-md">
       <!-- Logo appears in print view only -->
       <q-img
@@ -130,7 +130,7 @@
         <div class="factors-header-box text-bold text-center factors-header-mobile factors-header-sticky">Exceeds Job Require&shy;ments</div>
         <div class="factors-header-box text-bold text-center factors-header-mobile factors-header-sticky">Not Appli&shy;cable</div>
 
-        <div class="factors-box">
+        <div class="factors-box" id="factor-job-knowledge">
             <div class="row text-bold"><u>Job Knowledge</u></div>
             <div class="row">Present knowledge of techniques, skills, procedures, technologies, equipment, rules and policies of position.</div>
         </div>
@@ -139,14 +139,14 @@
         <div class="factors-radio-box"><q-radio v-model="factorJobKnowledge" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"></div>
         <div class="factors-box">
-            <div class="row text-bold"><u>Quality of Work</u></div>
+            <div class="row text-bold" id="factor-work-quality"><u>Quality of Work</u></div>
             <div class="row">Turns in high quality work and very seldom makes errors.</div>
         </div>
         <div class="factors-radio-box"><q-radio v-model="factorWorkQuality" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorWorkQuality" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorWorkQuality" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"></div>
-        <div class="factors-box">
+        <div class="factors-box" id="factor-work-quantity">
             <div class="row text-bold"><u>Quantity of Work</u></div>
             <div class="row">Accomplishes stated goals and expectations.</div>
         </div>
@@ -154,7 +154,7 @@
         <div class="factors-radio-box"><q-radio v-model="factorWorkQuantity" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorWorkQuantity" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"></div>
-        <div class="factors-box">
+        <div class="factors-box" id="factor-work-habits">
             <div class="row text-bold"><u>Work Habits</u></div>
             <div class="row">Uses equipment, supplies and time efficiently; punctual and on time.</div>
         </div>
@@ -162,7 +162,7 @@
         <div class="factors-radio-box"><q-radio v-model="factorWorkHabits" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorWorkHabits" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"></div>
-        <div class="factors-box">
+        <div class="factors-box" id="factor-analysis">
             <div class="row text-bold"><u>Analysis and Decision-Making</u></div>
             <div class="row">Has strong analytical abilities and makes sound judgements.</div>
         </div>
@@ -170,7 +170,7 @@
         <div class="factors-radio-box"><q-radio v-model="factorAnalysis" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorAnalysis" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"></div>
-        <div class="factors-box">
+        <div class="factors-box" id="factor-initiative">
             <div class="row text-bold"><u>Initiative and Creativity</u></div>
             <div class="row">A self-starter and seeks new responsibilities and opportunities for leadership; demonstrates creativity in performing tasks and identifying resolutions.</div>
         </div>
@@ -178,7 +178,7 @@
         <div class="factors-radio-box"><q-radio v-model="factorInitiative" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorInitiative" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"></div>
-        <div class="factors-box">
+        <div class="factors-box" id="factor-interpersonal">
             <div class="row text-bold"><u>Interpersonal Relations</u></div>
             <div class="row">Presents good attitude, works well in teams, cooperates with others, and is thoughtful and courteous/polite.</div>
         </div>
@@ -186,7 +186,7 @@
         <div class="factors-radio-box"><q-radio v-model="factorInterpersonal" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorInterpersonal" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"></div>
-        <div class="factors-box">
+        <div class="factors-box" id="factor-communication">
             <div class="row text-bold"><u>Communication</u></div>
             <div class="row">Effectively communicates (oral and written) and keeps others appropriately informed.</div>
         </div>
@@ -194,7 +194,7 @@
         <div class="factors-radio-box"><q-radio v-model="factorCommunication" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorCommunication" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"></div>
-        <div class="factors-box">
+        <div class="factors-box" id="factor-dependability">
             <div class="row text-bold"><u>Dependability and Responsibility</u></div>
             <div class="row">Completes assigned work within prescribed timelines; rarely needs direct supervision.</div>
         </div>
@@ -202,7 +202,7 @@
         <div class="factors-radio-box"><q-radio v-model="factorDependability" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorDependability" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"></div>
-        <div class="factors-box">
+        <div class="factors-box" id="factor-professionalism">
             <div class="row text-bold"><u>Professionalism and Customer Service</u></div>
             <div class="row">Presents and represents oneself and the agency in a positive manner; provides and delivers professional, helpful, high quality service and assistance.</div>
         </div>
@@ -210,7 +210,7 @@
         <div class="factors-radio-box"><q-radio v-model="factorProfessionalism" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorProfessionalism" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"></div>
-        <div class="factors-box">
+        <div class="factors-box" id="factor-management">
             <div class="row text-bold"><u>Project Management</u></div>
             <div class="row">Coordinates, delegates tasks to team members, and communicates internally and externally about projects; projects are high quality and are completed within timelines.</div>
         </div>
@@ -218,7 +218,7 @@
         <div class="factors-radio-box"><q-radio v-model="factorManagement" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorManagement" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
         <div class="factors-radio-box"><q-radio v-model="factorManagement" val="NA" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-        <div class="factors-box">
+        <div class="factors-box" id="factor-supervision">
             <div class="row text-bold"><u>Supervision</u></div>
             <div class="row">Provides support/guidance and motivation with open communication and transparency.</div>
         </div>
@@ -228,21 +228,21 @@
         <div class="factors-radio-box"><q-radio v-model="factorSupervision" val="NA" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
       </div>
 
-      <h5 class="text-uppercase text-bold q-my-md"><u>II. Employee's Successes</u></h5>
+      <h5 class="text-uppercase text-bold q-my-md" id="evaluation-successes"><u>II. Employee's Successes</u></h5>
       <q-input
         v-model="evaluationSuccesses"
         type="textarea"
         :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
       />
 
-      <h5 class="text-uppercase text-bold q-my-md"><u>III. Opportunities for Growth</u></h5>
+      <h5 class="text-uppercase text-bold q-my-md" id="evaluation-opportunities"><u>III. Opportunities for Growth</u></h5>
       <q-input
         v-model="evaluationOpportunities"
         type="textarea"
         :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
       />
 
-      <h5 class="text-uppercase text-bold q-my-md"><u>IV. Goals for the Coming Year</u></h5>
+      <h5 class="text-uppercase text-bold q-my-md" id="evaluation-goals"><u>IV. Goals for the Coming Year</u></h5>
       <q-input
         v-model="evaluationGoalsManager"
         type="textarea"
@@ -266,7 +266,7 @@
 
       <h5 class="text-uppercase text-bold q-my-md"><u>VI. Position Description Review</u></h5>
       
-      <div class="q-my-md">
+      <div class="q-my-md" id="position-description-review">
         <div>Position Description: <a v-if="positionDescriptionLink" :href="positionDescriptionLink" target="_blank">{{ positionDescriptionLink }}</a><span v-else>No link provided</span></div>
         <div><q-checkbox v-model="descriptionReviewedEmployee" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />Position Description has been reviewed and signed by employee and manager</div>
         <q-uploader
@@ -349,11 +349,22 @@
         </div>
       </div> -->
 
+      <q-dialog v-model="showErrorDialog" :position="errorDialogPosition">
+        <q-card style="width: 350px">
+          <q-list bordered separator>
+            <q-item v-for="(item, index) in this.formErrorItems()" :key="index" clickable @click="clickedErrorItem(item)">
+              <q-item-label>{{item[1]}}</q-item-label>
+            </q-item>
+          </q-list>
+        </q-card>
+      </q-dialog>
+
       <!-- Spacing for footer -->
       <div style="height: 80px;"></div>
 
       <div id="sticky-footer" class="row justify-between" v-if="currentUserIsManagerOfEmployee()">
         <q-btn id="update-button" class="col-1" color="white" text-color="black" label="Update" :disabled="!valuesAreChanged()" @click="updatePerformanceReview()" />
+        <q-btn v-if="this.showErrorButton && this.formErrorItems().length > 0" label="Show missing fields" icon="check" color="warning" @click="openErrorDialog('right')" />
         <div class="col-3 self-center status">Current Status: {{ status }}</div>
       </div>
     </div>
@@ -627,7 +638,8 @@
 </style>
 
 <script lang="ts">
-import { date as quasarDate } from 'quasar'
+import { date as quasarDate, scroll } from 'quasar'
+const { getScrollTarget, setScrollPosition } = scroll
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import PerformanceReviewDataService from '../services/PerformanceReviewDataService'
 import { AxiosManagerReviewNotesForEmployeeServerResponse, AxiosPerformanceReviewUpdateServerResponse, PerformanceReviewRetrieve, ReviewNoteRetrieve, SignedPositionDescriptionUploadServerResponse } from '../store/types'
@@ -706,6 +718,10 @@ export default class PerformanceReviewDetail extends Vue {
 
   private signatures = [['', '', '']]
 
+  private showErrorButton = false
+  private showErrorDialog = false
+  private errorDialogPosition = 'top'
+
   private reviewNotes: Array<ReviewNoteRetrieve> = []
 
   $refs!: {
@@ -769,6 +785,62 @@ export default class PerformanceReviewDetail extends Vue {
     } else {
       return true
     }
+  }
+
+  private formErrorItems(): Array<[string, string]> {
+    let errorItems: Array<[string, string]> = []
+    if (!this.factorJobKnowledgeCurrentVal) {
+      errorItems.push(['factor-job-knowledge', 'Evaluate Job Knowledge'])
+    }
+    if (!this.factorWorkQualityCurrentVal) {
+      errorItems.push(['factor-work-quality', 'Evaluate Quality of Work'])
+    }
+    if (!this.factorWorkQuantityCurrentVal) {
+      errorItems.push(['factor-work-quantity', 'Evaluate Quantity of Work'])
+    }
+    if (!this.factorWorkHabitsCurrentVal) {
+      errorItems.push(['factor-work-habits', 'Evaluate Work Habits'])
+    }
+    if (!this.factorAnalysisCurrentVal) {
+      errorItems.push(['factor-analysis', 'Evaluate Analysis and Decision-Making'])
+    }
+    if (!this.factorInitiativeCurrentVal) {
+      errorItems.push(['factor-initiative', 'Evaluate Initiative and Creativity'])
+    }
+    if (!this.factorInterpersonalCurrentVal) {
+      errorItems.push(['factor-interpersonal', 'Evaluate Interpersonal Relations'])
+    }
+    if (!this.factorCommunicationCurrentVal) {
+      errorItems.push(['factor-communication', 'Evaluate Communication'])
+    }
+    if (!this.factorDependabilityCurrentVal) {
+      errorItems.push(['factor-dependability', 'Evaluate Dependability and Responsibility'])
+    }
+    if (!this.factorProfessionalismCurrentVal) {
+      errorItems.push(['factor-professionalism', 'Evaluate Professionalism and Customer Service'])
+    }
+    if (!this.factorManagementCurrentVal) {
+      errorItems.push(['factor-management', 'Evaluate Project Management'])
+    }
+    if (!this.factorSupervisionCurrentVal) {
+      errorItems.push(['factor-supervision', 'Evaluate Supervision'])
+    }
+    if (!this.evaluationSuccessesCurrentVal) {
+      errorItems.push(['evaluation-successes', 'Write Employee Successes'])
+    }
+    if (!this.evaluationOpportunitiesCurrentVal) {
+      errorItems.push(['evaluation-opportunities', 'Write Opportunities for Growth'])
+    }
+    if (!this.evaluationGoalsManagerCurrentVal) {
+      errorItems.push(['evaluation-goals', 'Write Goals for the Coming Year'])
+    }
+    if (!this.descriptionReviewedEmployeeCurrentVal) {
+      errorItems.push(['position-description-review', 'Review and Sign Position Description with Employee'])
+    }
+    if (this.descriptionReviewedEmployeeCurrentVal && !this.uploadedPositionDescriptionUrl) {
+      errorItems.push(['position-description-review', 'Upload Signed Position Description'])
+    }
+    return errorItems
   }
 
   private retrievePerformanceReview() {
@@ -927,6 +999,10 @@ export default class PerformanceReviewDetail extends Vue {
 
         this.signatures = response.data.all_required_signatures
 
+        if (this.formErrorItems().length > 0) {
+          this.showErrorButton = true
+        }
+
         this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
           .catch(e => {
             console.log(e)
@@ -1020,12 +1096,26 @@ export default class PerformanceReviewDetail extends Vue {
           this.uploadedPositionDescriptionUrl = response.data // eslint-disable-line
           this.fileSuccessfullyUploaded = true
           setTimeout(() => this.fileSuccessfullyUploaded = false, 5000)
+          this.updatePerformanceReview()
         }
       })
       .catch(e => {
         console.log(e)
       })
+  }
 
+  private openErrorDialog(position) {
+    this.errorDialogPosition = position
+    this.showErrorDialog = true
+  }
+
+  private clickedErrorItem(item) {
+    this.showErrorDialog = false
+    const element = document.getElementById(item[0])
+    const target = getScrollTarget(element)
+    const offset = element.offsetTop - 50
+    const duration = 500
+    setScrollPosition(target, offset, duration)
   }
 
   mounted() {

@@ -364,7 +364,7 @@
 
       <div id="sticky-footer" class="row justify-between" v-if="currentUserIsManagerOfEmployee()">
         <q-btn id="update-button" class="col-1" color="white" text-color="black" label="Update" :disabled="!valuesAreChanged()" @click="updatePerformanceReview()" />
-        <q-btn v-if="showErrorButton" label="Show missing fields" icon="check" color="warning" @click="openErrorDialog('right')" />
+        <q-btn v-if="this.showErrorButton && this.formErrorItems().length > 0" label="Show missing fields" icon="check" color="warning" @click="openErrorDialog('right')" />
         <div class="col-3 self-center status">Current Status: {{ status }}</div>
       </div>
     </div>
@@ -999,7 +999,7 @@ export default class PerformanceReviewDetail extends Vue {
 
         this.signatures = response.data.all_required_signatures
 
-        if (this.formErrorItems().length) {
+        if (this.formErrorItems().length > 0) {
           this.showErrorButton = true
         }
 
@@ -1096,6 +1096,7 @@ export default class PerformanceReviewDetail extends Vue {
           this.uploadedPositionDescriptionUrl = response.data // eslint-disable-line
           this.fileSuccessfullyUploaded = true
           setTimeout(() => this.fileSuccessfullyUploaded = false, 5000)
+          this.updatePerformanceReview()
         }
       })
       .catch(e => {

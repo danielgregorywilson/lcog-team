@@ -1097,6 +1097,9 @@ export default class PerformanceReviewDetail extends Vue {
           this.fileSuccessfullyUploaded = true
           setTimeout(() => this.fileSuccessfullyUploaded = false, 5000)
           this.updatePerformanceReview()
+            .catch(e => {
+              console.log(e)
+            })
         }
       })
       .catch(e => {
@@ -1104,18 +1107,20 @@ export default class PerformanceReviewDetail extends Vue {
       })
   }
 
-  private openErrorDialog(position) {
+  private openErrorDialog(position: string) {
     this.errorDialogPosition = position
     this.showErrorDialog = true
   }
 
-  private clickedErrorItem(item) {
+  private clickedErrorItem(item: [string, string]) {
     this.showErrorDialog = false
     const element = document.getElementById(item[0])
-    const target = getScrollTarget(element)
-    const offset = element.offsetTop - 50
-    const duration = 500
-    setScrollPosition(target, offset, duration)
+    if (!!element) {
+      const target = getScrollTarget(element)
+      const offset = element.offsetTop - 50
+      const duration = 500
+      setScrollPosition(target, offset, duration)
+    }
   }
 
   mounted() {

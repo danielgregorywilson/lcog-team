@@ -83,14 +83,14 @@ export default class ReviewNoteTable extends Vue {
   private retrieveReviewNotes(): void {
     this.$store.dispatch('performanceReviewModule/getAllReviewNotes')
       .catch(e => {
-        console.log(e)
+        console.error("Error retrieving review notes", e)
       })
   }
 
   private editNote(props: QuasarReviewNoteTableRowClickActionProps): void {
     this.$router.push(`note/${ props.row.pk }`)
       .catch(e => {
-        console.log(e)
+        console.error("Error navigating to note detail", e)
       })
   }
 
@@ -108,14 +108,14 @@ export default class ReviewNoteTable extends Vue {
         this.retrieveReviewNotes()
       })
       .catch(e => {
-        console.log(e)
+        console.error("Error deleting review note", e)
       })
   }
 
   private clickAddNote(): void {
     this.$router.push('note/new')
       .catch(e => {
-        console.log(e)
+        console.error("Error navigating to new note page", e)
       })
   }
 

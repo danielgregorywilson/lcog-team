@@ -11,7 +11,7 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
         commit('setNextPerformanceReview', resp)
       })
       .catch(e => {
-        console.log(e)
+        console.error("Error getting next PR:", e)
       })
   },
   getAllReviewNotes: ({ commit }) => {
@@ -20,7 +20,7 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
         commit('setAllReviewNotes', resp);
       })
       .catch(e => {
-        console.log(e)
+        console.error("Error getting all review notes:", e)
       });
   },
   createReviewNote: ({ dispatch }, reviewNote: ReviewNoteCreate) => {
@@ -28,17 +28,17 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
       .then(() => {
         dispatch('getAllReviewNotes')
           .catch(e => {
-            console.log(e)
+            console.error("Error getting all review notes ater creating a review note:", e)
           })
       })
       .catch(e => {
-        console.log(e)
+        console.error("Error creating a review note:", e)
       });
   },
   createSignature: ({}, signature: SignatureCreate) => {
     axios({ url: `${ process.env.API_URL }api/v1/signature`, data: signature, method: 'POST' }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
       .catch(e => {
-        console.log(e)
+        console.error("Error creating a signature:", e)
       });
   },
   getPerformanceReview: ({ commit }, data: {pk: number}) => {
@@ -49,7 +49,7 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
         resolve(resp);
       })
       .catch(e => {
-        console.log(e)
+        console.error("Error getting performance review:", e)
         reject(e)
       });
     })
@@ -69,7 +69,7 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
         resolve(resp);
       })
       .catch(e => {
-        console.log(e)
+        console.error("Error getting all performance reviews:", e)
         reject(e)
       });
     })
@@ -80,7 +80,7 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
         commit('setAllPerformanceReviewsActionRequired', resp);
       })
       .catch(e => {
-        console.log(e)
+        console.error("Error getting all performance reviews action required:", e)
       });
   },
   getAllPerformanceReviewsActionNotRequired: ({ commit }) => {
@@ -89,7 +89,7 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
         commit('setAllPerformanceReviewsActionNotRequired', resp);
       })
       .catch(e => {
-        console.log(e)
+        console.error("Error setting all PRs action not required:", e)
       });
   },
   getAllSignaturePerformanceReviewsActionRequired: ({ commit }) => {
@@ -98,7 +98,7 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
         commit('setAllSignaturePerformanceReviewsActionRequired', resp);
       })
       .catch(e => {
-        console.log(e)
+        console.error("Error setting all signature PRs action required:", e)
       });
   },
   getAllSignaturePerformanceReviewsActionNotRequired: ({ commit }) => {
@@ -107,7 +107,7 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
         commit('setAllSignaturePerformanceReviewsActionNotRequired', resp);
       })
       .catch(e => {
-        console.log(e)
+        console.error("Error setting all signature PRs action not required:", e)
       });
   },
   // TODO: Still needed?
@@ -120,12 +120,12 @@ const actions: ActionTree<PerformanceReviewStateInterface, StateInterface> = {
   //     .then(resp => {
   //       dispatch('getAllPerformanceReviews')
   //         .catch(e => {
-  //           console.log(e)
+  //           console.error(e)
   //         })
   //       resolve(resp);
   //     })
   //     .catch(e => {
-  //       console.log(e)
+  //       console.error(e)
   //       reject(e)
   //     });
   //   })

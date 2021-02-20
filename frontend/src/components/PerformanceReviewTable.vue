@@ -146,24 +146,24 @@ export default class PerformanceReviewTable extends Vue {
       if (this.actionRequired) {
         this.$store.dispatch('performanceReviewModule/getAllSignaturePerformanceReviewsActionRequired')
         .catch(e => {
-          console.log(e)
+          console.error("Error retrieving getAllSignaturePerformanceReviewsActionRequired:", e)
         })
       } else {
         this.$store.dispatch('performanceReviewModule/getAllSignaturePerformanceReviewsActionNotRequired')
         .catch(e => {
-          console.log(e)
+          console.error("Error retrieving getAllSignaturePerformanceReviewsActionNotRequired:", e)
         })
       }
     } else {
       if (this.actionRequired) {
         this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
         .catch(e => {
-          console.log(e)
+          console.error("Error retrieving getAllPerformanceReviewsActionRequired:", e)
         })
       } else {
         this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionNotRequired')
         .catch(e => {
-          console.log(e)
+          console.error("Error retrieving getAllPerformanceReviewsActionNotRequired:", e)
         })
       }
     }
@@ -172,14 +172,14 @@ export default class PerformanceReviewTable extends Vue {
   private editEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {
     this.$router.push(`pr/${ props.row.pk }`)
       .catch(e => {
-        console.log(e)
+        console.error("Error navigating to PR detail:", e)
       })
   }
 
   private printEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {
     this.$router.push(`print/pr/${ props.row.pk }`)
       .catch(e => {
-        console.log(e)
+        console.error("Error printing PR:", e)
       })
   }
 

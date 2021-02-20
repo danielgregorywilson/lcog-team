@@ -217,6 +217,8 @@ class Employee(models.Model):
     def prs_can_view(self):
         # You can view all PRs for which either you are the employee or the
         # employee is your direct report or a descendant direct report.
+        if self.is_hr_manager or self.is_executive_director:
+            return map(lambda pr: pr.id, PerformanceReview.objects.all())
         self_and_direct_reports = self.get_direct_reports_descendants(include_self=True)
         pr_ids = []
         for employee in self_and_direct_reports:

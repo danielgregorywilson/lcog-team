@@ -34,6 +34,7 @@ const ifCanViewReview = (to: Route, from: Route, next: Next) => {
     next()
     return
   } else {
+    console.info('User can not view PR', to.params.pk, 'Redirecting to dashboard.')
     next('dashboard')
   }
 }

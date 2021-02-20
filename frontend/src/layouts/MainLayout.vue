@@ -108,7 +108,7 @@ export default class MainLayout extends Vue{
     if (!this.$store.getters['userModule/isProfileLoaded']) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access
       this.$store.dispatch('userModule/userRequest')
         .catch(e => {
-          console.error("Error getting user from store", e)
+          console.error('Error getting user from store', e)
         })
     }
   }
@@ -117,11 +117,11 @@ export default class MainLayout extends Vue{
     .then(() => {
       this.$router.push('/auth/login')
         .catch(e => {
-          console.error("Error navigating to login page after logout", e)
+          console.error('Error navigating to login page after logout', e)
         })
     })
     .catch(e => {
-      console.error("Error logging out", e);
+      console.error('Error logging out', e);
     })
   }
   mounted() {

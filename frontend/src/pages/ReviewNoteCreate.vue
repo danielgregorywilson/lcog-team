@@ -41,7 +41,7 @@ export default class ReviewNoteCreate extends Vue{
         })
       })
       .catch(e => {
-        console.error("Error getting direct reports:", e)
+        console.error('Error getting direct reports:', e)
       })
   }
 
@@ -62,11 +62,11 @@ export default class ReviewNoteCreate extends Vue{
             location.reload() // TODO: This seems to be necessary in order to immediately edit a review note after creating it.
           })
           .catch(e => {
-            console.error("Error navigating to dashboard after creating review note:", e)
+            console.error('Error navigating to dashboard after creating review note:', e)
           })
       })
       .catch(e => {
-        console.error("Error creating review note:", e)
+        console.error('Error creating review note:', e)
       })
   }
 

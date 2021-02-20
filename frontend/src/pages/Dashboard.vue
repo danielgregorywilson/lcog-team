@@ -95,7 +95,7 @@ export default class Dashboard extends Vue {
   private viewReview(pk: number): void {
     this.$router.push(`pr/${ pk }`)
       .catch(e => {
-        console.error("Error navigating to PR detail", e)
+        console.error('Error navigating to PR detail', e)
       })
   }
 };

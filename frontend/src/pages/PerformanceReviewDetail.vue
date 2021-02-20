@@ -858,7 +858,7 @@ export default class PerformanceReviewDetail extends Vue {
             console.log('PR does not seem to exist. Redirecting...')
             this.$router.push('/')
               .catch(e => {
-                console.error("Error navigating to dashboard upon not finding a matching PR:", e)
+                console.error('Error navigating to dashboard upon not finding a matching PR:', e)
                 reject(e)
               })
             return
@@ -932,7 +932,7 @@ export default class PerformanceReviewDetail extends Vue {
           resolve()
         })
         .catch(e => {
-          console.error("Error retrieving PR from API:", e)
+          console.error('Error retrieving PR from API:', e)
           reject(e)
         })
     })
@@ -944,7 +944,7 @@ export default class PerformanceReviewDetail extends Vue {
         this.reviewNotes = response.data
       })
       .catch(e => {
-        console.error("Error retrieving reivew notes from API:", e)
+        console.error('Error retrieving reivew notes from API:', e)
       })
   }
 
@@ -1011,19 +1011,19 @@ export default class PerformanceReviewDetail extends Vue {
 
         this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
           .catch(e => {
-            console.error("Error getting getAllPerformanceReviewsActionRequired after updaing PR:", e)
+            console.error('Error getting getAllPerformanceReviewsActionRequired after updaing PR:', e)
             reject(e)
           })
         this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionNotRequired')
           .catch(e => {
-            console.error("Error getting getAllPerformanceReviewsActionNotRequired after updaing PR:", e)
+            console.error('Error getting getAllPerformanceReviewsActionNotRequired after updaing PR:', e)
             reject(e)
           })
 
         resolve()
       })
       .catch(e => {
-        console.error("Error updating PR", e)
+        console.error('Error updating PR', e)
         reject(e)
       })
     })
@@ -1037,7 +1037,7 @@ export default class PerformanceReviewDetail extends Vue {
         this.evaluationCommentsEmployeeCurrentVal = response.data.evaluation_comments_employee
       })
       .catch(e => {
-        console.error("Error updaing employee comments:" ,e)
+        console.error('Error updaing employee comments:' ,e)
       })
   }
 
@@ -1054,23 +1054,23 @@ export default class PerformanceReviewDetail extends Vue {
           .then(() => {
             this.retrievePerformanceReview()
               .catch(e => {
-                console.error("Error retrieving PR after updating PR after signing PR:", e)
+                console.error('Error retrieving PR after updating PR after signing PR:', e)
               })
             this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
               .catch(e => {
-                console.error("Error getting getAllPerformanceReviewsActionRequired after updating PR after signing PR:", e)
+                console.error('Error getting getAllPerformanceReviewsActionRequired after updating PR after signing PR:', e)
               })
             this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionNotRequired')
               .catch(e => {
-                console.error("Error getting getAllPerformanceReviewsActionNotRequired after updating PR after signing PR:", e)
+                console.error('Error getting getAllPerformanceReviewsActionNotRequired after updating PR after signing PR:', e)
               })
           })
           .catch(e => {
-            console.error("Error updating PR after signing PR:", e)
+            console.error('Error updating PR after signing PR:', e)
           })
       })
       .catch(e => {
-        console.error("Error signing PR:", e)
+        console.error('Error signing PR:', e)
       })
   }
 
@@ -1082,7 +1082,7 @@ export default class PerformanceReviewDetail extends Vue {
   private onClickNoteCard(pk: number): void {
     this.$router.push(`/note/${ pk }`)
       .catch(e => {
-        console.error("Error navigating to PR note detail:", e)
+        console.error('Error navigating to PR note detail:', e)
       })
   }
 
@@ -1104,12 +1104,12 @@ export default class PerformanceReviewDetail extends Vue {
           setTimeout(() => this.fileSuccessfullyUploaded = false, 5000)
           this.updatePerformanceReview()
             .catch(e => {
-              console.error("Error updating PR after uploading signed position description:", e)
+              console.error('Error updating PR after uploading signed position description:', e)
             })
         }
       })
       .catch(e => {
-        console.error("Error uploading signed position description:", e)
+        console.error('Error uploading signed position description:', e)
       })
   }
 
@@ -1137,7 +1137,7 @@ export default class PerformanceReviewDetail extends Vue {
         }
       })
       .catch(e => {
-        console.error("Error retrieving PR on PR detail page mount:", e)
+        console.error('Error retrieving PR on PR detail page mount:', e)
       })
   }
 }

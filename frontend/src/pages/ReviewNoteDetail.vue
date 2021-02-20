@@ -49,11 +49,11 @@ export default class ReviewNoteDetail extends Vue{
         this.noteCurrentVal = response.data.note
         this.$store.dispatch('performanceReviewModule/getAllReviewNotes')
           .catch(e => {
-            console.error("Error getting all review notes after updating a review note:", e)
+            console.error('Error getting all review notes after updating a review note:', e)
           })
       })
       .catch(e => {
-        console.error("Error updating review note:", e)
+        console.error('Error updating review note:', e)
       })
   }
 
@@ -67,7 +67,7 @@ export default class ReviewNoteDetail extends Vue{
         this.noteCurrentVal = this.note
       })
       .catch(e => {
-        console.error("Error getting review note:", e);
+        console.error('Error getting review note:', e);
       });
   }
 
@@ -79,7 +79,7 @@ export default class ReviewNoteDetail extends Vue{
         })
       })
       .catch(e => {
-        console.error("Error getting direct reports:", e)
+        console.error('Error getting direct reports:', e)
       })
   }
 

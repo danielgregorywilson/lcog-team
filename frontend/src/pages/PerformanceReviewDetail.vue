@@ -62,14 +62,14 @@
         <div class="row eval-box eval-box-full eval-box-full-2">
           <div class="text-uppercase text-bold">Action:</div>
           <div class="label-radio-triplet">
-            <div class="text-bold">Step Increase:</div>
+            <div class="text-bold" id="step-increase">Step Increase:</div>
             <q-radio v-model="stepIncrease" val="Y" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
             <div>Yes</div>
             <q-radio v-model="stepIncrease" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
             <div>No</div>
           </div>
           <div class="label-radio-triplet">
-            <div class="text-bold">Top-Step Bonus</div>
+            <div class="text-bold" id="top-step-bonus">Top-Step Bonus</div>
             <q-radio v-model="topStepBonus" val="Y" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
             <div>Yes</div>
             <q-radio v-model="topStepBonus" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
@@ -789,6 +789,12 @@ export default class PerformanceReviewDetail extends Vue {
 
   private formErrorItems(): Array<[string, string]> {
     let errorItems: Array<[string, string]> = []
+    if (!this.stepIncreaseCurrentVal) {
+      errorItems.push(['step-increase', 'Select Step Increase'])
+    }
+    if (!this.topStepBonusCurrentVal) {
+      errorItems.push(['top-step-bonus', 'Select Top Step Bonus'])
+    }
     if (!this.factorJobKnowledgeCurrentVal) {
       errorItems.push(['factor-job-knowledge', 'Evaluate Job Knowledge'])
     }

@@ -2,6 +2,7 @@
   <q-page>
     <div class="q-px-md">
       <h4>Edit this Note</h4>
+      <p>Notes are visible to you when completing an evalutation for the employee. They are not visible to anyone else.</p>
       <q-select v-model="employee" :options="options" label="Employee" class="q-pb-md" />
       <q-input
         input-class="review-note"

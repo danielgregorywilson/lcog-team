@@ -94,7 +94,7 @@
       </div>
       <div>*Factors rated <span class="text-bold">(1)</span> Needs improvement must be addressed with a plan for improvement.</div>
 
-      <div v-if="currentUserIsManagerOfEmployee()" id="notes">
+      <div v-if="currentUserIsManagerOfEmployee() && this.reviewNotes.length" id="notes">
         <hr />
         <h5 class="text-h5 text-uppercase text-bold q-my-md"><u>Your Notes for {{ employeeName }}</u></h5>
         <div class="q-pa-md row items-start q-gutter-md">

@@ -20,6 +20,11 @@
       <div class="row items-center q-mb-md">
         <q-avatar icon="insert_chart_outlined" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
         <div class="text-h4">Review Notes</div>
+        <q-icon name="help" color="primary" size="xs" style="top: -10px;" >
+          <q-tooltip content-style="font-size: 16px">
+            Make a note about an employee to reference when completing their evaluation
+          </q-tooltip>
+        </q-icon>
       </div>
       <review-note-table />
     </div>

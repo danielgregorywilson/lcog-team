@@ -30,10 +30,11 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     is_upper_manager = serializers.SerializerMethodField()
     prs_can_view = serializers.SerializerMethodField()
     notes_can_view = serializers.SerializerMethodField()
+    next_to_sign_prs = serializers.SerializerMethodField()
     
     class Meta:
         model = Employee
-        fields = ['url', 'pk', 'name', 'user', 'email', 'manager', 'is_manager', 'is_upper_manager', 'is_hr_manager', 'is_executive_director', 'prs_can_view', 'notes_can_view']
+        fields = ['url', 'pk', 'name', 'user', 'email', 'manager', 'is_manager', 'is_upper_manager', 'is_hr_manager', 'is_executive_director', 'prs_can_view', 'notes_can_view', 'next_to_sign_prs']
 
     @staticmethod
     def get_is_manager(employee):
@@ -50,6 +51,23 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     @staticmethod
     def get_notes_can_view(employee):
         return employee.notes_can_view()
+
+    @staticmethod
+    def get_next_to_sign_prs(employee):
+        """
+        Returns the name of the next employee who will sign the PR.
+        """
+        if employee.is_executive_director:
+            return ""
+        elif employee.is_hr_manager:
+            return Employee.objects.filter(is_executive_director=True).first().user.get_full_name()
+        elif employee.is_division_director:
+            return Employee.objects.filter(is_hr_manager=True).first().user.get_full_name()
+        elif employee.manager:
+            return employee.manager.user.get_full_name()
+        else:
+            return ""
+
 
 
 class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):

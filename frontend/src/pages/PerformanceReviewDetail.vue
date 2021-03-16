@@ -321,7 +321,7 @@
           </template>
         </q-uploader>
         <div v-if="this.fileSuccessfullyUploaded" class="text-green">Successfully uploaded</div>
-        <div v-if="descriptionReviewedEmployee && uploadedPositionDescriptionUrl"> <a :href="uploadedPositionDescriptionUrl" target="_blank">Current uploaded position description</a></div>
+        <div v-if="descriptionReviewedEmployee && uploadedPositionDescriptionUrl"> <a :href="uploadedPositionDescriptionUrl" target="_blank">Current uploaded signed position description</a></div>
       </div>
 
       <div v-for="(signature, index) in signatures" :key="index" class="row signature-block">
@@ -349,6 +349,7 @@
         </div>
       </div> -->
 
+      <!-- Dialog of all error items -->
       <q-dialog v-model="showErrorDialog" :position="errorDialogPosition">
         <q-card style="width: 350px">
           <q-list bordered separator>
@@ -356,6 +357,24 @@
               <q-item-label>{{item[1]}}</q-item-label>
             </q-item>
           </q-list>
+        </q-card>
+      </q-dialog>
+
+      <!-- Dialog for when you are done and have signed the PR -->
+      <q-dialog v-model="showPRSignedAndCompleteDialog">
+        <q-card>
+          <q-card-section class="row items-center">
+            <q-avatar icon="check" color="primary" text-color="white" />
+            <div class="col">
+              <span class="q-ml-sm row">Your signature has been recorded, and you're all done!</span>
+              <span class="q-ml-sm row" v-if="nextPersonToSign() && !currentUserIsEmployee()">{{ nextPersonToSign() }} will be notified to sign next.</span>
+            </div>
+          </q-card-section>
+
+          <q-card-actions align="right">
+            <q-btn flat label="Cancel" color="primary" v-close-popup />
+            <q-btn flat label="Return to Dashboard" color="primary" @click="returnToDashboard()" />
+          </q-card-actions>
         </q-card>
       </q-dialog>
 
@@ -722,6 +741,8 @@ export default class PerformanceReviewDetail extends Vue {
   private showErrorDialog = false
   private errorDialogPosition = 'top'
 
+  private showPRSignedAndCompleteDialog = false
+
   private reviewNotes: Array<ReviewNoteRetrieve> = []
 
   $refs!: {
@@ -742,6 +763,10 @@ export default class PerformanceReviewDetail extends Vue {
 
   private employeeHasSigned(): boolean {
     return !!this.signatures[0][2]
+  }
+
+  private nextPersonToSign(): string {
+    return this.$store.getters['userModule/getEmployeeProfile'].next_to_sign_prs
   }
 
   private currentUserIsEmployee(): boolean {
@@ -1064,6 +1089,7 @@ export default class PerformanceReviewDetail extends Vue {
               .catch(e => {
                 console.error('Error getting getAllPerformanceReviewsActionNotRequired after updating PR after signing PR:', e)
               })
+            this.showPRSignedAndCompleteDialog = true
           })
           .catch(e => {
             console.error('Error updating PR after signing PR:', e)
@@ -1127,6 +1153,13 @@ export default class PerformanceReviewDetail extends Vue {
       const duration = 500
       setScrollPosition(target, offset, duration)
     }
+  }
+
+  private returnToDashboard(): void {
+    this.$router.push('/')
+      .catch(e => {
+        console.error('Error navigating to dashboard:', e)
+      })
   }
 
   mounted() {

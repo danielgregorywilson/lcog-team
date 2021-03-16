@@ -42,6 +42,7 @@ export interface EmployeeRetrieve {
   is_executive_director: boolean
   prs_can_view: Array<number>
   notes_can_view: Array<number>
+  next_to_sign_prs: string
 }
 
 export interface AxiosEmployeeRetrieveManyServerResponse {

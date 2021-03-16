@@ -18,7 +18,7 @@ const mutation: MutationTree<UserStateInterface> = {
   },
   authLogout: (state) => {
     // Clean up state
-    state.profile = {employee_pk: -1, username: '', email: '', name: '', is_manager: false, is_upper_manager: false, is_hr_manager: false, is_executive_director: false, prs_can_view: [], notes_can_view: []}
+    state.profile = {employee_pk: -1, username: '', email: '', name: '', is_manager: false, is_upper_manager: false, is_hr_manager: false, is_executive_director: false, prs_can_view: [], notes_can_view: [], next_to_sign_prs: ''}
   }
 };
 

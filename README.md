@@ -1,14 +1,10 @@
 # lcog-hr
 
 # Run the backend locally
-Activate the virtual environment
-`source env/bin/activate` 
-Start the server
-`./manage.py runserver`
+`source ../env/bin/activate && ./manage.py runserver`
 
 # Run the frontend locally
-`cd frontend`
-`quasar dev`
+`cd frontend && quasar dev`
 
 # Cypress e2e tests
 Open Cypress launcher to run individual tests

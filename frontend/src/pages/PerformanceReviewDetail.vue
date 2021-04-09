@@ -750,15 +750,15 @@ export default class PerformanceReviewDetail extends Vue {
   }
 
   private currentUserPk(): number {
-    return this.$store.getters['userModule/getEmployeeProfile'].pk // eslint-disable-line
+    return this.$store.getters['userModule/getEmployeeProfile'].pk // eslint-disable-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
   }
 
   private currentUserIsUpperManager(): boolean {
-    return this.$store.getters['userModule/getEmployeeProfile'].is_upper_manager // eslint-disable-line
+    return this.$store.getters['userModule/getEmployeeProfile'].is_upper_manager // eslint-disable-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
   }
 
   private currentUserIsManagerOfEmployee(): boolean {
-    return this.managerPk == this.$store.getters['userModule/getEmployeeProfile'].pk // eslint-disable-line
+    return this.managerPk == this.$store.getters['userModule/getEmployeeProfile'].pk // eslint-disable-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
   }
 
   private employeeHasSigned(): boolean {
@@ -766,11 +766,11 @@ export default class PerformanceReviewDetail extends Vue {
   }
 
   private nextPersonToSign(): string {
-    return this.$store.getters['userModule/getEmployeeProfile'].next_to_sign_prs
+    return this.$store.getters['userModule/getEmployeeProfile'].next_to_sign_prs // eslint-disable-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
   }
 
   private currentUserIsEmployee(): boolean {
-    return this.employeePk == this.$store.getters['userModule/getEmployeeProfile'].pk // eslint-disable-line
+    return this.employeePk == this.$store.getters['userModule/getEmployeeProfile'].pk // eslint-disable-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
   }
 
   private valuesAreChanged(): boolean {

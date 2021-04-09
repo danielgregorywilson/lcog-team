@@ -9,10 +9,10 @@ class CorsMiddleware(object):
         
         # Needs to be commented out for production build
         # response["Access-Control-Allow-Origin"] = "http://localhost:8080"
-        # response["Access-Control-Allow-Origin"] = "http://lcog-hr:8080"
+        response["Access-Control-Allow-Origin"] = "http://lcog-hr:8080"
 
         # Needs to be commented out for local development 
-        response["Access-Control-Allow-Origin"] = "http://lcog-hr-frontend.s3-website-us-west-2.amazonaws.com"
+        # response["Access-Control-Allow-Origin"] = "http://lcog-hr-frontend.s3-website-us-west-2.amazonaws.com"
         
         # response["Access-Control-Allow-Origin"] = "*"
         

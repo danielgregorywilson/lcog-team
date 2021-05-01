@@ -4,3 +4,7 @@ settings_local.py
 
 media
 sent_emails
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

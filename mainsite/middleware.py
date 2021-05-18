@@ -12,7 +12,6 @@ class CorsMiddleware(object):
         # response["Access-Control-Allow-Origin"] = "http://lcog-hr:8080"
 
         # Needs to be commented out for local development 
-        # response["Access-Control-Allow-Origin"] = "http://lcog-hr-frontend.s3-website-us-west-2.amazonaws.com"
         response["Access-Control-Allow-Origin"] = "http://team.lcog.org.s3-website-us-west-2.amazonaws.com"
         
         # response["Access-Control-Allow-Origin"] = "*"

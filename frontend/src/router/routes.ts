@@ -131,8 +131,15 @@ const routes: RouteConfig[] = [
   // Always leave this as last one,
   // but you can also remove it
   {
-    path: '*',
+    path: '/404',
     component: () => import('pages/Error404.vue')
+  },
+  {
+    path: '*',
+    component: () => {
+      console.log('Hit the 404')
+      return import('pages/Error404.vue')
+    }
   }
 ];
 

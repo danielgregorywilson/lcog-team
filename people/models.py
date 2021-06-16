@@ -74,6 +74,8 @@ class Employee(models.Model):
     is_hr_manager = models.BooleanField(_("is the HR manager"), default=False)
     is_executive_director = models.BooleanField(_("is the executive director"), default=False)
 
+    viewed_security_message = models.BooleanField(_("has viewed security message"), default=False)
+
     def save(self, *args, **kwargs):
         # is_hr_manager can only apply to ONE Employee
         if self.is_hr_manager:

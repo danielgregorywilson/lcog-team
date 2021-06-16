@@ -19,6 +19,13 @@ const actions: ActionTree<UserStateInterface, StateInterface> = {
           .catch(err => console.log(err))
       });
   },
+  markSecurityMessageViewed: ({}) => {
+    // TODO
+    // axios({ url: `${ process.env.API_URL }api/v1/signature`, data: signature, method: 'POST' }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
+    //   .catch(e => {
+    //     console.error('Error creating a signature:', e)
+    //   });
+  },
   authLogout: ({commit}) => {
     return new Promise((resolve) => {
       commit('authLogout')

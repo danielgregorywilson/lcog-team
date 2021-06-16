@@ -166,8 +166,20 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # LOGIN_REDIRECT_URL = '/dashboard'
 # LOGOUT_REDIRECT_URL = '/dashboard'
 
-EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
+#########
+# Email #
+#########
+
+# EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+# EMAIL_FILE_PATH = os.path.join(BASE_DIR, "sent_emails")
+
+EMAIL_BACKEND = 'django_ses.SESBackend'
+
+# Required for django-ses
+AWS_SES_REGION_NAME = 'us-west-2'
+AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'
+
+
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,

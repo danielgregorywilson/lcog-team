@@ -1,4 +1,4 @@
-# Quasar App (lcog-hr)
+# Quasar App (lcog-team)
 
 A Quasar Framework app
 

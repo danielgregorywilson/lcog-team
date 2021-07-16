@@ -15,7 +15,7 @@ describe('Manager Basic Workflow', () => {
   //   const password = "fank9crax.SEAP0scuh"
     
   //   // programmatically log us in without needing the UI
-  //   cy.request('POST', 'http://lcog-hr:8000/api/api-token-auth/', {
+  //   cy.request('POST', 'http://lcog-team:8000/api/api-token-auth/', {
   //     username,
   //     password
   //   })

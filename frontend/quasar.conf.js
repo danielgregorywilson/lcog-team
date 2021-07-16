@@ -51,7 +51,7 @@ module.exports = configure(function (ctx) {
     build: {
       vueRouterMode: 'history', // available values: 'hash', 'history'
       env: {
-        API_URL: ctx.dev ? 'http://lcog-hr:8000/' : 'http://lcog-internal-env.eba-4t9yrmiu.us-west-2.elasticbeanstalk.com/'
+        API_URL: ctx.dev ? 'http://lcog-team:8000/' : 'https://api.team.lcog.org/'
         // API_URL: 'http://lcog-internal-env.eba-4t9yrmiu.us-west-2.elasticbeanstalk.com/'
       },
 
@@ -199,7 +199,7 @@ module.exports = configure(function (ctx) {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: 'lcog-hr'
+        appId: 'lcog-team'
       },
 
       // More info: https://quasar.dev/quasar-cli/developing-electron-apps/node-integration

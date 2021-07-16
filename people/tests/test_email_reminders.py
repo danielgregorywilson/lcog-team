@@ -168,7 +168,7 @@ class ManagerWritesEvaluationTestCase(BaseEmailRemindersTestCase):
         # import pdb; pdb.set_trace()
         
         # headers = {'Authorization': 'Token 05c5ab7d90b00e4278ec37ffb8394953e4a8c97e'}
-        # requests.put(f'http://lcog-hr:8000/api/v1/performancereview/{pr.pk}', data=update_data, headers=headers)
+        # requests.put(f'http://lcog-team:8000/api/v1/performancereview/{pr.pk}', data=update_data, headers=headers)
         # import pdb; pdb.set_trace()
 
         # http.put(`api/v1/performancereview/${pk}`, data)

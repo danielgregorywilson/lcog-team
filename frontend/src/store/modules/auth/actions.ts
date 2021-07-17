@@ -5,7 +5,7 @@ import axios from 'axios';
 import { AxiosAuthResponse, UserRetrieve } from 'src/store/types';
 
 const actions: ActionTree<AuthStateInterface, StateInterface> = {
-  // TODO: Remove; old way of logging in
+  // Old way of logging in via /auth/login
   authRequest: ({commit, dispatch}, user: UserRetrieve) => {
     return new Promise((resolve, reject) => { // The Promise used for router redirect in login
       commit('authRequest')
@@ -27,6 +27,7 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
       })
     })
   },
+  // Log in with Microsoft Azure SSO
   setAuth: ({commit, dispatch}, user: UserRetrieve) => {
     return new Promise((resolve, reject) => { // The Promise used for router redirect in login
       commit('setAuth')

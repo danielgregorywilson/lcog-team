@@ -2,10 +2,11 @@ import { MutationTree } from 'vuex';
 import { AuthStateInterface } from './state';
 
 const mutation: MutationTree<AuthStateInterface> = {
-  // TODO: Remove, old way of logging in
+  // Old way of logging in via /auth/login
   authRequest: state => {
     state.status = 'loading'
   },
+  // Log in with Microsoft Azure SSO
   setAuth: state => {
     state.status = 'loading'
   },

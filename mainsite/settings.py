@@ -12,12 +12,6 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 
-try:
-    from .settings_local import *
-except ImportError:
-    pass
-
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -30,7 +24,7 @@ SITE_ID = 1
 SECRET_KEY = '168!=oo8jkix^e@!d09wb-_f1u@%5cgv8qrdtbrs2v0y#^qeuy'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     'localhost',
@@ -196,3 +190,12 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
 }
+
+# Frontend
+FRONTEND_DOMAIN = 'https://team.lcog.org'
+
+# Overwrite production settings with local ones
+try:
+    from .settings_local import *
+except ImportError:
+    pass

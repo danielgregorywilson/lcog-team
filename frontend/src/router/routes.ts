@@ -5,13 +5,13 @@ import userState from '../store/modules/user/state'
 
 type Next = (path?: string) => void
 
-const ifNotAuthenticated = (to: Route, from: Route, next: Next) => {
-  if (!authState.token) { // TODO: This should use the isAuthenticated getter
-    next()
-    return
-  }
-  next('/')
-}
+// const ifNotAuthenticated = (to: Route, from: Route, next: Next) => {
+//   if (!authState.token) { // TODO: This should use the isAuthenticated getter
+//     next()
+//     return
+//   }
+//   next('/')
+// }
 
 const ifAuthenticated = (to: Route, from: Route, next: Next) => {
   if (!!authState.token) { // TODO: This should use the isAuthenticated getter
@@ -88,7 +88,7 @@ const routes: RouteConfig[] = [
         path: '/timeoff',
         name: 'timeoff',
         component: () => import('pages/TimeOffRequests.vue'),
-        beforeEnter: ifAuthenticated,
+        // beforeEnter: ifAuthenticated,
       },
       {
         path: '/security-message',
@@ -122,7 +122,7 @@ const routes: RouteConfig[] = [
         path: 'login',
         name: 'login',
         component: () => import('pages/auth/Login.vue'),
-        beforeEnter: ifNotAuthenticated,
+        // beforeEnter: ifNotAuthenticated,
       },
     ]
   },

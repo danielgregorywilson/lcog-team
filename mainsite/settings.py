@@ -33,7 +33,7 @@ ALLOWED_HOSTS = [
     'localhost',
     'lcog-team',
     'team.lcog.org.s3-website-us-west-2.amazonaws.com', # Prod frontend
-    'lcog-internal-env.eba-4t9yrmiu.us-west-2.elasticbeanstalk.com', # Prod backend
+    'lcog-team-env.eba-zdtppjbp.us-west-2.elasticbeanstalk.com', # Prod backend
     'team.lcog.org', # Prod frontend
     'api.team.lcog.org', # Prod backend
 ]

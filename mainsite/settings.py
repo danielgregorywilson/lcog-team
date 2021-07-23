@@ -36,6 +36,7 @@ ALLOWED_HOSTS = [
     'lcog-team-env.eba-zdtppjbp.us-west-2.elasticbeanstalk.com', # Prod backend
     'team.lcog.org', # Prod frontend
     'api.team.lcog.org', # Prod backend
+    '172.31.11.132' #??? Showed up in EB stdout.log e.g. Jul 23 18:54:52 ip-172-31-11-132 web: Invalid HTTP_HOST header: '172.31.11.132'. You may need to add '172.31.11.132' to ALLOWED_HOSTS.           Jul 23 18:54:52 ip-172-31-11-132 web: Bad Request: /
 ]
 
 

@@ -1,8 +1,8 @@
 {
   "name": "lcog-team",
   "version": "0.0.1",
-  "description": "A Quasar Framework app",
-  "productName": "Quasar App",
+  "description": "App for LCOG internal use",
+  "productName": "LCOG Team App",
   "author": "Daniel Wilson <daniel.gregory.wilson@gmail.com>",
   "private": true,
   "scripts": {

@@ -13,13 +13,13 @@ type Next = (path?: string) => void
 //   next('/')
 // }
 
-const ifAuthenticated = (to: Route, from: Route, next: Next) => {
-  if (!!authState.token) { // TODO: This should use the isAuthenticated getter
-    next()
-    return
-  }
-  next('auth/login')
-}
+// const ifAuthenticated = (to: Route, from: Route, next: Next) => {
+//   if (!!authState.token) { // TODO: This should use the isAuthenticated getter
+//     next()
+//     return
+//   }
+//   next('auth/login')
+// }
 
 const ifManager = (to: Route, from: Route, next: Next) => {
   if (userState.profile.is_manager) {

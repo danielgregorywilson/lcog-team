@@ -36,7 +36,7 @@ ALLOWED_HOSTS = [
     'lcog-team-env.eba-zdtppjbp.us-west-2.elasticbeanstalk.com', # Prod backend
     'team.lcog.org', # Prod frontend
     'api.team.lcog.org', # Prod backend
-    '172.31.11.132' # IP of EC2 instance
+    # '172.31.11.132' # IP of EC2 instance
 ]
 
 

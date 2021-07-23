@@ -1,6 +1,6 @@
 import { Route, RouteConfig } from 'vue-router';
 
-import authState from '../store/modules/auth/state'
+// import authState from '../store/modules/auth/state'
 import userState from '../store/modules/user/state'
 
 type Next = (path?: string) => void

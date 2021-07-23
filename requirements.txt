@@ -5,6 +5,7 @@ Django==3.2.5                # The Django
 django-cors-headers==3.7.0   # To access API from Vue frontend
 djangorestframework==3.12.4  # API framework
 jmespath==0.10.0
+psycopg2==2.9.1              # Postgres driver
 python-dateutil==2.8.2
 python-dotenv==0.18.0        # Secrets manager
 pytz==2021.1

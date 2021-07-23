@@ -2,6 +2,7 @@
 .env
 
 settings_local.py
+requirements_local.txt
 
 media
 sent_emails

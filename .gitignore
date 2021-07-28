@@ -4,6 +4,8 @@
 settings_local.py
 requirements_local.txt
 
+db.sqlite3
+
 media
 sent_emails
 # Elastic Beanstalk Files

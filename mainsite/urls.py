@@ -19,6 +19,8 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views.generic.base import RedirectView
 
+from mainsite.views import health_check_view
+
 
 urlpatterns = [
     path('', RedirectView.as_view(url='/api/', permanent=False)),
@@ -26,6 +28,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('favicon.ico', RedirectView.as_view(url='%sfavicon.ico' % settings.STATIC_URL)),
+    path('health', health_check_view, name='health_check_view')
 ]
 
 if settings.DEBUG:

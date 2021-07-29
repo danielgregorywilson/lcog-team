@@ -1,3 +1,5 @@
+from django.http.response import HttpResponse
+
 from rest_framework import parsers, renderers
 from rest_framework.authtoken.models import Token
 from rest_framework.compat import coreapi, coreschema
@@ -40,3 +42,7 @@ class ObtainAuthTokenWithoutPassword(APIView):
 
 
 obtain_auth_token_without_password = ObtainAuthTokenWithoutPassword.as_view()
+
+
+def health_check_view(request):
+    return HttpResponse("OK")

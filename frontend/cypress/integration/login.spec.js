@@ -1,6 +1,6 @@
 describe('Login Page', () => {
   it('successfully loads', () => {
-    cy.visit('/')
+    cy.visit('/auth/login')
   })
   it('accepts credentials', () => {
     cy.get('#username')

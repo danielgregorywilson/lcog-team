@@ -1,7 +1,7 @@
 describe('Manager Basic Workflow', () => {
   beforeEach(() => {
     // TODO: Do not log in using the UI
-    cy.visit('/')
+    cy.visit('/auth/login')
     cy.get('#username')
       .type('manager')
     cy.get('#password')
@@ -54,7 +54,7 @@ describe('Manager Basic Workflow', () => {
     cy.url().should('include', '/note/new')
     cy.get('#review-note-create-button').should('be.disabled')
     cy.contains('Employee').click()
-    cy.contains('Dan Wilson').click()
+    cy.contains('Daniel Wilson').click()
     cy.get('#review-note-create-button').should('be.disabled')
     cy.get('.review-note')
       .type(note)
@@ -104,6 +104,6 @@ describe('Manager Basic Workflow', () => {
   it('can logout', () => {
     cy.get('#menu-button').click()
     cy.contains('Log Out').click()
-    cy.url().should('include', '/auth/login')
+    cy.url().should('include', '/dashboard')
   })
 })

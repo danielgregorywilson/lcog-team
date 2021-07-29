@@ -1,7 +1,7 @@
 describe('Employee Basic Workflow', () => {
   beforeEach(() => {
     // TODO: Do not log in using the UI
-    cy.visit('/')
+    cy.visit('/auth/login')
     cy.get('#username')
       .type('dwilson')
     cy.get('#password')
@@ -61,6 +61,6 @@ describe('Employee Basic Workflow', () => {
   it('can logout', () => {
     cy.get('#menu-button').click()
     cy.contains('Log Out').click()
-    cy.url().should('include', '/auth/login')
+    cy.url().should('include', '/dashboard')
   })
 })

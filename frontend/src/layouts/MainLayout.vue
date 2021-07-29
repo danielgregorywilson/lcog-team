@@ -166,10 +166,11 @@ export default class MainLayout extends Vue{
       .then((loginResponse) => {
         console.log('id_token acquired at: ' + new Date().toString());
         console.log(loginResponse);
-        
         if (this.myMSALObj.getAccount()) {
           let account = this.myMSALObj.getAccount()
-          this.$store.dispatch('authModule/setAuth', { username: account.userName })
+          let firstName = account.name.split(' ')[1][0].toUpperCase() + account.name.split(" ")[1].substring(1).toLowerCase()
+          let lastName = account.name.split(' ')[0][0].toUpperCase() + account.name.split(" ")[0].substring(1).toLowerCase()
+          this.$store.dispatch('authModule/setAuth', { username: account.userName, firstName, lastName })
             .then(() => this.$router.push('/'))
             .catch((err) => console.log(err))
         }      

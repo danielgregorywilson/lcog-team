@@ -16,6 +16,8 @@ export interface UserRetrieve {
   username: string
   email: string
   name: string
+  firstName?: string
+  lastName?: string
   is_staff: boolean
   is_manager: boolean
   is_upper_manager: boolean

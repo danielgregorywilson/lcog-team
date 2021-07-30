@@ -25,6 +25,7 @@ class JobTitleAdmin(admin.ModelAdmin):
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ("username", "job_title", "unit_or_program", "manager",)
+    list_filter = ("unit_or_program__division", "unit_or_program",)
 
 
 class SignatureReminderInline(admin.TabularInline):

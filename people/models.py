@@ -17,6 +17,7 @@ class Division(models.Model):
     class Meta:
         verbose_name = _("Division")
         verbose_name_plural = _("Divisions")
+        ordering = ["name"]
 
     name = models.CharField(_("name"), max_length=100)
 
@@ -28,6 +29,7 @@ class UnitOrProgram(models.Model):
     class Meta:
         verbose_name = _("Unit/Program")
         verbose_name_plural = _("Units/Programs")
+        ordering = ["division__name", "name"]
 
     division = models.ForeignKey("people.Division", verbose_name=_("division"), on_delete=models.CASCADE)
     name = models.CharField(_("name"), max_length=100)

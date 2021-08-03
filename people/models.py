@@ -297,6 +297,7 @@ class PerformanceReview(models.Model):
     class Meta:
         verbose_name = _("Performance Review")
         verbose_name_plural = _("Performance Reviews")
+        ordering = ["-pk"]
 
     def __str__(self):
         return f"Performance review for {self.employee.user.username} on {self.period_end_date}"
@@ -564,6 +565,7 @@ class ReviewNote(models.Model):
     class Meta:
         verbose_name = _("Review Note")
         verbose_name_plural = _("Review Notes")
+        ordering = ["-pk"]
 
     def get_absolute_url(self):
         return reverse("note-update", kwargs={"pk": self.pk})

@@ -30,10 +30,6 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = os.environ.get('DEBUG')
 
 ALLOWED_HOSTS = [
-    'localhost',
-    'lcog-team',
-    'team.lcog.org.s3-website-us-west-2.amazonaws.com', # Prod frontend
-    'lcog-team-env.eba-zdtppjbp.us-west-2.elasticbeanstalk.com', # Prod backend
     'team.lcog.org', # Prod frontend
     'api.team.lcog.org', # Prod backend
     os.environ.get('EC2_IP'), # IP of EC2 instance

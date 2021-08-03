@@ -48,6 +48,7 @@ def send_evaluation_written_email_to_employee(employee, review):
         f'Your manager {review.employee.manager.user.get_full_name()} has completed your evaluation for an upcoming performance review, which requires your signature. View and sign here: {url}',
         f'Your manager {review.employee.manager.user.get_full_name()} has completed your evaluation for an upcoming performance review, which requires your signature. View and sign here: {url}'
     )
+    print("Successfully sent an email")
     next_reminder = datetime.datetime.today() + datetime.timedelta(days=EMPLOYEE_SIGNATURE_REMINDER)
     SignatureReminder.objects.create(review=review, employee=employee, next_date=next_reminder)
 

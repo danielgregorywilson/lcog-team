@@ -32,7 +32,10 @@ def get_host_url(request):
 
 def send_email(to_address, subject, body, html_body):
     print("SENT EMAIL TO:", to_address)
-    return send_mail(subject, body, 'dwilson@lcog.org', [to_address], html_message=html_body)
+    try:
+        return send_mail(subject, body, 'dwilson@lcog.org', [to_address], html_message=html_body)
+    except Exception as e:
+        print("EMAIL EXCEPTION:", e)
 
 
 def send_evaluation_written_email_to_employee(employee, review):

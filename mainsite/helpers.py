@@ -1,4 +1,5 @@
 import datetime
+import os
 
 from django.apps import apps
 from django.conf import settings
@@ -31,27 +32,20 @@ def get_host_url(request):
 
 
 def send_email(to_address, subject, body, html_body):
-    print("SENT EMAIL TO:", to_address)
-    try:
-        return send_mail(subject, body, 'dwilson@lcog.org', [to_address], html_message=html_body)
-    except Exception as e:
-        print("EMAIL EXCEPTION:", e)
+    return send_mail(subject, body, os.environ.get('FROM_EMAIL'), [to_address], html_message=html_body)
 
 
 def send_evaluation_written_email_to_employee(employee, review):
     # Notification #5
-    print("Trying to send email to:", employee.user.email)
     SignatureReminder = apps.get_model('people.SignatureReminder')
     current_site = Site.objects.get_current()
     url = current_site.domain + '/dashboard'
-    print(current_site, url)
     send_email(
         employee.user.email,
         f'Signature required: {review.employee.manager.user.get_full_name()} has completed your performance evaluation',
         f'Your manager {review.employee.manager.user.get_full_name()} has completed your evaluation for an upcoming performance review, which requires your signature. View and sign here: {url}',
         f'Your manager {review.employee.manager.user.get_full_name()} has completed your evaluation for an upcoming performance review, which requires your signature. View and sign here: {url}'
     )
-    print("Successfully sent an email")
     next_reminder = datetime.datetime.today() + datetime.timedelta(days=EMPLOYEE_SIGNATURE_REMINDER)
     SignatureReminder.objects.create(review=review, employee=employee, next_date=next_reminder)
 

@@ -286,7 +286,7 @@
                 <q-tooltip>Pick File</q-tooltip>
               </q-btn>
               <q-btn v-if="scope.canUpload" icon="cloud_upload" @click="uploadFile()" round dense flat >
-                <q-tooltip>Upload File</q-tooltip>
+                <q-tooltip>Upload FileAA</q-tooltip>
               </q-btn>
 
               <q-btn v-if="scope.isUploading" icon="clear" @click="scope.abort" round dense flat >
@@ -1117,6 +1117,7 @@ export default class PerformanceReviewDetail extends Vue {
   }
 
   private uploadFile() {
+    console.log("CLICKED")
     let fd = new FormData();
     fd.append('pk', this.prPk)
     fd.append('file', this.selectedFile)

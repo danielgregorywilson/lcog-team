@@ -37,9 +37,11 @@ def send_email(to_address, subject, body, html_body):
 
 def send_evaluation_written_email_to_employee(employee, review):
     # Notification #5
+    print("Trying to send email to:", employee.user.email)
     SignatureReminder = apps.get_model('people.SignatureReminder')
     current_site = Site.objects.get_current()
     url = current_site.domain + '/dashboard'
+    print(current_site, url)
     send_email(
         employee.user.email,
         f'Signature required: {review.employee.manager.user.get_full_name()} has completed your performance evaluation',

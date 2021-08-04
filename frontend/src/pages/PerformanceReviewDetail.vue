@@ -286,7 +286,7 @@
                 <q-tooltip>Pick File</q-tooltip>
               </q-btn>
               <q-btn v-if="scope.canUpload" icon="cloud_upload" @click="uploadFile()" round dense flat >
-                <q-tooltip>Upload FileAA</q-tooltip>
+                <q-tooltip>Upload File</q-tooltip>
               </q-btn>
 
               <q-btn v-if="scope.isUploading" icon="clear" @click="scope.abort" round dense flat >
@@ -1117,17 +1117,12 @@ export default class PerformanceReviewDetail extends Vue {
   }
 
   private uploadFile() {
-    console.log("CLICKED")
     let fd = new FormData();
     fd.append('pk', this.prPk)
     fd.append('file', this.selectedFile)
     
-    console.log('About to upload');
     PerformanceReviewDataService.uploadSignedPositionDescription(fd)
       .then((response: SignedPositionDescriptionUploadServerResponse) => {
-        console.log('RESPONSE', response)
-        console.log(response.status)
-        console.log(response.status == 200)
         if (response.status == 200) {
           this.$refs.fileuploader.reset() // eslint-disable-line
           this.uploadedPositionDescriptionUrl = response.data // eslint-disable-line

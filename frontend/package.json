@@ -18,6 +18,7 @@
     "msal": "^1.4.10",
     "quasar": "^1.9.15",
     "vue-class-component": "^7.2.2",
+    "vue-cookies": "^1.7.4",
     "vue-property-decorator": "^8.3.0"
   },
   "devDependencies": {

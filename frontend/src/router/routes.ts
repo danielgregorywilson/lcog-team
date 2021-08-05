@@ -1,7 +1,7 @@
+import Vue from 'vue';
 import { Route, RouteConfig } from 'vue-router';
 
 // import authState from '../store/modules/auth/state'
-import userState from '../store/modules/user/state'
 
 type Next = (path?: string) => void
 
@@ -22,7 +22,7 @@ type Next = (path?: string) => void
 // }
 
 const ifManager = (to: Route, from: Route, next: Next) => {
-  if (userState.profile.is_manager) {
+  if (Vue.prototype.$cookies.get('is_manager') == 'true') { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     next()
     return
   }
@@ -30,7 +30,7 @@ const ifManager = (to: Route, from: Route, next: Next) => {
 }
 
 const ifCanViewReview = (to: Route, from: Route, next: Next) => {
-  if (userState.profile.prs_can_view.indexOf(parseInt(to.params.pk)) != -1) {
+  if (Vue.prototype.$cookies.get('prs_can_view').indexOf(to.params.pk) != -1) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     next()
     return
   } else {
@@ -40,7 +40,7 @@ const ifCanViewReview = (to: Route, from: Route, next: Next) => {
 }
 
 const ifCanViewNote = (to: Route, from: Route, next: Next) => {
-  if (userState.profile.notes_can_view.indexOf(parseInt(to.params.pk)) != -1) {
+  if (Vue.prototype.$cookies.get('notes_can_view') && Vue.prototype.$cookies.get('notes_can_view').indexOf(parseInt(to.params.pk)) != -1) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     next()
     return
   } else {

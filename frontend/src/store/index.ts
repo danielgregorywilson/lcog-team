@@ -1,5 +1,6 @@
 import { store } from 'quasar/wrappers';
 import Vuex from 'vuex';
+import VueCookies from 'vue-cookies'
 import authModule from './modules/auth'
 import performanceReviewModule from './modules/performancereview'
 import userModule from './modules/user'
@@ -20,7 +21,8 @@ export interface StateInterface {
 }
 
 export default store(function ({ Vue }) {
-  Vue.use(Vuex);
+  Vue.use(Vuex)
+  Vue.use(VueCookies)
 
   const Store = new Vuex.Store<StateInterface>({
     modules: {

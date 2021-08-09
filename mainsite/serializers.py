@@ -13,7 +13,7 @@ class AuthTokenSerializerWithoutPassword(serializers.Serializer):
         username = attrs.get('username')
 
         if username:
-            user = User.objects.get(email=username)
+            user = User.objects.get(email=username.lower())
 
             # The authenticate call simply returns None for is_active=False
             # users. (Assuming the default ModelBackend authentication

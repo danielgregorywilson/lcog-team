@@ -165,6 +165,9 @@ export default class TeleworkPolicy extends Vue{
       this.hasPerformedSpeedTest = true
       this.fileSuccessfullyUploaded = true
       setTimeout(() => this.fileSuccessfullyUploaded = false, 5000)
+    })
+    .catch(e => {
+      console.error('Error', e)
     });
 
     // PerformanceReviewDataService.uploadSignedPositionDescription(fd)

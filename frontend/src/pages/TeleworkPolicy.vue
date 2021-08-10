@@ -158,7 +158,7 @@ export default class TeleworkPolicy extends Vue{
     let fd = new FormData();
     fd.append('file', this.selectedFile)
     
-    const delay = t => new Promise(resolve => setTimeout(resolve, t));
+    const delay = (t: number) => new Promise(resolve => setTimeout(resolve, t));
 
     delay(1000).then(() => {
       this.$refs.fileuploader.reset() // eslint-disable-line

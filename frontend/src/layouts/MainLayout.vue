@@ -112,6 +112,11 @@ const linksData: Array<LinkData> = [
     icon: 'schedule',
     link: '/timeoff'
   },
+  {
+    title: 'Telework Policy',
+    icon: 'computer',
+    link: '/telework'
+  },
 ];
 
 interface LayoutData {

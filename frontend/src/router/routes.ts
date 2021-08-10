@@ -91,6 +91,12 @@ const routes: RouteConfig[] = [
         // beforeEnter: ifAuthenticated,
       },
       {
+        path: '/telework',
+        name: 'telework',
+        component: () => import('pages/TeleworkPolicy.vue'),
+        // beforeEnter: ifAuthenticated,
+      },
+      {
         path: '/security-message',
         name: 'security-message',
         component: () => import('pages/SecurityMessage.vue'),

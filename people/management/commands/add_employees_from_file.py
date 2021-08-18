@@ -9,8 +9,14 @@ from people.models import Employee, JobTitle, UnitOrProgram
 class Command(BaseCommand):
     help = 'Sends reminder emails for in-progress performance reviews'
 
+    def add_arguments(self, parser):
+        parser.add_argument('--path', type=str)
+
     def handle(self, *args, **options):
-        dataReader = csv.reader(open('people/management/employees.csv'), delimiter=',', quotechar='"')
+        path = options['path']
+        if not path:
+            path = 'people/management/employees.csv'
+        dataReader = csv.reader(open(path), delimiter=',', quotechar='"')
         for row in dataReader:
             # Parse row data
             last_name = row[0]

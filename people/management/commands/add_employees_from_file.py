@@ -16,6 +16,7 @@ class Command(BaseCommand):
         path = options['path']
         if not path:
             path = 'people/management/employees.csv'
+        
         dataReader = csv.reader(open(path), delimiter=',', quotechar='"')
         for row in dataReader:
             # Parse row data
@@ -82,7 +83,7 @@ class Command(BaseCommand):
                 )
 
         # Add managers
-        dataReader = csv.reader(open('people/management/employees.csv'), delimiter=',', quotechar='"')
+        dataReader = csv.reader(open(path), delimiter=',', quotechar='"')
         for row in dataReader:
             email = row[2].lower()
             user = User.objects.get(email=email)

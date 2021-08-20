@@ -76,7 +76,10 @@ class ReviewNoteAdmin(admin.ModelAdmin):
     readonly_fields = ("date",)
 
     def get_form(self, request, obj=None, **kwargs):
-        if hasattr(obj, 'pk') and not request.user.is_superuser and obj.pk not in request.user.employee.notes_can_view():
+        note_exists = hasattr(obj, 'pk')
+        user_is_superuser = request.user.is_superuser
+        employee_cannot_view_note = not hasattr(request.user, 'employee') or obj.pk not in request.user.employee.notes_can_view()
+        if note_exists and not user_is_superuser and employee_cannot_view_note:
             self.exclude = ('note',)
         else:
             self.exclude = ()

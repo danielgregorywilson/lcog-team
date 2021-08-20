@@ -48,7 +48,10 @@ class PerformanceReviewAdmin(admin.ModelAdmin):
     inlines = (SignatureInline, SignatureReminderInline)
 
     def get_form(self, request, obj=None, **kwargs):
-        if hasattr(obj, 'pk') and not request.user.is_superuser and obj.pk not in request.user.employee.prs_can_view():
+        pr_exists = hasattr(obj, 'pk')
+        user_is_superuser = request.user.is_superuser
+        employee_cannot_view_pr = not hasattr(request.user, 'employee') or obj.pk not in request.user.employee.prs_can_view()
+        if pr_exists and not user_is_superuser and employee_cannot_view_pr:
             self.exclude = (
                 'step_increase', 'top_step_bonus', 'action_other',
                 'factor_job_knowledge', 'factor_work_quality',

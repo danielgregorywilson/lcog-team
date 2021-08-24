@@ -3,9 +3,9 @@ describe('Employee Basic Workflow', () => {
     // TODO: Do not log in using the UI
     cy.visit('/auth/login')
     cy.get('#username')
-      .type('dwilson')
+      .type(Cypress.env('users').employee.username)
     cy.get('#password')
-      .type('fank9crax.SEAP0scuh')
+      .type(Cypress.env('users').employee.pw, {log: false})
     cy.contains('Login').click()
   })
   

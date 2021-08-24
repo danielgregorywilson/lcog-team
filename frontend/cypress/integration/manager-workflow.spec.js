@@ -3,9 +3,9 @@ describe('Manager Basic Workflow', () => {
     // TODO: Do not log in using the UI
     cy.visit('/auth/login')
     cy.get('#username')
-      .type('manager')
+      .type(Cypress.env('users').manager.username)
     cy.get('#password')
-      .type('EM{q=XUR4z7aCHFBR6c;')
+      .type(Cypress.env('users').manager.pw, {log: false})
     cy.contains('Login').click()
   })
   
@@ -54,7 +54,7 @@ describe('Manager Basic Workflow', () => {
     cy.url().should('include', '/note/new')
     cy.get('#review-note-create-button').should('be.disabled')
     cy.contains('Employee').click()
-    cy.contains('Daniel Wilson').click()
+    cy.contains(Cypress.env('users').employee.name).click()
     cy.get('#review-note-create-button').should('be.disabled')
     cy.get('.review-note')
       .type(note)

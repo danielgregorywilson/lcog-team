@@ -12,3 +12,5 @@ sent_emails
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+frontend/cypress.json

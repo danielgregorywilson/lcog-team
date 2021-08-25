@@ -4,14 +4,20 @@ describe('Login Page', () => {
   })
   it('accepts credentials', () => {
     cy.get('#username')
-      .type('dwilson')
-      .should('have.value', 'dwilson')
+      .type(Cypress.env('users').manager.username)
+      .should('have.value', Cypress.env('users').manager.username)
     cy.get('#password')
-      .type('fank9crax.SEAP0scuh')
-      .should('have.value', 'fank9crax.SEAP0scuh')
+      .type(Cypress.env('users').manager.pw, {log: false})
+      .should('have.value', Cypress.env('users').manager.pw)
   })
   it('logs in successfully', () => {
     cy.contains('Login').click()
+    cy.url().should('include', '/dashboard')
+  })
+
+  it('can logout', () => {
+    cy.get('#menu-button').click()
+    cy.contains('Log Out').click()
     cy.url().should('include', '/dashboard')
   })
 })

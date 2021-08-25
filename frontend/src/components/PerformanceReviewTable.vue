@@ -29,8 +29,8 @@
       <template v-slot:body-cell-actions="props">
         <q-td :props="props">
           <div class="row">
-            <q-btn class="col" dense round flat color="grey" @click="editEvaluation(props)" icon="edit"></q-btn>
-            <q-btn class="col" dense round flat color="grey" @click="printEvaluation(props)" icon="print"></q-btn>
+            <q-btn class="col edit-button" dense round flat color="grey" @click="editEvaluation(props)" icon="edit"></q-btn>
+            <q-btn class="col print-button" dense round flat color="grey" @click="printEvaluation(props)" icon="print"></q-btn>
           </div>
         </q-td>
       </template>
@@ -46,8 +46,8 @@
                     {{ col.value }}
                   </div>
                   <div class="q-table__grid-item-value row q-gutter-sm" v-else>
-                    <q-btn class="col" dense round flat color="grey" @click="editEvaluation(props)" icon="edit"></q-btn>
-                    <q-btn class="col" dense round flat color="grey" @click="printEvaluation(props)" icon="print"></q-btn>
+                    <q-btn class="col edit-button" dense round flat color="grey" @click="editEvaluation(props)" icon="edit"></q-btn>
+                    <q-btn class="col print-button" dense round flat color="grey" @click="printEvaluation(props)" icon="print"></q-btn>
                   </div>
                 </div>
               </q-item>

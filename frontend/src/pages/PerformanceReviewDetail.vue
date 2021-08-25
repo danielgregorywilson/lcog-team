@@ -230,6 +230,7 @@
 
       <h5 class="text-uppercase text-bold q-my-md" id="evaluation-successes"><u>II. Employee's Successes</u></h5>
       <q-input
+        input-class="evaluation-successes"
         v-model="evaluationSuccesses"
         type="textarea"
         :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"

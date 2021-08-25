@@ -1,36 +1,8 @@
 describe('Manager Basic Workflow', () => {
   beforeEach(() => {
     // TODO: Do not log in using the UI
-    cy.visit('/auth/login')
-    cy.get('#username')
-      .type(Cypress.env('users').manager.username)
-    cy.get('#password')
-      .type(Cypress.env('users').manager.pw, {log: false})
-    cy.contains('Login').click()
+    cy.loginManagerWithUI()
   })
-  
-  // // TODO: Should be able to login and set token without using the UI: https://stackoverflow.com/questions/59008563/cypress-re-use-auth-token-across-multiple-api-tests
-  // it('logs in programmatically without using the UI', function () {
-  //   const username = "dwilson"
-  //   const password = "fank9crax.SEAP0scuh"
-    
-  //   // programmatically log us in without needing the UI
-  //   cy.request('POST', 'http://lcog-team:8000/api/api-token-auth/', {
-  //     username,
-  //     password
-  //   })
-
-  //   // now that we're logged in, we can visit
-  //   // any kind of restricted route!
-  //   cy.visit('/')
-
-  //   // Verify user token was set
-  //   // expect(localStorage.getItem('user-token')).to.eq('dbbe99f7301bf3134d2259e1919d82148a68676d')
-
-  //   // UI should reflect this user being logged in
-  //   cy.get('h1').should('contain', 'jane.lane')
-  // })
-
 
   it('can navigate around', () => {
     cy.get('#menu-button').click()
@@ -45,9 +17,13 @@ describe('Manager Basic Workflow', () => {
   })
 
   it('can add, edit, and delete a note', () => {
-    // const note = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 30)
+    // Remember how many notes there were to start
+    cy.get('.q-table__bottom-item').then($elements => {cy.wrap($elements[2])}).invoke('text').then((text) => {
+      const parts = text.split(' ')
+      cy.wrap(parts[parts.length - 1]).as('numNotes')
+    })
     const note = 'A note'
-    // const updatedNote = 'An updated note'
+    const updatedNote = 'An updated note'
     
     // Create
     cy.contains('Add a note').click()
@@ -62,48 +38,72 @@ describe('Manager Basic Workflow', () => {
     cy.get('#review-note-create-button').should('be.enabled')
     cy.get('#review-note-create-button').click()
     cy.url().should('include', '/dashboard')
+    // There should now be one extra note
+    cy.wait(500)
+    cy.get('.q-table__bottom-item').then($elements => {cy.wrap($elements[2])}).invoke('text').then((text) => {
+      const parts = text.split(' ')
+      cy.get('@numNotes').then(numNotes => {
+        expect(parseInt(numNotes, 10)).to.equal(parts[parts.length - 1] - 1)
+      })
+    })
     
     // Update
-    // TODO: Finish this
-    // cy.contains('Date').click().click()
-    // cy.get('.edit-note:first').click()
-    // cy.get('#review-note-update-button').should('be.disabled')
-    // cy.get('.review-note').should('have.value', note)
-    // cy.get('.review-note')
-    //   .clear()  
-    //   .type(updatedNote)  
-    // cy.get('.review-note')
-    //   .should('have.value', updatedNote)
-    // cy.pause()
-    // cy.get('#review-note-update-button').should('be.enabled')
-    // cy.get('#review-note-update-button').click()
+    cy.contains('Date').click().click()
+    cy.get('.edit-note:first').click()
+    cy.get('#review-note-update-button').should('be.disabled')
+    cy.get('.review-note').should('have.value', note)
+    cy.get('.review-note')
+      .clear()  
+      .type(updatedNote)  
+    cy.get('.review-note')
+      .should('have.value', updatedNote)
+    cy.get('#review-note-update-button').should('be.enabled')
+    cy.get('#review-note-update-button').click()
     
     // Delete
+    cy.visit('/')
+    // There should still be one extra note
+    cy.wait(500)
+    cy.get('.q-table__bottom-item').then($elements => {cy.wrap($elements[2])}).invoke('text').then((text) => {
+      const parts = text.split(' ')
+      cy.get('@numNotes').then(numNotes => {
+        expect(parseInt(numNotes, 10)).to.equal(parts[parts.length - 1] - 1)
+      })
+    })
     cy.contains('Date').click().click()
     cy.get('.delete-note:first').click()
     cy.contains('Yes, delete it').click()
+    cy.wait(500)
+    // There should now be the original number of notes
+    cy.get('.q-table__bottom-item').then($elements => {cy.wrap($elements[2])}).invoke('text').then((text) => {
+      const parts = text.split(' ')
+      cy.get('@numNotes').then(numNotes => {
+        expect(numNotes).to.equal(parts[parts.length - 1])
+      })
+    })
   })
 
-  // it.only('can view evaluation and add comments', () => {
-  //   cy.contains('View and Sign Evaluation').click()
-  //   cy.url().should('include', '/pr/')
-  //   const employeeComments = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 30)
-  //   cy.get('.evaluation-comments-employee')
-  //     .clear()  
-  //     .type(employeeComments)
-  //     .should('have.value', employeeComments)
-  //   cy.get('#save-comments-employee').click()
+  it('can view performance review and make a change', () => {
+    // Make a change
+    cy.contains('Reviews for your Direct Reports').parent().parent()
+      .contains(Cypress.env('users').employee.name).parent().parent().parent()
+      .find('button.edit-button').click()
+    cy.url().should('include', '/pr/')
+    const employeeSuccesses = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 30)
+    cy.get('.evaluation-successes')
+      .clear()  
+      .type(employeeSuccesses)
+      .should('have.value', employeeSuccesses)
+    cy.get('#update-button').click()
 
-  //   cy.get('#menu-button').click()
-  //   cy.contains('Dashboard').click()
-  //   cy.contains('View and Sign Evaluation').click()
-  //   cy.get('.evaluation-comments-employee')
-  //     .should('have.value', employeeComments)
-  // })
-
-  it('can logout', () => {
+    // Verify changes were saved
     cy.get('#menu-button').click()
-    cy.contains('Log Out').click()
-    cy.url().should('include', '/dashboard')
+    cy.contains('Dashboard').click()
+    cy.contains('Reviews for your Direct Reports').parent().parent()
+      .contains(Cypress.env('users').employee.name).parent().parent().parent()
+      .find('button.edit-button').click()
+    cy.get('.evaluation-successes')
+      .should('have.value', employeeSuccesses)
   })
+
 })

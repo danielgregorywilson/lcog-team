@@ -5,6 +5,16 @@ describe('Employee Basic Workflow', () => {
   })
   
   it('can navigate around', () => {
+    cy.eyesOpen({
+      appName: 'LCOG Team App',
+      testName: 'Employee navigation',
+    })
+    cy.eyesCheckWindow({
+      tag: "Dashboard",
+      target: 'window',
+      fully: true
+    })
+    cy.eyesClose()
     cy.get('#menu-button').click()
     cy.contains('Time off Requests').click()
     cy.url().should('include', '/timeoff')
@@ -22,6 +32,17 @@ describe('Employee Basic Workflow', () => {
       .type(employeeComments)
       .should('have.value', employeeComments)
     cy.get('#save-comments-employee').click()
+
+    cy.eyesOpen({
+      appName: 'LCOG Team App',
+      testName: 'Employee PR detail',
+    })
+    cy.eyesCheckWindow({
+      tag: "PR Detail",
+      target: 'window',
+      fully: true
+    })
+    cy.eyesClose()
 
     cy.get('#menu-button').click()
     cy.contains('Dashboard').click()

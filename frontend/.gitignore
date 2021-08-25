@@ -35,3 +35,5 @@ yarn-error.log*
 # Cypress
 /cypress/screenshots
 /cypress/videos
+applitools.config.js
+cypress.json

@@ -29,3 +29,6 @@ module.exports = (on, config) => { // eslint-disable-line
     },
   })
 }
+
+
+require('@applitools/eyes-cypress')(module);

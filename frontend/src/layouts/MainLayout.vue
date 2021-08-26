@@ -117,6 +117,11 @@ const linksData: Array<LinkData> = [
     icon: 'computer',
     link: '/telework'
   },
+  {
+    title: 'Security Message',
+    icon: 'security',
+    link: '/security-message'
+  },
 ];
 
 interface LayoutData {

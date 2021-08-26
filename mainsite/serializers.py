@@ -1,3 +1,4 @@
+from mainsite.models import SecurityMessage
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.utils.translation import gettext_lazy as _
@@ -27,3 +28,10 @@ class AuthTokenSerializerWithoutPassword(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+
+
+class SecurityMessageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SecurityMessage
+        fields = ['url', 'pk', 'description', 'date', 'content']

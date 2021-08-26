@@ -100,7 +100,6 @@ const routes: RouteConfig[] = [
         path: '/security-message',
         name: 'security-message',
         component: () => import('pages/SecurityMessage.vue'),
-        // TODO: Temporary for demonstrating to team
         // beforeEnter: ifAuthenticated,
       }
     ]

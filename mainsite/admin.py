@@ -1,3 +1,4 @@
+from mainsite.models import ImageUpload, SecurityMessage
 from django import forms
 from django.contrib import admin
 from django.contrib.auth import password_validation
@@ -5,6 +6,19 @@ from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import UserCreationForm as BaseUserCreationForm
 from django.contrib.auth.models import User
 from django.utils.translation import gettext, gettext_lazy as _
+
+from mainsite.models import ImageUpload, SecurityMessage
+
+
+@admin.register(ImageUpload)
+class ImageUploadAdmin(admin.ModelAdmin):
+    list_display = ("pk", "description")
+
+
+@admin.register(SecurityMessage)
+class SecurityMessageAdmin(admin.ModelAdmin):
+    list_display = ("description", "date", "active")
+
 
 
 class UserCreationForm(BaseUserCreationForm):

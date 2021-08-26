@@ -3,6 +3,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 from django.urls import include, path
 
+from mainsite.api_views import SecurityMessageViewSet
 from mainsite.views import obtain_auth_token_without_password
 from people.api_views import (
     CurrentUserView, EmployeeViewSet, FileUploadViewSet, GroupViewSet,
@@ -25,5 +26,6 @@ router.register('v1/performancereview', PerformanceReviewViewSet)
 router.register('v1/fileupload', FileUploadViewSet, basename='fileupload')
 router.register('v1/signature', SignatureViewSet)
 router.register('v1/reviewnote', ReviewNoteViewSet)
+router.register('v1/securitymessage', SecurityMessageViewSet)
 
 urlpatterns = router.urls + urlpatterns

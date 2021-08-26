@@ -1,10 +1,8 @@
-from rest_framework import permissions, viewsets
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import RetrieveAPIView
-from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import (
-    BasePermission, DjangoModelPermissionsOrAnonReadOnly, IsAuthenticated,
-    IsAuthenticatedOrReadOnly, SAFE_METHODS
+    BasePermission, IsAuthenticatedOrReadOnly, SAFE_METHODS
 )
 from rest_framework.response import Response
 

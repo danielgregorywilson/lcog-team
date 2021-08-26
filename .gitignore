@@ -1,6 +1,8 @@
 *.pyc
 .env
 
+.DS_Store
+
 settings_local.py
 requirements_local.txt
 

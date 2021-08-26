@@ -96,16 +96,16 @@ describe('Manager Basic Workflow', () => {
       .should('have.value', employeeSuccesses)
     cy.get('#update-button').click()
 
-    cy.eyesOpen({
-      appName: 'LCOG Team App',
-      testName: 'Manager PR detail',
-    })
-    cy.eyesCheckWindow({
-      tag: "PR Detail",
-      target: 'window',
-      fully: true
-    })
-    cy.eyesClose()
+    // cy.eyesOpen({
+    //   appName: 'LCOG Team App',
+    //   testName: 'Manager PR detail',
+    // })
+    // cy.eyesCheckWindow({
+    //   tag: "PR Detail",
+    //   target: 'window',
+    //   fully: true
+    // })
+    // cy.eyesClose()
 
     // Verify changes were saved
     cy.get('#menu-button').click()

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import { Route, RouteConfig } from 'vue-router';
 
-// import authState from '../store/modules/auth/state'
+import authState from '../store/modules/auth/state'
 
 type Next = (path?: string) => void
 
@@ -13,13 +13,13 @@ type Next = (path?: string) => void
 //   next('/')
 // }
 
-// const ifAuthenticated = (to: Route, from: Route, next: Next) => {
-//   if (!!authState.token) { // TODO: This should use the isAuthenticated getter
-//     next()
-//     return
-//   }
-//   next('auth/login')
-// }
+const ifAuthenticated = (to: Route, from: Route, next: Next) => {
+  if (!!authState.token) { // TODO: This should use the isAuthenticated getter
+    next()
+    return
+  }
+  next('dashboard')
+}
 
 const ifManager = (to: Route, from: Route, next: Next) => {
   if (Vue.prototype.$cookies.get('is_manager') == 'true') { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -100,7 +100,7 @@ const routes: RouteConfig[] = [
         path: '/security-message',
         name: 'security-message',
         component: () => import('pages/SecurityMessage.vue'),
-        // beforeEnter: ifAuthenticated,
+        beforeEnter: ifAuthenticated,
       }
     ]
   },

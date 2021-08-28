@@ -35,13 +35,13 @@ export default class SecurityMessage extends Vue {
   }
 
   private hasViewedCurrentSecurityMessage(): boolean {
-    return this.$store.getters['securityMessageModule/viewedLatestSecurityMessage']
+    return this.$store.getters['securityMessageModule/viewedLatestSecurityMessage'] // eslint-disable-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
   }
 
   private retrieveLatestSecurityMessage(): void {
     SecurityMessageDataService.getLatestSecurityMessage()
       .then(response => {
-        this.message = response.data.content
+        this.message = response.data.content // eslint-disable-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       })
       .catch(e => {
         console.error('Error retrieving latest security message from API:', e)

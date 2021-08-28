@@ -1,4 +1,4 @@
-import { PerformanceReviewRetrieve, ReviewNoteRetrieve, ViewedSecurityMessageRetrieve } from 'src/store/types'
+import { ViewedSecurityMessageRetrieve } from 'src/store/types'
 import Vue from 'vue'
 
 import { MutationTree } from 'vuex'

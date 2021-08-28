@@ -11,11 +11,11 @@ class SecurityMessageDataService {
   }
 
   getLatestSecurityMessage() {
-    return http.get(`api/v1/securitymessage/get_latest_security_message`)
+    return http.get('api/v1/securitymessage/get_latest_security_message')
   }
 
-  hasViewedLatestSecurityMessage(): boolean {
-    return http.get(`api/v1/viewedsecuritymessage/employee_viewed_latest_security_message`)
+  hasViewedLatestSecurityMessage() {
+    return http.get('api/v1/viewedsecuritymessage/employee_viewed_latest_security_message')
   }
 }
 

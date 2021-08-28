@@ -1,4 +1,5 @@
 import datetime
+from mainsite.models import SecurityMessage
 
 from django.db import models
 from django.urls import reverse
@@ -9,9 +10,12 @@ from mainsite.helpers import (
     send_signature_email_to_executive_director,
     send_signature_email_to_hr_manager
 )
+from mainsite.models import SecurityMessage
+
 
 # SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE = 60
 SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE = 360
+
 
 class Division(models.Model):
     class Meta:
@@ -580,3 +584,9 @@ class ReviewNote(models.Model):
     employee = models.ForeignKey("Employee", related_name="notes", verbose_name=_("employee"), on_delete=models.CASCADE)
     date = models.DateField(_("review note date"), auto_now=False, auto_now_add=True)
     note = models.TextField(_("review note"))
+
+
+class ViewedSecurityMessage(models.Model):
+    employee = models.ForeignKey("people.Employee", verbose_name=_("employee"), on_delete=models.CASCADE)
+    security_message = models.ForeignKey(SecurityMessage, on_delete=models.CASCADE)
+    datetime = models.DateTimeField(_("viewed date"), auto_now=False, auto_now_add=True)

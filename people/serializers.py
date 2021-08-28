@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group, User
 
 from rest_framework import serializers
 
-from people.models import Employee, PerformanceReview, ReviewNote, Signature
+from people.models import Employee, PerformanceReview, ReviewNote, Signature, ViewedSecurityMessage
 
 
 # Serializers define the API representation.
@@ -185,3 +185,11 @@ class ReviewNoteSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ReviewNote
         fields = ['url', 'pk', 'employee_pk', 'employee_name', 'date', 'note']
+
+
+class ViewedSecurityMessageSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = ViewedSecurityMessage
+        fields = [
+            'url', 'pk', 'employee', 'security_message', 'datetime'
+        ]

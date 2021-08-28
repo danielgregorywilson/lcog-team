@@ -1,4 +1,5 @@
-from rest_framework import viewsets
+from mainsite.models import SecurityMessage
+from rest_framework import views, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import (
@@ -14,11 +15,14 @@ from mainsite.helpers import (
     send_signature_email_to_manager
 )
 
-from people.models import Employee, PerformanceReview, ReviewNote, Signature
+from people.models import (
+    Employee, PerformanceReview, ReviewNote, Signature, ViewedSecurityMessage
+)
 from people.serializers import (
     EmployeeSerializer, FileUploadSerializer, GroupSerializer,
     PerformanceReviewFileUploadSerializer, PerformanceReviewSerializer,
-    ReviewNoteSerializer, SignatureSerializer, UserSerializer
+    ReviewNoteSerializer, SignatureSerializer, UserSerializer,
+    ViewedSecurityMessageSerializer
 )
 
 
@@ -355,3 +359,38 @@ class ReviewNoteViewSet(viewsets.ModelViewSet):
         serialized_notes = [ReviewNoteSerializer(note,
             context={'request': request}).data for note in review_notes]
         return Response(serialized_notes)
+
+
+class ViewedSecurityMessageViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint to mark Security Messages as viewed
+    """
+    queryset = ViewedSecurityMessage.objects.all()
+    serializer_class = ViewedSecurityMessageSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    
+    @action(detail=False)
+    def employee_viewed_latest_security_message(self, request):
+        latest_security_message = SecurityMessage.objects.filter(active=True).latest()
+        viewed_security_message = ViewedSecurityMessage.objects.filter(employee=request.user.employee, security_message=latest_security_message)
+        if viewed_security_message.count():
+            return Response(True)
+        else:
+            return Response(False)
+    
+    @action(detail=True, methods=['get'])
+    def employee_viewed_security_message(self, request, pk=None):
+        viewed_security_message = ViewedSecurityMessage.objects.filter(employee=request.user.employee, security_message=pk)
+        if viewed_security_message.count():
+            return Response(True)
+        else:
+            return Response(False)
+
+    def create(self, request):
+        security_message = SecurityMessage.objects.latest()
+        employee = Employee.objects.get(pk=request.data['employee_pk'])
+        viewed_security_message = ViewedSecurityMessage.objects.create(security_message=security_message, employee=employee)
+        
+        serialized_object = ViewedSecurityMessageSerializer(viewed_security_message,
+            context={'request': request})
+        return Response(serialized_object.data)

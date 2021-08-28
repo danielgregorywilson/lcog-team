@@ -7,7 +7,8 @@ from mainsite.api_views import SecurityMessageViewSet
 from mainsite.views import obtain_auth_token_without_password
 from people.api_views import (
     CurrentUserView, EmployeeViewSet, FileUploadViewSet, GroupViewSet,
-    PerformanceReviewViewSet, ReviewNoteViewSet, SignatureViewSet, UserViewSet
+    PerformanceReviewViewSet, ReviewNoteViewSet, SignatureViewSet, UserViewSet,
+    ViewedSecurityMessageViewSet
 )
 
 
@@ -27,5 +28,6 @@ router.register('v1/fileupload', FileUploadViewSet, basename='fileupload')
 router.register('v1/signature', SignatureViewSet)
 router.register('v1/reviewnote', ReviewNoteViewSet)
 router.register('v1/securitymessage', SecurityMessageViewSet)
+router.register('v1/viewedsecuritymessage', ViewedSecurityMessageViewSet)
 
 urlpatterns = router.urls + urlpatterns

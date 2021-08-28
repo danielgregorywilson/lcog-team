@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from .models import (
     Division, Employee, JobTitle, PerformanceReview, ReviewNote, Signature,
-    SignatureReminder, UnitOrProgram
+    SignatureReminder, UnitOrProgram, ViewedSecurityMessage
 )
 
 
@@ -85,3 +85,7 @@ class ReviewNoteAdmin(admin.ModelAdmin):
             self.exclude = ()
         form = super(ReviewNoteAdmin, self).get_form(request, obj, **kwargs)
         return form
+
+@admin.register(ViewedSecurityMessage)
+class ViewedSecurityMessageAdmin(admin.ModelAdmin):
+    list_display = ("employee", "security_message", "datetime")

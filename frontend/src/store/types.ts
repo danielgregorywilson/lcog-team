@@ -267,3 +267,20 @@ export interface AxiosReviewNoteRetrieveManyServerResponse {
 export interface AxiosReviewNoteUpdateServerResponse {
   data: ReviewNoteRetrieve
 }
+
+
+////////////////////////////////////////////////////////////////
+// ViewedSecurityMessage Structure from Django Rest Framework //
+////////////////////////////////////////////////////////////////
+
+export interface ViewedSecurityMessageCreate {
+  employee_pk: number
+}
+
+export interface ViewedSecurityMessageRetrieve {
+  url: Url
+  pk: number
+  employee_pk: number
+  security_message_pk: number
+  datetime: string
+}

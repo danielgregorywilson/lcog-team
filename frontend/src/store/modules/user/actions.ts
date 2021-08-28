@@ -10,7 +10,9 @@ const actions: ActionTree<UserStateInterface, StateInterface> = {
       .then((resp: {data: {pk: number}}) => {
         commit('userSuccess', resp);
         dispatch('performanceReviewModule/getNextPerformanceReview', {pk: resp.data.pk}, { root: true })
-            .catch(err => console.log(err))
+          .catch(err => console.log(err))
+        dispatch('securityMessageModule/getViewedLatestSecurityMessage', {}, { root: true })
+          .catch(err => console.log(err))
       })
       .catch(() => {
         commit('userError');
@@ -18,13 +20,6 @@ const actions: ActionTree<UserStateInterface, StateInterface> = {
         dispatch('authLogout')
           .catch(err => console.log(err))
       });
-  },
-  markSecurityMessageViewed: ({}) => {
-    // TODO
-    // axios({ url: `${ process.env.API_URL }api/v1/signature`, data: signature, method: 'POST' }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
-    //   .catch(e => {
-    //     console.error('Error creating a signature:', e)
-    //   });
   },
   authLogout: ({commit}) => {
     return new Promise((resolve) => {

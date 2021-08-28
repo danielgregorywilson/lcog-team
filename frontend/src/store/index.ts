@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import VueCookies from 'vue-cookies'
 import authModule from './modules/auth'
 import performanceReviewModule from './modules/performancereview'
+import securityMessageModule from './modules/securitymessage';
 import userModule from './modules/user'
 
 // import example from './module-example';
@@ -29,6 +30,7 @@ export default store(function ({ Vue }) {
       authModule,
       userModule,
       performanceReviewModule,
+      securityMessageModule,
     },
 
     // enable strict mode (adds overhead!)

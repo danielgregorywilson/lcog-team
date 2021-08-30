@@ -107,10 +107,15 @@ const linksData: Array<LinkData> = [
     link: '/reviews',
     managerOnly: true
   },
+  // {
+  //   title: 'Time off Requests',
+  //   icon: 'schedule',
+  //   link: '/timeoff'
+  // },
   {
-    title: 'Time off Requests',
-    icon: 'schedule',
-    link: '/timeoff'
+    title: 'Telework Application',
+    icon: 'home_work',
+    link: '/telework-application'
   },
   {
     title: 'Telework Policy',

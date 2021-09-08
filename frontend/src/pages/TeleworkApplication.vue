@@ -463,7 +463,6 @@ export default class TeleworkApplication extends Vue {
   private teleworkLocation = ''
   private hoursWorking = ''
   private duties = ''
-  
   private communicationWhen = ''
   private communicationTime = ''
   private communicationHow = ''
@@ -642,6 +641,9 @@ export default class TeleworkApplication extends Vue {
     this.teleworkLocation = application.telework_location
     this.hoursWorking = application.hours_working
     this.duties = application.duties
+    this.communicationWhen = application.communication_when
+    this.communicationTime = application.communication_time
+    this.communicationHow = application.communication_how
     this.equipmentProvidedPhone = application.equipment_provided_phone
     this.equipmentProvidedLaptop = application.equipment_provided_laptop
     this.equipmentProvidedDesktop = application.equipment_provided_desktop

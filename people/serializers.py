@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group, User
 
 from rest_framework import serializers
 
-from people.models import Employee, PerformanceReview, ReviewNote, Signature, ViewedSecurityMessage
+from people.models import Employee, PerformanceReview, ReviewNote, Signature, TeleworkApplication, ViewedSecurityMessage
 
 
 # Serializers define the API representation.
@@ -34,7 +34,12 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = Employee
-        fields = ['url', 'pk', 'name', 'user', 'email', 'manager', 'is_manager', 'is_upper_manager', 'is_hr_manager', 'is_executive_director', 'viewed_security_message', 'prs_can_view', 'notes_can_view', 'next_to_sign_prs']
+        fields = [
+            'url', 'pk', 'name', 'user', 'email', 'manager', 'is_manager',
+            'is_upper_manager', 'is_hr_manager', 'is_executive_director',
+            'viewed_security_message', 'prs_can_view', 'notes_can_view',
+            'telework_applications_can_view', 'next_to_sign_prs'
+        ]
 
     @staticmethod
     def get_is_manager(employee):
@@ -51,6 +56,10 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     @staticmethod
     def get_notes_can_view(employee):
         return employee.notes_can_view()
+
+    @staticmethod
+    def get_telework_applications_can_view(employee):
+        return employee.telework_applications_can_view()
 
     @staticmethod
     def get_next_to_sign_prs(employee):
@@ -193,3 +202,90 @@ class ViewedSecurityMessageSerializer(serializers.HyperlinkedModelSerializer):
         fields = [
             'url', 'pk', 'employee', 'security_message', 'datetime'
         ]
+
+
+class TeleworkApplicationSerializer(serializers.HyperlinkedModelSerializer):
+    employee_name = serializers.CharField(source='employee.user.get_full_name')
+    employee_pk = serializers.IntegerField(source='employee.pk')
+    # manager_pk = serializers.IntegerField(source='employee.manager.pk')
+    manager_name = serializers.CharField(source='employee.manager.user.get_full_name')
+    program_manager_name = serializers.SerializerMethodField()
+    status = serializers.CharField(source='get_status_display')
+    # all_required_signatures = serializers.SerializerMethodField()
+    dependent_care_documentation = serializers.FileField()
+ 
+    class Meta:
+        model = TeleworkApplication
+        fields = [
+            'url', 'pk', 'employee_name', 'employee_pk', 'manager_name',
+            'program_manager_name', 'status', 'date', 
+            
+            'program_manager_approve', 'hours_onsite', 'telework_location',
+            'hours_working', 'duties', 'communication_when',
+            'communication_time', 'communication_how',
+            'equipment_provided_phone', 'equipment_provided_laptop',
+            'equipment_provided_desktop', 'equipment_provided_monitor',
+            'equipment_provided_access', 'equipment_provided_other',
+            'equipment_provided_other_value',
+
+            'workspace_checklist_1', 'workspace_checklist_2',
+            'workspace_checklist_3', 'workspace_checklist_4',
+            'workspace_checklist_5', 'workspace_checklist_6',
+            'workspace_checklist_7', 'workspace_checklist_8',
+            'workspace_checklist_9', 'workspace_checklist_10',
+            'workspace_checklist_11', 'workspace_checklist_12',
+            'emergency_checklist_1', 'emergency_checklist_2',
+            'emergency_checklist_3', 'ergonomics_checklist_1',
+            'ergonomics_checklist_2', 'ergonomics_checklist_3',
+            'ergonomics_checklist_4', 'ergonomics_checklist_5',
+            
+            'teleworker_comments', 'manager_comments',
+            
+            'dependent_care_checklist_1', 'dependent_care_documentation',
+
+            # 'all_required_signatures'
+        ]
+    
+    @staticmethod
+    def get_program_manager_name(application):
+        if application.employee.manager.job_title.name == 'Program Manager':
+            return application.employee.manager.user.get_full_name()
+        elif application.employee.manager.manager.job_title.name == 'Program Manager':
+            return application.employee.manager.manager.user.get_full_name()
+        else:
+            return 'NO PROGRAM MANAGER FOUND'
+    
+    # @staticmethod
+    # def get_employee_unit_or_program(pr):
+    #     if pr.employee.unit_or_program:
+    #         return pr.employee.unit_or_program.name
+    #     else:
+    #         return ''
+
+    # @staticmethod
+    # def get_days_until_review(pr):
+    #     today = datetime.date.today()
+    #     delta = pr.period_end_date - today
+    #     return delta.days
+    
+    # @staticmethod
+    # def get_evaluation(pr):
+    #     if hasattr(pr, 'performanceevaluation'):
+    #         return pr.performanceevaluation.evaluation
+    #     else:
+    #         return ""
+
+    # @staticmethod
+    # def get_position_description_link(pr):
+    #     return pr.employee.position_description_link()
+
+    # @staticmethod
+    # def get_discussion_took_place(pr):
+    #     if hasattr(pr, 'performanceevaluation'):
+    #         return "Yes" if pr.performanceevaluation.manager_discussed else "No"
+    #     else:
+    #         return "No"
+    
+    # @staticmethod
+    # def get_all_required_signatures(pr):
+    #     return pr.all_required_signatures()

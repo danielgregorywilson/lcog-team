@@ -48,6 +48,16 @@ const ifCanViewNote = (to: Route, from: Route, next: Next) => {
   }
 }
 
+const ifCanViewTeleworkApplication = (to: Route, from: Route, next: Next) => {
+  if (Vue.prototype.$cookies.get('telework_applications_can_view').indexOf(to.params.pk) != -1) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    next()
+    return
+  } else {
+    console.info('User can not view Telework Application', to.params.pk, 'Redirecting to dashboard.')
+    next('dashboard')
+  }
+}
+
 // TODO: Add a reset password view as in Django version, unless we're authenticating with LDAP
 const routes: RouteConfig[] = [
   {
@@ -93,8 +103,15 @@ const routes: RouteConfig[] = [
       {
         path: '/telework-application',
         name: 'telework-application',
-        component: () => import('pages/TeleworkApplication.vue'),
+        // component: () => import('pages/TeleworkApplication.vue'),
+        component: () => import('pages/TeleworkApplicationGetOrCreate.vue'),
         beforeEnter: ifAuthenticated,
+      },
+      {
+        path: '/telework-application/:pk',
+        name: 'telework-application-detail',
+        component: () => import('pages/TeleworkApplication.vue'),
+        beforeEnter: ifCanViewTeleworkApplication,
       },
       {
         path: '/telework',

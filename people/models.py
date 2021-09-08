@@ -240,6 +240,18 @@ class Employee(models.Model):
         note_ids = map(lambda note: note.id, ReviewNote.objects.filter(manager=self))
         return list(note_ids)
 
+    def telework_applications_can_view(self):
+        # You can view all Telework Applications for which either you are the employee or the
+        # employee is your direct report or a descendant direct report.
+        if self.is_hr_manager or self.is_executive_director:
+            return map(lambda pr: pr.id, TeleworkApplication.objects.all())
+        self_and_direct_reports = self.get_direct_reports_descendants(include_self=True)
+        application_ids = []
+        for employee in self_and_direct_reports:
+            employee_application_ids = map(lambda pr: pr.id, TeleworkApplication.objects.filter(employee=employee))
+            application_ids += employee_application_ids
+        return list(application_ids)
+
     def position_description_link(self):
         # Returns override link if provided, otherwise the link from job title if there is a job title
         if self.position_description_link_override:
@@ -590,3 +602,114 @@ class ViewedSecurityMessage(models.Model):
     employee = models.ForeignKey("people.Employee", verbose_name=_("employee"), on_delete=models.CASCADE)
     security_message = models.ForeignKey(SecurityMessage, on_delete=models.CASCADE)
     datetime = models.DateTimeField(_("viewed date"), auto_now=False, auto_now_add=True)
+
+
+class SignatureAllRelevantTeleworkApplicationsManager(models.Manager):
+    def get_queryset(self, user):
+        queryset = super().get_queryset()
+        desired_pks = [pr.pk for pr in user.employee.signature_all_relevant_applications()]
+        queryset = queryset.filter(pk__in=desired_pks)
+        return queryset
+
+
+class SignatureTeleworkApplicationsActionRequiredManager(models.Manager):
+    def get_queryset(self, user):
+        queryset = super().get_queryset()
+        desired_pks = [pr.pk for pr in user.employee.signature_applications_action_required()]
+        queryset = queryset.filter(pk__in=desired_pks)
+        return queryset
+
+
+class SignatureTeleworkApplicationsNoActionRequiredManager(models.Manager):
+    def get_queryset(self, user):
+        queryset = super().get_queryset()
+        desired_pks = [pr.pk for pr in user.employee.signature_applications_no_action_required()]
+        queryset = queryset.filter(pk__in=desired_pks)
+        return queryset
+
+
+class TeleworkApplication(models.Model):
+    class Meta:
+        verbose_name = _("Telework Application")
+        verbose_name_plural = _("Telework Applications")
+        ordering = ["-pk"]
+
+    def __str__(self):
+        return f"Telework application for {self.employee.user.username}"
+
+    def get_absolute_url(self):
+        return reverse("telework_application", kwargs={"pk": self.pk})
+
+    # Managers for filtering PRs
+    objects = models.Manager()
+    signature_all_relevant_applications = SignatureAllRelevantTeleworkApplicationsManager()
+    signature_applications_action_required = SignatureTeleworkApplicationsActionRequiredManager()
+    signature_applications_no_action_required = SignatureTeleworkApplicationsNoActionRequiredManager()
+
+    UNAPPROVED = 'U'
+    APPROVED = 'A'
+    STATUS_CHOICE = [
+        (UNAPPROVED, 'Not yet approved'),
+        (APPROVED, 'APPROVED')
+    ]
+
+    YES = 'Y'
+    NO = 'N'
+    NULLABLE_BOOLEAN_CHOICE = [
+        (YES, 'Yes'),
+        (NO, 'No')
+    ]
+
+    employee = models.OneToOneField("Employee", verbose_name=_("employee"), on_delete=models.CASCADE)
+    status = models.CharField(_("application status"), max_length=1, choices=STATUS_CHOICE, default=UNAPPROVED)
+
+    date = models.DateField(_("date"), auto_now=False, auto_now_add=False, blank=True, null=True)
+    program_manager_approve = models.CharField(_("program manager approve"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+
+    hours_onsite = models.TextField(_("hours onsite"), blank=True, null=True)
+    telework_location = models.TextField(_("telework location"), blank=True, null=True)
+    hours_working = models.TextField(_("hours working"), blank=True, null=True)
+    duties = models.TextField(_("duties"), blank=True, null=True)
+    communication_when = models.TextField(_("communication when"), blank=True, null=True)
+    communication_time = models.TextField(_("communication time"), blank=True, null=True)
+    communication_how = models.TextField(_("communication how"), blank=True, null=True)
+
+    equipment_provided_phone = models.BooleanField(_("equipment provided phone"), default=False)
+    equipment_provided_laptop = models.BooleanField(_("equipment provided laptop"), default=False)
+    equipment_provided_desktop = models.BooleanField(_("equipment provided desktop"), default=False)
+    equipment_provided_monitor = models.BooleanField(_("equipment provided monitor"), default=False)
+    equipment_provided_access = models.BooleanField(_("equipment provided access"), default=False)
+    equipment_provided_other = models.BooleanField(_("equipment provided other"), default=False)
+    equipment_provided_other_value = models.TextField(_("equipment provided other value"), blank=True, null=True)
+
+    workspace_checklist_1 = models.CharField(_("workspace checklist 1"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+    workspace_checklist_2 = models.CharField(_("workspace checklist 2"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+    workspace_checklist_3 = models.CharField(_("workspace checklist 3"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+    workspace_checklist_4 = models.CharField(_("workspace checklist 4"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+    workspace_checklist_5 = models.CharField(_("workspace checklist 5"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+    workspace_checklist_6 = models.CharField(_("workspace checklist 6"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+    workspace_checklist_7 = models.CharField(_("workspace checklist 7"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+    workspace_checklist_8 = models.CharField(_("workspace checklist 8"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+    workspace_checklist_9 = models.CharField(_("workspace checklist 9"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+    workspace_checklist_10 = models.CharField(_("workspace checklist 10"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+    workspace_checklist_11 = models.CharField(_("workspace checklist 11"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+    workspace_checklist_12 = models.CharField(_("workspace checklist 12"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+
+    emergency_checklist_1 = models.CharField(_("emergency checklist 1"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+    emergency_checklist_2 = models.CharField(_("emergency checklist 2"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+    emergency_checklist_3 = models.CharField(_("emergency checklist 3"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+
+    ergonomics_checklist_1 = models.CharField(_("emergency checklist 1"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+    ergonomics_checklist_2 = models.CharField(_("emergency checklist 2"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+    ergonomics_checklist_3 = models.CharField(_("emergency checklist 3"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+    ergonomics_checklist_4 = models.CharField(_("emergency checklist 4"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+    ergonomics_checklist_5 = models.CharField(_("emergency checklist 5"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+
+    teleworker_comments = models.TextField(_("teleworker comments"), blank=True, null=True)
+    manager_comments = models.TextField(_("manager comments"), blank=True, null=True)
+
+    dependent_care_checklist_1 = models.CharField(_("dependent care checklist 1"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
+    dependent_care_documentation = models.FileField(_("dependent care documentation"), upload_to="uploads/dependent-care-documentation", blank=True, null=True)
+
+    def username(self):
+        return self.employee.user.username

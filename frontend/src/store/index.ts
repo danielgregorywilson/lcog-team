@@ -4,7 +4,9 @@ import VueCookies from 'vue-cookies'
 import authModule from './modules/auth'
 import performanceReviewModule from './modules/performancereview'
 import securityMessageModule from './modules/securitymessage';
+import teleworkModule from './modules/telework';
 import userModule from './modules/user'
+
 
 // import example from './module-example';
 // import { ExampleStateInterface } from './module-example/state';
@@ -13,6 +15,8 @@ import userModule from './modules/user'
  * If not building with SSR mode, you can
  * directly export the Store instantiation
  */
+
+// TODO: https://betterprogramming.pub/the-state-of-typed-vuex-the-cleanest-approach-2358ee05d230
 
 export interface StateInterface {
   // Define your own store structure, using submodules if needed
@@ -31,6 +35,7 @@ export default store(function ({ Vue }) {
       userModule,
       performanceReviewModule,
       securityMessageModule,
+      teleworkModule,
     },
 
     // enable strict mode (adds overhead!)

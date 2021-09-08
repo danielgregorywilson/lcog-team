@@ -16,13 +16,13 @@ from mainsite.helpers import (
 )
 
 from people.models import (
-    Employee, PerformanceReview, ReviewNote, Signature, ViewedSecurityMessage
+    Employee, PerformanceReview, ReviewNote, Signature, TeleworkApplication, ViewedSecurityMessage
 )
 from people.serializers import (
     EmployeeSerializer, FileUploadSerializer, GroupSerializer,
     PerformanceReviewFileUploadSerializer, PerformanceReviewSerializer,
-    ReviewNoteSerializer, SignatureSerializer, UserSerializer,
-    ViewedSecurityMessageSerializer
+    ReviewNoteSerializer, SignatureSerializer, TeleworkApplicationSerializer,
+    UserSerializer, ViewedSecurityMessageSerializer
 )
 
 
@@ -394,3 +394,200 @@ class ViewedSecurityMessageViewSet(viewsets.ModelViewSet):
         serialized_object = ViewedSecurityMessageSerializer(viewed_security_message,
             context={'request': request})
         return Response(serialized_object.data)
+
+
+class TeleworkApplicationPermission(BasePermission):
+    """
+    Manager or employee may update the Telework Application until it is
+    approved. Others may read only.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        # TODO
+        # Read permissions are allowed to any request,
+        # so we'll always allow GET, HEAD or OPTIONS requests.
+        if request.method in SAFE_METHODS:
+            return True
+
+        # Write permissions are only allowed to the owner of the snippet.
+        return request.user in [obj.employee.manager.user, obj.employee.user]
+
+
+class TeleworkApplicationViewSet(viewsets.ModelViewSet):
+    queryset = TeleworkApplication.objects.all()
+    serializer_class = TeleworkApplicationSerializer
+    permission_classes = [
+        TeleworkApplicationPermission
+    ]
+
+    # def get_queryset(self):
+    #     """
+    #     This view should return a list of all performance reviews for which
+    #     the currently authenticated user is the manager.
+    #     """
+    #     user = self.request.user
+    #     if user.is_authenticated:
+    #         manager_prs = PerformanceReview.objects.filter(
+    #             employee__manager__user=user)
+    #         employee_prs = PerformanceReview.objects.filter(
+    #             employee__user=user)
+    #         queryset = manager_prs | employee_prs # Default queryset
+    #         signature = self.request.query_params.get('signature', None)
+    #         action_required = self.request.query_params.get('action_required',
+    #             None)
+    #         if is_true_string(signature):
+    #             if action_required is not None:
+    #                 if is_true_string(action_required):
+    #                     queryset = PerformanceReview.signature_upcoming_reviews_action_required.get_queryset(user)
+    #                 else:
+    #                     queryset = PerformanceReview.signature_upcoming_reviews_no_action_required.get_queryset(user)    
+    #             else:
+    #                 queryset = PerformanceReview.signature_all_relevant_upcoming_reviews.get_queryset(user)
+    #         elif action_required is not None:
+    #             if is_true_string(action_required):
+    #                 queryset = PerformanceReview.manager_upcoming_reviews_action_required.get_queryset(user)
+    #             else:
+    #                 queryset = PerformanceReview.manager_upcoming_reviews_no_action_required.get_queryset(user)
+    #         else:
+    #             queryset = PerformanceReview.manager_upcoming_reviews.get_queryset(user)
+    #     else:
+    #         queryset = PerformanceReview.objects.all()
+    #     return queryset
+
+    def retrieve(self, request, pk=None):
+        by_employee = request.query_params.get('by_employee', None)
+        if is_true_string(by_employee):
+            try:
+                application = TeleworkApplication.objects.get(employee__pk=pk)
+            except TeleworkApplication.DoesNotExist:
+                employee = Employee.objects.get(pk=pk)
+                application = TeleworkApplication.objects.create(employee=employee)
+        else:
+            queryset = TeleworkApplication.objects.all()
+            application = get_object_or_404(queryset, pk=pk)
+        serializer = TeleworkApplicationSerializer(application, 
+            context={'request': request})
+        return Response(serializer.data)
+
+    def update(self, request, pk=None):
+        application = TeleworkApplication.objects.get(pk=pk)
+        application.date = request.data['date']
+        application.program_manager_approve = request.data['program_manager_approve']
+        application.hours_onsite = request.data['hours_onsite']
+        application.telework_location = request.data['telework_location']
+        application.hours_working = request.data['hours_working']
+        application.duties = request.data['duties']
+        application.communication_when = request.data['communication_when']
+        application.communication_time = request.data['communication_time']
+        application.communication_how = request.data['communication_how']
+        application.equipment_provided_phone = request.data['equipment_provided_phone']
+        application.equipment_provided_laptop = request.data['equipment_provided_laptop']
+        application.equipment_provided_desktop = request.data['equipment_provided_desktop']
+        application.equipment_provided_monitor = request.data['equipment_provided_monitor']
+        application.equipment_provided_access = request.data['equipment_provided_access']
+        application.equipment_provided_other = request.data['equipment_provided_other']
+        application.equipment_provided_other_value = request.data['equipment_provided_other_value']
+        application.workspace_checklist_1 = request.data['workspace_checklist_1']
+        application.workspace_checklist_2 = request.data['workspace_checklist_2']
+        application.workspace_checklist_3 = request.data['workspace_checklist_3']
+        application.workspace_checklist_4 = request.data['workspace_checklist_4']
+        application.workspace_checklist_5 = request.data['workspace_checklist_5']
+        application.workspace_checklist_6 = request.data['workspace_checklist_6']
+        application.workspace_checklist_7 = request.data['workspace_checklist_7']
+        application.workspace_checklist_8 = request.data['workspace_checklist_8']
+        application.workspace_checklist_9 = request.data['workspace_checklist_9']
+        application.workspace_checklist_10 = request.data['workspace_checklist_10']
+        application.workspace_checklist_11 = request.data['workspace_checklist_11']
+        application.workspace_checklist_12 = request.data['workspace_checklist_12']
+        application.emergency_checklist_1 = request.data['emergency_checklist_1']
+        application.emergency_checklist_2 = request.data['emergency_checklist_2']
+        application.emergency_checklist_3 = request.data['emergency_checklist_3']
+        application.ergonomics_checklist_1 = request.data['ergonomics_checklist_1']
+        application.ergonomics_checklist_2 = request.data['ergonomics_checklist_2']
+        application.ergonomics_checklist_3 = request.data['ergonomics_checklist_3']
+        application.ergonomics_checklist_4 = request.data['ergonomics_checklist_4']
+        application.ergonomics_checklist_5 = request.data['ergonomics_checklist_5']
+        application.teleworker_comments = request.data['teleworker_comments']
+        application.manager_comments = request.data['manager_comments']
+        application.dependent_care_checklist_1 = request.data['dependent_care_checklist_1']
+        # application.dependent_care_documentation = request.data['dependent_care_documentation']
+
+        
+        # pr.evaluation_type = request.data['evaluation_type']
+        # pr.probationary_evaluation_type = \
+        #     request.data['probationary_evaluation_type']
+        # pr.step_increase = request.data['step_increase']
+        # pr.top_step_bonus = request.data['top_step_bonus']
+        # pr.action_other = request.data['action_other']
+        # pr.factor_job_knowledge = request.data['factor_job_knowledge']
+        # pr.factor_work_quality = request.data['factor_work_quality']
+        # pr.factor_work_quantity = request.data['factor_work_quantity']
+        # pr.factor_work_habits = request.data['factor_work_habits']
+        # pr.factor_analysis = request.data['factor_analysis']
+        # pr.factor_initiative = request.data['factor_initiative']
+        # pr.factor_interpersonal = request.data['factor_interpersonal']
+        # pr.factor_communication = request.data['factor_communication']
+        # pr.factor_dependability = request.data['factor_dependability']
+        # pr.factor_professionalism = request.data['factor_professionalism']
+        # pr.factor_management = request.data['factor_management']
+        # pr.factor_supervision = request.data['factor_supervision']
+        # pr.evaluation_successes = request.data['evaluation_successes']
+        # pr.evaluation_opportunities = request.data['evaluation_opportunities']
+        # pr.evaluation_goals_manager = request.data['evaluation_goals_manager']
+        # pr.evaluation_comments_employee = \
+        #     request.data['evaluation_comments_employee']
+        # pr.description_reviewed_employee = \
+        #     request.data['description_reviewed_employee']
+        # if pr.status == PerformanceReview.NEEDS_EVALUATION and all([
+        #     (pr.evaluation_type == 'A' or
+        #         (pr.evaluation_type == 'P' and
+        #             pr.probationary_evaluation_type != None
+        #         )
+        #     ),
+        #     pr.step_increase != None,
+        #     pr.top_step_bonus != None,
+        #     pr.factor_job_knowledge != None,
+        #     pr.factor_work_quality != None,
+        #     pr.factor_work_quantity != None,
+        #     pr.factor_work_habits != None,
+        #     pr.factor_analysis != None,
+        #     pr.factor_initiative != None,
+        #     pr.factor_interpersonal != None,
+        #     pr.factor_communication != None,
+        #     pr.factor_dependability != None,
+        #     pr.factor_professionalism != None,
+        #     pr.factor_management != None,
+        #     pr.factor_supervision != None,
+        #     len(pr.evaluation_successes) > 0,
+        #     len(pr.evaluation_opportunities) > 0,
+        #     len(pr.evaluation_goals_manager) > 0,
+        #     pr.description_reviewed_employee,
+        #     pr.signed_position_description.name != ''
+        # ]):
+        #     pr.status = PerformanceReview.EVALUATION_WRITTEN
+        #     send_evaluation_written_email_to_employee(pr.employee, pr)
+        application.save()
+        serialized_application = TeleworkApplicationSerializer(application,
+            context={'request': request})
+        return Response(serialized_application.data)
+    
+    # def partial_update(self, request, pk=None):
+    #     """
+    #     Currently just updates the employee's comments. This might need to be
+    #     more general to accept any partial updates.
+    #     """
+    #     pr = PerformanceReview.objects.get(pk=pk)
+    #     pr.evaluation_comments_employee = \
+    #         request.data['evaluation_comments_employee']
+    #     pr.save()
+    #     serialized_review = PerformanceReviewSerializer(pr,
+    #         context={'request': request})
+    #     return Response(serialized_review.data)
+
+    # # TODO: Don't use this - use the ModelViewSet get
+    # @action(detail=True, methods=['get'])
+    # def get_a_performance_review(self, request, pk=None):
+    #     review = PerformanceReview.objects.get(pk=pk)
+    #     serialized_review = PerformanceReviewSerializer(review,
+    #         context={'request': request})
+    #     return Response(serialized_review.data)

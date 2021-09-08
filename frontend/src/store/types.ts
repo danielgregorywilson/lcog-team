@@ -44,7 +44,12 @@ export interface EmployeeRetrieve {
   is_executive_director: boolean
   prs_can_view: Array<number>
   notes_can_view: Array<number>
+  telework_applications_can_view: Array<number>
   next_to_sign_prs: string
+}
+
+export interface AxiosEmployeeRetrieveOneServerResponse {
+  data: EmployeeRetrieve
 }
 
 export interface AxiosEmployeeRetrieveManyServerResponse {
@@ -284,3 +289,198 @@ export interface ViewedSecurityMessageRetrieve {
   security_message_pk: number
   datetime: string
 }
+
+
+//////////////////////////////////////////////////////////////
+// TeleworkApplication Structure from Django Rest Framework //
+//////////////////////////////////////////////////////////////
+
+export interface TeleworkApplicationRetrieve {
+  url: Url
+  pk: number
+  employee_pk: number
+  employee_name: string
+  manager_name: string
+  program_manager_name: string
+  status: string
+  date: Date
+  program_manager_approve: string
+  hours_onsite: string
+  telework_location: string
+  hours_working: string
+  duties: string
+  communication_when: string
+  communication_time: string
+  communication_how: string
+  equipment_provided_phone: boolean
+  equipment_provided_laptop: boolean
+  equipment_provided_desktop: boolean
+  equipment_provided_monitor: boolean
+  equipment_provided_access: boolean
+  equipment_provided_other: boolean
+  equipment_provided_other_value: string
+  workspace_checklist_1: string
+  workspace_checklist_2: string
+  workspace_checklist_3: string
+  workspace_checklist_4: string
+  workspace_checklist_5: string
+  workspace_checklist_6: string
+  workspace_checklist_7: string
+  workspace_checklist_8: string
+  workspace_checklist_9: string
+  workspace_checklist_10: string
+  workspace_checklist_11: string
+  workspace_checklist_12: string
+  emergency_checklist_1: string
+  emergency_checklist_2: string
+  emergency_checklist_3: string
+  ergonomics_checklist_1: string
+  ergonomics_checklist_2: string
+  ergonomics_checklist_3: string
+  ergonomics_checklist_4: string
+  ergonomics_checklist_5: string
+  teleworker_comments: string
+  manager_comments: string
+  dependent_care_checklist_1: string
+  // dependent_care_documentation: ??
+  
+  
+  // employee_division: string
+  // employee_unit_or_program: string
+  // employee_job_title: string
+  // manager_pk: number
+  
+  // days_until_review: number
+  // status: string
+  // period_start_date: Date
+  // period_end_date: Date
+  // effective_date: Date
+  // evaluation_type: string
+  // probationary_evaluation_type: string
+  // step_increase: string
+  // top_step_bonus: string
+  // action_other: string
+
+  // factor_job_knowledge: string
+  // factor_work_quality: string
+  // factor_work_quantity: string
+  // factor_work_habits: string
+  // factor_analysis: string
+  // factor_initiative: string
+  // factor_interpersonal: string
+  // factor_communication: string
+  // factor_dependability: string
+  // factor_professionalism: string
+  // factor_management: string
+  // factor_supervision: string
+  // evaluation_successes: string
+  // evaluation_opportunities: string
+  // evaluation_goals_manager: string
+  // evaluation_comments_employee: string
+  
+  // position_description_link: string
+  // description_reviewed_employee: boolean
+  // signed_position_description: string
+  // all_required_signatures: Array<[string, string, string]>
+}
+
+export interface AxiosTeleworkApplicationRetrieveOneServerResponse {
+  data: TeleworkApplicationRetrieve
+}
+
+export interface TeleworkApplicationCreate {
+  url: Url
+  pk: number
+  employee_name: string
+  days_until_review: number
+  status: string
+}
+
+export interface TeleworkApplicationUpdate {
+  date: string
+  program_manager_approve: string
+  hours_onsite: string
+  telework_location: string
+  hours_working: string
+  duties: string
+  communication_when: string
+  communication_time: string
+  communication_how: string
+  equipment_provided_phone: boolean
+  equipment_provided_laptop: boolean
+  equipment_provided_desktop: boolean
+  equipment_provided_monitor: boolean
+  equipment_provided_access: boolean
+  equipment_provided_other: boolean
+  equipment_provided_other_value: string
+  workspace_checklist_1: string
+  workspace_checklist_2: string
+  workspace_checklist_3: string
+  workspace_checklist_4: string
+  workspace_checklist_5: string
+  workspace_checklist_6: string
+  workspace_checklist_7: string
+  workspace_checklist_8: string
+  workspace_checklist_9: string
+  workspace_checklist_10: string
+  workspace_checklist_11: string
+  workspace_checklist_12: string
+  emergency_checklist_1: string
+  emergency_checklist_2: string
+  emergency_checklist_3: string
+  ergonomics_checklist_1: string
+  ergonomics_checklist_2: string
+  ergonomics_checklist_3: string
+  ergonomics_checklist_4: string
+  ergonomics_checklist_5: string
+  teleworker_comments: string
+  manager_comments: string
+  dependent_care_checklist_1: string
+  // dependent_care_documentation: ??
+}
+
+export interface TeleworkApplicationUpdatePartial {
+  evaluation_type?: string
+  probationary_evaluation_type?: string
+  step_increase?: string
+  top_step_bonus?: string
+  action_other?: string
+  factor_job_knowledge?: string
+  factor_work_quality?: string
+  factor_work_quantity?: string
+  factor_work_habits?: string
+  factor_analysis?: string
+  factor_initiative?: string
+  factor_interpersonal?: string
+  factor_communication?: string
+  factor_dependability?: string
+  factor_professionalism?: string
+  factor_management?: string
+  factor_supervision?: string
+  evaluation_successes?: string
+  evaluation_opportunities?: string
+  evaluation_goals_manager?: string
+  evaluation_comments_employee?: string
+  description_reviewed_employee?: boolean
+}
+
+export interface AxiosTeleworkApplicationUpdateServerResponse {
+  data: TeleworkApplicationRetrieve
+}
+
+// export interface AxiosPerformanceReviewSignServerResponse {
+//   data: {
+//     signatures: Array<[string, string, string]>
+//   }
+// }
+
+// export interface SignedPositionDescriptionUpload {
+//   pk: string
+//   file: File
+// }
+
+// export interface SignedPositionDescriptionUploadServerResponse {
+//   data: string
+//   status: number
+//   statusText: string
+// }

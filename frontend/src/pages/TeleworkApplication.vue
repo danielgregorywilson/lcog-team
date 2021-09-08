@@ -504,8 +504,8 @@ export default class TeleworkApplication extends Vue {
   private errorDialogPosition = 'top'
 
   yesNoOptions = [
-    { label: 'Yes', value: 'yes' },
-    { label: 'No', value: 'no' }
+    { label: 'Yes', value: 'Y' },
+    { label: 'No', value: 'N' }
   ]
 
   private currentUserPk(): number {

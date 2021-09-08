@@ -24,7 +24,7 @@ const actions: ActionTree<UserStateInterface, StateInterface> = {
   authLogout: ({commit}) => {
     return new Promise((resolve) => {
       commit('authLogout')
-      resolve()
+      resolve('Successfully triggered logout')
     })
   }
 };

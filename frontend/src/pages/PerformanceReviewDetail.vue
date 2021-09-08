@@ -955,7 +955,7 @@ export default class PerformanceReviewDetail extends Vue {
 
           this.signatures = pr.all_required_signatures
 
-          resolve()
+          resolve('Got PR')
         })
         .catch(e => {
           console.error('Error retrieving PR from API:', e)
@@ -1046,7 +1046,7 @@ export default class PerformanceReviewDetail extends Vue {
             reject(e)
           })
 
-        resolve()
+        resolve('Updated')
       })
       .catch(e => {
         console.error('Error updating PR', e)

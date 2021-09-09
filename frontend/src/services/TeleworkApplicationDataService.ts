@@ -33,7 +33,7 @@ class TeleworkApplicationDataService {
   }
 
   uploadDependentCareDocumentation(data: FormData) {
-    return http.post('api/v1/fileupload', data)
+    return http.post('api/v1/telework-fileupload', data)
   }
 
   signTeleworkApplication(teleworkApplicationPk: number, employeePk: number) {

@@ -365,14 +365,67 @@
         <div class="q-mt-sm">Employee will not undertake to provide primary care for any dependents who would require the care of a caregiver during at-home working hours. If temporarily care for a dependent during scheduled Telework hours is necessary, employee will notify their manager and sick or vacation leave, as appropriate, should be used for dependent care time for that time.</div>
         <div class="q-mt-sm">For employees who have dependents requiring care during Telework hours, they must attach documentation of dependent care arrangements.</div>
         <div class="q-mt-sm">Does the employee have dependents requiring care during Telework hours?</div>
-          <q-option-group
-              :options="yesNoOptions"
-              type="radio"
-              v-model="dependentCareChecklist1"
-              inline
-            />
-        <div class="q-mt-sm">If yes, attach documentation of dependent care arrangements.</div>
-        <div><strong>DOCUMENTATION</strong></div>
+        <q-option-group
+            :options="yesNoOptions"
+            type="radio"
+            v-model="dependentCareChecklist1"
+            inline
+          />
+        <div v-if="dependentCareChecklist1 == 'Y'">
+          <div class="q-mt-sm">If yes, attach documentation of dependent care arrangements.</div>
+          <q-uploader
+            ref="fileuploader"
+            url=""
+            @added="file_selected"
+            style="max-width: 300px"
+          >
+            <template v-slot:header="scope">
+              <div class="row no-wrap items-center q-pa-sm q-gutter-xs">
+                <div class="col">
+                  <div class="q-uploader__title">Upload dependent care documentation</div>
+                </div>
+                <q-btn v-if="scope.canAddFiles" type="a" icon="add_box" round dense flat>
+                  <q-uploader-add-trigger />
+                  <q-tooltip>Pick File</q-tooltip>
+                </q-btn>
+                <q-btn v-if="scope.canUpload" icon="cloud_upload" @click="uploadFile()" round dense flat >
+                  <q-tooltip>Upload File</q-tooltip>
+                </q-btn>
+
+                <q-btn v-if="scope.isUploading" icon="clear" @click="scope.abort" round dense flat >
+                  <q-tooltip>Abort Upload</q-tooltip>
+                </q-btn>
+              </div>
+            </template>
+            <template v-slot:list="scope">
+              <q-list separator>
+                <q-item v-for="file in scope.files" :key="file.name">
+                  <q-item-section>
+                    <q-item-label class="full-width ellipsis">
+                      {{ file.name }}
+                    </q-item-label>
+                    <q-item-label caption>
+                      {{ file.__sizeLabel }}
+                    </q-item-label>
+                  </q-item-section>
+                  <q-item-section top side>
+                    <q-btn
+                      class="gt-xs"
+                      size="12px"
+                      flat
+                      dense
+                      round
+                      icon="delete"
+                      @click="scope.removeFile(file)"
+                    />
+                  </q-item-section>
+                </q-item>
+              </q-list>
+            </template>
+          </q-uploader>
+          <div v-if="this.fileSuccessfullyUploaded" class="text-green">Successfully uploaded</div>
+          <div v-if="uploadedDependentCareDocumentationUrl"> <a :href="uploadedDependentCareDocumentationUrl" target="_blank">Current uploaded documentation</a></div>
+        </div>
 
         <div class="text-h6 q-mt-md">Employment Relationship</div>
         <div class="q-mt-sm">Employee understands that all obligations, responsibilities, terms, and conditions of employment with LCOG remain unchanged, except those obligations and responsibilities specifically addressed in this agreement. Nothing in this agreement changes the nature of the employment relationship Employee has with LCOG.</div>
@@ -447,7 +500,7 @@
 import TeleworkApplicationSignature from 'components/TeleworkApplicationSignature.vue'
 import { Component, Vue } from 'vue-property-decorator'
 import TeleworkApplicationDataService from '../services/TeleworkApplicationDataService'
-import { AxiosTeleworkApplicationUpdateServerResponse, TeleworkApplicationRetrieve } from '../store/types'
+import { AxiosTeleworkApplicationUpdateServerResponse, FileUploadDescriptionUploadServerResponse, TeleworkApplicationRetrieve } from '../store/types'
 
 @Component({
   components: { TeleworkApplicationSignature }
@@ -499,7 +552,11 @@ export default class TeleworkApplication extends Vue {
   private ergonomicsChecklist5 = ''
   private teleworkerComments = ''
   private managerComments = ''
+  
   private dependentCareChecklist1 = ''
+  private uploadedDependentCareDocumentationUrl = ''
+  private selectedFile: File = new File([''], '')
+  private fileSuccessfullyUploaded = false
 
   // Format: [Signature index, Role, Name, Date, Employee PK, Employee Ready to Sign]
   private programManagerSignature0 = [-1, '', '', '', -1, false]
@@ -685,7 +742,7 @@ export default class TeleworkApplication extends Vue {
     this.teleworkerComments = application.teleworker_comments
     this.managerComments = application.manager_comments
     this.dependentCareChecklist1 = application.dependent_care_checklist_1
-    // this.dependentCareDocumentation = application.dependent_care_documentation
+    this.uploadedDependentCareDocumentationUrl = application.dependent_care_documentation
 
     this.programManagerSignature0 = application.program_manager_signature_0
     this.employeeSignature0 = application.employee_signature_0
@@ -936,6 +993,33 @@ export default class TeleworkApplication extends Vue {
       })
       .catch(e => {
         console.error('Error signing application:', e)
+      })
+  }
+
+  private file_selected(file: Array<File>) {
+    this.selectedFile = file[0];
+  }
+
+  private uploadFile() {
+    let fd = new FormData();
+    fd.append('pk', this.applicationPk)
+    fd.append('file', this.selectedFile)
+    
+    TeleworkApplicationDataService.uploadDependentCareDocumentation(fd)
+      .then((response: FileUploadDescriptionUploadServerResponse) => {
+        if (response.status == 200) {
+          this.$refs.fileuploader.reset() // eslint-disable-line
+          this.uploadedDependentCareDocumentationUrl = response.data // eslint-disable-line
+          this.fileSuccessfullyUploaded = true
+          setTimeout(() => this.fileSuccessfullyUploaded = false, 5000)
+          this.updateTeleworkApplication()
+            .catch(e => {
+              console.error('Error updating telework application after uploading dependent care documentation:', e)
+            })
+        }
+      })
+      .catch(e => {
+        console.error('Error uploading dependent care documentation:', e)
       })
   }
 

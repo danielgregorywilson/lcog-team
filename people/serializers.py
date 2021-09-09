@@ -257,6 +257,7 @@ class TeleworkApplicationSerializer(serializers.HyperlinkedModelSerializer):
             'program_manager_signature_1', 'division_director_signature'
         ]
     
+    # TODO: Use model property
     @staticmethod
     def get_program_manager_name(application):
         if application.employee.has_program_manager:
@@ -268,41 +269,6 @@ class TeleworkApplicationSerializer(serializers.HyperlinkedModelSerializer):
                 return 'NO PROGRAM MANAGER FOUND'
         else:
             return 'NO PROGRAM MANAGER FOUND'
-    
-    # @staticmethod
-    # def get_employee_unit_or_program(pr):
-    #     if pr.employee.unit_or_program:
-    #         return pr.employee.unit_or_program.name
-    #     else:
-    #         return ''
-
-    # @staticmethod
-    # def get_days_until_review(pr):
-    #     today = datetime.date.today()
-    #     delta = pr.period_end_date - today
-    #     return delta.days
-    
-    # @staticmethod
-    # def get_evaluation(pr):
-    #     if hasattr(pr, 'performanceevaluation'):
-    #         return pr.performanceevaluation.evaluation
-    #     else:
-    #         return ""
-
-    # @staticmethod
-    # def get_position_description_link(pr):
-    #     return pr.employee.position_description_link()
-
-    # @staticmethod
-    # def get_discussion_took_place(pr):
-    #     if hasattr(pr, 'performanceevaluation'):
-    #         return "Yes" if pr.performanceevaluation.manager_discussed else "No"
-    #     else:
-    #         return "No"
-    
-    # @staticmethod
-    # def get_all_required_signatures(pr):
-    #     return pr.all_required_signatures()
 
     @staticmethod
     def get_program_manager_signature_0(application):
@@ -327,6 +293,16 @@ class TeleworkApplicationSerializer(serializers.HyperlinkedModelSerializer):
     @staticmethod
     def get_division_director_signature(application):
         return application.division_director_signature()
+
+
+class TeleworkApplicationFileUploadSerializer(serializers.HyperlinkedModelSerializer):
+    dependent_care_documentation = serializers.FileField()
+
+    class Meta:
+        model = TeleworkApplication
+        fields = [
+            'url', 'dependent_care_documentation'
+        ]
 
 
 class TeleworkSignatureSerializer(serializers.HyperlinkedModelSerializer):

@@ -662,7 +662,7 @@ import { date as quasarDate, scroll } from 'quasar'
 const { getScrollTarget, setScrollPosition } = scroll
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import PerformanceReviewDataService from '../services/PerformanceReviewDataService'
-import { AxiosManagerReviewNotesForEmployeeServerResponse, AxiosPerformanceReviewUpdateServerResponse, PerformanceReviewRetrieve, ReviewNoteRetrieve, SignedPositionDescriptionUploadServerResponse } from '../store/types'
+import { AxiosManagerReviewNotesForEmployeeServerResponse, AxiosPerformanceReviewUpdateServerResponse, PerformanceReviewRetrieve, ReviewNoteRetrieve, FileUploadDescriptionUploadServerResponse } from '../store/types'
 import '../filters'
 import ReviewNoteDataService from '../services/ReviewNoteDataService'
 
@@ -1123,7 +1123,7 @@ export default class PerformanceReviewDetail extends Vue {
     fd.append('file', this.selectedFile)
     
     PerformanceReviewDataService.uploadSignedPositionDescription(fd)
-      .then((response: SignedPositionDescriptionUploadServerResponse) => {
+      .then((response: FileUploadDescriptionUploadServerResponse) => {
         if (response.status == 200) {
           this.$refs.fileuploader.reset() // eslint-disable-line
           this.uploadedPositionDescriptionUrl = response.data // eslint-disable-line

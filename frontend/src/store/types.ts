@@ -189,7 +189,7 @@ export interface SignedPositionDescriptionUpload {
   file: File
 }
 
-export interface SignedPositionDescriptionUploadServerResponse {
+export interface FileUploadDescriptionUploadServerResponse {
   data: string
   status: number
   statusText: string
@@ -342,7 +342,7 @@ export interface TeleworkApplicationRetrieve {
   teleworker_comments: string
   manager_comments: string
   dependent_care_checklist_1: string
-  // dependent_care_documentation: ??
+  dependent_care_documentation: string
   
   program_manager_signature_0: [number, string, string, string, number, boolean]
   employee_signature_0: [number, string, string, string, number, boolean]

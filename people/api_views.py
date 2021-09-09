@@ -22,7 +22,8 @@ from people.models import (
 from people.serializers import (
     EmployeeSerializer, FileUploadSerializer, GroupSerializer,
     PerformanceReviewFileUploadSerializer, PerformanceReviewSerializer,
-    ReviewNoteSerializer, SignatureSerializer, TeleworkApplicationSerializer,
+    ReviewNoteSerializer, SignatureSerializer,
+    TeleworkApplicationFileUploadSerializer, TeleworkApplicationSerializer,
     TeleworkSignatureSerializer, UserSerializer,
     ViewedSecurityMessageSerializer
 )
@@ -277,6 +278,36 @@ class FileUploadViewSet(viewsets.ViewSet):
         pr.signed_position_description = file_upload
         pr.save()
         return Response(data=request.build_absolute_uri(pr.signed_position_description.url), status=200)
+
+
+class TeleworkApplicationFileUploadViewSet(viewsets.ViewSet):
+    serializer_class = FileUploadSerializer
+
+    def list(self, request):
+        queryset = TeleworkApplication.objects.all()
+        serializer = TeleworkApplicationFileUploadSerializer(queryset, many=True, context={'request': request})
+        return Response(serializer.data)
+    
+    def retrieve(self, request, pk=None):
+        queryset = TeleworkApplication.objects.all()
+        application = get_object_or_404(queryset, pk=pk)
+        serializer = TeleworkApplicationFileUploadSerializer(application, context={'request': request})
+        return Response(serializer.data)
+    
+    def create(self, request):
+        file_upload = request.FILES.get('file')
+        if not file_upload:
+            return Response(data="Missing file", status=400)
+        application_pk = request.data.get('pk')
+        if not application_pk:
+            return Response(data="Missing application PK", status=400)
+        try:
+            application = TeleworkApplication.objects.get(pk=application_pk)
+        except TeleworkApplication.DoesNotExist:
+            return Response(data="Invalid application PK", status=400)
+        application.dependent_care_documentation = file_upload
+        application.save()
+        return Response(data=request.build_absolute_uri(application.dependent_care_documentation.url), status=200)
 
 
 class SignatureViewSet(viewsets.ModelViewSet):

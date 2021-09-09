@@ -7,7 +7,7 @@ from ckeditor.fields import RichTextField
 
 class ImageUpload(models.Model):
     description = models.CharField(_("description"), max_length=255)
-    image = models.ImageField()
+    image = models.ImageField(upload_to="uploads/image-upload")
 
 
 class SecurityMessage(models.Model):

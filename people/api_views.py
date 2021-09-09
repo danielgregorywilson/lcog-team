@@ -16,13 +16,15 @@ from mainsite.helpers import (
 )
 
 from people.models import (
-    Employee, PerformanceReview, ReviewNote, Signature, TeleworkApplication, ViewedSecurityMessage
+    Employee, PerformanceReview, ReviewNote, Signature, TeleworkApplication,
+    TeleworkSignature, ViewedSecurityMessage
 )
 from people.serializers import (
     EmployeeSerializer, FileUploadSerializer, GroupSerializer,
     PerformanceReviewFileUploadSerializer, PerformanceReviewSerializer,
     ReviewNoteSerializer, SignatureSerializer, TeleworkApplicationSerializer,
-    UserSerializer, ViewedSecurityMessageSerializer
+    TeleworkSignatureSerializer, UserSerializer,
+    ViewedSecurityMessageSerializer
 )
 
 
@@ -591,3 +593,41 @@ class TeleworkApplicationViewSet(viewsets.ModelViewSet):
     #     serialized_review = PerformanceReviewSerializer(review,
     #         context={'request': request})
     #     return Response(serialized_review.data)
+
+
+class TeleworkSignatureViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows telework signatures to be created.
+    """
+    queryset = TeleworkSignature.objects.all()
+    serializer_class = TeleworkSignatureSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        """
+        This view should return a list of all signatures made by this user.
+        """
+        user = self.request.user
+        # TODO: Don't do this. There is an issue where the detail view doesn't have the user
+        if user.is_anonymous:
+            return TeleworkSignature.objects.all()
+        else:
+            return TeleworkSignature.objects.filter(employee__user=user)
+    
+    def create(self, request):
+        application = TeleworkApplication.objects.get(pk=request.data['application_pk'])
+        employee = Employee.objects.get(pk=request.data['employee_pk'])
+        new_signature = TeleworkSignature.objects.create(application=application, employee=employee, index=request.data['index'])
+        
+        # Send notification to next manager in the chain
+        # pr_employee_has_signed = Signature.objects.filter(employee=pr.employee).count() == 1
+        # pr_manager_has_signed = Signature.objects.filter(employee=pr.employee.manager).count() == 1
+        # if pr_employee_has_signed and pr_manager_has_signed and pr.status == PerformanceReview.EVALUATION_WRITTEN:
+        #     if employee == pr.employee:
+        #         send_signature_email_to_manager(employee.manager.manager, pr)
+        #     else:
+        #         send_signature_email_to_manager(employee.manager, pr)
+        
+        serialized_signature = TeleworkSignatureSerializer(new_signature,
+            context={'request': request})
+        return Response(serialized_signature.data)

@@ -83,6 +83,66 @@ class Employee(models.Model):
 
     viewed_security_message = models.BooleanField(_("has viewed security message"), default=False)
 
+    @property
+    def is_program_manager(self):
+        return self.manager.is_division_director
+
+    @property
+    def has_program_manager(self):
+        current_employee = self
+        if current_employee.is_executive_director:
+            return False
+        if current_employee.is_division_director:
+            return False
+        if current_employee.manager.is_division_director:
+            return False
+        while True:
+            if current_employee.manager.is_division_director:
+                return True
+            if current_employee.manager:
+                current_employee = current_employee.manager
+            else:
+                return False
+
+    @property
+    def get_program_manager(self):
+        current_employee = self
+        if current_employee.manager.is_division_director:
+            return None
+        while True:
+            if current_employee.manager.is_division_director:
+                return current_employee
+            if current_employee.manager:
+                current_employee = current_employee.manager
+            else:
+                return None
+
+    @property
+    def has_division_director(self):
+        current_employee = self
+        if current_employee.is_division_director:
+            return False
+        while True:
+            if current_employee.is_division_director:
+                return True
+            if current_employee.manager:
+                current_employee = current_employee.manager
+            else:
+                return False
+
+    @property
+    def get_division_director(self):
+        current_employee = self
+        if current_employee.is_division_director:
+            return None
+        while True:
+            if current_employee.is_division_director:
+                return current_employee
+            if current_employee.manager:
+                current_employee = current_employee.manager
+            else:
+                return None
+
     def save(self, *args, **kwargs):
         # is_hr_manager can only apply to ONE Employee
         if self.is_hr_manager:
@@ -547,8 +607,8 @@ class SignatureReminder(models.Model):
 
 class Signature(models.Model):    
     class Meta:
-        verbose_name = _("Signature")
-        verbose_name_plural = _("Signatures")
+        verbose_name = _("PR Signature")
+        verbose_name_plural = _("PR Signatures")
 
     def __str__(self):
         return f"{self.employee.user.get_full_name()}'s approval of {self.review.employee.user.get_full_name()}'s performance review"
@@ -650,7 +710,7 @@ class TeleworkApplication(models.Model):
     APPROVED = 'A'
     STATUS_CHOICE = [
         (UNAPPROVED, 'Not yet approved'),
-        (APPROVED, 'APPROVED')
+        (APPROVED, 'Approved')
     ]
 
     YES = 'Y'
@@ -713,3 +773,133 @@ class TeleworkApplication(models.Model):
 
     def username(self):
         return self.employee.user.username
+
+    def employee_signature(self, index):
+        """
+        (
+            Signature index, Employee Role, Employee Name, Signature Date,
+            Employee PK, Whether the Employee is ready to sign
+        )
+        """
+        signature = TeleworkSignature.objects.filter(application=self, employee=self.employee, index=index).first()
+        if signature:
+            return[index, "Employee", signature.employee.user.get_full_name(), signature.date, None, False] # Not ready to sign because there is a signature
+        else:
+            return [index, "Employee", None, None, self.employee.pk, True]
+
+    def employee_signature_0(self):
+        return self.employee_signature(0)
+
+    def employee_signature_1(self):
+        return self.employee_signature(1)
+
+    def manager_signature(self):
+        signature = TeleworkSignature.objects.filter(application=self, employee=self.employee.manager, index=0).first()
+        if signature:
+            return[0, "Manager", signature.employee.user.get_full_name(), signature.date, None, False] # Not ready to sign because there is a signature
+        else:
+            return [0, "Manager", None, None, self.employee.manager.pk, True]
+    
+    def program_manager_signature(self, index):
+        # Rule out this being someone who does not ultimately report to a program manager
+        if self.employee.is_division_director:
+            return
+        if self.employee.is_executive_director:
+            return
+        if self.employee.manager.is_division_director:
+            return
+        # TODO: HR people? Others?
+
+        # Start by getting the program manager, which is the direct report of the division director
+        current_employee = self.employee
+        while True:
+            if current_employee.is_executive_director:
+                return
+            if current_employee.manager.is_division_director:
+                program_manager = current_employee
+                break
+            if current_employee.manager:
+                current_employee = current_employee.manager
+            else:
+                # If we don't get to a division director somehow
+                return
+        signature = TeleworkSignature.objects.filter(application=self, employee=program_manager, index=index).first()
+        if signature:
+            return[index, "Program Manager", signature.employee.user.get_full_name(), signature.date, None, False] # Not ready to sign because there is a signature
+        else:
+            return [index, "Program Manager", None, None, program_manager.pk, True]
+
+    def program_manager_signature_0(self):
+        return self.program_manager_signature(0)
+
+    def program_manager_signature_1(self):
+        return self.program_manager_signature(1)
+    
+    def division_director_signature(self):
+        # Start by getting the division director
+        current_employee = self.employee
+        while True:
+            if current_employee.is_division_director:
+                director = current_employee
+                break
+            if current_employee.manager:
+                current_employee = current_employee.manager
+            else:
+                # If we don't get to a division director somehow
+                return
+        signature = TeleworkSignature.objects.filter(application=self, employee=director, index=0).first()
+        if signature:
+            return[0, "Division Director", signature.employee.user.get_full_name(), signature.date, None, False] # Not ready to sign because there is a signature
+        else:
+            return [0, "Division Director", None, None, director.pk, True]
+
+class TeleworkSignature(models.Model):
+    class Meta:
+        verbose_name = _("Telework Signature")
+        verbose_name_plural = _("Telework Signatures")
+
+    def __str__(self):
+        return f"{self.employee.user.get_full_name()}'s approval of {self.application.employee.user.get_full_name()}'s telework application"
+
+    application = models.ForeignKey("people.TeleworkApplication", verbose_name=_("telework application"), on_delete=models.CASCADE)
+    employee = models.ForeignKey("people.Employee", on_delete=models.CASCADE)
+    index = models.SmallIntegerField(default=0)
+    date = models.DateField(_("signature date"), auto_now=False, auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        # Approve if all required signatures are present
+        approve_application = False
+        applicant = self.application.employee
+        all_signatures = self.application.teleworksignature_set.all()
+        has_employee_signature_0 = all_signatures.filter(employee=applicant, index=0).exists()
+        has_employee_signature_1 = all_signatures.filter(employee=applicant, index=1).exists()
+        if has_employee_signature_0 and has_employee_signature_1:
+            if applicant.manager:
+                has_manager_signature = all_signatures.filter(employee=self.application.employee.manager).exists()
+                if has_manager_signature:
+                    if applicant.has_program_manager:
+                        program_manager = applicant.get_program_manager
+                        has_program_manager_signature_0 = all_signatures.filter(employee=program_manager, index=0).exists()
+                        has_program_manager_signature_1 = all_signatures.filter(employee=program_manager, index=1).exists()
+                        if has_program_manager_signature_0 and has_program_manager_signature_1:
+                            if applicant.has_division_director:
+                                division_director = applicant.get_division_director
+                                has_division_director_signature = all_signatures.filter(employee=division_director).exists()
+                                if has_division_director_signature:
+                                    # Application has all the required signatures, so approve
+                                    approve_application = True
+                            else:
+                                # Applicant has no division director but all the other required signatures, so approve
+                                approve_application = True
+                    else:
+                        # Applicant has no program manager but all the other required signatures, so approve
+                        approve_application = True
+            else:
+                # Applicant has no manager but all the other required signatures, so approve
+                approve_application = True
+        
+        if approve_application:
+            self.application.status = TeleworkApplication.APPROVED
+            self.application.save()

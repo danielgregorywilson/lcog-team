@@ -2,7 +2,8 @@ from django.contrib import admin
 
 from .models import (
     Division, Employee, JobTitle, PerformanceReview, ReviewNote, Signature,
-    SignatureReminder, TeleworkApplication, UnitOrProgram, ViewedSecurityMessage
+    SignatureReminder, TeleworkApplication, TeleworkSignature, UnitOrProgram,
+    ViewedSecurityMessage
 )
 
 
@@ -92,8 +93,14 @@ class ViewedSecurityMessageAdmin(admin.ModelAdmin):
     list_display = ("employee", "security_message", "datetime")
 
 
+class TeleworkSignatureInline(admin.TabularInline):
+    model = TeleworkSignature
+    fields = ("employee", "index", "date",)
+    readonly_fields = ("date",)
+    extra = 0
+
+
 @admin.register(TeleworkApplication)
 class TeleworkApplicationAdmin(admin.ModelAdmin):
-    pass
-
     list_display = ("username", "status")
+    inlines = (TeleworkSignatureInline,)

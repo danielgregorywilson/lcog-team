@@ -8,7 +8,8 @@ from mainsite.views import obtain_auth_token_without_password
 from people.api_views import (
     CurrentUserView, EmployeeViewSet, FileUploadViewSet, GroupViewSet,
     PerformanceReviewViewSet, ReviewNoteViewSet, SignatureViewSet,
-    TeleworkApplicationViewSet, UserViewSet, ViewedSecurityMessageViewSet
+    TeleworkApplicationViewSet, TeleworkSignatureViewSet, UserViewSet,
+    ViewedSecurityMessageViewSet
 )
 
 
@@ -30,5 +31,6 @@ router.register('v1/reviewnote', ReviewNoteViewSet)
 router.register('v1/securitymessage', SecurityMessageViewSet)
 router.register('v1/viewedsecuritymessage', ViewedSecurityMessageViewSet)
 router.register('v1/teleworkapplication', TeleworkApplicationViewSet)
+router.register('v1/teleworksignature', TeleworkSignatureViewSet)
 
 urlpatterns = router.urls + urlpatterns

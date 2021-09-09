@@ -4,7 +4,10 @@ from django.contrib.auth.models import Group, User
 
 from rest_framework import serializers
 
-from people.models import Employee, PerformanceReview, ReviewNote, Signature, TeleworkApplication, ViewedSecurityMessage
+from people.models import (
+    Employee, PerformanceReview, ReviewNote, Signature, TeleworkApplication,
+    TeleworkSignature, ViewedSecurityMessage
+)
 
 
 # Serializers define the API representation.
@@ -212,6 +215,12 @@ class TeleworkApplicationSerializer(serializers.HyperlinkedModelSerializer):
     program_manager_name = serializers.SerializerMethodField()
     status = serializers.CharField(source='get_status_display')
     # all_required_signatures = serializers.SerializerMethodField()
+    program_manager_signature_0 = serializers.SerializerMethodField()
+    employee_signature_0 = serializers.SerializerMethodField()
+    employee_signature_1 = serializers.SerializerMethodField()
+    manager_signature = serializers.SerializerMethodField()
+    program_manager_signature_1 = serializers.SerializerMethodField()
+    division_director_signature = serializers.SerializerMethodField()
     dependent_care_documentation = serializers.FileField()
  
     class Meta:
@@ -243,15 +252,20 @@ class TeleworkApplicationSerializer(serializers.HyperlinkedModelSerializer):
             
             'dependent_care_checklist_1', 'dependent_care_documentation',
 
-            # 'all_required_signatures'
+            'program_manager_signature_0', 'employee_signature_0',
+            'employee_signature_1', 'manager_signature',
+            'program_manager_signature_1', 'division_director_signature'
         ]
     
     @staticmethod
     def get_program_manager_name(application):
-        if application.employee.manager.job_title.name == 'Program Manager':
-            return application.employee.manager.user.get_full_name()
-        elif application.employee.manager.manager.job_title.name == 'Program Manager':
-            return application.employee.manager.manager.user.get_full_name()
+        if application.employee.has_program_manager:
+            if application.employee.manager.job_title.name == 'Program Manager':
+                return application.employee.manager.user.get_full_name()
+            elif application.employee.manager.manager.job_title.name == 'Program Manager':
+                return application.employee.manager.manager.user.get_full_name()
+            else:
+                return 'NO PROGRAM MANAGER FOUND'
         else:
             return 'NO PROGRAM MANAGER FOUND'
     
@@ -289,3 +303,35 @@ class TeleworkApplicationSerializer(serializers.HyperlinkedModelSerializer):
     # @staticmethod
     # def get_all_required_signatures(pr):
     #     return pr.all_required_signatures()
+
+    @staticmethod
+    def get_program_manager_signature_0(application):
+        return application.program_manager_signature_0()
+
+    @staticmethod
+    def get_employee_signature_0(application):
+        return application.employee_signature_0()
+    
+    @staticmethod
+    def get_employee_signature_1(application):
+        return application.employee_signature_1()
+    
+    @staticmethod
+    def get_manager_signature(application):
+        return application.manager_signature()
+
+    @staticmethod
+    def get_program_manager_signature_1(application):
+        return application.program_manager_signature_1()
+    
+    @staticmethod
+    def get_division_director_signature(application):
+        return application.division_director_signature()
+
+
+class TeleworkSignatureSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = TeleworkSignature
+        fields = [
+            'url', 'pk', 'application', 'employee', 'index', 'date'
+        ]

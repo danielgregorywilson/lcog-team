@@ -2,7 +2,10 @@ import { ActionTree } from 'vuex';
 import { StateInterface } from '../../index';
 import { TeleworkStateInterface } from './state';
 import axios from 'axios';
-import { AxiosTeleworkApplicationRetrieveOneServerResponse, ReviewNoteCreate, SignatureCreate } from 'src/store/types';
+import {
+  AxiosTeleworkApplicationRetrieveOneServerResponse, ReviewNoteCreate,
+  TeleworkSignatureCreate
+} from 'src/store/types';
 
 function getApiUrl(): string {
   if (process.env.API_URL) {
@@ -39,6 +42,12 @@ const actions: ActionTree<TeleworkStateInterface, StateInterface> = {
         });
     })
   },
+  createSignature: ({}, signature: TeleworkSignatureCreate) => {
+    axios({ url: `${ process.env.API_URL }api/v1/teleworksignature`, data: signature, method: 'POST' }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
+      .catch(e => {
+        console.error('Error creating a signature:', e)
+      });
+  },
   
   
   
@@ -73,12 +82,6 @@ const actions: ActionTree<TeleworkStateInterface, StateInterface> = {
       })
       .catch(e => {
         console.error('Error creating a review note:', e)
-      });
-  },
-  createSignature: ({}, signature: SignatureCreate) => {
-    axios({ url: `${ process.env.API_URL }api/v1/signature`, data: signature, method: 'POST' }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
-      .catch(e => {
-        console.error('Error creating a signature:', e)
       });
   },
   getPerformanceReview: ({ commit }, data: {pk: number}) => {

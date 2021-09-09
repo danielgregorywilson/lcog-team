@@ -32,7 +32,7 @@
             <q-radio v-model="programManagerApprove" val="not-approve" label="Does not approve" />
           </div>
         </div>
-        <div>Signature and date ___________________________________</div>
+        <telework-application-signature :signature="programManagerSignature0" :currentUserPk="currentUserPk()" @clicked-sign-button="signApplication" />
         <div class="q-mt-lg">If the Program Manager approves this Application, the proposed Telework Agreement then will be signed by the employee, manager, Program Manager, and Division Director.  The manager then will set a date for the employee to begin Telework that meets operational needs.</div>
         <div class="q-mt-sm">If the Program Manager does not approve this application, they will explain their reasoning in writing to the employee and the manager.  The employee then may present a written request appealing that decision to the Division Director, who will make their decision within ten working days.  If the Division Director does not approve this application, they will explain their reasoning in writing to the employee, manager, and Program Manager.  The employee then may present a written request appealing that decision to the Executive Director, who will make their decision within ten working days.  If the Executive Director does not approve this application, they will explain their reasoning in writing to the employee, manager, Program Manager, and Division Director.  The final decision cannot be grieved.</div>
         <div class="q-mt-sm">If at each succeeding level of management (Division Director or Executive Director), the application is approved, then the proposed Telework Agreement will be signed by the employee, manager, Program Manager, and Division Director.  The manager then will set a date for the employee to begin Telework that meets operational needs.</div>
@@ -338,7 +338,7 @@
         <div class="text-h6 q-mt-lg">ACKNOWLEDGEMENT:</div>
         <div class="text-italic q-mt-sm">I have completed the checklist accurately and honestly to the best of my knowledge.  I understand that I have the right to ask questions, or to have additional training provided.</div>
         <div class="text-italic q-mt-sm">I agree to abide by and operate in accordance with the terms and conditions described in this document.  I agree that the sole purpose of this Agreement is to regulate Telework and that it constitutes neither an employment contract nor an amendment to any existing contract or LCOG policy.</div>
-        <div class="q-mt-sm">Employee __________________________________________		Date ___________________</div>
+        <telework-application-signature :signature="employeeSignature0" :currentUserPk="currentUserPk()" @clicked-sign-button="signApplication" />
 
 
         <div class="text-h6 q-mt-lg">Reimbursable Expenses</div>
@@ -385,14 +385,14 @@
 
         <div class="q-mt-lg"><strong>I have read the Telework Policy and this Agreement and agree to all terms.  I understand that LCOG’s policies, as described in LCOG Policy Manual, remain in effect while I am a Teleworker, and that I agree to abide by them.  I also agree that the sole purpose of this agreement is to regulate Telework and that it constitutes neither an employment contract not an amendment to any existing contract or LCOG policy.</strong></div>
 
-        <div class="q-mt-lg"><strong>Employee Signature______________________________ Date _____________________</strong></div>
-        <div class="q-mt-lg"><strong>Manager Signature _______________________________ Date _____________________</strong></div>
+        <telework-application-signature :signature="employeeSignature1" :currentUserPk="currentUserPk()" @clicked-sign-button="signApplication" />
+        <telework-application-signature :signature="managerSignature" :currentUserPk="currentUserPk()" @clicked-sign-button="signApplication" />
 
         <hr class="q-mt-lg" />
         <div class="q-mt-sm">This Agreement takes effect only upon the signature of the Program Manager and Division Director.</div>
 
-        <div class="q-mt-lg"><strong>Program Manager	____________________________ Date _____________________</strong></div>
-        <div class="q-mt-lg"><strong>Division Director 	____________________________ Date _____________________</strong></div>
+        <telework-application-signature :signature="programManagerSignature1" :currentUserPk="currentUserPk()" @clicked-sign-button="signApplication" />
+        <telework-application-signature :signature="divisionDirectorSignature" :currentUserPk="currentUserPk()" @clicked-sign-button="signApplication" />
       </form>
 
       <!-- Spacing for footer -->
@@ -444,11 +444,14 @@
 </style>
 
 <script lang="ts">
+import TeleworkApplicationSignature from 'components/TeleworkApplicationSignature.vue'
 import { Component, Vue } from 'vue-property-decorator'
 import TeleworkApplicationDataService from '../services/TeleworkApplicationDataService'
 import { AxiosTeleworkApplicationUpdateServerResponse, TeleworkApplicationRetrieve } from '../store/types'
 
-@Component
+@Component({
+  components: { TeleworkApplicationSignature }
+})
 export default class TeleworkApplication extends Vue {
   private applicationPk = ''
   private status = ''
@@ -497,6 +500,14 @@ export default class TeleworkApplication extends Vue {
   private teleworkerComments = ''
   private managerComments = ''
   private dependentCareChecklist1 = ''
+
+  // Format: [Signature index, Role, Name, Date, Employee PK, Employee Ready to Sign]
+  private programManagerSignature0 = [-1, '', '', '', -1, false]
+  private employeeSignature0 = [-1, '', '', '', -1, false]
+  private employeeSignature1 = [-1, '', '', '', -1, false]
+  private managerSignature = [-1, '', '', '', -1, false]
+  private programManagerSignature1 = [-1, '', '', '', -1, false]
+  private divisionDirectorSignature = [-1, '', '', '', -1, false]
 
   private showErrorButton = false
   private showErrorDialog = false
@@ -675,6 +686,13 @@ export default class TeleworkApplication extends Vue {
     this.managerComments = application.manager_comments
     this.dependentCareChecklist1 = application.dependent_care_checklist_1
     // this.dependentCareDocumentation = application.dependent_care_documentation
+
+    this.programManagerSignature0 = application.program_manager_signature_0
+    this.employeeSignature0 = application.employee_signature_0
+    this.employeeSignature1 = application.employee_signature_1
+    this.managerSignature = application.manager_signature
+    this.programManagerSignature1 = application.program_manager_signature_1
+    this.divisionDirectorSignature = application.division_director_signature
     
     // this.periodStartDate = pr.period_start_date
     // this.periodEndDate = pr.period_end_date
@@ -891,6 +909,34 @@ export default class TeleworkApplication extends Vue {
         reject(e)
       })
     })
+  }
+
+  private signApplication(signatureIndex: number, employeePk: number) {
+    this.$store.dispatch('teleworkModule/createSignature', {application_pk: this.applicationPk, index: signatureIndex, employee_pk: employeePk})
+      .then(() => {
+        this.updateTeleworkApplication()
+          .then(() => {
+            this.retrieveTeleworkApplication(this.applicationPk)
+              .catch(e => {
+                console.error('Error retrieving application after updating application after signing application:', e)
+              })
+            // this.$store.dispatch('teleworkModule/getAllPerformanceReviewsActionRequired')
+            //   .catch(e => {
+            //     console.error('Error getting getAllPerformanceReviewsActionRequired after updating PR after signing PR:', e)
+            //   })
+            // this.$store.dispatch('teleworkModule/getAllPerformanceReviewsActionNotRequired')
+            //   .catch(e => {
+            //     console.error('Error getting getAllPerformanceReviewsActionNotRequired after updating PR after signing PR:', e)
+            //   })
+            // this.showPRSignedAndCompleteDialog = true
+          })
+          .catch(e => {
+            console.error('Error updating application after signing application:', e)
+          })
+      })
+      .catch(e => {
+        console.error('Error signing application:', e)
+      })
   }
 
   private openErrorDialog(position: string) {

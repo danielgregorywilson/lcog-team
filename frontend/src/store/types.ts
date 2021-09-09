@@ -344,6 +344,13 @@ export interface TeleworkApplicationRetrieve {
   dependent_care_checklist_1: string
   // dependent_care_documentation: ??
   
+  program_manager_signature_0: [number, string, string, string, number, boolean]
+  employee_signature_0: [number, string, string, string, number, boolean]
+  employee_signature_1: [number, string, string, string, number, boolean]
+  manager_signature: [number, string, string, string, number, boolean]
+  program_manager_signature_1: [number, string, string, string, number, boolean]
+  division_director_signature: [number, string, string, string, number, boolean]
+
   
   // employee_division: string
   // employee_unit_or_program: string
@@ -484,3 +491,23 @@ export interface AxiosTeleworkApplicationUpdateServerResponse {
 //   status: number
 //   statusText: string
 // }
+
+
+////////////////////////////////////////////////////////////
+// TeleworkSignature Structure from Django Rest Framework //
+////////////////////////////////////////////////////////////
+
+export interface TeleworkSignatureCreate {
+  application_pk: number
+  employee_pk: number
+  index: number
+}
+
+export interface TeleworkSignatureRetrieve {
+  url: Url
+  pk: number
+  application: Url
+  employee: Url
+  index: number
+  date: Date
+}

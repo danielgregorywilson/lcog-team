@@ -570,6 +570,10 @@ export default class TeleworkApplication extends Vue {
   private showErrorDialog = false
   private errorDialogPosition = 'top'
 
+  $refs!: {
+    fileuploader: HTMLFormElement
+  }
+
   yesNoOptions = [
     { label: 'Yes', value: 'Y' },
     { label: 'No', value: 'N' }
@@ -1008,8 +1012,8 @@ export default class TeleworkApplication extends Vue {
     TeleworkApplicationDataService.uploadDependentCareDocumentation(fd)
       .then((response: FileUploadDescriptionUploadServerResponse) => {
         if (response.status == 200) {
-          this.$refs.fileuploader.reset() // eslint-disable-line
-          this.uploadedDependentCareDocumentationUrl = response.data // eslint-disable-line
+          this.$refs.fileuploader.reset()
+          this.uploadedDependentCareDocumentationUrl = response.data
           this.fileSuccessfullyUploaded = true
           setTimeout(() => this.fileSuccessfullyUploaded = false, 5000)
           this.updateTeleworkApplication()

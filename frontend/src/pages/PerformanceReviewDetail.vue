@@ -1125,8 +1125,8 @@ export default class PerformanceReviewDetail extends Vue {
     PerformanceReviewDataService.uploadSignedPositionDescription(fd)
       .then((response: FileUploadDescriptionUploadServerResponse) => {
         if (response.status == 200) {
-          this.$refs.fileuploader.reset() // eslint-disable-line
-          this.uploadedPositionDescriptionUrl = response.data // eslint-disable-line
+          this.$refs.fileuploader.reset()
+          this.uploadedPositionDescriptionUrl = response.data 
           this.fileSuccessfullyUploaded = true
           setTimeout(() => this.fileSuccessfullyUploaded = false, 5000)
           this.updatePerformanceReview()

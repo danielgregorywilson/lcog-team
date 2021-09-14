@@ -572,7 +572,7 @@ class PerformanceReview(models.Model):
     def create_next_review_for_employee(self):
         PerformanceReview.objects.create(
             employee=self.employee,
-            period_start_date=self.period_end_date + datetime.timedelta(days=1),
+            period_start_date=self.period_end_date,
             period_end_date=self.period_end_date + datetime.timedelta(days=365),
             effective_date=self.effective_date + datetime.timedelta(days=365),
             evaluation_type=self.ANNUAL_EVALUATION

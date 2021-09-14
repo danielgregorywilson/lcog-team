@@ -43,10 +43,12 @@ class Command(BaseCommand):
                 unit_or_program = UnitOrProgram.objects.get(name='Planning Services')
             elif department == 'Administration FD':
                 unit_or_program = UnitOrProgram.objects.get(name='Administration')
-            elif department in ['Senior & Disability Services', 'SDS', 'Senior & Disablility', 'Senior & Disablility Services', 'Senior $ Disability Services', 'Senior & Diability Services']:
+            elif department in ['Senior & Disability Services', 'SDS', 'Senior & Disablility', 'Senior & Disablility Services', 'Senior $ Disability Services', 'Senior & Diability Services', 'S&DS']:
                 unit_or_program = UnitOrProgram.objects.get(division__name='Senior & Disability Services', name='-')
             elif department == 'Govt Services':
                 unit_or_program = UnitOrProgram.objects.get(division__name='Government Services', name='-')
+            elif department == 'Transport Service':
+                unit_or_program = UnitOrProgram.objects.get(name='Transport Services')
             else:
                 raise ValueError('Unknown department {}'.format(department))
 
@@ -69,13 +71,21 @@ class Command(BaseCommand):
             # Get or create employee. Update employee department if necessary.
             try:
                 employee = Employee.objects.get(user=user)
-                if employee.job_title != job_title or employee.unit_or_program != unit_or_program:
-                    employee.job_title = job_title
-                    employee.unit_or_program = unit_or_program
-                    employee.save()
-                    self.stdout.write(
-                        'Updated employee {} {} title or department'.format(employee.user.first_name, employee.user.last_name)
-                    )
+                updated_title = employee.job_title != job_title
+                updated_department = employee.unit_or_program != unit_or_program
+                if updated_title or updated_department:
+                    if updated_title:
+                        employee.job_title = job_title
+                        employee.save()
+                        self.stdout.write(
+                            'Updated employee {} {} title'.format(employee.user.first_name, employee.user.last_name)
+                        )
+                    if updated_department:
+                        employee.unit_or_program = unit_or_program
+                        employee.save()
+                        self.stdout.write(
+                            'Updated employee {} {} department'.format(employee.user.first_name, employee.user.last_name)
+                        )
             except Employee.DoesNotExist:
                 employee = Employee.objects.create(user=user, job_title=job_title, unit_or_program=unit_or_program)
                 self.stdout.write(
@@ -104,6 +114,8 @@ class Command(BaseCommand):
                         manager = Employee.objects.get(user__last_name=manager_last_name, user__first_name='Lynn')
                     elif manager_last_name == 'Goodman':
                         manager = Employee.objects.get(user__last_name=manager_last_name, user__first_name='Micah')
+                    elif manager_last_name == 'Davies':
+                        manager = Employee.objects.get(user__last_name=manager_last_name, user__first_name='Nancy')
                     else:
                         manager = Employee.objects.get(user__last_name=manager_last_name)
                     if employee.manager != manager:

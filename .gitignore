@@ -14,3 +14,5 @@ sent_emails
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+employees-2021-08-12.csv

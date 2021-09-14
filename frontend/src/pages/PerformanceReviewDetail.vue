@@ -1126,7 +1126,7 @@ export default class PerformanceReviewDetail extends Vue {
       .then((response: FileUploadDescriptionUploadServerResponse) => {
         if (response.status == 200) {
           this.$refs.fileuploader.reset()
-          this.uploadedPositionDescriptionUrl = response.data 
+          this.uploadedPositionDescriptionUrl = response.data
           this.fileSuccessfullyUploaded = true
           setTimeout(() => this.fileSuccessfullyUploaded = false, 5000)
           this.updatePerformanceReview()

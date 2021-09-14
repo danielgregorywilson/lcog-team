@@ -105,6 +105,8 @@ class Command(BaseCommand):
                 department_col_pieces = department_col_pieces[0:-1]
             if len(department_col_pieces) > 1:
                 manager_last_name = department_col_pieces[-1]
+            else:
+                manager_last_name = None
 
             if manager_last_name:
                 try:

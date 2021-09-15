@@ -33,6 +33,7 @@ ALLOWED_HOSTS = [
     'team.lcog.org', # Prod frontend
     'api.team.lcog.org', # Prod backend
     os.environ.get('EC2_IP'), # IP of EC2 instance
+    os.environ.get('EBS_DOMAIN'), # Domain of Elastic Beanstalk instance
 ]
 
 

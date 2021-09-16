@@ -275,12 +275,14 @@
           ref="fileuploader"
           url=""
           @added="file_selected"
+          max-file-size="20000000"
+          @rejected="rejectFileTooLarge"
           style="max-width: 300px"
         >
           <template v-slot:header="scope">
             <div class="row no-wrap items-center q-pa-sm q-gutter-xs">
               <div class="col">
-                <div class="q-uploader__title">Upload signed position description</div>
+                <div class="q-uploader__title">Upload signed position description (max size: 20MB)</div>
               </div>
               <q-btn v-if="scope.canAddFiles" type="a" icon="add_box" round dense flat>
                 <q-uploader-add-trigger />
@@ -322,6 +324,7 @@
           </template>
         </q-uploader>
         <div v-if="this.fileSuccessfullyUploaded" class="text-green">Successfully uploaded</div>
+        <div v-if="this.fileTooLarge" class="text-red">File is too large</div>
         <div v-if="descriptionReviewedEmployee && uploadedPositionDescriptionUrl"> <a :href="uploadedPositionDescriptionUrl" target="_blank">Current uploaded signed position description</a></div>
       </div>
 
@@ -734,6 +737,7 @@ export default class PerformanceReviewDetail extends Vue {
   private descriptionReviewedEmployee = false
   private uploadedPositionDescriptionUrl = ''
   private selectedFile: File = new File([''], '')
+  private fileTooLarge = false
   private fileSuccessfullyUploaded = false
 
   private signatures = [['', '', '']]
@@ -1138,6 +1142,11 @@ export default class PerformanceReviewDetail extends Vue {
       .catch(e => {
         console.error('Error uploading signed position description:', e)
       })
+  }
+
+  private rejectFileTooLarge() {
+    this.fileTooLarge = true
+    setTimeout(() => this.fileTooLarge = false, 5000)
   }
 
   private openErrorDialog(position: string) {

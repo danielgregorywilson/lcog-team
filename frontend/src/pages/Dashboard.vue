@@ -40,13 +40,23 @@
     </div>
     <div class="q-py-md" v-if="isUpperManager() || isTheHRManager() || isTheExecutiveDirector()">
       <div class="row items-center q-mb-md">
-        <q-avatar icon="assignment_ind" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
+        <q-avatar icon="assignment_turned_in" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
         <div class="text-h4">Reviews to Sign</div>
       </div>
       <div class="text-h6">Signature Required</div>
         <performance-review-table :signature="true" :actionRequired="true" />
       <div class="text-h6">Signed</div>
         <performance-review-table :signature="true" :actionRequired="false" />
+    </div>
+    <div class="q-py-md" v-if="isManager()">
+      <div class="row items-center q-mb-md">
+        <q-avatar icon="assignment_ind" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
+        <div class="text-h4">Telework Applications from your Direct Reports</div>
+      </div>
+      <div class="text-h6">Signature Required</div>
+        <telework-application-table :signature="true" />
+      <div class="text-h6">Signed</div>
+        <telework-application-table :signature="false" />
     </div>
   </q-page>
 </template>
@@ -55,10 +65,11 @@
 import { Component, Vue } from 'vue-property-decorator'
 import ReviewNoteTable from '../components/ReviewNoteTable.vue';
 import PerformanceReviewTable from '../components/PerformanceReviewTable.vue';
+import TeleworkApplicationTable from '../components/TeleworkApplicationTable.vue';
 import { PerformanceReviewRetrieve } from '../store/types'
 
 @Component({
-  components: { PerformanceReviewTable, ReviewNoteTable }
+  components: { PerformanceReviewTable, ReviewNoteTable, TeleworkApplicationTable }
 })
 export default class Dashboard extends Vue {
   private currentIndex = -1

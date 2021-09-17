@@ -9,44 +9,18 @@ const mutation: MutationTree<TeleworkStateInterface> = {
   setTeleworkApplication: (state, resp: {data: TeleworkApplicationRetrieve}) => {
     Vue.set(state, 'teleworkApplication', resp.data)
   },
-  
-  
-  // setNextPerformanceReview: (state, resp: {data: PerformanceReviewRetrieve}) => {
-  //   Vue.set(state, 'nextPerformanceReview', resp.data)
-  // },
-  // setAllReviewNotes: (state, resp: {data: Array<ReviewNoteRetrieve>}) => {
-  //   Vue.set(state, 'allReviewNotes', resp.data)
-  // },
-  // setPerformanceReview: (state, resp: {data: PerformanceReviewRetrieve}) => {
-  //   Vue.set(state, 'performanceReview', resp.data)
-  // },
-  // setAllPerformanceReviews: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
-  //   Vue.set(state, 'allPerformanceReviews', resp.data)
-  // },
-  // setAllPerformanceReviewsActionRequired: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
-  //   Vue.set(state, 'allPerformanceReviewsActionRequired', resp.data)
-  // },
-  // setAllPerformanceReviewsActionNotRequired: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
-  //   Vue.set(state, 'allPerformanceReviewsActionNotRequired', resp.data)
-  // },
-  // setAllSignaturePerformanceReviewsActionRequired: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
-  //   Vue.set(state, 'allSignaturePerformanceReviewsActionRequired', resp.data)
-  // },
-  // setAllSignaturePerformanceReviewsActionNotRequired: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
-  //   Vue.set(state, 'allSignaturePerformanceReviewsActionNotRequired', resp.data)
-  // },
-  // authLogout: (state) => {
-  //   // Clean up state
-  //   state.nextPerformanceReview = {pk: undefined, employee_pk: undefined, employee_name: '', performance_period: '', days_until_review: '', status: '', evaluation: ''}
-  //   state.performanceReview = {pk: undefined, employee_pk: undefined, employee_name: '', performance_period: '', days_until_review: '', status: '', evaluation: ''}
-  //   state.allPerformanceReviews = []
-  //   state.allPerformanceReviewsActionRequired = []
-  //   state.allPerformanceReviewsActionNotRequired = []
-  //   state.allSignaturePerformanceReviewsActionRequired = []
-  //   state.allSignaturePerformanceReviewsActionNotRequired = []
-  //   state.performanceReviewDetails = {}
-  //   state.allReviewNotes = []
-  // }
+  setAllTeleworkApplicationsSignatureRequired: (state, resp: {data: Array<TeleworkApplicationRetrieve>}) => {
+    Vue.set(state, 'allTeleworkApplicationsSignatureRequired', resp.data)
+  },
+  setAllTeleworkApplicationsSignatureNotRequired: (state, resp: {data: Array<TeleworkApplicationRetrieve>}) => {
+    Vue.set(state, 'allTeleworkApplicationsSignatureNotRequired', resp.data)
+  },
+  authLogout: (state) => {
+    // Clean up state
+    state.teleworkApplication = {pk: undefined, employee_pk: undefined, employee_name: '', status: ''}
+    state.allTeleworkApplicationsSignatureRequired = []
+    state.allTeleworkApplicationsSignatureNotRequired = []
+  }
 };
 
 export default mutation;

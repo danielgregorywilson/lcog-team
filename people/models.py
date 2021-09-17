@@ -283,6 +283,46 @@ class Employee(models.Model):
                 reviews.append(review)
         return reviews
 
+    def telework_applications_signature_required(self):
+        # Returns all telework applications requiring a user's signature.
+        applications = []
+        # Division Director
+        if self.is_division_director:
+            for employee in self.get_direct_reports_descendants():
+                if hasattr(employee, 'teleworkapplication') and employee.teleworkapplication.divison_director_ready_to_sign():
+                    applications.append(employee.teleworkapplication)
+        # Program Manager
+        elif self.is_program_manager:
+            for employee in self.get_direct_reports_descendants():
+                if hasattr(employee, 'teleworkapplication') and employee.teleworkapplication.program_manager_ready_to_sign():
+                    applications.append(employee.teleworkapplication)    
+        # Manager
+        else:
+            for employee in self.direct_reports.all():
+                if hasattr(employee, 'teleworkapplication') and employee.teleworkapplication.manager_ready_to_sign():
+                    applications.append(employee.teleworkapplication)
+        return sorted(applications, key=lambda application: application.date)
+    
+    def telework_applications_signature_not_required(self):
+        # Returns all telework applications signed by the user
+        applications = []
+        # Division Director
+        if self.is_division_director:
+            for employee in self.get_direct_reports_descendants():
+                if hasattr(employee, 'teleworkapplication') and employee.teleworkapplication.divison_director_signed():
+                    applications.append(employee.teleworkapplication)
+        # Program Manager
+        elif self.is_program_manager:
+            for employee in self.get_direct_reports_descendants():
+                if hasattr(employee, 'teleworkapplication') and employee.teleworkapplication.program_manager_signed():
+                    applications.append(employee.teleworkapplication)
+        # Manager
+        else:
+            for employee in self.direct_reports.all():
+                if hasattr(employee, 'teleworkapplication') and employee.teleworkapplication.manager_signed():
+                    applications.append(employee.teleworkapplication)
+        return sorted(applications, key=lambda application: application.date)
+
     def prs_can_view(self):
         # You can view all PRs for which either you are the employee or the
         # employee is your direct report or a descendant direct report.
@@ -664,26 +704,28 @@ class ViewedSecurityMessage(models.Model):
     datetime = models.DateTimeField(_("viewed date"), auto_now=False, auto_now_add=True)
 
 
-class SignatureAllRelevantTeleworkApplicationsManager(models.Manager):
+class AllRelevantTeleworkApplicationsManager(models.Manager):
     def get_queryset(self, user):
+        if not hasattr(user, 'employee'):
+            import pdb; pdb.set_trace();
         queryset = super().get_queryset()
-        desired_pks = [pr.pk for pr in user.employee.signature_all_relevant_applications()]
+        desired_pks = [pr.pk for pr in user.employee.all_relevant_telework_applications()]
         queryset = queryset.filter(pk__in=desired_pks)
         return queryset
 
 
-class SignatureTeleworkApplicationsActionRequiredManager(models.Manager):
+class TeleworkApplicationsSignatureRequiredManager(models.Manager):
     def get_queryset(self, user):
         queryset = super().get_queryset()
-        desired_pks = [pr.pk for pr in user.employee.signature_applications_action_required()]
+        desired_pks = [pr.pk for pr in user.employee.telework_applications_signature_required()]
         queryset = queryset.filter(pk__in=desired_pks)
         return queryset
 
 
-class SignatureTeleworkApplicationsNoActionRequiredManager(models.Manager):
+class TeleworkApplicationsSignatureNotRequiredManager(models.Manager):
     def get_queryset(self, user):
         queryset = super().get_queryset()
-        desired_pks = [pr.pk for pr in user.employee.signature_applications_no_action_required()]
+        desired_pks = [pr.pk for pr in user.employee.telework_applications_signature_not_required()]
         queryset = queryset.filter(pk__in=desired_pks)
         return queryset
 
@@ -702,14 +744,16 @@ class TeleworkApplication(models.Model):
 
     # Managers for filtering PRs
     objects = models.Manager()
-    signature_all_relevant_applications = SignatureAllRelevantTeleworkApplicationsManager()
-    signature_applications_action_required = SignatureTeleworkApplicationsActionRequiredManager()
-    signature_applications_no_action_required = SignatureTeleworkApplicationsNoActionRequiredManager()
+    all_relevant_applications = AllRelevantTeleworkApplicationsManager()
+    applications_signature_required = TeleworkApplicationsSignatureRequiredManager()
+    applications_signature_not_required = TeleworkApplicationsSignatureNotRequiredManager()
 
-    UNAPPROVED = 'U'
+    INCOMPLETE = 'I'
+    READY_FOR_SIGNATURE = 'R'
     APPROVED = 'A'
     STATUS_CHOICE = [
-        (UNAPPROVED, 'Not yet approved'),
+        (INCOMPLETE, 'Incomplete'),
+        (READY_FOR_SIGNATURE, 'Ready for signature'),
         (APPROVED, 'Approved')
     ]
 
@@ -721,7 +765,7 @@ class TeleworkApplication(models.Model):
     ]
 
     employee = models.OneToOneField("Employee", verbose_name=_("employee"), on_delete=models.CASCADE)
-    status = models.CharField(_("application status"), max_length=1, choices=STATUS_CHOICE, default=UNAPPROVED)
+    status = models.CharField(_("application status"), max_length=1, choices=STATUS_CHOICE, default=INCOMPLETE)
 
     date = models.DateField(_("date"), auto_now=False, auto_now_add=False, blank=True, null=True)
     program_manager_approve = models.CharField(_("program manager approve"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
@@ -792,6 +836,37 @@ class TeleworkApplication(models.Model):
 
     def employee_signature_1(self):
         return self.employee_signature(1)
+
+    def manager_ready_to_sign(self):
+        if self.employee.manager:
+            signature = TeleworkSignature.objects.filter(application=self, employee=self.employee.manager, index=0).first()
+            return self.status == TeleworkApplication.READY_FOR_SIGNATURE and not signature
+    
+    def program_manager_ready_to_sign(self):
+        if self.employee.has_program_manager:
+            signature = TeleworkSignature.objects.filter(application=self, employee=self.employee.get_program_manager, index=0).first()
+            return self.status == TeleworkApplication.READY_FOR_SIGNATURE and not signature
+        else:
+            return False
+
+    def division_director_ready_to_sign(self):
+        if self.employee.has_division_director:
+            signature = TeleworkSignature.objects.filter(application=self, employee=self.employee.get_division_director, index=0).first()
+            return self.status == TeleworkApplication.READY_FOR_SIGNATURE and not signature
+        else:
+            return False
+
+    def manager_signed(self):
+        if self.employee.manager:
+            return TeleworkSignature.objects.filter(application=self, employee=self.employee.manager, index=0).count()
+
+    def program_manager_signed(self):
+        if self.employee.has_program_manager:
+            return TeleworkSignature.objects.filter(application=self, employee=self.employee.get_program_manager, index=0).count()
+    
+    def division_director_signed(self):
+        if self.employee.has_division_director:
+            return TeleworkSignature.objects.filter(application=self, employee=self.employee.get_division_director, index=0).count()
 
     def manager_signature(self):
         signature = TeleworkSignature.objects.filter(application=self, employee=self.employee.manager, index=0).first()
@@ -868,6 +943,9 @@ class TeleworkSignature(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+
+        # Mark as ready for signature if it is complete and has employee signatures
+        # TODO: Complete
 
         # Approve if all required signatures are present
         approve_application = False

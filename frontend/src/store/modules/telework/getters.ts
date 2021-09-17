@@ -4,7 +4,9 @@ import { TeleworkStateInterface } from './state';
 
 const getters: GetterTree<TeleworkStateInterface, StateInterface> = {
   teleworkApplication: state => state.teleworkApplication,
-  
+  allTeleworkApplicationsSignatureRequired: state => state.allTeleworkApplicationsSignatureRequired,
+  allTeleworkApplicationsSignatureNotRequired: state => state.allTeleworkApplicationsSignatureNotRequired,
+
   // nextPerformanceReview: state => state.nextPerformanceReview,
   // allReviewNotes: state => state.allReviewNotes,
   // performanceReview: state => state.performanceReview,

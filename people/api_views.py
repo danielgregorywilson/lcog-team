@@ -453,39 +453,29 @@ class TeleworkApplicationViewSet(viewsets.ModelViewSet):
         TeleworkApplicationPermission
     ]
 
-    # def get_queryset(self):
-    #     """
-    #     This view should return a list of all performance reviews for which
-    #     the currently authenticated user is the manager.
-    #     """
-    #     user = self.request.user
-    #     if user.is_authenticated:
-    #         manager_prs = PerformanceReview.objects.filter(
-    #             employee__manager__user=user)
-    #         employee_prs = PerformanceReview.objects.filter(
-    #             employee__user=user)
-    #         queryset = manager_prs | employee_prs # Default queryset
-    #         signature = self.request.query_params.get('signature', None)
-    #         action_required = self.request.query_params.get('action_required',
-    #             None)
-    #         if is_true_string(signature):
-    #             if action_required is not None:
-    #                 if is_true_string(action_required):
-    #                     queryset = PerformanceReview.signature_upcoming_reviews_action_required.get_queryset(user)
-    #                 else:
-    #                     queryset = PerformanceReview.signature_upcoming_reviews_no_action_required.get_queryset(user)    
-    #             else:
-    #                 queryset = PerformanceReview.signature_all_relevant_upcoming_reviews.get_queryset(user)
-    #         elif action_required is not None:
-    #             if is_true_string(action_required):
-    #                 queryset = PerformanceReview.manager_upcoming_reviews_action_required.get_queryset(user)
-    #             else:
-    #                 queryset = PerformanceReview.manager_upcoming_reviews_no_action_required.get_queryset(user)
-    #         else:
-    #             queryset = PerformanceReview.manager_upcoming_reviews.get_queryset(user)
-    #     else:
-    #         queryset = PerformanceReview.objects.all()
-    #     return queryset
+    def get_queryset(self):
+        """
+        This view should return a list of all telework applications for which
+        the currently authenticated user is the manager.
+        """
+        user = self.request.user
+        if user.is_authenticated and hasattr(user, 'employee'):
+            manager_prs = TeleworkApplication.objects.filter(
+                employee__manager__user=user)
+            employee_prs = TeleworkApplication.objects.filter(
+                employee__user=user)
+            queryset = manager_prs | employee_prs # Default queryset
+            signature = self.request.query_params.get('signature', None)
+            if signature is not None:
+                if is_true_string(signature):
+                    queryset = TeleworkApplication.applications_signature_required.get_queryset(user)
+                else:
+                    queryset = TeleworkApplication.applications_signature_not_required.get_queryset(user)
+            else:
+                queryset = TeleworkApplication.all_relevant_applications.get_queryset(user)
+        else:
+            queryset = TeleworkApplication.objects.all()
+        return queryset
 
     def retrieve(self, request, pk=None):
         by_employee = request.query_params.get('by_employee', None)

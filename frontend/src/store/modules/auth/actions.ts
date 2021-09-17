@@ -58,6 +58,8 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
         .catch(err => console.log(err))
       dispatch('securityMessageModule/authLogout', null, { root: true })
         .catch(err => console.log(err))
+      dispatch('teleworkModule/authLogout', null, { root: true })
+        .catch(err => console.log(err))
       localStorage.removeItem('user-token') // clear your user's token from localstorage
       resolve('Successfully logged user out')
     })

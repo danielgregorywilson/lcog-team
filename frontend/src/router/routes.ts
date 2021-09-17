@@ -22,7 +22,7 @@ const ifAuthenticated = (to: Route, from: Route, next: Next) => {
 }
 
 const ifManager = (to: Route, from: Route, next: Next) => {
-  if (Vue.prototype.$cookies.get('is_manager') == 'true') { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  if (!!authState.token && Vue.prototype.$cookies.get('is_manager') == 'true') { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     next()
     return
   }
@@ -30,7 +30,7 @@ const ifManager = (to: Route, from: Route, next: Next) => {
 }
 
 const ifCanViewReview = (to: Route, from: Route, next: Next) => {
-  if (Vue.prototype.$cookies.get('prs_can_view').indexOf(to.params.pk) != -1) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  if (!!authState.token && Vue.prototype.$cookies.get('prs_can_view').indexOf(to.params.pk) != -1) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     next()
     return
   } else {
@@ -40,7 +40,7 @@ const ifCanViewReview = (to: Route, from: Route, next: Next) => {
 }
 
 const ifCanViewNote = (to: Route, from: Route, next: Next) => {
-  if (Vue.prototype.$cookies.get('notes_can_view') && Vue.prototype.$cookies.get('notes_can_view').indexOf(parseInt(to.params.pk)) != -1) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  if (!!authState.token && Vue.prototype.$cookies.get('notes_can_view') && Vue.prototype.$cookies.get('notes_can_view').indexOf(parseInt(to.params.pk)) != -1) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     next()
     return
   } else {
@@ -49,7 +49,7 @@ const ifCanViewNote = (to: Route, from: Route, next: Next) => {
 }
 
 const ifCanViewTeleworkApplication = (to: Route, from: Route, next: Next) => {
-  if (Vue.prototype.$cookies.get('telework_applications_can_view').indexOf(to.params.pk) != -1) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  if (!!authState.token && Vue.prototype.$cookies.get('telework_applications_can_view').indexOf(to.params.pk) != -1) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     next()
     return
   } else {

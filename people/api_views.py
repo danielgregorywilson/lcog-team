@@ -11,8 +11,10 @@ from django.contrib.auth.models import Group, User
 from django.shortcuts import get_object_or_404
 
 from mainsite.helpers import (
-    is_true_string, send_evaluation_written_email_to_employee,
-    send_signature_email_to_manager
+    is_true_string, send_completed_email_to_hr_manager,
+    send_evaluation_written_email_to_employee,
+    send_signature_email_to_executive_director,
+    send_signature_email_to_hr_manager, send_signature_email_to_manager
 )
 
 from people.models import (
@@ -334,14 +336,43 @@ class SignatureViewSet(viewsets.ModelViewSet):
         employee = Employee.objects.get(pk=request.data['employee_pk'])
         new_signature = Signature.objects.create(review=pr, employee=employee)
         
-        # Send notification to next manager in the chain
-        pr_employee_has_signed = Signature.objects.filter(employee=pr.employee).count() == 1
-        pr_manager_has_signed = Signature.objects.filter(employee=pr.employee.manager).count() == 1
-        if pr_employee_has_signed and pr_manager_has_signed and pr.status == PerformanceReview.EVALUATION_WRITTEN:
-            if employee == pr.employee:
-                send_signature_email_to_manager(employee.manager.manager, pr)
+        def send_to_next_manager(employee):
+            if employee.is_division_director:
+                # Send notification to next manager in the chain (HR manager)
+                send_signature_email_to_hr_manager(pr)
             else:
                 send_signature_email_to_manager(employee.manager, pr)
+
+        # Send notification to next manager in the chain
+        if pr.status == PerformanceReview.EVALUATION_WRITTEN:
+            pr_employee_has_signed = Signature.objects.filter(review=pr, employee=pr.employee).count()
+            pr_manager_has_signed = Signature.objects.filter(review=pr, employee=pr.employee.manager).count()
+            if pr_employee_has_signed and pr_manager_has_signed:
+                # If the PR manager is the division director, mark as approved now that both manager and employee have signed
+                if pr.employee.manager.is_division_director or employee.is_division_director:
+                    pr.status = PerformanceReview.EVALUATION_APPROVED
+                    pr.save()
+                if pr.employee.manager.is_hr_manager or employee.is_hr_manager:
+                    pr.status = PerformanceReview.EVALUATION_HR_PROCESSED
+                    pr.save()
+                if employee == pr.employee:
+                    send_to_next_manager(employee.manager)
+                else:
+                    send_to_next_manager(employee)
+        elif pr.status == PerformanceReview.EVALUATION_APPROVED:
+            if employee.is_hr_manager:
+                pr.status = PerformanceReview.EVALUATION_HR_PROCESSED
+                pr.save()
+                # Send notification to next manager in the chain (executive director)
+                send_signature_email_to_executive_director(pr)
+        elif pr.status == PerformanceReview.EVALUATION_HR_PROCESSED:
+            if employee.is_executive_director:
+                pr.status = PerformanceReview.EVALUATION_ED_APPROVED
+                pr.save()
+                # Send notification to HR manager
+                send_completed_email_to_hr_manager(pr)
+                # Create new Performance Review for employee
+                pr.create_next_review_for_employee()
         
         serialized_signature = SignatureSerializer(new_signature,
             context={'request': request})

@@ -27,6 +27,7 @@ class JobTitleAdmin(admin.ModelAdmin):
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ("username", "job_title", "unit_or_program", "manager",)
     list_filter = ("unit_or_program__division", "unit_or_program",)
+    search_fields = ("user__username", )
 
 
 class SignatureReminderInline(admin.TabularInline):
@@ -46,6 +47,7 @@ class SignatureInline(admin.TabularInline):
 @admin.register(PerformanceReview)
 class PerformanceReviewAdmin(admin.ModelAdmin):
     list_display = ("username", "status", "effective_date")
+    search_fields = ("employee__user__username", )
     inlines = (SignatureInline, SignatureReminderInline)
 
     def get_form(self, request, obj=None, **kwargs):

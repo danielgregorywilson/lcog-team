@@ -85,7 +85,7 @@ class Employee(models.Model):
 
     @property
     def is_program_manager(self):
-        return self.manager.is_division_director
+        return not self.is_executive_director and self.manager.is_division_director
 
     @property
     def has_program_manager(self):
@@ -289,7 +289,7 @@ class Employee(models.Model):
         # Division Director
         if self.is_division_director:
             for employee in self.get_direct_reports_descendants():
-                if hasattr(employee, 'teleworkapplication') and employee.teleworkapplication.divison_director_ready_to_sign():
+                if hasattr(employee, 'teleworkapplication') and employee.teleworkapplication.division_director_ready_to_sign():
                     applications.append(employee.teleworkapplication)
         # Program Manager
         elif self.is_program_manager:
@@ -309,7 +309,7 @@ class Employee(models.Model):
         # Division Director
         if self.is_division_director:
             for employee in self.get_direct_reports_descendants():
-                if hasattr(employee, 'teleworkapplication') and employee.teleworkapplication.divison_director_signed():
+                if hasattr(employee, 'teleworkapplication') and employee.teleworkapplication.division_director_signed():
                     applications.append(employee.teleworkapplication)
         # Program Manager
         elif self.is_program_manager:
@@ -524,6 +524,9 @@ class PerformanceReview(models.Model):
             return True
         return False
 
+    def employee_has_signed(self, employee):
+        return Signature.objects.filter(review=self, employee=employee).count()
+
     def all_required_signatures(self):
         """
         Returns a list of lists of the form:
@@ -656,26 +659,6 @@ class Signature(models.Model):
     review = models.ForeignKey("people.PerformanceReview", verbose_name=_("performance review"), on_delete=models.CASCADE)
     employee = models.ForeignKey("people.Employee", on_delete=models.CASCADE)
     date = models.DateField(_("signature date"), auto_now=False, auto_now_add=True)
-
-    def save(self, *args, **kwargs):
-        if self.employee.is_division_director:
-            self.review.status = PerformanceReview.EVALUATION_APPROVED
-            self.review.save()
-            # Send notification to next manager in the chain (HR manager)
-            send_signature_email_to_hr_manager(self.review)
-        elif self.employee.is_hr_manager:
-            self.review.status = PerformanceReview.EVALUATION_HR_PROCESSED
-            self.review.save()
-            # Send notification to next manager in the chain (executive director)
-            send_signature_email_to_executive_director(self.review)
-        elif self.employee.is_executive_director:
-            self.review.status = PerformanceReview.EVALUATION_ED_APPROVED
-            self.review.save()
-            # Send notification to HR manager
-            send_completed_email_to_hr_manager(self.review)
-            # Create new Performance Review for employee
-            self.review.create_next_review_for_employee()
-        super().save(*args, **kwargs)
 
 
 class ReviewNote(models.Model):

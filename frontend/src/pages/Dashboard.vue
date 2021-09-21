@@ -1,5 +1,11 @@
 <template>
   <q-page class="q-pa-md" v-if="isAuthenticated()">
+    <q-spinner-grid
+      v-if="!isProfileLoaded()"
+      class="spinner"
+      color="primary"
+      size="xl"
+    />
     <div class="q-py-md">
       <div class="text-h4 q-mb-md">Your Next Review</div>
       <div v-if="getNextReview().employee_pk">
@@ -61,6 +67,15 @@
   </q-page>
 </template>
 
+<style scoped lang="scss">
+.spinner {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+}
+</style>
+
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import ReviewNoteTable from '../components/ReviewNoteTable.vue';
@@ -80,6 +95,10 @@ export default class Dashboard extends Vue {
     return this.$store.getters['authModule/isAuthenticated'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
   }
   
+  private isProfileLoaded(): boolean {
+    return this.$store.getters['userModule/isProfileLoaded'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+  }
+
   private isManager(): boolean {
     return this.$store.getters['userModule/getEmployeeProfile'].is_manager // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
   }

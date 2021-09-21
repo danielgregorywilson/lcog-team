@@ -85,7 +85,7 @@ class Employee(models.Model):
 
     @property
     def is_program_manager(self):
-        return not self.is_executive_director and self.manager.is_division_director
+        return self.manager and self.manager.is_division_director
 
     @property
     def has_program_manager(self):
@@ -94,10 +94,11 @@ class Employee(models.Model):
             return False
         if current_employee.is_division_director:
             return False
-        if current_employee.manager.is_division_director:
+        if current_employee.manager and current_employee.manager.is_division_director:
+            # They *are* the program manager
             return False
         while True:
-            if current_employee.manager.is_division_director:
+            if current_employee.manager and current_employee.manager.is_division_director:
                 return True
             if current_employee.manager:
                 current_employee = current_employee.manager
@@ -873,7 +874,7 @@ class TeleworkApplication(models.Model):
         while True:
             if current_employee.is_executive_director:
                 return
-            if current_employee.manager.is_division_director:
+            if current_employee.manager and current_employee.manager.is_division_director:
                 program_manager = current_employee
                 break
             if current_employee.manager:

@@ -30,6 +30,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     name = serializers.CharField(source='user.get_full_name')
     email = serializers.EmailField(source='user.email')
     is_manager = serializers.SerializerMethodField()
+    has_manager = serializers.SerializerMethodField()
     is_upper_manager = serializers.SerializerMethodField()
     prs_can_view = serializers.SerializerMethodField()
     notes_can_view = serializers.SerializerMethodField()
@@ -39,14 +40,19 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
         model = Employee
         fields = [
             'url', 'pk', 'name', 'user', 'email', 'manager', 'is_manager',
-            'is_upper_manager', 'is_hr_manager', 'is_executive_director',
-            'viewed_security_message', 'prs_can_view', 'notes_can_view',
-            'telework_applications_can_view', 'next_to_sign_prs'
+            'has_manager', 'is_upper_manager', 'is_hr_manager',
+            'is_executive_director', 'viewed_security_message', 'prs_can_view',
+            'notes_can_view', 'telework_applications_can_view',
+            'next_to_sign_prs'
         ]
 
     @staticmethod
     def get_is_manager(employee):
         return employee.get_direct_reports().count() != 0
+    
+    @staticmethod
+    def get_has_manager(employee):
+        return bool(employee.manager)
 
     @staticmethod
     def get_is_upper_manager(employee):

@@ -93,6 +93,7 @@ interface LinkData {
   icon: string;
   link: string;
   managerOnly?: boolean;
+  hasManagerOnly?: boolean;
 }
 
 const linksData: Array<LinkData> = [
@@ -115,7 +116,8 @@ const linksData: Array<LinkData> = [
   {
     title: 'Telework Application',
     icon: 'home_work',
-    link: '/telework-application'
+    link: '/telework-application',
+    hasManagerOnly: true
   },
   {
     title: 'Telework Policy',

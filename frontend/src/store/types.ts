@@ -39,6 +39,7 @@ export interface EmployeeRetrieve {
   email: string
   manager: Url
   is_manager: boolean
+  has_manager: boolean
   is_upper_manager: boolean
   is_hr_manager: boolean
   is_executive_director: boolean

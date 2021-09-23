@@ -26,12 +26,12 @@ export default class NavLink extends Vue{
   @Prop({default: '#'}) readonly link!: string
   @Prop({default: ''}) readonly icon!: string
   @Prop({default: false}) readonly managerOnly!: boolean
-  @Prop({default: false}) readonly hasManagerOnly!: boolean
+  @Prop({default: false}) readonly eligibleForTeleworkApplicationOnly!: boolean
 
   private isVisible(): boolean {
-    const shouldNotViewBecauseNotManager = this.managerOnly && !this.$store.getters['userModule/getEmployeeProfile'].is_manager
-    const shouldNotViewBecauseNotHasManager = this.hasManagerOnly && !this.$store.getters['userModule/getEmployeeProfile'].has_manager
-    if (shouldNotViewBecauseNotManager || shouldNotViewBecauseNotHasManager) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access
+    const shouldNotViewBecauseNotManager = this.managerOnly && !this.$store.getters['userModule/getEmployeeProfile'].is_manager // eslint-disable-line @typescript-eslint/no-unsafe-member-access
+    const shouldNotViewBecauseNotEligibleForTeleworkApplication = this.eligibleForTeleworkApplicationOnly && !this.$store.getters['userModule/getEmployeeProfile'].is_eligible_for_telework_application // eslint-disable-line @typescript-eslint/no-unsafe-member-access
+    if (shouldNotViewBecauseNotManager || shouldNotViewBecauseNotEligibleForTeleworkApplication) {
       return false
     } else {
       return true

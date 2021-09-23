@@ -29,6 +29,14 @@ const ifManager = (to: Route, from: Route, next: Next) => {
   next('dashboard')
 }
 
+const ifEligibleForTeleworkApplication = (to: Route, from: Route, next: Next) => {
+  if (!!authState.token && Vue.prototype.$cookies.get('is_eligible_for_telework_application') == 'true') { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    next()
+    return
+  }
+  next('dashboard')
+}
+
 const ifHasManager = (to: Route, from: Route, next: Next) => {
   if (!!authState.token && Vue.prototype.$cookies.get('has_manager') == 'true') { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     next()
@@ -113,7 +121,7 @@ const routes: RouteConfig[] = [
         name: 'telework-application',
         // component: () => import('pages/TeleworkApplication.vue'),
         component: () => import('pages/TeleworkApplicationGetOrCreate.vue'),
-        beforeEnter: ifHasManager,
+        beforeEnter: ifEligibleForTeleworkApplication,
       },
       {
         path: '/telework-application/:pk',

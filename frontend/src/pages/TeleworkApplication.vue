@@ -6,7 +6,7 @@
         <div class="row items-center q-gutter-md q-mt-sm">
           <div>Date:</div>
           <div style="max-width: 300px">
-            <q-input filled v-model="date" mask="date" :rules="['date']">
+            <q-input filled v-model="date" mask="date" :rules="['date']" :disable="!currentUserIsEmployeeOrManager()">
               <template v-slot:append>
                 <q-icon name="event" class="cursor-pointer">
                   <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
@@ -28,8 +28,8 @@
         <div class="q-mt-lg">
           Program Manager:
           <div class="q-gutter-sm">
-            <q-radio v-model="programManagerApprove" val="approve" label="Approve" />
-            <q-radio v-model="programManagerApprove" val="not-approve" label="Does not approve" />
+            <q-radio v-model="programManagerApprove" val="approve" label="Approve" :disable="!currentUserIsProgramManager()" />
+            <q-radio v-model="programManagerApprove" val="not-approve" label="Does not approve" :disable="!currentUserIsProgramManager()" />
           </div>
         </div>
         <telework-application-signature :signature="programManagerSignature0" :currentUserPk="currentUserPk()" @clicked-sign-button="signApplication" />
@@ -41,7 +41,7 @@
         <div class="text-h4 text-center q-mt-xl">TELEWORK AGREEMENT</div>
         <div class="text-h5 text-center">FOR THE LANE COUNCIL OF GOVERNMENTS (LCOG)</div>
         <div class="q-mt-md">This Agreement is entered into between LCOG and <strong>{{ employeeName }}</strong> (“Employee”). This Agreement takes effect only upon the signature of the Program Manager and Division Director.</div>
-        <div class="q-mt-sm">This Telework Agreement starts on __________________ and will remain in effect for three months unless LCOG or Employee determines that the Telework Agreement should end earlier, for any reason.  If the Agreement remains in effect for three months, and if employee has performed to their manager’s satisfaction as a teleworker, this Agreement may be extended until and when either LCOG or employee decides to end the Agreement.  The availability of Telework can be discontinued at any time at LCOG’s discretion.</div>
+        <div class="q-mt-sm">This Telework Agreement starts on <span class="text-bold">{{ approvalDate }}</span> and will remain in effect for three months unless LCOG or Employee determines that the Telework Agreement should end earlier, for any reason.  If the Agreement remains in effect for three months, and if employee has performed to their manager’s satisfaction as a teleworker, this Agreement may be extended until and when either LCOG or employee decides to end the Agreement.  The availability of Telework can be discontinued at any time at LCOG’s discretion.</div>
 
         <div class="text-h6 q-mt-md">Location and Schedule</div>
         <ul>
@@ -52,6 +52,7 @@
               input-class="hours-onsite"
               v-model="hoursOnsite"
               type="textarea"
+              :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
           <li>
@@ -61,6 +62,7 @@
               input-class="telework-location"
               v-model="teleworkLocation"
               type="textarea"
+              :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
           <li>
@@ -70,6 +72,7 @@
               input-class="hours-working"
               v-model="hoursWorking"
               type="textarea"
+              :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
         </ul>
@@ -82,6 +85,7 @@
             input-class="duties"
             v-model="duties"
             type="textarea"
+            :disable="!currentUserIsEmployeeOrManager()"
           />
         </div>
         <div class="q-mt-sm text-italic">Note: Management reserves the right to assign work as necessary at any work site at any time as long as doing so is in line with any applicable collective bargaining agreement and state and federal laws.</div>
@@ -92,15 +96,15 @@
         <ul>
           <li class="row items-center">
             <div class="col-md-1 col-xs-2 text-center">When:</div>
-            <q-input filled v-model="communicationWhen" class="col" />
+            <q-input filled v-model="communicationWhen" class="col" :disable="!currentUserIsEmployeeOrManager()" />
           </li>
           <li class="row items-center q-mt-xs">
             <div class="col-md-1 col-xs-2 text-center">Time:</div>
-            <q-input filled v-model="communicationTime" class="col q-mt-xs" />
+            <q-input filled v-model="communicationTime" class="col q-mt-xs" :disable="!currentUserIsEmployeeOrManager()" />
           </li>
           <li class="row items-center q-mt-xs">
             <div class="col-md-1 col-xs-2 text-center">How:</div>
-            <q-input filled v-model="communicationHow" class="col q-mt-xs" label="e.g. phone, text, face-to-face, etc." />  
+            <q-input filled v-model="communicationHow" class="col q-mt-xs" label="e.g. phone, text, face-to-face, etc." :disable="!currentUserIsEmployeeOrManager()" />
           </li>
         </ul>
         <div class="q-mt-sm text-italic"><strong>Employee agrees to remain accessible during all designated work hours.</strong></div>
@@ -122,13 +126,13 @@
         <div class="q-mt-sm text-italic">LCOG Equipment to be provided to employee:</div>
 
         <div class="q-mt-sm">This is based on the employee’s manager’s determination of what is needed at the telework location (check all that apply):</div>
-        <q-checkbox v-model="equipmentProvidedPhone" val="cell-phone" label="Cell Phone" />
-        <q-checkbox v-model="equipmentProvidedLaptop" val="laptop" label="Laptop" />
-        <q-checkbox v-model="equipmentProvidedDesktop" val="desktop" label="Desktop Computer" />
-        <q-checkbox v-model="equipmentProvidedMonitor" val="monitor" label="Monitor" />
-        <q-checkbox v-model="equipmentProvidedAccess" val="remote-access" label="Remote Network Access" />
-        <q-checkbox v-model="equipmentProvidedOther" val="other" label="Other" />
-        <q-input dense filled v-if="equipmentProvidedOther" v-model="equipmentProvidedOtherValue" class="q-pl-sm"/>
+        <q-checkbox v-model="equipmentProvidedPhone" val="cell-phone" label="Cell Phone" :disable="!currentUserIsEmployeeOrManager()" />
+        <q-checkbox v-model="equipmentProvidedLaptop" val="laptop" label="Laptop" :disable="!currentUserIsEmployeeOrManager()" />
+        <q-checkbox v-model="equipmentProvidedDesktop" val="desktop" label="Desktop Computer" :disable="!currentUserIsEmployeeOrManager()" />
+        <q-checkbox v-model="equipmentProvidedMonitor" val="monitor" label="Monitor" :disable="!currentUserIsEmployeeOrManager()" />
+        <q-checkbox v-model="equipmentProvidedAccess" val="remote-access" label="Remote Network Access" :disable="!currentUserIsEmployeeOrManager()" />
+        <q-checkbox v-model="equipmentProvidedOther" val="other" label="Other" :disable="!currentUserIsEmployeeOrManager()" />
+        <q-input dense filled v-if="equipmentProvidedOther" v-model="equipmentProvidedOtherValue" class="q-pl-sm" :disable="!currentUserIsEmployeeOrManager()"/>
 
         <div class="text-h6 q-mt-md">Safety and Accidents</div>
         <ul>
@@ -148,6 +152,7 @@
               type="radio"
               v-model="workspaceChecklist1"
               inline
+              :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
           <li class="q-mt-md">Are temperature, noise, ventilation, and lighting levels adequate for maintaining your normal level of performance?
@@ -156,6 +161,7 @@
               type="radio"
               v-model="workspaceChecklist2"
               inline
+              :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
           <li class="q-mt-md">Are all supplies and equipment (both LCOG and employee-owned) in good condition and can be safely used as intended?
@@ -164,6 +170,7 @@
               type="radio"
               v-model="workspaceChecklist3"
               inline
+              :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
           <li class="q-mt-md">Is storage organized to minimize risks of fires and spontaneous combustion?
@@ -172,6 +179,7 @@
               type="radio"
               v-model="workspaceChecklist4"
               inline
+              :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
           <li class="q-mt-md">Do all electrical enclosures (switches, outlets, receptacles, junction boxes) affecting the designated work area have tight fitting covers or plates?
@@ -180,6 +188,7 @@
               type="radio"
               v-model="workspaceChecklist5"
               inline
+              :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
           <li class="q-mt-md">Is all electrical equipment free of recognized hazards that would cause physical harm (frayed wires, bare conductors, loose wires or fixtures, exposed wiring on the ceiling or walls)?
@@ -188,6 +197,7 @@
               type="radio"
               v-model="workspaceChecklist6"
               inline
+              :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
           <li class="q-mt-md">Will the building’s electrical system permit the grounding of electrical equipment (a three-prong receptacle)?
@@ -196,6 +206,7 @@
               type="radio"
               v-model="workspaceChecklist7"
               inline
+              :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
           <li class="q-mt-md">Are aisles, doorways, and corners free from obstructions to permit visibility and movement?
@@ -204,6 +215,7 @@
               type="radio"
               v-model="workspaceChecklist8"
               inline
+              :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
           <li class="q-mt-md">Are the file cabinets and storage closets arranged so drawers and doors do not enter walkways?
@@ -212,6 +224,7 @@
               type="radio"
               v-model="workspaceChecklist9"
               inline
+              :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
           <li class="q-mt-md">Are heavy items, such as computer monitors and printers, securely placed on sturdy stands close to walls?
@@ -220,6 +233,7 @@
               type="radio"
               v-model="workspaceChecklist10"
               inline
+              :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
           <li class="q-mt-md">Are phone lines, electrical cords, and surge protectors secured under a desk or along a baseboard?
@@ -228,6 +242,7 @@
               type="radio"
               v-model="workspaceChecklist11"
               inline
+              :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
           <li class="q-mt-md">Are computer components kept out of direct sunlight and away from heaters?
@@ -236,6 +251,7 @@
               type="radio"
               v-model="workspaceChecklist12"
               inline
+              :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
         </ol>
@@ -248,6 +264,7 @@
                 type="radio"
                 v-model="emergencyChecklist1"
                 inline
+                :disable="!currentUserIsEmployeeOrManager()"
               />
           </li>
           <li class="q-mt-md">Is a first aid kit accessible and periodically inspected and replenished as needed?
@@ -256,6 +273,7 @@
                 type="radio"
                 v-model="emergencyChecklist2"
                 inline
+                :disable="!currentUserIsEmployeeOrManager()"
               />
           </li>
           <li class="q-mt-md">In case of fire, is there a primary exit free of obstruction and easy to use?
@@ -264,6 +282,7 @@
                 type="radio"
                 v-model="emergencyChecklist3"
                 inline
+                :disable="!currentUserIsEmployeeOrManager()"
               />
           </li>
         </ol>
@@ -278,6 +297,7 @@
                   type="radio"
                   v-model="ergonomicsChecklist1"
                   inline
+                  :disable="!currentUserIsEmployeeOrManager()"
                 />
               </li>
               <li>There are not pressure points on any part of the body (wrists, forearms, back of legs)?
@@ -286,6 +306,7 @@
                   type="radio"
                   v-model="ergonomicsChecklist2"
                   inline
+                  :disable="!currentUserIsEmployeeOrManager()"
                 />
               </li>
               <li>There is no glare on the computer screen?
@@ -294,6 +315,7 @@
                   type="radio"
                   v-model="ergonomicsChecklist3"
                   inline
+                  :disable="!currentUserIsEmployeeOrManager()"
                 />
               </li>
               <li>Work can be performed without eye strain?
@@ -302,6 +324,7 @@
                   type="radio"
                   v-model="ergonomicsChecklist4"
                   inline
+                  :disable="!currentUserIsEmployeeOrManager()"
                 />
               </li>
               <li>There is no strain on any part of the body for static tasks over 20 minutes?
@@ -310,6 +333,7 @@
                   type="radio"
                   v-model="ergonomicsChecklist5"
                   inline
+                  :disable="!currentUserIsEmployeeOrManager()"
                 />
               </li>
             </ol>
@@ -323,6 +347,7 @@
             input-class="teleworker-comments"
             v-model="teleworkerComments"
             type="textarea"
+            :disable="!currentUserIsEmployee()"
           />  
         </div>
         <div class="q-mt-sm">
@@ -332,6 +357,7 @@
             input-class="manager-comments"
             v-model="managerComments"
             type="textarea"
+            :disable="!currentUserIsManagerOfEmployee()"
           />  
         </div>
 
@@ -370,8 +396,9 @@
             type="radio"
             v-model="dependentCareChecklist1"
             inline
+            :disable="!currentUserIsEmployeeOrManager()"
           />
-        <div v-if="dependentCareChecklist1 == 'Y'">
+        <div v-if="currentUserIsEmployeeOrManager() && dependentCareChecklist1 == 'Y'">
           <div class="q-mt-sm">If yes, attach documentation of dependent care arrangements.</div>
           <q-uploader
             ref="fileuploader"
@@ -451,7 +478,7 @@
       <!-- Spacing for footer -->
       <div style="height: 80px;"></div>
 
-      <div id="sticky-footer" class="row justify-between" v-if="currentUserIsEmployee()">
+      <div id="sticky-footer" class="row justify-between" v-if="currentUserIsEmployeeOrManager()">
         <q-btn id="update-button" class="col-1" color="white" text-color="black" label="Update" :disabled="!valuesAreChanged()" @click="updateTeleworkApplication()" />
         <q-btn v-if="this.showErrorButton && this.formErrorItems().length > 0" label="Show missing fields" icon="check" color="warning" @click="openErrorDialog('right')" />
         <div class="col-3 self-center status">Current Status: {{ status }}</div>
@@ -461,7 +488,7 @@
   </q-page>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 #sticky-footer {
   padding: 10px;
   background-color: rgb(25, 118, 210);
@@ -508,9 +535,12 @@ import { AxiosTeleworkApplicationUpdateServerResponse, FileUploadDescriptionUplo
 export default class TeleworkApplication extends Vue {
   private applicationPk = ''
   private status = ''
+  private approvalDate = ''
   private employeePk = -1
   private employeeName = ''
+  private managerPk = -1
   private managerName = ''
+  private programManagerPk = -1
   private programManagerName = ''
 
   private date = ''
@@ -585,6 +615,18 @@ export default class TeleworkApplication extends Vue {
 
   private currentUserIsEmployee(): boolean {
     return this.employeePk == this.$store.getters['userModule/getEmployeeProfile'].pk // eslint-disable-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
+  }
+
+  private currentUserIsManagerOfEmployee(): boolean {
+    return this.managerPk == this.$store.getters['userModule/getEmployeeProfile'].pk // eslint-disable-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
+  }
+
+  private currentUserIsEmployeeOrManager(): boolean {
+    return this.currentUserIsEmployee() || this.currentUserIsManagerOfEmployee()
+  }
+
+  private currentUserIsProgramManager(): boolean {
+    return this.programManagerPk == this.$store.getters['userModule/getEmployeeProfile'].pk // eslint-disable-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
   }
 
   private formErrorItems(): Array<[string, string]> {
@@ -693,9 +735,18 @@ export default class TeleworkApplication extends Vue {
       return
     }
     this.status = application.status
+
+    if (application.approval_date) {
+      this.approvalDate = application.approval_date.toString()
+    } else {
+      this.approvalDate = 'the day it is approved'
+    }
+
     this.employeePk = application.employee_pk
     this.employeeName = application.employee_name
+    this.managerPk = application.manager_pk
     this.managerName = application.manager_name
+    this.programManagerPk = application.program_manager_pk
     this.programManagerName = application.program_manager_name
 
     if (application.date) {
@@ -754,65 +805,6 @@ export default class TeleworkApplication extends Vue {
     this.managerSignature = application.manager_signature
     this.programManagerSignature1 = application.program_manager_signature_1
     this.divisionDirectorSignature = application.division_director_signature
-    
-    // this.periodStartDate = pr.period_start_date
-    // this.periodEndDate = pr.period_end_date
-    // this.effectiveDate = pr.effective_date
-    // this.division = pr.employee_division
-    // this.unitOrProgram = pr.employee_unit_or_program
-    // this.jobTitle = pr.employee_job_title
-
-    // this.evaluationType = pr.evaluation_type
-    // this.evaluationTypeCurrentVal = this.evaluationType
-    // this.probationaryEvaluationType = pr.probationary_evaluation_type
-    // this.probationaryEvaluationTypeCurrentVal = this.probationaryEvaluationType
-    // this.stepIncrease = pr.step_increase
-    // this.stepIncreaseCurrentVal = this.stepIncrease
-    // this.topStepBonus = pr.top_step_bonus
-    // this.topStepBonusCurrentVal = this.topStepBonus
-    // this.actionOther = pr.action_other
-    // this.actionOtherCurrentVal = this.actionOther
-
-    // this.factorJobKnowledge = pr.factor_job_knowledge
-    // this.factorJobKnowledgeCurrentVal = this.factorJobKnowledge
-    // this.factorWorkQuality = pr.factor_work_quality
-    // this.factorWorkQualityCurrentVal = this.factorWorkQuality
-    // this.factorWorkQuantity = pr.factor_work_quantity
-    // this.factorWorkQuantityCurrentVal = this.factorWorkQuantity
-    // this.factorWorkHabits = pr.factor_work_habits
-    // this.factorWorkHabitsCurrentVal = this.factorWorkHabits
-    // this.factorAnalysis = pr.factor_analysis
-    // this.factorAnalysisCurrentVal = this.factorAnalysis
-    // this.factorInitiative = pr.factor_initiative
-    // this.factorInitiativeCurrentVal = this.factorInitiative
-    // this.factorInterpersonal = pr.factor_interpersonal
-    // this.factorInterpersonalCurrentVal = this.factorInterpersonal
-    // this.factorCommunication = pr.factor_communication
-    // this.factorCommunicationCurrentVal = this.factorCommunication
-    // this.factorDependability = pr.factor_dependability
-    // this.factorDependabilityCurrentVal = this.factorDependability
-    // this.factorProfessionalism = pr.factor_professionalism
-    // this.factorProfessionalismCurrentVal = this.factorProfessionalism
-    // this.factorManagement = pr.factor_management
-    // this.factorManagementCurrentVal = this.factorManagement
-    // this.factorSupervision = pr.factor_supervision
-    // this.factorSupervisionCurrentVal = this.factorSupervision
-
-    // this.evaluationSuccesses = pr.evaluation_successes
-    // this.evaluationSuccessesCurrentVal = this.evaluationSuccesses
-    // this.evaluationOpportunities = pr.evaluation_opportunities
-    // this.evaluationOpportunitiesCurrentVal = this.evaluationOpportunities
-    // this.evaluationGoalsManager = pr.evaluation_goals_manager
-    // this.evaluationGoalsManagerCurrentVal = this.evaluationGoalsManager
-    // this.evaluationCommentsEmployee = pr.evaluation_comments_employee
-    // this.evaluationCommentsEmployeeCurrentVal = this.evaluationCommentsEmployee
-
-    // this.positionDescriptionLink = pr.position_description_link
-    // this.descriptionReviewedEmployee = pr.description_reviewed_employee
-    // this.descriptionReviewedEmployeeCurrentVal = this.descriptionReviewedEmployee
-    // this.uploadedPositionDescriptionUrl = pr.signed_position_description
-
-    // this.signatures = pr.all_required_signatures
   }
 
   private valuesAreChanged(): boolean {
@@ -892,30 +884,6 @@ export default class TeleworkApplication extends Vue {
         teleworker_comments: this.teleworkerComments,
         manager_comments: this.managerComments,
         dependent_care_checklist_1: this.dependentCareChecklist1,
-        // dependent_care_documentation: this.dependentCareDocumentation
-
-        // evaluation_type: this.evaluationType,
-        // probationary_evaluation_type: this.probationaryEvaluationType,
-        // step_increase: this.stepIncrease,
-        // top_step_bonus: this.topStepBonus,
-        // action_other: this.actionOther,
-        // factor_job_knowledge: this.factorJobKnowledge,
-        // factor_work_quality: this.factorWorkQuality,
-        // factor_work_quantity: this.factorWorkQuantity,
-        // factor_work_habits: this.factorWorkHabits,
-        // factor_analysis: this.factorAnalysis,
-        // factor_initiative: this.factorInitiative,
-        // factor_interpersonal: this.factorInterpersonal,
-        // factor_communication: this.factorCommunication,
-        // factor_dependability: this.factorDependability,
-        // factor_professionalism: this.factorProfessionalism,
-        // factor_management: this.factorManagement,
-        // factor_supervision: this.factorSupervision,
-        // evaluation_successes: this.evaluationSuccesses,
-        // evaluation_opportunities: this.evaluationOpportunities,
-        // evaluation_goals_manager: this.evaluationGoalsManager,
-        // evaluation_comments_employee: this.evaluationCommentsEmployee,
-        // description_reviewed_employee: this.descriptionReviewedEmployee
       })
       .then((response: AxiosTeleworkApplicationUpdateServerResponse) => {
         this.status = response.data.status

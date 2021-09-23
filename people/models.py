@@ -750,6 +750,7 @@ class TeleworkApplication(models.Model):
 
     employee = models.OneToOneField("Employee", verbose_name=_("employee"), on_delete=models.CASCADE)
     status = models.CharField(_("application status"), max_length=1, choices=STATUS_CHOICE, default=INCOMPLETE)
+    date_approved = models.DateField(_("date approved"), auto_now=False, auto_now_add=False, blank=True, null=True)
 
     date = models.DateField(_("date"), auto_now=False, auto_now_add=False, blank=True, null=True)
     program_manager_approve = models.CharField(_("program manager approve"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
@@ -798,6 +799,90 @@ class TeleworkApplication(models.Model):
 
     dependent_care_checklist_1 = models.CharField(_("dependent care checklist 1"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
     dependent_care_documentation = models.FileField(_("dependent care documentation"), upload_to="uploads/dependent-care-documentation", blank=True, null=True)
+
+    @property
+    def program_manager_pk(self):
+        if self.employee.has_program_manager:
+            if self.employee.manager.job_title.name == 'Program Manager':
+                return self.employee.manager.pk
+            elif self.employee.manager.manager.job_title.name == 'Program Manager':
+                return self.employee.manager.manager.pk
+            else:
+                return -1
+        else:
+            return -1
+
+    @property
+    def program_manager_name(self):
+        if self.employee.has_program_manager:
+            if self.employee.manager.job_title.name == 'Program Manager':
+                return self.employee.manager.user.get_full_name()
+            elif self.employee.manager.manager.job_title.name == 'Program Manager':
+                return self.employee.manager.manager.user.get_full_name()
+            else:
+                return 'NO PROGRAM MANAGER FOUND'
+        else:
+            return 'NO PROGRAM MANAGER FOUND'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        # Mark as ready for signature if it is complete and has employee signatures
+        if self.status == TeleworkApplication.INCOMPLETE:
+            applicant = self.employee
+            all_signatures = self.teleworksignature_set.all()
+            has_employee_signature_0 = all_signatures.filter(employee=applicant, index=0).exists()
+            has_employee_signature_1 = all_signatures.filter(employee=applicant, index=1).exists()
+            if all([
+                has_employee_signature_0,
+                has_employee_signature_1,
+                self.employee_fields_complete()
+            ]):
+                self.status = TeleworkApplication.READY_FOR_SIGNATURE
+                self.save()
+
+    def employee_fields_complete(self):
+        completed_equipment_provided_other_value = True
+        if self.equipment_provided_other and not self.equipment_provided_other_value:
+            completed_equipment_provided_other_value = False
+
+        completed_dependent_care_documentation = True
+        if self.dependent_care_checklist_1 == TeleworkApplication.YES and not self.dependent_care_documentation:
+            completed_dependent_care_documentation = False
+        
+        return all([
+            bool(self.date),
+            bool(self.hours_onsite),
+            bool(self.telework_location),
+            bool(self.hours_working),
+            bool(self.duties),
+            bool(self.communication_when),
+            bool(self.communication_time),
+            bool(self.communication_how),
+            completed_equipment_provided_other_value,
+            bool(self.workspace_checklist_1),
+            bool(self.workspace_checklist_2),
+            bool(self.workspace_checklist_3),
+            bool(self.workspace_checklist_4),
+            bool(self.workspace_checklist_5),
+            bool(self.workspace_checklist_6),
+            bool(self.workspace_checklist_7),
+            bool(self.workspace_checklist_8),
+            bool(self.workspace_checklist_9),
+            bool(self.workspace_checklist_10),
+            bool(self.workspace_checklist_11),
+            bool(self.workspace_checklist_12),
+            bool(self.emergency_checklist_1),
+            bool(self.emergency_checklist_2),
+            bool(self.emergency_checklist_3),
+            bool(self.ergonomics_checklist_1),
+            bool(self.ergonomics_checklist_2),
+            bool(self.ergonomics_checklist_3),
+            bool(self.ergonomics_checklist_4),
+            bool(self.ergonomics_checklist_5),
+            bool(self.dependent_care_checklist_1),
+            completed_dependent_care_documentation
+        ])
 
     def username(self):
         return self.employee.user.username
@@ -929,39 +1014,51 @@ class TeleworkSignature(models.Model):
         super().save(*args, **kwargs)
 
         # Mark as ready for signature if it is complete and has employee signatures
-        # TODO: Complete
+        if self.application.status == TeleworkApplication.INCOMPLETE:
+            applicant = self.application.employee
+            all_signatures = self.application.teleworksignature_set.all()
+            has_employee_signature_0 = all_signatures.filter(employee=applicant, index=0).exists()
+            has_employee_signature_1 = all_signatures.filter(employee=applicant, index=1).exists()
+            if all([
+                has_employee_signature_0,
+                has_employee_signature_1,
+                self.application.employee_fields_complete()
+            ]):
+                self.application.status = TeleworkApplication.READY_FOR_SIGNATURE
+                self.application.save()
 
         # Approve if all required signatures are present
-        approve_application = False
-        applicant = self.application.employee
-        all_signatures = self.application.teleworksignature_set.all()
-        has_employee_signature_0 = all_signatures.filter(employee=applicant, index=0).exists()
-        has_employee_signature_1 = all_signatures.filter(employee=applicant, index=1).exists()
-        if has_employee_signature_0 and has_employee_signature_1:
-            if applicant.manager:
-                has_manager_signature = all_signatures.filter(employee=self.application.employee.manager).exists()
-                if has_manager_signature:
-                    if applicant.has_program_manager:
-                        program_manager = applicant.get_program_manager
-                        has_program_manager_signature_0 = all_signatures.filter(employee=program_manager, index=0).exists()
-                        has_program_manager_signature_1 = all_signatures.filter(employee=program_manager, index=1).exists()
-                        if has_program_manager_signature_0 and has_program_manager_signature_1:
-                            if applicant.has_division_director:
-                                division_director = applicant.get_division_director
-                                has_division_director_signature = all_signatures.filter(employee=division_director).exists()
-                                if has_division_director_signature:
-                                    # Application has all the required signatures, so approve
+        if self.application.status == TeleworkApplication.READY_FOR_SIGNATURE:
+            approve_application = False
+            applicant = self.application.employee
+            all_signatures = self.application.teleworksignature_set.all()
+            has_employee_signature_0 = all_signatures.filter(employee=applicant, index=0).exists()
+            has_employee_signature_1 = all_signatures.filter(employee=applicant, index=1).exists()
+            if has_employee_signature_0 and has_employee_signature_1:
+                if applicant.manager:
+                    has_manager_signature = all_signatures.filter(employee=self.application.employee.manager).exists()
+                    if has_manager_signature:
+                        if applicant.has_program_manager:
+                            program_manager = applicant.get_program_manager
+                            has_program_manager_signature_0 = all_signatures.filter(employee=program_manager, index=0).exists()
+                            has_program_manager_signature_1 = all_signatures.filter(employee=program_manager, index=1).exists()
+                            if has_program_manager_signature_0 and has_program_manager_signature_1:
+                                if applicant.has_division_director:
+                                    division_director = applicant.get_division_director
+                                    has_division_director_signature = all_signatures.filter(employee=division_director).exists()
+                                    if has_division_director_signature:
+                                        # Application has all the required signatures, so approve
+                                        approve_application = True
+                                else:
+                                    # Applicant has no division director but all the other required signatures, so approve
                                     approve_application = True
-                            else:
-                                # Applicant has no division director but all the other required signatures, so approve
-                                approve_application = True
-                    else:
-                        # Applicant has no program manager but all the other required signatures, so approve
-                        approve_application = True
-            else:
-                # Applicant has no manager but all the other required signatures, so approve
-                approve_application = True
-        
-        if approve_application:
-            self.application.status = TeleworkApplication.APPROVED
-            self.application.save()
+                        else:
+                            # Applicant has no program manager but all the other required signatures, so approve
+                            approve_application = True
+                else:
+                    # Applicant has no manager but all the other required signatures, so approve
+                    approve_application = True
+            
+            if approve_application:
+                self.application.status = TeleworkApplication.APPROVED
+                self.application.save()

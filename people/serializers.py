@@ -31,6 +31,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     email = serializers.EmailField(source='user.email')
     is_manager = serializers.SerializerMethodField()
     has_manager = serializers.SerializerMethodField()
+    is_eligible_for_telework_application = serializers.SerializerMethodField()
     is_upper_manager = serializers.SerializerMethodField()
     prs_can_view = serializers.SerializerMethodField()
     notes_can_view = serializers.SerializerMethodField()
@@ -40,10 +41,10 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
         model = Employee
         fields = [
             'url', 'pk', 'name', 'user', 'email', 'manager', 'is_manager',
-            'has_manager', 'is_upper_manager', 'is_hr_manager',
-            'is_executive_director', 'viewed_security_message', 'prs_can_view',
-            'notes_can_view', 'telework_applications_can_view',
-            'next_to_sign_prs'
+            'has_manager', 'is_eligible_for_telework_application',
+            'is_upper_manager', 'is_hr_manager', 'is_executive_director',
+            'viewed_security_message', 'prs_can_view', 'notes_can_view',
+            'telework_applications_can_view', 'next_to_sign_prs'
         ]
 
     @staticmethod
@@ -53,6 +54,18 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     @staticmethod
     def get_has_manager(employee):
         return bool(employee.manager)
+
+    @staticmethod
+    def get_is_eligible_for_telework_application(employee):
+        return all([
+            not employee.is_executive_director, # Not the executive director
+            not employee.manager.is_executive_director, # Not anyone who reports to the executive director (e.g. finance manager)
+            not employee.manager.manager.is_executive_director, # Not anyone who reports to the above (e.g. finance employees)
+            not employee.is_division_director, # No division directors
+            not employee.manager.is_division_director, # No program managers
+            not employee.is_hr_manager,  # Not the HR manager
+            not employee.manager.is_hr_manager  # Not anyone who reports to the HR manager
+        ])
 
     @staticmethod
     def get_is_upper_manager(employee):
@@ -216,11 +229,9 @@ class ViewedSecurityMessageSerializer(serializers.HyperlinkedModelSerializer):
 class TeleworkApplicationSerializer(serializers.HyperlinkedModelSerializer):
     employee_name = serializers.CharField(source='employee.user.get_full_name')
     employee_pk = serializers.IntegerField(source='employee.pk')
-    # manager_pk = serializers.IntegerField(source='employee.manager.pk')
+    manager_pk = serializers.IntegerField(source='employee.manager.pk')
     manager_name = serializers.CharField(source='employee.manager.user.get_full_name')
-    program_manager_name = serializers.SerializerMethodField()
     status = serializers.CharField(source='get_status_display')
-    # all_required_signatures = serializers.SerializerMethodField()
     program_manager_signature_0 = serializers.SerializerMethodField()
     employee_signature_0 = serializers.SerializerMethodField()
     employee_signature_1 = serializers.SerializerMethodField()
@@ -232,8 +243,9 @@ class TeleworkApplicationSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = TeleworkApplication
         fields = [
-            'url', 'pk', 'employee_name', 'employee_pk', 'manager_name',
-            'program_manager_name', 'status', 'date', 
+            'url', 'pk', 'employee_name', 'employee_pk', 'manager_pk',
+            'manager_name', 'program_manager_pk', 'program_manager_name',
+            'status', 'date', 
             
             'program_manager_approve', 'hours_onsite', 'telework_location',
             'hours_working', 'duties', 'communication_when',
@@ -262,19 +274,6 @@ class TeleworkApplicationSerializer(serializers.HyperlinkedModelSerializer):
             'employee_signature_1', 'manager_signature',
             'program_manager_signature_1', 'division_director_signature'
         ]
-    
-    # TODO: Use model property
-    @staticmethod
-    def get_program_manager_name(application):
-        if application.employee.has_program_manager:
-            if application.employee.manager.job_title.name == 'Program Manager':
-                return application.employee.manager.user.get_full_name()
-            elif application.employee.manager.manager.job_title.name == 'Program Manager':
-                return application.employee.manager.manager.user.get_full_name()
-            else:
-                return 'NO PROGRAM MANAGER FOUND'
-        else:
-            return 'NO PROGRAM MANAGER FOUND'
 
     @staticmethod
     def get_program_manager_signature_0(application):

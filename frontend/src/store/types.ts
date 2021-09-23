@@ -43,6 +43,7 @@ export interface EmployeeRetrieve {
   is_upper_manager: boolean
   is_hr_manager: boolean
   is_executive_director: boolean
+  is_eligible_for_telework_application: boolean
   prs_can_view: Array<number>
   notes_can_view: Array<number>
   telework_applications_can_view: Array<number>
@@ -301,9 +302,12 @@ export interface TeleworkApplicationRetrieve {
   pk: number
   employee_pk: number
   employee_name: string
+  manager_pk: number
   manager_name: string
+  program_manager_pk: number
   program_manager_name: string
   status: string
+  approval_date: Date
   date: Date
   program_manager_approve: string
   hours_onsite: string

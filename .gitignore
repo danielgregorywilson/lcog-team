@@ -8,6 +8,8 @@ requirements_local.txt
 
 db.sqlite3
 
+vetur.config.js
+
 media
 sent_emails
 # Elastic Beanstalk Files

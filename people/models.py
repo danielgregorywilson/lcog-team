@@ -342,9 +342,12 @@ class Employee(models.Model):
         return list(note_ids)
 
     def telework_applications_can_view(self):
-        # You can view all Telework Applications for which either you are the employee or the
-        # employee is your direct report or a descendant direct report.
-        if self.is_hr_manager or self.is_executive_director:
+        # You can view all Telework Applications for which either you are the
+        # employee or the employee is your direct report or a descendant direct
+        # report. Employees with the 'View all telework applications' group
+        # role can view all of them.
+        view_all_applications = self.user.groups.filter(name='View all telework applications').exists()
+        if self.is_hr_manager or self.is_executive_director or view_all_applications:
             return map(lambda pr: pr.id, TeleworkApplication.objects.all())
         self_and_direct_reports = self.get_direct_reports_descendants(include_self=True)
         application_ids = []

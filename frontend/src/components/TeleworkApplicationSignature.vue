@@ -52,6 +52,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import '../filters'
 
 @Component
 export default class TeleworkApplicationSignature extends Vue {

@@ -37,13 +37,13 @@ const ifEligibleForTeleworkApplication = (to: Route, from: Route, next: Next) =>
   next('dashboard')
 }
 
-const ifHasManager = (to: Route, from: Route, next: Next) => {
-  if (!!authState.token && Vue.prototype.$cookies.get('has_manager') == 'true') { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    next()
-    return
-  }
-  next('dashboard')
-}
+// const ifHasManager = (to: Route, from: Route, next: Next) => {
+//   if (!!authState.token && Vue.prototype.$cookies.get('has_manager') == 'true') { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+//     next()
+//     return
+//   }
+//   next('dashboard')
+// }
 
 const ifCanViewReview = (to: Route, from: Route, next: Next) => {
   if (!!authState.token && Vue.prototype.$cookies.get('prs_can_view').indexOf(to.params.pk) != -1) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call

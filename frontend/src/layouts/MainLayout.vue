@@ -114,7 +114,7 @@ const linksData: Array<LinkData> = [
   //   link: '/timeoff'
   // },
   {
-    title: 'Your Telework Application',
+    title: 'My Telework Application',
     icon: 'home_work',
     link: '/telework-application',
     eligibleForTeleworkApplicationOnly: true

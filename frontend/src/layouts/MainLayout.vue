@@ -34,7 +34,7 @@
           header
           class="text-grey-8"
         >
-          LCOG HR App
+          LCOG Team App
         </q-item-label>
         <q-item
           clickable

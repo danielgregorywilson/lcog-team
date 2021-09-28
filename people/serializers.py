@@ -20,10 +20,15 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
-    
+    user_usernames = serializers.SerializerMethodField()
+
     class Meta:
         model = Group
-        fields = ['pk', 'url']
+        fields = ['pk', 'url', 'user_set', 'user_usernames']
+    
+    @staticmethod
+    def get_user_usernames(group):
+        return map(lambda user: user.username, group.user_set.all())
 
 
 class EmployeeSerializer(serializers.HyperlinkedModelSerializer):

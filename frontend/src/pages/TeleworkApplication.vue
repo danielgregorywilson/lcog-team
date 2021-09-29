@@ -2,7 +2,7 @@
   <q-page>
     <div class="q-pa-xl">
       <form>
-        <div class="text-h4 text-center">APPLICATION FOR PROPOSED TELEWORK</div>
+        <div class="text-h4 text-center text-uppercase">Application For Proposed Telework</div>
         <div class="row items-center q-gutter-md q-mt-sm">
           <div>Date:</div>
           <div style="max-width: 300px">
@@ -38,8 +38,8 @@
         <div class="q-mt-sm">If at each succeeding level of management (Division Director or Executive Director), the application is approved, then the proposed Telework Agreement will be signed by the employee, manager, Program Manager, and Division Director.  The manager then will set a date for the employee to begin Telework that meets operational needs.</div>
 
   
-        <div class="text-h4 text-center q-mt-xl">TELEWORK AGREEMENT</div>
-        <div class="text-h5 text-center">FOR THE LANE COUNCIL OF GOVERNMENTS (LCOG)</div>
+        <div class="text-h4 text-center text-uppercase q-mt-xl">Telework Agreement</div>
+        <div class="text-h5 text-center text-uppercase">for the Lane Council of Governments (LCOG)</div>
         <div class="q-mt-md">This Agreement is entered into between LCOG and <strong>{{ employeeName }}</strong> (“Employee”). This Agreement takes effect only upon the signature of the Program Manager and Division Director.</div>
         <div class="q-mt-sm">This Telework Agreement starts on <span class="text-bold">{{ approvalDate }}</span> and will remain in effect for three months unless LCOG or Employee determines that the Telework Agreement should end earlier, for any reason.  If the Agreement remains in effect for three months, and if employee has performed to their manager’s satisfaction as a teleworker, this Agreement may be extended until and when either LCOG or employee decides to end the Agreement.  The availability of Telework can be discontinued at any time at LCOG’s discretion.</div>
 
@@ -475,6 +475,34 @@
         <telework-application-signature :signature="divisionDirectorSignature" :currentUserPk="currentUserPk()" @clicked-sign-button="signApplication" />
       </form>
 
+      <!-- Dialog of all error items -->
+      <!--<q-dialog v-model="showErrorDialog" :position="errorDialogPosition">
+        <q-card style="width: 350px">
+          <q-list bordered separator>
+            <q-item v-for="(item, index) in this.formErrorItems()" :key="index" clickable @click="clickedErrorItem(item)">
+              <q-item-label>{{item[1]}}</q-item-label>
+            </q-item>
+          </q-list>
+        </q-card>
+      </q-dialog>-->
+
+      <!-- Dialog for when you are done and have signed the PR -->
+      <q-dialog v-model="showApplicationSignedAndCompleteDialog">
+        <q-card>
+          <q-card-section class="row items-center">
+            <q-avatar icon="check" color="primary" text-color="white" />
+            <div class="col">
+              <span class="q-ml-sm row">Your signature has been recorded, and you're all done!</span>
+            </div>
+          </q-card-section>
+
+          <q-card-actions align="right">
+            <q-btn flat label="Cancel" color="primary" v-close-popup />
+            <q-btn flat label="Return to Dashboard" color="primary" @click="returnToDashboard()" />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+
       <!-- Spacing for footer -->
       <div style="height: 80px;"></div>
 
@@ -595,6 +623,8 @@ export default class TeleworkApplication extends Vue {
   private managerSignature = [-1, '', '', '', -1, false]
   private programManagerSignature1 = [-1, '', '', '', -1, false]
   private divisionDirectorSignature = [-1, '', '', '', -1, false]
+
+  private showApplicationSignedAndCompleteDialog = false
 
   private showErrorButton = false
   private showErrorDialog = false
@@ -957,7 +987,9 @@ export default class TeleworkApplication extends Vue {
             //   .catch(e => {
             //     console.error('Error getting getAllPerformanceReviewsActionNotRequired after updating PR after signing PR:', e)
             //   })
-            // this.showPRSignedAndCompleteDialog = true
+            if (this.currentUserIsEmployee() && this.status == 'Ready for signature') {
+              this.showApplicationSignedAndCompleteDialog = true
+            }
           })
           .catch(e => {
             console.error('Error updating application after signing application:', e)
@@ -998,6 +1030,13 @@ export default class TeleworkApplication extends Vue {
   private openErrorDialog(position: string) {
     this.errorDialogPosition = position
     this.showErrorDialog = true
+  }
+
+  private returnToDashboard(): void {
+    this.$router.push('/')
+      .catch(e => {
+        console.error('Error navigating to dashboard:', e)
+      })
   }
 
   mounted() {

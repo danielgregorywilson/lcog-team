@@ -56,7 +56,7 @@ export default class TeleworkApplicationGetOrCreate extends Vue {
   mounted() {
     this.getOrCreateTeleworkApplication()
       .then(response => {
-        this.$router.push(`telework-application/${ response.data.pk }`)
+        this.$router.push(`/telework-application/${ response.data.pk }`)
           .catch(e => {
             console.error('Error navigating to telework application detail:', e)
           })

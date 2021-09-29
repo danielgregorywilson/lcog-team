@@ -572,46 +572,85 @@ export default class TeleworkApplication extends Vue {
   private programManagerName = ''
 
   private date = ''
+  private dateCurrentVal = ''
   private programManagerApprove = ''
+  private programManagerApproveCurrentVal = ''
   private hoursOnsite = ''
+  private hoursOnsiteCurrentVal = ''
   private teleworkLocation = ''
+  private teleworkLocationCurrentVal = ''
   private hoursWorking = ''
+  private hoursWorkingCurrentVal = ''
   private duties = ''
+  private dutiesCurrentVal = ''
   private communicationWhen = ''
+  private communicationWhenCurrentVal = ''
   private communicationTime = ''
+  private communicationTimeCurrentVal = ''
   private communicationHow = ''
+  private communicationHowCurrentVal = ''
 
   private equipmentProvidedPhone = false
+  private equipmentProvidedPhoneCurrentVal = false
   private equipmentProvidedLaptop = false
+  private equipmentProvidedLaptopCurrentVal = false
   private equipmentProvidedDesktop = false
+  private equipmentProvidedDesktopCurrentVal = false
   private equipmentProvidedMonitor = false
+  private equipmentProvidedMonitorCurrentVal = false
   private equipmentProvidedAccess = false
+  private equipmentProvidedAccessCurrentVal = false
   private equipmentProvidedOther = false
+  private equipmentProvidedOtherCurrentVal = false
   private equipmentProvidedOtherValue = ''
+  private equipmentProvidedOtherValueCurrentVal = ''
   private workspaceChecklist1 = ''
+  private workspaceChecklist1CurrentVal = ''
   private workspaceChecklist2 = ''
+  private workspaceChecklist2CurrentVal = ''
   private workspaceChecklist3 = ''
+  private workspaceChecklist3CurrentVal = ''
   private workspaceChecklist4 = ''
+  private workspaceChecklist4CurrentVal = ''
   private workspaceChecklist5 = ''
+  private workspaceChecklist5CurrentVal = ''
   private workspaceChecklist6 = ''
+  private workspaceChecklist6CurrentVal = ''
   private workspaceChecklist7 = ''
+  private workspaceChecklist7CurrentVal = ''
   private workspaceChecklist8 = ''
+  private workspaceChecklist8CurrentVal = ''
   private workspaceChecklist9 = ''
+  private workspaceChecklist9CurrentVal = ''
   private workspaceChecklist10 = ''
+  private workspaceChecklist10CurrentVal = ''
   private workspaceChecklist11 = ''
+  private workspaceChecklist11CurrentVal = ''
   private workspaceChecklist12 = ''
+  private workspaceChecklist12CurrentVal = ''
   private emergencyChecklist1 = ''
+  private emergencyChecklist1CurrentVal = ''
   private emergencyChecklist2 = ''
+  private emergencyChecklist2CurrentVal = ''
   private emergencyChecklist3 = ''
+  private emergencyChecklist3CurrentVal = ''
   private ergonomicsChecklist1 = ''
+  private ergonomicsChecklist1CurrentVal = ''
   private ergonomicsChecklist2 = ''
+  private ergonomicsChecklist2CurrentVal = ''
   private ergonomicsChecklist3 = ''
+  private ergonomicsChecklist3CurrentVal = ''
   private ergonomicsChecklist4 = ''
+  private ergonomicsChecklist4CurrentVal = ''
   private ergonomicsChecklist5 = ''
+  private ergonomicsChecklist5CurrentVal = ''
   private teleworkerComments = ''
+  private teleworkerCommentsCurrentVal = ''
   private managerComments = ''
+  private managerCommentsCurrentVal = ''
   
   private dependentCareChecklist1 = ''
+  private dependentCareChecklist1CurrentVal = ''
   private uploadedDependentCareDocumentationUrl = ''
   private selectedFile: File = new File([''], '')
   private fileSuccessfullyUploaded = false
@@ -780,7 +819,7 @@ export default class TeleworkApplication extends Vue {
     this.programManagerName = application.program_manager_name
 
     if (application.date) {
-      this.date = application.date.toString()
+      this.date = application.date.toString().split('-').join('/')
     } else {
       const today = new Date()
       const dd = String(today.getDate()).padStart(2, '0');
@@ -788,45 +827,84 @@ export default class TeleworkApplication extends Vue {
       const yyyy = today.getFullYear();
       this.date = `${yyyy}/${mm}/${dd}`
     }
+    this.dateCurrentVal = this.date
 
     this.programManagerApprove = application.program_manager_approve
+    this.programManagerApproveCurrentVal = this.programManagerApprove
     this.hoursOnsite = application.hours_onsite
+    this.hoursOnsiteCurrentVal = this.hoursOnsite
     this.teleworkLocation = application.telework_location
+    this.teleworkLocationCurrentVal = this.teleworkLocation
     this.hoursWorking = application.hours_working
+    this.hoursWorkingCurrentVal = this.hoursWorking
     this.duties = application.duties
+    this.dutiesCurrentVal = this.duties
     this.communicationWhen = application.communication_when
+    this.communicationWhenCurrentVal = this.communicationWhen
     this.communicationTime = application.communication_time
+    this.communicationTimeCurrentVal = this.communicationTime
     this.communicationHow = application.communication_how
+    this.communicationHowCurrentVal = this.communicationHow
     this.equipmentProvidedPhone = application.equipment_provided_phone
+    this.equipmentProvidedPhoneCurrentVal = this.equipmentProvidedPhone
     this.equipmentProvidedLaptop = application.equipment_provided_laptop
+    this.equipmentProvidedLaptopCurrentVal = this.equipmentProvidedLaptop
     this.equipmentProvidedDesktop = application.equipment_provided_desktop
+    this.equipmentProvidedDesktopCurrentVal = this.equipmentProvidedDesktop
     this.equipmentProvidedMonitor = application.equipment_provided_monitor
+    this.equipmentProvidedMonitorCurrentVal = this.equipmentProvidedMonitor
     this.equipmentProvidedAccess = application.equipment_provided_access
+    this.equipmentProvidedAccessCurrentVal = this.equipmentProvidedAccess
     this.equipmentProvidedOther = application.equipment_provided_other
+    this.equipmentProvidedOtherCurrentVal = this.equipmentProvidedOther
     this.equipmentProvidedOtherValue = application.equipment_provided_other_value
+    this.equipmentProvidedOtherValueCurrentVal = this.equipmentProvidedOtherValue
     this.workspaceChecklist1 = application.workspace_checklist_1
+    this.workspaceChecklist1CurrentVal = this.workspaceChecklist1
     this.workspaceChecklist2 = application.workspace_checklist_2
+    this.workspaceChecklist2CurrentVal = this.workspaceChecklist2
     this.workspaceChecklist3 = application.workspace_checklist_3
+    this.workspaceChecklist3CurrentVal = this.workspaceChecklist3
     this.workspaceChecklist4 = application.workspace_checklist_4
+    this.workspaceChecklist4CurrentVal = this.workspaceChecklist4
     this.workspaceChecklist5 = application.workspace_checklist_5
+    this.workspaceChecklist5CurrentVal = this.workspaceChecklist5
     this.workspaceChecklist6 = application.workspace_checklist_6
+    this.workspaceChecklist6CurrentVal = this.workspaceChecklist6
     this.workspaceChecklist7 = application.workspace_checklist_7
+    this.workspaceChecklist7CurrentVal = this.workspaceChecklist7
     this.workspaceChecklist8 = application.workspace_checklist_8
+    this.workspaceChecklist8CurrentVal = this.workspaceChecklist8
     this.workspaceChecklist9 = application.workspace_checklist_9
+    this.workspaceChecklist9CurrentVal = this.workspaceChecklist9
     this.workspaceChecklist10 = application.workspace_checklist_10
+    this.workspaceChecklist10CurrentVal = this.workspaceChecklist10
     this.workspaceChecklist11 = application.workspace_checklist_11
+    this.workspaceChecklist11CurrentVal = this.workspaceChecklist11
     this.workspaceChecklist12 = application.workspace_checklist_12
+    this.workspaceChecklist12CurrentVal = this.workspaceChecklist12
     this.emergencyChecklist1 = application.emergency_checklist_1
+    this.emergencyChecklist1CurrentVal = this.emergencyChecklist1
     this.emergencyChecklist2 = application.emergency_checklist_2
+    this.emergencyChecklist2CurrentVal = this.emergencyChecklist2
     this.emergencyChecklist3 = application.emergency_checklist_3
+    this.emergencyChecklist3CurrentVal = this.emergencyChecklist3
     this.ergonomicsChecklist1 = application.ergonomics_checklist_1
+    this.ergonomicsChecklist1CurrentVal = this.ergonomicsChecklist1
     this.ergonomicsChecklist2 = application.ergonomics_checklist_2
+    this.ergonomicsChecklist2CurrentVal = this.ergonomicsChecklist2
     this.ergonomicsChecklist3 = application.ergonomics_checklist_3
+    this.ergonomicsChecklist3CurrentVal = this.ergonomicsChecklist3
     this.ergonomicsChecklist4 = application.ergonomics_checklist_4
+    this.ergonomicsChecklist4CurrentVal = this.ergonomicsChecklist4
     this.ergonomicsChecklist5 = application.ergonomics_checklist_5
+    this.ergonomicsChecklist5CurrentVal = this.ergonomicsChecklist5
     this.teleworkerComments = application.teleworker_comments
+    this.teleworkerCommentsCurrentVal = this.teleworkerComments
     this.managerComments = application.manager_comments
+    this.managerCommentsCurrentVal = this.managerComments
     this.dependentCareChecklist1 = application.dependent_care_checklist_1
+    this.dependentCareChecklist1CurrentVal = this.dependentCareChecklist1
     this.uploadedDependentCareDocumentationUrl = application.dependent_care_documentation
 
     this.programManagerSignature0 = application.program_manager_signature_0
@@ -838,35 +916,51 @@ export default class TeleworkApplication extends Vue {
   }
 
   private valuesAreChanged(): boolean {
-    return true
-    // if (
-    //   // this.evaluationType == this.evaluationTypeCurrentVal &&
-    //   // this.probationaryEvaluationType == this.probationaryEvaluationTypeCurrentVal &&
-    //   // this.stepIncrease == this.stepIncreaseCurrentVal &&
-    //   // this.topStepBonus == this.topStepBonusCurrentVal &&
-    //   // this.actionOther == this.actionOtherCurrentVal &&
-    //   // this.factorJobKnowledge == this.factorJobKnowledgeCurrentVal &&
-    //   // this.factorWorkQuality == this.factorWorkQualityCurrentVal &&
-    //   // this.factorWorkQuantity == this.factorWorkQuantityCurrentVal &&
-    //   // this.factorWorkHabits == this.factorWorkHabitsCurrentVal &&
-    //   // this.factorAnalysis == this.factorAnalysisCurrentVal &&
-    //   // this.factorInitiative == this.factorInitiativeCurrentVal &&
-    //   // this.factorInterpersonal == this.factorInterpersonalCurrentVal &&
-    //   // this.factorCommunication == this.factorCommunicationCurrentVal &&
-    //   // this.factorDependability == this.factorDependabilityCurrentVal &&
-    //   // this.factorProfessionalism == this.factorProfessionalismCurrentVal &&
-    //   // this.factorManagement == this.factorManagementCurrentVal &&
-    //   // this.factorSupervision == this.factorSupervisionCurrentVal &&
-    //   // this.evaluationSuccesses == this.evaluationSuccessesCurrentVal &&
-    //   // this.evaluationOpportunities == this.evaluationOpportunitiesCurrentVal &&
-    //   // this.evaluationGoalsManager == this.evaluationGoalsManagerCurrentVal &&
-    //   // this.evaluationCommentsEmployee == this.evaluationCommentsEmployeeCurrentVal &&
-    //   // this.descriptionReviewedEmployee == this.descriptionReviewedEmployeeCurrentVal
-    // ) {
-    //   return false
-    // } else {
-    //   return true
-    // }
+    if (
+      this.date == this.dateCurrentVal &&
+      this.programManagerApprove == this.programManagerApproveCurrentVal &&
+      this.hoursOnsite == this.hoursOnsiteCurrentVal &&
+      this.teleworkLocation == this.teleworkLocationCurrentVal &&
+      this.hoursWorking == this.hoursWorkingCurrentVal &&
+      this.duties == this.dutiesCurrentVal &&
+      this.communicationWhen == this.communicationWhenCurrentVal &&
+      this.communicationTime == this.communicationTimeCurrentVal &&
+      this.communicationHow == this.communicationHowCurrentVal &&
+      this.equipmentProvidedPhone == this.equipmentProvidedPhoneCurrentVal &&
+      this.equipmentProvidedLaptop == this.equipmentProvidedLaptopCurrentVal &&
+      this.equipmentProvidedDesktop == this.equipmentProvidedDesktopCurrentVal &&
+      this.equipmentProvidedMonitor == this.equipmentProvidedMonitorCurrentVal &&
+      this.equipmentProvidedAccess == this.equipmentProvidedAccessCurrentVal &&
+      this.equipmentProvidedOther == this.equipmentProvidedOtherCurrentVal &&
+      this.equipmentProvidedOtherValue == this.equipmentProvidedOtherValueCurrentVal &&
+      this.workspaceChecklist1 == this.workspaceChecklist1CurrentVal &&
+      this.workspaceChecklist2 == this.workspaceChecklist2CurrentVal &&
+      this.workspaceChecklist3 == this.workspaceChecklist3CurrentVal &&
+      this.workspaceChecklist4 == this.workspaceChecklist4CurrentVal &&
+      this.workspaceChecklist5 == this.workspaceChecklist5CurrentVal &&
+      this.workspaceChecklist6 == this.workspaceChecklist6CurrentVal &&
+      this.workspaceChecklist7 == this.workspaceChecklist7CurrentVal &&
+      this.workspaceChecklist8 == this.workspaceChecklist8CurrentVal &&
+      this.workspaceChecklist9 == this.workspaceChecklist9CurrentVal &&
+      this.workspaceChecklist10 == this.workspaceChecklist10CurrentVal &&
+      this.workspaceChecklist11 == this.workspaceChecklist11CurrentVal &&
+      this.workspaceChecklist12 == this.workspaceChecklist12CurrentVal &&
+      this.emergencyChecklist1 == this.emergencyChecklist1CurrentVal &&
+      this.emergencyChecklist2 == this.emergencyChecklist2CurrentVal &&
+      this.emergencyChecklist3 == this.emergencyChecklist3CurrentVal &&
+      this.ergonomicsChecklist1 == this.ergonomicsChecklist1CurrentVal &&
+      this.ergonomicsChecklist2 == this.ergonomicsChecklist2CurrentVal &&
+      this.ergonomicsChecklist3 == this.ergonomicsChecklist3CurrentVal &&
+      this.ergonomicsChecklist4 == this.ergonomicsChecklist4CurrentVal &&
+      this.ergonomicsChecklist5 == this.ergonomicsChecklist5CurrentVal &&
+      this.teleworkerComments == this.teleworkerCommentsCurrentVal &&
+      this.managerComments == this.managerCommentsCurrentVal &&
+      this.dependentCareChecklist1 == this.dependentCareChecklist1CurrentVal
+    ) {
+      return false
+    } else {
+      return true
+    }
   }
 
   private updateTeleworkApplication() {
@@ -918,31 +1012,45 @@ export default class TeleworkApplication extends Vue {
       .then((response: AxiosTeleworkApplicationUpdateServerResponse) => {
         this.status = response.data.status
 
-        // this.evaluationTypeCurrentVal = response.data.evaluation_type
-        // this.probationaryEvaluationTypeCurrentVal = response.data.probationary_evaluation_type
-        // this.stepIncreaseCurrentVal = response.data.step_increase
-        // this.topStepBonusCurrentVal = response.data.top_step_bonus
-        // this.actionOtherCurrentVal = response.data.action_other
-
-        // this.factorJobKnowledgeCurrentVal = response.data.factor_job_knowledge
-        // this.factorWorkQualityCurrentVal = response.data.factor_work_quality
-        // this.factorWorkQuantityCurrentVal = response.data.factor_work_quantity
-        // this.factorWorkHabitsCurrentVal = response.data.factor_work_habits
-        // this.factorAnalysisCurrentVal = response.data.factor_analysis
-        // this.factorInitiativeCurrentVal = response.data.factor_initiative
-        // this.factorInterpersonalCurrentVal = response.data.factor_interpersonal
-        // this.factorCommunicationCurrentVal = response.data.factor_communication
-        // this.factorDependabilityCurrentVal = response.data.factor_dependability
-        // this.factorProfessionalismCurrentVal = response.data.factor_professionalism
-        // this.factorManagementCurrentVal = response.data.factor_management
-        // this.factorSupervisionCurrentVal = response.data.factor_supervision
-
-        // this.evaluationSuccessesCurrentVal = response.data.evaluation_successes
-        // this.evaluationOpportunitiesCurrentVal = response.data.evaluation_opportunities
-        // this.evaluationGoalsManagerCurrentVal = response.data.evaluation_goals_manager
-        // this.evaluationCommentsEmployeeCurrentVal = response.data.evaluation_comments_employee
-
-        // this.descriptionReviewedEmployeeCurrentVal = response.data.description_reviewed_employee
+        this.dateCurrentVal = response.data.date.toString().split('-').join('/')
+        this.programManagerApproveCurrentVal = response.data.program_manager_approve
+        this.hoursOnsiteCurrentVal = response.data.hours_onsite
+        this.teleworkLocationCurrentVal = response.data.telework_location
+        this.hoursWorkingCurrentVal = response.data.hours_working
+        this.dutiesCurrentVal = response.data.duties
+        this.communicationWhenCurrentVal = response.data.communication_when
+        this.communicationTimeCurrentVal = response.data.communication_time
+        this.communicationHowCurrentVal = response.data.communication_how
+        this.equipmentProvidedPhoneCurrentVal = response.data.equipment_provided_phone
+        this.equipmentProvidedLaptopCurrentVal = response.data.equipment_provided_laptop
+        this.equipmentProvidedDesktopCurrentVal = response.data.equipment_provided_desktop
+        this.equipmentProvidedMonitorCurrentVal = response.data.equipment_provided_monitor
+        this.equipmentProvidedAccessCurrentVal = response.data.equipment_provided_access
+        this.equipmentProvidedOtherCurrentVal = response.data.equipment_provided_other
+        this.equipmentProvidedOtherValueCurrentVal = response.data.equipment_provided_other_value
+        this.workspaceChecklist1CurrentVal = response.data.workspace_checklist_1
+        this.workspaceChecklist2CurrentVal = response.data.workspace_checklist_2
+        this.workspaceChecklist3CurrentVal = response.data.workspace_checklist_3
+        this.workspaceChecklist4CurrentVal = response.data.workspace_checklist_4
+        this.workspaceChecklist5CurrentVal = response.data.workspace_checklist_5
+        this.workspaceChecklist6CurrentVal = response.data.workspace_checklist_6
+        this.workspaceChecklist7CurrentVal = response.data.workspace_checklist_7
+        this.workspaceChecklist8CurrentVal = response.data.workspace_checklist_8
+        this.workspaceChecklist9CurrentVal = response.data.workspace_checklist_9
+        this.workspaceChecklist10CurrentVal = response.data.workspace_checklist_10
+        this.workspaceChecklist11CurrentVal = response.data.workspace_checklist_11
+        this.workspaceChecklist12CurrentVal = response.data.workspace_checklist_12
+        this.emergencyChecklist1CurrentVal = response.data.emergency_checklist_1
+        this.emergencyChecklist2CurrentVal = response.data.emergency_checklist_2
+        this.emergencyChecklist3CurrentVal = response.data.emergency_checklist_3
+        this.ergonomicsChecklist1CurrentVal = response.data.ergonomics_checklist_1
+        this.ergonomicsChecklist2CurrentVal = response.data.ergonomics_checklist_2
+        this.ergonomicsChecklist3CurrentVal = response.data.ergonomics_checklist_3
+        this.ergonomicsChecklist4CurrentVal = response.data.ergonomics_checklist_4
+        this.ergonomicsChecklist5CurrentVal = response.data.ergonomics_checklist_5
+        this.teleworkerCommentsCurrentVal = response.data.teleworker_comments
+        this.managerCommentsCurrentVal = response.data.manager_comments
+        this.dependentCareChecklist1CurrentVal = response.data.dependent_care_checklist_1
 
         // this.signatures = response.data.all_required_signatures
 

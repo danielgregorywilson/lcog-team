@@ -229,25 +229,28 @@
       </div>
 
       <h5 class="text-uppercase text-bold q-my-md" id="evaluation-successes"><u>II. Employee's Successes</u></h5>
+      <div v-if="!currentUserIsManagerOfEmployee() || employeeHasSigned()" class="read-only-text-area">{{ evaluationSuccesses}}</div>
       <q-input
+        v-else
         input-class="evaluation-successes"
         v-model="evaluationSuccesses"
         type="textarea"
-        :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
       />
 
       <h5 class="text-uppercase text-bold q-my-md" id="evaluation-opportunities"><u>III. Opportunities for Growth</u></h5>
+      <div v-if="!currentUserIsManagerOfEmployee() || employeeHasSigned()" class="read-only-text-area">{{ evaluationOpportunities}}</div>
       <q-input
+        v-else
         v-model="evaluationOpportunities"
         type="textarea"
-        :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
       />
 
       <h5 class="text-uppercase text-bold q-my-md" id="evaluation-goals"><u>IV. Goals for the Coming Year</u></h5>
+      <div v-if="!currentUserIsManagerOfEmployee() || employeeHasSigned()" class="read-only-text-area">{{ evaluationGoalsManager}}</div>
       <q-input
+        v-else
         v-model="evaluationGoalsManager"
         type="textarea"
-        :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
       />
 
       <!-- <h5 class="text-uppercase">V. Goals for the Coming Year (Employee)</h5>
@@ -257,11 +260,12 @@
       /> -->
 
       <h5><span class="text-uppercase text-bold q-my-md"><u>V. Employee Comments</u></span> (e.g. self-evaluation and goals)</h5>
+      <div v-if="!currentUserIsEmployee() || employeeHasSigned()" class="read-only-text-area">{{ evaluationCommentsEmployee}}</div>
       <q-input
+        v-else
         input-class="evaluation-comments-employee"
         v-model="evaluationCommentsEmployee"
         type="textarea"
-        :disable="!currentUserIsEmployee() || employeeHasSigned()"
       />
       <q-btn v-if="currentUserIsEmployee()" id="save-comments-employee" color="white" text-color="black" label="Save comments" @click="updateEmployeeComments()" class="q-mt-sm" :disable="!employeeCommentsIsChanged()" />
 
@@ -490,6 +494,9 @@
   }
   #update-button {
     min-width: 60px;
+  }
+  .read-only-text-area {
+    white-space: pre-line;
   }
 
   @media only screen and (max-width: 640px) {

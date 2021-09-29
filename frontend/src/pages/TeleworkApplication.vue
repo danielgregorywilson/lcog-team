@@ -46,7 +46,7 @@
         <div class="text-h6 q-mt-md">Location and Schedule</div>
         <ul>
           <li>
-            <div>Days and hours when Employee is expected to be onsite at LCOG’s regular place of business:</div>
+            <div id="hours-onsite">Days and hours when Employee is expected to be onsite at LCOG’s regular place of business:</div>
             <q-input
               filled
               input-class="hours-onsite"
@@ -56,7 +56,7 @@
             />
           </li>
           <li>
-            <div>Description about Employee’s primary Telework work site location:</div>
+            <div id="telework-location">Description about Employee’s primary Telework work site location:</div>
             <q-input
               filled
               input-class="telework-location"
@@ -66,7 +66,7 @@
             />
           </li>
           <li>
-            <div>Days and hours when Employee will normally work at their Telework work site, along with break times (if applicable, for FLSA non-exempt employees):</div>
+            <div id="hours-working">Days and hours when Employee will normally work at their Telework work site, along with break times (if applicable, for FLSA non-exempt employees):</div>
             <q-input
               filled
               input-class="hours-working"
@@ -79,7 +79,7 @@
         
         <div class="text-h6 q-mt-md">Duties</div>
         <div class="q-mt-sm">
-          <div>The duties and assignments authorized to be performed at this alternate work site include:</div>
+          <div id="duties">The duties and assignments authorized to be performed at this alternate work site include:</div>
           <q-input
             filled
             input-class="duties"
@@ -95,15 +95,15 @@
         <div class="q-mt-sm">Specify the appropriate methods and times of communications including:</div>
         <ul>
           <li class="row items-center">
-            <div class="col-md-1 col-xs-2 text-center">When:</div>
+            <div id="communication-when" class="col-md-1 col-xs-2 text-center">When:</div>
             <q-input filled v-model="communicationWhen" class="col" :disable="!currentUserIsEmployeeOrManager()" />
           </li>
           <li class="row items-center q-mt-xs">
-            <div class="col-md-1 col-xs-2 text-center">Time:</div>
+            <div id="communication-time" class="col-md-1 col-xs-2 text-center">Time:</div>
             <q-input filled v-model="communicationTime" class="col q-mt-xs" :disable="!currentUserIsEmployeeOrManager()" />
           </li>
           <li class="row items-center q-mt-xs">
-            <div class="col-md-1 col-xs-2 text-center">How:</div>
+            <div id="communication-how" class="col-md-1 col-xs-2 text-center">How:</div>
             <q-input filled v-model="communicationHow" class="col q-mt-xs" label="e.g. phone, text, face-to-face, etc." :disable="!currentUserIsEmployeeOrManager()" />
           </li>
         </ul>
@@ -125,7 +125,7 @@
 
         <div class="q-mt-sm text-italic">LCOG Equipment to be provided to employee:</div>
 
-        <div class="q-mt-sm">This is based on the employee’s manager’s determination of what is needed at the telework location (check all that apply):</div>
+        <div class="q-mt-sm" id="equipment-provided">This is based on the employee’s manager’s determination of what is needed at the telework location (check all that apply):</div>
         <q-checkbox v-model="equipmentProvidedPhone" val="cell-phone" label="Cell Phone" :disable="!currentUserIsEmployeeOrManager()" />
         <q-checkbox v-model="equipmentProvidedLaptop" val="laptop" label="Laptop" :disable="!currentUserIsEmployeeOrManager()" />
         <q-checkbox v-model="equipmentProvidedDesktop" val="desktop" label="Desktop Computer" :disable="!currentUserIsEmployeeOrManager()" />
@@ -146,7 +146,7 @@
 
         <div class="text-h6 q-mt-sm">THE DESIGNATED WORK SPACE:</div>
         <ol>
-          <li>Are LCOG computers and other equipment plugged into surge protectors?
+          <li id="workspace-checklist-1">Are LCOG computers and other equipment plugged into surge protectors?
             <q-option-group
               :options="yesNoOptions"
               type="radio"
@@ -155,7 +155,7 @@
               :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
-          <li class="q-mt-md">Are temperature, noise, ventilation, and lighting levels adequate for maintaining your normal level of performance?
+          <li id="workspace-checklist-2" class="q-mt-md">Are temperature, noise, ventilation, and lighting levels adequate for maintaining your normal level of performance?
             <q-option-group
               :options="yesNoOptions"
               type="radio"
@@ -164,7 +164,7 @@
               :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
-          <li class="q-mt-md">Are all supplies and equipment (both LCOG and employee-owned) in good condition and can be safely used as intended?
+          <li id="workspace-checklist-3" class="q-mt-md">Are all supplies and equipment (both LCOG and employee-owned) in good condition and can be safely used as intended?
             <q-option-group
               :options="yesNoOptions"
               type="radio"
@@ -173,7 +173,7 @@
               :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
-          <li class="q-mt-md">Is storage organized to minimize risks of fires and spontaneous combustion?
+          <li id="workspace-checklist-4" class="q-mt-md">Is storage organized to minimize risks of fires and spontaneous combustion?
             <q-option-group
               :options="yesNoOptions"
               type="radio"
@@ -182,7 +182,7 @@
               :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
-          <li class="q-mt-md">Do all electrical enclosures (switches, outlets, receptacles, junction boxes) affecting the designated work area have tight fitting covers or plates?
+          <li id="workspace-checklist-5" class="q-mt-md">Do all electrical enclosures (switches, outlets, receptacles, junction boxes) affecting the designated work area have tight fitting covers or plates?
             <q-option-group
               :options="yesNoOptions"
               type="radio"
@@ -191,7 +191,7 @@
               :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
-          <li class="q-mt-md">Is all electrical equipment free of recognized hazards that would cause physical harm (frayed wires, bare conductors, loose wires or fixtures, exposed wiring on the ceiling or walls)?
+          <li id="workspace-checklist-6" class="q-mt-md">Is all electrical equipment free of recognized hazards that would cause physical harm (frayed wires, bare conductors, loose wires or fixtures, exposed wiring on the ceiling or walls)?
             <q-option-group
               :options="yesNoOptions"
               type="radio"
@@ -200,7 +200,7 @@
               :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
-          <li class="q-mt-md">Will the building’s electrical system permit the grounding of electrical equipment (a three-prong receptacle)?
+          <li id="workspace-checklist-7" class="q-mt-md">Will the building’s electrical system permit the grounding of electrical equipment (a three-prong receptacle)?
             <q-option-group
               :options="yesNoOptions"
               type="radio"
@@ -209,7 +209,7 @@
               :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
-          <li class="q-mt-md">Are aisles, doorways, and corners free from obstructions to permit visibility and movement?
+          <li id="workspace-checklist-8" class="q-mt-md">Are aisles, doorways, and corners free from obstructions to permit visibility and movement?
             <q-option-group
               :options="yesNoOptions"
               type="radio"
@@ -218,7 +218,7 @@
               :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
-          <li class="q-mt-md">Are the file cabinets and storage closets arranged so drawers and doors do not enter walkways?
+          <li id="workspace-checklist-9" class="q-mt-md">Are the file cabinets and storage closets arranged so drawers and doors do not enter walkways?
             <q-option-group
               :options="yesNoOptions"
               type="radio"
@@ -227,7 +227,7 @@
               :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
-          <li class="q-mt-md">Are heavy items, such as computer monitors and printers, securely placed on sturdy stands close to walls?
+          <li id="workspace-checklist-10" class="q-mt-md">Are heavy items, such as computer monitors and printers, securely placed on sturdy stands close to walls?
             <q-option-group
               :options="yesNoOptions"
               type="radio"
@@ -236,7 +236,7 @@
               :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
-          <li class="q-mt-md">Are phone lines, electrical cords, and surge protectors secured under a desk or along a baseboard?
+          <li id="workspace-checklist-11" class="q-mt-md">Are phone lines, electrical cords, and surge protectors secured under a desk or along a baseboard?
             <q-option-group
               :options="yesNoOptions"
               type="radio"
@@ -245,7 +245,7 @@
               :disable="!currentUserIsEmployeeOrManager()"
             />
           </li>
-          <li class="q-mt-md">Are computer components kept out of direct sunlight and away from heaters?
+          <li id="workspace-checklist-12" class="q-mt-md">Are computer components kept out of direct sunlight and away from heaters?
             <q-option-group
               :options="yesNoOptions"
               type="radio"
@@ -258,7 +258,7 @@
 
         <div class="text-h6">EMERGENCY PREPAREDNESS:</div>
         <ol>
-          <li>Are emergency phone numbers (911, nearest hospital, fire department, police department, etc.) posted in the telework work space?
+          <li id="emergency-checklist-1">Are emergency phone numbers (911, nearest hospital, fire department, police department, etc.) posted in the telework work space?
             <q-option-group
                 :options="yesNoOptions"
                 type="radio"
@@ -267,7 +267,7 @@
                 :disable="!currentUserIsEmployeeOrManager()"
               />
           </li>
-          <li class="q-mt-md">Is a first aid kit accessible and periodically inspected and replenished as needed?
+          <li id="emergency-checklist-2" class="q-mt-md">Is a first aid kit accessible and periodically inspected and replenished as needed?
             <q-option-group
                 :options="yesNoOptions"
                 type="radio"
@@ -276,7 +276,7 @@
                 :disable="!currentUserIsEmployeeOrManager()"
               />
           </li>
-          <li class="q-mt-md">In case of fire, is there a primary exit free of obstruction and easy to use?
+          <li id="emergency-checklist-3" class="q-mt-md">In case of fire, is there a primary exit free of obstruction and easy to use?
             <q-option-group
                 :options="yesNoOptions"
                 type="radio"
@@ -291,7 +291,7 @@
         <ol>
           <li>Are your desk, chair, computer, and other equipment of appropriate design and arranged so that:
             <ol type="a" class="q-mt-md">
-              <li>Neck and shoulders are not stooped to view the task?
+              <li id="ergonomics-checklist-1">Neck and shoulders are not stooped to view the task?
                 <q-option-group
                   :options="yesNoOptions"
                   type="radio"
@@ -300,7 +300,7 @@
                   :disable="!currentUserIsEmployeeOrManager()"
                 />
               </li>
-              <li>There are not pressure points on any part of the body (wrists, forearms, back of legs)?
+              <li id="ergonomics-checklist-2">There are not pressure points on any part of the body (wrists, forearms, back of legs)?
                 <q-option-group
                   :options="yesNoOptions"
                   type="radio"
@@ -309,7 +309,7 @@
                   :disable="!currentUserIsEmployeeOrManager()"
                 />
               </li>
-              <li>There is no glare on the computer screen?
+              <li id="ergonomics-checklist-3">There is no glare on the computer screen?
                 <q-option-group
                   :options="yesNoOptions"
                   type="radio"
@@ -318,7 +318,7 @@
                   :disable="!currentUserIsEmployeeOrManager()"
                 />
               </li>
-              <li>Work can be performed without eye strain?
+              <li id="ergonomics-checklist-4">Work can be performed without eye strain?
                 <q-option-group
                   :options="yesNoOptions"
                   type="radio"
@@ -327,7 +327,7 @@
                   :disable="!currentUserIsEmployeeOrManager()"
                 />
               </li>
-              <li>There is no strain on any part of the body for static tasks over 20 minutes?
+              <li id="ergonomics-checklist-5">There is no strain on any part of the body for static tasks over 20 minutes?
                 <q-option-group
                   :options="yesNoOptions"
                   type="radio"
@@ -387,7 +387,7 @@
         <div class="q-mt-sm">Employee agrees to use LCOG-owned equipment, records, and materials for purposes of LCOG business only, and to protect them against unauthorized or accidental access, use, modification, destruction, or disclosure. Employee agrees to report to the manager instances of loss, damage, or unauthorized access at the earliest reasonable opportunity.</div>
         <div class="q-mt-sm">LCOG records and documents must be disposed of at an LCOG office.</div>
 
-        <div class="text-h6 q-mt-md">Dependent Care</div>
+        <div id="dependent-care" class="text-h6 q-mt-md">Dependent Care</div>
         <div class="q-mt-sm">Employee will not undertake to provide primary care for any dependents who would require the care of a caregiver during at-home working hours. If temporarily care for a dependent during scheduled Telework hours is necessary, employee will notify their manager and sick or vacation leave, as appropriate, should be used for dependent care time for that time.</div>
         <div class="q-mt-sm">For employees who have dependents requiring care during Telework hours, they must attach documentation of dependent care arrangements.</div>
         <div class="q-mt-sm">Does the employee have dependents requiring care during Telework hours?</div>
@@ -476,7 +476,7 @@
       </form>
 
       <!-- Dialog of all error items -->
-      <!--<q-dialog v-model="showErrorDialog" :position="errorDialogPosition">
+      <q-dialog v-model="showErrorDialog" :position="errorDialogPosition">
         <q-card style="width: 350px">
           <q-list bordered separator>
             <q-item v-for="(item, index) in this.formErrorItems()" :key="index" clickable @click="clickedErrorItem(item)">
@@ -484,7 +484,7 @@
             </q-item>
           </q-list>
         </q-card>
-      </q-dialog>-->
+      </q-dialog>
 
       <!-- Dialog for when you are done and have signed the PR -->
       <q-dialog v-model="showApplicationSignedAndCompleteDialog">
@@ -552,6 +552,8 @@
 </style>
 
 <script lang="ts">
+import { scroll } from 'quasar'
+const { getScrollTarget, setScrollPosition } = scroll
 import TeleworkApplicationSignature from 'components/TeleworkApplicationSignature.vue'
 import { Component, Vue } from 'vue-property-decorator'
 import TeleworkApplicationDataService from '../services/TeleworkApplicationDataService'
@@ -700,63 +702,99 @@ export default class TeleworkApplication extends Vue {
 
   private formErrorItems(): Array<[string, string]> {
     let errorItems: Array<[string, string]> = []
-    // if (!this.stepIncreaseCurrentVal) {
-    //   errorItems.push(['step-increase', 'Select Step Increase'])
-    // }
-    // if (!this.topStepBonusCurrentVal) {
-    //   errorItems.push(['top-step-bonus', 'Select Top Step Bonus'])
-    // }
-    // if (!this.factorJobKnowledgeCurrentVal) {
-    //   errorItems.push(['factor-job-knowledge', 'Evaluate Job Knowledge'])
-    // }
-    // if (!this.factorWorkQualityCurrentVal) {
-    //   errorItems.push(['factor-work-quality', 'Evaluate Quality of Work'])
-    // }
-    // if (!this.factorWorkQuantityCurrentVal) {
-    //   errorItems.push(['factor-work-quantity', 'Evaluate Quantity of Work'])
-    // }
-    // if (!this.factorWorkHabitsCurrentVal) {
-    //   errorItems.push(['factor-work-habits', 'Evaluate Work Habits'])
-    // }
-    // if (!this.factorAnalysisCurrentVal) {
-    //   errorItems.push(['factor-analysis', 'Evaluate Analysis and Decision-Making'])
-    // }
-    // if (!this.factorInitiativeCurrentVal) {
-    //   errorItems.push(['factor-initiative', 'Evaluate Initiative and Creativity'])
-    // }
-    // if (!this.factorInterpersonalCurrentVal) {
-    //   errorItems.push(['factor-interpersonal', 'Evaluate Interpersonal Relations'])
-    // }
-    // if (!this.factorCommunicationCurrentVal) {
-    //   errorItems.push(['factor-communication', 'Evaluate Communication'])
-    // }
-    // if (!this.factorDependabilityCurrentVal) {
-    //   errorItems.push(['factor-dependability', 'Evaluate Dependability and Responsibility'])
-    // }
-    // if (!this.factorProfessionalismCurrentVal) {
-    //   errorItems.push(['factor-professionalism', 'Evaluate Professionalism and Customer Service'])
-    // }
-    // if (!this.factorManagementCurrentVal) {
-    //   errorItems.push(['factor-management', 'Evaluate Project Management'])
-    // }
-    // if (!this.factorSupervisionCurrentVal) {
-    //   errorItems.push(['factor-supervision', 'Evaluate Supervision'])
-    // }
-    // if (!this.evaluationSuccessesCurrentVal) {
-    //   errorItems.push(['evaluation-successes', 'Write Employee Successes'])
-    // }
-    // if (!this.evaluationOpportunitiesCurrentVal) {
-    //   errorItems.push(['evaluation-opportunities', 'Write Opportunities for Growth'])
-    // }
-    // if (!this.evaluationGoalsManagerCurrentVal) {
-    //   errorItems.push(['evaluation-goals', 'Write Goals for the Coming Year'])
-    // }
-    // if (!this.descriptionReviewedEmployeeCurrentVal) {
-    //   errorItems.push(['position-description-review', 'Review and Sign Position Description with Employee'])
-    // }
-    // if (this.descriptionReviewedEmployeeCurrentVal && !this.uploadedPositionDescriptionUrl) {
-    //   errorItems.push(['position-description-review', 'Upload Signed Position Description'])
-    // }
+    if (!this.hoursOnsiteCurrentVal) {
+      errorItems.push(['hours-onsite', 'Enter hours onsite'])
+    }
+    if (!this.teleworkLocationCurrentVal) {
+      errorItems.push(['telework-location', 'Enter telework location'])
+    }
+    if (!this.hoursWorkingCurrentVal) {
+      errorItems.push(['hours-working', 'Enter hours working'])
+    }
+    if (!this.dutiesCurrentVal) {
+      errorItems.push(['duties', 'Enter Duties'])
+    }
+    if (!this.communicationWhenCurrentVal) {
+      errorItems.push(['communication-when', 'Enter communication: when'])
+    }
+    if (!this.communicationTimeCurrentVal) {
+      errorItems.push(['communication-time', 'Enter communication: time'])
+    }
+    if (!this.communicationHowCurrentVal) {
+      errorItems.push(['communication-how', 'Enter communication: how'])
+    }
+    if (this.equipmentProvidedOther && !this.equipmentProvidedOtherValue) {
+      errorItems.push(['equipment-provided', 'Enter other equipment provided'])
+    }
+    if (!this.workspaceChecklist1) {
+      errorItems.push(['workspace-checklist-1', 'Select work space checklist - 1'])
+    }
+    if (!this.workspaceChecklist2) {
+      errorItems.push(['workspace-checklist-2', 'Select work space checklist - 2'])
+    }
+    if (!this.workspaceChecklist3) {
+      errorItems.push(['workspace-checklist-3', 'Select work space checklist - 3'])
+    }
+    if (!this.workspaceChecklist4) {
+      errorItems.push(['workspace-checklist-4', 'Select work space checklist - 4'])
+    }
+    if (!this.workspaceChecklist5) {
+      errorItems.push(['workspace-checklist-5', 'Select work space checklist - 5'])
+    }
+    if (!this.workspaceChecklist6) {
+      errorItems.push(['workspace-checklist-6', 'Select work space checklist - 6'])
+    }
+    if (!this.workspaceChecklist7) {
+      errorItems.push(['workspace-checklist-7', 'Select work space checklist - 7'])
+    }
+    if (!this.workspaceChecklist8) {
+      errorItems.push(['workspace-checklist-8', 'Select work space checklist - 8'])
+    }
+    if (!this.workspaceChecklist9) {
+      errorItems.push(['workspace-checklist-9', 'Select work space checklist - 9'])
+    }
+    if (!this.workspaceChecklist10) {
+      errorItems.push(['workspace-checklist-10', 'Select work space checklist - 10'])
+    }
+    if (!this.workspaceChecklist11) {
+      errorItems.push(['workspace-checklist-11', 'Select work space checklist - 11'])
+    }
+    if (!this.workspaceChecklist12) {
+      errorItems.push(['workspace-checklist-12', 'Select work space checklist - 12'])
+    }
+    if (!this.emergencyChecklist1) {
+      errorItems.push(['emergency-checklist-1', 'Select emergency checklist - 1'])
+    }
+    if (!this.emergencyChecklist2) {
+      errorItems.push(['emergency-checklist-2', 'Select emergency checklist - 2'])
+    }
+    if (!this.emergencyChecklist3) {
+      errorItems.push(['emergency-checklist-3', 'Select emergency checklist - 3'])
+    }
+    if (!this.ergonomicsChecklist1) {
+      errorItems.push(['ergonomics-checklist-1', 'Select ergonomics checklist - a'])
+    }
+    if (!this.ergonomicsChecklist2) {
+      errorItems.push(['ergonomics-checklist-2', 'Select ergonomics checklist - b'])
+    }
+    if (!this.ergonomicsChecklist3) {
+      errorItems.push(['ergonomics-checklist-3', 'Select ergonomics checklist - c'])
+    }
+    if (!this.ergonomicsChecklist4) {
+      errorItems.push(['ergonomics-checklist-4', 'Select ergonomics checklist - d'])
+    }
+    if (!this.ergonomicsChecklist5) {
+      errorItems.push(['ergonomics-checklist-5', 'Select ergonomics checklist - e'])
+    }
+    if (!this.ergonomicsChecklist5) {
+      errorItems.push(['ergonomics-checklist-5', 'Select ergonomics checklist - e'])
+    }
+    if (!this.dependentCareChecklist1) {
+      errorItems.push(['dependent-care', 'Select dependent care'])
+    }
+    if (this.dependentCareChecklist1 == 'Y' && !this.uploadedDependentCareDocumentationUrl) {
+      errorItems.push(['dependent-care', 'Upload dependent care documentation'])
+    }
     return errorItems
   }
 
@@ -1054,9 +1092,9 @@ export default class TeleworkApplication extends Vue {
 
         // this.signatures = response.data.all_required_signatures
 
-        // if (this.formErrorItems().length > 0) {
-        //   this.showErrorButton = true
-        // }
+        if (this.formErrorItems().length > 0) {
+          this.showErrorButton = true
+        }
 
         // this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
         //   .catch(e => {
@@ -1138,6 +1176,17 @@ export default class TeleworkApplication extends Vue {
   private openErrorDialog(position: string) {
     this.errorDialogPosition = position
     this.showErrorDialog = true
+  }
+
+  private clickedErrorItem(item: [string, string]) {
+    this.showErrorDialog = false
+    const element = document.getElementById(item[0])
+    if (!!element) {
+      const target = getScrollTarget(element)
+      const offset = element.offsetTop - 50
+      const duration = 500
+      setScrollPosition(target, offset, duration)
+    }
   }
 
   private returnToDashboard(): void {

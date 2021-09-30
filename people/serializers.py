@@ -24,7 +24,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Group
-        fields = ['pk', 'url', 'user_set', 'user_usernames']
+        fields = ['pk', 'url', 'name', 'user_set', 'user_usernames']
     
     @staticmethod
     def get_user_usernames(group):

@@ -45,10 +45,21 @@ class IsAdminOrReadOnly(BasePermission):
         )
 
 
+class IsAdmin(BasePermission):
+    """
+    The request is an authenticated admin user
+    """
+
+    def has_permission(self, request, view):
+        return bool(
+            request.user and
+            request.user.is_staff
+        )
+
+
 class CurrentUserView(RetrieveAPIView):
     serializer_class = EmployeeSerializer
     queryset = Employee.objects.all()
-    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_object(self):
         return getattr(self.request.user, 'employee', None)
@@ -60,7 +71,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
-    # permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [IsAdmin]
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -69,7 +80,7 @@ class GroupViewSet(viewsets.ModelViewSet):
     """
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
-    # permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [IsAdmin]
 
 
 class EmployeeViewSet(viewsets.ModelViewSet):
@@ -78,7 +89,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     """
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         """
@@ -106,6 +117,7 @@ class PerformanceReviewPermission(BasePermission):
     Manager or employee may update the Performance Review.
     Others may read only.
     """
+    # permission_classes = [IsAuthenticated]
 
     def has_object_permission(self, request, view, obj):
         # Read permissions are allowed to any request,
@@ -122,11 +134,11 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
     A simple ViewSet for viewing and editing the accounts
     associated with the user.
     """
-
     queryset = PerformanceReview.objects.all()
     serializer_class = PerformanceReviewSerializer
     permission_classes = [
-        IsAuthenticatedOrReadOnly, PerformanceReviewPermission
+        # IsAuthenticated,
+        PerformanceReviewPermission
     ]
 
     def get_queryset(self):
@@ -254,6 +266,7 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
 
 class FileUploadViewSet(viewsets.ViewSet):
     serializer_class = FileUploadSerializer
+    # permission_classes = [IsAuthenticated]
 
     def list(self, request):
         queryset = PerformanceReview.objects.all()
@@ -284,6 +297,7 @@ class FileUploadViewSet(viewsets.ViewSet):
 
 class TeleworkApplicationFileUploadViewSet(viewsets.ViewSet):
     serializer_class = FileUploadSerializer
+    # permission_classes = [IsAuthenticated]
 
     def list(self, request):
         queryset = TeleworkApplication.objects.all()
@@ -318,7 +332,7 @@ class SignatureViewSet(viewsets.ModelViewSet):
     """
     queryset = Signature.objects.all()
     serializer_class = SignatureSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         """
@@ -382,7 +396,7 @@ class SignatureViewSet(viewsets.ModelViewSet):
 class ReviewNoteViewSet(viewsets.ModelViewSet):
     queryset = ReviewNote.objects.all()
     serializer_class = ReviewNoteSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         """
@@ -431,7 +445,7 @@ class ViewedSecurityMessageViewSet(viewsets.ModelViewSet):
     """
     queryset = ViewedSecurityMessage.objects.all()
     serializer_class = ViewedSecurityMessageSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    # permission_classes = [IsAuthenticated]
     
     @action(detail=False)
     def employee_viewed_latest_security_message(self, request):
@@ -481,6 +495,7 @@ class TeleworkApplicationViewSet(viewsets.ModelViewSet):
     queryset = TeleworkApplication.objects.all()
     serializer_class = TeleworkApplicationSerializer
     permission_classes = [
+        # IsAuthenticated,
         TeleworkApplicationPermission
     ]
 
@@ -653,7 +668,7 @@ class TeleworkSignatureViewSet(viewsets.ModelViewSet):
     """
     queryset = TeleworkSignature.objects.all()
     serializer_class = TeleworkSignatureSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         """

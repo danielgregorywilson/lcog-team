@@ -198,7 +198,7 @@ export default class PerformanceReviewTable extends Vue {
   }
 
   created() {
-    bus.$on('updateTeleworkApplicationTables', (data: string) => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    bus.$on('updateTeleworkApplicationTables', () => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       this.retrievePerformanceReviews()
     })
   }

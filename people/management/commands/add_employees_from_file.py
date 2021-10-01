@@ -4,15 +4,42 @@ from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models.manager import Manager
 
-from people.models import Employee, JobTitle, UnitOrProgram
+from people.models import Division, Employee, JobTitle, UnitOrProgram
 
 class Command(BaseCommand):
-    help = 'Sends reminder emails for in-progress performance reviews'
+    help = 'Imports employees after exporting from Caselle'
 
     def add_arguments(self, parser):
         parser.add_argument('--path', type=str)
 
     def handle(self, *args, **options):
+        # Set up database if new
+        if not Division.objects.filter(name='Administrative Services').count():
+            d = Division.objects.create(name='Administrative Services')
+            UnitOrProgram.objects.create(name='-', division=d)
+            UnitOrProgram.objects.create(name='Administration', division=d)
+        if not Division.objects.filter(name='Government Services').count():
+            d = Division.objects.create(name='Government Services')
+            UnitOrProgram.objects.create(name='-', division=d)
+            UnitOrProgram.objects.create(name='Business Services', division=d)
+            UnitOrProgram.objects.create(name='GIS', division=d)
+            UnitOrProgram.objects.create(name='Information Services', division=d)
+            UnitOrProgram.objects.create(name='MetroTV Services', division=d)
+            UnitOrProgram.objects.create(name='Planning Services', division=d)
+            UnitOrProgram.objects.create(name='Technology Services', division=d)
+            UnitOrProgram.objects.create(name='Telecom', division=d)
+            UnitOrProgram.objects.create(name='Transport Services', division=d)
+        if not Division.objects.filter(name='Senior & Disability Services').count():
+            d = Division.objects.create(name='Senior & Disability Services')
+            UnitOrProgram.objects.create(name='-', division=d)
+            UnitOrProgram.objects.create(name='Area Plan', division=d)
+            UnitOrProgram.objects.create(name='Senior Meals', division=d)
+        if not Division.objects.filter(name='Test Division').count():
+            d = Division.objects.create(name='Test Division')
+            UnitOrProgram.objects.create(name='-', division=d)
+            UnitOrProgram.objects.create(name='Test Unit', division=d)
+        
+        # Import from file
         path = options['path']
         if not path:
             path = 'people/management/employees.csv'

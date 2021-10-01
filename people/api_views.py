@@ -449,6 +449,8 @@ class ViewedSecurityMessageViewSet(viewsets.ModelViewSet):
     
     @action(detail=False)
     def employee_viewed_latest_security_message(self, request):
+        if not SecurityMessage.objects.count():
+            return Response(False)
         latest_security_message = SecurityMessage.objects.filter(active=True).latest()
         viewed_security_message = ViewedSecurityMessage.objects.filter(employee=request.user.employee, security_message=latest_security_message)
         if viewed_security_message.count():

@@ -198,6 +198,9 @@ export default class MainLayout extends Vue{
 
   public loginDev(): void {
     this.$router.push('/auth/login')
+      .catch(e => {
+        console.error('Error navigating to login page', e)
+      })
   }
 
   public logout() {

@@ -52,6 +52,15 @@
             <q-item-label>Sign in with Microsoft</q-item-label>
           </q-item-section>
         </q-item>
+        <q-item
+          clickable
+          @click='loginDev'
+          v-if="process.env.DEV && !isAuthenticated()"
+        >
+          <q-item-section>
+            <q-item-label>Sign in dev</q-item-label>
+          </q-item-section>
+        </q-item>
         <div v-if="isAuthenticated()">
           <NavLink
             v-for="link in navLinks"
@@ -61,7 +70,7 @@
         </div>
         <q-item
           clickable
-          @click='logoutWithMicrosoft'
+          @click='logout'
           v-if="isAuthenticated()"
         >
           <q-item-section avatar>
@@ -196,6 +205,18 @@ export default class MainLayout extends Vue{
       });
   }
 
+  public loginDev(): void {
+    this.$router.push('/auth/login')
+  }
+
+  public logout() {
+    if (process.env.DEV) {
+      this.logoutDev()
+    } else {
+      this.logoutWithMicrosoft()
+    }
+  }
+
   public logoutWithMicrosoft() {
     this.$store.dispatch('authModule/authLogout')
     .then(() => {
@@ -207,7 +228,7 @@ export default class MainLayout extends Vue{
   }
 
   // TODO: Old logout
-  public logout(): void {
+  public logoutDev(): void {
     this.$store.dispatch('authModule/authLogout')
     .then(() => {
       this.$router.push('/auth/login')

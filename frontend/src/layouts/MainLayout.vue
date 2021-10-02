@@ -52,15 +52,6 @@
             <q-item-label>Sign in with Microsoft</q-item-label>
           </q-item-section>
         </q-item>
-        <q-item
-          clickable
-          @click='loginDev'
-          v-if="process.env.DEV && !isAuthenticated()"
-        >
-          <q-item-section>
-            <q-item-label>Sign in dev</q-item-label>
-          </q-item-section>
-        </q-item>
         <div v-if="isAuthenticated()">
           <NavLink
             v-for="link in navLinks"

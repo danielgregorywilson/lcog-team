@@ -119,11 +119,11 @@ const linksData: Array<LinkData> = [
     link: '/telework-application',
     eligibleForTeleworkApplicationOnly: true
   },
-  {
-    title: 'Telework Policy',
-    icon: 'computer',
-    link: '/telework'
-  },
+  // {
+  //   title: 'Telework Policy',
+  //   icon: 'computer',
+  //   link: '/telework'
+  // },
   {
     title: 'Security Message',
     icon: 'security',

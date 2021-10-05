@@ -18,7 +18,7 @@
           </div>
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <div>{{ appVersionTag() }}</div>
       </q-toolbar>
     </q-header>
 
@@ -119,11 +119,11 @@ const linksData: Array<LinkData> = [
     link: '/telework-application',
     eligibleForTeleworkApplicationOnly: true
   },
-  {
-    title: 'Telework Policy',
-    icon: 'computer',
-    link: '/telework'
-  },
+  // {
+  //   title: 'Telework Policy',
+  //   icon: 'computer',
+  //   link: '/telework'
+  // },
   {
     title: 'Security Message',
     icon: 'security',
@@ -142,6 +142,10 @@ export default class MainLayout extends Vue{
   private leftDrawerOpen = false;
   private navLinks: Array<LinkData> = linksData;
   
+  private appVersionTag() {
+    return process.env.APP_VERSION_TAG
+  }
+
   private isAuthenticated(): boolean {
     return this.$store.getters['authModule/isAuthenticated'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
   }
@@ -180,9 +184,7 @@ export default class MainLayout extends Vue{
 
   public loginWithMicrosoft(): void {
     this.myMSALObj.loginPopup(this.loginRequest)
-      .then((loginResponse) => {
-        // console.log('id_token acquired at: ' + new Date().toString());
-        // console.log(loginResponse);
+      .then(() => {
         if (this.myMSALObj.getAccount()) {
           let account = this.myMSALObj.getAccount()
           let firstName = account.name.split(' ')[1][0].toUpperCase() + account.name.split(' ')[1].substring(1).toLowerCase()

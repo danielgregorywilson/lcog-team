@@ -1,3 +1,4 @@
+from django.db.models.query import QuerySet
 from mainsite.models import SecurityMessage
 from rest_framework import views, viewsets
 from rest_framework.decorators import action
@@ -89,19 +90,25 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     """
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
-    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         """
-        Return a list of all employees. Optionally filter by direct reports
+        Return a list of all employees to admins. Filter by direct reports for
+        everyone else.
         """
-        queryset = Employee.objects.all() # Default queryset
-
-        # Optionally filter by direct reports
         user = self.request.user
-        direct_reports = self.request.query_params.get('direct-reports', None)
-        if direct_reports is not None and direct_reports == "True":
-            queryset = Employee.objects.filter(manager__user=user)
+        if user.is_authenticated:
+            if user.is_staff:
+                queryset = Employee.objects.all()
+            else:
+                # Filter to just direct reports, or else them and all their descendants
+                direct_reports = self.request.query_params.get('direct-reports', None)
+                if direct_reports is not None and direct_reports == "True":
+                    queryset = Employee.objects.filter(manager__user=user)
+                else:
+                    queryset = user.employee.get_direct_reports_descendants(include_self=True)
+        else:
+            queryset = Employee.objects.none()
         return queryset
     
     @action(detail=True, methods=['get'])
@@ -117,7 +124,6 @@ class PerformanceReviewPermission(BasePermission):
     Manager or employee may update the Performance Review.
     Others may read only.
     """
-    # permission_classes = [IsAuthenticated]
 
     def has_object_permission(self, request, view, obj):
         # Read permissions are allowed to any request,
@@ -125,54 +131,49 @@ class PerformanceReviewPermission(BasePermission):
         if request.method in SAFE_METHODS:
             return True
 
-        # Write permissions are only allowed to the owner of the snippet.
+        # Write permissions are only allowed to the owners of the PR.
         return request.user in [obj.employee.manager.user, obj.employee.user]
 
 
 class PerformanceReviewViewSet(viewsets.ModelViewSet):
-    """
-    A simple ViewSet for viewing and editing the accounts
-    associated with the user.
-    """
     queryset = PerformanceReview.objects.all()
     serializer_class = PerformanceReviewSerializer
-    permission_classes = [
-        # IsAuthenticated,
-        PerformanceReviewPermission
-    ]
+    permission_classes = [PerformanceReviewPermission]
 
     def get_queryset(self):
         """
-        This view should return a list of all performance reviews for which
-        the currently authenticated user is the manager.
+        Return a list of all performance reviews to admins. Filter by direct
+        reports for everyone else.
         """
         user = self.request.user
         if user.is_authenticated:
-            manager_prs = PerformanceReview.objects.filter(
-                employee__manager__user=user)
-            employee_prs = PerformanceReview.objects.filter(
-                employee__user=user)
-            queryset = manager_prs | employee_prs # Default queryset
-            signature = self.request.query_params.get('signature', None)
-            action_required = self.request.query_params.get('action_required',
-                None)
-            if is_true_string(signature):
-                if action_required is not None:
-                    if is_true_string(action_required):
-                        queryset = PerformanceReview.signature_upcoming_reviews_action_required.get_queryset(user)
-                    else:
-                        queryset = PerformanceReview.signature_upcoming_reviews_no_action_required.get_queryset(user)    
-                else:
-                    queryset = PerformanceReview.signature_all_relevant_upcoming_reviews.get_queryset(user)
-            elif action_required is not None:
-                if is_true_string(action_required):
-                    queryset = PerformanceReview.manager_upcoming_reviews_action_required.get_queryset(user)
-                else:
-                    queryset = PerformanceReview.manager_upcoming_reviews_no_action_required.get_queryset(user)
+            if user.is_staff:
+                queryset = PerformanceReview.objects.all()
             else:
-                queryset = PerformanceReview.manager_upcoming_reviews.get_queryset(user)
+                signature = self.request.query_params.get('signature', None)
+                action_required = self.request.query_params.get('action_required',
+                    None)
+                if is_true_string(signature):
+                    if action_required is not None:
+                        if is_true_string(action_required):
+                            queryset = PerformanceReview.signature_upcoming_reviews_action_required.get_queryset(user)
+                        else:
+                            queryset = PerformanceReview.signature_upcoming_reviews_no_action_required.get_queryset(user)    
+                    else:
+                        queryset = PerformanceReview.signature_all_relevant_upcoming_reviews.get_queryset(user)
+                elif action_required is not None:
+                    if is_true_string(action_required):
+                        queryset = PerformanceReview.manager_upcoming_reviews_action_required.get_queryset(user)
+                    else:
+                        queryset = PerformanceReview.manager_upcoming_reviews_no_action_required.get_queryset(user)
+                else:
+                    manager_prs = PerformanceReview.objects.filter( # PRs for which the current user is the manager
+                        employee__manager__user=user)
+                    employee_prs = PerformanceReview.objects.filter( # PRs for the current user
+                        employee__user=user)
+                    queryset = manager_prs | employee_prs # Default queryset
         else:
-            queryset = PerformanceReview.objects.all()
+            queryset = PerformanceReview.objects.none()
         return queryset
 
     def retrieve(self, request, pk=None):
@@ -489,7 +490,7 @@ class TeleworkApplicationPermission(BasePermission):
         if request.method in SAFE_METHODS:
             return True
 
-        # Write permissions are only allowed to the owner of the snippet.
+        # Write permissions are only allowed to the owners of the Application.
         return request.user in [obj.employee.manager.user, obj.employee.user]
 
 

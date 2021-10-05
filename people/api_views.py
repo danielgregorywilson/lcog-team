@@ -125,14 +125,21 @@ class PerformanceReviewPermission(BasePermission):
     Others may read only.
     """
 
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
+        return super().has_permission(request, view)
+
     def has_object_permission(self, request, view, obj):
         # Read permissions are allowed to any request,
         # so we'll always allow GET, HEAD or OPTIONS requests.
-        if request.method in SAFE_METHODS:
+        if request.user.is_staff:
             return True
-
-        # Write permissions are only allowed to the owners of the PR.
-        return request.user in [obj.employee.manager.user, obj.employee.user]
+        else:
+            if request.method in SAFE_METHODS:
+                return True
+            # Write permissions are only allowed to the owners of the PR.
+            return request.user in [obj.employee.manager.user, obj.employee.user]
 
 
 class PerformanceReviewViewSet(viewsets.ModelViewSet):
@@ -483,24 +490,27 @@ class TeleworkApplicationPermission(BasePermission):
     approved. Others may read only.
     """
 
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
+        return super().has_permission(request, view)
+
     def has_object_permission(self, request, view, obj):
-        # TODO
         # Read permissions are allowed to any request,
         # so we'll always allow GET, HEAD or OPTIONS requests.
-        if request.method in SAFE_METHODS:
+        if request.user.is_staff:
             return True
-
-        # Write permissions are only allowed to the owners of the Application.
-        return request.user in [obj.employee.manager.user, obj.employee.user]
+        else:
+            if request.method in SAFE_METHODS:
+                return True
+            # Write permissions are only allowed to the owners of the PR.
+            return request.user in [obj.employee.manager.user, obj.employee.user]
 
 
 class TeleworkApplicationViewSet(viewsets.ModelViewSet):
     queryset = TeleworkApplication.objects.all()
     serializer_class = TeleworkApplicationSerializer
-    permission_classes = [
-        # IsAuthenticated,
-        TeleworkApplicationPermission
-    ]
+    permission_classes = [TeleworkApplicationPermission]
 
     def get_queryset(self):
         """
@@ -508,22 +518,30 @@ class TeleworkApplicationViewSet(viewsets.ModelViewSet):
         the currently authenticated user is the manager.
         """
         user = self.request.user
-        if user.is_authenticated and hasattr(user, 'employee'):
-            manager_prs = TeleworkApplication.objects.filter(
-                employee__manager__user=user)
-            employee_prs = TeleworkApplication.objects.filter(
-                employee__user=user)
-            queryset = manager_prs | employee_prs # Default queryset
-            signature = self.request.query_params.get('signature', None)
-            if signature is not None:
-                if is_true_string(signature):
-                    queryset = TeleworkApplication.applications_signature_required.get_queryset(user)
-                else:
-                    queryset = TeleworkApplication.applications_signature_not_required.get_queryset(user)
+        if user.is_authenticated:
+            if user.is_staff:
+                queryset = TeleworkApplication.objects.all()
             else:
-                queryset = TeleworkApplication.all_relevant_applications.get_queryset(user)
+                manager_prs = TeleworkApplication.objects.filter(
+                    employee__manager__user=user)
+                employee_prs = TeleworkApplication.objects.filter(
+                    employee__user=user)
+                queryset = manager_prs | employee_prs # Default queryset
+                if hasattr(user, 'employee'):
+                    signature = self.request.query_params.get('signature', None)
+                    if signature is not None:
+                        if is_true_string(signature):
+                            queryset = TeleworkApplication.applications_signature_required.get_queryset(user)
+                        else:
+                            queryset = TeleworkApplication.applications_signature_not_required.get_queryset(user)
+                    else:
+                        # Use default queryset
+                        pass
+                else:
+                    # Use default queryset
+                    pass
         else:
-            queryset = TeleworkApplication.objects.all()
+            queryset = TeleworkApplication.objects.none()
         return queryset
 
     def retrieve(self, request, pk=None):
@@ -582,62 +600,7 @@ class TeleworkApplicationViewSet(viewsets.ModelViewSet):
         application.teleworker_comments = request.data['teleworker_comments']
         application.manager_comments = request.data['manager_comments']
         application.dependent_care_checklist_1 = request.data['dependent_care_checklist_1']
-        # application.dependent_care_documentation = request.data['dependent_care_documentation']
 
-        
-        # pr.evaluation_type = request.data['evaluation_type']
-        # pr.probationary_evaluation_type = \
-        #     request.data['probationary_evaluation_type']
-        # pr.step_increase = request.data['step_increase']
-        # pr.top_step_bonus = request.data['top_step_bonus']
-        # pr.action_other = request.data['action_other']
-        # pr.factor_job_knowledge = request.data['factor_job_knowledge']
-        # pr.factor_work_quality = request.data['factor_work_quality']
-        # pr.factor_work_quantity = request.data['factor_work_quantity']
-        # pr.factor_work_habits = request.data['factor_work_habits']
-        # pr.factor_analysis = request.data['factor_analysis']
-        # pr.factor_initiative = request.data['factor_initiative']
-        # pr.factor_interpersonal = request.data['factor_interpersonal']
-        # pr.factor_communication = request.data['factor_communication']
-        # pr.factor_dependability = request.data['factor_dependability']
-        # pr.factor_professionalism = request.data['factor_professionalism']
-        # pr.factor_management = request.data['factor_management']
-        # pr.factor_supervision = request.data['factor_supervision']
-        # pr.evaluation_successes = request.data['evaluation_successes']
-        # pr.evaluation_opportunities = request.data['evaluation_opportunities']
-        # pr.evaluation_goals_manager = request.data['evaluation_goals_manager']
-        # pr.evaluation_comments_employee = \
-        #     request.data['evaluation_comments_employee']
-        # pr.description_reviewed_employee = \
-        #     request.data['description_reviewed_employee']
-        # if pr.status == PerformanceReview.NEEDS_EVALUATION and all([
-        #     (pr.evaluation_type == 'A' or
-        #         (pr.evaluation_type == 'P' and
-        #             pr.probationary_evaluation_type != None
-        #         )
-        #     ),
-        #     pr.step_increase != None,
-        #     pr.top_step_bonus != None,
-        #     pr.factor_job_knowledge != None,
-        #     pr.factor_work_quality != None,
-        #     pr.factor_work_quantity != None,
-        #     pr.factor_work_habits != None,
-        #     pr.factor_analysis != None,
-        #     pr.factor_initiative != None,
-        #     pr.factor_interpersonal != None,
-        #     pr.factor_communication != None,
-        #     pr.factor_dependability != None,
-        #     pr.factor_professionalism != None,
-        #     pr.factor_management != None,
-        #     pr.factor_supervision != None,
-        #     len(pr.evaluation_successes) > 0,
-        #     len(pr.evaluation_opportunities) > 0,
-        #     len(pr.evaluation_goals_manager) > 0,
-        #     pr.description_reviewed_employee,
-        #     pr.signed_position_description.name != ''
-        # ]):
-        #     pr.status = PerformanceReview.EVALUATION_WRITTEN
-        #     send_evaluation_written_email_to_employee(pr.employee, pr)
         application.save()
         serialized_application = TeleworkApplicationSerializer(application,
             context={'request': request})
@@ -653,14 +616,6 @@ class TeleworkApplicationViewSet(viewsets.ModelViewSet):
     #         request.data['evaluation_comments_employee']
     #     pr.save()
     #     serialized_review = PerformanceReviewSerializer(pr,
-    #         context={'request': request})
-    #     return Response(serialized_review.data)
-
-    # # TODO: Don't use this - use the ModelViewSet get
-    # @action(detail=True, methods=['get'])
-    # def get_a_performance_review(self, request, pk=None):
-    #     review = PerformanceReview.objects.get(pk=pk)
-    #     serialized_review = PerformanceReviewSerializer(review,
     #         context={'request': request})
     #     return Response(serialized_review.data)
 

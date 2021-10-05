@@ -8,7 +8,7 @@ from django.db.models.manager import Manager
 from people.models import Employee, JobTitle, PerformanceReview, UnitOrProgram
 
 class Command(BaseCommand):
-    help = 'Sends reminder emails for in-progress performance reviews'
+    help = 'Imports reviews after exporting from Caselle'
 
     def add_arguments(self, parser):
         parser.add_argument('--path', type=str)

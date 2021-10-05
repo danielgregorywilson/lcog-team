@@ -61,7 +61,7 @@
         </div>
         <q-item
           clickable
-          @click='logoutWithMicrosoft'
+          @click='logout'
           v-if="isAuthenticated()"
         >
           <q-item-section avatar>
@@ -181,8 +181,8 @@ export default class MainLayout extends Vue{
   public loginWithMicrosoft(): void {
     this.myMSALObj.loginPopup(this.loginRequest)
       .then((loginResponse) => {
-        console.log('id_token acquired at: ' + new Date().toString());
-        console.log(loginResponse);
+        // console.log('id_token acquired at: ' + new Date().toString());
+        // console.log(loginResponse);
         if (this.myMSALObj.getAccount()) {
           let account = this.myMSALObj.getAccount()
           let firstName = account.name.split(' ')[1][0].toUpperCase() + account.name.split(' ')[1].substring(1).toLowerCase()
@@ -196,6 +196,21 @@ export default class MainLayout extends Vue{
       });
   }
 
+  public loginDev(): void {
+    this.$router.push('/auth/login')
+      .catch(e => {
+        console.error('Error navigating to login page', e)
+      })
+  }
+
+  public logout() {
+    if (process.env.DEV) {
+      this.logoutDev()
+    } else {
+      this.logoutWithMicrosoft()
+    }
+  }
+
   public logoutWithMicrosoft() {
     this.$store.dispatch('authModule/authLogout')
     .then(() => {
@@ -207,7 +222,7 @@ export default class MainLayout extends Vue{
   }
 
   // TODO: Old logout
-  public logout(): void {
+  public logoutDev(): void {
     this.$store.dispatch('authModule/authLogout')
     .then(() => {
       this.$router.push('/auth/login')

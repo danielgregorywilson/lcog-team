@@ -2,9 +2,8 @@ branch-defaults:
   default:
     environment: lcog-team-env
     group_suffix: null
-  main:
+  production:
     environment: lcog-team-env
-    group_suffix: null
 environment-defaults:
   lcog-internal-env:
     branch: null

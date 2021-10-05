@@ -125,11 +125,6 @@ class PerformanceReviewPermission(BasePermission):
     Others may read only.
     """
 
-    def has_permission(self, request, view):
-        if not request.user.is_authenticated:
-            return False
-        return super().has_permission(request, view)
-
     def has_object_permission(self, request, view, obj):
         # Read permissions are allowed to any request,
         # so we'll always allow GET, HEAD or OPTIONS requests.
@@ -489,11 +484,6 @@ class TeleworkApplicationPermission(BasePermission):
     Manager or employee may update the Telework Application until it is
     approved. Others may read only.
     """
-
-    def has_permission(self, request, view):
-        if not request.user.is_authenticated:
-            return False
-        return super().has_permission(request, view)
 
     def has_object_permission(self, request, view, obj):
         # Read permissions are allowed to any request,

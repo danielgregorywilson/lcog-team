@@ -181,8 +181,8 @@ export default class MainLayout extends Vue{
   public loginWithMicrosoft(): void {
     this.myMSALObj.loginPopup(this.loginRequest)
       .then((loginResponse) => {
-        console.log('id_token acquired at: ' + new Date().toString());
-        console.log(loginResponse);
+        // console.log('id_token acquired at: ' + new Date().toString());
+        // console.log(loginResponse);
         if (this.myMSALObj.getAccount()) {
           let account = this.myMSALObj.getAccount()
           let firstName = account.name.split(' ')[1][0].toUpperCase() + account.name.split(' ')[1].substring(1).toLowerCase()

@@ -44,6 +44,8 @@ export interface EmployeeRetrieve {
   is_hr_manager: boolean
   is_executive_director: boolean
   is_eligible_for_telework_application: boolean
+  can_view_seating_charts: boolean
+  can_edit_seating_charts: boolean
   prs_can_view: Array<number>
   notes_can_view: Array<number>
   telework_applications_can_view: Array<number>

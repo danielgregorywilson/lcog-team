@@ -355,6 +355,29 @@ class Employee(models.Model):
             employee_application_ids = map(lambda pr: pr.id, TeleworkApplication.objects.filter(employee=employee))
             application_ids += employee_application_ids
         return list(application_ids)
+    
+    def can_view_seating_charts(self):
+        # You can view seating charts if you are an ED, HR Manager, or Division
+        # Director. Employees with the 'HR Employee' or 'View Seating Charts'
+        # group role can also view them.
+        hr_employee = self.user.groups.filter(name='HR Employee').exists()
+        view_seating_charts = self.user.groups.filter(name='View seating charts').exists()
+        if any([
+            self.is_executive_director, self.is_hr_manager,
+            self.is_division_director, hr_employee, view_seating_charts
+        ]):
+            return True
+        else:
+            return False
+    
+    def can_edit_seating_charts(self):
+        # Employees with the 'Edit Seating Charts' group role can edit seating
+        # charts.
+        edit_seating_charts = self.user.groups.filter(name='Edit seating charts').exists()
+        if edit_seating_charts:
+            return True
+        else:
+            return False
 
     def position_description_link(self):
         # Returns override link if provided, otherwise the link from job title if there is a job title

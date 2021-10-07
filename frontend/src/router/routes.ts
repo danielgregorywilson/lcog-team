@@ -50,7 +50,7 @@ const ifCanViewReview = (to: Route, from: Route, next: Next) => {
     next()
     return
   } else {
-    console.info('User can not view PR', to.params.pk, 'Redirecting to dashboard.')
+    console.info('User cannot view PR', to.params.pk, 'Redirecting to dashboard.')
     next('dashboard')
   }
 }
@@ -69,7 +69,17 @@ const ifCanViewTeleworkApplication = (to: Route, from: Route, next: Next) => {
     next()
     return
   } else {
-    console.info('User can not view Telework Application', to.params.pk, 'Redirecting to dashboard.')
+    console.info('User cannot view Telework Application', to.params.pk, 'Redirecting to dashboard.')
+    next('dashboard')
+  }
+}
+
+const ifCanViewSeatingCharts = (to: Route, from: Route, next: Next) => {
+  if (!!authState.token && Vue.prototype.$cookies.get('can_view_seating_charts') == 'true') { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    next()
+    return
+  } else {
+    console.info('User cannot view seating charts. Redirecting to dashboard.')
     next('dashboard')
   }
 }
@@ -84,62 +94,68 @@ const routes: RouteConfig[] = [
       {
         path: '/dashboard',
         name: 'dashboard',
-        component: () => import('pages/Dashboard.vue'),
+        component: () => import('pages/Dashboard.vue')
       },
       {
         path: '/reviews',
         name: 'reviews',
         component: () => import('pages/PerformanceReviews.vue'),
-        beforeEnter: ifManager,
+        beforeEnter: ifManager
       },
       {
         path: '/note/new',
         name: 'note-create',
         component: () => import('pages/ReviewNoteCreate.vue'),
-        beforeEnter: ifManager,
+        beforeEnter: ifManager
       },
       {
         path: '/note/:pk',
         name: 'note-details',
         component: () => import('pages/ReviewNoteDetail.vue'),
-        beforeEnter: ifCanViewNote,
+        beforeEnter: ifCanViewNote
       },
       {
         path: '/pr/:pk',
         name: 'pr-details',
         component: () => import('pages/PerformanceReviewDetail.vue'),
-        beforeEnter: ifCanViewReview,
+        beforeEnter: ifCanViewReview
       },
       {
         path: '/timeoff',
         name: 'timeoff',
         component: () => import('pages/TimeOffRequests.vue'),
-        // beforeEnter: ifAuthenticated,
+        // beforeEnter: ifAuthenticated
       },
       {
         path: '/telework-application',
         name: 'telework-application',
         // component: () => import('pages/TeleworkApplication.vue'),
         component: () => import('pages/TeleworkApplicationGetOrCreate.vue'),
-        beforeEnter: ifEligibleForTeleworkApplication,
+        beforeEnter: ifEligibleForTeleworkApplication
       },
       {
         path: '/telework-application/:pk',
         name: 'telework-application-detail',
         component: () => import('pages/TeleworkApplication.vue'),
-        beforeEnter: ifCanViewTeleworkApplication,
+        beforeEnter: ifCanViewTeleworkApplication
       },
       {
         path: '/telework',
         name: 'telework',
         component: () => import('pages/TeleworkPolicy.vue'),
-        // beforeEnter: ifAuthenticated,
+        // beforeEnter: ifAuthenticated
       },
       {
         path: '/security-message',
         name: 'security-message',
         component: () => import('pages/SecurityMessage.vue'),
-        beforeEnter: ifAuthenticated,
+        beforeEnter: ifAuthenticated
+      },
+      {
+        path: '/seating-charts',
+        name: 'seating-charts',
+        component: () => import('pages/SeatingCharts.vue'),
+        beforeEnter: ifCanViewSeatingCharts
       }
     ]
   },

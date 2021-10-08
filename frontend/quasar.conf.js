@@ -74,16 +74,36 @@ module.exports = configure(function (ctx) {
       // extractCSS: false,
 
       // https://quasar.dev/quasar-cli/handling-webpack
+      // chainWebpack (chain, { isServer, isClient }) {
+      //   chain.module.rules.delete('svg')
+      // },
+
       extendWebpack (cfg) {
-          // linting is slow in TS projects, we execute it only for production builds
-        if (ctx.prod) {
+        // Modify webpack to load SVG with vue-svg-loader
+        const imgRule = cfg.module.rules.filter(rule =>
+          rule.test.toString().match(/svg/)
+        )[0]
+        // console.log("PRINT1", imgRule)
+        // console.log("PRINT1.5", typeof imgRule.test)
+        imgRule.test = eval(imgRule.test.toString().replace('|svg', ''))
+        // console.log("PRINT2", imgRule)
         cfg.module.rules.push({
-          enforce: 'pre',
-          test: /\.(js|vue)$/,
-          loader: 'eslint-loader',
-          exclude: /node_modules/
+          test: /\.svg$/,
+          // loader: 'file-loader',
+          loader: 'vue-svg-loader', // `vue-svg` for webpack 1.x
+          // loader: 'vue-svg', // `vue-svg` for webpack 1.x
         })
+        
+        // linting is slow in TS projects, we execute it only for production builds
+        if (ctx.prod) {
+          cfg.module.rules.push({
+            enforce: 'pre',
+            test: /\.(js|vue)$/,
+            loader: 'eslint-loader',
+            exclude: /node_modules/
+          })
         }
+        console.log("PRINT", cfg.module.rules)
       },
     },
 

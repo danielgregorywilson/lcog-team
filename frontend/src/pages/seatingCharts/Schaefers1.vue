@@ -1,13 +1,7 @@
 <template>
   <q-page class="row items-center justify-evenly">
-    <!-- <img :src="floorPlan()" class="floor-plan" /> -->
-    <!-- <div v-html="floorPlan()" /> -->
-    <!-- <q-img
-      class="floor-plan"
-      src="../../assets/floorPlans/schaefers1.svg"
-    /> -->
     <div class="row q-gutter-md">
-      <div class="col">
+      <div class="col unassigned-employee-list">
         <div>Unassigned Employees</div>
         <q-btn v-for="employee in unassignedEmployees" :key="employee.name" :color="employee.selected ? 'primary' : 'white'" @click="unassignedEmployeeClick(employee)" text-color="black" :label="employee.name" />
       </div>
@@ -16,7 +10,7 @@
   </q-page>
 </template>
 
-<style lang="scss">
+<style lang="scss"> 
   .floor-plan {
     width: 800px;
   }
@@ -46,7 +40,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import FloorPlan from '../../assets/floorPlans/schaefers1.svg';
+import FloorPlan from '../../assets/floorPlans/schaefers1.svg'
 
 interface EmployeeType {
   name: string
@@ -57,12 +51,6 @@ interface EmployeeType {
   components: { FloorPlan }
 })
 export default class Schaefers1 extends Vue{
-  // private floorPlan() {         
-  //   let plan = require('../../assets/floorPlans/schaefers1.svg') // eslint-disable-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-var-requires
-  //   debugger
-  //   return plan // eslint-disable-line @typescript-eslint/no-unsafe-return
-  // }
-
   private ignoreList = ['UP', 'DOWN']
   
   private unassignedEmployees: EmployeeType[] = [
@@ -74,9 +62,8 @@ export default class Schaefers1 extends Vue{
     {name: 'Deanna Troi', selected: false}
   ]
   private currentEmployee: EmployeeType = {name: '', selected: false}
+  private allRooms: HTMLElement[] = []
   private currentRoom: HTMLElement = document.createElement('div')
-  private currentAnnotationElem: HTMLDivElement = document.createElement('div')
-  private currentannotationSize: DOMRect = document.createElement('div').getBoundingClientRect()
   
   // TODO: Use Quasar colors
   private primaryColor = '#1976d2'
@@ -88,51 +75,37 @@ export default class Schaefers1 extends Vue{
       employee.selected = false
       this.currentEmployee = {name: '', selected: false}
     } else {
-      if (this.currentRoom.innerText) {
-      // TODO
-      //   if (this.currentRoom.innerText == 'Unassigned') {
-      //     // Assign the employee to the current room
-      //     this.currentRoom.innerText = employee.name;
-      //     const annotationSize = annotationElem.getBoundingClientRect();
-      //     annotationElem.style.marginLeft = `-${annotationSize.width/2}px`;
-      //     annotationElem.style.marginTop = `-${annotationSize.height/2}px`;
-      //     // Remove the current employee from the list
-      //     this.unassignedEmployees.splice(this.unassignedEmployees.indexOf(this.currentEmployee), 1)
-      //     this.currentEmployee = {name: '', selected: false}
-      //   } else {
-      //     // Swap the two employees
-      //     // Move the room employee out
-      //     this.unassignedEmployees.push({name: roomButton.innerText, selected: false})
-      //     // Remove the current employee in
-      //     roomButton.innerText = this.currentEmployee.name;
-      //     const annotationSize = annotationElem.getBoundingClientRect();
-      //     annotationElem.style.marginLeft = `-${annotationSize.width/2}px`;
-      //     annotationElem.style.marginTop = `-${annotationSize.height/2}px`;
-      //     // Remove the current employee from the list
-      //     this.unassignedEmployees.splice(this.unassignedEmployees.indexOf(this.currentEmployee), 1)
-      //     this.currentEmployee = {name: '', selected: false}
-      //   }
-        
-        
-        
+      if (this.currentRoom.innerText && this.currentRoom.innerText == 'Unassigned') {
+        // Assign the employee to the current room
+        this.currentRoom.innerText = employee.name
+        const annotationElem = this.currentRoom.parentElement ? this.currentRoom.parentElement : document.createElement('div')
+        const annotationSize = annotationElem.getBoundingClientRect()
+        annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
+        annotationElem.style.marginTop = `-${annotationSize.height/2}px`
+        // Remove the current employee from the list
+        this.unassignedEmployees.splice(this.unassignedEmployees.indexOf(employee), 1)
+        this.currentEmployee = {name: '', selected: false}
+        // Unhighlight the room
+        this.currentRoom.style.borderColor = this.greyColor
+        this.currentRoom.style.color = this.blackColor
+        this.currentRoom = document.createElement('div')
       } else {
         // Select this employee (and deselect others)
         this.unassignedEmployees.forEach((employee) => {employee.selected = false})
         employee.selected = true
         this.currentEmployee = employee
       }
-      
     }
   }
 
-  private roomClick(roomButton: HTMLElement, annotationElem: HTMLDivElement, annotationSize: DOMRect) {
+  private roomClick(roomButton: HTMLElement, annotationElem: HTMLDivElement) {
     if (roomButton.innerText == 'Unassigned') {
       if (this.currentEmployee.name) {
         // Assign the current employee to the room
-        roomButton.innerText = this.currentEmployee.name;
-        const annotationSize = annotationElem.getBoundingClientRect();
-        annotationElem.style.marginLeft = `-${annotationSize.width/2}px`;
-        annotationElem.style.marginTop = `-${annotationSize.height/2}px`;
+        roomButton.innerText = this.currentEmployee.name
+        const annotationSize = annotationElem.getBoundingClientRect()
+        annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
+        annotationElem.style.marginTop = `-${annotationSize.height/2}px`
         // Remove the current employee from the list
         this.unassignedEmployees.splice(this.unassignedEmployees.indexOf(this.currentEmployee), 1)
         this.currentEmployee = {name: '', selected: false}
@@ -143,7 +116,11 @@ export default class Schaefers1 extends Vue{
           roomButton.style.borderColor = this.greyColor
           roomButton.style.color = this.blackColor
         } else {
-          // Highlight the room
+          // Highlight the room (and unhighlight others)
+          this.allRooms.forEach((room) => {
+            room.style.borderColor = this.greyColor
+            room.style.color = this.blackColor
+          })
           this.currentRoom = roomButton
           roomButton.style.borderColor = this.primaryColor
           roomButton.style.color = this.primaryColor
@@ -155,10 +132,10 @@ export default class Schaefers1 extends Vue{
         // Move the room employee out
         this.unassignedEmployees.push({name: roomButton.innerText, selected: false})
         // Remove the current employee in
-        roomButton.innerText = this.currentEmployee.name;
-        const annotationSize = annotationElem.getBoundingClientRect();
-        annotationElem.style.marginLeft = `-${annotationSize.width/2}px`;
-        annotationElem.style.marginTop = `-${annotationSize.height/2}px`;
+        roomButton.innerText = this.currentEmployee.name
+        const annotationSize = annotationElem.getBoundingClientRect()
+        annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
+        annotationElem.style.marginTop = `-${annotationSize.height/2}px`
         // Remove the current employee from the list
         this.unassignedEmployees.splice(this.unassignedEmployees.indexOf(this.currentEmployee), 1)
         this.currentEmployee = {name: '', selected: false}
@@ -166,87 +143,72 @@ export default class Schaefers1 extends Vue{
         // Kick out the room employee
         this.unassignedEmployees.push({name: roomButton.innerText, selected: false})
         roomButton.innerText = 'Unassigned'
-        const annotationSize = annotationElem.getBoundingClientRect();
-        annotationElem.style.marginLeft = `-${annotationSize.width/2}px`;
-        annotationElem.style.marginTop = `-${annotationSize.height/2}px`;
+        const annotationSize = annotationElem.getBoundingClientRect()
+        annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
+        annotationElem.style.marginTop = `-${annotationSize.height/2}px`
       }
     }
   }
 
   private handleSVG() {
     // Destroy any previously created annotation nodes
-    const staleAnnotationNodes = Array.from(document.querySelectorAll('.annotation'));
+    const staleAnnotationNodes = Array.from(document.querySelectorAll('.annotation'))
     staleAnnotationNodes.forEach(node => { node.remove() })
 
-    const textNodes = Array.from(document.querySelectorAll('text'));
+    const textNodes = Array.from(document.querySelectorAll('text'))
 
     textNodes
-      .filter(it => it.innerHTML.match(/^\s*/))
+      .filter(it => /^\s*/.exec(it.innerHTML))
       .forEach(node => {
-        const text = node.innerHTML;
-        console.log(text)
+        const text = node.innerHTML
+        // console.log(text)
         if (this.ignoreList.indexOf(text) != -1) {
           return
         }
       
-        node.style.display = 'hidden';
+        node.style.display = 'hidden'
       
-        const rect = node.getBoundingClientRect();
+        const rect = node.getBoundingClientRect()
 
-        const annotationElem = document.createElement('div');
-        annotationElem.className = 'annotation';
+        const annotationElem = document.createElement('div')
+        annotationElem.className = 'annotation'
       
-        annotationElem.style.left = (rect.left + rect.width/2).toString() + 'px';
-        annotationElem.style.top = (rect.top + rect.height/2).toString() + 'px';
+        annotationElem.style.left = (rect.left + rect.width/2).toString() + 'px'
+        annotationElem.style.top = (rect.top + rect.height/2).toString() + 'px'
 
-        annotationElem.innerHTML = `<div>${text}</div><button>Unassigned</button>`;
+        annotationElem.innerHTML = `<div>${text}</div><button>Unassigned</button>`
 
         const clickableButton = annotationElem.querySelector('button') as HTMLElement
+        this.allRooms.push(clickableButton)
+
         if (clickableButton) {
           clickableButton.addEventListener('click', e => { // eslint-disable-line @typescript-eslint/no-non-null-assertion
             const buttonElem = e.target as HTMLElement
-            this.roomClick(buttonElem, annotationElem, annotationSize)
-
-            // for (let name = ''; name != buttonElem.innerText; name = [
-            //   'Jean-Luc Picard',
-            //   'Jordi LaForge',
-            //   'Dr. Crusher',
-            //   'Wesley Crusher',
-            //   'Data',
-            //   'Deanna Troi',
-            // ][(Math.random() * 6) | 0]) {
-            //   buttonElem.innerText = name;
-              
-            //   const annotationSize = annotationElem.getBoundingClientRect();
-            //   annotationElem.style.marginLeft = `-${annotationSize.width/2}px`;
-            //   annotationElem.style.marginTop = `-${annotationSize.height/2}px`;
-            // }
+            this.roomClick(buttonElem, annotationElem)
           })
         }
         
-        document.body.appendChild(annotationElem);
+        document.body.appendChild(annotationElem)
         
-        const annotationSize = annotationElem.getBoundingClientRect();
+        const annotationSize = annotationElem.getBoundingClientRect()
         
-        annotationElem.style.marginLeft = `-${annotationSize.width/2}px`;
-        annotationElem.style.marginTop = `-${annotationSize.height/2}px`;
-    });
+        annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
+        annotationElem.style.marginTop = `-${annotationSize.height/2}px`
+    })
   }
 
-  private windowResizeEventHandler() {
-    this.handleSVG()
-  }
+  private windowResizeEventHandler = this.handleSVG.bind(this)
 
   created() {
-    window.addEventListener('resize', this.windowResizeEventHandler);
+    window.addEventListener('resize', this.windowResizeEventHandler)
   }
 
   destroyed() {
-    window.removeEventListener('resize', this.windowResizeEventHandler);
+    window.removeEventListener('resize', this.windowResizeEventHandler)
   }
 
   mounted() {
-    this.handleSVG();
+    this.handleSVG()
   }
 }
 </script>

@@ -74,15 +74,15 @@ const ifCanViewTeleworkApplication = (to: Route, from: Route, next: Next) => {
   }
 }
 
-const ifCanViewSeatingCharts = (to: Route, from: Route, next: Next) => {
-  if (!!authState.token && Vue.prototype.$cookies.get('can_view_seating_charts') == 'true') { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    next()
-    return
-  } else {
-    console.info('User cannot view seating charts. Redirecting to dashboard.')
-    next('dashboard')
-  }
-}
+// const ifCanViewSeatingCharts = (to: Route, from: Route, next: Next) => {
+//   if (!!authState.token && Vue.prototype.$cookies.get('can_view_seating_charts') == 'true') { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+//     next()
+//     return
+//   } else {
+//     console.info('User cannot view seating charts. Redirecting to dashboard.')
+//     next('dashboard')
+//   }
+// }
 
 // TODO: Add a reset password view as in Django version, unless we're authenticating with LDAP
 const routes: RouteConfig[] = [
@@ -149,13 +149,60 @@ const routes: RouteConfig[] = [
         path: '/security-message',
         name: 'security-message',
         component: () => import('pages/SecurityMessage.vue'),
-        beforeEnter: ifAuthenticated
+        beforeEnter: ifAuthenticated,
+        children: [
+          {
+            path: '/sec',
+            component: () => import('pages/SecurityMessage.vue'),
+          }
+        ]
       },
       {
         path: '/seating-charts',
         name: 'seating-charts',
-        component: () => import('pages/SeatingCharts.vue'),
-        beforeEnter: ifCanViewSeatingCharts
+        component: () => import('src/pages/seatingCharts/SeatingCharts.vue'),
+        // beforeEnter: ifCanViewSeatingCharts,
+        children: [
+          {
+            path: 'schaefers',
+            name: 'schaefers',
+            component: () => import('src/pages/seatingCharts/Schaefers.vue'),
+            children: [
+              {
+                path: '1',
+                name: 'schaefers-1',
+                component: () => import('src/pages/seatingCharts/Schaefers1.vue'),
+              },
+              {
+                path: '2',
+                name: 'schaefers-2',
+                component: () => import('src/pages/seatingCharts/Schaefers2.vue'),
+              },
+              {
+                path: '3',
+                name: 'schaefers-3',
+                component: () => import('src/pages/seatingCharts/Schaefers3.vue'),
+              }
+            ]
+          },
+          {
+            path: 'park-place',
+            name: 'park-place',
+            component: () => import('src/pages/seatingCharts/ParkPlace.vue'),
+            children: [
+              {
+                path: '4',
+                name: 'park-place-4',
+                component: () => import('src/pages/seatingCharts/ParkPlace4.vue'),
+              },
+              {
+                path: '5',
+                name: 'park-place-5',
+                component: () => import('src/pages/seatingCharts/ParkPlace5.vue'),
+              }
+            ]
+          }
+        ]
       }
     ]
   },

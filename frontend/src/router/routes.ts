@@ -97,6 +97,11 @@ const routes: RouteConfig[] = [
         component: () => import('pages/Dashboard.vue')
       },
       {
+        path: 'release-notes',
+        name: 'release-notes',
+        component: () => import('pages/ReleaseNotes.vue')
+      },
+      {
         path: '/reviews',
         name: 'reviews',
         component: () => import('pages/PerformanceReviews.vue'),

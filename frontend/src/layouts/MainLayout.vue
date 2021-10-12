@@ -18,7 +18,7 @@
           </div>
         </q-toolbar-title>
 
-        <div>{{ appVersionTag() }}</div>
+        <q-btn flat no-caps :to="{ name: 'release-notes'}">{{ appVersionTag() }}</q-btn>
       </q-toolbar>
     </q-header>
 

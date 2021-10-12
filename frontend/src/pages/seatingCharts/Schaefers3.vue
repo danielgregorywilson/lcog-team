@@ -51,7 +51,7 @@ interface EmployeeType {
   components: { FloorPlan }
 })
 export default class Schaefers3 extends Vue{
-  private ignoreList = []
+  private ignoreList = ['']
   
   private unassignedEmployees: EmployeeType[] = [
     {name: 'Jean-Luc Picard', selected: false},

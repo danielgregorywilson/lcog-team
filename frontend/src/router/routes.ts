@@ -74,15 +74,15 @@ const ifCanViewTeleworkApplication = (to: Route, from: Route, next: Next) => {
   }
 }
 
-const ifCanViewSeatingCharts = (to: Route, from: Route, next: Next) => {
-  if (!!authState.token && Vue.prototype.$cookies.get('can_view_seating_charts') == 'true') { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    next()
-    return
-  } else {
-    console.info('User cannot view seating charts. Redirecting to dashboard.')
-    next('dashboard')
-  }
-}
+// const ifCanViewSeatingCharts = (to: Route, from: Route, next: Next) => {
+//   if (!!authState.token && Vue.prototype.$cookies.get('can_view_seating_charts') == 'true') { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+//     next()
+//     return
+//   } else {
+//     console.info('User cannot view seating charts. Redirecting to dashboard.')
+//     next('dashboard')
+//   }
+// }
 
 // TODO: Add a reset password view as in Django version, unless we're authenticating with LDAP
 const routes: RouteConfig[] = [
@@ -161,7 +161,7 @@ const routes: RouteConfig[] = [
         path: '/seating-charts',
         name: 'seating-charts',
         component: () => import('src/pages/seatingCharts/SeatingCharts.vue'),
-        beforeEnter: ifCanViewSeatingCharts,
+        // beforeEnter: ifCanViewSeatingCharts,
         children: [
           {
             path: 'schaefers',

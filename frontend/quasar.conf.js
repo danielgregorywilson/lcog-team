@@ -77,12 +77,16 @@ module.exports = configure(function (ctx) {
 
       extendWebpack (cfg) {
         // Modify webpack to load SVG with vue-svg-loader
-        const imgRule = cfg.module.rules.filter(rule =>
-          rule.test.toString().match(/svg/)
-        )[0]
-        imgRule.test = eval(imgRule.test.toString().replace('|svg', ''))
+        
+        // Use this to remove existing svg rule
+        // const imgRule = cfg.module.rules.filter(rule =>
+        //   rule.test.toString().match(/svg/)
+        // )[0]
+        // imgRule.test = eval(imgRule.test.toString().replace('|svg', ''))
+        
+        // Create a new rule for '.fpsvg' files that represent floor plan svgs to handle with vue-svg-loader
         cfg.module.rules.push({
-          test: /\.svg$/,
+          test: /\.fpsvg$/,
           loader: 'vue-svg-loader', // `vue-svg` for webpack 1.x
         })
         

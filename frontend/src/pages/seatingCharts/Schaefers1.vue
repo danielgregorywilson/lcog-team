@@ -1,5 +1,5 @@
 <template>
-  <q-page class="row items-center justify-evenly">
+  <q-page class="row items-center justify-evenly" id="schaefers-1-page">
     <div class="row q-gutter-md">
       <div class="col unassigned-employee-list">
         <div>Unassigned Employees</div>
@@ -40,7 +40,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import FloorPlan from '../../assets/floorPlans/schaefers1.svg'
+import FloorPlan from '../../assets/floorPlans/schaefers1.fpsvg'
 
 interface EmployeeType {
   name: string
@@ -173,8 +173,8 @@ export default class Schaefers1 extends Vue{
         const annotationElem = document.createElement('div')
         annotationElem.className = 'annotation'
       
-        annotationElem.style.left = (rect.left + rect.width/2).toString() + 'px'
-        annotationElem.style.top = (rect.top + rect.height/2).toString() + 'px'
+        annotationElem.style.left = (rect.left + rect.width/2 - 209).toString() + 'px'
+        annotationElem.style.top = (rect.top + rect.height/2 - 102).toString() + 'px'
 
         annotationElem.innerHTML = `<div>${text}</div><button>Unassigned</button>`
 
@@ -188,7 +188,7 @@ export default class Schaefers1 extends Vue{
           })
         }
         
-        document.body.appendChild(annotationElem)
+        document.querySelector('#schaefers-1-page')?.appendChild(annotationElem)
         
         const annotationSize = annotationElem.getBoundingClientRect()
         

@@ -1095,7 +1095,7 @@ class Responsibility(models.Model):
         verbose_name = _("Responsibility")
         verbose_name_plural = _("Responsibilities")
 
-    name = models.CharField(_("name"), max_length=500, blank=True, null=True)
-    url = models.URLField(_("url"), blank=True, null=True)
+    name = models.CharField(_("name"), max_length=500)
+    link = models.URLField(_("link"), blank=True)
     primary_employee = models.ForeignKey("people.Employee", related_name="primary_responsibilities", null=True, on_delete=models.SET_NULL)
     secondary_employee = models.ForeignKey("people.Employee", related_name="secondary_responsibilities", null=True, on_delete=models.SET_NULL)

@@ -102,6 +102,30 @@ const routes: RouteConfig[] = [
         component: () => import('pages/ReleaseNotes.vue')
       },
       {
+        path: '/responsibilities',
+        name: 'responsibilities',
+        component: () => import('src/pages/responsibilities/Responsibilities.vue'),
+        // props: { pk: 77 },
+        children: [
+          {
+            path: 'orphaned1',
+            name: 'orphaned-responsibilities',
+            props: { orphaned: true, pk: 78 }
+          },
+          {
+            path: ':pk',
+            name: 'employee-responsibilities',
+            children: [
+              {
+                path: 'secondary',
+                name: 'employee-secondary-responsibilities',
+                props: { secondary: true }
+              }
+            ]
+          }
+        ]
+      },
+      {
         path: '/reviews',
         name: 'reviews',
         component: () => import('pages/PerformanceReviews.vue'),
@@ -154,13 +178,7 @@ const routes: RouteConfig[] = [
         path: '/security-message',
         name: 'security-message',
         component: () => import('pages/SecurityMessage.vue'),
-        beforeEnter: ifAuthenticated,
-        children: [
-          {
-            path: '/sec',
-            component: () => import('pages/SecurityMessage.vue'),
-          }
-        ]
+        beforeEnter: ifAuthenticated
       },
       {
         path: '/seating-charts',

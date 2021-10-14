@@ -9,6 +9,7 @@ from rest_framework.permissions import (
 from rest_framework.response import Response
 
 from django.contrib.auth.models import Group, User
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 from mainsite.helpers import (
@@ -19,13 +20,13 @@ from mainsite.helpers import (
 )
 
 from people.models import (
-    Employee, PerformanceReview, ReviewNote, Signature, TeleworkApplication,
-    TeleworkSignature, ViewedSecurityMessage
+    Employee, PerformanceReview, Responsibility, ReviewNote, Signature,
+    TeleworkApplication, TeleworkSignature, ViewedSecurityMessage
 )
 from people.serializers import (
     EmployeeSerializer, FileUploadSerializer, GroupSerializer,
     PerformanceReviewFileUploadSerializer, PerformanceReviewSerializer,
-    ReviewNoteSerializer, SignatureSerializer,
+    ResponsibilitySerializer, ReviewNoteSerializer, SignatureSerializer,
     TeleworkApplicationFileUploadSerializer, TeleworkApplicationSerializer,
     TeleworkSignatureSerializer, UserSerializer,
     ViewedSecurityMessageSerializer
@@ -117,6 +118,39 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         serialized_review = PerformanceReviewSerializer(next_review,
             context={'request': request})
         return Response(serialized_review.data)
+
+
+class ResponsibilityViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Responsibility.objects.all()
+    serializer_class = ResponsibilitySerializer
+
+    def get_queryset(self):
+        """
+        Return a list of all responsibilities to any authenticated user.
+        Optionally filter by orphaned responsibilities.
+        Optionally filter by employee pk to get primary responsibilities with
+        secondaries, or just a list of secondaries.
+        """
+        user = self.request.user
+        if user.is_authenticated:
+            orphaned = self.request.query_params.get('orphaned', None)
+            if orphaned is not None and orphaned == "True":
+                queryset = Responsibility.objects.filter(
+                    Q(primary_employee__isnull=True) | Q(secondary_employee__isnull=True)
+                )
+            employee = self.request.query_params.get('employee', None)
+            if employee is not None and employee.isdigit():
+                secondary = self.request.query_params.get('secondary', None)
+                if secondary is not None and secondary == "True":
+                    queryset = Responsibility.objects.filter(secondary_employee=employee)
+                else:
+                    queryset = Responsibility.objects.filter(primary_employee=employee)
+        else:
+            queryset = Responsibility.objects.none()
+        return queryset if 'queryset' in locals() else Responsibility.objects.all()
 
 
 class PerformanceReviewPermission(BasePermission):

@@ -518,3 +518,29 @@ export interface TeleworkSignatureRetrieve {
   index: number
   date: Date
 }
+
+
+/////////////////////////////////////////////////////////
+// Responsibility Structure from Django Rest Framework //
+/////////////////////////////////////////////////////////
+
+export interface ResponsibilityCreate {
+  name: string
+  employee_pk: number
+  index: number
+}
+
+export interface ResponsibilityRetrieve {
+  url: Url
+  pk: number
+  name: string
+  link?: Url
+  primary_employee?: number
+  primary_employee_name?: string
+  secondary_employee?: number
+  secondary_employee_name?: string
+}
+
+export interface ResponsibilityModule {
+  'responsibilityModule/allResponsibilities': string 
+}

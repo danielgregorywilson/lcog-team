@@ -7,9 +7,10 @@ from mainsite.api_views import SecurityMessageViewSet
 from mainsite.views import obtain_auth_token_without_password
 from people.api_views import (
     CurrentUserView, EmployeeViewSet, FileUploadViewSet, GroupViewSet,
-    PerformanceReviewViewSet, ReviewNoteViewSet, SignatureViewSet,
-    TeleworkApplicationFileUploadViewSet, TeleworkApplicationViewSet,
-    TeleworkSignatureViewSet, UserViewSet, ViewedSecurityMessageViewSet
+    PerformanceReviewViewSet, ResponsibilityViewSet, ReviewNoteViewSet,
+    SignatureViewSet, TeleworkApplicationFileUploadViewSet,
+    TeleworkApplicationViewSet, TeleworkSignatureViewSet, UserViewSet,
+    ViewedSecurityMessageViewSet
 )
 
 
@@ -24,6 +25,7 @@ router = routers.DefaultRouter(trailing_slash=False)
 router.register('v1/user', UserViewSet)
 router.register('v1/groups', GroupViewSet)
 router.register('v1/employee', EmployeeViewSet)
+router.register('v1/responsibilities', ResponsibilityViewSet)
 router.register('v1/performancereview', PerformanceReviewViewSet)
 router.register('v1/fileupload', FileUploadViewSet, basename='fileupload')
 router.register('v1/telework-fileupload', TeleworkApplicationFileUploadViewSet, basename='telework-fileupload')

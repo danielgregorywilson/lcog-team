@@ -1,11 +1,7 @@
-import { ActionTree } from 'vuex';
-import { StateInterface } from '../../index';
-import { ResponsibilityStateInterface } from './state';
-import axios from 'axios';
-import {
-  AxiosTeleworkApplicationRetrieveOneServerResponse,
-  TeleworkSignatureCreate
-} from 'src/store/types';
+import { ActionTree } from 'vuex'
+import { StateInterface } from '../../index'
+import { ResponsibilityStateInterface } from './state'
+import axios from 'axios'
 
 function getApiUrl(): string {
   if (process.env.API_URL) {
@@ -54,6 +50,15 @@ const actions: ActionTree<ResponsibilityStateInterface, StateInterface> = {
           reject(e)
         })
     })
+  },
+  getSimpleEmployeeList: ({ commit }) => {
+    axios({ url: `${ process.env.API_URL }api/v1/employee/simple_list`}) // eslint-disable-line @typescript-eslint/restrict-template-expressions
+      .then(resp => {
+        commit('setSimpleEmployeeList', resp)
+      })
+      .catch(e => {
+        console.error('Error getting simple employee list:', e)
+      })
   },
   authLogout: ({commit}) => {
     return new Promise((resolve) => {

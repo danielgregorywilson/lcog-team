@@ -118,6 +118,14 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             return ""
 
 
+class SimpleEmployeeSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='user.get_full_name')
+
+    class Meta:
+        model = Employee
+        fields = ['pk', 'name']
+
+
 class ResponsibilitySerializer(serializers.HyperlinkedModelSerializer):
     primary_employee_name = serializers.SerializerMethodField()
     secondary_employee_name = serializers.SerializerMethodField()

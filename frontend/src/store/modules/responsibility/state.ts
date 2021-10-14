@@ -1,3 +1,5 @@
+import { SimpleEmployeeRetrieve } from "src/store/types";
+
 export interface ResponsibilityInterface {
   pk: number
   name: string
@@ -19,6 +21,7 @@ export interface ResponsibilityStateInterface {
   orphanedResponsibilities: Array<ResponsibilityInterface>
   employeePrimaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
   employeeSecondaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
+  simpleEmployeeList: Array<SimpleEmployeeRetrieve>
 }
 
 const state: ResponsibilityStateInterface = {
@@ -26,6 +29,7 @@ const state: ResponsibilityStateInterface = {
   orphanedResponsibilities: [],
   employeePrimaryResponsibilities: [],
   employeeSecondaryResponsibilities: [],
+  simpleEmployeeList: []
 };
 
 export default state;

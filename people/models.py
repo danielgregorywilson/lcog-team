@@ -1094,6 +1094,7 @@ class Responsibility(models.Model):
     class Meta:
         verbose_name = _("Responsibility")
         verbose_name_plural = _("Responsibilities")
+        ordering = ["name"]
 
     name = models.CharField(_("name"), max_length=500)
     link = models.URLField(_("link"), blank=True)

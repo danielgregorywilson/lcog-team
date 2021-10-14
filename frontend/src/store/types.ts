@@ -52,6 +52,11 @@ export interface EmployeeRetrieve {
   next_to_sign_prs: string
 }
 
+export interface SimpleEmployeeRetrieve {
+  pk: number
+  name: string
+}
+
 export interface AxiosEmployeeRetrieveOneServerResponse {
   data: EmployeeRetrieve
 }
@@ -541,6 +546,33 @@ export interface ResponsibilityRetrieve {
   secondary_employee_name?: string
 }
 
-export interface ResponsibilityModule {
-  'responsibilityModule/allResponsibilities': string 
+export interface ResponsibilityUpdate {
+  name?: string
+  link?: Url
+  primary_employee?: number
+  primary_employee_name?: string
+  secondary_employee?: number
+  secondary_employee_name?: string
+}
+
+export interface AxiosResponsibilityUpdateServerResponse {
+  data: ResponsibilityRetrieve
+}
+
+export interface VuexStoreGetters {
+  'responsibilityModule/simpleEmployeeList': {
+    results: Array<SimpleEmployeeRetrieve>
+  },
+  'responsibilityModule/allResponsibilities': {
+    results: Array<ResponsibilityRetrieve>
+  },
+  'responsibilityModule/orphanedResponsibilities': {
+    results: Array<ResponsibilityRetrieve>
+  },
+  'responsibilityModule/employeePrimaryResponsibilities': { // TODO: Fix
+    results: Array<ResponsibilityRetrieve>
+  },
+  'responsibilityModule/employeeSecondaryResponsibilities': { // TODO: Fix
+    results: Array<ResponsibilityRetrieve>
+  }
 }

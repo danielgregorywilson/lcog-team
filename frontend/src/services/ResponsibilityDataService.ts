@@ -1,5 +1,5 @@
 import http from '../http-common';
-import { ResponsibilityUpdate } from 'src/store/types';
+import { ResponsibilityCreate, ResponsibilityUpdate } from 'src/store/types';
 
 
 class ResponsibilityDataService {
@@ -17,6 +17,10 @@ class ResponsibilityDataService {
 
   getSecondariesForEmployee(employee_pk: number) {
     return http.get(`api/v1/responsibilities?employee=${employee_pk}&secondary=True`)
+  }
+
+  create(data: ResponsibilityCreate) {
+    return http.post('api/v1/responsibilities', data);
   }
 
   update(pk: string, data: ResponsibilityUpdate) {

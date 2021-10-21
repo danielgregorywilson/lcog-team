@@ -159,6 +159,16 @@ class ResponsibilityViewSet(viewsets.ModelViewSet):
             queryset = Responsibility.objects.none()
         return queryset if 'queryset' in locals() else Responsibility.objects.all()
 
+    def create(self, request):
+        name = request.data['name']
+        link = request.data['link'] if hasattr(request.data, 'link') else ''
+        primary_employee = Employee.objects.get(pk=request.data['primary_employee'])
+        secondary_employee = Employee.objects.get(pk=request.data['secondary_employee'])
+        responsibility = Responsibility.objects.create(name=name, link=link, primary_employee=primary_employee, secondary_employee=secondary_employee)
+        serialized_responsibility = ResponsibilitySerializer(responsibility,
+            context={'request': request})
+        return Response(serialized_responsibility.data)
+
     # def update(self, request, pk=None):
     #     import pdb; pdb.set_trace();
     #     pr = PerformanceReview.objects.get(pk=pk)

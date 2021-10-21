@@ -1,4 +1,4 @@
-import { SimpleEmployeeRetrieve } from "src/store/types";
+import { SimpleEmployeeRetrieve } from 'src/store/types';
 
 export interface ResponsibilityInterface {
   pk: number
@@ -17,7 +17,7 @@ export interface EmployeeResponsibilitiesInterface {
 }
 
 export interface ResponsibilityStateInterface {
-  allResponsibilities: Array<ResponsibilityInterface>
+  allResponsibilities: { results: Array<ResponsibilityInterface> }
   orphanedResponsibilities: Array<ResponsibilityInterface>
   employeePrimaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
   employeeSecondaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
@@ -25,7 +25,7 @@ export interface ResponsibilityStateInterface {
 }
 
 const state: ResponsibilityStateInterface = {
-  allResponsibilities: [],
+  allResponsibilities: { results: []},
   orphanedResponsibilities: [],
   employeePrimaryResponsibilities: [],
   employeeSecondaryResponsibilities: [],

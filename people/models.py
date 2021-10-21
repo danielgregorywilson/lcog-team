@@ -1095,6 +1095,9 @@ class Responsibility(models.Model):
         verbose_name = _("Responsibility")
         verbose_name_plural = _("Responsibilities")
         ordering = ["name"]
+    
+    def __str__(self):
+        return self.name
 
     name = models.CharField(_("name"), max_length=500)
     link = models.URLField(_("link"), blank=True)

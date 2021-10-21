@@ -531,8 +531,9 @@ export interface TeleworkSignatureRetrieve {
 
 export interface ResponsibilityCreate {
   name: string
-  employee_pk: number
-  index: number
+  link?: Url
+  primary_employee?: number
+  secondary_employee?: number
 }
 
 export interface ResponsibilityRetrieve {
@@ -547,12 +548,15 @@ export interface ResponsibilityRetrieve {
 }
 
 export interface ResponsibilityUpdate {
+  pk?: number
   name?: string
   link?: Url
   primary_employee?: number
-  primary_employee_name?: string
   secondary_employee?: number
-  secondary_employee_name?: string
+}
+
+export interface ResponsibilityNameUpdate extends ResponsibilityUpdate {
+  name: string
 }
 
 export interface AxiosResponsibilityUpdateServerResponse {
@@ -560,9 +564,7 @@ export interface AxiosResponsibilityUpdateServerResponse {
 }
 
 export interface VuexStoreGetters {
-  'responsibilityModule/simpleEmployeeList': {
-    results: Array<SimpleEmployeeRetrieve>
-  },
+  'responsibilityModule/simpleEmployeeList': Array<SimpleEmployeeRetrieve>,
   'responsibilityModule/allResponsibilities': {
     results: Array<ResponsibilityRetrieve>
   },

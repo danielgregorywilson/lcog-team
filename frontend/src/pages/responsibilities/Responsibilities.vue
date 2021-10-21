@@ -48,7 +48,7 @@
     <div class="q-mt-lg" style="max-width: 400px">
       <q-form
         @submit="onFormSubmit"
-        @reset="onFormReset"
+        @reset="clearForm"
         class="q-gutter-sm"
       >
         <div class="text-h5">Add a Responsibility</div>
@@ -56,10 +56,9 @@
           filled
           v-model="formName"
           label="Name"
-          lazy-rules
-          :rules="[ val => val && val.length > 0 || 'Required']"
         />
-        <q-select v-model="formPrimaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="0" @filter="filterFn">
+        <!-- <q-select v-model="formPrimaryEmployee" :options="employeeOptions" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="0" @filter="filterFn"> -->
+        <q-select v-model="formPrimaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="0">
           <template v-slot:no-option>
             <q-item>
               <q-item-section class="text-grey">
@@ -67,20 +66,28 @@
               </q-item-section>
             </q-item>
           </template>
-          <template v-if="formPrimaryEmployee" v-slot:append>
-            <q-icon name="cancel" @click.stop="formPrimaryEmployee = null" class="cursor-pointer" />
+          <template v-if="formPrimaryEmployee.name" v-slot:append>
+            <q-icon name="cancel" @click.stop="formPrimaryEmployee = this.emptyEmployee" class="cursor-pointer" />
           </template>
         </q-select>
-        <q-select v-model="formSecondaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Secondary Employee" />
+        <q-select v-model="formSecondaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Secondary Employee"  use-input hide-selected fill-input input-debounce="0">
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-grey">
+                No results
+              </q-item-section>
+            </q-item>
+          </template>
+          <template v-if="formSecondaryEmployee.name" v-slot:append>
+            <q-icon name="cancel" @click.stop="formSecondaryEmployee = this.emptyEmployee" class="cursor-pointer" />
+          </template>
+        </q-select>
         <div>
           <q-btn label="Submit" type="submit" color="primary" :disable="!formName"/>
           <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
         </div>
       </q-form>
     </div>
-    <!-- <div>
-      <div v-for="responsibility of allResponsibilities()" :key="responsibility.pk">{{ responsibility }}</div>
-    </div> -->
   </q-page>
 </template>
 
@@ -93,7 +100,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { AxiosResponsibilityUpdateServerResponse, ResponsibilityRetrieve, SimpleEmployeeRetrieve, VuexStoreGetters } from '../../store/types'
+import { ResponsibilityRetrieve, SimpleEmployeeRetrieve, VuexStoreGetters } from '../../store/types'
 import { Notify } from 'quasar'
 import ResponsibilityDataService from '../../services/ResponsibilityDataService'
 
@@ -109,15 +116,18 @@ export default class TimeOffRequests extends Vue {
   private displayEmployeeSecondaryResponsibilitiesTable = false
 
   private formName = ''
-  private formPrimaryEmployee = ''
-  private formSecondaryEmployee = ''
+  private emptyEmployee = {name: '', pk: -1}
+  private formPrimaryEmployee = this.emptyEmployee
+  private formSecondaryEmployee = this.emptyEmployee
 
   // private getters = this.$store.getters
   private getters = this.$store.getters as VuexStoreGetters
-  
-  private employeeOptions() {
-    return {...this.employees()}
-  }
+
+  // private employeeOptions() {
+  //   return {...this.employees()}
+  // }
+
+  // private employeeOptions = Object.assign([], this.employees())
 
   private employees(): Array<SimpleEmployeeRetrieve> {    
     return this.getters['responsibilityModule/simpleEmployeeList']
@@ -154,13 +164,30 @@ export default class TimeOffRequests extends Vue {
     closePopupMethod()
   }
 
+  private createResponsibility() {
+    return new Promise((resolve, reject) => {
+      ResponsibilityDataService.create({
+        name: this.formName,
+        primary_employee: this.formPrimaryEmployee.pk,
+        secondary_employee: this.formSecondaryEmployee.pk
+      })
+        .then(() => {
+          resolve('Created')
+        })
+        .catch(e => {
+          console.error('Error creating Responsibility:', e)
+          reject(e)
+        })
+    })
+  }
+
   private updateResponsibility(responsibility: ResponsibilityRetrieve, closePopupMethod: () => any) { // eslint-disable-line @typescript-eslint/no-explicit-any
     return new Promise((resolve, reject) => {
       ResponsibilityDataService.update(responsibility.pk.toString(), {
         name: responsibility.name
         // TODO: employees
       })
-      .then((response: AxiosResponsibilityUpdateServerResponse) => {
+      .then(() => {
         closePopupMethod()
         Notify.create('Updated responsibility')
         resolve('Updated')
@@ -212,19 +239,29 @@ export default class TimeOffRequests extends Vue {
     return n !== Infinity && String(n) === str && n >= 0;
   }
 
-  private filterFn (val, update, abort) {
-    update(() => {
-      const needle = val.toLowerCase()
-      this.employees = stringOptions.filter(v => v.toLowerCase().indexOf(needle) > -1)
-    })
-  }
+  // private filterFn (val, update, abort) {
+  //   update(() => {
+  //     const needle = val.toLowerCase()
+  //     this.employeeOptions = this.employeeOptions.filter(v => v.toLowerCase().indexOf(needle) > -1)
+  //   })
+  // }
 
-  private onFormReset () {
+  private clearForm() {
     this.formName = ''
+    this.formPrimaryEmployee = this.emptyEmployee
+    this.formSecondaryEmployee = this.emptyEmployee
   }
 
   private onFormSubmit () {
-  
+    this.createResponsibility()
+      .then(() => {
+        this.retrieveAllResponsibilites()
+        Notify.create('Created responsibility')
+        this.clearForm()
+      })
+      .catch(e => {
+        console.error('Error creating Responsibility:', e)
+      })
   }
 
   mounted() {
@@ -248,7 +285,9 @@ export default class TimeOffRequests extends Vue {
       }
     } else {
       this.displayAllResponsibilitiesTable = true
-      if (this.allResponsibilities() == null) {
+      // TODO: Only fetch if doesn't exist
+      this.retrieveAllResponsibilites()
+      if (this.allResponsibilities() == []) { // <----- THIS DOESN'T WORK
         this.retrieveAllResponsibilites()
       }
     }

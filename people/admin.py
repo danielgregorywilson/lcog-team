@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models import (
-    Division, Employee, JobTitle, PerformanceReview, ReviewNote, Signature,
+    Division, Employee, JobTitle, PerformanceReview, Responsibility, ReviewNote, Signature,
     SignatureReminder, TeleworkApplication, TeleworkSignature, UnitOrProgram,
     ViewedSecurityMessage
 )
@@ -106,3 +106,8 @@ class TeleworkSignatureInline(admin.TabularInline):
 class TeleworkApplicationAdmin(admin.ModelAdmin):
     list_display = ("username", "status")
     inlines = (TeleworkSignatureInline,)
+
+
+@admin.register(Responsibility)
+class ResponsibilityAdmin(admin.ModelAdmin):
+    list_display = ("pk", "name", "primary_employee", "secondary_employee")

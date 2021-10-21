@@ -1,5 +1,4 @@
-import { stat } from 'fs';
-import { ResponsibilityRetrieve, SimpleEmployeeRetrieve } from 'src/store/types'
+import { ResponsibilityRetrieve, ResponsibilityNameUpdate, SimpleEmployeeRetrieve } from 'src/store/types'
 import Vue from 'vue'
 
 import { MutationTree } from 'vuex'
@@ -33,7 +32,7 @@ const mutation: MutationTree<ResponsibilityStateInterface> = {
   // setUserSecondaryResponsibilities: (state, resp: {data: Array<ResponsibilityRetrieve>}) => {
   //   Vue.set(state, 'allResponsibilities', resp.data)
   // },
-  updateResponsibilityName: (state, data) => {
+  updateResponsibilityName: (state, data: ResponsibilityNameUpdate) => {
     state.allResponsibilities.results.filter(r => r.pk == data.pk)[0].name = data.name
     
     
@@ -48,7 +47,7 @@ const mutation: MutationTree<ResponsibilityStateInterface> = {
   },
   authLogout: (state) => {
     // Clean up state
-    state.allResponsibilities = []
+    state.allResponsibilities = { results: [] }
     state.orphanedResponsibilities = []
     state.employeePrimaryResponsibilities = []
     state.employeeSecondaryResponsibilities = []

@@ -26,6 +26,10 @@ class ResponsibilityDataService {
   update(pk: string, data: ResponsibilityUpdate) {
     return http.put(`api/v1/responsibilities/${pk}`, data);
   }
+
+  delete(pk: string) {
+    return http.delete(`api/v1/responsibilities/${pk}`);
+  }
 }
 
 export default new ResponsibilityDataService();

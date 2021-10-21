@@ -34,6 +34,9 @@
               <q-input v-model="props.row.secondary_employee_name" dense autofocus />
             </q-popup-edit>
           </q-td>
+          <q-td key="actions" :props="props">
+            <q-btn class="col delete-button" dense round flat color="grey" @click="showDeleteDialog(props)" icon="delete"></q-btn>
+          </q-td>
         </q-tr>
       </template>
     </q-table>
@@ -88,6 +91,23 @@
         </div>
       </q-form>
     </div>
+
+    <q-dialog v-model="deleteDialogVisible">
+      <q-card>
+        <q-card-section>
+          <div class="row items-center">
+            <q-avatar icon="list" color="primary" text-color="white" />
+            <span class="q-ml-sm">Are you sure you want to delete this responsibility?</span>
+          </div>
+          <div class="row justify-center text-center">{{ deleteDialogResponsibilityName }}</div>
+        </q-card-section>
+
+        <q-card-actions class="row justify-around">
+          <q-btn flat label="Cancel" color="primary" v-close-popup />
+          <q-btn flat label="Yes, delete it" color="primary" @click="deleteRow()" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -104,6 +124,11 @@ import { ResponsibilityRetrieve, SimpleEmployeeRetrieve, VuexStoreGetters } from
 import { Notify } from 'quasar'
 import ResponsibilityDataService from '../../services/ResponsibilityDataService'
 
+interface QuasarResponsibilityTableRowClickActionProps {
+  evt: MouseEvent;
+  row: ResponsibilityRetrieve;
+}
+
 @Component
 export default class TimeOffRequests extends Vue {
   private orphaned = this.$route.query.orphaned
@@ -114,6 +139,10 @@ export default class TimeOffRequests extends Vue {
   private displayOrphanedResponsibilitiesTable = false
   private displayEmployeeResponsibilitiesTable = false
   private displayEmployeeSecondaryResponsibilitiesTable = false
+
+  private deleteDialogVisible = false
+  private deleteDialogResponsibilityName = ''
+  private rowPkToDelete = ''
 
   private formName = ''
   private emptyEmployee = {name: '', pk: -1}
@@ -153,6 +182,7 @@ export default class TimeOffRequests extends Vue {
     { name: 'name', required: true, label: 'Name', field: 'name', sortable: true, align: 'left' },
     { name: 'primary_employee_name', label: 'Primary Employee', field: 'primary_employee_name', sortable: true },
     { name: 'secondary_employee_name', label: 'Secondary Employee', field: 'secondary_employee_name', sortable: true },
+    { name: 'actions', label: 'Actions', },
   ]
 
   private updateName(pk: number, name: string) {
@@ -245,6 +275,23 @@ export default class TimeOffRequests extends Vue {
   //     this.employeeOptions = this.employeeOptions.filter(v => v.toLowerCase().indexOf(needle) > -1)
   //   })
   // }
+
+  private showDeleteDialog(props: QuasarResponsibilityTableRowClickActionProps): void {
+    this.rowPkToDelete = props.row.pk.toString()
+    this.deleteDialogResponsibilityName = props.row.name
+    this.deleteDialogVisible = true;
+  }
+
+  private deleteRow(): void {
+    ResponsibilityDataService.delete(this.rowPkToDelete)
+      .then(() => {
+        Notify.create('Deleted a responsibility.')
+        this.retrieveAllResponsibilites()
+      })
+      .catch(e => {
+        console.error('Error deleting responsibility', e)
+      })
+  }
 
   private clearForm() {
     this.formName = ''

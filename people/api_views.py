@@ -161,9 +161,9 @@ class ResponsibilityViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         name = request.data['name']
-        link = request.data['link'] if hasattr(request.data, 'link') else ''
-        primary_employee = Employee.objects.get(pk=request.data['primary_employee'])
-        secondary_employee = Employee.objects.get(pk=request.data['secondary_employee'])
+        link = request.data['link'] if 'link' in request.data else ''
+        primary_employee = Employee.objects.get(pk=request.data['primary_employee']) if request.data['primary_employee'] != -1 else None
+        secondary_employee = Employee.objects.get(pk=request.data['secondary_employee']) if request.data['secondary_employee'] != -1 else None
         responsibility = Responsibility.objects.create(name=name, link=link, primary_employee=primary_employee, secondary_employee=secondary_employee)
         serialized_responsibility = ResponsibilitySerializer(responsibility,
             context={'request': request})

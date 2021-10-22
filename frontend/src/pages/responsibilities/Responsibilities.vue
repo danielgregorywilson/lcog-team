@@ -10,7 +10,7 @@
     >
       <template v-slot:body="props">
         <q-tr :props="props">
-          <q-td key="name" :props="props">
+          <q-td key="name" :props="props" class="cursor-pointer">
             {{ props.row.name }}
             <q-popup-edit :value="props.row.name" persistent>
               <template v-slot="{ initialValue, value, emitValue, validate, set, cancel }">
@@ -24,15 +24,15 @@
           </q-td>
           <q-td key="primary_employee_name" :props="props">
             {{ props.row.primary_employee_name }}
-            <q-popup-edit v-model="props.row.primary_employee_name" buttons>
+            <!-- <q-popup-edit v-model="props.row.primary_employee_name" buttons>
               <q-input v-model="props.row.primary_employee_name" dense autofocus />
-            </q-popup-edit>
+            </q-popup-edit> -->
           </q-td>
           <q-td key="secondary_employee_name" :props="props">
             {{ props.row.secondary_employee_name }}
-            <q-popup-edit v-model="props.row.secondary_employee_name" buttons>
+            <!-- <q-popup-edit v-model="props.row.secondary_employee_name" buttons>
               <q-input v-model="props.row.secondary_employee_name" dense autofocus />
-            </q-popup-edit>
+            </q-popup-edit> -->
           </q-td>
           <q-td key="actions" :props="props">
             <q-btn class="col delete-button" dense round flat color="grey" @click="showDeleteDialog(props)" icon="delete"></q-btn>
@@ -70,7 +70,7 @@
             </q-item>
           </template>
           <template v-if="formPrimaryEmployee.name" v-slot:append>
-            <q-icon name="cancel" @click.stop="formPrimaryEmployee = this.emptyEmployee" class="cursor-pointer" />
+            <q-icon name="cancel" @click.stop="formPrimaryEmployee = emptyEmployee" class="cursor-pointer" />
           </template>
         </q-select>
         <q-select v-model="formSecondaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Secondary Employee"  use-input hide-selected fill-input input-debounce="0">
@@ -82,7 +82,7 @@
             </q-item>
           </template>
           <template v-if="formSecondaryEmployee.name" v-slot:append>
-            <q-icon name="cancel" @click.stop="formSecondaryEmployee = this.emptyEmployee" class="cursor-pointer" />
+            <q-icon name="cancel" @click.stop="formSecondaryEmployee = emptyEmployee" class="cursor-pointer" />
           </template>
         </q-select>
         <div>

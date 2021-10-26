@@ -26,17 +26,8 @@
     >
       <template v-slot:body="props">
         <q-tr :props="props">
-          <q-td key="name" :props="props" class="cursor-pointer">
+          <q-td key="name" :props="props">
             {{ props.row.name }}
-            <!-- <q-popup-edit :value="props.row.name" persistent>
-              <template v-slot="{ initialValue, value, emitValue, validate, set, cancel }">
-                <q-input :value="props.row.name" dense autofocus @input="updateName(props.row.pk, $event)" />
-                <div class="row justify-center q-mt-sm">
-                  <q-btn flat class="text-primary" @click.stop="cancelUpdateName(props.row.pk, initialValue, cancel)">Cancel</q-btn>
-                  <q-btn flat class="text-primary" @click.stop="updateResponsibility(props.row, cancel)" :disable="value === '' || initialValue === value">Set</q-btn>
-                </div>
-              </template>
-            </q-popup-edit> -->
           </q-td>
           <q-td key="primary_employee_name" :props="props">
             <router-link v-if="props.row.primary_employee_pk" :to="{ name: 'employee-responsibilities', params: { pk: props.row.primary_employee_pk} }">
@@ -64,17 +55,8 @@
     >
       <template v-slot:body="props">
         <q-tr :props="props">
-          <q-td key="name" :props="props" class="cursor-pointer">
+          <q-td key="name" :props="props">
             {{ props.row.name }}
-            <!-- <q-popup-edit :value="props.row.name" persistent>
-              <template v-slot="{ initialValue, value, emitValue, validate, set, cancel }">
-                <q-input :value="props.row.name" dense autofocus @input="updateName(props.row.pk, $event)" />
-                <div class="row justify-center q-mt-sm">
-                  <q-btn flat class="text-primary" @click.stop="cancelUpdateName(props.row.pk, initialValue, cancel)">Cancel</q-btn>
-                  <q-btn flat class="text-primary" @click.stop="updateResponsibility(props.row, cancel)" :disable="value === '' || initialValue === value">Set</q-btn>
-                </div>
-              </template>
-            </q-popup-edit> -->
           </q-td>
           <q-td key="primary_employee_name" :props="props">
             <router-link v-if="props.row.primary_employee_pk" :to="{ name: 'employee-responsibilities', params: { pk: props.row.primary_employee_pk} }">

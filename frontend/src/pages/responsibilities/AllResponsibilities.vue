@@ -8,35 +8,21 @@
     >
       <template v-slot:body="props">
         <q-tr :props="props">
-          <q-td key="name" :props="props" class="cursor-pointer">
+          <q-td key="name" :props="props">
             {{ props.row.name }}
-            <q-popup-edit :value="props.row.name" persistent>
-              <template v-slot="{ initialValue, value, emitValue, validate, set, cancel }">
-                <q-input :value="props.row.name" dense autofocus @input="updateName(props.row.pk, $event)" />
-                <div class="row justify-center q-mt-sm">
-                  <q-btn flat class="text-primary" @click.stop="cancelUpdateName(props.row.pk, initialValue, cancel)">Cancel</q-btn>
-                  <q-btn flat class="text-primary" @click.stop="updateResponsibility(props.row, cancel)" :disable="value === '' || initialValue === value">Set</q-btn>
-                </div>
-              </template>
-            </q-popup-edit>
           </q-td>
           <q-td key="primary_employee_name" :props="props">
             <router-link v-if="props.row.primary_employee_pk" :to="{ name: 'employee-responsibilities', params: { pk: props.row.primary_employee_pk} }">
               {{ props.row.primary_employee_name }}
             </router-link>
-            <!-- <q-popup-edit v-model="props.row.primary_employee_name" buttons>
-              <q-input v-model="props.row.primary_employee_name" dense autofocus />
-            </q-popup-edit> -->
           </q-td>
           <q-td key="secondary_employee_name" :props="props">
             <router-link v-if="props.row.secondary_employee_pk" :to="{ name: 'employee-secondary-responsibilities', params: { pk: props.row.secondary_employee_pk} }">
               {{ props.row.secondary_employee_name }}
             </router-link>
-            <!-- <q-popup-edit v-model="props.row.secondary_employee_name" buttons>
-              <q-input v-model="props.row.secondary_employee_name" dense autofocus />
-            </q-popup-edit> -->
           </q-td>
           <q-td key="actions" :props="props">
+            <q-btn class="col edit-button" dense round flat color="grey" @click="showEditDialog(props.row)" icon="edit"></q-btn>
             <q-btn class="col delete-button" dense round flat color="grey" @click="showDeleteDialog(props)" icon="delete"></q-btn>
           </q-td>
         </q-tr>
@@ -68,6 +54,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { Notify } from 'quasar'
+import { bus } from '../../App.vue'
 import ResponsibilityDataService from '../../services/ResponsibilityDataService'
 import { Responsibility, VuexStoreGetters } from '../../store/types'
 
@@ -99,38 +86,15 @@ export default class TimeOffRequests extends Vue {
     { name: 'name', required: true, label: 'Name', field: 'name', sortable: true, align: 'left' },
   ]
 
-  private updateName(pk: number, name: string) {
-    this.$store.commit('responsibilityModule/updateResponsibilityName', {pk, name})
-  }
-
-  private cancelUpdateName(pk: number, name: string, closePopupMethod: () => any) { // eslint-disable-line @typescript-eslint/no-explicit-any
-    this.$store.commit('responsibilityModule/updateResponsibilityName', {pk, name})
-    closePopupMethod()
-  }
-
-  private updateResponsibility(responsibility: Responsibility, closePopupMethod: () => any) { // eslint-disable-line @typescript-eslint/no-explicit-any
-    return new Promise((resolve, reject) => {
-      ResponsibilityDataService.update(responsibility.pk.toString(), {
-        name: responsibility.name
-        // TODO: employees
-      })
-      .then(() => {
-        closePopupMethod()
-        Notify.create('Updated responsibility')
-        resolve('Updated')
-      })
-      .catch(e => {
-        console.error('Error updating Responsibility:', e)
-        reject(e)
-      })
-    })
-  }
-
   private retrieveAllResponsibilites(): void {
     this.$store.dispatch('responsibilityModule/getAllResponsibilities')
       .catch(e => {
         console.error('Error retrieving responsibilities', e)
       })
+  }
+
+  private showEditDialog(row: Responsibility): void {
+    bus.$emit('emitOpenEditDialog', row) // eslint-disable-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   }
 
   private showDeleteDialog(props: QuasarResponsibilityTableRowClickActionProps): void {

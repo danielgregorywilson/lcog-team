@@ -3,20 +3,21 @@
     <router-link :to="{ name: 'all-responsibilities' }" >All Responsibilites</router-link>
     <router-view :key="$route.path" />
 
+    <!-- ADD RESPONSIBILITY FORM -->
     <div class="q-mt-lg" style="max-width: 400px">
       <q-form
-        @submit="onFormSubmit"
-        @reset="clearForm"
+        @submit="onAddFormSubmit"
+        @reset="clearAddForm"
         class="q-gutter-sm"
       >
         <div class="text-h5">Add a Responsibility</div>
         <q-input
           filled
-          v-model="formName"
+          v-model="addFormName"
           label="Name"
         />
-        <!-- <q-select v-model="formPrimaryEmployee" :options="employeeOptions" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="0" @filter="filterFn"> -->
-        <q-select v-model="formPrimaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="0">
+        <!-- <q-select v-model="addFormPrimaryEmployee" :options="employeeOptions" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="0" @filter="filterFn"> -->
+        <q-select v-model="addFormPrimaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="0">
           <template v-slot:no-option>
             <q-item>
               <q-item-section class="text-grey">
@@ -24,11 +25,11 @@
               </q-item-section>
             </q-item>
           </template>
-          <template v-if="formPrimaryEmployee.name" v-slot:append>
-            <q-icon name="cancel" @click.stop="formPrimaryEmployee = emptyEmployee" class="cursor-pointer" />
+          <template v-if="addFormPrimaryEmployee.name" v-slot:append>
+            <q-icon name="cancel" @click.stop="addFormPrimaryEmployee = emptyEmployee" class="cursor-pointer" />
           </template>
         </q-select>
-        <q-select v-model="formSecondaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Secondary Employee"  use-input hide-selected fill-input input-debounce="0">
+        <q-select v-model="addFormSecondaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Secondary Employee"  use-input hide-selected fill-input input-debounce="0">
           <template v-slot:no-option>
             <q-item>
               <q-item-section class="text-grey">
@@ -36,16 +37,63 @@
               </q-item-section>
             </q-item>
           </template>
-          <template v-if="formSecondaryEmployee.name" v-slot:append>
-            <q-icon name="cancel" @click.stop="formSecondaryEmployee = emptyEmployee" class="cursor-pointer" />
+          <template v-if="addFormSecondaryEmployee.name" v-slot:append>
+            <q-icon name="cancel" @click.stop="addFormSecondaryEmployee = emptyEmployee" class="cursor-pointer" />
           </template>
         </q-select>
         <div>
-          <q-btn label="Submit" type="submit" color="primary" :disable="!formName"/>
+          <q-btn label="Submit" type="submit" color="primary" :disable="!addFormName"/>
           <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
         </div>
       </q-form>
     </div>
+
+    <!-- EDIT RESPONSIBILITY DIALOG -->
+    <q-dialog v-model="editDialogVisible">
+      <q-card>
+        <q-card-section>
+          <q-form
+            @submit="onEditFormSubmit"
+            class="q-gutter-sm"
+          >
+            <div class="text-h5">Edit Responsibility</div>
+            <q-input
+              filled
+              v-model="editFormName"
+              label="Name"
+            />
+            <!-- <q-select v-model="formPrimaryEmployee" :options="employeeOptions" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="0" @filter="filterFn"> -->
+            <q-select v-model="editFormPrimaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="0">
+              <template v-slot:no-option>
+                <q-item>
+                  <q-item-section class="text-grey">
+                    No results
+                  </q-item-section>
+                </q-item>
+              </template>
+              <template v-if="editFormPrimaryEmployee.name" v-slot:append>
+                <q-icon name="cancel" @click.stop="editFormPrimaryEmployee = emptyEmployee" class="cursor-pointer" />
+              </template>
+            </q-select>
+            <q-select v-model="editFormSecondaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Secondary Employee"  use-input hide-selected fill-input input-debounce="0">
+              <template v-slot:no-option>
+                <q-item>
+                  <q-item-section class="text-grey">
+                    No results
+                  </q-item-section>
+                </q-item>
+              </template>
+              <template v-if="editFormSecondaryEmployee.name" v-slot:append>
+                <q-icon name="cancel" @click.stop="editFormSecondaryEmployee = emptyEmployee" class="cursor-pointer" />
+              </template>
+            </q-select>
+            <div>
+              <q-btn label="Submit" type="submit" color="primary" :disable="!editFormName"/>
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -54,8 +102,9 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { Responsibility, SimpleEmployeeRetrieve, VuexStoreGetters } from '../../store/types'
 import { Notify } from 'quasar'
+import { bus } from '../../App.vue'
+import { Responsibility, SimpleEmployeeRetrieve, VuexStoreGetters } from '../../store/types'
 import ResponsibilityDataService from '../../services/ResponsibilityDataService'
 
 interface QuasarResponsibilityTableRowClickActionProps {
@@ -65,10 +114,17 @@ interface QuasarResponsibilityTableRowClickActionProps {
 
 @Component
 export default class TimeOffRequests extends Vue {
-  private formName = ''
+  private addFormName = ''
   private emptyEmployee = {name: '', pk: -1}
-  private formPrimaryEmployee = this.emptyEmployee
-  private formSecondaryEmployee = this.emptyEmployee
+  private addFormPrimaryEmployee = this.emptyEmployee
+  private addFormSecondaryEmployee = this.emptyEmployee
+
+  private editDialogVisible = false
+  private pkToEdit = -1
+  private editFormName = ''
+  private editFormPrimaryEmployee = this.emptyEmployee
+  private editFormSecondaryEmployee = this.emptyEmployee
+  
 
   private getters = this.$store.getters as VuexStoreGetters
 
@@ -81,22 +137,39 @@ export default class TimeOffRequests extends Vue {
   private employees(): Array<SimpleEmployeeRetrieve> {    
     // TODO: Type to filter; for now just use IS employees
     const employees = this.getters['responsibilityModule/simpleEmployeeList']
-    const ISEmployees = ["Andrew Smith", "Daniel Hogue", "Daniel Wilson", "Heidi Leyba", "Jeannine Bienn", "Jon Hausmann", "Kathleen Moore", "Keith Testerman", "Kelly Griffin", "Robert Hamburg", "Shugo Nakagome"]
-    return employees.filter((employee) => ISEmployees.indexOf(employee.name) != -1)
+    const isEmployees = ['Andrew Smith', 'Daniel Hogue', 'Daniel Wilson', 'Heidi Leyba', 'Jeannine Bienn', 'Jon Hausmann', 'Kathleen Moore', 'Keith Testerman', 'Kelly Griffin', 'Robert Hamburg', 'Shugo Nakagome']
+    return employees.filter((employee) => isEmployees.indexOf(employee.name) != -1)
   }
 
   private createResponsibility() {
     return new Promise((resolve, reject) => {
       ResponsibilityDataService.create({
-        name: this.formName,
-        primary_employee: this.formPrimaryEmployee.pk,
-        secondary_employee: this.formSecondaryEmployee.pk
+        name: this.addFormName,
+        primary_employee: this.addFormPrimaryEmployee.pk,
+        secondary_employee: this.addFormSecondaryEmployee.pk
       })
         .then(() => {
           resolve('Created')
         })
         .catch(e => {
           console.error('Error creating Responsibility:', e)
+          reject(e)
+        })
+    })
+  }
+
+  private editResponsibility() {
+    return new Promise((resolve, reject) => {
+      ResponsibilityDataService.update(this.pkToEdit.toString(), {
+        name: this.editFormName,
+        primary_employee: this.editFormPrimaryEmployee.pk,
+        secondary_employee: this.editFormSecondaryEmployee.pk
+      })
+        .then(() => {
+          resolve('Updated')
+        })
+        .catch(e => {
+          console.error('Error updating Responsibility:', e)
           reject(e)
         })
     })
@@ -117,13 +190,20 @@ export default class TimeOffRequests extends Vue {
   // }
 
 
-  private clearForm() {
-    this.formName = ''
-    this.formPrimaryEmployee = this.emptyEmployee
-    this.formSecondaryEmployee = this.emptyEmployee
+  private clearAddForm() {
+    this.addFormName = ''
+    this.addFormPrimaryEmployee = this.emptyEmployee
+    this.addFormSecondaryEmployee = this.emptyEmployee
   }
 
-  private onFormSubmit () {
+  private clearEditForm() {
+    this.pkToEdit = -1
+    this.editFormName = ''
+    this.editFormPrimaryEmployee = this.emptyEmployee
+    this.editFormSecondaryEmployee = this.emptyEmployee
+  }
+
+  private onAddFormSubmit () {
     this.createResponsibility()
       .then(() => {
         // this.retrieveAllResponsibilites() TODO update tables when create a new one
@@ -134,10 +214,41 @@ export default class TimeOffRequests extends Vue {
           this.retrieveEmployeeSecondaryResponsibilites(pk)
         }
         Notify.create('Created responsibility')
-        this.clearForm()
+        this.clearAddForm()
       })
       .catch(e => {
         console.error('Error creating Responsibility:', e)
+      })
+  }
+
+  private openEditDialog(row: Responsibility) {
+    this.pkToEdit = row.pk
+    this.editFormName = row.name
+    if (row.primary_employee_pk && row.primary_employee_name) {
+      this.editFormPrimaryEmployee = { pk: row.primary_employee_pk, name: row.primary_employee_name}
+    }
+    if (row.secondary_employee_pk && row.secondary_employee_name) {
+      this.editFormSecondaryEmployee = { pk: row.secondary_employee_pk, name: row.secondary_employee_name}
+    }
+    this.editDialogVisible = true
+  }
+
+  private onEditFormSubmit () {
+    this.editResponsibility()
+      .then(() => {
+        // this.retrieveAllResponsibilites() TODO update tables when create a new one
+        this.retrieveAllResponsibilites()
+        const pk = this.$route.params.pk
+        if (pk) {
+          this.retrieveEmployeeResponsibilites(pk)
+          this.retrieveEmployeeSecondaryResponsibilites(pk)
+        }
+        this.editDialogVisible = false
+        Notify.create('Updated responsibility')
+        this.clearEditForm()
+      })
+      .catch(e => {
+        console.error('Error updating Responsibility:', e)
       })
   }
 
@@ -163,6 +274,13 @@ export default class TimeOffRequests extends Vue {
       .catch(e => {
         console.error('Error retrieving employee secondary responsibilities', e)
       })
+  }
+
+  created() {
+    // We trigger opening the edit dialog in AllResponsibilities, EmployeeResponsibilites, or OrphanedResponsibilities
+    bus.$on('emitOpenEditDialog', (row: Responsibility) => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      this.openEditDialog(row)
+    })
   }
 
   mounted() {

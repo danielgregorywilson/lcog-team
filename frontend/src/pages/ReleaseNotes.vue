@@ -16,7 +16,7 @@ import { releases } from '../releaseNotes'
 @Component({
   components: { VueReleaseNotes } // eslint-disable-line @typescript-eslint/no-unsafe-assignment
 })
-export default class TimeOffRequests extends Vue{
+export default class ReleaseNotes extends Vue{
   private releaseNotes = releases
 }
 </script>

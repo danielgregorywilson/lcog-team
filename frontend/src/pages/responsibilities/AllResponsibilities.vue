@@ -3,7 +3,7 @@
     <q-table
       title="All Responsibilities"
       :data="allResponsibilities()"
-      :columns="allEmployeesTableColumns"
+      :columns="tableColumns"
       row-key="pk"
     >
       <template v-slot:body="props">
@@ -23,28 +23,11 @@
           </q-td>
           <q-td key="actions" :props="props">
             <q-btn class="col edit-button" dense round flat color="grey" @click="showEditDialog(props.row)" icon="edit"></q-btn>
-            <q-btn class="col delete-button" dense round flat color="grey" @click="showDeleteDialog(props)" icon="delete"></q-btn>
+            <q-btn class="col delete-button" dense round flat color="grey" @click="showDeleteDialog(props.row)" icon="delete"></q-btn>
           </q-td>
         </q-tr>
       </template>
     </q-table>
-
-    <q-dialog v-model="deleteDialogVisible">
-      <q-card>
-        <q-card-section>
-          <div class="row items-center">
-            <q-avatar icon="list" color="primary" text-color="white" />
-            <span class="q-ml-sm">Are you sure you want to delete this responsibility?</span>
-          </div>
-          <div class="row justify-center text-center">{{ deleteDialogResponsibilityName }}</div>
-        </q-card-section>
-
-        <q-card-actions class="row justify-around">
-          <q-btn flat label="Cancel" color="primary" v-close-popup />
-          <q-btn flat label="Yes, delete it" color="primary" @click="deleteRow()" v-close-popup />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
   </div>
 </template>
 
@@ -53,37 +36,22 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { Notify } from 'quasar'
 import { bus } from '../../App.vue'
-import ResponsibilityDataService from '../../services/ResponsibilityDataService'
 import { Responsibility, VuexStoreGetters } from '../../store/types'
 
-interface QuasarResponsibilityTableRowClickActionProps {
-  evt: MouseEvent;
-  row: Responsibility;
-}
-
 @Component
-export default class TimeOffRequests extends Vue {
-  private deleteDialogVisible = false
-  private deleteDialogResponsibilityName = ''
-  private rowPkToDelete = ''
-
+export default class AllResponsibilities extends Vue {
   private getters = this.$store.getters as VuexStoreGetters
 
   private allResponsibilities(): Array<Responsibility> {
     return this.getters['responsibilityModule/allResponsibilities'].results
   }
   
-  private allEmployeesTableColumns = [
+  private tableColumns = [
     { name: 'name', required: true, label: 'Name', field: 'name', sortable: true, align: 'left' },
     { name: 'primary_employee_name', label: 'Primary Employee', field: 'primary_employee_name', sortable: true },
     { name: 'secondary_employee_name', label: 'Secondary Employee', field: 'secondary_employee_name', sortable: true },
     { name: 'actions', label: 'Actions', },
-  ]
-
-  private primaryEmployeeTableColumns = [
-    { name: 'name', required: true, label: 'Name', field: 'name', sortable: true, align: 'left' },
   ]
 
   private retrieveAllResponsibilites(): void {
@@ -97,21 +65,8 @@ export default class TimeOffRequests extends Vue {
     bus.$emit('emitOpenEditDialog', row) // eslint-disable-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   }
 
-  private showDeleteDialog(props: QuasarResponsibilityTableRowClickActionProps): void {
-    this.rowPkToDelete = props.row.pk.toString()
-    this.deleteDialogResponsibilityName = props.row.name
-    this.deleteDialogVisible = true;
-  }
-
-  private deleteRow(): void {
-    ResponsibilityDataService.delete(this.rowPkToDelete)
-      .then(() => {
-        Notify.create('Deleted a responsibility.')
-        this.retrieveAllResponsibilites()
-      })
-      .catch(e => {
-        console.error('Error deleting responsibility', e)
-      })
+  private showDeleteDialog(row: Responsibility): void {
+    bus.$emit('emitOpenDeleteDialog', row) // eslint-disable-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   }
 
   mounted() {

@@ -94,6 +94,24 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <!-- DELETE RESPONSIBILITY DIALOG -->
+    <q-dialog v-model="deleteDialogVisible">
+      <q-card>
+        <q-card-section>
+          <div class="row items-center">
+            <q-avatar icon="list" color="primary" text-color="white" />
+            <span class="q-ml-sm">Are you sure you want to delete this responsibility?</span>
+          </div>
+          <div class="row justify-center text-center">{{ deleteDialogResponsibilityName }}</div>
+        </q-card-section>
+
+        <q-card-actions class="row justify-around">
+          <q-btn flat label="Cancel" color="primary" v-close-popup />
+          <q-btn flat label="Yes, delete it" color="primary" @click="deleteRow()" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -107,13 +125,8 @@ import { bus } from '../../App.vue'
 import { Responsibility, SimpleEmployeeRetrieve, VuexStoreGetters } from '../../store/types'
 import ResponsibilityDataService from '../../services/ResponsibilityDataService'
 
-interface QuasarResponsibilityTableRowClickActionProps {
-  evt: MouseEvent;
-  row: Responsibility;
-}
-
 @Component
-export default class TimeOffRequests extends Vue {
+export default class Responsibilities extends Vue {
   private addFormName = ''
   private emptyEmployee = {name: '', pk: -1}
   private addFormPrimaryEmployee = this.emptyEmployee
@@ -125,6 +138,9 @@ export default class TimeOffRequests extends Vue {
   private editFormPrimaryEmployee = this.emptyEmployee
   private editFormSecondaryEmployee = this.emptyEmployee
   
+  private deleteDialogVisible = false
+  private deleteDialogResponsibilityName = ''
+  private rowPkToDelete = ''
 
   private getters = this.$store.getters as VuexStoreGetters
 
@@ -134,45 +150,14 @@ export default class TimeOffRequests extends Vue {
 
   // private employeeOptions = Object.assign([], this.employees())
 
+  ///////////////
+  // EMPLOYEES //
+  ///////////////
   private employees(): Array<SimpleEmployeeRetrieve> {    
     // TODO: Type to filter; for now just use IS employees
     const employees = this.getters['responsibilityModule/simpleEmployeeList']
     const isEmployees = ['Andrew Smith', 'Daniel Hogue', 'Daniel Wilson', 'Heidi Leyba', 'Jeannine Bienn', 'Jon Hausmann', 'Kathleen Moore', 'Keith Testerman', 'Kelly Griffin', 'Robert Hamburg', 'Shugo Nakagome']
     return employees.filter((employee) => isEmployees.indexOf(employee.name) != -1)
-  }
-
-  private createResponsibility() {
-    return new Promise((resolve, reject) => {
-      ResponsibilityDataService.create({
-        name: this.addFormName,
-        primary_employee: this.addFormPrimaryEmployee.pk,
-        secondary_employee: this.addFormSecondaryEmployee.pk
-      })
-        .then(() => {
-          resolve('Created')
-        })
-        .catch(e => {
-          console.error('Error creating Responsibility:', e)
-          reject(e)
-        })
-    })
-  }
-
-  private editResponsibility() {
-    return new Promise((resolve, reject) => {
-      ResponsibilityDataService.update(this.pkToEdit.toString(), {
-        name: this.editFormName,
-        primary_employee: this.editFormPrimaryEmployee.pk,
-        secondary_employee: this.editFormSecondaryEmployee.pk
-      })
-        .then(() => {
-          resolve('Updated')
-        })
-        .catch(e => {
-          console.error('Error updating Responsibility:', e)
-          reject(e)
-        })
-    })
   }
 
   private retrieveSimpleEmployeeList(): void {
@@ -189,18 +174,13 @@ export default class TimeOffRequests extends Vue {
   //   })
   // }
 
-
+  //////////////
+  // ADD FORM //
+  //////////////
   private clearAddForm() {
     this.addFormName = ''
     this.addFormPrimaryEmployee = this.emptyEmployee
     this.addFormSecondaryEmployee = this.emptyEmployee
-  }
-
-  private clearEditForm() {
-    this.pkToEdit = -1
-    this.editFormName = ''
-    this.editFormPrimaryEmployee = this.emptyEmployee
-    this.editFormSecondaryEmployee = this.emptyEmployee
   }
 
   private onAddFormSubmit () {
@@ -219,7 +199,28 @@ export default class TimeOffRequests extends Vue {
       .catch(e => {
         console.error('Error creating Responsibility:', e)
       })
+   }
+
+  private createResponsibility() {
+    return new Promise((resolve, reject) => {
+      ResponsibilityDataService.create({
+        name: this.addFormName,
+        primary_employee: this.addFormPrimaryEmployee.pk,
+        secondary_employee: this.addFormSecondaryEmployee.pk
+      })
+        .then(() => {
+          resolve('Created')
+        })
+        .catch(e => {
+          console.error('Error creating Responsibility:', e)
+          reject(e)
+        })
+    })
   }
+
+  ///////////////
+  // EDIT FORM //
+  ///////////////
 
   private openEditDialog(row: Responsibility) {
     this.pkToEdit = row.pk
@@ -231,6 +232,13 @@ export default class TimeOffRequests extends Vue {
       this.editFormSecondaryEmployee = { pk: row.secondary_employee_pk, name: row.secondary_employee_name}
     }
     this.editDialogVisible = true
+  }
+
+  private clearEditForm() {
+    this.pkToEdit = -1
+    this.editFormName = ''
+    this.editFormPrimaryEmployee = this.emptyEmployee
+    this.editFormSecondaryEmployee = this.emptyEmployee
   }
 
   private onEditFormSubmit () {
@@ -251,6 +259,53 @@ export default class TimeOffRequests extends Vue {
         console.error('Error updating Responsibility:', e)
       })
   }
+
+  private editResponsibility() {
+    return new Promise((resolve, reject) => {
+      ResponsibilityDataService.update(this.pkToEdit.toString(), {
+        name: this.editFormName,
+        primary_employee: this.editFormPrimaryEmployee.pk,
+        secondary_employee: this.editFormSecondaryEmployee.pk
+      })
+        .then(() => {
+          resolve('Updated')
+        })
+        .catch(e => {
+          console.error('Error updating Responsibility:', e)
+          reject(e)
+        })
+    })
+  }
+
+  /////////////////
+  // DELETE FORM //
+  /////////////////
+
+  private openDeleteDialog(row: Responsibility) {
+    this.rowPkToDelete = row.pk.toString()
+    this.deleteDialogResponsibilityName = row.name
+    this.deleteDialogVisible = true;
+  }
+
+  private deleteRow(): void {
+    ResponsibilityDataService.delete(this.rowPkToDelete)
+      .then(() => {
+        this.retrieveAllResponsibilites()
+        const pk = this.$route.params.pk
+        if (pk) {
+          this.retrieveEmployeeResponsibilites(pk)
+          this.retrieveEmployeeSecondaryResponsibilites(pk)
+        }
+        Notify.create('Deleted a responsibility.')
+      })
+      .catch(e => {
+        console.error('Error deleting responsibility', e)
+      })
+  }
+
+  ///////////////
+  // SET STATE //
+  ///////////////
 
   // Update All Responsibilities Table
   private retrieveAllResponsibilites(): void {
@@ -277,9 +332,12 @@ export default class TimeOffRequests extends Vue {
   }
 
   created() {
-    // We trigger opening the edit dialog in AllResponsibilities, EmployeeResponsibilites, or OrphanedResponsibilities
+    // We trigger opening the edit and delete dialogs in AllResponsibilities, EmployeeResponsibilites, or OrphanedResponsibilities
     bus.$on('emitOpenEditDialog', (row: Responsibility) => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       this.openEditDialog(row)
+    })
+    bus.$on('emitOpenDeleteDialog', (row: Responsibility) => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      this.openDeleteDialog(row)
     })
   }
 

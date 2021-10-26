@@ -138,7 +138,7 @@ interface QuasarResponsibilityTableRowClickActionProps {
 }
 
 @Component
-export default class TimeOffRequests extends Vue {
+export default class OrphanedResponsibilities extends Vue {
   private orphaned = this.$route.query.orphaned
   private pk = this.$route.params.pk
   private secondary = this.$route.query.secondary

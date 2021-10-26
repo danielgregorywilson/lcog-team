@@ -79,7 +79,10 @@ export default class TimeOffRequests extends Vue {
   // private employeeOptions = Object.assign([], this.employees())
 
   private employees(): Array<SimpleEmployeeRetrieve> {    
-    return this.getters['responsibilityModule/simpleEmployeeList']
+    // TODO: Type to filter; for now just use IS employees
+    const employees = this.getters['responsibilityModule/simpleEmployeeList']
+    const ISEmployees = ["Andrew Smith", "Daniel Hogue", "Daniel Wilson", "Heidi Leyba", "Jeannine Bienn", "Jon Hausmann", "Kathleen Moore", "Keith Testerman", "Kelly Griffin", "Robert Hamburg", "Shugo Nakagome"]
+    return employees.filter((employee) => ISEmployees.indexOf(employee.name) != -1)
   }
 
   private createResponsibility() {

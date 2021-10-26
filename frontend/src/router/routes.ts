@@ -105,16 +105,21 @@ const routes: RouteConfig[] = [
         path: '/responsibilities',
         name: 'responsibilities',
         component: () => import('src/pages/responsibilities/Responsibilities.vue'),
-        // props: { pk: 77 },
         children: [
           {
-            path: 'orphaned1',
+            path: 'all',
+            name: 'all-responsibilities',
+            component: () => import('src/pages/responsibilities/AllResponsibilities.vue'),
+          },
+          {
+            path: 'orphaned',
             name: 'orphaned-responsibilities',
-            props: { orphaned: true, pk: 78 }
+            props: { orphaned: true }
           },
           {
             path: ':pk',
             name: 'employee-responsibilities',
+            component: () => import('src/pages/responsibilities/EmployeeResponsibilities.vue'),
             children: [
               {
                 path: 'secondary',

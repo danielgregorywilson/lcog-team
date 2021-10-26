@@ -125,6 +125,13 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         employees = Employee.objects.all()
         serializer = SimpleEmployeeSerializer(employees, many=True)
         return Response(serializer.data)
+    
+    # Retrieve the name of an employee from pk
+    @action(detail=True, methods=['get'])
+    def simple_detail(self, request, pk):
+        employee = Employee.objects.get(pk=pk)
+        serializer = SimpleEmployeeSerializer(employee, many=False)
+        return Response(serializer.data)
 
 
 class ResponsibilityViewSet(viewsets.ModelViewSet):
@@ -144,14 +151,14 @@ class ResponsibilityViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_authenticated:
             orphaned = self.request.query_params.get('orphaned', None)
-            if orphaned is not None and orphaned == "True":
+            if orphaned is not None and orphaned == "true":
                 queryset = Responsibility.objects.filter(
                     Q(primary_employee__isnull=True) | Q(secondary_employee__isnull=True)
                 )
             employee = self.request.query_params.get('employee', None)
             if employee is not None and employee.isdigit():
                 secondary = self.request.query_params.get('secondary', None)
-                if secondary is not None and secondary == "True":
+                if secondary is not None and secondary == 'true':
                     queryset = Responsibility.objects.filter(secondary_employee=employee)
                 else:
                     queryset = Responsibility.objects.filter(primary_employee=employee)

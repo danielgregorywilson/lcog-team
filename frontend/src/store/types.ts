@@ -529,22 +529,21 @@ export interface TeleworkSignatureRetrieve {
 // Responsibility Structure from Django Rest Framework //
 /////////////////////////////////////////////////////////
 
+export interface Responsibility {
+  pk: number
+  name: string
+  link?: string
+  primary_employee_pk?: number
+  primary_employee_name?: string
+  secondary_employee_pk?: number
+  secondary_employee_name?: string
+}
+
 export interface ResponsibilityCreate {
   name: string
   link?: Url
   primary_employee?: number
   secondary_employee?: number
-}
-
-export interface ResponsibilityRetrieve {
-  url: Url
-  pk: number
-  name: string
-  link?: Url
-  primary_employee?: number
-  primary_employee_name?: string
-  secondary_employee?: number
-  secondary_employee_name?: string
 }
 
 export interface ResponsibilityUpdate {
@@ -560,21 +559,32 @@ export interface ResponsibilityNameUpdate extends ResponsibilityUpdate {
 }
 
 export interface AxiosResponsibilityUpdateServerResponse {
-  data: ResponsibilityRetrieve
+  data: Responsibility
+}
+
+export interface ResponsibilityStateInterface {
+  allResponsibilities: { results: Array<Responsibility> }
+  orphanedResponsibilities: Array<Responsibility>
+  employeePrimaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
+  employeeSecondaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
+  simpleEmployeeList: Array<SimpleEmployeeRetrieve>
+  simpleEmployeeDetail: SimpleEmployeeRetrieve
+}
+
+export interface EmployeeResponsibilitiesInterface {
+  pk: number
+  responsibilities: Array<Responsibility>
 }
 
 export interface VuexStoreGetters {
   'responsibilityModule/simpleEmployeeList': Array<SimpleEmployeeRetrieve>,
+  'responsibilityModule/simpleEmployeeDetail': SimpleEmployeeRetrieve,
   'responsibilityModule/allResponsibilities': {
-    results: Array<ResponsibilityRetrieve>
+    results: Array<Responsibility>
   },
   'responsibilityModule/orphanedResponsibilities': {
-    results: Array<ResponsibilityRetrieve>
+    results: Array<Responsibility>
   },
-  'responsibilityModule/employeePrimaryResponsibilities': { // TODO: Fix
-    results: Array<ResponsibilityRetrieve>
-  },
-  'responsibilityModule/employeeSecondaryResponsibilities': { // TODO: Fix
-    results: Array<ResponsibilityRetrieve>
-  }
+  'responsibilityModule/employeePrimaryResponsibilities': Array<EmployeeResponsibilitiesInterface>,
+  'responsibilityModule/employeeSecondaryResponsibilities': Array<EmployeeResponsibilitiesInterface>
 }

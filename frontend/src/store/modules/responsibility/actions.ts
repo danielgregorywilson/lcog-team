@@ -1,6 +1,6 @@
 import { ActionTree } from 'vuex'
 import { StateInterface } from '../../index'
-import { ResponsibilityStateInterface } from './state'
+import { ResponsibilityStateInterface } from '../../types'
 import axios from 'axios'
 
 function getApiUrl(): string {
@@ -51,6 +51,19 @@ const actions: ActionTree<ResponsibilityStateInterface, StateInterface> = {
         })
     })
   },
+  getEmployeeSecondaryResponsibilities: ({ commit }, data: {pk: number}) => {
+    return new Promise((resolve, reject) => {
+      axios({ url: `${ getApiUrl() }api/v1/responsibilities?employee=${ data.pk }&secondary=true` })
+        .then(resp => {
+          commit('setEmployeeSecondaryResponsibilities', {employeePk: data.pk, responsibilities: resp})
+          resolve(resp)
+        })
+        .catch(e => {
+          console.error('Error getting employee secondary responsibilities:', e)
+          reject(e)
+        })
+    })
+  },
   getSimpleEmployeeList: ({ commit }) => {
     axios({ url: `${ process.env.API_URL }api/v1/employee/simple_list`}) // eslint-disable-line @typescript-eslint/restrict-template-expressions
       .then(resp => {
@@ -58,6 +71,15 @@ const actions: ActionTree<ResponsibilityStateInterface, StateInterface> = {
       })
       .catch(e => {
         console.error('Error getting simple employee list:', e)
+      })
+  },
+  getSimpleEmployeeDetail: ({ commit }, data: {pk: number}) => {
+    axios({ url: `${ process.env.API_URL }api/v1/employee/${ data.pk }/simple_detail`}) // eslint-disable-line @typescript-eslint/restrict-template-expressions
+      .then(resp => {
+        commit('setSimpleEmployeeDetail', resp)
+      })
+      .catch(e => {
+        console.error('Error getting simple employee detail:', e)
       })
   },
   authLogout: ({commit}) => {

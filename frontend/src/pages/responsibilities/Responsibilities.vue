@@ -1,52 +1,59 @@
 <template>
   <q-page class="q-pa-md">
-    <router-link :to="{ name: 'all-responsibilities' }" >All Responsibilites</router-link>
+    <div class="q-gutter-sm q-mb-md">
+      <q-btn :to="{ name: 'all-responsibilities' }" unelevated rounded color="primary" icon="visibility" label="View All" />
+      <q-btn unelevated rounded color="primary" icon="add" label="Add" @click="addDialogVisible=true" />
+    </div>
     <router-view :key="$route.path" />
 
-    <!-- ADD RESPONSIBILITY FORM -->
-    <div class="q-mt-lg" style="max-width: 400px">
-      <q-form
-        @submit="onAddFormSubmit"
-        @reset="clearAddForm"
-        class="q-gutter-sm"
-      >
-        <div class="text-h5">Add a Responsibility</div>
-        <q-input
-          filled
-          v-model="addFormName"
-          label="Name"
-        />
-        <!-- <q-select v-model="addFormPrimaryEmployee" :options="employeeOptions" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="0" @filter="filterFn"> -->
-        <q-select v-model="addFormPrimaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="0">
-          <template v-slot:no-option>
-            <q-item>
-              <q-item-section class="text-grey">
-                No results
-              </q-item-section>
-            </q-item>
-          </template>
-          <template v-if="addFormPrimaryEmployee.name" v-slot:append>
-            <q-icon name="cancel" @click.stop="addFormPrimaryEmployee = emptyEmployee" class="cursor-pointer" />
-          </template>
-        </q-select>
-        <q-select v-model="addFormSecondaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Secondary Employee"  use-input hide-selected fill-input input-debounce="0">
-          <template v-slot:no-option>
-            <q-item>
-              <q-item-section class="text-grey">
-                No results
-              </q-item-section>
-            </q-item>
-          </template>
-          <template v-if="addFormSecondaryEmployee.name" v-slot:append>
-            <q-icon name="cancel" @click.stop="addFormSecondaryEmployee = emptyEmployee" class="cursor-pointer" />
-          </template>
-        </q-select>
-        <div>
-          <q-btn label="Submit" type="submit" color="primary" :disable="!addFormName"/>
-          <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
-        </div>
-      </q-form>
-    </div>
+    <!-- ADD RESPONSIBILITY DIALOG -->
+    <q-dialog v-model="addDialogVisible">
+      <q-card>
+        <q-card-section>
+          <q-form
+            @submit="onAddFormSubmit"
+            @reset="clearAddForm"
+            class="q-gutter-sm"
+          >
+            <div class="text-h5">Add a Responsibility</div>
+            <q-input
+              filled
+              v-model="addFormName"
+              label="Name"
+            />
+            <!-- <q-select v-model="addFormPrimaryEmployee" :options="employeeOptions" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="0" @filter="filterFn"> -->
+            <q-select v-model="addFormPrimaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="0">
+              <template v-slot:no-option>
+                <q-item>
+                  <q-item-section class="text-grey">
+                    No results
+                  </q-item-section>
+                </q-item>
+              </template>
+              <template v-if="addFormPrimaryEmployee.name" v-slot:append>
+                <q-icon name="cancel" @click.stop="addFormPrimaryEmployee = emptyEmployee" class="cursor-pointer" />
+              </template>
+            </q-select>
+            <q-select v-model="addFormSecondaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Secondary Employee"  use-input hide-selected fill-input input-debounce="0">
+              <template v-slot:no-option>
+                <q-item>
+                  <q-item-section class="text-grey">
+                    No results
+                  </q-item-section>
+                </q-item>
+              </template>
+              <template v-if="addFormSecondaryEmployee.name" v-slot:append>
+                <q-icon name="cancel" @click.stop="addFormSecondaryEmployee = emptyEmployee" class="cursor-pointer" />
+              </template>
+            </q-select>
+            <div>
+              <q-btn label="Submit" type="submit" color="primary" :disable="!addFormName"/>
+              <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
 
     <!-- EDIT RESPONSIBILITY DIALOG -->
     <q-dialog v-model="editDialogVisible">
@@ -127,6 +134,7 @@ import ResponsibilityDataService from '../../services/ResponsibilityDataService'
 
 @Component
 export default class Responsibilities extends Vue {
+  private addDialogVisible = false
   private addFormName = ''
   private emptyEmployee = {name: '', pk: -1}
   private addFormPrimaryEmployee = this.emptyEmployee
@@ -193,6 +201,7 @@ export default class Responsibilities extends Vue {
           this.retrieveEmployeeResponsibilites(pk)
           this.retrieveEmployeeSecondaryResponsibilites(pk)
         }
+        this.addDialogVisible = false
         Notify.create('Created responsibility')
         this.clearAddForm()
       })

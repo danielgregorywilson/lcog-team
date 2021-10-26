@@ -3,7 +3,7 @@
     <div>
       <q-btn-toggle
         :value="displayEmployeeSecondaryResponsibilities"
-        class="my-custom-toggle"
+        class="q-mb-sm"
         no-caps
         rounded
         unelevated

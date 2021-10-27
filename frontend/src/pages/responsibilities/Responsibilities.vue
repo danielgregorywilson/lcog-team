@@ -1,8 +1,13 @@
 <template>
   <q-page class="q-pa-md">
-    <div class="q-gutter-sm q-mb-md">
-      <q-btn :to="{ name: 'all-responsibilities' }" unelevated rounded color="primary" icon="visibility" label="View All" />
-      <q-btn unelevated rounded color="primary" icon="add" label="Add" @click="addDialogVisible=true" />
+    <div class="q-mb-md row justify-between">
+      <div class="q-gutter-sm">
+        <q-btn :to="{ name: 'all-responsibilities' }" unelevated rounded color="primary" icon="visibility" label="View All" />
+        <q-btn :to="{ name: 'orphaned-responsibilities' }" unelevated rounded color="primary" icon="visibility_off" label="View Orphaned" />
+      </div>
+      <div>
+        <q-btn unelevated rounded color="primary" icon="add" label="Add" @click="addDialogVisible=true" />
+      </div>
     </div>
     <router-view :key="$route.path" />
 

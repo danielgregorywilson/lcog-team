@@ -1,5 +1,27 @@
 export const releases = [
   {
+    version: '0.1.3',
+    date: new Date(2021, 9, 26),
+    changes: [
+      {
+        type: 'new',
+        description: 'Responsibilities Module'
+      },
+      {
+        type: 'new',
+        description: 'Release Notes page'
+      },
+      {
+        type: 'improved',
+        description: 'Add LCOG logo to menu'
+      },
+      {
+        type: 'improved',
+        description: 'Add Schaefers 2nd and 3rd floor plans to seating chart'
+      }
+    ]
+  },
+  {
     version: '0.1.2',
     date: new Date(2021, 9, 11),
     changes: [
@@ -7,10 +29,6 @@ export const releases = [
         type: 'new',
         description: 'Seating chart demo'
       },
-      {
-        type: 'fix',
-        description: 'Nothing'
-      }
     ]
   },
   {
@@ -38,6 +56,10 @@ export const releases = [
       {
         type: 'improved',
         description: 'Clean up navigation'
+      },
+      {
+        type: 'fix',
+        description: ''
       }
     ]
   }

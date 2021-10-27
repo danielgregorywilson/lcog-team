@@ -199,13 +199,7 @@ export default class Responsibilities extends Vue {
   private onAddFormSubmit () {
     this.createResponsibility()
       .then(() => {
-        // this.retrieveAllResponsibilites() TODO update tables when create a new one
-        this.retrieveAllResponsibilites()
-        const pk = this.$route.params.pk
-        if (pk) {
-          this.retrieveEmployeeResponsibilites(pk)
-          this.retrieveEmployeeSecondaryResponsibilites(pk)
-        }
+        this.updateResponsibiliyLists()
         this.addDialogVisible = false
         Notify.create('Created responsibility')
         this.clearAddForm()
@@ -259,12 +253,7 @@ export default class Responsibilities extends Vue {
     this.editResponsibility()
       .then(() => {
         // this.retrieveAllResponsibilites() TODO update tables when create a new one
-        this.retrieveAllResponsibilites()
-        const pk = this.$route.params.pk
-        if (pk) {
-          this.retrieveEmployeeResponsibilites(pk)
-          this.retrieveEmployeeSecondaryResponsibilites(pk)
-        }
+        this.updateResponsibiliyLists()
         this.editDialogVisible = false
         Notify.create('Updated responsibility')
         this.clearEditForm()
@@ -304,12 +293,7 @@ export default class Responsibilities extends Vue {
   private deleteRow(): void {
     ResponsibilityDataService.delete(this.rowPkToDelete)
       .then(() => {
-        this.retrieveAllResponsibilites()
-        const pk = this.$route.params.pk
-        if (pk) {
-          this.retrieveEmployeeResponsibilites(pk)
-          this.retrieveEmployeeSecondaryResponsibilites(pk)
-        }
+        this.updateResponsibiliyLists()
         Notify.create('Deleted a responsibility.')
       })
       .catch(e => {
@@ -321,11 +305,30 @@ export default class Responsibilities extends Vue {
   // SET STATE //
   ///////////////
 
+  // Update the various responsibility lists in Vuex
+  private updateResponsibiliyLists(): void {
+    this.retrieveAllResponsibilites()
+    this.retrieveOrphanedResponsibilites()
+    const pk = this.$route.params.pk
+    if (pk) {
+      this.retrieveEmployeeResponsibilites(pk)
+      this.retrieveEmployeeSecondaryResponsibilites(pk)
+    }
+  }
+
   // Update All Responsibilities Table
   private retrieveAllResponsibilites(): void {
     this.$store.dispatch('responsibilityModule/getAllResponsibilities')
       .catch(e => {
         console.error('Error retrieving responsibilities', e)
+      })
+  }
+
+  // Update Orphaned Responsibilities Table
+  private retrieveOrphanedResponsibilites(): void {
+    this.$store.dispatch('responsibilityModule/getOrphanedResponsibilities')
+      .catch(e => {
+        console.error('Error retrieving orphaned responsibilities', e)
       })
   }
 

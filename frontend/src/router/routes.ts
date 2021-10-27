@@ -114,7 +114,7 @@ const routes: RouteConfig[] = [
           {
             path: 'orphaned',
             name: 'orphaned-responsibilities',
-            props: { orphaned: true }
+            component: () => import('src/pages/responsibilities/OrphanedResponsibilities.vue'),
           },
           {
             path: ':pk',

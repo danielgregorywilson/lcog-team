@@ -27,7 +27,7 @@ const actions: ActionTree<ResponsibilityStateInterface, StateInterface> = {
   },
   getOrphanedResponsibilities: ({ commit }) => {
     return new Promise((resolve, reject) => {
-      axios({ url: `${ getApiUrl() }api/v1/responsibilities?orphaned=True` })
+      axios({ url: `${ getApiUrl() }api/v1/responsibilities?orphaned=true` })
         .then(resp => {
           commit('setOrphanedResponsibilities', resp)
           resolve(resp)

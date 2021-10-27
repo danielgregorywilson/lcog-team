@@ -4,6 +4,7 @@
       title="All Responsibilities"
       :data="allResponsibilities()"
       :columns="tableColumns"
+      :pagination="initialTablePagination"
       row-key="pk"
     >
       <template v-slot:body="props">
@@ -53,6 +54,10 @@ export default class AllResponsibilities extends Vue {
     { name: 'secondary_employee_name', label: 'Secondary Employee', field: 'secondary_employee_name', sortable: true },
     { name: 'actions', label: 'Actions', },
   ]
+
+  private initialTablePagination = {
+    rowsPerPage: 10
+  }
 
   private retrieveAllResponsibilites(): void {
     this.$store.dispatch('responsibilityModule/getAllResponsibilities')

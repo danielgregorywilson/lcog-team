@@ -4,6 +4,7 @@
       title="Orphaned Responsibilities"
       :data="orphanedResponsibilities()"
       :columns="tableColumns"
+      :pagination="initialTablePagination"
       row-key="pk"
     >
       <template v-slot:body="props">
@@ -53,6 +54,10 @@ export default class OrphanedResponsibilities extends Vue {
     { name: 'secondary_employee_name', label: 'Secondary Employee', field: 'secondary_employee_name', sortable: true },
     { name: 'actions', label: 'Actions', },
   ]
+
+  private initialTablePagination = {
+    rowsPerPage: 10
+  }
 
   private retrieveOrphanedResponsibilites(): void {
     this.$store.dispatch('responsibilityModule/getOrphanedResponsibilities')

@@ -22,6 +22,7 @@
       v-if="!displayEmployeeSecondaryResponsibilities"
       :data="employeePrimaryResponsibilities()"
       :columns="tableColumns"
+      :pagination="initialTablePagination"
       row-key="pk"
     >
       <template v-slot:body="props">
@@ -52,6 +53,7 @@
       v-if="displayEmployeeSecondaryResponsibilities"
       :data="employeeSecondaryResponsibilities()"
       :columns="tableColumns"
+      :pagination="initialTablePagination"
       row-key="pk"
     >
       <template v-slot:body="props">
@@ -113,6 +115,10 @@ export default class EmployeeResponsibilites extends Vue {
     { name: 'secondary_employee_name', label: 'Secondary Employee', field: 'secondary_employee_name', sortable: true },
     { name: 'actions', label: 'Actions', },
   ]
+
+  private initialTablePagination = {
+    rowsPerPage: 10
+  }
 
   private getters = this.$store.getters as VuexStoreGetters
 

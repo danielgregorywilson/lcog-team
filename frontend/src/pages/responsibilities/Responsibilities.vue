@@ -169,7 +169,7 @@ export default class Responsibilities extends Vue {
   private employees(): Array<SimpleEmployeeRetrieve> {    
     // TODO: Type to filter; for now just use IS employees
     const employees = this.getters['responsibilityModule/simpleEmployeeList']
-    const isEmployees = ['Andrew Smith', 'Daniel Hogue', 'Daniel Wilson', 'Heidi Leyba', 'Jeannine Bienn', 'Jon Hausmann', 'Kathleen Moore', 'Keith Testerman', 'Kelly Griffin', 'Robert Hamburg', 'Shugo Nakagome']
+    const isEmployees = ['Andrew Smith', 'Daniel Hogue', 'Daniel Wilson', 'Heidi Leyba', 'Jacob Callister', 'Jeannine Bienn', 'Jon Hausmann', 'Kathleen Moore', 'Keith Testerman', 'Kelly Griffin', 'Robert Hamburg', 'Shugo Nakagome']
     return employees.filter((employee) => isEmployees.indexOf(employee.name) != -1)
   }
 

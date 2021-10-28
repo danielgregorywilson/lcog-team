@@ -1,10 +1,11 @@
-import { store } from 'quasar/wrappers';
-import Vuex from 'vuex';
+import { store } from 'quasar/wrappers'
+import Vuex from 'vuex'
 import VueCookies from 'vue-cookies'
 import authModule from './modules/auth'
 import performanceReviewModule from './modules/performancereview'
-import securityMessageModule from './modules/securitymessage';
-import teleworkModule from './modules/telework';
+import responsibilityModule from './modules/responsibility'
+import securityMessageModule from './modules/securitymessage'
+import teleworkModule from './modules/telework'
 import userModule from './modules/user'
 
 
@@ -34,6 +35,7 @@ export default store(function ({ Vue }) {
       authModule,
       userModule,
       performanceReviewModule,
+      responsibilityModule,
       securityMessageModule,
       teleworkModule,
     },

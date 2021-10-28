@@ -18,7 +18,7 @@
           </div>
         </q-toolbar-title>
 
-        <div>{{ appVersionTag() }}</div>
+        <q-btn flat no-caps :to="{ name: 'release-notes'}">{{ appVersionTag() }}</q-btn>
       </q-toolbar>
     </q-header>
 
@@ -29,13 +29,23 @@
       content-class="bg-grey-1"
       :width="210"
     >
-      <q-list>
-        <q-item-label
-          header
-          class="text-grey-8"
+      <q-list>        
+        <q-item
+          clickable
+          :to="{ name: 'dashboard' }"
+          v-if="isAuthenticated()"
         >
-          LCOG Team App
-        </q-item-label>
+          <q-item-section avatar>
+            <q-img
+              id="lcog-logo"
+              src="../assets/lcog-logo.png"
+              style="width: 30px;"
+            />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>LCOG Team App</q-item-label>
+          </q-item-section>
+        </q-item>
         <q-item
           clickable
           @click='loginWithMicrosoft'
@@ -43,7 +53,7 @@
         >
           <q-item-section avatar>
             <q-img
-              id="lcog-logo"
+              id="ms-logo"
               src="../assets/microsoft-logo.svg"
               style="width: 24px;"
             />
@@ -80,6 +90,15 @@
   </q-layout>
 </template>
 
+<style lang="scss"> 
+  #lcog-logo {
+    color: black;
+    .q-img__image {
+      background-position: 0% 0% !important;
+    }
+  }
+</style>
+
 <script lang="ts">
 import NavLink from 'components/NavLink.vue'
 
@@ -97,11 +116,11 @@ interface LinkData {
 }
 
 const linksData: Array<LinkData> = [
-  {
-    title: 'Dashboard',
-    icon: 'dashboard',
-    link: '/dashboard'
-  },
+  // {
+  //   title: 'Dashboard',
+  //   icon: 'dashboard',
+  //   link: '/dashboard'
+  // },
   {
     title: 'Performance Reviews',
     icon: 'assignment_turned_in',

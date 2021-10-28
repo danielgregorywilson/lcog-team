@@ -52,6 +52,11 @@ export interface EmployeeRetrieve {
   next_to_sign_prs: string
 }
 
+export interface SimpleEmployeeRetrieve {
+  pk: number
+  name: string
+}
+
 export interface AxiosEmployeeRetrieveOneServerResponse {
   data: EmployeeRetrieve
 }
@@ -517,4 +522,69 @@ export interface TeleworkSignatureRetrieve {
   employee: Url
   index: number
   date: Date
+}
+
+
+/////////////////////////////////////////////////////////
+// Responsibility Structure from Django Rest Framework //
+/////////////////////////////////////////////////////////
+
+export interface Responsibility {
+  pk: number
+  name: string
+  link?: string
+  primary_employee_pk?: number
+  primary_employee_name?: string
+  secondary_employee_pk?: number
+  secondary_employee_name?: string
+}
+
+export interface ResponsibilityCreate {
+  name: string
+  link?: Url
+  primary_employee?: number
+  secondary_employee?: number
+}
+
+export interface ResponsibilityUpdate {
+  pk?: number
+  name?: string
+  link?: Url
+  primary_employee?: number
+  secondary_employee?: number
+}
+
+export interface ResponsibilityNameUpdate extends ResponsibilityUpdate {
+  name: string
+}
+
+export interface AxiosResponsibilityUpdateServerResponse {
+  data: Responsibility
+}
+
+export interface ResponsibilityStateInterface {
+  allResponsibilities: { results: Array<Responsibility> }
+  orphanedResponsibilities: Array<Responsibility>
+  employeePrimaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
+  employeeSecondaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
+  simpleEmployeeList: Array<SimpleEmployeeRetrieve>
+  simpleEmployeeDetail: SimpleEmployeeRetrieve
+}
+
+export interface EmployeeResponsibilitiesInterface {
+  pk: number
+  responsibilities: Array<Responsibility>
+}
+
+export interface VuexStoreGetters {
+  'responsibilityModule/simpleEmployeeList': Array<SimpleEmployeeRetrieve>,
+  'responsibilityModule/simpleEmployeeDetail': SimpleEmployeeRetrieve,
+  'responsibilityModule/allResponsibilities': {
+    results: Array<Responsibility>
+  },
+  'responsibilityModule/orphanedResponsibilities': {
+    results: Array<Responsibility>
+  },
+  'responsibilityModule/employeePrimaryResponsibilities': Array<EmployeeResponsibilitiesInterface>,
+  'responsibilityModule/employeeSecondaryResponsibilities': Array<EmployeeResponsibilitiesInterface>
 }

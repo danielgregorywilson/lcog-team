@@ -26,8 +26,7 @@
               v-model="addFormName"
               label="Name"
             />
-            <!-- <q-select v-model="addFormPrimaryEmployee" :options="employeeOptions" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="0" @filter="filterFn"> -->
-            <q-select v-model="addFormPrimaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="0">
+            <q-select v-model="addFormPrimaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
               <template v-slot:no-option>
                 <q-item>
                   <q-item-section class="text-grey">
@@ -39,7 +38,7 @@
                 <q-icon name="cancel" @click.stop="addFormPrimaryEmployee = emptyEmployee" class="cursor-pointer" />
               </template>
             </q-select>
-            <q-select v-model="addFormSecondaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Secondary Employee"  use-input hide-selected fill-input input-debounce="0">
+            <q-select v-model="addFormSecondaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Secondary Employee"  use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
               <template v-slot:no-option>
                 <q-item>
                   <q-item-section class="text-grey">
@@ -74,8 +73,7 @@
               v-model="editFormName"
               label="Name"
             />
-            <!-- <q-select v-model="formPrimaryEmployee" :options="employeeOptions" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="0" @filter="filterFn"> -->
-            <q-select v-model="editFormPrimaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="0">
+            <q-select v-model="editFormPrimaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
               <template v-slot:no-option>
                 <q-item>
                   <q-item-section class="text-grey">
@@ -87,7 +85,7 @@
                 <q-icon name="cancel" @click.stop="editFormPrimaryEmployee = emptyEmployee" class="cursor-pointer" />
               </template>
             </q-select>
-            <q-select v-model="editFormSecondaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Secondary Employee"  use-input hide-selected fill-input input-debounce="0">
+            <q-select v-model="editFormSecondaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Secondary Employee"  use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
               <template v-slot:no-option>
                 <q-item>
                   <q-item-section class="text-grey">
@@ -157,20 +155,16 @@ export default class Responsibilities extends Vue {
 
   private getters = this.$store.getters as VuexStoreGetters
 
-  // private employeeOptions() {
-  //   return {...this.employees()}
-  // }
-
-  // private employeeOptions = Object.assign([], this.employees())
+  private needle = '' // For filtering employee list
 
   ///////////////
   // EMPLOYEES //
   ///////////////
   private employees(): Array<SimpleEmployeeRetrieve> {    
-    // TODO: Type to filter; for now just use IS employees
     const employees = this.getters['responsibilityModule/simpleEmployeeList']
-    const isEmployees = ['Andrew Smith', 'Daniel Hogue', 'Daniel Wilson', 'Heidi Leyba', 'Jeannine Bienn', 'Jon Hausmann', 'Kathleen Moore', 'Keith Testerman', 'Kelly Griffin', 'Robert Hamburg', 'Shugo Nakagome']
-    return employees.filter((employee) => isEmployees.indexOf(employee.name) != -1)
+    return employees.filter((employee) => {
+      return employee.name.toLowerCase().indexOf(this.needle) != -1
+    })
   }
 
   private retrieveSimpleEmployeeList(): void {
@@ -180,12 +174,11 @@ export default class Responsibilities extends Vue {
       })
   }
 
-  // private filterFn (val, update, abort) {
-  //   update(() => {
-  //     const needle = val.toLowerCase()
-  //     this.employeeOptions = this.employeeOptions.filter(v => v.toLowerCase().indexOf(needle) > -1)
-  //   })
-  // }
+  private filterFn (val: string, update: Function) { // eslint-disable-line @typescript-eslint/ban-types
+    update(() => {
+      this.needle = val.toLowerCase()
+    })
+  }
 
   //////////////
   // ADD FORM //
@@ -252,7 +245,6 @@ export default class Responsibilities extends Vue {
   private onEditFormSubmit () {
     this.editResponsibility()
       .then(() => {
-        // this.retrieveAllResponsibilites() TODO update tables when create a new one
         this.updateResponsibiliyLists()
         this.editDialogVisible = false
         Notify.create('Updated responsibility')

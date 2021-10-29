@@ -174,7 +174,7 @@ export default class Responsibilities extends Vue {
       })
   }
 
-  private filterFn (val, update, abort) {
+  private filterFn (val: string, update: Function) { // eslint-disable-line @typescript-eslint/ban-types
     update(() => {
       this.needle = val.toLowerCase()
     })

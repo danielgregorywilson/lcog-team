@@ -1,7 +1,11 @@
+// ////////////////////////////////
+// WATCH THOSE MONTH CODES, NOOB //
+///////////////////////////////////
+
 export const releases = [
   {
     version: '0.2.0',
-    date: new Date(2021, 10, 29),
+    date: new Date(2022, 0, 14),
     changes: [
       {
         type: 'improved',
@@ -11,7 +15,7 @@ export const releases = [
   },
   {
     version: '0.1.4',
-    date: new Date(2021, 10, 29),
+    date: new Date(2021, 9, 29),
     changes: [
       {
         type: 'improved',

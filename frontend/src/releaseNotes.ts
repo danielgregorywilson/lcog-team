@@ -1,5 +1,25 @@
 export const releases = [
   {
+    version: '0.2.0',
+    date: new Date(2021, 10, 29),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Upgrade to Django 4'
+      },
+    ]
+  },
+  {
+    version: '0.1.4',
+    date: new Date(2021, 10, 29),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Responsibilities module: filter employee list dropdown by typing'
+      },
+    ]
+  },
+  {
     version: '0.1.3',
     date: new Date(2021, 9, 26),
     changes: [

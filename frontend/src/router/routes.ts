@@ -185,8 +185,41 @@ const routes: RouteConfig[] = [
         component: () => import('pages/SecurityMessage.vue'),
         beforeEnter: ifAuthenticated
       },
+    ]
+  },
+  {
+    path: '/print',
+    component: () => import('layouts/PrintLayout.vue'),
+    children: [
       {
-        path: '/seating-charts',
+        path: 'pr/:pk',
+        name: 'pr-print',
+        component: () => import('pages/PerformanceReviewDetail.vue'),
+        beforeEnter: ifManager,
+        props: {
+          print: true
+        }
+      }
+    ]
+  },
+  {
+    path: '/auth',
+    component: () => import('layouts/AuthLayout.vue'),
+    children: [
+      {
+        path: 'login',
+        name: 'login',
+        component: () => import('pages/auth/Login.vue'),
+        // beforeEnter: ifNotAuthenticated,
+      },
+    ]
+  },
+  {
+    path: '/f',
+    component: () => import('layouts/NoNavLayout.vue'),
+    children: [
+      {
+        path: 'seating-charts',
         name: 'seating-charts',
         component: () => import('src/pages/seatingCharts/SeatingCharts.vue'),
         // beforeEnter: ifCanViewSeatingCharts,
@@ -232,33 +265,6 @@ const routes: RouteConfig[] = [
           }
         ]
       }
-    ]
-  },
-  {
-    path: '/print',
-    component: () => import('layouts/PrintLayout.vue'),
-    children: [
-      {
-        path: 'pr/:pk',
-        name: 'pr-print',
-        component: () => import('pages/PerformanceReviewDetail.vue'),
-        beforeEnter: ifManager,
-        props: {
-          print: true
-        }
-      }
-    ]
-  },
-  {
-    path: '/auth',
-    component: () => import('layouts/AuthLayout.vue'),
-    children: [
-      {
-        path: 'login',
-        name: 'login',
-        component: () => import('pages/auth/Login.vue'),
-        // beforeEnter: ifNotAuthenticated,
-      },
     ]
   },
 

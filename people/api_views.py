@@ -20,15 +20,16 @@ from mainsite.helpers import (
 )
 
 from people.models import (
-    Employee, PerformanceReview, Responsibility, ReviewNote, Signature,
+    Desk, DeskReservation, Employee, PerformanceReview, Responsibility, ReviewNote, Signature,
     TeleworkApplication, TeleworkSignature, ViewedSecurityMessage
 )
 from people.serializers import (
-    EmployeeSerializer, FileUploadSerializer, GroupSerializer,
+    DeskReservationSerializer, DeskSerializer, EmployeeSerializer,
+    FileUploadSerializer, GroupSerializer,
     PerformanceReviewFileUploadSerializer, PerformanceReviewSerializer,
-    ResponsibilitySerializer, ReviewNoteSerializer, SignatureSerializer, SimpleEmployeeSerializer,
-    TeleworkApplicationFileUploadSerializer, TeleworkApplicationSerializer,
-    TeleworkSignatureSerializer, UserSerializer,
+    ResponsibilitySerializer, ReviewNoteSerializer, SignatureSerializer,
+    SimpleEmployeeSerializer, TeleworkApplicationFileUploadSerializer,
+    TeleworkApplicationSerializer, TeleworkSignatureSerializer, UserSerializer,
     ViewedSecurityMessageSerializer
 )
 
@@ -177,6 +178,98 @@ class ResponsibilityViewSet(viewsets.ModelViewSet):
         return Response(serialized_responsibility.data)
 
     def update(self, request, pk=None):
+        responsibility = Responsibility.objects.get(pk=pk)
+        name = request.data['name']
+        link = request.data['link'] if 'link' in request.data else ''
+        primary_employee = Employee.objects.get(pk=request.data['primary_employee']) if request.data['primary_employee'] != -1 else None
+        secondary_employee = Employee.objects.get(pk=request.data['secondary_employee']) if request.data['secondary_employee'] != -1 else None
+        responsibility.name = name
+        responsibility.link = link
+        responsibility.primary_employee = primary_employee
+        responsibility.secondary_employee = secondary_employee
+        responsibility.save()
+        serialized_responsibility = ResponsibilitySerializer(responsibility,
+            context={'request': request})
+        return Response(serialized_responsibility.data)
+
+
+class DeskViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for desk reservations.
+    """
+    queryset = Desk.objects.all()
+    serializer_class = DeskSerializer
+
+    # def get_queryset(self):
+    #     """
+    #     Return a list of all responsibilities to any authenticated user.
+    #     Optionally filter by orphaned responsibilities.
+    #     Optionally filter by employee pk to get primary responsibilities with
+    #     secondaries, or just a list of secondaries.
+    #     """
+    #     import pdb; pdb.set_trace();
+    #     user = self.request.user
+    #     if user.is_authenticated:
+    #         orphaned = self.request.query_params.get('orphaned', None)
+    #         if orphaned is not None and orphaned == "true":
+    #             queryset = Responsibility.objects.filter(
+    #                 Q(primary_employee__isnull=True) | Q(secondary_employee__isnull=True)
+    #             )
+    #         employee = self.request.query_params.get('employee', None)
+    #         if employee is not None and employee.isdigit():
+    #             secondary = self.request.query_params.get('secondary', None)
+    #             if secondary is not None and secondary == 'true':
+    #                 queryset = Responsibility.objects.filter(secondary_employee=employee)
+    #             else:
+    #                 queryset = Responsibility.objects.filter(primary_employee=employee)
+    #     else:
+    #         queryset = Responsibility.objects.none()
+    #     return queryset if 'queryset' in locals() else Responsibility.objects.all()
+
+
+class DeskReservationViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for desk reservations.
+    """
+    queryset = DeskReservation.objects.all()
+    serializer_class = DeskReservationSerializer
+
+    # def get_queryset(self):
+    #     """
+    #     Return a list of all responsibilities to any authenticated user.
+    #     Optionally filter by orphaned responsibilities.
+    #     Optionally filter by employee pk to get primary responsibilities with
+    #     secondaries, or just a list of secondaries.
+    #     """
+    #     import pdb; pdb.set_trace();
+    #     user = self.request.user
+    #     if user.is_authenticated:
+    #         orphaned = self.request.query_params.get('orphaned', None)
+    #         if orphaned is not None and orphaned == "true":
+    #             queryset = Responsibility.objects.filter(
+    #                 Q(primary_employee__isnull=True) | Q(secondary_employee__isnull=True)
+    #             )
+    #         employee = self.request.query_params.get('employee', None)
+    #         if employee is not None and employee.isdigit():
+    #             secondary = self.request.query_params.get('secondary', None)
+    #             if secondary is not None and secondary == 'true':
+    #                 queryset = Responsibility.objects.filter(secondary_employee=employee)
+    #             else:
+    #                 queryset = Responsibility.objects.filter(primary_employee=employee)
+    #     else:
+    #         queryset = Responsibility.objects.none()
+    #     return queryset if 'queryset' in locals() else Responsibility.objects.all()
+
+    def create(self, request):
+        employee = Employee.objects.get(pk=request.data['employee_pk']) if request.data['employee_pk'] != -1 else None
+        desk = Desk.objects.get(number=request.data['desk_number']) if request.data['desk_number'] != -1 else None
+        reservation = DeskReservation.objects.create(employee=employee, desk=desk)
+        serialized_reservation = DeskReservationSerializer(reservation,
+            context={'request': request})
+        return Response(serialized_reservation.data)
+
+    def update(self, request, pk=None):
+        import pdb; pdb.set_trace();
         responsibility = Responsibility.objects.get(pk=pk)
         name = request.data['name']
         link = request.data['link'] if 'link' in request.data else ''

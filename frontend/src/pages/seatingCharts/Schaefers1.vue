@@ -1,12 +1,25 @@
 <template>
-  <q-page class="row items-center justify-evenly" id="schaefers-1-page">
-    <div class="row q-gutter-md">
-      <div class="col unassigned-employee-list">
-        <div>Unassigned Employees</div>
-        <q-btn v-for="employee in unassignedEmployees" :key="employee.name" :color="employee.selected ? 'primary' : 'white'" @click="unassignedEmployeeClick(employee)" text-color="black" :label="employee.name" />
-      </div>
+  <q-page class="q-mt-md" id="schaefers-1-page">
+    <div class="row justify-between">
+      <q-select class="" v-model="selectedEmployee" :options="employees()" option-value="pk" option-label="name" label="Employee" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
+        <template v-slot:no-option>
+          <q-item>
+            <q-item-section class="text-grey">
+              No results
+            </q-item-section>
+          </q-item>
+        </template>
+        <template v-if="selectedEmployee.name" v-slot:append>
+          <q-icon name="cancel" @click.stop="selectedEmployee = emptyEmployee" class="cursor-pointer" />
+        </template>
+      </q-select>
+      <q-btn class="" :disabled="selectedEmployee.pk == -1" @click="clickReserve()">Reserve</q-btn>
+    </div>
+    <div class="row q-gutter-md q-mt-sm">
       <FloorPlan class="floor-plan"/>
     </div>
+    <!-- {{ desks }} -->
+    <!-- {{ deskReservations[0] }} -->
   </q-page>
 </template>
 
@@ -23,7 +36,7 @@
   
   @media only screen and (min-width: 1500px) {
     .floor-plan {
-      width: 1000px;
+      width: 1600px;
     }
   }
   
@@ -39,8 +52,11 @@
 </style>
 
 <script lang="ts">
+import { Notify } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
+import DeskReservationDataService from '../../services/DeskReservationDataService'
 import FloorPlan from '../../assets/floorPlans/schaefers1.fpsvg'
+import { AxiosDeskReservationCreateServerResponse, Desk, DeskReservation, SimpleEmployeeRetrieve, VuexStoreGetters } from '../../store/types'
 
 interface EmployeeType {
   name: string
@@ -51,6 +67,10 @@ interface EmployeeType {
   components: { FloorPlan }
 })
 export default class Schaefers1 extends Vue{
+  private getters = this.$store.getters as VuexStoreGetters
+
+  private needle = '' // For filtering employee list
+  
   private ignoreList = ['UP', 'DOWN']
   
   private unassignedEmployees: EmployeeType[] = [
@@ -64,90 +84,189 @@ export default class Schaefers1 extends Vue{
   private currentEmployee: EmployeeType = {name: '', selected: false}
   private allRooms: HTMLElement[] = []
   private currentRoom: HTMLElement = document.createElement('div')
+
+  private BUILDING = 'S'
+  private FLOOR = '1'
+  private desks: Array<Desk> = []
+  private deskReservations: Array<DeskReservation> = []
+
+  private emptyEmployee = {name: '', pk: -1}
+  private selectedEmployee = this.emptyEmployee
+
+  private selectedDeskNumber = ''
   
   // TODO: Use Quasar colors
   private primaryColor = '#1976d2'
   private greyColor = '#767676'
   private blackColor = '#000000'
+  private redColor = 'red'
 
-  private unassignedEmployeeClick(employee: EmployeeType) {
-    if (employee.selected) {
-      employee.selected = false
-      this.currentEmployee = {name: '', selected: false}
-    } else {
-      if (this.currentRoom.innerText && this.currentRoom.innerText == 'Unassigned') {
-        // Assign the employee to the current room
-        this.currentRoom.innerText = employee.name
-        const annotationElem = this.currentRoom.parentElement ? this.currentRoom.parentElement : document.createElement('div')
-        const annotationSize = annotationElem.getBoundingClientRect()
-        annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
-        annotationElem.style.marginTop = `-${annotationSize.height/2}px`
-        // Remove the current employee from the list
-        this.unassignedEmployees.splice(this.unassignedEmployees.indexOf(employee), 1)
-        this.currentEmployee = {name: '', selected: false}
-        // Unhighlight the room
-        this.currentRoom.style.borderColor = this.greyColor
-        this.currentRoom.style.color = this.blackColor
-        this.currentRoom = document.createElement('div')
-      } else {
-        // Select this employee (and deselect others)
-        this.unassignedEmployees.forEach((employee) => {employee.selected = false})
-        employee.selected = true
-        this.currentEmployee = employee
+  ///////////////
+  // EMPLOYEES //
+  ///////////////
+  private employees(): Array<SimpleEmployeeRetrieve> {    
+    const employees = this.getters['responsibilityModule/simpleEmployeeList']
+    return employees.filter((employee) => {
+      return employee.name.toLowerCase().indexOf(this.needle) != -1
+    })
+  }
+
+  private retrieveSimpleEmployeeList(): void {
+    this.$store.dispatch('responsibilityModule/getSimpleEmployeeList')
+      .catch(e => {
+        console.error('Error retrieving simple employee list', e)
+      })
+  }
+
+  private filterFn (val: string, update: Function) { // eslint-disable-line @typescript-eslint/ban-types
+    update(() => {
+      this.needle = val.toLowerCase()
+    })
+  }
+
+  private deselectAllRoomButtons() {
+    Array.from(document.getElementsByClassName('desk-button') as HTMLCollectionOf<HTMLElement>).forEach(room => {
+      if (!room.classList.contains('reserved')) {
+        room.style.borderColor = this.greyColor
+        room.style.color = this.blackColor
       }
-    }
+    })
   }
 
   private roomClick(roomButton: HTMLElement, annotationElem: HTMLDivElement) {
-    if (roomButton.innerText == 'Unassigned') {
-      if (this.currentEmployee.name) {
-        // Assign the current employee to the room
-        roomButton.innerText = this.currentEmployee.name
-        const annotationSize = annotationElem.getBoundingClientRect()
-        annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
-        annotationElem.style.marginTop = `-${annotationSize.height/2}px`
-        // Remove the current employee from the list
-        this.unassignedEmployees.splice(this.unassignedEmployees.indexOf(this.currentEmployee), 1)
-        this.currentEmployee = {name: '', selected: false}
+
+    
+    if (roomButton.dataset.pk) {
+      const buttonNumber = roomButton.dataset.pk
+
+      if (buttonNumber == this.selectedDeskNumber) {
+        // Deselect the room
+        this.selectedDeskNumber = ''
+        roomButton.style.borderColor = this.greyColor
+        roomButton.style.color = this.blackColor
       } else {
-        if (this.currentRoom == roomButton) {
-          // Unhighlight the room
-          this.currentRoom = document.createElement('div')
-          roomButton.style.borderColor = this.greyColor
-          roomButton.style.color = this.blackColor
-        } else {
-          // Highlight the room (and unhighlight others)
-          this.allRooms.forEach((room) => {
-            room.style.borderColor = this.greyColor
-            room.style.color = this.blackColor
-          })
-          this.currentRoom = roomButton
-          roomButton.style.borderColor = this.primaryColor
-          roomButton.style.color = this.primaryColor
-        }
+        // Select the room (and deselect others)
+        this.selectedDeskNumber = buttonNumber
+        this.deselectAllRoomButtons()
+        roomButton.style.borderColor = this.primaryColor
+        roomButton.style.color = this.primaryColor
       }
-    } else {
-      if (this.currentEmployee.name) {
-        // Swap the two employees
-        // Move the room employee out
-        this.unassignedEmployees.push({name: roomButton.innerText, selected: false})
-        // Remove the current employee in
-        roomButton.innerText = this.currentEmployee.name
-        const annotationSize = annotationElem.getBoundingClientRect()
-        annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
-        annotationElem.style.marginTop = `-${annotationSize.height/2}px`
-        // Remove the current employee from the list
-        this.unassignedEmployees.splice(this.unassignedEmployees.indexOf(this.currentEmployee), 1)
-        this.currentEmployee = {name: '', selected: false}
-      } else {
-        // Kick out the room employee
-        this.unassignedEmployees.push({name: roomButton.innerText, selected: false})
-        roomButton.innerText = 'Unassigned'
-        const annotationSize = annotationElem.getBoundingClientRect()
-        annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
-        annotationElem.style.marginTop = `-${annotationSize.height/2}px`
-      }
+      
+      
+
+
     }
+
+    // if (roomButton.innerText == 'Unassigned') {
+    //   if (this.currentEmployee.name) {
+    //     // Assign the current employee to the room
+    //     roomButton.innerText = this.currentEmployee.name
+    //     const annotationSize = annotationElem.getBoundingClientRect()
+    //     annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
+    //     annotationElem.style.marginTop = `-${annotationSize.height/2}px`
+    //     // Remove the current employee from the list
+    //     this.unassignedEmployees.splice(this.unassignedEmployees.indexOf(this.currentEmployee), 1)
+    //     this.currentEmployee = {name: '', selected: false}
+    //   } else {
+    //     if (this.currentRoom == roomButton) {
+    //       // Unhighlight the room
+    //       this.currentRoom = document.createElement('div')
+    //       roomButton.style.borderColor = this.greyColor
+    //       roomButton.style.color = this.blackColor
+    //     } else {
+    //       // Highlight the room (and unhighlight others)
+    //       this.allRooms.forEach((room) => {
+    //         room.style.borderColor = this.greyColor
+    //         room.style.color = this.blackColor
+    //       })
+    //       this.currentRoom = roomButton
+    //       roomButton.style.borderColor = this.primaryColor
+    //       roomButton.style.color = this.primaryColor
+    //     }
+    //   }
+    // } else {
+    //   if (this.currentEmployee.name) {
+    //     // Swap the two employees
+    //     // Move the room employee out
+    //     this.unassignedEmployees.push({name: roomButton.innerText, selected: false})
+    //     // Remove the current employee in
+    //     roomButton.innerText = this.currentEmployee.name
+    //     const annotationSize = annotationElem.getBoundingClientRect()
+    //     annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
+    //     annotationElem.style.marginTop = `-${annotationSize.height/2}px`
+    //     // Remove the current employee from the list
+    //     this.unassignedEmployees.splice(this.unassignedEmployees.indexOf(this.currentEmployee), 1)
+    //     this.currentEmployee = {name: '', selected: false}
+    //   } else {
+    //     // Kick out the room employee
+    //     this.unassignedEmployees.push({name: roomButton.innerText, selected: false})
+    //     roomButton.innerText = 'Unassigned'
+    //     const annotationSize = annotationElem.getBoundingClientRect()
+    //     annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
+    //     annotationElem.style.marginTop = `-${annotationSize.height/2}px`
+    //   }
+    // }
+  }
+
+  private clickReserve() {
+    DeskReservationDataService.create({
+      employee_pk: this.selectedEmployee.pk,
+      building: this.BUILDING,
+      floor: this.FLOOR,
+      desk_number: this.selectedDeskNumber
+    })
+      .then((response: AxiosDeskReservationCreateServerResponse) => {
+        Notify.create(`Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`)
+        this.selectedEmployee = this.emptyEmployee
+        this.selectedDeskNumber = ''
+        this.deselectAllRoomButtons()
+        this.initDeskReservations()
+          .then(() => {
+            this.handleSVG()
+          })
+          .catch(e => {
+            console.error('Error initializing desk reservations:', e)
+          })
+        // TODO: Update reserved desks list everywhere
+      })
+      .catch(e => {
+        console.error('Error creating desk reservation:' ,e)
+      })
+  }
+
+  private initDesksAndReservations() {
+    return Promise.all([this.initDesks(), this.initDeskReservations()])
+      .catch(e => {
+        console.error('Error initializing desks and desk reservations from API:', e)
+      })
+  }
+
+  private initDesks() {
+    return new Promise((resolve, reject) => {
+      this.$store.dispatch('deskReservationModule/getAllDesks', {building: this.BUILDING, floor: this.FLOOR})
+        .then(() => {
+          this.desks = this.getters['deskReservationModule/allDesks'].results
+          resolve('Set desks')
+        })
+        .catch(e => {
+          console.error('Error getting desks from API:', e)
+          reject(e)
+        })
+    })
+  }
+
+  private initDeskReservations() {
+    return new Promise((resolve, reject) => {
+      this.$store.dispatch('deskReservationModule/getAllDeskReservations', {building: this.BUILDING, floor: this.FLOOR})
+        .then(() => {
+          this.deskReservations = this.getters['deskReservationModule/allDeskReservations'].results
+          resolve(this.deskReservations)
+        })
+        .catch(e => {
+          console.error('Error initializing desk reservations from API:', e)
+          reject(e)
+        })
+    })
   }
 
   private handleSVG() {
@@ -161,31 +280,61 @@ export default class Schaefers1 extends Vue{
       .filter(it => /^\s*/.exec(it.innerHTML))
       .forEach(node => {
         const text = node.innerHTML
-        // console.log(text)
+        
+        // Ignore any text on the ignore list
         if (this.ignoreList.indexOf(text) != -1) {
           return
         }
+
+        const matchingDesks = this.desks.filter((desk: Desk) => {
+          return desk.building == this.BUILDING && desk.floor == this.FLOOR && desk.number == text
+        })
+        if (!matchingDesks.length) {
+          // Hide any desk labels that shouldn't be displayed
+          node.style.display = 'none'
+          return
+        }
+
+        // Determine if desk is already reserved
+        // TODO: Determine if desk is actually still reserved - right now just checking if it has EVER been reserved
+        let deskReserved = false
+        const reservations = this.deskReservations.filter((reservation: DeskReservation) => {
+          return reservation.desk_building == this.BUILDING && reservation.desk_floor == this.FLOOR && reservation.desk_number == text
+        })
+        if (reservations.length) {
+          // Hide any desk labels that shouldn't be displayed
+          deskReserved = true
+        }
       
-        node.style.display = 'hidden'
-      
+        // Get the rectangle around the static map label
         const rect = node.getBoundingClientRect()
 
+        // Create an annotation element to replace the static map label
         const annotationElem = document.createElement('div')
         annotationElem.className = 'annotation'
       
-        annotationElem.style.left = (rect.left + rect.width/2 - 209).toString() + 'px'
-        annotationElem.style.top = (rect.top + rect.height/2 - 102).toString() + 'px'
-
-        annotationElem.innerHTML = `<div>${text}</div><button>Unassigned</button>`
+        annotationElem.innerHTML = `<button class="desk-button" data-pk="${text}">${text}</button>`
+        
+        // Position the annotation directly on top of the map label
+        annotationElem.style.left = (rect.left + rect.width/2 - 88).toString() + 'px'
+        annotationElem.style.top = (rect.top + rect.height/2 - 70).toString() + 'px'
+        // annotationElem.style.left = (rect.left).toString() + 'px'
+        // annotationElem.style.top = (rect.top).toString() + 'px'
 
         const clickableButton = annotationElem.querySelector('button') as HTMLElement
         this.allRooms.push(clickableButton)
 
         if (clickableButton) {
-          clickableButton.addEventListener('click', e => { // eslint-disable-line @typescript-eslint/no-non-null-assertion
-            const buttonElem = e.target as HTMLElement
-            this.roomClick(buttonElem, annotationElem)
-          })
+          if (deskReserved) {
+            clickableButton.style.borderColor = this.redColor
+            clickableButton.style.color = this.redColor
+            clickableButton.classList.add('reserved')
+          } else {
+            clickableButton.addEventListener('click', e => { // eslint-disable-line @typescript-eslint/no-non-null-assertion
+              const buttonElem = e.target as HTMLElement
+              this.roomClick(buttonElem, annotationElem)
+            })
+          }
         }
         
         document.querySelector('#schaefers-1-page')?.appendChild(annotationElem)
@@ -194,6 +343,7 @@ export default class Schaefers1 extends Vue{
         
         annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
         annotationElem.style.marginTop = `-${annotationSize.height/2}px`
+
     })
   }
 
@@ -208,7 +358,18 @@ export default class Schaefers1 extends Vue{
   }
 
   mounted() {
-    this.handleSVG()
+    this.initDesksAndReservations()
+      .then(() => {
+        this.handleSVG()
+      })
+      .catch(e => {
+        console.error('Error initializing desk reservations in component:', e)
+      })
+    // this.initDesks()
+    // this.initDeskReservations()
+    if (!this.employees().length) {
+      this.retrieveSimpleEmployeeList()
+    }
   }
 }
 </script>

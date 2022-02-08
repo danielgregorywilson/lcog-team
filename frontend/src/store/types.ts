@@ -576,7 +576,57 @@ export interface EmployeeResponsibilitiesInterface {
   responsibilities: Array<Responsibility>
 }
 
+
+//////////////////////////////////////////////////////////
+// DeskReservation Structure from Django Rest Framework //
+//////////////////////////////////////////////////////////
+
+export interface Desk {
+  pk: number
+  building: string
+  floor: string
+  number: string
+  active: boolean
+  lead: boolean
+  ergonomic: boolean
+}
+
+export interface DeskReservation {
+  pk: number
+  employee_pk: number
+  employee_name: string
+  desk_building: string
+  desk_floor: string
+  desk_number: string
+  check_in: Date
+  check_out: Date
+}
+
+export interface DeskReservationCreate {
+  employee_pk: number
+  building: string
+  floor: string
+  desk_number: string
+}
+
+export interface AxiosDeskReservationCreateServerResponse {
+  data: DeskReservation
+}
+
+export interface DeskReservationStateInterface {
+  allDesks: { results: Array<Desk> }
+  allDeskReservations: { results: Array<DeskReservation> }
+}
+
+
 export interface VuexStoreGetters {
+  'deskReservationModule/allDesks': {
+    results: Array<Desk>
+  },
+  'deskReservationModule/allDeskReservations': {
+    results: Array<DeskReservation>
+  },
+
   'responsibilityModule/simpleEmployeeList': Array<SimpleEmployeeRetrieve>,
   'responsibilityModule/simpleEmployeeDetail': SimpleEmployeeRetrieve,
   'responsibilityModule/allResponsibilities': {

@@ -1,12 +1,12 @@
 import { Module } from 'vuex';
 import { StateInterface } from '../../index';
 import state from './state';
-import { ResponsibilityStateInterface } from '../../types';
+import { DeskReservationStateInterface } from '../../types';
 import actions from './actions';
 import getters from './getters';
 import mutations from './mutations';
 
-const responsibilityModule: Module<ResponsibilityStateInterface, StateInterface> = {
+const deskReservationModule: Module<DeskReservationStateInterface, StateInterface> = {
   namespaced: true,
   actions,
   getters,
@@ -14,4 +14,4 @@ const responsibilityModule: Module<ResponsibilityStateInterface, StateInterface>
   state
 };
 
-export default responsibilityModule;
+export default deskReservationModule;

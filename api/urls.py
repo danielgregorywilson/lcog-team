@@ -6,11 +6,11 @@ from django.urls import include, path
 from mainsite.api_views import SecurityMessageViewSet
 from mainsite.views import obtain_auth_token_without_password
 from people.api_views import (
-    CurrentUserView, EmployeeViewSet, FileUploadViewSet, GroupViewSet,
-    PerformanceReviewViewSet, ResponsibilityViewSet, ReviewNoteViewSet,
-    SignatureViewSet, TeleworkApplicationFileUploadViewSet,
-    TeleworkApplicationViewSet, TeleworkSignatureViewSet, UserViewSet,
-    ViewedSecurityMessageViewSet
+    CurrentUserView, DeskReservationViewSet, DeskViewSet, EmployeeViewSet,
+    FileUploadViewSet, GroupViewSet, PerformanceReviewViewSet,
+    ResponsibilityViewSet, ReviewNoteViewSet, SignatureViewSet,
+    TeleworkApplicationFileUploadViewSet, TeleworkApplicationViewSet,
+    TeleworkSignatureViewSet, UserViewSet, ViewedSecurityMessageViewSet
 )
 
 
@@ -26,6 +26,8 @@ router.register('v1/user', UserViewSet)
 router.register('v1/groups', GroupViewSet)
 router.register('v1/employee', EmployeeViewSet)
 router.register('v1/responsibilities', ResponsibilityViewSet)
+router.register('v1/desk', DeskViewSet)
+router.register('v1/deskreservation', DeskReservationViewSet)
 router.register('v1/performancereview', PerformanceReviewViewSet)
 router.register('v1/fileupload', FileUploadViewSet, basename='fileupload')
 router.register('v1/telework-fileupload', TeleworkApplicationFileUploadViewSet, basename='telework-fileupload')

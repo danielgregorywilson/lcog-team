@@ -2,6 +2,7 @@ import { store } from 'quasar/wrappers'
 import Vuex from 'vuex'
 import VueCookies from 'vue-cookies'
 import authModule from './modules/auth'
+import deskReservationModule from './modules/deskreservation'
 import performanceReviewModule from './modules/performancereview'
 import responsibilityModule from './modules/responsibility'
 import securityMessageModule from './modules/securitymessage'
@@ -33,11 +34,12 @@ export default store(function ({ Vue }) {
   const Store = new Vuex.Store<StateInterface>({
     modules: {
       authModule,
-      userModule,
+      deskReservationModule,
       performanceReviewModule,
       responsibilityModule,
       securityMessageModule,
       teleworkModule,
+      userModule,
     },
 
     // enable strict mode (adds overhead!)

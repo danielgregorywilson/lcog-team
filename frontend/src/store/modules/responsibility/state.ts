@@ -1,7 +1,7 @@
 import { ResponsibilityStateInterface } from 'src/store/types';
 
 const state: ResponsibilityStateInterface = {
-  allResponsibilities: { results: []},
+  allResponsibilities: { results: [] },
   orphanedResponsibilities: [],
   employeePrimaryResponsibilities: [],
   employeeSecondaryResponsibilities: [],

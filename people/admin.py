@@ -124,3 +124,5 @@ class DeskReservationAdmin(admin.ModelAdmin):
     list_display = ("pk", "employee", "desk", "check_in", "check_out")
     search_fields = ("employee__user__username", )
     list_filter = ("desk__building", "desk__floor", "desk__number")
+    fields = ("employee", "desk", "check_in", "check_out")
+    readonly_fields = ("check_in",)

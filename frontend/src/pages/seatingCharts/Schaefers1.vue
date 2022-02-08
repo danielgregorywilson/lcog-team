@@ -19,7 +19,7 @@
       <FloorPlan class="floor-plan"/>
     </div>
     <!-- {{ desks }} -->
-    {{ deskReservations[0] }}
+    <!-- {{ deskReservations[0] }} -->
   </q-page>
 </template>
 
@@ -56,9 +56,7 @@ import { Notify } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
 import DeskReservationDataService from '../../services/DeskReservationDataService'
 import FloorPlan from '../../assets/floorPlans/schaefers1.fpsvg'
-import { AxiosDeskReservationCreateServerResponse, SimpleEmployeeRetrieve, VuexStoreGetters } from '../../store/types'
-import { parseHTML } from 'cypress/types/jquery'
-import { indexOf } from 'cypress/types/lodash'
+import { AxiosDeskReservationCreateServerResponse, Desk, DeskReservation, SimpleEmployeeRetrieve, VuexStoreGetters } from '../../store/types'
 
 interface EmployeeType {
   name: string
@@ -88,14 +86,14 @@ export default class Schaefers1 extends Vue{
   private currentRoom: HTMLElement = document.createElement('div')
 
   private BUILDING = 'S'
-  private FLOOR = 1
-  private desks = []
-  private deskReservations = []
+  private FLOOR = '1'
+  private desks: Array<Desk> = []
+  private deskReservations: Array<DeskReservation> = []
 
   private emptyEmployee = {name: '', pk: -1}
   private selectedEmployee = this.emptyEmployee
 
-  private selectedDeskNumber = -1
+  private selectedDeskNumber = ''
   
   // TODO: Use Quasar colors
   private primaryColor = '#1976d2'
@@ -127,7 +125,7 @@ export default class Schaefers1 extends Vue{
   }
 
   private deselectAllRoomButtons() {
-    Array.from(document.getElementsByClassName("desk-button")).forEach(room => {
+    Array.from(document.getElementsByClassName('desk-button') as HTMLCollectionOf<HTMLElement>).forEach(room => {
       if (!room.classList.contains('reserved')) {
         room.style.borderColor = this.greyColor
         room.style.color = this.blackColor
@@ -139,11 +137,11 @@ export default class Schaefers1 extends Vue{
 
     
     if (roomButton.dataset.pk) {
-      const buttonNumber = parseInt(roomButton.dataset.pk)  
+      const buttonNumber = roomButton.dataset.pk
 
       if (buttonNumber == this.selectedDeskNumber) {
         // Deselect the room
-        this.selectedDeskNumber = -1
+        this.selectedDeskNumber = ''
         roomButton.style.borderColor = this.greyColor
         roomButton.style.color = this.blackColor
       } else {
@@ -211,7 +209,6 @@ export default class Schaefers1 extends Vue{
   }
 
   private clickReserve() {
-    // TODO: Add building and floor
     DeskReservationDataService.create({
       employee_pk: this.selectedEmployee.pk,
       building: this.BUILDING,
@@ -219,14 +216,16 @@ export default class Schaefers1 extends Vue{
       desk_number: this.selectedDeskNumber
     })
       .then((response: AxiosDeskReservationCreateServerResponse) => {
-        Notify.create(`Reserved desk ${this.selectedDeskNumber.toString()} for ${this.selectedEmployee.name}`)
+        Notify.create(`Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`)
         this.selectedEmployee = this.emptyEmployee
-        this.selectedDeskNumber = -1
+        this.selectedDeskNumber = ''
         this.deselectAllRoomButtons()
-        // TODO: Update reserved desks list
         this.initDeskReservations()
           .then(() => {
             this.handleSVG()
+          })
+          .catch(e => {
+            console.error('Error initializing desk reservations:', e)
           })
         // TODO: Update reserved desks list everywhere
       })
@@ -246,7 +245,7 @@ export default class Schaefers1 extends Vue{
     return new Promise((resolve, reject) => {
       this.$store.dispatch('deskReservationModule/getAllDesks', {building: this.BUILDING, floor: this.FLOOR})
         .then(() => {
-          this.desks = this.$store.getters['deskReservationModule/allDesks'].results
+          this.desks = this.getters['deskReservationModule/allDesks'].results
           resolve('Set desks')
         })
         .catch(e => {
@@ -260,7 +259,7 @@ export default class Schaefers1 extends Vue{
     return new Promise((resolve, reject) => {
       this.$store.dispatch('deskReservationModule/getAllDeskReservations', {building: this.BUILDING, floor: this.FLOOR})
         .then(() => {
-          this.deskReservations = this.$store.getters['deskReservationModule/allDeskReservations'].results
+          this.deskReservations = this.getters['deskReservationModule/allDeskReservations'].results
           resolve(this.deskReservations)
         })
         .catch(e => {
@@ -287,8 +286,7 @@ export default class Schaefers1 extends Vue{
           return
         }
 
-        let matchingDesk = null
-        const matchingDesks = this.desks.filter(desk => {
+        const matchingDesks = this.desks.filter((desk: Desk) => {
           return desk.building == this.BUILDING && desk.floor == this.FLOOR && desk.number == text
         })
         if (!matchingDesks.length) {
@@ -300,7 +298,7 @@ export default class Schaefers1 extends Vue{
         // Determine if desk is already reserved
         // TODO: Determine if desk is actually still reserved - right now just checking if it has EVER been reserved
         let deskReserved = false
-        const reservations = this.deskReservations.filter(reservation => {
+        const reservations = this.deskReservations.filter((reservation: DeskReservation) => {
           return reservation.desk_building == this.BUILDING && reservation.desk_floor == this.FLOOR && reservation.desk_number == text
         })
         if (reservations.length) {
@@ -363,6 +361,9 @@ export default class Schaefers1 extends Vue{
     this.initDesksAndReservations()
       .then(() => {
         this.handleSVG()
+      })
+      .catch(e => {
+        console.error('Error initializing desk reservations in component:', e)
       })
     // this.initDesks()
     // this.initDeskReservations()

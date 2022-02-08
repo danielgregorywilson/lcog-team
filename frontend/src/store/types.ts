@@ -576,19 +576,6 @@ export interface EmployeeResponsibilitiesInterface {
   responsibilities: Array<Responsibility>
 }
 
-export interface VuexStoreGetters {
-  'responsibilityModule/simpleEmployeeList': Array<SimpleEmployeeRetrieve>,
-  'responsibilityModule/simpleEmployeeDetail': SimpleEmployeeRetrieve,
-  'responsibilityModule/allResponsibilities': {
-    results: Array<Responsibility>
-  },
-  'responsibilityModule/orphanedResponsibilities': {
-    results: Array<Responsibility>
-  },
-  'responsibilityModule/employeePrimaryResponsibilities': Array<EmployeeResponsibilitiesInterface>,
-  'responsibilityModule/employeeSecondaryResponsibilities': Array<EmployeeResponsibilitiesInterface>
-}
-
 
 //////////////////////////////////////////////////////////
 // DeskReservation Structure from Django Rest Framework //
@@ -597,7 +584,7 @@ export interface VuexStoreGetters {
 export interface Desk {
   pk: number
   building: string
-  floor: number
+  floor: string
   number: string
   active: boolean
   lead: boolean
@@ -608,9 +595,9 @@ export interface DeskReservation {
   pk: number
   employee_pk: number
   employee_name: string
-  desk_building: number
-  desk_floor: number
-  desk_number: number
+  desk_building: string
+  desk_floor: string
+  desk_number: string
   check_in: Date
   check_out: Date
 }
@@ -618,15 +605,36 @@ export interface DeskReservation {
 export interface DeskReservationCreate {
   employee_pk: number
   building: string
-  floor: number
-  desk_number: number
+  floor: string
+  desk_number: string
 }
 
 export interface AxiosDeskReservationCreateServerResponse {
-  data: Responsibility
+  data: DeskReservation
 }
 
 export interface DeskReservationStateInterface {
   allDesks: { results: Array<Desk> }
   allDeskReservations: { results: Array<DeskReservation> }
+}
+
+
+export interface VuexStoreGetters {
+  'deskReservationModule/allDesks': {
+    results: Array<Desk>
+  },
+  'deskReservationModule/allDeskReservations': {
+    results: Array<DeskReservation>
+  },
+
+  'responsibilityModule/simpleEmployeeList': Array<SimpleEmployeeRetrieve>,
+  'responsibilityModule/simpleEmployeeDetail': SimpleEmployeeRetrieve,
+  'responsibilityModule/allResponsibilities': {
+    results: Array<Responsibility>
+  },
+  'responsibilityModule/orphanedResponsibilities': {
+    results: Array<Responsibility>
+  },
+  'responsibilityModule/employeePrimaryResponsibilities': Array<EmployeeResponsibilitiesInterface>,
+  'responsibilityModule/employeeSecondaryResponsibilities': Array<EmployeeResponsibilitiesInterface>
 }

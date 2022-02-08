@@ -182,12 +182,15 @@ class DeskSerializer(serializers.HyperlinkedModelSerializer):
 class DeskReservationSerializer(serializers.HyperlinkedModelSerializer):
     employee_pk = serializers.SerializerMethodField()
     employee_name = serializers.SerializerMethodField()
+    desk_building = serializers.CharField(source='desk.building')
+    desk_floor = serializers.CharField(source='desk.floor')
+    desk_number = serializers.CharField(source='desk.number')
     
     class Meta:
         model = DeskReservation
         fields = [
-            'url', 'pk', 'employee_pk', 'employee_name', 'desk', 'check_in',
-            'check_out'
+            'url', 'pk', 'employee_pk', 'employee_name', 'desk_building',
+            'desk_floor', 'desk_number', 'check_in', 'check_out'
         ]
 
     @staticmethod

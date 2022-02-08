@@ -1137,6 +1137,6 @@ class DeskReservation(models.Model):
         return f"Desk reservation for {self.employee.user.get_full_name()}"
 
     employee = models.ForeignKey("people.Employee", related_name="desk_reservations", on_delete=models.CASCADE)
-    desk = models.ForeignKey("people.Desk", related_name="reservations", null=True, on_delete=models.SET_NULL)
+    desk = models.ForeignKey("people.Desk", related_name="reservations", on_delete=models.CASCADE)
     check_in = models.DateTimeField(_("check-in datetime"), auto_now=False, auto_now_add=True)
     check_out = models.DateTimeField(_("check-out datetime"), null=True, auto_now=False, auto_now_add=False)

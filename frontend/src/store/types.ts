@@ -608,7 +608,9 @@ export interface DeskReservation {
   pk: number
   employee_pk: number
   employee_name: string
-  desk_pk: number
+  desk_building: number
+  desk_floor: number
+  desk_number: number
   check_in: Date
   check_out: Date
 }

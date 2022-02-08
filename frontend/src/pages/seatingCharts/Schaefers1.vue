@@ -18,8 +18,8 @@
     <div class="row q-gutter-md q-mt-sm">
       <FloorPlan class="floor-plan"/>
     </div>
-    {{ desks }}
-    <!-- {{ deskReservations }} -->
+    <!-- {{ desks }} -->
+    {{ deskReservations[0] }}
   </q-page>
 </template>
 
@@ -52,10 +52,13 @@
 </style>
 
 <script lang="ts">
+import { Notify } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
 import DeskReservationDataService from '../../services/DeskReservationDataService'
 import FloorPlan from '../../assets/floorPlans/schaefers1.fpsvg'
 import { AxiosDeskReservationCreateServerResponse, SimpleEmployeeRetrieve, VuexStoreGetters } from '../../store/types'
+import { parseHTML } from 'cypress/types/jquery'
+import { indexOf } from 'cypress/types/lodash'
 
 interface EmployeeType {
   name: string
@@ -84,7 +87,7 @@ export default class Schaefers1 extends Vue{
   private allRooms: HTMLElement[] = []
   private currentRoom: HTMLElement = document.createElement('div')
 
-  private BUILDING = 'Schaefers'
+  private BUILDING = 'S'
   private FLOOR = 1
   private desks = []
   private deskReservations = []
@@ -98,6 +101,7 @@ export default class Schaefers1 extends Vue{
   private primaryColor = '#1976d2'
   private greyColor = '#767676'
   private blackColor = '#000000'
+  private redColor = 'red'
 
   ///////////////
   // EMPLOYEES //
@@ -122,61 +126,88 @@ export default class Schaefers1 extends Vue{
     })
   }
 
+  private deselectAllRoomButtons() {
+    Array.from(document.getElementsByClassName("desk-button")).forEach(room => {
+      if (!room.classList.contains('reserved')) {
+        room.style.borderColor = this.greyColor
+        room.style.color = this.blackColor
+      }
+    })
+  }
+
   private roomClick(roomButton: HTMLElement, annotationElem: HTMLDivElement) {
 
+    
     if (roomButton.dataset.pk) {
-      this.selectedDeskNumber = parseInt(roomButton.dataset.pk, 10)
+      const buttonNumber = parseInt(roomButton.dataset.pk)  
+
+      if (buttonNumber == this.selectedDeskNumber) {
+        // Deselect the room
+        this.selectedDeskNumber = -1
+        roomButton.style.borderColor = this.greyColor
+        roomButton.style.color = this.blackColor
+      } else {
+        // Select the room (and deselect others)
+        this.selectedDeskNumber = buttonNumber
+        this.deselectAllRoomButtons()
+        roomButton.style.borderColor = this.primaryColor
+        roomButton.style.color = this.primaryColor
+      }
+      
+      
+
+
     }
 
-    if (roomButton.innerText == 'Unassigned') {
-      if (this.currentEmployee.name) {
-        // Assign the current employee to the room
-        roomButton.innerText = this.currentEmployee.name
-        const annotationSize = annotationElem.getBoundingClientRect()
-        annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
-        annotationElem.style.marginTop = `-${annotationSize.height/2}px`
-        // Remove the current employee from the list
-        this.unassignedEmployees.splice(this.unassignedEmployees.indexOf(this.currentEmployee), 1)
-        this.currentEmployee = {name: '', selected: false}
-      } else {
-        if (this.currentRoom == roomButton) {
-          // Unhighlight the room
-          this.currentRoom = document.createElement('div')
-          roomButton.style.borderColor = this.greyColor
-          roomButton.style.color = this.blackColor
-        } else {
-          // Highlight the room (and unhighlight others)
-          this.allRooms.forEach((room) => {
-            room.style.borderColor = this.greyColor
-            room.style.color = this.blackColor
-          })
-          this.currentRoom = roomButton
-          roomButton.style.borderColor = this.primaryColor
-          roomButton.style.color = this.primaryColor
-        }
-      }
-    } else {
-      if (this.currentEmployee.name) {
-        // Swap the two employees
-        // Move the room employee out
-        this.unassignedEmployees.push({name: roomButton.innerText, selected: false})
-        // Remove the current employee in
-        roomButton.innerText = this.currentEmployee.name
-        const annotationSize = annotationElem.getBoundingClientRect()
-        annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
-        annotationElem.style.marginTop = `-${annotationSize.height/2}px`
-        // Remove the current employee from the list
-        this.unassignedEmployees.splice(this.unassignedEmployees.indexOf(this.currentEmployee), 1)
-        this.currentEmployee = {name: '', selected: false}
-      } else {
-        // Kick out the room employee
-        this.unassignedEmployees.push({name: roomButton.innerText, selected: false})
-        roomButton.innerText = 'Unassigned'
-        const annotationSize = annotationElem.getBoundingClientRect()
-        annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
-        annotationElem.style.marginTop = `-${annotationSize.height/2}px`
-      }
-    }
+    // if (roomButton.innerText == 'Unassigned') {
+    //   if (this.currentEmployee.name) {
+    //     // Assign the current employee to the room
+    //     roomButton.innerText = this.currentEmployee.name
+    //     const annotationSize = annotationElem.getBoundingClientRect()
+    //     annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
+    //     annotationElem.style.marginTop = `-${annotationSize.height/2}px`
+    //     // Remove the current employee from the list
+    //     this.unassignedEmployees.splice(this.unassignedEmployees.indexOf(this.currentEmployee), 1)
+    //     this.currentEmployee = {name: '', selected: false}
+    //   } else {
+    //     if (this.currentRoom == roomButton) {
+    //       // Unhighlight the room
+    //       this.currentRoom = document.createElement('div')
+    //       roomButton.style.borderColor = this.greyColor
+    //       roomButton.style.color = this.blackColor
+    //     } else {
+    //       // Highlight the room (and unhighlight others)
+    //       this.allRooms.forEach((room) => {
+    //         room.style.borderColor = this.greyColor
+    //         room.style.color = this.blackColor
+    //       })
+    //       this.currentRoom = roomButton
+    //       roomButton.style.borderColor = this.primaryColor
+    //       roomButton.style.color = this.primaryColor
+    //     }
+    //   }
+    // } else {
+    //   if (this.currentEmployee.name) {
+    //     // Swap the two employees
+    //     // Move the room employee out
+    //     this.unassignedEmployees.push({name: roomButton.innerText, selected: false})
+    //     // Remove the current employee in
+    //     roomButton.innerText = this.currentEmployee.name
+    //     const annotationSize = annotationElem.getBoundingClientRect()
+    //     annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
+    //     annotationElem.style.marginTop = `-${annotationSize.height/2}px`
+    //     // Remove the current employee from the list
+    //     this.unassignedEmployees.splice(this.unassignedEmployees.indexOf(this.currentEmployee), 1)
+    //     this.currentEmployee = {name: '', selected: false}
+    //   } else {
+    //     // Kick out the room employee
+    //     this.unassignedEmployees.push({name: roomButton.innerText, selected: false})
+    //     roomButton.innerText = 'Unassigned'
+    //     const annotationSize = annotationElem.getBoundingClientRect()
+    //     annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
+    //     annotationElem.style.marginTop = `-${annotationSize.height/2}px`
+    //   }
+    // }
   }
 
   private clickReserve() {
@@ -188,9 +219,15 @@ export default class Schaefers1 extends Vue{
       desk_number: this.selectedDeskNumber
     })
       .then((response: AxiosDeskReservationCreateServerResponse) => {
+        Notify.create(`Reserved desk ${this.selectedDeskNumber.toString()} for ${this.selectedEmployee.name}`)
         this.selectedEmployee = this.emptyEmployee
         this.selectedDeskNumber = -1
+        this.deselectAllRoomButtons()
         // TODO: Update reserved desks list
+        this.initDeskReservations()
+          .then(() => {
+            this.handleSVG()
+          })
         // TODO: Update reserved desks list everywhere
       })
       .catch(e => {
@@ -199,7 +236,7 @@ export default class Schaefers1 extends Vue{
   }
 
   private initDesksAndReservations() {
-    Promise.all([this.initDesks(), this.initDeskReservations()])
+    return Promise.all([this.initDesks(), this.initDeskReservations()])
       .catch(e => {
         console.error('Error initializing desks and desk reservations from API:', e)
       })
@@ -244,11 +281,32 @@ export default class Schaefers1 extends Vue{
       .filter(it => /^\s*/.exec(it.innerHTML))
       .forEach(node => {
         const text = node.innerHTML
+        
+        // Ignore any text on the ignore list
         if (this.ignoreList.indexOf(text) != -1) {
           return
         }
-        // console.log(text)
-        node.style.display = 'hidden'
+
+        let matchingDesk = null
+        const matchingDesks = this.desks.filter(desk => {
+          return desk.building == this.BUILDING && desk.floor == this.FLOOR && desk.number == text
+        })
+        if (!matchingDesks.length) {
+          // Hide any desk labels that shouldn't be displayed
+          node.style.display = 'none'
+          return
+        }
+
+        // Determine if desk is already reserved
+        // TODO: Determine if desk is actually still reserved - right now just checking if it has EVER been reserved
+        let deskReserved = false
+        const reservations = this.deskReservations.filter(reservation => {
+          return reservation.desk_building == this.BUILDING && reservation.desk_floor == this.FLOOR && reservation.desk_number == text
+        })
+        if (reservations.length) {
+          // Hide any desk labels that shouldn't be displayed
+          deskReserved = true
+        }
       
         // Get the rectangle around the static map label
         const rect = node.getBoundingClientRect()
@@ -257,7 +315,7 @@ export default class Schaefers1 extends Vue{
         const annotationElem = document.createElement('div')
         annotationElem.className = 'annotation'
       
-        annotationElem.innerHTML = `<button data-pk="${text}">${text}</button>`
+        annotationElem.innerHTML = `<button class="desk-button" data-pk="${text}">${text}</button>`
         
         // Position the annotation directly on top of the map label
         annotationElem.style.left = (rect.left + rect.width/2 - 88).toString() + 'px'
@@ -269,10 +327,16 @@ export default class Schaefers1 extends Vue{
         this.allRooms.push(clickableButton)
 
         if (clickableButton) {
-          clickableButton.addEventListener('click', e => { // eslint-disable-line @typescript-eslint/no-non-null-assertion
-            const buttonElem = e.target as HTMLElement
-            this.roomClick(buttonElem, annotationElem)
-          })
+          if (deskReserved) {
+            clickableButton.style.borderColor = this.redColor
+            clickableButton.style.color = this.redColor
+            clickableButton.classList.add('reserved')
+          } else {
+            clickableButton.addEventListener('click', e => { // eslint-disable-line @typescript-eslint/no-non-null-assertion
+              const buttonElem = e.target as HTMLElement
+              this.roomClick(buttonElem, annotationElem)
+            })
+          }
         }
         
         document.querySelector('#schaefers-1-page')?.appendChild(annotationElem)
@@ -281,6 +345,7 @@ export default class Schaefers1 extends Vue{
         
         annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
         annotationElem.style.marginTop = `-${annotationSize.height/2}px`
+
     })
   }
 
@@ -296,9 +361,11 @@ export default class Schaefers1 extends Vue{
 
   mounted() {
     this.initDesksAndReservations()
+      .then(() => {
+        this.handleSVG()
+      })
     // this.initDesks()
     // this.initDeskReservations()
-    this.handleSVG()
     if (!this.employees().length) {
       this.retrieveSimpleEmployeeList()
     }

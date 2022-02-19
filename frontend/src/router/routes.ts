@@ -137,6 +137,33 @@ const routes: RouteConfig[] = [
         beforeEnter: ifManager
       },
       {
+        path: '/mileage-reimbursement',
+        name: 'mileage-reimbursement',
+        component: () => import('src/pages/mileageReimbursement/MileageReimbursement.vue'),
+        children: [
+          {
+            path: 'create',
+            name: 'mileage-reimbursement-create',
+            component: () => import('src/pages/mileageReimbursement/MileageReimbursementCreate.vue'),
+          },
+          // {
+          //   path: 'list',
+          //   name: 'mileage-reimbursement-list',
+          //   component: () => import('src/pages/mileageReimbursement/MileageReimbursementList.vue'),
+          // },
+          // {
+          //   path: 'approve',
+          //   name: 'mileage-reimbursement-approve',
+          //   component: () => import('src/pages/mileageReimbursement/MileageReimbursementApprove.vue'),
+          // },
+          // {
+          //   path: ':pk',
+          //   name: 'mileage-reimbursement-detail',
+          //   component: () => import('src/pages/mileageReimbursement/MileageReimbursementDetail.vue'),
+          // }
+        ]
+      },
+      {
         path: '/note/new',
         name: 'note-create',
         component: () => import('pages/ReviewNoteCreate.vue'),

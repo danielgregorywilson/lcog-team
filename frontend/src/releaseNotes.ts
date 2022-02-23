@@ -4,6 +4,16 @@
 
 export const releases = [
   {
+    version: '0.2.2',
+    date: new Date(2022, 1, 22),
+    changes: [
+      {
+        type: 'new',
+        description: 'Demo of mileage reimbursement app'
+      },
+    ]
+  },
+  {
     version: '0.2.1',
     date: new Date(2022, 1, 8),
     changes: [

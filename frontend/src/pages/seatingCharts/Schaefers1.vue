@@ -134,7 +134,8 @@ export default class Schaefers1 extends Vue{
   }
 
   private roomClick(roomButton: HTMLElement, annotationElem: HTMLDivElement) {
-
+    // TODO: Remove
+    console.log(annotationElem)
     
     if (roomButton.dataset.pk) {
       const buttonNumber = roomButton.dataset.pk

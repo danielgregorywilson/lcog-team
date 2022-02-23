@@ -18,7 +18,7 @@
     "core-js": "^3.6.5",
     "git-describe": "^4.1.0",
     "msal": "^1.4.10",
-    "quasar": "^1.9.15",
+    "quasar": "^1.18.5",
     "vue-class-component": "^7.2.2",
     "vue-cookies": "^1.7.4",
     "vue-property-decorator": "^8.3.0",
@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@applitools/eyes-cypress": "^3.22.3",
-    "@quasar/app": "^2.0.0",
+    "@quasar/app": "^2.2.11",
     "@types/node": "^10.17.15",
     "@typescript-eslint/eslint-plugin": "^3.3.0",
     "@typescript-eslint/parser": "^3.3.0",

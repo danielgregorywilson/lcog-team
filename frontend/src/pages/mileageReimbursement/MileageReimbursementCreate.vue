@@ -106,7 +106,6 @@ table {
 </style>
 
 <script lang="ts">
-import { isInteger } from 'cypress/types/lodash'
 import { Notify } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
 import { bus } from '../../App.vue'

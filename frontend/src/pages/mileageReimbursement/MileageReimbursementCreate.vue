@@ -77,6 +77,7 @@
       <q-btn unelevated rounded color="primary" icon="add" label="Add Row" @click="addRow()" />
 
       <div>
+        <div class="text-subtitle1 q-mb-sm">By clicking "Submit" below, I certify that all the expenses listed above are true and correct and were incurred on official LCOG business.</div>
         <q-btn label="Submit" type="submit" color="primary"/>
         <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
       </div>

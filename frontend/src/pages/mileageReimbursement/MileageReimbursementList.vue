@@ -1,19 +1,19 @@
 <template>
-  <div>
+  <div class="q-pt-sm">
     <q-form
       @submit="formSubmit"
-      @reset="formReset"
       class="q-gutter-md"
     >
       
       <table>
         <thead>
           <tr>
-            <td colspan="3"></td>
+            <td colspan="4"></td>
             <td colspan="2" class="rowspan">Odometer</td>
             <td></td>
           </tr>
           <tr>
+            <td><q-checkbox :value="allChecked()" @input="checkAll()" /></td>
             <td>Date</td>
             <td>Purpose/Destination</td>
             <td>Subfund & Contract</td>
@@ -24,61 +24,20 @@
         </thead>
         <tbody>
           <tr v-for="row in rows" :key="rows.indexOf(row)">
-            <td>
-              <div>
-                <q-input filled v-model="row.date" mask="date" :rules="['date']" style="padding-bottom: 0px;">
-                  <template v-slot:append>
-                    <q-icon name="event" class="cursor-pointer">
-                      <q-popup-proxy ref="qDateProxy" cover transition-show="scale" transition-hide="scale">
-                        <q-date v-model="row.date">
-                          <div class="row items-center justify-end">
-                            <q-btn v-close-popup label="Close" color="primary" flat />
-                          </div>
-                        </q-date>
-                      </q-popup-proxy>
-                    </q-icon>
-                  </template>
-                </q-input>
-              </div>
-            </td>
-
-            <td>
-              <q-input outlined v-model="row.purpose" />
-            </td>
-            <td>
-              <q-input outlined v-model="row.subfund" />
-            </td>
-            <td>
-              <q-input outlined v-model="row.start" />
-            </td>
-            <td>
-              <q-input outlined v-model="row.finish" />
-            </td>
-            <div v-if="row.finish && row.start && row.start < row.finish">{{ (parseInt(row.finish) - parseInt(row.start)).toFixed() }}</div>
-
+            <td><q-checkbox v-model="row.checked" /></td>
+            <td>{{ row.date }}</td>
+            <td>{{ row.purpose }}</td>
+            <td>{{ row.subfund }}</td>
+            <td>{{ row.start }}</td>
+            <td>{{ row.finish }}</td>
+            <td>{{ row.finish - row.start }}</td>
           </tr>
-          <tr>
-            <td colspan="4"></td>
-            <td>Total Miles:</td>
-            <td>{{ totalMiles() }}</td>
-          </tr>
-          <tr>
-            <td colspan="4"></td>
-            <td>x $0.585</td>
-            <td>${{ (totalMiles() * 0.585).toFixed(2) }}</td>
-          </tr>
-
         </tbody>
 
       </table>
 
-      
-
-      <q-btn unelevated rounded color="primary" icon="add" label="Add Row" @click="addRow()" />
-
       <div>
-        <q-btn label="Submit" type="submit" color="primary"/>
-        <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
+        <q-btn label="Approve all checked" type="submit" color="primary"/>
       </div>
     </q-form>
 
@@ -89,24 +48,25 @@
 
 <style scoped lang="scss">
 table {
+   border: 1px solid black;
+   border-radius: 10px;
 
   thead {
     font-weight: bold;
   }
 
-  td.rowspan {
+  td {
+    padding-left: 5px;
+    padding-right: 5px;
+
+  &.rowspan {
     text-align: center;
   }
-
-  tfoot {
-    font-weight: bold;
   }
-
 }
 </style>
 
 <script lang="ts">
-import { isInteger } from 'cypress/types/lodash'
 import { Notify } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
 import { bus } from '../../App.vue'
@@ -116,8 +76,12 @@ import { Responsibility, VuexStoreGetters } from '../../store/types'
 export default class AllResponsibilities extends Vue {
   private getters = this.$store.getters as VuexStoreGetters
 
-  private emptyRow = {'date': '', 'purpose': '', 'subfund': '', 'start': '', 'finish': ''}
-  private rows = [{'date': '', 'purpose': '', 'subfund': '', 'start': '', 'finish': ''}]
+  // private allChecked = false
+
+  private rows = [
+    { 'checked': false, 'date': '2022/02/22', 'purpose': 'Portland', 'subfund': 'Fund A', 'start': '1005', 'finish': '1010' },
+    { 'checked': false, 'date': '2022/02/23', 'purpose': 'Salem', 'subfund': 'Fund B', 'start': '42', 'finish': '420' }
+  ]
 
   private allResponsibilities(): Array<Responsibility> {
     return this.getters['responsibilityModule/allResponsibilities'].results
@@ -134,14 +98,26 @@ export default class AllResponsibilities extends Vue {
     rowsPerPage: 10
   }
 
-  private totalMiles(): number {
-    let totalMiles = 0
-    this.rows.forEach(row => {
-      if (parseInt(row.finish) >= parseInt(row.start)) {
-        totalMiles += parseInt(row.finish) - parseInt(row.start)
+  private allChecked(): boolean {
+    let falseRows = this.rows.filter(row => {
+      if (row.checked == false) {
+        return row
       }
     })
-    return totalMiles
+    if (falseRows.length) {
+      return false
+    }
+    return true
+  }
+
+  private checkAll(): void {
+    let setCheckedTo = true
+    if (this.allChecked()) {
+      setCheckedTo = false
+    }
+    this.rows.forEach(row => {
+      row.checked = setCheckedTo
+    })
   }
 
   private retrieveAllResponsibilites(): void {
@@ -159,18 +135,8 @@ export default class AllResponsibilities extends Vue {
     bus.$emit('emitOpenDeleteDialog', row) // eslint-disable-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   }
 
-  private addRow(): void {
-    this.rows.push({...this.emptyRow})
-  }
-
   private formSubmit (): void {
-    this.formReset()
-    Notify.create('Submitted')
-  }
-
-  private formReset (): void {
-    this.rows = []
-    this.rows.push({...this.emptyRow})
+    Notify.create('Approved')
   }
 
   mounted() {

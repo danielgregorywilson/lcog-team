@@ -146,11 +146,11 @@ const routes: RouteConfig[] = [
             name: 'mileage-reimbursement-create',
             component: () => import('src/pages/mileageReimbursement/MileageReimbursementCreate.vue'),
           },
-          // {
-          //   path: 'list',
-          //   name: 'mileage-reimbursement-list',
-          //   component: () => import('src/pages/mileageReimbursement/MileageReimbursementList.vue'),
-          // },
+          {
+            path: 'list',
+            name: 'mileage-reimbursement-list',
+            component: () => import('src/pages/mileageReimbursement/MileageReimbursementList.vue'),
+          },
           // {
           //   path: 'approve',
           //   name: 'mileage-reimbursement-approve',

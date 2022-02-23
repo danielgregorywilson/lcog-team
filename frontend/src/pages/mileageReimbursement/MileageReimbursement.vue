@@ -1,8 +1,10 @@
 <template>
   <q-page class="q-pa-md">
-    <div class="q-mb-md row justify-between">
+    <div class="text-h4">Mileage Reimbursement</div>
+    <div class="q-my-md row justify-between">
       <div class="q-gutter-sm">
-        <q-btn :to="{ name: 'mileage-reimbursement-create' }" unelevated rounded color="primary" icon="add" label="New" />
+        <q-btn :to="{ name: 'mileage-reimbursement-create' }" unelevated rounded color="primary" icon="directions_car" label="Request Reimbursement" />
+        <q-btn :to="{ name: 'mileage-reimbursement-list' }" unelevated rounded color="primary" icon="list" label="View Requests" />
         <!-- <q-btn :to="{ name: 'orphaned-responsibilities' }" unelevated rounded color="primary" icon="visibility_off" label="View Orphaned" /> -->
       </div>
     </div>

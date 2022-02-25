@@ -275,6 +275,10 @@ export default class Schaefers1 extends Vue{
     const staleAnnotationNodes = Array.from(document.querySelectorAll('.annotation'))
     staleAnnotationNodes.forEach(node => { node.remove() })
 
+    // Get horizontal and vertical offsets of svg floor plan
+    const floorPlanNode = document.getElementsByClassName('floor-plan')[0]
+    const floorPlanRect = floorPlanNode.getBoundingClientRect()
+
     const textNodes = Array.from(document.querySelectorAll('text'))
 
     textNodes
@@ -317,10 +321,13 @@ export default class Schaefers1 extends Vue{
         annotationElem.innerHTML = `<button class="desk-button" data-pk="${text}">${text}</button>`
         
         // Position the annotation directly on top of the map label
-        annotationElem.style.left = (rect.left + rect.width/2 - 88).toString() + 'px'
-        annotationElem.style.top = (rect.top + rect.height/2 - 70).toString() + 'px'
-        // annotationElem.style.left = (rect.left).toString() + 'px'
-        // annotationElem.style.top = (rect.top).toString() + 'px'
+        // annotationElem.style.left = (rect.left + rect.width/2 - 88).toString() + 'px'
+        // annotationElem.style.top = (rect.top + rect.height/2 - 70).toString() + 'px'
+        
+        // TODO: Finish and annotate this - can't brain today
+        annotationElem.style.left = (rect.left - floorPlanRect.left - rect.width/2 + annotationElem.offsetWidth/2).toString() + 'px'
+        // TODO: Fix and annotate this - can't brain today
+        annotationElem.style.top = (rect.top - floorPlanRect.top + 70).toString() + 'px'
 
         const clickableButton = annotationElem.querySelector('button') as HTMLElement
         this.allRooms.push(clickableButton)
@@ -340,10 +347,10 @@ export default class Schaefers1 extends Vue{
         
         document.querySelector('#schaefers-1-page')?.appendChild(annotationElem)
         
-        const annotationSize = annotationElem.getBoundingClientRect()
+        // const annotationSize = annotationElem.getBoundingClientRect()
         
-        annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
-        annotationElem.style.marginTop = `-${annotationSize.height/2}px`
+        // annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
+        // annotationElem.style.marginTop = `-${annotationSize.height/2}px`
 
     })
   }

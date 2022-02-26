@@ -598,8 +598,8 @@ export interface DeskReservation {
   desk_building: string
   desk_floor: string
   desk_number: string
-  check_in: Date
-  check_out: Date
+  check_in: string
+  check_out: string
 }
 
 export interface DeskReservationCreate {

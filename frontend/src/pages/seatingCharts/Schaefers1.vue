@@ -18,6 +18,22 @@
     <div class="row q-gutter-md q-mt-sm">
       <FloorPlan class="floor-plan"/>
     </div>
+
+    <q-dialog v-model="cancelDialogVisible">
+      <q-card>
+        <q-card-section>
+          <div class="row items-center">
+            <q-avatar icon="no_meeting_room" color="primary" text-color="white" />
+            <span class="q-ml-sm"><strong>{{ selectedDeskOccupantToCancel }}</strong> checked in to desk <strong>{{ selectedDeskNumberToCancel }}</strong> at <strong>{{ selectedDeskToCancelCheckInTime }}</strong>. End this reservation?</span>
+          </div>
+        </q-card-section>
+
+        <q-card-actions class="row justify-around">
+          <q-btn flat label="No" color="primary" v-close-popup />
+          <q-btn flat label="Yes, end reservation" color="primary" @click="deleteReservation()" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
     <!-- {{ desks }} -->
     <!-- {{ deskReservations[0] }} -->
   </q-page>
@@ -95,6 +111,12 @@ export default class Schaefers1 extends Vue{
 
   private selectedDeskNumber = ''
   
+  private cancelDialogVisible = false
+  private selectedDeskReservationToCancelPk = -1
+  private selectedDeskNumberToCancel = ''
+  private selectedDeskOccupantToCancel = ''
+  private selectedDeskToCancelCheckInTime = ''
+  
   // TODO: Use Quasar colors
   private primaryColor = '#1976d2'
   private greyColor = '#767676'
@@ -152,9 +174,6 @@ export default class Schaefers1 extends Vue{
         roomButton.style.borderColor = this.primaryColor
         roomButton.style.color = this.primaryColor
       }
-      
-      
-
 
     }
 
@@ -207,6 +226,43 @@ export default class Schaefers1 extends Vue{
     //     annotationElem.style.marginTop = `-${annotationSize.height/2}px`
     //   }
     // }
+  }
+
+  private reservedRoomClick(roomButton: HTMLElement) {
+    if (roomButton.dataset.pk) {
+      const buttonNumber = roomButton.dataset.pk
+      this.selectedDeskNumberToCancel = buttonNumber
+      const currentDeskReservation = this.deskReservations.filter(deskReservation => deskReservation.desk_number == buttonNumber)[0]
+      this.selectedDeskReservationToCancelPk = currentDeskReservation.pk
+      this.selectedDeskOccupantToCancel = currentDeskReservation.employee_name
+      const checkInDate = new Date(currentDeskReservation.check_in)
+      this.selectedDeskToCancelCheckInTime = checkInDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric' })
+
+      // Open reservation cancel dialog
+      this.cancelDialogVisible = true
+    }
+  }
+
+  private deleteReservation() {
+    DeskReservationDataService.delete(this.selectedDeskReservationToCancelPk)
+      .then(() => {
+        Notify.create(`Cancelled desk reservation: ${this.selectedDeskNumberToCancel} for ${this.selectedDeskOccupantToCancel}`)
+        this.selectedDeskReservationToCancelPk
+        this.selectedDeskNumberToCancel = ''
+        this.selectedDeskOccupantToCancel = ''
+        this.selectedDeskToCancelCheckInTime = ''
+        this.initDeskReservations()
+          .then(() => {
+            this.handleSVG()
+          })
+          .catch(e => {
+            console.error('Error initializing desk reservations:', e)
+          })
+        // TODO: Update reserved desks list everywhere
+      })
+      .catch(e => {
+        console.error('Error cancelling desk reservation:' ,e)
+      })
   }
 
   private clickReserve() {
@@ -337,6 +393,10 @@ export default class Schaefers1 extends Vue{
             clickableButton.style.borderColor = this.redColor
             clickableButton.style.color = this.redColor
             clickableButton.classList.add('reserved')
+            clickableButton.addEventListener('click', e => { // eslint-disable-line @typescript-eslint/no-non-null-assertion
+              const buttonElem = e.target as HTMLElement
+              this.reservedRoomClick(buttonElem)
+            })
           } else {
             clickableButton.addEventListener('click', e => { // eslint-disable-line @typescript-eslint/no-non-null-assertion
               const buttonElem = e.target as HTMLElement

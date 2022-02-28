@@ -32,7 +32,7 @@
           <q-img src="../../assets/floorPlans/desk-ergo.png" width=48px />
         </div>
       </div>
-      <q-btn class="" :disabled="selectedEmployee.pk == -1" @click="clickReserve()">Reserve</q-btn>
+      <q-btn color="primary" :disabled="selectedEmployee.pk == -1 || selectedDeskNumber == ''" @click="clickReserve()">Reserve</q-btn>
     </div>
     
     <div class="row q-gutter-md q-mt-sm">

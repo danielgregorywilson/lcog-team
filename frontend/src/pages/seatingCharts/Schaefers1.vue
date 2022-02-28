@@ -1,7 +1,7 @@
 <template>
   <q-page class="q-mt-md" id="schaefers-1-page">
     
-    <div class="row justify-between">
+    <div class="row justify-between items-center">
       <q-select class="" v-model="selectedEmployee" :options="employees()" option-value="pk" option-label="name" label="Employee" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
         <template v-slot:no-option>
           <q-item>
@@ -14,6 +14,24 @@
           <q-icon name="cancel" @click.stop="selectedEmployee = emptyEmployee" class="cursor-pointer" />
         </template>
       </q-select>
+      <div class="row items-center q-gutter-md">
+        <div class="row items-center q-gutter-sm">
+          <div>Drop-In</div>
+          <div id="drop-in-key">123</div>
+        </div>
+        <div class="row items-center q-gutter-sm">
+          <div>Lead Drop-In</div>
+          <div id="lead-drop-in-key">123</div>
+        </div>
+        <div class="row items-center q-gutter-sm">
+          <div>Work Station</div>
+          <q-img src="../../assets/floorPlans/desk-standard.png" width=48px />
+        </div>
+        <div class="row items-center q-gutter-sm">
+          <div>Ergonomic Work Station</div>
+          <q-img src="../../assets/floorPlans/desk-ergo.png" width=48px />
+        </div>
+      </div>
       <q-btn class="" :disabled="selectedEmployee.pk == -1" @click="clickReserve()">Reserve</q-btn>
     </div>
     
@@ -42,6 +60,22 @@
 </template>
 
 <style lang="scss"> 
+  #drop-in-key {
+    width: 48px;
+    height: 48px;
+    background-color: yellow;
+    border: 1px black solid;
+    text-align: center;
+  }
+  
+  #lead-drop-in-key {
+    width: 48px;
+    height: 48px;
+    background-color: orange;
+    border: 1px black solid;
+    text-align: center;
+  }
+  
   .floor-plan {
     width: 800px;
   }

@@ -1,5 +1,6 @@
 <template>
   <q-page class="q-mt-md" id="schaefers-1-page">
+    
     <div class="row justify-between">
       <q-select class="" v-model="selectedEmployee" :options="employees()" option-value="pk" option-label="name" label="Employee" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
         <template v-slot:no-option>
@@ -15,6 +16,7 @@
       </q-select>
       <q-btn class="" :disabled="selectedEmployee.pk == -1" @click="clickReserve()">Reserve</q-btn>
     </div>
+    
     <div class="row q-gutter-md q-mt-sm">
       <FloorPlan class="floor-plan"/>
     </div>
@@ -56,6 +58,10 @@
     }
   }
   
+  .desk-ergo {
+    width: 50px;
+  }
+
   .annotation {
     position: absolute;
     background: white;
@@ -89,6 +95,9 @@ export default class Schaefers1 extends Vue{
   
   private ignoreList = ['UP', 'DOWN']
   
+  private standardDesk = require('../../assets/floorPlans/desk-standard.png')
+  private ergoDesk = require('../../assets/floorPlans/desk-ergo.png')
+
   private unassignedEmployees: EmployeeType[] = [
     {name: 'Jean-Luc Picard', selected: false},
     {name: 'Jordi LaForge', selected: false},
@@ -122,6 +131,8 @@ export default class Schaefers1 extends Vue{
   private greyColor = '#767676'
   private blackColor = '#000000'
   private redColor = 'red'
+  private yellowColor = 'yellow'
+  private orangeColor = 'orange'
 
   ///////////////
   // EMPLOYEES //
@@ -155,10 +166,9 @@ export default class Schaefers1 extends Vue{
     })
   }
 
-  private roomClick(roomButton: HTMLElement, annotationElem: HTMLDivElement) {
-    // TODO: Remove
-    console.log(annotationElem)
-    
+  private roomClick(roomButton: HTMLElement) {
+    console.log(roomButton.dataset.pk)
+
     if (roomButton.dataset.pk) {
       const buttonNumber = roomButton.dataset.pk
 
@@ -366,6 +376,14 @@ export default class Schaefers1 extends Vue{
           // Hide any desk labels that shouldn't be displayed
           deskReserved = true
         }
+
+        // Determine if the desk is ergo and/or lead
+        const desk  = this.desks.filter((desk: Desk) => {
+          return desk.building == this.BUILDING && desk.floor == this.FLOOR && desk.number == text
+        })[0]
+        // Use correct icon based on ergonomic or not
+        const deskLogo = desk.ergonomic ? this.ergoDesk : this.standardDesk
+        const deskLead = desk.lead
       
         // Get the rectangle around the static map label
         const rect = node.getBoundingClientRect()
@@ -374,16 +392,16 @@ export default class Schaefers1 extends Vue{
         const annotationElem = document.createElement('div')
         annotationElem.className = 'annotation'
       
-        annotationElem.innerHTML = `<button class="desk-button" data-pk="${text}">${text}</button>`
+        annotationElem.innerHTML = `<button class="desk-button" data-pk="${text}"><div>${text}</div><img class="desk-ergo" src="${ deskLogo }" /></button>`
         
         // Position the annotation directly on top of the map label
         // annotationElem.style.left = (rect.left + rect.width/2 - 88).toString() + 'px'
         // annotationElem.style.top = (rect.top + rect.height/2 - 70).toString() + 'px'
         
         // TODO: Finish and annotate this - can't brain today
-        annotationElem.style.left = (rect.left - floorPlanRect.left - rect.width/2 + annotationElem.offsetWidth/2).toString() + 'px'
+        annotationElem.style.left = (rect.left - floorPlanRect.left - rect.width/2 + annotationElem.offsetWidth/2 - 12).toString() + 'px'
         // TODO: Fix and annotate this - can't brain today
-        annotationElem.style.top = (rect.top - floorPlanRect.top + 70).toString() + 'px'
+        annotationElem.style.top = (rect.top - floorPlanRect.top + 48).toString() + 'px'
 
         const clickableButton = annotationElem.querySelector('button') as HTMLElement
         this.allRooms.push(clickableButton)
@@ -391,16 +409,26 @@ export default class Schaefers1 extends Vue{
         if (clickableButton) {
           if (deskReserved) {
             clickableButton.style.borderColor = this.redColor
-            clickableButton.style.color = this.redColor
             clickableButton.classList.add('reserved')
             clickableButton.addEventListener('click', e => { // eslint-disable-line @typescript-eslint/no-non-null-assertion
-              const buttonElem = e.target as HTMLElement
-              this.reservedRoomClick(buttonElem)
+              const target = e.target as HTMLElement
+              const buttonElem = target.closest('button')
+              if (buttonElem) {
+                this.reservedRoomClick(buttonElem)
+              }
             })
           } else {
+            if (deskLead) {
+              clickableButton.style.backgroundColor = this.orangeColor
+            } else {
+              clickableButton.style.backgroundColor = this.yellowColor
+            }
             clickableButton.addEventListener('click', e => { // eslint-disable-line @typescript-eslint/no-non-null-assertion
-              const buttonElem = e.target as HTMLElement
-              this.roomClick(buttonElem, annotationElem)
+              const target = e.target as HTMLElement
+              const buttonElem = target.closest('button')
+              if (buttonElem) {
+                this.roomClick(buttonElem)
+              }
             })
           }
         }

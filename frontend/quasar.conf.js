@@ -53,6 +53,7 @@ module.exports = configure(function (ctx) {
       vueRouterMode: 'history', // available values: 'hash', 'history'
       env: {
         API_URL: ctx.dev ? 'http://lcog-team:8000/' : 'https://api.team.lcog.org/',
+        WEBSOCKET_URL: ctx.dev ? 'ws://lcog-team:8000/' : 'ws://api.team.lcog.org/',
         DASHBOARD_URL: ctx.dev ? 'http://lcog-team:8080/dashboard' : 'https://team.lcog.org/dashboard',
         APP_VERSION_TAG: gitDescribeSync().tag
       },

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'api',
     'mainsite',
     'people',
+    'responsibilities',
     'rest_framework',
     'rest_framework.authtoken',
     'storages',

@@ -8,10 +8,11 @@ from mainsite.views import obtain_auth_token_without_password
 from people.api_views import (
     CurrentUserView, DeskReservationViewSet, DeskViewSet, EmployeeViewSet,
     FileUploadViewSet, GroupViewSet, PerformanceReviewViewSet,
-    ResponsibilityViewSet, ReviewNoteViewSet, SignatureViewSet,
-    TeleworkApplicationFileUploadViewSet, TeleworkApplicationViewSet,
-    TeleworkSignatureViewSet, UserViewSet, ViewedSecurityMessageViewSet
+    ReviewNoteViewSet, SignatureViewSet, TeleworkApplicationFileUploadViewSet,
+    TeleworkApplicationViewSet, TeleworkSignatureViewSet, UserViewSet,
+    ViewedSecurityMessageViewSet
 )
+from responsibilities.api_views import ResponsibilityViewSet
 
 
 urlpatterns = [

@@ -129,8 +129,8 @@ export default class Schaefers1 extends Vue{
   
   private ignoreList = ['UP', 'DOWN']
   
-  private standardDesk = require('../../assets/floorPlans/desk-standard.png')
-  private ergoDesk = require('../../assets/floorPlans/desk-ergo.png')
+  private standardDesk = require('../../assets/floorPlans/desk-standard.png') as string // eslint-disable-line @typescript-eslint/no-var-requires
+  private ergoDesk = require('../../assets/floorPlans/desk-ergo.png') as string // eslint-disable-line @typescript-eslint/no-var-requires
 
   private unassignedEmployees: EmployeeType[] = [
     {name: 'Jean-Luc Picard', selected: false},

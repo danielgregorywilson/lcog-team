@@ -1,6 +1,7 @@
 <template>
   <q-page class="q-mt-md" id="schaefers-1-page">
-    <div class="row justify-between">
+    
+    <div class="row justify-between items-center">
       <q-select class="" v-model="selectedEmployee" :options="employees()" option-value="pk" option-label="name" label="Employee" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
         <template v-slot:no-option>
           <q-item>
@@ -13,17 +14,68 @@
           <q-icon name="cancel" @click.stop="selectedEmployee = emptyEmployee" class="cursor-pointer" />
         </template>
       </q-select>
-      <q-btn class="" :disabled="selectedEmployee.pk == -1" @click="clickReserve()">Reserve</q-btn>
+      <div class="row items-center q-gutter-md">
+        <div class="row items-center q-gutter-sm">
+          <div>Drop-In</div>
+          <div id="drop-in-key">123</div>
+        </div>
+        <div class="row items-center q-gutter-sm">
+          <div>Lead Drop-In</div>
+          <div id="lead-drop-in-key">123</div>
+        </div>
+        <div class="row items-center q-gutter-sm">
+          <div>Work Station</div>
+          <q-img src="../../assets/floorPlans/desk-standard.png" width=48px />
+        </div>
+        <div class="row items-center q-gutter-sm">
+          <div>Ergonomic Work Station</div>
+          <q-img src="../../assets/floorPlans/desk-ergo.png" width=48px />
+        </div>
+      </div>
+      <q-btn color="primary" :disabled="selectedEmployee.pk == -1 || selectedDeskNumber == ''" @click="clickReserve()">Reserve</q-btn>
     </div>
+    
     <div class="row q-gutter-md q-mt-sm">
       <FloorPlan class="floor-plan"/>
     </div>
+
+    <q-dialog v-model="cancelDialogVisible">
+      <q-card>
+        <q-card-section>
+          <div class="row items-center">
+            <q-avatar icon="no_meeting_room" color="primary" text-color="white" />
+            <span class="q-ml-sm"><strong>{{ selectedDeskOccupantToCancel }}</strong> checked in to desk <strong>{{ selectedDeskNumberToCancel }}</strong> at <strong>{{ selectedDeskToCancelCheckInTime }}</strong>. End this reservation?</span>
+          </div>
+        </q-card-section>
+
+        <q-card-actions class="row justify-around">
+          <q-btn flat label="No" color="primary" v-close-popup />
+          <q-btn flat label="Yes, end reservation" color="primary" @click="deleteReservation()" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
     <!-- {{ desks }} -->
     <!-- {{ deskReservations[0] }} -->
   </q-page>
 </template>
 
 <style lang="scss"> 
+  #drop-in-key {
+    width: 48px;
+    height: 48px;
+    background-color: yellow;
+    border: 1px black solid;
+    text-align: center;
+  }
+  
+  #lead-drop-in-key {
+    width: 48px;
+    height: 48px;
+    background-color: orange;
+    border: 1px black solid;
+    text-align: center;
+  }
+  
   .floor-plan {
     width: 800px;
   }
@@ -40,6 +92,10 @@
     }
   }
   
+  .desk-ergo {
+    width: 50px;
+  }
+
   .annotation {
     position: absolute;
     background: white;
@@ -73,6 +129,9 @@ export default class Schaefers1 extends Vue{
   
   private ignoreList = ['UP', 'DOWN']
   
+  private standardDesk = require('../../assets/floorPlans/desk-standard.png')
+  private ergoDesk = require('../../assets/floorPlans/desk-ergo.png')
+
   private unassignedEmployees: EmployeeType[] = [
     {name: 'Jean-Luc Picard', selected: false},
     {name: 'Jordi LaForge', selected: false},
@@ -95,11 +154,19 @@ export default class Schaefers1 extends Vue{
 
   private selectedDeskNumber = ''
   
+  private cancelDialogVisible = false
+  private selectedDeskReservationToCancelPk = -1
+  private selectedDeskNumberToCancel = ''
+  private selectedDeskOccupantToCancel = ''
+  private selectedDeskToCancelCheckInTime = ''
+  
   // TODO: Use Quasar colors
   private primaryColor = '#1976d2'
   private greyColor = '#767676'
   private blackColor = '#000000'
   private redColor = 'red'
+  private yellowColor = 'yellow'
+  private orangeColor = 'orange'
 
   ///////////////
   // EMPLOYEES //
@@ -133,10 +200,9 @@ export default class Schaefers1 extends Vue{
     })
   }
 
-  private roomClick(roomButton: HTMLElement, annotationElem: HTMLDivElement) {
-    // TODO: Remove
-    console.log(annotationElem)
-    
+  private roomClick(roomButton: HTMLElement) {
+    console.log(roomButton.dataset.pk)
+
     if (roomButton.dataset.pk) {
       const buttonNumber = roomButton.dataset.pk
 
@@ -152,9 +218,6 @@ export default class Schaefers1 extends Vue{
         roomButton.style.borderColor = this.primaryColor
         roomButton.style.color = this.primaryColor
       }
-      
-      
-
 
     }
 
@@ -207,6 +270,43 @@ export default class Schaefers1 extends Vue{
     //     annotationElem.style.marginTop = `-${annotationSize.height/2}px`
     //   }
     // }
+  }
+
+  private reservedRoomClick(roomButton: HTMLElement) {
+    if (roomButton.dataset.pk) {
+      const buttonNumber = roomButton.dataset.pk
+      this.selectedDeskNumberToCancel = buttonNumber
+      const currentDeskReservation = this.deskReservations.filter(deskReservation => deskReservation.desk_number == buttonNumber)[0]
+      this.selectedDeskReservationToCancelPk = currentDeskReservation.pk
+      this.selectedDeskOccupantToCancel = currentDeskReservation.employee_name
+      const checkInDate = new Date(currentDeskReservation.check_in)
+      this.selectedDeskToCancelCheckInTime = checkInDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric' })
+
+      // Open reservation cancel dialog
+      this.cancelDialogVisible = true
+    }
+  }
+
+  private deleteReservation() {
+    DeskReservationDataService.delete(this.selectedDeskReservationToCancelPk)
+      .then(() => {
+        Notify.create(`Cancelled desk reservation: ${this.selectedDeskNumberToCancel} for ${this.selectedDeskOccupantToCancel}`)
+        this.selectedDeskReservationToCancelPk
+        this.selectedDeskNumberToCancel = ''
+        this.selectedDeskOccupantToCancel = ''
+        this.selectedDeskToCancelCheckInTime = ''
+        this.initDeskReservations()
+          .then(() => {
+            this.handleSVG()
+          })
+          .catch(e => {
+            console.error('Error initializing desk reservations:', e)
+          })
+        // TODO: Update reserved desks list everywhere
+      })
+      .catch(e => {
+        console.error('Error cancelling desk reservation:' ,e)
+      })
   }
 
   private clickReserve() {
@@ -275,6 +375,10 @@ export default class Schaefers1 extends Vue{
     const staleAnnotationNodes = Array.from(document.querySelectorAll('.annotation'))
     staleAnnotationNodes.forEach(node => { node.remove() })
 
+    // Get horizontal and vertical offsets of svg floor plan
+    const floorPlanNode = document.getElementsByClassName('floor-plan')[0]
+    const floorPlanRect = floorPlanNode.getBoundingClientRect()
+
     const textNodes = Array.from(document.querySelectorAll('text'))
 
     textNodes
@@ -306,6 +410,14 @@ export default class Schaefers1 extends Vue{
           // Hide any desk labels that shouldn't be displayed
           deskReserved = true
         }
+
+        // Determine if the desk is ergo and/or lead
+        const desk  = this.desks.filter((desk: Desk) => {
+          return desk.building == this.BUILDING && desk.floor == this.FLOOR && desk.number == text
+        })[0]
+        // Use correct icon based on ergonomic or not
+        const deskLogo = desk.ergonomic ? this.ergoDesk : this.standardDesk
+        const deskLead = desk.lead
       
         // Get the rectangle around the static map label
         const rect = node.getBoundingClientRect()
@@ -314,13 +426,16 @@ export default class Schaefers1 extends Vue{
         const annotationElem = document.createElement('div')
         annotationElem.className = 'annotation'
       
-        annotationElem.innerHTML = `<button class="desk-button" data-pk="${text}">${text}</button>`
+        annotationElem.innerHTML = `<button class="desk-button" data-pk="${text}"><div>${text}</div><img class="desk-ergo" src="${ deskLogo }" /></button>`
         
         // Position the annotation directly on top of the map label
-        annotationElem.style.left = (rect.left + rect.width/2 - 88).toString() + 'px'
-        annotationElem.style.top = (rect.top + rect.height/2 - 70).toString() + 'px'
-        // annotationElem.style.left = (rect.left).toString() + 'px'
-        // annotationElem.style.top = (rect.top).toString() + 'px'
+        // annotationElem.style.left = (rect.left + rect.width/2 - 88).toString() + 'px'
+        // annotationElem.style.top = (rect.top + rect.height/2 - 70).toString() + 'px'
+        
+        // TODO: Finish and annotate this - can't brain today
+        annotationElem.style.left = (rect.left - floorPlanRect.left - rect.width/2 + annotationElem.offsetWidth/2 - 12).toString() + 'px'
+        // TODO: Fix and annotate this - can't brain today
+        annotationElem.style.top = (rect.top - floorPlanRect.top + 48).toString() + 'px'
 
         const clickableButton = annotationElem.querySelector('button') as HTMLElement
         this.allRooms.push(clickableButton)
@@ -328,22 +443,36 @@ export default class Schaefers1 extends Vue{
         if (clickableButton) {
           if (deskReserved) {
             clickableButton.style.borderColor = this.redColor
-            clickableButton.style.color = this.redColor
             clickableButton.classList.add('reserved')
-          } else {
             clickableButton.addEventListener('click', e => { // eslint-disable-line @typescript-eslint/no-non-null-assertion
-              const buttonElem = e.target as HTMLElement
-              this.roomClick(buttonElem, annotationElem)
+              const target = e.target as HTMLElement
+              const buttonElem = target.closest('button')
+              if (buttonElem) {
+                this.reservedRoomClick(buttonElem)
+              }
+            })
+          } else {
+            if (deskLead) {
+              clickableButton.style.backgroundColor = this.orangeColor
+            } else {
+              clickableButton.style.backgroundColor = this.yellowColor
+            }
+            clickableButton.addEventListener('click', e => { // eslint-disable-line @typescript-eslint/no-non-null-assertion
+              const target = e.target as HTMLElement
+              const buttonElem = target.closest('button')
+              if (buttonElem) {
+                this.roomClick(buttonElem)
+              }
             })
           }
         }
         
         document.querySelector('#schaefers-1-page')?.appendChild(annotationElem)
         
-        const annotationSize = annotationElem.getBoundingClientRect()
+        // const annotationSize = annotationElem.getBoundingClientRect()
         
-        annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
-        annotationElem.style.marginTop = `-${annotationSize.height/2}px`
+        // annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
+        // annotationElem.style.marginTop = `-${annotationSize.height/2}px`
 
     })
   }

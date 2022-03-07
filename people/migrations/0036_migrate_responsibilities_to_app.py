@@ -20,6 +20,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('people', '0035_alter_responsibility_primary_employee_and_more'),
+        ('responsibilities', '0001_initial'),
     ]
 
     operations = [

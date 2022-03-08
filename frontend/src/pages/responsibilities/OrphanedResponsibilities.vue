@@ -12,6 +12,15 @@
           <q-td key="name" :props="props">
             {{ props.row.name }}
           </q-td>
+          <q-td key="description" :props="props">
+            {{ props.row.description }}
+          </q-td>
+          <q-td key="link" :props="props">
+            <a :href="props.row.link">{{ props.row.link }}</a>
+          </q-td>
+          <q-td key="tags" :props="props">
+            <q-chip v-for="tag of props.row.tags" :key="tag.name" color="secondary" text-color="white">{{ tag.name }}</q-chip>
+          </q-td>
           <q-td key="primary_employee_name" :props="props">
             <router-link v-if="props.row.primary_employee_pk" :to="{ name: 'employee-responsibilities', params: { pk: props.row.primary_employee_pk} }">
               {{ props.row.primary_employee_name }}
@@ -50,6 +59,9 @@ export default class OrphanedResponsibilities extends Vue {
   
   private tableColumns = [
     { name: 'name', required: true, label: 'Name', field: 'name', sortable: true, align: 'left' },
+    { name: 'description', required: false, label: 'Description', field: 'description', sortable: false, align: 'left' },
+    { name: 'link', required: false, label: 'Link', field: 'link', sortable: false, align: 'left' },
+    { name: 'tags', required: false, label: 'Tags', field: 'tags', sortable: false, align: 'left' },
     { name: 'primary_employee_name', label: 'Primary Employee', field: 'primary_employee_name', sortable: true },
     { name: 'secondary_employee_name', label: 'Secondary Employee', field: 'secondary_employee_name', sortable: true },
     { name: 'actions', label: 'Actions', },

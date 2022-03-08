@@ -73,6 +73,16 @@
               v-model="editFormName"
               label="Name"
             />
+            <q-input
+              filled
+              v-model="editFormDescription"
+              label="Description"
+            />
+            <q-input
+              filled
+              v-model="editFormLink"
+              label="Link"
+            />
             <q-select v-model="editFormPrimaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
               <template v-slot:no-option>
                 <q-item>
@@ -146,6 +156,9 @@ export default class Responsibilities extends Vue {
   private editDialogVisible = false
   private pkToEdit = -1
   private editFormName = ''
+  private editFormDescription = ''
+  private editFormLink = ''
+  private editFormTags = []
   private editFormPrimaryEmployee = this.emptyEmployee
   private editFormSecondaryEmployee = this.emptyEmployee
   
@@ -226,6 +239,9 @@ export default class Responsibilities extends Vue {
   private openEditDialog(row: Responsibility) {
     this.pkToEdit = row.pk
     this.editFormName = row.name
+    this.editFormDescription = row.description
+    this.editFormLink = row.link
+    this.editFormTags = row.tags
     if (row.primary_employee_pk && row.primary_employee_name) {
       this.editFormPrimaryEmployee = { pk: row.primary_employee_pk, name: row.primary_employee_name}
     }
@@ -259,6 +275,8 @@ export default class Responsibilities extends Vue {
     return new Promise((resolve, reject) => {
       ResponsibilityDataService.update(this.pkToEdit.toString(), {
         name: this.editFormName,
+        description: this.editFormDescription,
+        link: this.editFormLink,
         primary_employee: this.editFormPrimaryEmployee.pk,
         secondary_employee: this.editFormSecondaryEmployee.pk
       })

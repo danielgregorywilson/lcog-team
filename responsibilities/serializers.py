@@ -1,10 +1,17 @@
 
 from rest_framework import serializers
 
-from people.models import Responsibility
+from .models import Responsibility, Tag
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ['name']
 
 
 class ResponsibilitySerializer(serializers.HyperlinkedModelSerializer):
+    tags = TagSerializer(many=True)
     primary_employee_pk = serializers.SerializerMethodField()
     primary_employee_name = serializers.SerializerMethodField()
     secondary_employee_pk = serializers.SerializerMethodField()
@@ -13,7 +20,7 @@ class ResponsibilitySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Responsibility
         fields = [
-            'url', 'pk', 'name', 'link', 'primary_employee_pk',
+            'url', 'pk', 'name', 'description', 'link', 'tags', 'primary_employee_pk',
             'primary_employee_name', 'secondary_employee_pk',
             'secondary_employee_name'
         ]

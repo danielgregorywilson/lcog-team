@@ -43,6 +43,7 @@ class ResponsibilityViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         name = request.data['name']
+        description = request.data['description'] if 'description' in request.data else ''
         link = request.data['link'] if 'link' in request.data else ''
         primary_employee = Employee.objects.get(pk=request.data['primary_employee']) if request.data['primary_employee'] != -1 else None
         secondary_employee = Employee.objects.get(pk=request.data['secondary_employee']) if request.data['secondary_employee'] != -1 else None
@@ -54,10 +55,12 @@ class ResponsibilityViewSet(viewsets.ModelViewSet):
     def update(self, request, pk=None):
         responsibility = Responsibility.objects.get(pk=pk)
         name = request.data['name']
+        description = request.data['description'] if 'description' in request.data else ''
         link = request.data['link'] if 'link' in request.data else ''
         primary_employee = Employee.objects.get(pk=request.data['primary_employee']) if request.data['primary_employee'] != -1 else None
         secondary_employee = Employee.objects.get(pk=request.data['secondary_employee']) if request.data['secondary_employee'] != -1 else None
         responsibility.name = name
+        responsibility.description = description
         responsibility.link = link
         responsibility.primary_employee = primary_employee
         responsibility.secondary_employee = secondary_employee

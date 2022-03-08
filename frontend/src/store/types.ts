@@ -532,7 +532,9 @@ export interface TeleworkSignatureRetrieve {
 export interface Responsibility {
   pk: number
   name: string
-  link?: string
+  description: string
+  link: string
+  tags?: Array<string>
   primary_employee_pk?: number
   primary_employee_name?: string
   secondary_employee_pk?: number
@@ -541,7 +543,8 @@ export interface Responsibility {
 
 export interface ResponsibilityCreate {
   name: string
-  link?: Url
+  description?: string
+  link?: string
   primary_employee?: number
   secondary_employee?: number
 }
@@ -549,7 +552,8 @@ export interface ResponsibilityCreate {
 export interface ResponsibilityUpdate {
   pk?: number
   name?: string
-  link?: Url
+  description?: string
+  link?: string
   primary_employee?: number
   secondary_employee?: number
 }

@@ -108,11 +108,6 @@ class TeleworkApplicationAdmin(admin.ModelAdmin):
     inlines = (TeleworkSignatureInline,)
 
 
-@admin.register(Responsibility)
-class ResponsibilityAdmin(admin.ModelAdmin):
-    list_display = ("pk", "name", "primary_employee", "secondary_employee")
-
-
 @admin.register(Desk)
 class DeskAdmin(admin.ModelAdmin):
     list_display = ("pk", "building", "floor", "number", "lead", "ergonomic")

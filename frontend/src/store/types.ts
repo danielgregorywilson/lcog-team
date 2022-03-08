@@ -534,7 +534,7 @@ export interface Responsibility {
   name: string
   description: string
   link: string
-  tags?: Array<string>
+  tags: Array<string>
   primary_employee_pk?: number
   primary_employee_name?: string
   secondary_employee_pk?: number

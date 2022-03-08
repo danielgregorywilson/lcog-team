@@ -26,6 +26,26 @@
               v-model="addFormName"
               label="Name"
             />
+            <q-input
+              filled
+              v-model="addFormDescription"
+              label="Description"
+            />
+            <q-input
+              filled
+              v-model="addFormLink"
+              label="Link"
+            />
+            <div>Tags</div>
+            <q-chip v-for="tag of addFormTags" :key="addFormTags.indexOf(tag)" removable @remove="addFormRemoveTag(addFormTags.indexOf(tag))" color="secondary" text-color="white">{{ tag.name }}</q-chip>
+            <div class="row justify-between">
+              <q-input
+                filled
+                v-model="addFormNewTag"
+                label="Add Tag"
+              />
+              <q-btn label="Add" color="primary" :disable="!addFormNewTag" @click="addFormAddTag(addFormNewTag)"/>
+            </div>
             <q-select v-model="addFormPrimaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
               <template v-slot:no-option>
                 <q-item>
@@ -83,6 +103,16 @@
               v-model="editFormLink"
               label="Link"
             />
+            <div>Tags</div>
+            <q-chip v-for="tag of editFormTags" :key="editFormTags.indexOf(tag)" removable @remove="editFormRemoveTag(editFormTags.indexOf(tag))" color="secondary" text-color="white">{{ tag.name }}</q-chip>
+            <div class="row justify-between">
+              <q-input
+                filled
+                v-model="editFormNewTag"
+                label="Add Tag"
+              />
+              <q-btn label="Add" color="primary" :disable="!editFormNewTag" @click="editFormAddTag(editFormNewTag)"/>
+            </div>
             <q-select v-model="editFormPrimaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
               <template v-slot:no-option>
                 <q-item>
@@ -147,9 +177,14 @@ import ResponsibilityDataService from '../../services/ResponsibilityDataService'
 
 @Component
 export default class Responsibilities extends Vue {
+  private emptyEmployee = {name: '', pk: -1}
+  
   private addDialogVisible = false
   private addFormName = ''
-  private emptyEmployee = {name: '', pk: -1}
+  private addFormDescription = ''
+  private addFormLink = ''
+  private addFormTags = []
+  private addFormNewTag = ''
   private addFormPrimaryEmployee = this.emptyEmployee
   private addFormSecondaryEmployee = this.emptyEmployee
 
@@ -159,6 +194,7 @@ export default class Responsibilities extends Vue {
   private editFormDescription = ''
   private editFormLink = ''
   private editFormTags = []
+  private editFormNewTag = ''
   private editFormPrimaryEmployee = this.emptyEmployee
   private editFormSecondaryEmployee = this.emptyEmployee
   
@@ -196,8 +232,21 @@ export default class Responsibilities extends Vue {
   //////////////
   // ADD FORM //
   //////////////
+  private addFormAddTag(): void {
+    this.addFormTags.push({'name': this.addFormNewTag})
+    this.addFormNewTag = ''
+  }
+
+  private addFormRemoveTag(tagIndex: number): void {
+    this.addFormTags.splice(tagIndex, 1)
+  }
+  
   private clearAddForm() {
     this.addFormName = ''
+    this.addFormDescription = ''
+    this.addFormLink = ''
+    this.addFormNewTag = ''
+    this.addFormTags = []
     this.addFormPrimaryEmployee = this.emptyEmployee
     this.addFormSecondaryEmployee = this.emptyEmployee
   }
@@ -219,6 +268,9 @@ export default class Responsibilities extends Vue {
     return new Promise((resolve, reject) => {
       ResponsibilityDataService.create({
         name: this.addFormName,
+        description: this.addFormDescription,
+        link: this.addFormLink,
+        tags: this.addFormTags,
         primary_employee: this.addFormPrimaryEmployee.pk,
         secondary_employee: this.addFormSecondaryEmployee.pk
       })
@@ -251,9 +303,22 @@ export default class Responsibilities extends Vue {
     this.editDialogVisible = true
   }
 
+  private editFormAddTag(editFormNewTag: string): void {
+    this.editFormTags.push({'name': editFormNewTag})
+    this.editFormNewTag = ''
+  }
+
+  private editFormRemoveTag(tagIndex: number): void {
+    this.editFormTags.splice(tagIndex, 1)
+  }
+
   private clearEditForm() {
     this.pkToEdit = -1
     this.editFormName = ''
+    this.editFormDescription = ''
+    this.editFormLink = ''
+    this.editForm = []
+    this.editFormNewTag = ''
     this.editFormPrimaryEmployee = this.emptyEmployee
     this.editFormSecondaryEmployee = this.emptyEmployee
   }
@@ -277,6 +342,7 @@ export default class Responsibilities extends Vue {
         name: this.editFormName,
         description: this.editFormDescription,
         link: this.editFormLink,
+        tags: this.editFormTags,
         primary_employee: this.editFormPrimaryEmployee.pk,
         secondary_employee: this.editFormSecondaryEmployee.pk
       })

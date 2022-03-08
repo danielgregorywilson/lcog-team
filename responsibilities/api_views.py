@@ -6,7 +6,7 @@ from django.db.models import Q
 from people.models import Employee
 
 from .models import Responsibility, Tag
-from .serializers import ResponsibilitySerializer
+from .serializers import ResponsibilitySerializer, TagSerializer
 
 
 class ResponsibilityViewSet(viewsets.ModelViewSet):
@@ -84,3 +84,24 @@ class ResponsibilityViewSet(viewsets.ModelViewSet):
         serialized_responsibility = ResponsibilitySerializer(responsibility,
             context={'request': request})
         return Response(serialized_responsibility.data)
+
+
+class TagViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+
+    def get_queryset(self):
+        """
+        Return a list of all tags to any authenticated user.
+        """
+        user = self.request.user
+        if user.is_authenticated:
+            employee = self.request.query_params.get('employee', None)
+            if employee is not None and employee.isdigit():
+                queryset = Tag.objects.all()
+        else:
+            queryset = Tag.objects.none()
+        return queryset if 'queryset' in locals() else Tag.objects.all()

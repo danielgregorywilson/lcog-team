@@ -117,6 +117,18 @@ const routes: RouteConfig[] = [
             component: () => import('src/pages/responsibilities/OrphanedResponsibilities.vue'),
           },
           {
+            path: 'tag',
+            name: 'tags',
+            component: () => import('src/pages/responsibilities/Tags.vue'),
+            children: [
+              {
+                path: ':pk',
+                name: 'tagged-responsibilities',
+                component: () => import ('src/pages/responsibilities/TaggedResponsibilities.vue')
+              }
+            ]
+          },
+          {
             path: ':pk',
             name: 'employee-responsibilities',
             component: () => import('src/pages/responsibilities/EmployeeResponsibilities.vue'),

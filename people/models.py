@@ -1101,8 +1101,8 @@ class Responsibility(models.Model):
 
     name = models.CharField(_("name"), max_length=500)
     link = models.URLField(_("link"), blank=True)
-    primary_employee = models.ForeignKey("people.Employee", related_name="primary_responsibilities", null=True, on_delete=models.SET_NULL)
-    secondary_employee = models.ForeignKey("people.Employee", related_name="secondary_responsibilities", null=True, on_delete=models.SET_NULL)
+    primary_employee = models.ForeignKey("people.Employee", related_name="primary_responsibilities_old", null=True, on_delete=models.SET_NULL)
+    secondary_employee = models.ForeignKey("people.Employee", related_name="secondary_responsibilities_old", null=True, on_delete=models.SET_NULL)
 
 
 class Desk(models.Model):

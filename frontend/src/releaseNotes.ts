@@ -4,6 +4,20 @@
 
 export const releases = [
   {
+    version: '0.3.0',
+    date: new Date(2022, 2, 7),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Update desk reservation app UI significantly'
+      },
+      {
+        type: 'improved',
+        description: 'Migrate responsibility app data to its own Django app'
+      },
+    ]
+  },
+  {
     version: '0.2.2',
     date: new Date(2022, 1, 22),
     changes: [

@@ -1,12 +1,14 @@
-from rest_framework import viewsets
-from rest_framework.response import Response
-
 from django.db.models import Q
+
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from people.models import Employee
 
+
 from .models import Responsibility, Tag
-from .serializers import ResponsibilitySerializer, TagSerializer
+from .serializers import ResponsibilitySerializer, SimpleTagSerializer, TagSerializer
 
 
 class ResponsibilityViewSet(viewsets.ModelViewSet):
@@ -105,3 +107,10 @@ class TagViewSet(viewsets.ModelViewSet):
         else:
             queryset = Tag.objects.none()
         return queryset if 'queryset' in locals() else Tag.objects.all()
+
+    # A simple list of employees for populating dropdowns
+    @action(detail=False, methods=['get'])
+    def simple_list(self, request):
+        tags = Tag.objects.all()
+        serializer = SimpleTagSerializer(tags, many=True)
+        return Response(serializer.data)

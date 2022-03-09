@@ -1,4 +1,4 @@
-import { Responsibility, ResponsibilityNameUpdate, ResponsibilityTag, SimpleEmployeeRetrieve } from 'src/store/types'
+import { Responsibility, ResponsibilityNameUpdate, ResponsibilityTag, SimpleEmployeeRetrieve, SimpleResponsibilityTagRetrieve } from 'src/store/types'
 import Vue from 'vue'
 
 import { MutationTree } from 'vuex'
@@ -45,6 +45,9 @@ const mutation: MutationTree<ResponsibilityStateInterface> = {
   },
   setSimpleEmployeeDetail: (state, resp: {data: SimpleEmployeeRetrieve}) => {
     Vue.set(state, 'simpleEmployeeDetail', resp.data)
+  },
+  setSimpleTagList: (state, resp: {data: Array<SimpleResponsibilityTagRetrieve>}) => {
+    Vue.set(state, 'simpleTagList', resp.data)
   },
   authLogout: (state) => {
     // Clean up state

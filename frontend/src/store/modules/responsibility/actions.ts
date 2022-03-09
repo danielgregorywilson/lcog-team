@@ -95,6 +95,15 @@ const actions: ActionTree<ResponsibilityStateInterface, StateInterface> = {
         console.error('Error getting simple employee detail:', e)
       })
   },
+  getSimpleTagList: ({ commit }) => {
+    axios({ url: `${ process.env.API_URL }api/v1/responsibilitytags/simple_list`}) // eslint-disable-line @typescript-eslint/restrict-template-expressions
+      .then(resp => {
+        commit('setSimpleTagList', resp)
+      })
+      .catch(e => {
+        console.error('Error getting simple tag list:', e)
+      })
+  },
   authLogout: ({commit}) => {
     return new Promise((resolve) => {
       commit('authLogout')

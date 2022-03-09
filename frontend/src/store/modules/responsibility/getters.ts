@@ -9,7 +9,8 @@ const getters: GetterTree<ResponsibilityStateInterface, StateInterface> = {
   employeeSecondaryResponsibilities: state => state.employeeSecondaryResponsibilities,
   allTags: state => state.allTags,
   simpleEmployeeList: state => state.simpleEmployeeList,
-  simpleEmployeeDetail: state => state.simpleEmployeeDetail
+  simpleEmployeeDetail: state => state.simpleEmployeeDetail,
+  simpleTagList: state => state.simpleTagList,
 };
 
 export default getters;

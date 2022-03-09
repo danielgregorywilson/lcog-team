@@ -40,11 +40,18 @@
             <div>Tags</div>
             <q-chip v-for="tag of addFormTags" :key="addFormTags.indexOf(tag)" removable @remove="addFormRemoveTag(addFormTags.indexOf(tag))" color="secondary" text-color="white">{{ tag.name }}</q-chip>
             <div class="row justify-between">
-              <q-input
-                filled
-                v-model="addFormNewTag"
-                label="Add Tag"
-              />
+              <q-select :value="addFormNewTag" :options="tags()" option-value="pk" option-label="name" label="Add Tag" use-input hide-selected fill-input input-debounce="500" @filter="tagFilterFn" @input-value="setNewAddTagName">
+                <template v-slot:no-option>
+                  <q-item>
+                    <q-item-section class="text-grey">
+                      No results
+                    </q-item-section>
+                  </q-item>
+                </template>
+                <template v-if="addFormNewTag.name" v-slot:append>
+                  <q-icon name="cancel" @click.stop="addFormNewTag = ''" class="cursor-pointer" />
+                </template>
+              </q-select>
               <q-btn label="Add" color="primary" :disable="!addFormNewTag" @click="addFormAddTag(addFormNewTag)"/>
             </div>
             <q-select v-model="addFormPrimaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
@@ -107,11 +114,18 @@
             <div>Tags</div>
             <q-chip v-for="tag of editFormTags" :key="editFormTags.indexOf(tag)" removable @remove="editFormRemoveTag(editFormTags.indexOf(tag))" color="secondary" text-color="white">{{ tag.name }}</q-chip>
             <div class="row justify-between">
-              <q-input
-                filled
-                v-model="editFormNewTag"
-                label="Add Tag"
-              />
+              <q-select :value="editFormNewTag" :options="tags()" option-value="pk" option-label="name" label="Add Tag" use-input hide-selected fill-input input-debounce="500" @filter="tagFilterFn" @input-value="setNewEditTagName">
+                <template v-slot:no-option>
+                  <q-item>
+                    <q-item-section class="text-grey">
+                      No results
+                    </q-item-section>
+                  </q-item>
+                </template>
+                <template v-if="editFormNewTag.name" v-slot:append>
+                  <q-icon name="cancel" @click.stop="editFormNewTag = ''" class="cursor-pointer" />
+                </template>
+              </q-select>
               <q-btn label="Add" color="primary" :disable="!editFormNewTag" @click="editFormAddTag(editFormNewTag)"/>
             </div>
             <q-select v-model="editFormPrimaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
@@ -213,7 +227,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { Notify } from 'quasar'
 import { bus } from '../../App.vue'
-import { Responsibility, ResponsibilityTag, SimpleEmployeeRetrieve, VuexStoreGetters } from '../../store/types'
+import { Responsibility, ResponsibilityTag, SimpleEmployeeRetrieve, SimpleResponsibilityTagRetrieve, VuexStoreGetters } from '../../store/types'
 import ResponsibilityDataService from '../../services/ResponsibilityDataService'
 
 @Component
@@ -254,6 +268,7 @@ export default class Responsibilities extends Vue {
   private getters = this.$store.getters as VuexStoreGetters
 
   private needle = '' // For filtering employee list
+  private tagNeedle = '' // For filtering tag list
 
   ///////////////
   // EMPLOYEES //
@@ -278,9 +293,40 @@ export default class Responsibilities extends Vue {
     })
   }
 
+  //////////
+  // TAGS //
+  //////////
+  private tags(): Array<SimpleResponsibilityTagRetrieve> {    
+    const tags = this.getters['responsibilityModule/simpleTagList']
+    return tags.filter((tag) => {
+      return tag.name.toLowerCase().indexOf(this.tagNeedle) != -1
+    })
+  }
+
+  private retrieveSimpleTagList(): void {
+    this.$store.dispatch('responsibilityModule/getSimpleTagList')
+      .catch(e => {
+        console.error('Error retrieving simple tag list', e)
+      })
+  }
+
+  private tagFilterFn (val: string, update: Function) { // eslint-disable-line @typescript-eslint/ban-types
+    update(() => {
+      this.tagNeedle = val.toLowerCase()
+    })
+  }
+
+  private setNewEditTagName(val: string) {
+    this.editFormNewTag = val
+  }
+
   //////////////
   // ADD FORM //
   //////////////
+  private setNewAddTagName(val: string) {
+    this.addFormNewTag = val
+  }
+  
   private addFormAddTag(): void {
     this.addFormTags.push({'name': this.addFormNewTag})
     this.addFormNewTag = ''
@@ -304,6 +350,7 @@ export default class Responsibilities extends Vue {
     this.createResponsibility()
       .then(() => {
         this.updateResponsibiliyLists()
+        this.retrieveSimpleTagList()
         this.addDialogVisible = false
         Notify.create('Created responsibility')
         this.clearAddForm()
@@ -380,6 +427,7 @@ export default class Responsibilities extends Vue {
     this.editResponsibility()
       .then(() => {
         this.updateResponsibiliyLists()
+        this.retrieveSimpleTagList()
         this.editDialogVisible = false
         Notify.create('Updated responsibility')
         this.clearEditForm()
@@ -516,6 +564,7 @@ export default class Responsibilities extends Vue {
   // Update the various tag lists in Vuex
   private updateTagLists(): void {
     this.retrieveAllTags()
+    this.retrieveSimpleTagList()
   }
 
   // Update All Tags Table
@@ -577,6 +626,7 @@ export default class Responsibilities extends Vue {
   mounted() {
     if (!this.employees().length) {
       this.retrieveSimpleEmployeeList()
+      this.retrieveSimpleTagList()
     }
     
   }

@@ -576,11 +576,17 @@ export interface ResponsibilityStateInterface {
   allTags: { results: Array<ResponsibilityTag> }
   simpleEmployeeList: Array<SimpleEmployeeRetrieve>
   simpleEmployeeDetail: SimpleEmployeeRetrieve
+  simpleTagList: Array<SimpleResponsibilityTagRetrieve>
 }
 
 export interface EmployeeResponsibilitiesInterface {
   pk: number
   responsibilities: Array<Responsibility>
+}
+
+export interface SimpleResponsibilityTagRetrieve {
+  pk: number
+  name: string
 }
 
 export interface ResponsibilityTag {
@@ -662,4 +668,5 @@ export interface VuexStoreGetters {
   'responsibilityModule/allTags': {
     results: Array<ResponsibilityTag>
   },
+  'responsibilityModule/simpleTagList': Array<SimpleResponsibilityTagRetrieve>,
 }

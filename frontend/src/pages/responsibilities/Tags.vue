@@ -10,7 +10,7 @@
       <template v-slot:body="props">
         <q-tr :props="props">
           <q-td key="name" :props="props">
-            {{ props.row.name }}
+            <q-chip clickable @click="navigateToTag(props.row.pk)" color="secondary" text-color="white">{{ props.row.name }}</q-chip>
           </q-td>
           <q-td key="actions" :props="props">
             <q-btn class="col edit-button" dense round flat color="grey" @click="showEditDialog(props.row)" icon="edit"></q-btn>
@@ -34,9 +34,6 @@ import { Responsibility, ResponsibilityTag, VuexStoreGetters } from '../../store
 
 @Component
 export default class Tags extends Vue {
-  private deleteDialogVisible = false
-  private deleteDialogResponsibilityName = ''
-  private rowPkToDelete = ''
 
   private tableColumns = [
     { name: 'name', required: true, label: 'Name', field: 'name', sortable: true, align: 'left' },
@@ -80,11 +77,12 @@ export default class Tags extends Vue {
         console.error('Error retrieving tags', e)
       })
   }
-  
-  // TODO: Move this to a UTIL
-  private isNormalInteger(str: string | (string | null)[]) {
-    var n = Math.floor(Number(str));
-    return n !== Infinity && String(n) === str && n >= 0;
+
+  private navigateToTag(tagPk: string): void {
+    this.$router.push({ name: 'tagged-responsibilities', params: { pk: tagPk }})
+      .catch(e => {
+        console.error('Error navigating to tag detail:', e)
+      })
   }
 
   private showEditDialog(row: Responsibility): void {

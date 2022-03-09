@@ -23,8 +23,21 @@
       :data="employeePrimaryResponsibilities()"
       :columns="tableColumns"
       :pagination="initialTablePagination"
+      :filter="tableFilter"
+      :filter-method="tableFilterMethod"
       row-key="pk"
     >
+      <template v-slot:top-right>
+        <q-input borderless dense clearable debounce="300" v-model="tableFilter" placeholder="Search">
+          <template v-slot:prepend>
+            <q-icon name="search">
+              <q-tooltip>
+                Type to search on Name, Description, or Tag name
+              </q-tooltip>
+            </q-icon>
+          </template>
+        </q-input>
+      </template>
       <template v-slot:body="props">
         <q-tr :props="props">
           <q-td key="name" :props="props">
@@ -63,8 +76,21 @@
       :data="employeeSecondaryResponsibilities()"
       :columns="tableColumns"
       :pagination="initialTablePagination"
+      :filter="tableFilter"
+      :filter-method="tableFilterMethod"
       row-key="pk"
     >
+      <template v-slot:top-right>
+        <q-input borderless dense clearable debounce="300" v-model="tableFilter" placeholder="Search">
+          <template v-slot:prepend>
+            <q-icon name="search">
+              <q-tooltip>
+                Type to search on Name, Description, or Tag name
+              </q-tooltip>
+            </q-icon>
+          </template>
+        </q-input>
+      </template>
       <template v-slot:body="props">
         <q-tr :props="props">
           <q-td key="name" :props="props">
@@ -117,6 +143,8 @@ export default class EmployeeResponsibilites extends Vue {
     return routeParts[routeParts.length - 1] === 'secondary'
   }
   
+  private tableFilter = ''
+
   private employeeName(): string {
     return this.getters['responsibilityModule/simpleEmployeeDetail'].name
   }
@@ -161,6 +189,38 @@ export default class EmployeeResponsibilites extends Vue {
       .catch(e => {
         console.error('Error retrieving simple employee detail', e)
       })
+  }
+
+  private tableFilterMethod(rows: Array<Responsibility>, term: string) {
+    // rows contain the entire data
+    // terms contains whatever you have as filter
+    // TODO: Make this a shared util with other tables
+
+    const searchTerm = term ? term.toLowerCase() : ''
+
+    const filteredRows = rows.filter(
+      (row) =>{
+        if (searchTerm == '') {
+          // If no search term, return all rows
+          return true
+        } else {
+          // Check name, description, and tags
+          const nameMatches = row.name.toLowerCase().includes(searchTerm)
+          const descriptionMatches = row.description.toLowerCase().includes(searchTerm)
+          let tagsMatch = false
+          for (let i=0; i<row.tags.length; i++) {
+            if (row.tags[i].name.toLowerCase().includes(searchTerm)) {
+              tagsMatch = true
+            }
+          }
+          if (nameMatches || descriptionMatches || tagsMatch) {
+            return true
+          }
+          // Assume row doesn't match
+          return false
+        }
+      })
+    return filteredRows
   }
 
   private employeeResponsibilities(secondary=false): Array<Responsibility> {

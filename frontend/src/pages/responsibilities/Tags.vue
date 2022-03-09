@@ -5,8 +5,21 @@
       :data="allTags()"
       :columns="tableColumns"
       :pagination="initialTablePagination"
+      :filter="tableFilter"
+      :filter-method="tableFilterMethod"
       row-key="pk"
     >
+      <template v-slot:top-right>
+        <q-input borderless dense clearable debounce="300" v-model="tableFilter" placeholder="Search">
+          <template v-slot:prepend>
+            <q-icon name="search">
+              <q-tooltip>
+                Type to search on Name, Description, or Tag name
+              </q-tooltip>
+            </q-icon>
+          </template>
+        </q-input>
+      </template>
       <template v-slot:body="props">
         <q-tr :props="props">
           <q-td key="name" :props="props">
@@ -34,6 +47,8 @@ import { Responsibility, ResponsibilityTag, VuexStoreGetters } from '../../store
 
 @Component
 export default class Tags extends Vue {
+
+  private tableFilter = ''
 
   private tableColumns = [
     { name: 'name', required: true, label: 'Name', field: 'name', sortable: true, align: 'left' },
@@ -76,6 +91,31 @@ export default class Tags extends Vue {
       .catch(e => {
         console.error('Error retrieving tags', e)
       })
+  }
+
+  private tableFilterMethod(rows: Array<Responsibility>, term: string) {
+    // rows contain the entire data
+    // terms contains whatever you have as filter
+    // TODO: Make this a shared util with other tables - pass in which columns to check
+
+    const searchTerm = term ? term.toLowerCase() : ''
+
+    const filteredRows = rows.filter(
+      (row) =>{
+        if (searchTerm == '') {
+          // If no search term, return all rows
+          return true
+        } else {
+          // Check name, description, and tags
+          const nameMatches = row.name.toLowerCase().includes(searchTerm)
+          if (nameMatches) {
+            return true
+          }
+          // Assume row doesn't match
+          return false
+        }
+      })
+    return filteredRows
   }
 
   private navigateToTag(tagPk: string): void {

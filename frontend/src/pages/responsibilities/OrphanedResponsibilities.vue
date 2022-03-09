@@ -68,7 +68,7 @@ export default class OrphanedResponsibilities extends Vue {
   ]
 
   private initialTablePagination = {
-    rowsPerPage: 10
+    rowsPerPage: 50
   }
 
   private retrieveOrphanedResponsibilites(): void {

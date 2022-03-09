@@ -68,7 +68,7 @@ export default class AllResponsibilities extends Vue {
   ]
 
   private initialTablePagination = {
-    rowsPerPage: 10
+    rowsPerPage: 50
   }
 
   private retrieveAllResponsibilites(): void {

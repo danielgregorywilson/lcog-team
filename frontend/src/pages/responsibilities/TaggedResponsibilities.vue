@@ -138,7 +138,7 @@ export default class EmployeeResponsibilites extends Vue {
   ]
 
   private initialTablePagination = {
-    rowsPerPage: 10
+    rowsPerPage: 50
   }
 
   private getters = this.$store.getters as VuexStoreGetters

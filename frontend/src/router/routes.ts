@@ -120,11 +120,16 @@ const routes: RouteConfig[] = [
             path: 'tags',
             name: 'tags',
             component: () => import('src/pages/responsibilities/Tags.vue'),
+          },
+          {
+            path: 'tag',
+            name: 'tag',
+            component: () => import('src/pages/responsibilities/TaggedResponsibilities.vue'),
             children: [
               {
                 path: ':pk',
                 name: 'tagged-responsibilities',
-                component: () => import ('src/pages/responsibilities/TaggedResponsibilities.vue')
+                component: () => import ('src/pages/responsibilities/TaggedResponsibility.vue')
               }
             ]
           },

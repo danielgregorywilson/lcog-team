@@ -573,6 +573,7 @@ export interface ResponsibilityStateInterface {
   orphanedResponsibilities: Array<Responsibility>
   employeePrimaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
   employeeSecondaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
+  tagWithResponsibilities: Array<EmployeeResponsibilitiesInterface>
   allTags: { results: Array<ResponsibilityTag> }
   simpleEmployeeList: Array<SimpleEmployeeRetrieve>
   simpleEmployeeDetail: SimpleEmployeeRetrieve
@@ -665,8 +666,9 @@ export interface VuexStoreGetters {
   },
   'responsibilityModule/employeePrimaryResponsibilities': Array<EmployeeResponsibilitiesInterface>,
   'responsibilityModule/employeeSecondaryResponsibilities': Array<EmployeeResponsibilitiesInterface>
+  'responsibilityModule/tagWithResponsibilities': ResponsibilityTag
   'responsibilityModule/allTags': {
-    results: Array<ResponsibilityTag>
+    results: Array<SimpleResponsibilityTagRetrieve>
   },
   'responsibilityModule/simpleTagList': Array<SimpleResponsibilityTagRetrieve>,
 }

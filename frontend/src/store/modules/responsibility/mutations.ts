@@ -34,6 +34,9 @@ const mutation: MutationTree<ResponsibilityStateInterface> = {
     }
     Vue.set(state, 'employeeSecondaryResponsibilities', employeeResponsibilities)
   },
+  setTagWithResponsibilities: (state, resp) => {
+    Vue.set(state, 'tagWithResponsibilities', resp.tagData.data)
+  },
   updateResponsibilityName: (state, data: ResponsibilityNameUpdate) => {
     state.allResponsibilities.results.filter(r => r.pk == data.pk)[0].name = data.name
   },

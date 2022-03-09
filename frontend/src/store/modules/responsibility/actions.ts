@@ -64,6 +64,19 @@ const actions: ActionTree<ResponsibilityStateInterface, StateInterface> = {
         })
     })
   },
+  getTagWithResponsibilities: ({ commit }, data: {pk: number}) => {
+    return new Promise((resolve, reject) => {
+      axios({ url: `${ getApiUrl() }api/v1/responsibilitytags/${ data.pk }` })
+        .then(resp => {
+          commit('setTagWithResponsibilities', {TagPk: data.pk, tagData: resp})
+          resolve(resp)
+        })
+        .catch(e => {
+          console.error('Error getting tag responsibilities:', e)
+          reject(e)
+        })
+    })
+  },
   getAllTags: ({ commit }) => {
     return new Promise((resolve, reject) => {
       axios({ url: `${ getApiUrl() }api/v1/responsibilitytags` })

@@ -4,6 +4,32 @@
 
 export const releases = [
   {
+    version: '0.3.1',
+    date: new Date(2022, 2, 9),
+    changes: [
+      {
+        type: 'new',
+        description: 'Responsibilities can be tagged'
+      },
+      {
+        type: 'new',
+        description: 'Responsibilities now have descriptions and links'
+      },
+      {
+        type: 'new',
+        description: 'View all responsibilities by tag'
+      },
+      {
+        type: 'new',
+        description: 'Filter all responsibility tables by name, description, and tag'
+      },
+      {
+        type: 'improved',
+        description: 'Responsibility app UI improvements'
+      },
+    ]
+  },
+  {
     version: '0.3.0',
     date: new Date(2022, 2, 7),
     changes: [

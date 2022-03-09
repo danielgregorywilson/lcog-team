@@ -64,6 +64,19 @@ const actions: ActionTree<ResponsibilityStateInterface, StateInterface> = {
         })
     })
   },
+  getAllTags: ({ commit }) => {
+    return new Promise((resolve, reject) => {
+      axios({ url: `${ getApiUrl() }api/v1/responsibilitytags` })
+        .then(resp => {
+          commit('setAllTags', resp)
+          resolve(resp)
+        })
+        .catch(e => {
+          console.error('Error getting all tags:', e)
+          reject(e)
+        })
+    })
+  },
   getSimpleEmployeeList: ({ commit }) => {
     axios({ url: `${ process.env.API_URL }api/v1/employee/simple_list`}) // eslint-disable-line @typescript-eslint/restrict-template-expressions
       .then(resp => {

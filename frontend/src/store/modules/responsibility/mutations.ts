@@ -1,4 +1,4 @@
-import { Responsibility, ResponsibilityNameUpdate, SimpleEmployeeRetrieve } from 'src/store/types'
+import { Responsibility, ResponsibilityNameUpdate, ResponsibilityTag, SimpleEmployeeRetrieve } from 'src/store/types'
 import Vue from 'vue'
 
 import { MutationTree } from 'vuex'
@@ -37,6 +37,9 @@ const mutation: MutationTree<ResponsibilityStateInterface> = {
   updateResponsibilityName: (state, data: ResponsibilityNameUpdate) => {
     state.allResponsibilities.results.filter(r => r.pk == data.pk)[0].name = data.name
   },
+  setAllTags: (state, resp: {data: Array<ResponsibilityTag>}) => {
+    Vue.set(state, 'allTags', resp.data)
+  },
   setSimpleEmployeeList: (state, resp: {data: Array<SimpleEmployeeRetrieve>}) => {
     Vue.set(state, 'simpleEmployeeList', resp.data)
   },
@@ -49,6 +52,7 @@ const mutation: MutationTree<ResponsibilityStateInterface> = {
     state.orphanedResponsibilities = []
     state.employeePrimaryResponsibilities = []
     state.employeeSecondaryResponsibilities = []
+    state.allTags = { results: [] }
     state.simpleEmployeeList = []
   }
 };

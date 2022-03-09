@@ -117,7 +117,7 @@ const routes: RouteConfig[] = [
             component: () => import('src/pages/responsibilities/OrphanedResponsibilities.vue'),
           },
           {
-            path: 'tag',
+            path: 'tags',
             name: 'tags',
             component: () => import('src/pages/responsibilities/Tags.vue'),
             children: [

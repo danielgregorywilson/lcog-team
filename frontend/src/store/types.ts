@@ -534,7 +534,7 @@ export interface Responsibility {
   name: string
   description: string
   link: string
-  tags: Array<string>
+  tags: Array<ResponsibilityTag>
   primary_employee_pk?: number
   primary_employee_name?: string
   secondary_employee_pk?: number
@@ -545,6 +545,7 @@ export interface ResponsibilityCreate {
   name: string
   description?: string
   link?: string
+  tags?: Array<ResponsibilityTag>
   primary_employee?: number
   secondary_employee?: number
 }
@@ -554,6 +555,7 @@ export interface ResponsibilityUpdate {
   name?: string
   description?: string
   link?: string
+  tags?: Array<ResponsibilityTag>
   primary_employee?: number
   secondary_employee?: number
 }
@@ -571,6 +573,7 @@ export interface ResponsibilityStateInterface {
   orphanedResponsibilities: Array<Responsibility>
   employeePrimaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
   employeeSecondaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
+  allTags: { results: Array<ResponsibilityTag> }
   simpleEmployeeList: Array<SimpleEmployeeRetrieve>
   simpleEmployeeDetail: SimpleEmployeeRetrieve
 }
@@ -578,6 +581,21 @@ export interface ResponsibilityStateInterface {
 export interface EmployeeResponsibilitiesInterface {
   pk: number
   responsibilities: Array<Responsibility>
+}
+
+export interface ResponsibilityTag {
+  pk?: number
+  name: string
+  responsibilities?: Array<string>
+}
+
+export interface ResponsibilityTagCreate {
+  name: string
+}
+
+export interface ResponsibilityTagUpdate {
+  pk?: number
+  name?: string
 }
 
 
@@ -641,4 +659,7 @@ export interface VuexStoreGetters {
   },
   'responsibilityModule/employeePrimaryResponsibilities': Array<EmployeeResponsibilitiesInterface>,
   'responsibilityModule/employeeSecondaryResponsibilities': Array<EmployeeResponsibilitiesInterface>
+  'responsibilityModule/allTags': {
+    results: Array<ResponsibilityTag>
+  },
 }

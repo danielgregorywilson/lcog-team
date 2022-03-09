@@ -4,6 +4,7 @@
       <div class="q-gutter-sm">
         <q-btn :to="{ name: 'all-responsibilities' }" unelevated rounded color="primary" icon="visibility" label="View All" />
         <q-btn :to="{ name: 'orphaned-responsibilities' }" unelevated rounded color="primary" icon="visibility_off" label="View Orphaned" />
+        <q-btn :to="{ name: 'tags' }" unelevated rounded color="primary" icon="tag" label="View Tags" />
       </div>
       <div>
         <q-btn unelevated rounded color="primary" icon="add" label="Add" @click="addDialogVisible=true" />
@@ -162,6 +163,46 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+
+    <!-- EDIT TAG DIALOG -->
+    <q-dialog v-model="editTagDialogVisible">
+      <q-card>
+        <q-card-section>
+          <q-form
+            @submit="onTagEditFormSubmit"
+            class="q-gutter-sm"
+          >
+            <div class="text-h5">Edit Tag</div>
+            <q-input
+              filled
+              v-model="editTagFormName"
+              label="Name"
+            />
+            <div>
+              <q-btn label="Submit" type="submit" color="primary" :disable="!editTagFormName"/>
+            </div>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <!-- DELETE TAG DIALOG -->
+    <q-dialog v-model="deleteTagDialogVisible">
+      <q-card>
+        <q-card-section>
+          <div class="row items-center">
+            <q-avatar icon="list" color="primary" text-color="white" />
+            <span class="q-ml-sm">Are you sure you want to delete this tag?</span>
+          </div>
+          <div class="row justify-center text-center">{{ deleteTagDialogName }}</div>
+        </q-card-section>
+
+        <q-card-actions class="row justify-around">
+          <q-btn flat label="Cancel" color="primary" v-close-popup />
+          <q-btn flat label="Yes, delete it" color="primary" @click="deleteTag()" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -172,7 +213,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { Notify } from 'quasar'
 import { bus } from '../../App.vue'
-import { Responsibility, SimpleEmployeeRetrieve, VuexStoreGetters } from '../../store/types'
+import { Responsibility, ResponsibilityTag, SimpleEmployeeRetrieve, VuexStoreGetters } from '../../store/types'
 import ResponsibilityDataService from '../../services/ResponsibilityDataService'
 
 @Component
@@ -183,7 +224,7 @@ export default class Responsibilities extends Vue {
   private addFormName = ''
   private addFormDescription = ''
   private addFormLink = ''
-  private addFormTags = []
+  private addFormTags: Array<{'name': string}> = []
   private addFormNewTag = ''
   private addFormPrimaryEmployee = this.emptyEmployee
   private addFormSecondaryEmployee = this.emptyEmployee
@@ -193,7 +234,7 @@ export default class Responsibilities extends Vue {
   private editFormName = ''
   private editFormDescription = ''
   private editFormLink = ''
-  private editFormTags = []
+  private editFormTags: Array<ResponsibilityTag> = []
   private editFormNewTag = ''
   private editFormPrimaryEmployee = this.emptyEmployee
   private editFormSecondaryEmployee = this.emptyEmployee
@@ -201,6 +242,14 @@ export default class Responsibilities extends Vue {
   private deleteDialogVisible = false
   private deleteDialogResponsibilityName = ''
   private rowPkToDelete = ''
+
+  private editTagDialogVisible = false
+  private tagPkToEdit = -1
+  private editTagFormName = ''
+
+  private deleteTagDialogVisible = false
+  private deleteTagDialogName = ''
+  private tagPkToDelete = ''
 
   private getters = this.$store.getters as VuexStoreGetters
 
@@ -304,12 +353,16 @@ export default class Responsibilities extends Vue {
   }
 
   private editFormAddTag(editFormNewTag: string): void {
-    this.editFormTags.push({'name': editFormNewTag})
+    let newTags = [...this.editFormTags]
+    newTags.push({'name': editFormNewTag})
+    this.editFormTags = newTags
     this.editFormNewTag = ''
   }
 
   private editFormRemoveTag(tagIndex: number): void {
-    this.editFormTags.splice(tagIndex, 1)
+    let newTags = [...this.editFormTags]
+    newTags.splice(tagIndex, 1)
+    this.editFormTags = newTags
   }
 
   private clearEditForm() {
@@ -317,7 +370,7 @@ export default class Responsibilities extends Vue {
     this.editFormName = ''
     this.editFormDescription = ''
     this.editFormLink = ''
-    this.editForm = []
+    this.editFormTags = []
     this.editFormNewTag = ''
     this.editFormPrimaryEmployee = this.emptyEmployee
     this.editFormSecondaryEmployee = this.emptyEmployee
@@ -356,9 +409,9 @@ export default class Responsibilities extends Vue {
     })
   }
 
-  /////////////////
-  // DELETE FORM //
-  /////////////////
+  ////////////////////////////////
+  // DELETE RESPONSIBILITY FORM //
+  ////////////////////////////////
 
   private openDeleteDialog(row: Responsibility) {
     this.rowPkToDelete = row.pk.toString()
@@ -377,6 +430,74 @@ export default class Responsibilities extends Vue {
       })
   }
 
+  ///////////////////
+  // EDIT TAG FORM //
+  ///////////////////
+
+  private openTagEditDialog(tag: ResponsibilityTag) {
+    if (tag.pk) {
+      this.tagPkToEdit = tag.pk
+      this.editTagFormName = tag.name
+      this.editTagDialogVisible = true
+    }
+  }
+
+  private clearTagEditForm() {
+    this.tagPkToEdit = -1
+    this.editTagFormName = ''
+  }
+
+  private onTagEditFormSubmit () {
+    this.editTag()
+      .then(() => {
+        this.updateTagLists()
+        this.editTagDialogVisible = false
+        Notify.create('Updated tag')
+        this.clearTagEditForm()
+      })
+      .catch(e => {
+        console.error('Error updating Tag:', e)
+      })
+  }
+
+  private editTag() {
+    return new Promise((resolve, reject) => {
+      ResponsibilityDataService.updateTag(this.tagPkToEdit.toString(), {
+        name: this.editTagFormName,
+      })
+        .then(() => {
+          resolve('Updated')
+        })
+        .catch(e => {
+          console.error('Error updating Tag:', e)
+          reject(e)
+        })
+    })
+  }
+
+  /////////////////////
+  // DELETE TAG FORM //
+  /////////////////////
+
+  private openDeleteTagDialog(row: ResponsibilityTag) {
+    if (row.pk) {
+      this.tagPkToDelete = row.pk.toString()
+      this.deleteTagDialogName = row.name
+      this.deleteTagDialogVisible = true
+    }
+  }
+
+  private deleteTag(): void {
+    ResponsibilityDataService.deleteTag(this.tagPkToDelete)
+      .then(() => {
+        this.updateTagLists()
+        Notify.create('Deleted a tag.')
+      })
+      .catch(e => {
+        console.error('Error deleting tag', e)
+      })
+  }
+
   ///////////////
   // SET STATE //
   ///////////////
@@ -390,6 +511,19 @@ export default class Responsibilities extends Vue {
       this.retrieveEmployeeResponsibilites(pk)
       this.retrieveEmployeeSecondaryResponsibilites(pk)
     }
+  }
+
+  // Update the various tag lists in Vuex
+  private updateTagLists(): void {
+    this.retrieveAllTags()
+  }
+
+  // Update All Tags Table
+  private retrieveAllTags(): void {
+    this.$store.dispatch('responsibilityModule/getAllTags')
+      .catch(e => {
+        console.error('Error retrieving tags', e)
+      })
   }
 
   // Update All Responsibilities Table
@@ -431,6 +565,12 @@ export default class Responsibilities extends Vue {
     })
     bus.$on('emitOpenDeleteDialog', (row: Responsibility) => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       this.openDeleteDialog(row)
+    })
+    bus.$on('emitOpenEditTagDialog', (row: ResponsibilityTag) => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      this.openTagEditDialog(row)
+    })
+    bus.$on('emitOpenDeleteTagDialog', (row: ResponsibilityTag) => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      this.openDeleteTagDialog(row)
     })
   }
 

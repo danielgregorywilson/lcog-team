@@ -5,6 +5,7 @@ const state: ResponsibilityStateInterface = {
   orphanedResponsibilities: [],
   employeePrimaryResponsibilities: [],
   employeeSecondaryResponsibilities: [],
+  allTags: { results: [] },
   simpleEmployeeList: [],
   simpleEmployeeDetail: { pk: -1, name: '' }
 };

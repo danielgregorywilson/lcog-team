@@ -64,6 +64,32 @@ const actions: ActionTree<ResponsibilityStateInterface, StateInterface> = {
         })
     })
   },
+  getTagWithResponsibilities: ({ commit }, data: {pk: number}) => {
+    return new Promise((resolve, reject) => {
+      axios({ url: `${ getApiUrl() }api/v1/responsibilitytags/${ data.pk }` })
+        .then(resp => {
+          commit('setTagWithResponsibilities', {TagPk: data.pk, tagData: resp})
+          resolve(resp)
+        })
+        .catch(e => {
+          console.error('Error getting tag responsibilities:', e)
+          reject(e)
+        })
+    })
+  },
+  getAllTags: ({ commit }) => {
+    return new Promise((resolve, reject) => {
+      axios({ url: `${ getApiUrl() }api/v1/responsibilitytags` })
+        .then(resp => {
+          commit('setAllTags', resp)
+          resolve(resp)
+        })
+        .catch(e => {
+          console.error('Error getting all tags:', e)
+          reject(e)
+        })
+    })
+  },
   getSimpleEmployeeList: ({ commit }) => {
     axios({ url: `${ process.env.API_URL }api/v1/employee/simple_list`}) // eslint-disable-line @typescript-eslint/restrict-template-expressions
       .then(resp => {
@@ -80,6 +106,15 @@ const actions: ActionTree<ResponsibilityStateInterface, StateInterface> = {
       })
       .catch(e => {
         console.error('Error getting simple employee detail:', e)
+      })
+  },
+  getSimpleTagList: ({ commit }) => {
+    axios({ url: `${ process.env.API_URL }api/v1/responsibilitytags/simple_list`}) // eslint-disable-line @typescript-eslint/restrict-template-expressions
+      .then(resp => {
+        commit('setSimpleTagList', resp)
+      })
+      .catch(e => {
+        console.error('Error getting simple tag list:', e)
       })
   },
   authLogout: ({commit}) => {

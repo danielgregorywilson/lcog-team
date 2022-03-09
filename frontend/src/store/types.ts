@@ -532,7 +532,9 @@ export interface TeleworkSignatureRetrieve {
 export interface Responsibility {
   pk: number
   name: string
-  link?: string
+  description: string
+  link: string
+  tags: Array<ResponsibilityTag>
   primary_employee_pk?: number
   primary_employee_name?: string
   secondary_employee_pk?: number
@@ -541,7 +543,9 @@ export interface Responsibility {
 
 export interface ResponsibilityCreate {
   name: string
-  link?: Url
+  description?: string
+  link?: string
+  tags?: Array<ResponsibilityTag>
   primary_employee?: number
   secondary_employee?: number
 }
@@ -549,7 +553,9 @@ export interface ResponsibilityCreate {
 export interface ResponsibilityUpdate {
   pk?: number
   name?: string
-  link?: Url
+  description?: string
+  link?: string
+  tags?: Array<ResponsibilityTag>
   primary_employee?: number
   secondary_employee?: number
 }
@@ -567,13 +573,36 @@ export interface ResponsibilityStateInterface {
   orphanedResponsibilities: Array<Responsibility>
   employeePrimaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
   employeeSecondaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
+  tagWithResponsibilities: Array<EmployeeResponsibilitiesInterface>
+  allTags: { results: Array<ResponsibilityTag> }
   simpleEmployeeList: Array<SimpleEmployeeRetrieve>
   simpleEmployeeDetail: SimpleEmployeeRetrieve
+  simpleTagList: Array<SimpleResponsibilityTagRetrieve>
 }
 
 export interface EmployeeResponsibilitiesInterface {
   pk: number
   responsibilities: Array<Responsibility>
+}
+
+export interface SimpleResponsibilityTagRetrieve {
+  pk: number
+  name: string
+}
+
+export interface ResponsibilityTag {
+  pk?: number
+  name: string
+  responsibilities?: Array<string>
+}
+
+export interface ResponsibilityTagCreate {
+  name: string
+}
+
+export interface ResponsibilityTagUpdate {
+  pk?: number
+  name?: string
 }
 
 
@@ -637,4 +666,9 @@ export interface VuexStoreGetters {
   },
   'responsibilityModule/employeePrimaryResponsibilities': Array<EmployeeResponsibilitiesInterface>,
   'responsibilityModule/employeeSecondaryResponsibilities': Array<EmployeeResponsibilitiesInterface>
+  'responsibilityModule/tagWithResponsibilities': ResponsibilityTag
+  'responsibilityModule/allTags': {
+    results: Array<SimpleResponsibilityTagRetrieve>
+  },
+  'responsibilityModule/simpleTagList': Array<SimpleResponsibilityTagRetrieve>,
 }

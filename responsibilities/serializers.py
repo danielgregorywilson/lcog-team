@@ -1,10 +1,19 @@
-
 from rest_framework import serializers
+from rest_framework.response import Response
 
-from people.models import Responsibility
+from .models import Responsibility, Tag
+
+
+class SimpleTagSerializer(serializers.HyperlinkedModelSerializer):
+    # For use by ResponsibilitySerializer - does not have url or responsibilities
+    
+    class Meta:
+        model = Tag
+        fields = ['pk', 'name']
 
 
 class ResponsibilitySerializer(serializers.HyperlinkedModelSerializer):
+    tags = SimpleTagSerializer(many=True)
     primary_employee_pk = serializers.SerializerMethodField()
     primary_employee_name = serializers.SerializerMethodField()
     secondary_employee_pk = serializers.SerializerMethodField()
@@ -13,9 +22,9 @@ class ResponsibilitySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Responsibility
         fields = [
-            'url', 'pk', 'name', 'link', 'primary_employee_pk',
-            'primary_employee_name', 'secondary_employee_pk',
-            'secondary_employee_name'
+            'url', 'pk', 'name', 'description', 'link', 'tags',
+            'primary_employee_pk', 'primary_employee_name',
+            'secondary_employee_pk', 'secondary_employee_name'
         ]
 
     @staticmethod
@@ -45,3 +54,18 @@ class ResponsibilitySerializer(serializers.HyperlinkedModelSerializer):
             return responsibility.secondary_employee.user.get_full_name()
         else:
             return ''
+
+
+class TagSerializer(serializers.HyperlinkedModelSerializer):
+    responsibilities = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Tag
+        fields = ['url', 'pk', 'name', 'responsibilities']
+
+    def get_responsibilities(self, tag):
+        responsibilities = tag.responsibility_set.all()
+        serializer = ResponsibilitySerializer(
+            responsibilities, many=True, context=self.context
+        )
+        return serializer.data

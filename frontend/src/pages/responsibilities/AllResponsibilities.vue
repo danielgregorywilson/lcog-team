@@ -19,7 +19,7 @@
             <a :href="props.row.link">{{ props.row.link }}</a>
           </q-td>
           <q-td key="tags" :props="props">
-            <q-chip v-for="tag of props.row.tags" :key="tag.name" color="secondary" text-color="white">{{ tag.name }}</q-chip>
+            <q-chip v-for="tag of props.row.tags" :key="tag.name" clickable @click="navigateToTag(tag.pk)" color="secondary" text-color="white">{{ tag.name }}</q-chip>
           </q-td>
           <q-td key="primary_employee_name" :props="props">
             <router-link v-if="props.row.primary_employee_pk" :to="{ name: 'employee-responsibilities', params: { pk: props.row.primary_employee_pk} }">
@@ -75,6 +75,13 @@ export default class AllResponsibilities extends Vue {
     this.$store.dispatch('responsibilityModule/getAllResponsibilities')
       .catch(e => {
         console.error('Error retrieving responsibilities', e)
+      })
+  }
+
+  private navigateToTag(tagPk: string): void {
+    this.$router.push({ name: 'tagged-responsibilities', params: { pk: tagPk }})
+      .catch(e => {
+        console.error('Error navigating to tag detail:', e)
       })
   }
 

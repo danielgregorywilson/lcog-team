@@ -20,13 +20,13 @@
     <router-view></router-view>
 
     <q-dialog v-model="showHelp">
-      <q-card>
+      <q-card id="help-dialog">
         <q-card-section class="q-ma-lg">
           <div class="row items-center q-gutter-lg">
             <q-avatar icon="meeting_room" size="100px" font-size="52px" color="primary" text-color="white" />
             <div class="text-h5">
-              <div>1) Select your name</div>
-              <div>2) Select a desk</div>
+              <div>1) Select your name from the dropdown</div>
+              <div>2) Select an available (yellow or orange) desk</div>
               <div>3) Click “Reserve”</div>
             </div>
           </div>
@@ -37,6 +37,14 @@
     </q-dialog>
   </q-page>
 </template>
+
+<style lang="scss"> 
+
+#help-dialog {
+  max-width: 700px;
+}
+
+</style>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'

@@ -1,8 +1,8 @@
 <template>
   <div>
     <q-table
-      title="Orphaned Responsibilities"
-      :data="orphanedResponsibilities()"
+      :title="`Responsibilities for ${tagName()}`"
+      :data="tagResponsibilities()"
       :columns="tableColumns"
       :pagination="initialTablePagination"
       :filter="tableFilter"
@@ -63,15 +63,11 @@ import { bus } from '../../App.vue'
 import { Responsibility, VuexStoreGetters } from '../../store/types'
 
 @Component
-export default class OrphanedResponsibilities extends Vue {
-  private getters = this.$store.getters as VuexStoreGetters
+export default class TaggedResponsibility extends Vue {
+  private pk = this.$route.params.pk
 
   private tableFilter = ''
 
-  private orphanedResponsibilities(): Array<Responsibility> {
-    return this.getters['responsibilityModule/orphanedResponsibilities'].results
-  }
-  
   private tableColumns = [
     { name: 'name', required: true, label: 'Name', field: 'name', sortable: true, align: 'left' },
     { name: 'description', required: false, label: 'Description', field: 'description', sortable: false, align: 'left' },
@@ -86,10 +82,16 @@ export default class OrphanedResponsibilities extends Vue {
     rowsPerPage: 50
   }
 
-  private retrieveOrphanedResponsibilites(): void {
-    this.$store.dispatch('responsibilityModule/getOrphanedResponsibilities')
+  private getters = this.$store.getters as VuexStoreGetters
+
+  private tagName(): string {
+    return this.getters['responsibilityModule/tagWithResponsibilities'].name
+  }
+
+  private retrieveTagWithResponsibilities(): void {
+    this.$store.dispatch('responsibilityModule/getTagWithResponsibilities', {pk: this.pk})
       .catch(e => {
-        console.error('Error retrieving orphaned responsibilities', e)
+        console.error('Error retrieving tag data', e)
       })
   }
 
@@ -125,13 +127,17 @@ export default class OrphanedResponsibilities extends Vue {
     return filteredRows
   }
 
+  private tagResponsibilities() {
+    return this.getters['responsibilityModule/tagWithResponsibilities'].responsibilities
+  }
+
   private navigateToTag(tagPk: string): void {
     this.$router.push({ name: 'tagged-responsibilities', params: { pk: tagPk }})
       .catch(e => {
         console.error('Error navigating to tag detail:', e)
       })
   }
-
+  
   private showEditDialog(row: Responsibility): void {
     bus.$emit('emitOpenEditDialog', row) // eslint-disable-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   }
@@ -141,11 +147,7 @@ export default class OrphanedResponsibilities extends Vue {
   }
 
   mounted() {
-    // TODO: Only fetch if doesn't exist, or needs update?
-    this.retrieveOrphanedResponsibilites()
-    if (this.orphanedResponsibilities() == []) { // <----- THIS DOESN'T WORK
-      this.retrieveOrphanedResponsibilites()
-    }
+    this.retrieveTagWithResponsibilities()
   }
 }
 </script>

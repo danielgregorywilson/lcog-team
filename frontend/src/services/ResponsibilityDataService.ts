@@ -30,6 +30,22 @@ class ResponsibilityDataService {
   delete(pk: string) {
     return http.delete(`api/v1/responsibilities/${pk}`);
   }
+
+  //////////
+  // Tags //
+  //////////
+
+  createTag(data: ResponsibilityCreate) {
+    return http.post('api/v1/responsibilitytags', data);
+  }
+
+  updateTag(pk: string, data: ResponsibilityUpdate) {
+    return http.put(`api/v1/responsibilitytags/${pk}`, data);
+  }
+
+  deleteTag(pk: string) {
+    return http.delete(`api/v1/responsibilitytags/${pk}`);
+  }
 }
 
 export default new ResponsibilityDataService();

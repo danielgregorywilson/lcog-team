@@ -12,7 +12,9 @@ from people.api_views import (
     TeleworkApplicationViewSet, TeleworkSignatureViewSet, UserViewSet,
     ViewedSecurityMessageViewSet
 )
-from responsibilities.api_views import ResponsibilityViewSet
+from responsibilities.api_views import (
+    ResponsibilityViewSet, TagViewSet as ResponsibilityTagViewSet
+)
 
 
 urlpatterns = [
@@ -27,6 +29,7 @@ router.register('v1/user', UserViewSet)
 router.register('v1/groups', GroupViewSet)
 router.register('v1/employee', EmployeeViewSet)
 router.register('v1/responsibilities', ResponsibilityViewSet)
+router.register('v1/responsibilitytags', ResponsibilityTagViewSet)
 router.register('v1/desk', DeskViewSet)
 router.register('v1/deskreservation', DeskReservationViewSet)
 router.register('v1/performancereview', PerformanceReviewViewSet)

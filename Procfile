@@ -1,0 +1,1 @@
+websocket: daphne -b :: -p 5000 lcog-team.asgi:application

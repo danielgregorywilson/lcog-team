@@ -474,8 +474,9 @@ export default class Schaefers1 extends Vue{
   private windowResizeEventHandler = this.handleSVG.bind(this)
 
   // WebSocket magic for sharing reservation changes
+  private webSocketUrl = process.env.WEBSOCKET_URL ? process.env.WEBSOCKET_URL : 'ws://api.team.lcog.org/'
   private deskReservationSocket = new WebSocket(
-    `${ process.env.WEBSOCKET_URL }ws/desk-reservation/${ this.BUILDING }/${ this.FLOOR }/`
+    `${ this.webSocketUrl }ws/desk-reservation/${ this.BUILDING }/${ this.FLOOR }/`
   )
 
   created() {
@@ -489,8 +490,8 @@ export default class Schaefers1 extends Vue{
   mounted() {
     // When a WebSocket message is received
     this.deskReservationSocket.onmessage = (socketMessageObj) => {
-      const socketMessageData = JSON.parse(socketMessageObj.data)
-      const updateMessage = socketMessageData.message
+      const socketMessageData = JSON.parse(socketMessageObj.data) // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+      const updateMessage = socketMessageData.message // eslint-disable-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       this.initDeskReservations()
         .then(() => {
           this.handleSVG()

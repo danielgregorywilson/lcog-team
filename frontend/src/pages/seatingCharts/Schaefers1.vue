@@ -1,8 +1,7 @@
 <template>
   <q-page class="q-mt-md" id="schaefers-1-page">
-    
     <div class="row justify-between items-center">
-      <q-select class="" v-model="selectedEmployee" :options="employees()" option-value="pk" option-label="name" label="Employee" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
+      <q-select class="" v-model="selectedEmployee" :options="employees()" option-value="pk" option-label="name" label="Select your name" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
         <template v-slot:no-option>
           <q-item>
             <q-item-section class="text-grey">
@@ -290,19 +289,17 @@ export default class Schaefers1 extends Vue{
   private deleteReservation() {
     DeskReservationDataService.delete(this.selectedDeskReservationToCancelPk)
       .then(() => {
-        Notify.create(`Cancelled desk reservation: ${this.selectedDeskNumberToCancel} for ${this.selectedDeskOccupantToCancel}`)
+        const deleteMessage = `Cancelled desk reservation: ${this.selectedDeskNumberToCancel} for ${this.selectedDeskOccupantToCancel}`
         this.selectedDeskReservationToCancelPk
         this.selectedDeskNumberToCancel = ''
         this.selectedDeskOccupantToCancel = ''
         this.selectedDeskToCancelCheckInTime = ''
-        this.initDeskReservations()
-          .then(() => {
-            this.handleSVG()
+        // Update reserved desks list everywhere with WebSocket
+        this.deskReservationSocket.send(
+          JSON.stringify({
+            'message': deleteMessage
           })
-          .catch(e => {
-            console.error('Error initializing desk reservations:', e)
-          })
-        // TODO: Update reserved desks list everywhere
+        );
       })
       .catch(e => {
         console.error('Error cancelling desk reservation:' ,e)
@@ -317,18 +314,15 @@ export default class Schaefers1 extends Vue{
       desk_number: this.selectedDeskNumber
     })
       .then((response: AxiosDeskReservationCreateServerResponse) => {
-        Notify.create(`Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`)
         this.selectedEmployee = this.emptyEmployee
         this.selectedDeskNumber = ''
         this.deselectAllRoomButtons()
-        this.initDeskReservations()
-          .then(() => {
-            this.handleSVG()
+        // Update reserved desks list everywhere with WebSocket
+        this.deskReservationSocket.send(
+          JSON.stringify({
+            'message': `Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`
           })
-          .catch(e => {
-            console.error('Error initializing desk reservations:', e)
-          })
-        // TODO: Update reserved desks list everywhere
+        );
       })
       .catch(e => {
         console.error('Error creating desk reservation:' ,e)
@@ -479,6 +473,12 @@ export default class Schaefers1 extends Vue{
 
   private windowResizeEventHandler = this.handleSVG.bind(this)
 
+  // WebSocket magic for sharing reservation changes
+  private webSocketUrl = process.env.WEBSOCKET_URL ? process.env.WEBSOCKET_URL : 'ws://api.team.lcog.org/'
+  private deskReservationSocket = new WebSocket(
+    `${ this.webSocketUrl }ws/desk-reservation/${ this.BUILDING }/${ this.FLOOR }/`
+  )
+
   created() {
     window.addEventListener('resize', this.windowResizeEventHandler)
   }
@@ -488,6 +488,25 @@ export default class Schaefers1 extends Vue{
   }
 
   mounted() {
+    // When a WebSocket message is received
+    this.deskReservationSocket.onmessage = (socketMessageObj) => {
+      const socketMessageData = JSON.parse(socketMessageObj.data) // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+      const updateMessage = socketMessageData.message // eslint-disable-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      this.initDeskReservations()
+        .then(() => {
+          this.handleSVG()
+          Notify.create(updateMessage)
+        })
+        .catch(e => {
+          console.error('Error initializing desk reservations from socket message:', e)
+        })
+    }
+
+    // We do not expect the socket to ever close
+    this.deskReservationSocket.onclose = () => {
+      console.error('Desk Reservation socket closed unexpectedly');
+    };
+    
     this.initDesksAndReservations()
       .then(() => {
         this.handleSVG()

@@ -1,3 +1,4 @@
+from xmlrpc.client import ResponseError
 from django.db.models.query import QuerySet
 from mainsite.models import SecurityMessage
 from rest_framework import views, viewsets
@@ -7,6 +8,7 @@ from rest_framework.permissions import (
     BasePermission, IsAuthenticatedOrReadOnly, SAFE_METHODS
 )
 from rest_framework.response import Response
+from rest_framework.status import HTTP_400_BAD_REQUEST
 
 from django.contrib.auth.models import Group, User
 from django.db.models import Q
@@ -207,10 +209,13 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
     def create(self, request):
         employee = Employee.objects.get(pk=request.data['employee_pk']) if request.data['employee_pk'] != -1 else None
         desk = Desk.objects.get(number=request.data['desk_number']) if request.data['desk_number'] != -1 else None
-        reservation = DeskReservation.objects.create(employee=employee, desk=desk)
+        reservation, created = DeskReservation.objects.get_or_create(employee=employee, desk=desk)
         serialized_reservation = DeskReservationSerializer(reservation,
             context={'request': request})
-        return Response(serialized_reservation.data)
+        if created:
+            return Response(serialized_reservation.data)
+        else:
+            return Response(serialized_reservation.data, status=HTTP_400_BAD_REQUEST)
 
     # def update(self, request, pk=None):
     #     import pdb; pdb.set_trace();

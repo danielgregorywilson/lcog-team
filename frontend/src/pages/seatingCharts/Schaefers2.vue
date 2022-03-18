@@ -228,16 +228,27 @@ export default class Schaefers2 extends Vue{
     DeskReservationDataService.delete(this.selectedDeskReservationToCancelPk)
       .then(() => {
         const deleteMessage = `Cancelled desk reservation: ${this.selectedDeskNumberToCancel} for ${this.selectedDeskOccupantToCancel}`
+        Notify.create(deleteMessage)
         this.selectedDeskReservationToCancelPk
         this.selectedDeskNumberToCancel = ''
         this.selectedDeskOccupantToCancel = ''
         this.selectedDeskToCancelCheckInTime = ''
-        // Update reserved desks list everywhere with WebSocket
-        this.deskReservationSocket.send(
-          JSON.stringify({
-            'message': deleteMessage
+
+        // TODO: Temporarily restoring to remove sockets for production
+        this.initDeskReservations()
+          .then(() => {
+            this.handleSVG()
           })
-        );
+          .catch(e => {
+            console.error('Error initializing desk reservations:', e)
+          })
+
+        // Update reserved desks list everywhere with WebSocket
+        // this.deskReservationSocket.send(
+        //   JSON.stringify({
+        //     'message': deleteMessage
+        //   })
+        // );
       })
       .catch(e => {
         console.error('Error cancelling desk reservation:' ,e)
@@ -255,12 +266,23 @@ export default class Schaefers2 extends Vue{
         this.selectedEmployee = this.emptyEmployee
         this.selectedDeskNumber = ''
         this.deselectAllRoomButtons()
-        // Update reserved desks list everywhere with WebSocket
-        this.deskReservationSocket.send(
-          JSON.stringify({
-            'message': `Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`
+        Notify.create(`Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`)
+        
+        // TODO: Temporarily restoring to remove sockets for production
+        this.initDeskReservations()
+          .then(() => {
+            this.handleSVG()
           })
-        );
+          .catch(e => {
+            console.error('Error initializing desk reservations:', e)
+          })
+
+        // Update reserved desks list everywhere with WebSocket
+        // this.deskReservationSocket.send(
+        //   JSON.stringify({
+        //     'message': `Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`
+        //   })
+        // );
       })
       .catch(e => {
         console.error('Error creating desk reservation:' ,e)
@@ -412,9 +434,9 @@ export default class Schaefers2 extends Vue{
 
   // WebSocket magic for sharing reservation changes
   private webSocketUrl = process.env.WEBSOCKET_URL ? process.env.WEBSOCKET_URL : 'ws://api.team.lcog.org/'
-  private deskReservationSocket = new WebSocket(
-    `${ this.webSocketUrl }ws/desk-reservation/${ this.BUILDING }/${ this.FLOOR }/`
-  )
+  // private deskReservationSocket = new WebSocket(
+  //   `${ this.webSocketUrl }ws/desk-reservation/${ this.BUILDING }/${ this.FLOOR }/`
+  // )
 
   private showHelp() {
     bus.$emit('showReservationHelpDialog') // eslint-disable-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
@@ -430,23 +452,23 @@ export default class Schaefers2 extends Vue{
 
   mounted() {
     // When a WebSocket message is received
-    this.deskReservationSocket.onmessage = (socketMessageObj) => {
-      const socketMessageData = JSON.parse(socketMessageObj.data) // eslint-disable-line @typescript-eslint/no-unsafe-assignment
-      const updateMessage = socketMessageData.message // eslint-disable-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      this.initDeskReservations()
-        .then(() => {
-          this.handleSVG()
-          Notify.create(updateMessage)
-        })
-        .catch(e => {
-          console.error('Error initializing desk reservations from socket message:', e)
-        })
-    }
+    // this.deskReservationSocket.onmessage = (socketMessageObj) => {
+    //   const socketMessageData = JSON.parse(socketMessageObj.data) // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+    //   const updateMessage = socketMessageData.message // eslint-disable-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    //   this.initDeskReservations()
+    //     .then(() => {
+    //       this.handleSVG()
+    //       Notify.create(updateMessage)
+    //     })
+    //     .catch(e => {
+    //       console.error('Error initializing desk reservations from socket message:', e)
+    //     })
+    // }
 
     // We do not expect the socket to ever close
-    this.deskReservationSocket.onclose = () => {
-      console.error('Desk Reservation socket closed unexpectedly');
-    };
+    // this.deskReservationSocket.onclose = () => {
+    //   console.error('Desk Reservation socket closed unexpectedly');
+    // };
     
     this.initDesksAndReservations()
       .then(() => {

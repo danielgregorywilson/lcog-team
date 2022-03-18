@@ -4,6 +4,20 @@
 
 export const releases = [
   {
+    version: '0.3.2',
+    date: new Date(2022, 2, 18),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Added second and third Schaefers floors to desk reservation app'
+      },
+      {
+        type: 'improved',
+        description: 'Cleaned up desk reservation app layout'
+      },
+    ]
+  },
+  {
     version: '0.3.1',
     date: new Date(2022, 2, 9),
     changes: [

@@ -1,18 +1,21 @@
 <template>
   <q-page class="q-mt-md" id="schaefers-1-page">
     <div class="row justify-between items-center">
-      <q-select class="" v-model="selectedEmployee" :options="employees()" option-value="pk" option-label="name" label="Select your name" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
-        <template v-slot:no-option>
-          <q-item>
-            <q-item-section class="text-grey">
-              No results
-            </q-item-section>
-          </q-item>
-        </template>
-        <template v-if="selectedEmployee.name" v-slot:append>
-          <q-icon name="cancel" @click.stop="selectedEmployee = emptyEmployee" class="cursor-pointer" />
-        </template>
-      </q-select>
+      <div class="row items-center">
+        <q-icon name="help" color="primary" size="48px" class="q-mr-md cursor-pointer" @click="showHelp()" />
+        <q-select class="" v-model="selectedEmployee" :options="employees()" option-value="pk" option-label="name" label="Select your name" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-grey">
+                No results
+              </q-item-section>
+            </q-item>
+          </template>
+          <template v-if="selectedEmployee.name" v-slot:append>
+            <q-icon name="cancel" @click.stop="selectedEmployee = emptyEmployee" class="cursor-pointer" />
+          </template>
+        </q-select>
+      </div>
       <div class="row items-center q-gutter-md">
         <div class="row items-center q-gutter-sm">
           <div>Drop-In</div>
@@ -411,6 +414,10 @@ export default class Schaefers1 extends Vue{
   private deskReservationSocket = new WebSocket(
     `${ this.webSocketUrl }ws/desk-reservation/${ this.BUILDING }/${ this.FLOOR }/`
   )
+
+  private showHelp() {
+    bus.$emit('showReservationHelpDialog') // eslint-disable-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+  }
 
   created() {
     window.addEventListener('resize', this.windowResizeEventHandler)

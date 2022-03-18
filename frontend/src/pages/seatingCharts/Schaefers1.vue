@@ -53,8 +53,6 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <!-- {{ desks }} -->
-    <!-- {{ deskReservations[0] }} -->
   </q-page>
 </template>
 
@@ -126,22 +124,10 @@ export default class Schaefers1 extends Vue{
 
   private needle = '' // For filtering employee list
   
-  private ignoreList = ['UP', 'DOWN']
+  private ignoreList = ['UP', 'DOWN', 'DN']
   
   private standardDesk = require('../../assets/floorPlans/desk-standard.png') as string // eslint-disable-line @typescript-eslint/no-var-requires
   private ergoDesk = require('../../assets/floorPlans/desk-ergo.png') as string // eslint-disable-line @typescript-eslint/no-var-requires
-
-  private unassignedEmployees: EmployeeType[] = [
-    {name: 'Jean-Luc Picard', selected: false},
-    {name: 'Jordi LaForge', selected: false},
-    {name: 'Dr. Crusher', selected: false},
-    {name: 'Wesley Crusher', selected: false},
-    {name: 'Data', selected: false},
-    {name: 'Deanna Troi', selected: false}
-  ]
-  private currentEmployee: EmployeeType = {name: '', selected: false}
-  private allRooms: HTMLElement[] = []
-  private currentRoom: HTMLElement = document.createElement('div')
 
   private BUILDING = 'S'
   private FLOOR = '1'
@@ -219,56 +205,6 @@ export default class Schaefers1 extends Vue{
       }
 
     }
-
-    // if (roomButton.innerText == 'Unassigned') {
-    //   if (this.currentEmployee.name) {
-    //     // Assign the current employee to the room
-    //     roomButton.innerText = this.currentEmployee.name
-    //     const annotationSize = annotationElem.getBoundingClientRect()
-    //     annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
-    //     annotationElem.style.marginTop = `-${annotationSize.height/2}px`
-    //     // Remove the current employee from the list
-    //     this.unassignedEmployees.splice(this.unassignedEmployees.indexOf(this.currentEmployee), 1)
-    //     this.currentEmployee = {name: '', selected: false}
-    //   } else {
-    //     if (this.currentRoom == roomButton) {
-    //       // Unhighlight the room
-    //       this.currentRoom = document.createElement('div')
-    //       roomButton.style.borderColor = this.greyColor
-    //       roomButton.style.color = this.blackColor
-    //     } else {
-    //       // Highlight the room (and unhighlight others)
-    //       this.allRooms.forEach((room) => {
-    //         room.style.borderColor = this.greyColor
-    //         room.style.color = this.blackColor
-    //       })
-    //       this.currentRoom = roomButton
-    //       roomButton.style.borderColor = this.primaryColor
-    //       roomButton.style.color = this.primaryColor
-    //     }
-    //   }
-    // } else {
-    //   if (this.currentEmployee.name) {
-    //     // Swap the two employees
-    //     // Move the room employee out
-    //     this.unassignedEmployees.push({name: roomButton.innerText, selected: false})
-    //     // Remove the current employee in
-    //     roomButton.innerText = this.currentEmployee.name
-    //     const annotationSize = annotationElem.getBoundingClientRect()
-    //     annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
-    //     annotationElem.style.marginTop = `-${annotationSize.height/2}px`
-    //     // Remove the current employee from the list
-    //     this.unassignedEmployees.splice(this.unassignedEmployees.indexOf(this.currentEmployee), 1)
-    //     this.currentEmployee = {name: '', selected: false}
-    //   } else {
-    //     // Kick out the room employee
-    //     this.unassignedEmployees.push({name: roomButton.innerText, selected: false})
-    //     roomButton.innerText = 'Unassigned'
-    //     const annotationSize = annotationElem.getBoundingClientRect()
-    //     annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
-    //     annotationElem.style.marginTop = `-${annotationSize.height/2}px`
-    //   }
-    // }
   }
 
   private reservedRoomClick(roomButton: HTMLElement) {
@@ -432,7 +368,6 @@ export default class Schaefers1 extends Vue{
         annotationElem.style.top = (rect.top - floorPlanRect.top + 48).toString() + 'px'
 
         const clickableButton = annotationElem.querySelector('button') as HTMLElement
-        this.allRooms.push(clickableButton)
 
         if (clickableButton) {
           if (deskReserved) {
@@ -514,8 +449,7 @@ export default class Schaefers1 extends Vue{
       .catch(e => {
         console.error('Error initializing desk reservations in component:', e)
       })
-    // this.initDesks()
-    // this.initDeskReservations()
+
     if (!this.employees().length) {
       this.retrieveSimpleEmployeeList()
     }

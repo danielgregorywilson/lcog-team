@@ -8,11 +8,11 @@
           <q-btn push color="primary" glossy label="Second Floor" :to="{ name: 'schaefers-2' }" />
           <q-btn push color="primary" glossy label="Third Floor" :to="{ name: 'schaefers-3' }"  />
         </q-btn-group>
-        <div>Park Place</div>
+        <!-- <div>Park Place</div>
         <q-btn-group push class="">
           <q-btn push color="primary" glossy label="Fourth Floor" :to="{ name: 'park-place-4' }" />
           <q-btn push color="primary" glossy label="Fifth Floor" :to="{ name: 'park-place-5' }" />
-        </q-btn-group>
+        </q-btn-group> -->
       </div>
       <q-icon name="help" color="primary" size="48px" class="q-mr-md q-mt-lg cursor-pointer" @click="showHelp = !showHelp" />
     </div>

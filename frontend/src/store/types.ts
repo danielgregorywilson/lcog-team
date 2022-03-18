@@ -629,6 +629,7 @@ export interface DeskReservation {
   desk_number: string
   check_in: string
   check_out: string
+  created?: boolean
 }
 
 export interface DeskReservationCreate {

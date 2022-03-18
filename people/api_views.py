@@ -209,13 +209,16 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
     def create(self, request):
         employee = Employee.objects.get(pk=request.data['employee_pk']) if request.data['employee_pk'] != -1 else None
         desk = Desk.objects.get(number=request.data['desk_number']) if request.data['desk_number'] != -1 else None
-        reservation, created = DeskReservation.objects.get_or_create(employee=employee, desk=desk)
-        serialized_reservation = DeskReservationSerializer(reservation,
-            context={'request': request})
-        if created:
-            return Response(serialized_reservation.data)
+        existing_reservations = DeskReservation.objects.filter(desk=desk, check_out__isnull=True)
+        if existing_reservations.count():
+            serialized_reservation = DeskReservationSerializer(existing_reservations[0],
+                context={'request': request})
+            return Response({**serialized_reservation.data, 'created': False})
         else:
-            return Response(serialized_reservation.data, status=HTTP_400_BAD_REQUEST)
+            reservation = DeskReservation.objects.create(employee=employee, desk=desk)
+            serialized_reservation = DeskReservationSerializer(reservation,
+                context={'request': request})
+            return Response({**serialized_reservation.data, 'created': True})
 
     # def update(self, request, pk=None):
     #     import pdb; pdb.set_trace();

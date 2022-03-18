@@ -48,11 +48,19 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import { bus } from '../../App.vue'
 
 @Component
 export default class SeatingCharts extends Vue{
 
-  private showHelp = false;
+  private showHelp = false
+
+  created() {
+    // We trigger opening the edit and delete dialogs in AllResponsibilities, EmployeeResponsibilites, or OrphanedResponsibilities
+    bus.$on('showReservationHelpDialog', () => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      this.showHelp = true
+    })
+  }
 
 }
 </script>

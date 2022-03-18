@@ -110,6 +110,7 @@
 <script lang="ts">
 import { Notify } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
+import { bus } from '../../App.vue'
 import DeskReservationDataService from '../../services/DeskReservationDataService'
 import FloorPlan from '../../assets/floorPlans/schaefers3.fpsvg'
 import { AxiosDeskReservationCreateServerResponse, Desk, DeskReservation, SimpleEmployeeRetrieve, VuexStoreGetters } from '../../store/types'

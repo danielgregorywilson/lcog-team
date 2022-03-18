@@ -186,8 +186,6 @@ export default class Schaefers3 extends Vue{
   }
 
   private roomClick(roomButton: HTMLElement) {
-    console.log(roomButton.dataset.pk)
-
     if (roomButton.dataset.pk) {
       const buttonNumber = roomButton.dataset.pk
 

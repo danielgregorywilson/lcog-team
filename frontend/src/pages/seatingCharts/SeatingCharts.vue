@@ -1,7 +1,7 @@
 <template>
-  <q-page class="">
+  <q-page class="row justify-center">
     <div class="header row justify-between">
-      <div class="row items-center q-gutter-md q-ma-none">
+      <!-- <div class="row items-center q-gutter-md q-ma-none">
         <div>Schaefers</div>
         <q-btn-group push class="">
           <q-btn push color="primary" glossy label="First Floor" :to="{ name: 'schaefers-1' }" />
@@ -13,8 +13,8 @@
           <q-btn push color="primary" glossy label="Fourth Floor" :to="{ name: 'park-place-4' }" />
           <q-btn push color="primary" glossy label="Fifth Floor" :to="{ name: 'park-place-5' }" />
         </q-btn-group>
-      </div>
-      <q-icon name="help" color="primary" size="48px" class="q-mr-md q-mt-lg cursor-pointer" @click="showHelp = !showHelp" />
+      </div> -->
+      <!-- <q-icon name="help" color="primary" size="48px" class="q-mr-md q-mt-lg cursor-pointer" @click="showHelp = !showHelp" /> -->
     </div>
     
     <router-view></router-view>
@@ -48,11 +48,19 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import { bus } from '../../App.vue'
 
 @Component
 export default class SeatingCharts extends Vue{
 
-  private showHelp = false;
+  private showHelp = false
+
+  created() {
+    // We trigger opening the edit and delete dialogs in AllResponsibilities, EmployeeResponsibilites, or OrphanedResponsibilities
+    bus.$on('showReservationHelpDialog', () => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      this.showHelp = true
+    })
+  }
 
 }
 </script>

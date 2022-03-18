@@ -1,18 +1,21 @@
 <template>
   <q-page class="q-mt-md" id="schaefers-1-page">
     <div class="row justify-between items-center">
-      <q-select class="" v-model="selectedEmployee" :options="employees()" option-value="pk" option-label="name" label="Select your name" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
-        <template v-slot:no-option>
-          <q-item>
-            <q-item-section class="text-grey">
-              No results
-            </q-item-section>
-          </q-item>
-        </template>
-        <template v-if="selectedEmployee.name" v-slot:append>
-          <q-icon name="cancel" @click.stop="selectedEmployee = emptyEmployee" class="cursor-pointer" />
-        </template>
-      </q-select>
+      <div class="row items-center">
+        <q-icon name="help" color="primary" size="48px" class="q-mr-md cursor-pointer" @click="showHelp()" />
+        <q-select class="" v-model="selectedEmployee" :options="employees()" option-value="pk" option-label="name" label="Select your name" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-grey">
+                No results
+              </q-item-section>
+            </q-item>
+          </template>
+          <template v-if="selectedEmployee.name" v-slot:append>
+            <q-icon name="cancel" @click.stop="selectedEmployee = emptyEmployee" class="cursor-pointer" />
+          </template>
+        </q-select>
+      </div>
       <div class="row items-center q-gutter-md">
         <div class="row items-center q-gutter-sm">
           <div>Drop-In</div>
@@ -53,8 +56,6 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
-    <!-- {{ desks }} -->
-    <!-- {{ deskReservations[0] }} -->
   </q-page>
 </template>
 
@@ -109,6 +110,7 @@
 <script lang="ts">
 import { Notify } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
+import { bus } from '../../App.vue'
 import DeskReservationDataService from '../../services/DeskReservationDataService'
 import FloorPlan from '../../assets/floorPlans/schaefers1.fpsvg'
 import { AxiosDeskReservationCreateServerResponse, Desk, DeskReservation, SimpleEmployeeRetrieve, VuexStoreGetters } from '../../store/types'
@@ -126,22 +128,10 @@ export default class Schaefers1 extends Vue{
 
   private needle = '' // For filtering employee list
   
-  private ignoreList = ['UP', 'DOWN']
+  private ignoreList = ['UP', 'DOWN', 'DN']
   
   private standardDesk = require('../../assets/floorPlans/desk-standard.png') as string // eslint-disable-line @typescript-eslint/no-var-requires
   private ergoDesk = require('../../assets/floorPlans/desk-ergo.png') as string // eslint-disable-line @typescript-eslint/no-var-requires
-
-  private unassignedEmployees: EmployeeType[] = [
-    {name: 'Jean-Luc Picard', selected: false},
-    {name: 'Jordi LaForge', selected: false},
-    {name: 'Dr. Crusher', selected: false},
-    {name: 'Wesley Crusher', selected: false},
-    {name: 'Data', selected: false},
-    {name: 'Deanna Troi', selected: false}
-  ]
-  private currentEmployee: EmployeeType = {name: '', selected: false}
-  private allRooms: HTMLElement[] = []
-  private currentRoom: HTMLElement = document.createElement('div')
 
   private BUILDING = 'S'
   private FLOOR = '1'
@@ -200,8 +190,6 @@ export default class Schaefers1 extends Vue{
   }
 
   private roomClick(roomButton: HTMLElement) {
-    console.log(roomButton.dataset.pk)
-
     if (roomButton.dataset.pk) {
       const buttonNumber = roomButton.dataset.pk
 
@@ -219,56 +207,6 @@ export default class Schaefers1 extends Vue{
       }
 
     }
-
-    // if (roomButton.innerText == 'Unassigned') {
-    //   if (this.currentEmployee.name) {
-    //     // Assign the current employee to the room
-    //     roomButton.innerText = this.currentEmployee.name
-    //     const annotationSize = annotationElem.getBoundingClientRect()
-    //     annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
-    //     annotationElem.style.marginTop = `-${annotationSize.height/2}px`
-    //     // Remove the current employee from the list
-    //     this.unassignedEmployees.splice(this.unassignedEmployees.indexOf(this.currentEmployee), 1)
-    //     this.currentEmployee = {name: '', selected: false}
-    //   } else {
-    //     if (this.currentRoom == roomButton) {
-    //       // Unhighlight the room
-    //       this.currentRoom = document.createElement('div')
-    //       roomButton.style.borderColor = this.greyColor
-    //       roomButton.style.color = this.blackColor
-    //     } else {
-    //       // Highlight the room (and unhighlight others)
-    //       this.allRooms.forEach((room) => {
-    //         room.style.borderColor = this.greyColor
-    //         room.style.color = this.blackColor
-    //       })
-    //       this.currentRoom = roomButton
-    //       roomButton.style.borderColor = this.primaryColor
-    //       roomButton.style.color = this.primaryColor
-    //     }
-    //   }
-    // } else {
-    //   if (this.currentEmployee.name) {
-    //     // Swap the two employees
-    //     // Move the room employee out
-    //     this.unassignedEmployees.push({name: roomButton.innerText, selected: false})
-    //     // Remove the current employee in
-    //     roomButton.innerText = this.currentEmployee.name
-    //     const annotationSize = annotationElem.getBoundingClientRect()
-    //     annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
-    //     annotationElem.style.marginTop = `-${annotationSize.height/2}px`
-    //     // Remove the current employee from the list
-    //     this.unassignedEmployees.splice(this.unassignedEmployees.indexOf(this.currentEmployee), 1)
-    //     this.currentEmployee = {name: '', selected: false}
-    //   } else {
-    //     // Kick out the room employee
-    //     this.unassignedEmployees.push({name: roomButton.innerText, selected: false})
-    //     roomButton.innerText = 'Unassigned'
-    //     const annotationSize = annotationElem.getBoundingClientRect()
-    //     annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
-    //     annotationElem.style.marginTop = `-${annotationSize.height/2}px`
-    //   }
-    // }
   }
 
   private reservedRoomClick(roomButton: HTMLElement) {
@@ -290,16 +228,27 @@ export default class Schaefers1 extends Vue{
     DeskReservationDataService.delete(this.selectedDeskReservationToCancelPk)
       .then(() => {
         const deleteMessage = `Cancelled desk reservation: ${this.selectedDeskNumberToCancel} for ${this.selectedDeskOccupantToCancel}`
+        Notify.create(deleteMessage)
         this.selectedDeskReservationToCancelPk
         this.selectedDeskNumberToCancel = ''
         this.selectedDeskOccupantToCancel = ''
         this.selectedDeskToCancelCheckInTime = ''
-        // Update reserved desks list everywhere with WebSocket
-        this.deskReservationSocket.send(
-          JSON.stringify({
-            'message': deleteMessage
+        
+        // TODO: Temporarily restoring to remove sockets for production
+        this.initDeskReservations()
+          .then(() => {
+            this.handleSVG()
           })
-        );
+          .catch(e => {
+            console.error('Error initializing desk reservations:', e)
+          })
+
+        // Update reserved desks list everywhere with WebSocket
+        // this.deskReservationSocket.send(
+        //   JSON.stringify({
+        //     'message': deleteMessage
+        //   })
+        // );
       })
       .catch(e => {
         console.error('Error cancelling desk reservation:' ,e)
@@ -317,12 +266,27 @@ export default class Schaefers1 extends Vue{
         this.selectedEmployee = this.emptyEmployee
         this.selectedDeskNumber = ''
         this.deselectAllRoomButtons()
-        // Update reserved desks list everywhere with WebSocket
-        this.deskReservationSocket.send(
-          JSON.stringify({
-            'message': `Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`
+        if (response.data.created) {
+          Notify.create(`Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`)  
+        } else {
+          Notify.create({message: `Sorry! Desk ${response.data.desk_number} is already reserved for ${response.data.employee_name}. Please choose another`, type: 'negative'})
+        }
+        
+        // TODO: Temporarily restoring to remove sockets for production
+        this.initDeskReservations()
+          .then(() => {
+            this.handleSVG()
           })
-        );
+          .catch(e => {
+            console.error('Error initializing desk reservations:', e)
+          })
+        
+        // Update reserved desks list everywhere with WebSocket
+        // this.deskReservationSocket.send(
+        //   JSON.stringify({
+        //     'message': `Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`
+        //   })
+        // );
       })
       .catch(e => {
         console.error('Error creating desk reservation:' ,e)
@@ -432,7 +396,6 @@ export default class Schaefers1 extends Vue{
         annotationElem.style.top = (rect.top - floorPlanRect.top + 48).toString() + 'px'
 
         const clickableButton = annotationElem.querySelector('button') as HTMLElement
-        this.allRooms.push(clickableButton)
 
         if (clickableButton) {
           if (deskReserved) {
@@ -475,9 +438,13 @@ export default class Schaefers1 extends Vue{
 
   // WebSocket magic for sharing reservation changes
   private webSocketUrl = process.env.WEBSOCKET_URL ? process.env.WEBSOCKET_URL : 'ws://api.team.lcog.org/'
-  private deskReservationSocket = new WebSocket(
-    `${ this.webSocketUrl }ws/desk-reservation/${ this.BUILDING }/${ this.FLOOR }/`
-  )
+  // private deskReservationSocket = new WebSocket(
+  //   `${ this.webSocketUrl }ws/desk-reservation/${ this.BUILDING }/${ this.FLOOR }/`
+  // )
+
+  private showHelp() {
+    bus.$emit('showReservationHelpDialog') // eslint-disable-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+  }
 
   created() {
     window.addEventListener('resize', this.windowResizeEventHandler)
@@ -489,23 +456,23 @@ export default class Schaefers1 extends Vue{
 
   mounted() {
     // When a WebSocket message is received
-    this.deskReservationSocket.onmessage = (socketMessageObj) => {
-      const socketMessageData = JSON.parse(socketMessageObj.data) // eslint-disable-line @typescript-eslint/no-unsafe-assignment
-      const updateMessage = socketMessageData.message // eslint-disable-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      this.initDeskReservations()
-        .then(() => {
-          this.handleSVG()
-          Notify.create(updateMessage)
-        })
-        .catch(e => {
-          console.error('Error initializing desk reservations from socket message:', e)
-        })
-    }
+    // this.deskReservationSocket.onmessage = (socketMessageObj) => {
+    //   const socketMessageData = JSON.parse(socketMessageObj.data) // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+    //   const updateMessage = socketMessageData.message // eslint-disable-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    //   this.initDeskReservations()
+    //     .then(() => {
+    //       this.handleSVG()
+    //       Notify.create(updateMessage)
+    //     })
+    //     .catch(e => {
+    //       console.error('Error initializing desk reservations from socket message:', e)
+    //     })
+    // }
 
     // We do not expect the socket to ever close
-    this.deskReservationSocket.onclose = () => {
-      console.error('Desk Reservation socket closed unexpectedly');
-    };
+    // this.deskReservationSocket.onclose = () => {
+    //   console.error('Desk Reservation socket closed unexpectedly');
+    // };
     
     this.initDesksAndReservations()
       .then(() => {
@@ -514,8 +481,7 @@ export default class Schaefers1 extends Vue{
       .catch(e => {
         console.error('Error initializing desk reservations in component:', e)
       })
-    // this.initDesks()
-    // this.initDeskReservations()
+
     if (!this.employees().length) {
       this.retrieveSimpleEmployeeList()
     }

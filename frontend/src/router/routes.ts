@@ -259,53 +259,45 @@ const routes: RouteConfig[] = [
     ]
   },
   {
-    path: '/f',
-    component: () => import('layouts/NoNavLayout.vue'),
+    path: '/desk-reservation',
+    component: () => import('src/pages/deskReservation/DeskReservation.vue'),
     children: [
       {
-        path: 'seating-charts',
-        name: 'seating-charts',
-        component: () => import('src/pages/seatingCharts/SeatingCharts.vue'),
-        // beforeEnter: ifCanViewSeatingCharts,
+        path: 'schaefers',
+        name: 'schaefers',
+        component: () => import('src/pages/deskReservation/Schaefers.vue'),
         children: [
           {
-            path: 'schaefers',
-            name: 'schaefers',
-            component: () => import('src/pages/seatingCharts/Schaefers.vue'),
-            children: [
-              {
-                path: '1',
-                name: 'schaefers-1',
-                component: () => import('src/pages/seatingCharts/Schaefers1.vue'),
-              },
-              {
-                path: '2',
-                name: 'schaefers-2',
-                component: () => import('src/pages/seatingCharts/Schaefers2.vue'),
-              },
-              {
-                path: '3',
-                name: 'schaefers-3',
-                component: () => import('src/pages/seatingCharts/Schaefers3.vue'),
-              }
-            ]
+            path: '1',
+            name: 'schaefers-1',
+            component: () => import('src/pages/deskReservation/Schaefers1.vue'),
           },
           {
-            path: 'park-place',
-            name: 'park-place',
-            component: () => import('src/pages/seatingCharts/ParkPlace.vue'),
-            children: [
-              {
-                path: '4',
-                name: 'park-place-4',
-                component: () => import('src/pages/seatingCharts/ParkPlace4.vue'),
-              },
-              {
-                path: '5',
-                name: 'park-place-5',
-                component: () => import('src/pages/seatingCharts/ParkPlace5.vue'),
-              }
-            ]
+            path: '2',
+            name: 'schaefers-2',
+            component: () => import('src/pages/deskReservation/Schaefers2.vue'),
+          },
+          {
+            path: '3',
+            name: 'schaefers-3',
+            component: () => import('src/pages/deskReservation/Schaefers3.vue'),
+          }
+        ]
+      },
+      {
+        path: 'park-place',
+        name: 'park-place',
+        component: () => import('src/pages/deskReservation/ParkPlace.vue'),
+        children: [
+          {
+            path: '4',
+            name: 'park-place-4',
+            component: () => import('src/pages/deskReservation/ParkPlace4.vue'),
+          },
+          {
+            path: '5',
+            name: 'park-place-5',
+            component: () => import('src/pages/deskReservation/ParkPlace5.vue'),
           }
         ]
       }

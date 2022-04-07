@@ -225,15 +225,13 @@ export default class Schaefers3 extends Vue{
   }
 
   private deleteReservation() {
-    DeskReservationDataService.delete(this.selectedDeskReservationToCancelPk)
+    DeskReservationDataService.cancelReservation(this.selectedDeskReservationToCancelPk) 
       .then(() => {
-        const deleteMessage = `Cancelled desk reservation: ${this.selectedDeskNumberToCancel} for ${this.selectedDeskOccupantToCancel}`
-        Notify.create(deleteMessage)
-        this.selectedDeskReservationToCancelPk
+        Notify.create({message: `Canceled reservation of desk ${this.selectedDeskNumberToCancel} for ${this.selectedDeskOccupantToCancel}`})
+        this.selectedDeskReservationToCancelPk = -1
         this.selectedDeskNumberToCancel = ''
         this.selectedDeskOccupantToCancel = ''
-        this.selectedDeskToCancelCheckInTime = ''
-        
+
         // TODO: Temporarily restoring to remove sockets for production
         this.initDeskReservations()
           .then(() => {
@@ -242,11 +240,11 @@ export default class Schaefers3 extends Vue{
           .catch(e => {
             console.error('Error initializing desk reservations:', e)
           })
-
+        
         // Update reserved desks list everywhere with WebSocket
         // this.deskReservationSocket.send(
         //   JSON.stringify({
-        //     'message': deleteMessage
+        //     'message': `Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`
         //   })
         // );
       })

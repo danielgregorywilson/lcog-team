@@ -1127,6 +1127,11 @@ class Desk(models.Model):
     ergonomic = models.BooleanField(default=False)
 
 
+class CurrentlyReservedManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(check_out__isnull=True)
+
+
 class DeskReservation(models.Model):
     class Meta:
         verbose_name = _("Desk Reservation")
@@ -1135,6 +1140,9 @@ class DeskReservation(models.Model):
     
     def __str__(self):
         return f"Desk reservation for {self.employee.user.get_full_name()}"
+
+    objects = models.Manager()
+    currently_reserved_objects = CurrentlyReservedManager()
 
     employee = models.ForeignKey("people.Employee", related_name="desk_reservations", on_delete=models.CASCADE)
     desk = models.ForeignKey("people.Desk", related_name="reservations", on_delete=models.CASCADE)

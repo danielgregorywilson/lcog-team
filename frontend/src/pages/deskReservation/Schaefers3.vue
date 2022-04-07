@@ -7,7 +7,7 @@
           <q-btn-group push class="">
             <q-btn push color="primary" glossy label="1F" :to="{ name: 'schaefers-1' }" />
             <q-btn push color="primary" glossy label="2F" :to="{ name: 'schaefers-2' }" />
-            <q-btn push color="primary" glossy label="3F" :to="{ name: 'schaefers-3' }"  />
+            <q-btn push color="secondary" glossy label="3F" :to="{ name: 'schaefers-3' }"  />
           </q-btn-group>
         </div>
       </div>

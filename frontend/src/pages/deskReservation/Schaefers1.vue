@@ -5,7 +5,7 @@
         <q-icon name="help" color="primary" size="48px" class="q-mr-md cursor-pointer" @click="showHelp()" />
         <div class="row items-center q-gutter-md">
           <q-btn-group push class="">
-            <q-btn push color="primary" glossy label="1F" :to="{ name: 'schaefers-1' }" />
+            <q-btn push color="secondary" glossy label="1F" :to="{ name: 'schaefers-1' }" />
             <q-btn push color="primary" glossy label="2F" :to="{ name: 'schaefers-2' }" />
             <q-btn push color="primary" glossy label="3F" :to="{ name: 'schaefers-3' }"  />
           </q-btn-group>

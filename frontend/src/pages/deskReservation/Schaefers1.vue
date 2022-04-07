@@ -3,19 +3,26 @@
     <div class="row justify-between items-center">
       <div class="row items-center">
         <q-icon name="help" color="primary" size="48px" class="q-mr-md cursor-pointer" @click="showHelp()" />
-        <q-select class="" v-model="selectedEmployee" :options="employees()" option-value="pk" option-label="name" label="Select your name" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
-          <template v-slot:no-option>
-            <q-item>
-              <q-item-section class="text-grey">
-                No results
-              </q-item-section>
-            </q-item>
-          </template>
-          <template v-if="selectedEmployee.name" v-slot:append>
-            <q-icon name="cancel" @click.stop="selectedEmployee = emptyEmployee" class="cursor-pointer" />
-          </template>
-        </q-select>
+        <div class="row items-center q-gutter-md">
+          <q-btn-group push class="">
+            <q-btn push color="primary" glossy label="1F" :to="{ name: 'schaefers-1' }" />
+            <q-btn push color="primary" glossy label="2F" :to="{ name: 'schaefers-2' }" />
+            <q-btn push color="primary" glossy label="3F" :to="{ name: 'schaefers-3' }"  />
+          </q-btn-group>
+        </div>
       </div>
+      <q-select class="" v-model="selectedEmployee" :options="employees()" option-value="pk" option-label="name" label="Select your name" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
+        <template v-slot:no-option>
+          <q-item>
+            <q-item-section class="text-grey">
+              No results
+            </q-item-section>
+          </q-item>
+        </template>
+        <template v-if="selectedEmployee.name" v-slot:append>
+          <q-icon name="cancel" @click.stop="selectedEmployee = emptyEmployee" class="cursor-pointer" />
+        </template>
+      </q-select>
       <div class="row items-center q-gutter-md">
         <div class="row items-center q-gutter-sm">
           <div>Drop-In</div>

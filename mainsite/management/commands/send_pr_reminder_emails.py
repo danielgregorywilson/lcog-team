@@ -9,4 +9,3 @@ class Command(BaseCommand):
         send_pr_reminder_emails()
         # TODO: Output some data about how many emails sent, etc.
         self.stdout.write(self.style.SUCCESS('Sent some emails.'))
-        # self.stdout.write(self.style.SUCCESS('Successfully closed poll "%s"' % poll_id))sen

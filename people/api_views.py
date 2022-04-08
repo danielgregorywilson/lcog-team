@@ -1,6 +1,10 @@
-from xmlrpc.client import ResponseError
-from django.db.models.query import QuerySet
-from mainsite.models import SecurityMessage
+from datetime import datetime
+
+from django.contrib.auth.models import Group, User
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
+from django.utils.timezone import get_current_timezone
+
 from rest_framework import views, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import RetrieveAPIView
@@ -10,17 +14,13 @@ from rest_framework.permissions import (
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
 
-from django.contrib.auth.models import Group, User
-from django.db.models import Q
-from django.shortcuts import get_object_or_404
-
+from mainsite.models import SecurityMessage
 from mainsite.helpers import (
     is_true_string, send_completed_email_to_hr_manager,
     send_evaluation_written_email_to_employee,
     send_signature_email_to_executive_director,
     send_signature_email_to_hr_manager, send_signature_email_to_manager
 )
-
 from people.models import (
     Desk, DeskReservation, Employee, PerformanceReview, ReviewNote, Signature,
     TeleworkApplication, TeleworkSignature, ViewedSecurityMessage
@@ -177,34 +177,8 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
     """
     API endpoint for desk reservations.
     """
-    queryset = DeskReservation.objects.all()
+    queryset = DeskReservation.currently_reserved_objects.all()
     serializer_class = DeskReservationSerializer
-
-    # def get_queryset(self):
-    #     """
-    #     Return a list of all responsibilities to any authenticated user.
-    #     Optionally filter by orphaned responsibilities.
-    #     Optionally filter by employee pk to get primary responsibilities with
-    #     secondaries, or just a list of secondaries.
-    #     """
-    #     import pdb; pdb.set_trace();
-    #     user = self.request.user
-    #     if user.is_authenticated:
-    #         orphaned = self.request.query_params.get('orphaned', None)
-    #         if orphaned is not None and orphaned == "true":
-    #             queryset = Responsibility.objects.filter(
-    #                 Q(primary_employee__isnull=True) | Q(secondary_employee__isnull=True)
-    #             )
-    #         employee = self.request.query_params.get('employee', None)
-    #         if employee is not None and employee.isdigit():
-    #             secondary = self.request.query_params.get('secondary', None)
-    #             if secondary is not None and secondary == 'true':
-    #                 queryset = Responsibility.objects.filter(secondary_employee=employee)
-    #             else:
-    #                 queryset = Responsibility.objects.filter(primary_employee=employee)
-    #     else:
-    #         queryset = Responsibility.objects.none()
-    #     return queryset if 'queryset' in locals() else Responsibility.objects.all()
 
     def create(self, request):
         employee = Employee.objects.get(pk=request.data['employee_pk']) if request.data['employee_pk'] != -1 else None
@@ -220,21 +194,14 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
                 context={'request': request})
             return Response({**serialized_reservation.data, 'created': True})
 
-    # def update(self, request, pk=None):
-    #     import pdb; pdb.set_trace();
-    #     responsibility = Responsibility.objects.get(pk=pk)
-    #     name = request.data['name']
-    #     link = request.data['link'] if 'link' in request.data else ''
-    #     primary_employee = Employee.objects.get(pk=request.data['primary_employee']) if request.data['primary_employee'] != -1 else None
-    #     secondary_employee = Employee.objects.get(pk=request.data['secondary_employee']) if request.data['secondary_employee'] != -1 else None
-    #     responsibility.name = name
-    #     responsibility.link = link
-    #     responsibility.primary_employee = primary_employee
-    #     responsibility.secondary_employee = secondary_employee
-    #     responsibility.save()
-    #     serialized_responsibility = ResponsibilitySerializer(responsibility,
-    #         context={'request': request})
-    #     return Response(serialized_responsibility.data)
+    @action(detail=True, methods=['put'], url_path='cancel-reservation', url_name='cancel-reservation')
+    def cancel_reservation(self, request, pk=None):
+        reservation = DeskReservation.objects.get(pk=pk)
+        reservation.check_out = datetime.now(tz=get_current_timezone())
+        reservation.save()
+        serialized_reservation = DeskReservationSerializer(reservation,
+            context={'request': request})
+        return Response(serialized_reservation.data)
 
 
 class PerformanceReviewPermission(BasePermission):

@@ -4,6 +4,20 @@
 
 export const releases = [
   {
+    version: '0.3.3',
+    date: new Date(2022, 3, 7),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Add end time, rather than delete, desk reservations upon check out.'
+      },
+      {
+        type: 'improved',
+        description: 'Prevent double booking of desk reservations by canceling existing reservations when a new one is made.'
+      },
+    ]
+  },
+  {
     version: '0.3.2',
     date: new Date(2022, 2, 18),
     changes: [

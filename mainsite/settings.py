@@ -42,6 +42,7 @@ ALLOWED_HOSTS = [
 INSTALLED_APPS = [
     'api',
     'mainsite',
+    'deskreservation',
     'people',
     'responsibilities',
     'rest_framework',

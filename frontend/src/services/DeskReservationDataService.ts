@@ -1,23 +1,23 @@
-import http from '../http-common';
-import { DeskReservationCreate } from 'src/store/types';
+import http from '../http-common'
+import { DeskReservationCreate } from 'src/store/types'
 
 
 class DeskReservationDataService {
   getAll() {
-    return http.get('api/v1/deskreservation');
+    return http.get('api/v1/deskreservation')
   }
 
   create(data: DeskReservationCreate) {
-    return http.post('api/v1/deskreservation', data);
+    return http.post('api/v1/deskreservation', data)
   }
 
-  // update(pk: string, data: ResponsibilityUpdate) {
-  //   return http.put(`api/v1/responsibilities/${pk}`, data);
+  cancelReservation(pk: number) {
+    return http.put(`api/v1/deskreservation/${pk}/cancel-reservation`)
+  }
+
+  // delete(pk: number) {
+  //   return http.delete(`api/v1/deskreservation/${pk}`)
   // }
-
-  delete(pk: number) {
-    return http.delete(`api/v1/deskreservation/${pk}`);
-  }
 }
 
 export default new DeskReservationDataService();

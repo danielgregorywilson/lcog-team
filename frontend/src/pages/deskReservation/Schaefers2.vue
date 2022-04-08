@@ -2,20 +2,27 @@
   <q-page class="q-mt-md" id="schaefers-2-page">
     <div class="row justify-between items-center">
       <div class="row items-center">
-        <q-icon name="help" color="primary" size="48px" class="q-mr-md cursor-pointer" @click="showHelp = !showHelp" />
-        <q-select class="" v-model="selectedEmployee" :options="employees()" option-value="pk" option-label="name" label="Select your name" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
-          <template v-slot:no-option>
-            <q-item>
-              <q-item-section class="text-grey">
-                No results
-              </q-item-section>
-            </q-item>
-          </template>
-          <template v-if="selectedEmployee.name" v-slot:append>
-            <q-icon name="cancel" @click.stop="selectedEmployee = emptyEmployee" class="cursor-pointer" />
-          </template>
-        </q-select>
+        <q-icon name="help" color="primary" size="48px" class="q-mr-md cursor-pointer" @click="showHelp()" />
+        <div class="row items-center q-gutter-md">
+          <q-btn-group push class="">
+            <q-btn push color="primary" glossy label="1F" :to="{ name: 'schaefers-1' }" />
+            <q-btn push color="secondary" glossy label="2F" :to="{ name: 'schaefers-2' }" />
+            <q-btn push color="primary" glossy label="3F" :to="{ name: 'schaefers-3' }"  />
+          </q-btn-group>
+        </div>
       </div>
+      <q-select class="" v-model="selectedEmployee" :options="employees()" option-value="pk" option-label="name" label="Select your name" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
+        <template v-slot:no-option>
+          <q-item>
+            <q-item-section class="text-grey">
+              No results
+            </q-item-section>
+          </q-item>
+        </template>
+        <template v-if="selectedEmployee.name" v-slot:append>
+          <q-icon name="cancel" @click.stop="selectedEmployee = emptyEmployee" class="cursor-pointer" />
+        </template>
+      </q-select>
       <div class="row items-center q-gutter-md">
         <div class="row items-center q-gutter-sm">
           <div>Drop-In</div>
@@ -41,6 +48,7 @@
       <FloorPlan class="floor-plan"/>
     </div>
 
+    <!-- Dialog to cancel a reservation -->
     <q-dialog v-model="cancelDialogVisible">
       <q-card>
         <q-card-section>
@@ -49,10 +57,25 @@
             <span class="q-ml-sm"><strong>{{ selectedDeskOccupantToCancel }}</strong> checked in to desk <strong>{{ selectedDeskNumberToCancel }}</strong> at <strong>{{ selectedDeskToCancelCheckInTime }}</strong>. End this reservation?</span>
           </div>
         </q-card-section>
-
         <q-card-actions class="row justify-around">
           <q-btn flat label="No" color="primary" v-close-popup />
-          <q-btn flat label="Yes, end reservation" color="primary" @click="deleteReservation()" v-close-popup />
+          <q-btn flat label="Yes, end reservation" color="primary" @click="deleteReservation(selectedDeskReservationToCancelPk)" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <!-- Dialog to confirm moving a reservation -->
+    <q-dialog v-model="moveReservationDialogVisible">
+      <q-card>
+        <q-card-section>
+          <div class="row items-center">
+            <q-avatar icon="no_meeting_room" color="primary" text-color="white" />
+            <span class="q-ml-sm"><strong>{{ selectedEmployee.name }}</strong> has a reservation at <span v-for="(reservation, index) in activeUserReservations" :key="reservation.pk"><span v-if="index != 0"> and </span>desk <strong>{{ reservation.desk_number }}</strong></span>. Cancel this existing reservation and make a new one?</span>
+          </div>
+        </q-card-section>
+        <q-card-actions class="row justify-around">
+          <q-btn flat label="No" color="primary" v-close-popup />
+          <q-btn flat label="Yes, move reservation" color="primary" @click="moveReservation()" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -139,8 +162,10 @@ export default class Schaefers2 extends Vue{
   private deskReservations: Array<DeskReservation> = []
 
   private emptyEmployee = {name: '', pk: -1}
+  
+  private moveReservationDialogVisible = false
+  private activeUserReservations: Array<DeskReservation> = []
   private selectedEmployee = this.emptyEmployee
-
   private selectedDeskNumber = ''
   
   private cancelDialogVisible = false
@@ -224,15 +249,15 @@ export default class Schaefers2 extends Vue{
     }
   }
 
-  private deleteReservation() {
-    DeskReservationDataService.delete(this.selectedDeskReservationToCancelPk)
+ private deleteReservation(pk: number) {
+    DeskReservationDataService.cancelReservation(pk) 
       .then(() => {
-        const deleteMessage = `Cancelled desk reservation: ${this.selectedDeskNumberToCancel} for ${this.selectedDeskOccupantToCancel}`
-        Notify.create(deleteMessage)
-        this.selectedDeskReservationToCancelPk
+        if (this.selectedDeskNumberToCancel) {
+          Notify.create({message: `Canceled reservation of desk ${this.selectedDeskNumberToCancel} for ${this.selectedDeskOccupantToCancel}`})
+        }
+        this.selectedDeskReservationToCancelPk = -1
         this.selectedDeskNumberToCancel = ''
         this.selectedDeskOccupantToCancel = ''
-        this.selectedDeskToCancelCheckInTime = ''
 
         // TODO: Temporarily restoring to remove sockets for production
         this.initDeskReservations()
@@ -242,11 +267,11 @@ export default class Schaefers2 extends Vue{
           .catch(e => {
             console.error('Error initializing desk reservations:', e)
           })
-
+        
         // Update reserved desks list everywhere with WebSocket
         // this.deskReservationSocket.send(
         //   JSON.stringify({
-        //     'message': deleteMessage
+        //     'message': `Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`
         //   })
         // );
       })
@@ -256,6 +281,25 @@ export default class Schaefers2 extends Vue{
   }
 
   private clickReserve() {
+    // Before we reserve the desk, ensure the user does not have any active reservations. If so, offer to move them
+    const activeUserReservations = this.deskReservations.filter(desk => desk.employee_pk == this.selectedEmployee.pk)
+    if (activeUserReservations.length) {
+      this.activeUserReservations = activeUserReservations
+      this.moveReservationDialogVisible = true
+    } else {
+      this.reserveDesk()
+    }
+  }
+
+  private moveReservation() {
+    // Cancel all existing reservations and make the new one.
+    for (let i=0; i<this.activeUserReservations.length; i++) {
+      this.deleteReservation(this.activeUserReservations[i].pk)
+    }
+    this.reserveDesk()
+  }
+
+  private reserveDesk() {
     DeskReservationDataService.create({
       employee_pk: this.selectedEmployee.pk,
       building: this.BUILDING,

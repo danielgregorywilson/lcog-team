@@ -48,6 +48,7 @@
       <FloorPlan class="floor-plan"/>
     </div>
 
+    <!-- Dialog to cancel a reservation -->
     <q-dialog v-model="cancelDialogVisible">
       <q-card>
         <q-card-section>
@@ -56,10 +57,25 @@
             <span class="q-ml-sm"><strong>{{ selectedDeskOccupantToCancel }}</strong> checked in to desk <strong>{{ selectedDeskNumberToCancel }}</strong> at <strong>{{ selectedDeskToCancelCheckInTime }}</strong>. End this reservation?</span>
           </div>
         </q-card-section>
-
         <q-card-actions class="row justify-around">
           <q-btn flat label="No" color="primary" v-close-popup />
-          <q-btn flat label="Yes, end reservation" color="primary" @click="deleteReservation()" v-close-popup />
+          <q-btn flat label="Yes, end reservation" color="primary" @click="deleteReservation(selectedDeskReservationToCancelPk)" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <!-- Dialog to confirm moving a reservation -->
+    <q-dialog v-model="moveReservationDialogVisible">
+      <q-card>
+        <q-card-section>
+          <div class="row items-center">
+            <q-avatar icon="no_meeting_room" color="primary" text-color="white" />
+            <span class="q-ml-sm"><strong>{{ selectedEmployee.name }}</strong> has a reservation at <span v-for="(reservation, index) in activeUserReservations" :key="reservation.pk"><span v-if="index != 0"> and </span>desk <strong>{{ reservation.desk_number }}</strong></span>. Cancel this existing reservation and make a new one?</span>
+          </div>
+        </q-card-section>
+        <q-card-actions class="row justify-around">
+          <q-btn flat label="No" color="primary" v-close-popup />
+          <q-btn flat label="Yes, move reservation" color="primary" @click="moveReservation()" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -146,8 +162,10 @@ export default class Schaefers1 extends Vue{
   private deskReservations: Array<DeskReservation> = []
 
   private emptyEmployee = {name: '', pk: -1}
+  
+  private moveReservationDialogVisible = false
+  private activeUserReservations: Array<DeskReservation> = []
   private selectedEmployee = this.emptyEmployee
-
   private selectedDeskNumber = ''
   
   private cancelDialogVisible = false
@@ -231,10 +249,12 @@ export default class Schaefers1 extends Vue{
     }
   }
 
-  private deleteReservation() {
-    DeskReservationDataService.cancelReservation(this.selectedDeskReservationToCancelPk) 
+  private deleteReservation(pk: number) {
+    DeskReservationDataService.cancelReservation(pk) 
       .then(() => {
-        Notify.create({message: `Canceled reservation of desk ${this.selectedDeskNumberToCancel} for ${this.selectedDeskOccupantToCancel}`})
+        if (this.selectedDeskNumberToCancel) {
+          Notify.create({message: `Canceled reservation of desk ${this.selectedDeskNumberToCancel} for ${this.selectedDeskOccupantToCancel}`})
+        }
         this.selectedDeskReservationToCancelPk = -1
         this.selectedDeskNumberToCancel = ''
         this.selectedDeskOccupantToCancel = ''
@@ -261,6 +281,25 @@ export default class Schaefers1 extends Vue{
   }
 
   private clickReserve() {
+    // Before we reserve the desk, ensure the user does not have any active reservations. If so, offer to move them
+    const activeUserReservations = this.deskReservations.filter(desk => desk.employee_pk == this.selectedEmployee.pk)
+    if (activeUserReservations.length) {
+      this.activeUserReservations = activeUserReservations
+      this.moveReservationDialogVisible = true
+    } else {
+      this.reserveDesk()
+    }
+  }
+
+  private moveReservation() {
+    // Cancel all existing reservations and make the new one.
+    for (let i=0; i<this.activeUserReservations.length; i++) {
+      this.deleteReservation(this.activeUserReservations[i].pk)
+    }
+    this.reserveDesk()
+  }
+
+  private reserveDesk() {
     DeskReservationDataService.create({
       employee_pk: this.selectedEmployee.pk,
       building: this.BUILDING,

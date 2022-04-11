@@ -1090,21 +1090,6 @@ class TeleworkSignature(models.Model):
                 self.application.save()
 
 
-class Responsibility(models.Model):
-    class Meta:
-        verbose_name = _("Responsibility")
-        verbose_name_plural = _("Responsibilities")
-        ordering = ["name"]
-    
-    def __str__(self):
-        return self.name
-
-    name = models.CharField(_("name"), max_length=500)
-    link = models.URLField(_("link"), blank=True)
-    primary_employee = models.ForeignKey("people.Employee", related_name="primary_responsibilities_old", null=True, on_delete=models.SET_NULL)
-    secondary_employee = models.ForeignKey("people.Employee", related_name="secondary_responsibilities_old", null=True, on_delete=models.SET_NULL)
-
-
 class Desk(models.Model):
     SCHAEFERS = 'S'
     PARK_PLACE = 'P'
@@ -1144,7 +1129,7 @@ class DeskReservation(models.Model):
     objects = models.Manager()
     currently_reserved_objects = CurrentlyReservedManager()
 
-    employee = models.ForeignKey("people.Employee", related_name="desk_reservations", on_delete=models.CASCADE)
-    desk = models.ForeignKey("people.Desk", related_name="reservations", on_delete=models.CASCADE)
+    employee = models.ForeignKey("people.Employee", related_name="desk_reservations_old", on_delete=models.CASCADE)
+    desk = models.ForeignKey("people.Desk", related_name="reservations_old", on_delete=models.CASCADE)
     check_in = models.DateTimeField(_("check-in datetime"), auto_now=False, auto_now_add=True)
     check_out = models.DateTimeField(_("check-out datetime"), null=True, auto_now=False, auto_now_add=False)

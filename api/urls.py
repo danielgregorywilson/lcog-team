@@ -3,14 +3,14 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 from django.urls import include, path
 
+from deskreservation.api_views import DeskReservationViewSet, DeskViewSet
 from mainsite.api_views import SecurityMessageViewSet
 from mainsite.views import obtain_auth_token_without_password
 from people.api_views import (
-    CurrentUserView, DeskReservationViewSet, DeskViewSet, EmployeeViewSet,
-    FileUploadViewSet, GroupViewSet, PerformanceReviewViewSet,
-    ReviewNoteViewSet, SignatureViewSet, TeleworkApplicationFileUploadViewSet,
-    TeleworkApplicationViewSet, TeleworkSignatureViewSet, UserViewSet,
-    ViewedSecurityMessageViewSet
+    CurrentUserView, EmployeeViewSet, FileUploadViewSet, GroupViewSet,
+    PerformanceReviewViewSet, ReviewNoteViewSet, SignatureViewSet,
+    TeleworkApplicationFileUploadViewSet, TeleworkApplicationViewSet,
+    TeleworkSignatureViewSet, UserViewSet, ViewedSecurityMessageViewSet
 )
 from responsibilities.api_views import (
     ResponsibilityViewSet, TagViewSet as ResponsibilityTagViewSet

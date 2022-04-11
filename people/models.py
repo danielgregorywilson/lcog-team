@@ -1090,21 +1090,6 @@ class TeleworkSignature(models.Model):
                 self.application.save()
 
 
-class Responsibility(models.Model):
-    class Meta:
-        verbose_name = _("Responsibility")
-        verbose_name_plural = _("Responsibilities")
-        ordering = ["name"]
-    
-    def __str__(self):
-        return self.name
-
-    name = models.CharField(_("name"), max_length=500)
-    link = models.URLField(_("link"), blank=True)
-    primary_employee = models.ForeignKey("people.Employee", related_name="primary_responsibilities_old", null=True, on_delete=models.SET_NULL)
-    secondary_employee = models.ForeignKey("people.Employee", related_name="secondary_responsibilities_old", null=True, on_delete=models.SET_NULL)
-
-
 class Desk(models.Model):
     SCHAEFERS = 'S'
     PARK_PLACE = 'P'

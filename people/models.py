@@ -1129,7 +1129,7 @@ class DeskReservation(models.Model):
     objects = models.Manager()
     currently_reserved_objects = CurrentlyReservedManager()
 
-    employee = models.ForeignKey("people.Employee", related_name="desk_reservations", on_delete=models.CASCADE)
-    desk = models.ForeignKey("people.Desk", related_name="reservations", on_delete=models.CASCADE)
+    employee = models.ForeignKey("people.Employee", related_name="desk_reservations_old", on_delete=models.CASCADE)
+    desk = models.ForeignKey("people.Desk", related_name="reservations_old", on_delete=models.CASCADE)
     check_in = models.DateTimeField(_("check-in datetime"), auto_now=False, auto_now_add=True)
     check_out = models.DateTimeField(_("check-out datetime"), null=True, auto_now=False, auto_now_add=False)

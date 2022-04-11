@@ -33,7 +33,7 @@ class DeskReservation(models.Model):
     class Meta:
         verbose_name = _("Desk Reservation")
         verbose_name_plural = _("Desk Reservations")
-        # ordering = ["name"]
+        ordering = ["-pk"]
     
     def __str__(self):
         return f"Desk reservation for {self.employee.user.get_full_name()}"
@@ -42,6 +42,6 @@ class DeskReservation(models.Model):
     currently_reserved_objects = CurrentlyReservedManager()
 
     employee = models.ForeignKey("people.Employee", related_name="desk_reservations", on_delete=models.CASCADE)
-    desk = models.ForeignKey("people.Desk", related_name="reservations", on_delete=models.CASCADE)
+    desk = models.ForeignKey("deskreservation.Desk", related_name="reservations", on_delete=models.CASCADE)
     check_in = models.DateTimeField(_("check-in datetime"), auto_now=False, auto_now_add=True)
     check_out = models.DateTimeField(_("check-out datetime"), null=True, auto_now=False, auto_now_add=False)

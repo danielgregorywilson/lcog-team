@@ -136,11 +136,11 @@ export default class Report extends Vue{
 
   private download_desk_usage_report(data: GetDeskReservationDataInterface) {
     // Define the heading for each row of the data
-    var csv = 'Desk,Total Hours,Days Utilized\n'
+    var csv = 'Desk,Total Hours,Days Utilized,Most Frequent Employee\n'
 
     // Merge the data with CSV
     Object.keys(data).forEach((key) => {
-      var row = [key, data[key]['total_hours'], data[key]['days_utilized']].join(',')
+      var row = [key, data[key]['total_hours'], data[key]['days_utilized'], data[key]['most_frequent_employee']].join(',')
       csv += row
       csv += '\n'
     });

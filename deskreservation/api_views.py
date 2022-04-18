@@ -111,17 +111,24 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
         for desk in Desk.objects.all():
             total_hours = timedelta(0)
             days_utilized = []
+            most_frequent_employee = '' 
+            most_frequent_employee_time = timedelta(0)
             reservations = DeskReservation.objects.filter(desk=desk, check_in__lte=end_date_time, check_out__gte=start_date_time)
             for reservation in reservations:
                 start = max(start_date_time, reservation.check_in)
                 end = min(end_date_time, reservation.check_out)
-                total_hours += end - start
+                reservation_duration = end - start
+                total_hours += reservation_duration
                 day = [start.month, start.day]
                 if not day in days_utilized:
                     days_utilized.append(day)
+                if reservation_duration > most_frequent_employee_time:
+                    most_frequent_employee_time = reservation_duration
+                    most_frequent_employee = reservation.employee.username()
             desk_stats[f'{desk.get_building_display()} {desk.floor}F {desk.number}'] = {
                 'total_hours': f'{total_hours.days * 24 + total_hours.seconds // 3600}h{(total_hours.seconds//60)%60}m',
-                'days_utilized': len(days_utilized)
+                'days_utilized': len(days_utilized),
+                'most_frequent_employee': most_frequent_employee
             }
         return Response(desk_stats)
     
@@ -133,7 +140,7 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
         for employee in Employee.objects.all():
             total_hours = timedelta(0)
             days_utilized = []
-            most_frequent_desk = ''
+            most_frequent_desk = '' 
             most_frequent_desk_time = timedelta(0)
             reservations = DeskReservation.objects.filter(employee=employee, check_in__lte=end_date_time, check_out__gte=start_date_time)
             for reservation in reservations:
@@ -145,6 +152,7 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
                 if not day in days_utilized:
                     days_utilized.append(day)
                 if reservation_duration > most_frequent_desk_time:
+                    most_frequent_desk_time = reservation_duration
                     desk = reservation.desk
                     most_frequent_desk = f'{desk.get_building_display()} {desk.floor}F {desk.number}'
             employee_stats[f'{employee.username()}'] = {

@@ -655,7 +655,8 @@ export interface AxiosGetDeskReservationReportDataServerResponse {
 export interface GetDeskReservationDataInterface {
   [key: string]: {
     'total_hours': string,
-    'days_utilized': number
+    'days_utilized': number,
+    'most_frequent_employee': string
   }
 }
 

@@ -300,6 +300,11 @@ const routes: RouteConfig[] = [
             component: () => import('src/pages/deskReservation/ParkPlace5.vue'),
           }
         ]
+      },
+      {
+        path: 'report',
+        name: 'report',
+        component: () => import('src/pages/deskReservation/Report.vue'),
       }
     ]
   },

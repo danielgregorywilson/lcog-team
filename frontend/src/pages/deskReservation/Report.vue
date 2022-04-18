@@ -32,7 +32,7 @@
             mask="YYYY-MM-DD HH:mm"
           />
         </div>
-        <div class="row justify-center">End Date/Time (defaults to 11:59PM on the last day of last month)</div>
+        <div class="row justify-center">End Date/Time (defaults to midnight on the first day of this month)</div>
         <div class="row justify-center q-gutter-md q-mb-md">
           <q-date
             v-model="endDateTime"
@@ -83,7 +83,9 @@
 </template>
 
 <script lang="ts">
+import DeskReservationDataService from 'src/services/DeskReservationDataService'
 import { Component, Vue } from 'vue-property-decorator'
+import { AxiosGetReservationReportDataServerResponse, GetReservationDataInterface } from '../../store/types'
 
 @Component
 export default class Report extends Vue{
@@ -93,12 +95,19 @@ export default class Report extends Vue{
   private formSubmitted = false
 
   private deskFormSubmit (): void {
-    this.formReset()
     this.formSubmitted = true
-    // TODO: Make request for desk report
-    setTimeout(() => {
-      this.formSubmitted = false
-    }, 1000)
+    DeskReservationDataService.getDeskUsageReport({
+      startDateTime: this.startDateTime,
+      endDateTime: this.endDateTime
+    })
+      .then((response: AxiosGetReservationReportDataServerResponse) => {
+        this.download_desk_usage_report(response.data)
+        this.formReset()
+        this.formSubmitted = false
+      })
+      .catch(e => {
+        console.error('Error generating desk usage report:', e)
+      })
   }
 
   private employeeFormSubmit (): void {
@@ -113,6 +122,26 @@ export default class Report extends Vue{
   private formReset (): void {
     this.startDateTime = ''
     this.endDateTime = ''
+  }
+
+  private download_desk_usage_report(data: GetReservationDataInterface) {
+    // Define the heading for each row of the data
+    var csv = 'Desk,Total Hours,Days Utilized\n'
+
+    // Merge the data with CSV
+    Object.keys(data).forEach((key) => {
+      var row = [key, data[key]['total_hours'], data[key]['days_utilized']].join(',')
+      csv += row
+      csv += '\n'
+    });
+
+    var hiddenElement = document.createElement('a')
+    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv)
+    hiddenElement.target = '_blank'
+    
+    // Provide the name for the CSV file to be downloaded
+    hiddenElement.download = `desk_usage_report_${this.startDateTime.replace(' ','_')}_${this.endDateTime.replace(' ','_')}.csv`
+    hiddenElement.click()
   }
 }
 </script>

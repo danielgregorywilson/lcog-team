@@ -643,6 +643,22 @@ export interface AxiosDeskReservationCreateServerResponse {
   data: DeskReservation
 }
 
+export interface GetReservationReportData {
+  startDateTime: string
+  endDateTime: string
+}
+
+export interface AxiosGetReservationReportDataServerResponse {
+  data: GetReservationDataInterface
+}
+
+export interface GetReservationDataInterface {
+  [key: string]: {
+    'total_hours': string,
+    'days_utilized': number
+  }
+}
+
 export interface DeskReservationStateInterface {
   allDesks: { results: Array<Desk> }
   allDeskReservations: { results: Array<DeskReservation> }

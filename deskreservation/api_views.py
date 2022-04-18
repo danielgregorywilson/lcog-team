@@ -1,4 +1,6 @@
-from datetime import datetime
+from calendar import month
+from datetime import date, datetime, timedelta
+from pytz import timezone
 
 from django.utils.timezone import get_current_timezone
 
@@ -74,3 +76,45 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
         serialized_reservation = DeskReservationSerializer(reservation,
             context={'request': request})
         return Response(serialized_reservation.data)
+    
+    @action(detail=False, methods=['post'], url_path='desk-usage-report', url_name='desk-usage-report')
+    def desk_usage_report(self, request):
+        start_date_time = request.data['startDateTime']
+        end_date_time = request.data['endDateTime']
+        # If no date time specified, set to whole of last month
+        if not start_date_time:
+            today = date.today()
+            first_of_this_month = today.replace(day=1)
+            last_of_last_month = first_of_this_month - timedelta(days=1)
+            first_of_last_month = last_of_last_month.replace(day=1)
+            start_date_time = datetime.combine(first_of_last_month, datetime.min.time())
+        else:
+            start_date_time = datetime.strptime(start_date_time, '%Y-%m-%d %H:%M')
+        if not end_date_time:
+            today = date.today()
+            first_of_this_month = today.replace(day=1)
+            end_date_time = datetime.combine(first_of_this_month, datetime.min.time())
+        else:
+            end_date_time = datetime.strptime(end_date_time, '%Y-%m-%d %H:%M')
+        start_date_time = timezone('US/Pacific').localize(start_date_time)
+        end_date_time = timezone('US/Pacific').localize(end_date_time)
+        
+        # For each desk, and within the range, give the number of hours it was utilized and the number of days it was utilized at all.
+        desk_stats = {}
+        for desk in Desk.objects.all():
+            total_hours = timedelta(0)
+            days_utilized = []
+            reservations = DeskReservation.objects.filter(desk=desk, check_in__lte=end_date_time, check_out__gte=start_date_time)
+            for reservation in reservations:
+                start = max(start_date_time, reservation.check_in)
+                end = min(end_date_time, reservation.check_out)
+                total_hours += end - start
+                day = [start.month, start.day]
+                if not day in days_utilized:
+                    days_utilized.append(day)
+            desk_stats[f'{desk.get_building_display()} {desk.floor}F {desk.number}'] = {
+                'total_hours': f'{total_hours.days * 24 + total_hours.seconds // 3600}h{(total_hours.seconds//60)%60}m',
+                'days_utilized': len(days_utilized)
+            }
+
+        return Response(desk_stats)

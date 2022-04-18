@@ -63,7 +63,7 @@
             mask="YYYY-MM-DD HH:mm"
           />
         </div>
-        <div class="row justify-center">End Date/Time (defaults to 11:59PM on the last day of last month)</div>
+        <div class="row justify-center">End Date/Time (defaults to midnight on the first day of this month)</div>
         <div class="row justify-center q-gutter-md q-mb-md">
           <q-date
             v-model="endDateTime"
@@ -85,7 +85,10 @@
 <script lang="ts">
 import DeskReservationDataService from 'src/services/DeskReservationDataService'
 import { Component, Vue } from 'vue-property-decorator'
-import { AxiosGetReservationReportDataServerResponse, GetReservationDataInterface } from '../../store/types'
+import {
+  AxiosGetDeskReservationReportDataServerResponse, AxiosGetEmployeeDeskReservationReportDataServerResponse,
+  GetDeskReservationDataInterface, GetEmployeeDeskReservationDataInterface
+} from '../../store/types'
 
 @Component
 export default class Report extends Vue{
@@ -100,7 +103,7 @@ export default class Report extends Vue{
       startDateTime: this.startDateTime,
       endDateTime: this.endDateTime
     })
-      .then((response: AxiosGetReservationReportDataServerResponse) => {
+      .then((response: AxiosGetDeskReservationReportDataServerResponse) => {
         this.download_desk_usage_report(response.data)
         this.formReset()
         this.formSubmitted = false
@@ -111,12 +114,19 @@ export default class Report extends Vue{
   }
 
   private employeeFormSubmit (): void {
-    this.formReset()
     this.formSubmitted = true
-    // TODO: Make request for employee report
-    setTimeout(() => {
-      this.formSubmitted = false
-    }, 1000)
+    DeskReservationDataService.getEmployeeDeskUsageReport({
+      startDateTime: this.startDateTime,
+      endDateTime: this.endDateTime
+    })
+      .then((response: AxiosGetEmployeeDeskReservationReportDataServerResponse) => {
+        this.download_employee_desk_usage_report(response.data)
+        this.formReset()
+        this.formSubmitted = false
+      })
+      .catch(e => {
+        console.error('Error generating employee desk usage report:', e)
+      })
   }
 
   private formReset (): void {
@@ -124,7 +134,7 @@ export default class Report extends Vue{
     this.endDateTime = ''
   }
 
-  private download_desk_usage_report(data: GetReservationDataInterface) {
+  private download_desk_usage_report(data: GetDeskReservationDataInterface) {
     // Define the heading for each row of the data
     var csv = 'Desk,Total Hours,Days Utilized\n'
 
@@ -143,6 +153,28 @@ export default class Report extends Vue{
     let startString = this.startDateTime ? this.startDateTime.replace(' ','_') : 'beginning_of_last_month'
     let endString = this.endDateTime ? this.endDateTime.replace(' ','_') : 'end_of_last_month'
     hiddenElement.download = `desk_usage_report_${startString}_${endString}.csv`
+    hiddenElement.click()
+  }
+
+  private download_employee_desk_usage_report(data: GetEmployeeDeskReservationDataInterface) {
+    // Define the heading for each row of the data
+    var csv = 'Desk,Total Hours,Days Utilized,Most Frequent Desk\n'
+
+    // Merge the data with CSV
+    Object.keys(data).forEach((key) => {
+      var row = [key, data[key]['total_hours'], data[key]['days_utilized'], data[key]['most_frequent_desk']].join(',')
+      csv += row
+      csv += '\n'
+    });
+
+    var hiddenElement = document.createElement('a')
+    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv)
+    hiddenElement.target = '_blank'
+
+    // Provide the name for the CSV file to be downloaded
+    let startString = this.startDateTime ? this.startDateTime.replace(' ','_') : 'beginning_of_last_month'
+    let endString = this.endDateTime ? this.endDateTime.replace(' ','_') : 'end_of_last_month'
+    hiddenElement.download = `employee_desk_usage_report_${startString}_${endString}.csv`
     hiddenElement.click()
   }
 }

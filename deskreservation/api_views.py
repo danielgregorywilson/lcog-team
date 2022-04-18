@@ -77,10 +77,13 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
             context={'request': request})
         return Response(serialized_reservation.data)
     
-    @action(detail=False, methods=['post'], url_path='desk-usage-report', url_name='desk-usage-report')
-    def desk_usage_report(self, request):
-        start_date_time = request.data['startDateTime']
-        end_date_time = request.data['endDateTime']
+    @staticmethod
+    def parseReportRequestData(data):
+        """
+        Helper method to parse the start and end times in a desk reservation report request
+        """
+        start_date_time = data['startDateTime']
+        end_date_time = data['endDateTime']
         # If no date time specified, set to whole of last month
         if not start_date_time:
             today = date.today()
@@ -98,7 +101,11 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
             end_date_time = datetime.strptime(end_date_time, '%Y-%m-%d %H:%M')
         start_date_time = timezone('US/Pacific').localize(start_date_time)
         end_date_time = timezone('US/Pacific').localize(end_date_time)
-        
+        return (start_date_time, end_date_time)
+
+    @action(detail=False, methods=['post'], url_path='desk-usage-report', url_name='desk-usage-report')
+    def desk_usage_report(self, request):
+        start_date_time, end_date_time = self.parseReportRequestData(request.data)
         # For each desk, and within the range, give the number of hours it was utilized and the number of days it was utilized at all.
         desk_stats = {}
         for desk in Desk.objects.all():
@@ -116,5 +123,33 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
                 'total_hours': f'{total_hours.days * 24 + total_hours.seconds // 3600}h{(total_hours.seconds//60)%60}m',
                 'days_utilized': len(days_utilized)
             }
-
         return Response(desk_stats)
+    
+    @action(detail=False, methods=['post'], url_path='employee-desk-usage-report', url_name='employee-desk-usage-report')
+    def employee_desk_usage_report(self, request):
+        start_date_time, end_date_time = self.parseReportRequestData(request.data)
+        # For each desk, and within the range, give the number of hours it was utilized and the number of days it was utilized at all.
+        employee_stats = {}
+        for employee in Employee.objects.all():
+            total_hours = timedelta(0)
+            days_utilized = []
+            most_frequent_desk = ''
+            most_frequent_desk_time = timedelta(0)
+            reservations = DeskReservation.objects.filter(employee=employee, check_in__lte=end_date_time, check_out__gte=start_date_time)
+            for reservation in reservations:
+                start = max(start_date_time, reservation.check_in)
+                end = min(end_date_time, reservation.check_out)
+                reservation_duration = end - start
+                total_hours += reservation_duration
+                day = [start.month, start.day]
+                if not day in days_utilized:
+                    days_utilized.append(day)
+                if reservation_duration > most_frequent_desk_time:
+                    desk = reservation.desk
+                    most_frequent_desk = f'{desk.get_building_display()} {desk.floor}F {desk.number}'
+            employee_stats[f'{employee.username()}'] = {
+                'total_hours': f'{total_hours.days * 24 + total_hours.seconds // 3600}h{(total_hours.seconds//60)%60}m',
+                'days_utilized': len(days_utilized),
+                'most_frequent_desk': most_frequent_desk
+            }
+        return Response(employee_stats)

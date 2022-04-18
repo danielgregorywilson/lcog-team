@@ -22,6 +22,10 @@ class DeskReservationDataService {
   getDeskUsageReport(data: GetReservationReportData) {
     return http.post('api/v1/deskreservation/desk-usage-report', data)
   }
+
+  getEmployeeDeskUsageReport(data: GetReservationReportData) {
+    return http.post('api/v1/deskreservation/employee-desk-usage-report', data)
+  }
 }
 
 export default new DeskReservationDataService();

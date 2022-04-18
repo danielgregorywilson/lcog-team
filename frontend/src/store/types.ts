@@ -648,14 +648,26 @@ export interface GetReservationReportData {
   endDateTime: string
 }
 
-export interface AxiosGetReservationReportDataServerResponse {
-  data: GetReservationDataInterface
+export interface AxiosGetDeskReservationReportDataServerResponse {
+  data: GetDeskReservationDataInterface
 }
 
-export interface GetReservationDataInterface {
+export interface GetDeskReservationDataInterface {
   [key: string]: {
     'total_hours': string,
     'days_utilized': number
+  }
+}
+
+export interface AxiosGetEmployeeDeskReservationReportDataServerResponse {
+  data: GetEmployeeDeskReservationDataInterface
+}
+
+export interface GetEmployeeDeskReservationDataInterface {
+  [key: string]: {
+    'total_hours': string,
+    'days_utilized': number,
+    'most_frequent_desk': string
   }
 }
 

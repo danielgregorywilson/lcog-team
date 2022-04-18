@@ -138,9 +138,11 @@ export default class Report extends Vue{
     var hiddenElement = document.createElement('a')
     hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv)
     hiddenElement.target = '_blank'
-    
+
     // Provide the name for the CSV file to be downloaded
-    hiddenElement.download = `desk_usage_report_${this.startDateTime.replace(' ','_')}_${this.endDateTime.replace(' ','_')}.csv`
+    let startString = this.startDateTime ? this.startDateTime.replace(' ','_') : 'beginning_of_last_month'
+    let endString = this.endDateTime ? this.endDateTime.replace(' ','_') : 'end_of_last_month'
+    hiddenElement.download = `desk_usage_report_${startString}_${endString}.csv`
     hiddenElement.click()
   }
 }

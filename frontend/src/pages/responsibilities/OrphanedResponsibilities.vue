@@ -8,6 +8,7 @@
       :filter="tableFilter"
       :filter-method="tableFilterMethod"
       row-key="pk"
+      :dense="$q.screen.lt.lg"
     >
       <template v-slot:top-right>
         <q-input borderless dense clearable debounce="300" v-model="tableFilter" placeholder="Search">
@@ -54,7 +55,25 @@
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss">
+.q-table {
+    .table-description {
+      white-space: normal;
+    }
+    .table-link {
+      white-space: normal;
+    }
+    .table-tags {
+      white-space: normal;
+    }
+  }
+
+
+ @media only screen and (max-width: 1600px) {
+  .q-table td {
+    white-space: normal;
+  }
+ }
 </style>
 
 <script lang="ts">
@@ -74,9 +93,9 @@ export default class OrphanedResponsibilities extends Vue {
   
   private tableColumns = [
     { name: 'name', required: true, label: 'Name', field: 'name', sortable: true, align: 'left' },
-    { name: 'description', required: false, label: 'Description', field: 'description', sortable: false, align: 'left' },
-    { name: 'link', required: false, label: 'Link', field: 'link', sortable: false, align: 'left' },
-    { name: 'tags', required: false, label: 'Tags', field: 'tags', sortable: false, align: 'left' },
+    { name: 'description', required: false, label: 'Description', field: 'description', sortable: false, align: 'left', classes: 'table-description', headerClasses: 'table-description' },
+    { name: 'link', required: false, label: 'Link', field: 'link', sortable: false, align: 'left', classes: 'table-link', headerClasses: 'table-link' },
+    { name: 'tags', required: false, label: 'Tags', field: 'tags', sortable: false, align: 'left', classes: 'table-tags', headerClasses: 'table-tags' },
     { name: 'primary_employee_name', label: 'Primary Employee', field: 'primary_employee_name', sortable: true },
     { name: 'secondary_employee_name', label: 'Secondary Employee', field: 'secondary_employee_name', sortable: true },
     { name: 'actions', label: 'Actions', },

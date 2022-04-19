@@ -1,5 +1,5 @@
 import http from '../http-common'
-import { DeskReservationCreate } from 'src/store/types'
+import { DeskReservationCreate, GetReservationReportData } from 'src/store/types'
 
 
 class DeskReservationDataService {
@@ -18,6 +18,14 @@ class DeskReservationDataService {
   // delete(pk: number) {
   //   return http.delete(`api/v1/deskreservation/${pk}`)
   // }
+
+  getDeskUsageReport(data: GetReservationReportData) {
+    return http.post('api/v1/deskreservation/desk-usage-report', data)
+  }
+
+  getEmployeeDeskUsageReport(data: GetReservationReportData) {
+    return http.post('api/v1/deskreservation/employee-desk-usage-report', data)
+  }
 }
 
 export default new DeskReservationDataService();

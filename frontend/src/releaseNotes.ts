@@ -4,6 +4,20 @@
 
 export const releases = [
   {
+    version: '0.4.1',
+    date: new Date(2022, 3, 18),
+    changes: [
+      {
+        type: 'new',
+        description: 'Add Desk Reservation reports.'
+      },
+      {
+        type: 'improved',
+        description: 'Responsibility app looks better on smaller screens.'
+      },
+    ]
+  },
+  {
     version: '0.4.0',
     date: new Date(2022, 3, 11),
     changes: [

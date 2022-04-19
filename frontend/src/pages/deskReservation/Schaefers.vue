@@ -1,7 +1,7 @@
 <template>
-  <q-page class="row items-center justify-evenly">
+  <q-page id="schaefers-page" class="row items-center justify-evenly">
     <div class="col">
-      <div class="row">
+      <div>
         <router-view></router-view>
       </div>
       <div class="row justify-center" id="refresh-timer">Time to refresh: {{ count }}</div>
@@ -10,6 +10,10 @@
 </template>
 
 <style lang="scss"> 
+
+#schaefers-page {
+  width: 1366px;
+}
 
 #refresh-timer {
   // margin-top: -80px;

@@ -418,10 +418,26 @@ export default class Schaefers3 extends Vue{
         // annotationElem.style.left = (rect.left + rect.width/2 - 88).toString() + 'px'
         // annotationElem.style.top = (rect.top + rect.height/2 - 70).toString() + 'px'
         
+        // On narrower screens, the header takes up 2-4 rows, so we need to nudge the buttons down to match.
+        var extraHeaderSpace = 0
+        if (window.innerWidth < 673) {
+          // If width less than 673px, there are 4 rows of header
+          extraHeaderSpace = 164
+        } else if (window.innerWidth < 764) {
+          // If width less than 764px, there are 3 rows of header
+          extraHeaderSpace = 92
+        } else if (window.innerWidth < 1062) {
+          // If width less that 1062px, there are 2 rows of header
+          extraHeaderSpace = 56
+        } else if (window.innerWidth < 1153) {
+          // If width less that 1153px, there are 2 rows of header
+          extraHeaderSpace = 36
+        }
+
         // TODO: Finish and annotate this - can't brain today
         annotationElem.style.left = (rect.left - floorPlanRect.left - rect.width/2 + annotationElem.offsetWidth/2 - 12).toString() + 'px'
         // TODO: Fix and annotate this - can't brain today
-        annotationElem.style.top = (rect.top - floorPlanRect.top + 48).toString() + 'px'
+        annotationElem.style.top = (rect.top - floorPlanRect.top + 48 + extraHeaderSpace).toString() + 'px'
 
         const clickableButton = annotationElem.querySelector('button') as HTMLElement
 

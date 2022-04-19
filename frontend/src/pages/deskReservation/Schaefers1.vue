@@ -437,7 +437,6 @@ export default class Schaefers1 extends Vue{
         // TODO: Finish and annotate this - can't brain today
         annotationElem.style.left = (rect.left - floorPlanRect.left - rect.width/2 + annotationElem.offsetWidth/2 - 12).toString() + 'px'
         // TODO: Fix and annotate this - can't brain today
-        console.log(extraHeaderSpace)
         annotationElem.style.top = (rect.top - floorPlanRect.top + 48 + extraHeaderSpace).toString() + 'px'
 
         const clickableButton = annotationElem.querySelector('button') as HTMLElement

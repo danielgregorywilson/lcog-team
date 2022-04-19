@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-mt-md" id="schaefers-3-page">
+  <q-page class="q-mt-xs" id="schaefers-3-page">
     <div class="row justify-between items-center">
       <div class="row items-center">
         <q-icon name="help" color="primary" size="48px" class="q-mr-md cursor-pointer" @click="showHelp()" />
@@ -44,7 +44,7 @@
       <q-btn color="primary" :disabled="selectedEmployee.pk == -1 || selectedDeskNumber == ''" @click="clickReserve()">Reserve</q-btn>
     </div>
     
-    <div class="row q-gutter-md q-mt-sm">
+    <div class="row q-gutter-md q-mt-xs">
       <FloorPlan class="floor-plan"/>
     </div>
 
@@ -97,22 +97,6 @@
     background-color: orange;
     border: 1px black solid;
     text-align: center;
-  }
-  
-  .floor-plan {
-    width: 800px;
-  }
-  
-  @media only screen and (max-width: 800px) {
-    .floor-plan {
-      width: 450px;
-    }
-  }
-  
-  @media only screen and (min-width: 1500px) {
-    .floor-plan {
-      width: 1600px;
-    }
   }
   
   .desk-ergo {

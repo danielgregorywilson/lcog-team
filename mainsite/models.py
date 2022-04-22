@@ -5,6 +5,11 @@ from django.utils.translation import gettext as _
 from ckeditor.fields import RichTextField
 
 
+class ActiveManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(active=True)
+
+
 class ImageUpload(models.Model):
     description = models.CharField(_("description"), max_length=255)
     image = models.ImageField(upload_to="uploads/image-upload")

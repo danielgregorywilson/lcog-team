@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext as _
 
+from mainsite.models import ActiveManager
+
 
 class Desk(models.Model):
     SCHAEFERS = 'S'
@@ -15,6 +17,9 @@ class Desk(models.Model):
 
     def __str__(self):
         return f"Desk: {self.get_building_display()} {self.floor}F #{self.number} "
+
+    objects = models.Manager()
+    active_objects = ActiveManager()
 
     building = models.CharField(_("building"), max_length=1, choices=BUILDING_CHOICE, default=SCHAEFERS)
     floor = models.PositiveSmallIntegerField(default=1)

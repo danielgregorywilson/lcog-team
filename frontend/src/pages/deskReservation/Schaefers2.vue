@@ -370,7 +370,10 @@ export default class Schaefers2 extends Vue{
     textNodes
       .filter(it => /^\s*/.exec(it.innerHTML))
       .forEach(node => {
-        const text = node.innerHTML
+        if (!node.firstElementChild) {
+          return
+        }
+        const text = node.firstElementChild.innerHTML
         
         // Ignore any text on the ignore list
         if (this.ignoreList.indexOf(text) != -1) {

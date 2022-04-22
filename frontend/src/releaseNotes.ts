@@ -4,12 +4,26 @@
 
 export const releases = [
   {
+    version: '0.4.3',
+    date: new Date(2022, 3, 22),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Update floor plans processing code to be compatible with new Illustrator version changes.'
+      },
+      {
+        type: 'improved',
+        description: 'Desks can now be deactivated.'
+      },
+    ]
+  },
+  {
     version: '0.4.2',
     date: new Date(2022, 3, 19),
     changes: [
       {
         type: 'improved',
-        description: 'Adjust desk reservation app to fit better on office laptop screens'
+        description: 'Adjust desk reservation app to fit better on office laptop screens.'
       },
     ]
   },

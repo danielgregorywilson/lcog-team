@@ -17,7 +17,7 @@ class DeskViewSet(viewsets.ModelViewSet):
     """
     API endpoint for desk reservations.
     """
-    queryset = Desk.objects.all()
+    queryset = Desk.active_objects.all()
     serializer_class = DeskSerializer
 
     # def get_queryset(self):

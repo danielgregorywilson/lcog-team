@@ -29,6 +29,32 @@ class Desk(models.Model):
     ergonomic = models.BooleanField(default=False)
 
 
+class DeskHold(models.Model):
+    MONDAY = 'M'
+    TUESDAY = 'U'
+    WEDNESDAY = 'W'
+    THURSDAY = 'H'
+    FRIDAY = 'F'
+    DAY_CHOICE = [
+        (MONDAY, 'Monday'),
+        (TUESDAY, 'Tuesday'),
+        (WEDNESDAY, 'Wednesday'),
+        (THURSDAY, 'Thursday'),
+        (FRIDAY, 'Friday'),
+    ]
+
+    class Meta:
+        unique_together = ["desk", "day"]
+
+    def __str__(self):
+        return f"Desk hold for {self.desk} on {self.get_day_display()}s"
+
+    desk = models.ForeignKey("deskreservation.Desk", related_name="holds", on_delete=models.CASCADE)
+    employees = models.ManyToManyField("people.Employee", related_name="desk_holds")
+    day = models.CharField(_("day"), max_length=1, choices=DAY_CHOICE)
+    
+
+
 class CurrentlyReservedManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(check_out__isnull=True)

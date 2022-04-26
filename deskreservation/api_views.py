@@ -4,7 +4,7 @@ from pytz import timezone
 
 from django.utils.timezone import get_current_timezone
 
-from rest_framework import viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -59,14 +59,20 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
         desk = Desk.objects.get(number=request.data['desk_number']) if request.data['desk_number'] != -1 else None
         existing_reservations = DeskReservation.objects.filter(desk=desk, check_out__isnull=True)
         if existing_reservations.count():
+            # Check to see if the desk is already reserved by someone else.
             serialized_reservation = DeskReservationSerializer(existing_reservations[0],
                 context={'request': request})
             return Response({**serialized_reservation.data, 'created': False})
         else:
-            reservation = DeskReservation.objects.create(employee=employee, desk=desk)
-            serialized_reservation = DeskReservationSerializer(reservation,
-                context={'request': request})
-            return Response({**serialized_reservation.data, 'created': True})
+            if desk.held_today and employee not in desk.todays_hold.employees.all():
+                # Check to see if the desk is held for other employees today.
+                return Response({'desk_number': request.data['desk_number'], 'desk_held': True})
+            else:
+                # Otherwise, reserve the desk
+                reservation = DeskReservation.objects.create(employee=employee, desk=desk)
+                serialized_reservation = DeskReservationSerializer(reservation,
+                    context={'request': request})
+                return Response({**serialized_reservation.data, 'created': True})
 
     @action(detail=True, methods=['put'], url_path='cancel-reservation', url_name='cancel-reservation')
     def cancel_reservation(self, request, pk=None):

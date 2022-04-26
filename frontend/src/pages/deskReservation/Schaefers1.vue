@@ -300,7 +300,11 @@ export default class Schaefers1 extends Vue{
         if (response.data.created) {
           Notify.create(`Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`)  
         } else {
-          Notify.create({message: `Sorry! Desk ${response.data.desk_number} is already reserved for ${response.data.employee_name}. Please choose another`, type: 'negative'})
+          if (response.data.desk_held) {
+            Notify.create({message: `Sorry! Desk ${response.data.desk_number} is held today. Please choose another`, type: 'negative'})
+          } else {
+            Notify.create({message: `Sorry! Desk ${response.data.desk_number} is already reserved for ${response.data.employee_name}. Please choose another`, type: 'negative'})
+          }
         }
         
         // TODO: Temporarily restoring to remove sockets for production

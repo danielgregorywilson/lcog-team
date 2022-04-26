@@ -618,6 +618,7 @@ export interface Desk {
   active: boolean
   lead: boolean
   ergonomic: boolean
+  held_today: boolean
 }
 
 export interface DeskReservation {

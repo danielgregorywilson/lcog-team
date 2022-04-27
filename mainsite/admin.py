@@ -1,4 +1,4 @@
-from mainsite.models import ImageUpload, SecurityMessage
+from mainsite.models import ImageUpload, SecurityMessage, TrustedIPAddress
 from django import forms
 from django.contrib import admin
 from django.contrib.auth import password_validation
@@ -19,6 +19,10 @@ class ImageUploadAdmin(admin.ModelAdmin):
 class SecurityMessageAdmin(admin.ModelAdmin):
     list_display = ("description", "date", "active")
 
+
+@admin.register(TrustedIPAddress)
+class TrustedIPAddressAdmin(admin.ModelAdmin):
+    list_display = ["address", "description"]
 
 
 class UserCreationForm(BaseUserCreationForm):

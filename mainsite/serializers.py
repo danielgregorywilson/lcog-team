@@ -30,6 +30,10 @@ class AuthTokenSerializerWithoutPassword(serializers.Serializer):
         return attrs
 
 
+class TrustedIPSerializer(serializers.Serializer):
+    address = serializers.CharField(label=_("address"))
+
+
 class SecurityMessageSerializer(serializers.ModelSerializer):
 
     class Meta:

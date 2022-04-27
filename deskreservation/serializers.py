@@ -1,14 +1,19 @@
+from datetime import datetime
+
+from django.utils.timezone import get_current_timezone
+
 from rest_framework import serializers
 
-from .models import Desk, DeskReservation
+from .models import Desk, DeskHold, DeskReservation
 
 
 class DeskSerializer(serializers.HyperlinkedModelSerializer):
+    
     class Meta:
         model = Desk
         fields = [
             'url', 'pk', 'building', 'floor', 'number', 'active', 'lead',
-            'ergonomic'
+            'ergonomic', 'held_today'
         ]
 
 

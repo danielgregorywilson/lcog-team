@@ -29,3 +29,20 @@ class SecurityMessage(models.Model):
 
     def __str__(self):
         return self.description
+
+
+class TrustedIPAddress(models.Model):
+    """
+    Allow these addresses to access the Desk Reservation App
+    """
+    
+    class Meta:
+        verbose_name = _("Trusted IP Address")
+        verbose_name_plural = _("Trusted IP Addresses")
+
+    def __str__(self):
+        return _("Trusted IP Address")
+
+    address = models.GenericIPAddressField()
+    description = models.CharField(max_length=255)
+    

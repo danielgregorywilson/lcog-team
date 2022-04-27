@@ -4,7 +4,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 from django.urls import include, path
 
 from deskreservation.api_views import DeskReservationViewSet, DeskViewSet
-from mainsite.api_views import SecurityMessageViewSet
+from mainsite.api_views import TrustedIPViewSet, SecurityMessageViewSet
 from mainsite.views import obtain_auth_token_without_password
 from people.api_views import (
     CurrentUserView, EmployeeViewSet, FileUploadViewSet, GroupViewSet,
@@ -41,5 +41,6 @@ router.register('v1/securitymessage', SecurityMessageViewSet)
 router.register('v1/viewedsecuritymessage', ViewedSecurityMessageViewSet)
 router.register('v1/teleworkapplication', TeleworkApplicationViewSet)
 router.register('v1/teleworksignature', TeleworkSignatureViewSet)
+router.register('v1/trustedip', TrustedIPViewSet, basename='trustedip')
 
 urlpatterns = router.urls + urlpatterns

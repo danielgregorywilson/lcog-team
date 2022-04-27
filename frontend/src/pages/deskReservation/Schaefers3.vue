@@ -121,8 +121,9 @@
 import { Notify } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
 import { bus } from '../../App.vue'
-import DeskReservationDataService from '../../services/DeskReservationDataService'
 import FloorPlan from '../../assets/floorPlans/schaefers3.fpsvg'
+import DeskReservationDataService from '../../services/DeskReservationDataService'
+import TrustedIPDataService from '../../services/TrustedIPDataService'
 import { AxiosDeskReservationCreateServerResponse, Desk, DeskReservation, SimpleEmployeeRetrieve, VuexStoreGetters } from '../../store/types'
 
 interface EmployeeType {
@@ -526,6 +527,24 @@ export default class Schaefers3 extends Vue{
     // this.deskReservationSocket.onclose = () => {
     //   console.error('Desk Reservation socket closed unexpectedly');
     // };
+
+    // Boot session to dashboard if not authenticated or IP not in trusted IP lists
+    const isAuthenticated = this.getters['authModule/isAuthenticated']
+    if (!isAuthenticated) {
+      TrustedIPDataService.getTrustedIPs()
+        .then((response: {data: boolean}) => {
+          const addressIsSafe = response.data
+          if (!addressIsSafe) {
+            this.$router.push('/')
+              .catch((e) => {
+                console.error('Error navigating to dashboard upon rejecting connection to desk reservations:', e)
+              })
+          }
+        })
+        .catch(e => {
+          console.error('Error getting safe IP address status from API:', e)
+        })
+    }
     
     this.initDesksAndReservations()
       .then(() => {

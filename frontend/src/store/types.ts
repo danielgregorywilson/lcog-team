@@ -681,6 +681,7 @@ export interface DeskReservationStateInterface {
 
 
 export interface VuexStoreGetters {
+  'authModule/isAuthenticated': boolean
   'deskReservationModule/allDesks': {
     results: Array<Desk>
   },

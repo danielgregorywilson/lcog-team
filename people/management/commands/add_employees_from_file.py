@@ -64,17 +64,19 @@ class Command(BaseCommand):
             else:
                 department = " ".join(department_col_pieces[0:-1])
             department = department.strip()
-            if department in ['Technology Services', 'MetroTV Services', 'Planning Services', 'Administration', 'Business Services', 'Transport Services']:
+            if department in ['Technology Services', 'Business Services']:
                 unit_or_program = UnitOrProgram.objects.get(name=department)
-            elif department == 'Planning Svcs':
+            elif department in ['MetroTV Services', 'MetroTV Services GS']:
+                unit_or_program = UnitOrProgram.objects.get(name='MetroTV Services')
+            elif department in ['Planning Services', 'Planning Svcs', 'Planning Svcs GS', 'Planning Services GS']:
                 unit_or_program = UnitOrProgram.objects.get(name='Planning Services')
-            elif department == 'Administration FD':
+            elif department in ['Administration', 'Administration FD', 'Administration GS']:
                 unit_or_program = UnitOrProgram.objects.get(name='Administration')
             elif department in ['Senior & Disability Services', 'SDS', 'Senior & Disablility', 'Senior & Disablility Services', 'Senior $ Disability Services', 'Senior & Diability Services', 'S&DS']:
                 unit_or_program = UnitOrProgram.objects.get(division__name='Senior & Disability Services', name='-')
             elif department == 'Govt Services':
                 unit_or_program = UnitOrProgram.objects.get(division__name='Government Services', name='-')
-            elif department == 'Transport Service':
+            elif department in ['Transport Services', 'Transport Service', 'Transport Service GS']:
                 unit_or_program = UnitOrProgram.objects.get(name='Transport Services')
             else:
                 raise ValueError('Unknown department {}'.format(department))
@@ -145,6 +147,16 @@ class Command(BaseCommand):
                         manager = Employee.objects.get(user__last_name=manager_last_name, user__first_name='Micah')
                     elif manager_last_name == 'Davies':
                         manager = Employee.objects.get(user__last_name=manager_last_name, user__first_name='Nancy')
+                    elif manager_last_name == 'Sheelar2': # WTF
+                        manager = Employee.objects.get(user__last_name='Sheelar', user__first_name='Stephanie')
+                    elif manager_last_name == 'Newall': # Nicole Wilbur changed last name
+                        manager = Employee.objects.get(user__last_name='Wilbur', user__first_name='Nicole')
+                    elif manager_last_name == 'Crowder':
+                        manager = Employee.objects.get(user__last_name='Crowder', user__first_name='Jordan')
+                    elif manager_last_name == 'Wright':
+                        manager = Employee.objects.get(user__last_name='Wright', user__first_name='Vicki')
+                    elif manager_last_name == 'Sowards': # Sowards doesn't exist
+                        manager = Employee.objects.get(user__last_name='Sheelar', user__first_name='Stephanie')
                     else:
                         manager = Employee.objects.get(user__last_name=manager_last_name)
                     if employee.manager != manager:

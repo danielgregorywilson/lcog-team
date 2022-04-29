@@ -4,6 +4,20 @@
 
 export const releases = [
   {
+    version: '0.4.4',
+    date: new Date(2022, 3, 27),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Desks can now have weekly holds placed on them for certain employees.'
+      },
+      {
+        type: 'improved',
+        description: 'Desk reservation app now blocked unless you are authenticated or on a trusted IP.'
+      },
+    ]
+  },
+  {
     version: '0.4.3',
     date: new Date(2022, 3, 22),
     changes: [

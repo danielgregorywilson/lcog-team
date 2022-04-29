@@ -271,6 +271,9 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 100,
 }
 
+# Allow these addresses to access the Desk Reservation App
+REST_FRAMEWORK_TRUSTED_IPS_LIST = []
+
 # Frontend
 FRONTEND_DOMAIN = 'https://team.lcog.org'
 

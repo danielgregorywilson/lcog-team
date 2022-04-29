@@ -618,6 +618,7 @@ export interface Desk {
   active: boolean
   lead: boolean
   ergonomic: boolean
+  held_today: boolean
 }
 
 export interface DeskReservation {
@@ -630,6 +631,7 @@ export interface DeskReservation {
   check_in: string
   check_out: string
   created?: boolean
+  desk_held?: boolean
 }
 
 export interface DeskReservationCreate {
@@ -679,6 +681,7 @@ export interface DeskReservationStateInterface {
 
 
 export interface VuexStoreGetters {
+  'authModule/isAuthenticated': boolean
   'deskReservationModule/allDesks': {
     results: Array<Desk>
   },

@@ -40,6 +40,9 @@
           <div>Ergonomic Work Station</div>
           <q-img src="../../assets/floorPlans/desk-ergo.png" width=48px />
         </div>
+        <div class="row items-center q-gutter-sm">
+          <div>*held</div>
+        </div>
       </div>
       <q-btn color="primary" :disabled="selectedEmployee.pk == -1 || selectedDeskNumber == ''" @click="clickReserve()">Reserve</q-btn>
     </div>
@@ -118,8 +121,9 @@
 import { Notify } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
 import { bus } from '../../App.vue'
-import DeskReservationDataService from '../../services/DeskReservationDataService'
 import FloorPlan from '../../assets/floorPlans/schaefers3.fpsvg'
+import DeskReservationDataService from '../../services/DeskReservationDataService'
+import TrustedIPDataService from '../../services/TrustedIPDataService'
 import { AxiosDeskReservationCreateServerResponse, Desk, DeskReservation, SimpleEmployeeRetrieve, VuexStoreGetters } from '../../store/types'
 
 interface EmployeeType {
@@ -408,6 +412,9 @@ export default class Schaefers3 extends Vue{
         const deskLogo = desk.ergonomic ? this.ergoDesk : this.standardDesk
         const deskLead = desk.lead
       
+        // Determine if the desk has a hold on it today
+        const heldTodayText = desk.held_today ? '*' : ''
+
         // Get the rectangle around the static map label
         const rect = node.getBoundingClientRect()
 
@@ -415,7 +422,7 @@ export default class Schaefers3 extends Vue{
         const annotationElem = document.createElement('div')
         annotationElem.className = 'annotation'
       
-        annotationElem.innerHTML = `<button class="desk-button" data-pk="${text}"><div>${text}</div><img class="desk-ergo" src="${ deskLogo }" /></button>`
+        annotationElem.innerHTML = `<button class="desk-button" data-pk="${text}"><div>${text}${heldTodayText}</div><img class="desk-ergo" src="${ deskLogo }" /></button>`
         
         // Position the annotation directly on top of the map label
         // annotationElem.style.left = (rect.left + rect.width/2 - 88).toString() + 'px'
@@ -423,17 +430,17 @@ export default class Schaefers3 extends Vue{
         
         // On narrower screens, the header takes up 2-4 rows, so we need to nudge the buttons down to match.
         var extraHeaderSpace = 0
-        if (window.innerWidth < 673) {
-          // If width less than 673px, there are 4 rows of header
+        if (window.innerWidth < 730) {
+          // If width less than 730px, there are 4 rows of header
           extraHeaderSpace = 164
-        } else if (window.innerWidth < 764) {
-          // If width less than 764px, there are 3 rows of header
+        } else if (window.innerWidth < 820) {
+          // If width less than 820px, there are 3 rows of header
           extraHeaderSpace = 92
-        } else if (window.innerWidth < 1062) {
-          // If width less that 1062px, there are 2 rows of header
+        } else if (window.innerWidth < 1119) {
+          // If width less that 1119px, there are 2 tall rows of header
           extraHeaderSpace = 56
-        } else if (window.innerWidth < 1153) {
-          // If width less that 1153px, there are 2 rows of header
+        } else if (window.innerWidth < 1209) {
+          // If width less that 1209px, there are 2 short rows of header
           extraHeaderSpace = 36
         }
 
@@ -520,6 +527,24 @@ export default class Schaefers3 extends Vue{
     // this.deskReservationSocket.onclose = () => {
     //   console.error('Desk Reservation socket closed unexpectedly');
     // };
+
+    // Boot session to dashboard if not authenticated or IP not in trusted IP lists
+    const isAuthenticated = this.getters['authModule/isAuthenticated']
+    if (!isAuthenticated) {
+      TrustedIPDataService.getTrustedIPs()
+        .then((response: {data: boolean}) => {
+          const addressIsSafe = response.data
+          if (!addressIsSafe) {
+            this.$router.push('/')
+              .catch((e) => {
+                console.error('Error navigating to dashboard upon rejecting connection to desk reservations:', e)
+              })
+          }
+        })
+        .catch(e => {
+          console.error('Error getting safe IP address status from API:', e)
+        })
+    }
     
     this.initDesksAndReservations()
       .then(() => {

@@ -4,6 +4,16 @@
 
 export const releases = [
   {
+    version: '0.4.5',
+    date: new Date(2022, 3, 30),
+    changes: [
+      {
+        type: 'fix',
+        description: 'Fix bug where desks don\'t display on weekends'
+      }
+    ]
+  },
+  {
     version: '0.4.4',
     date: new Date(2022, 3, 27),
     changes: [
@@ -14,7 +24,7 @@ export const releases = [
       {
         type: 'improved',
         description: 'Desk reservation app now blocked unless you are authenticated or on a trusted IP.'
-      },
+      }
     ]
   },
   {
@@ -28,7 +38,7 @@ export const releases = [
       {
         type: 'improved',
         description: 'Desks can now be deactivated.'
-      },
+      }
     ]
   },
   {
@@ -38,7 +48,7 @@ export const releases = [
       {
         type: 'improved',
         description: 'Adjust desk reservation app to fit better on office laptop screens.'
-      },
+      }
     ]
   },
   {
@@ -52,7 +62,7 @@ export const releases = [
       {
         type: 'improved',
         description: 'Responsibility app looks better on smaller screens.'
-      },
+      }
     ]
   },
   {
@@ -62,7 +72,7 @@ export const releases = [
       {
         type: 'improved',
         description: 'Migrate desk reservation data to a new Django app.'
-      },
+      }
     ]
   },
   {
@@ -72,7 +82,7 @@ export const releases = [
       {
         type: 'improved',
         description: 'End all active desk reservations every day at 7 PM.'
-      },
+      }
     ]
   },
   {
@@ -86,7 +96,7 @@ export const releases = [
       {
         type: 'improved',
         description: 'Prevent double booking of desk reservations by canceling existing reservations when a new one is made.'
-      },
+      }
     ]
   },
   {
@@ -100,7 +110,7 @@ export const releases = [
       {
         type: 'improved',
         description: 'Cleaned up desk reservation app layout'
-      },
+      }
     ]
   },
   {
@@ -126,7 +136,7 @@ export const releases = [
       {
         type: 'improved',
         description: 'Responsibility app UI improvements'
-      },
+      }
     ]
   },
   {
@@ -140,7 +150,7 @@ export const releases = [
       {
         type: 'improved',
         description: 'Migrate responsibility app data to its own Django app'
-      },
+      }
     ]
   },
   {
@@ -150,7 +160,7 @@ export const releases = [
       {
         type: 'new',
         description: 'Demo of mileage reimbursement app'
-      },
+      }
     ]
   },
   {
@@ -160,7 +170,7 @@ export const releases = [
       {
         type: 'new',
         description: 'Demo of desk reservation app'
-      },
+      }
     ]
   },
   {
@@ -170,7 +180,7 @@ export const releases = [
       {
         type: 'improved',
         description: 'Upgrade to Django 4'
-      },
+      }
     ]
   },
   {
@@ -180,7 +190,7 @@ export const releases = [
       {
         type: 'improved',
         description: 'Responsibilities module: filter employee list dropdown by typing'
-      },
+      }
     ]
   },
   {
@@ -212,7 +222,7 @@ export const releases = [
       {
         type: 'new',
         description: 'Seating chart demo'
-      },
+      }
     ]
   },
   {
@@ -240,10 +250,6 @@ export const releases = [
       {
         type: 'improved',
         description: 'Clean up navigation'
-      },
-      {
-        type: 'fix',
-        description: ''
       }
     ]
   }

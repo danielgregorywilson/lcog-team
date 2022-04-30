@@ -35,6 +35,7 @@ class Desk(models.Model):
     def held_today(self):
         # Return true if there is a hold on a desk today
         day_of_week = datetime.now(tz=get_current_timezone()).weekday()
+        day = None
         if day_of_week == 0:
             day = DeskHold.MONDAY
         elif day_of_week == 1:

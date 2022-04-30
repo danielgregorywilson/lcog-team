@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 
+from distutils.util import strtobool
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -27,7 +29,7 @@ SITE_ID = 1
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG')
+DEBUG = bool(strtobool(os.getenv('DEBUG', 'True')))
 
 ALLOWED_HOSTS = [
     'team.lcog.org', # Prod frontend

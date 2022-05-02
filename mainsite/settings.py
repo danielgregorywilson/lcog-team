@@ -33,7 +33,7 @@ DEBUG = bool(strtobool(os.getenv('DEBUG', 'True')))
 
 ENVIRONMENT = os.environ.get('ENVIRONMENT')
 
-if (ENVIRONMENT == 'STAGING'): 
+if ENVIRONMENT == 'STAGING': 
     ALLOWED_HOSTS = [
         'team-app-staging.s3-website-us-west-2.amazonaws.com', # Staging frontend
         'lcog-team-staging.us-west-2.elasticbeanstalk.com', # Staging backend

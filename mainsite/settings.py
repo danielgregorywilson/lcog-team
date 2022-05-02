@@ -31,32 +31,23 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(strtobool(os.getenv('DEBUG', 'True')))
 
-# ENVIRONMENT = os.environ.get('ENVIRONMENT')
+ENVIRONMENT = os.environ.get('ENVIRONMENT')
 
-# if ENVIRONMENT == 'STAGING': 
-#     ALLOWED_HOSTS = [
-#         'team-app-staging.s3-website-us-west-2.amazonaws.com', # Staging frontend
-#         'lcog-team-staging.us-west-2.elasticbeanstalk.com', # Staging backend
-#         os.environ.get('EC2_IP'), # IP of EC2 instance
-#         os.environ.get('EBS_DOMAIN'), # Domain of Elastic Beanstalk instance
-#     ]
-# else:
-#     # PRODUCTION
-#     ALLOWED_HOSTS = [
-#         'team.lcog.org', # Prod frontend
-#         'api.team.lcog.org', # Prod backend
-#         os.environ.get('EC2_IP'), # IP of EC2 instance
-#         os.environ.get('EBS_DOMAIN'), # Domain of Elastic Beanstalk instance
-#     ]
-
-ALLOWED_HOSTS = [
-    'team.lcog.org', # Prod frontend
-    'api.team.lcog.org', # Prod backend
-    'team-app-staging.s3-website-us-west-2.amazonaws.com', # Staging frontend
-    'lcog-team-staging.us-west-2.elasticbeanstalk.com', # Staging backend
-    os.environ.get('EC2_IP'), # IP of EC2 instance
-    os.environ.get('EBS_DOMAIN'), # Domain of Elastic Beanstalk instance
-]
+if ENVIRONMENT == 'STAGING': 
+    ALLOWED_HOSTS = [
+        'team-app-staging.s3-website-us-west-2.amazonaws.com', # Staging frontend
+        'lcog-team-staging.us-west-2.elasticbeanstalk.com', # Staging backend
+        os.environ.get('EC2_IP'), # IP of EC2 instance
+        os.environ.get('EBS_DOMAIN'), # Domain of Elastic Beanstalk instance
+    ]
+else:
+    # PRODUCTION
+    ALLOWED_HOSTS = [
+        'team.lcog.org', # Prod frontend
+        'api.team.lcog.org', # Prod backend
+        os.environ.get('EC2_IP'), # IP of EC2 instance
+        os.environ.get('EBS_DOMAIN'), # Domain of Elastic Beanstalk instance
+    ]
 
 
 # Application definition
@@ -297,7 +288,11 @@ REST_FRAMEWORK = {
 REST_FRAMEWORK_TRUSTED_IPS_LIST = []
 
 # Frontend
-FRONTEND_DOMAIN = 'https://team.lcog.org'
+if ENVIRONMENT == 'STAGING': 
+    FRONTEND_DOMAIN = 'team-app-staging.s3-website-us-west-2.amazonaws.com'
+else:
+    # Production
+    FRONTEND_DOMAIN = 'https://team.lcog.org'
 
 # Overwrite production settings with local ones
 try:

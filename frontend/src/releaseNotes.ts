@@ -4,12 +4,22 @@
 
 export const releases = [
   {
+    version: '0.4.6',
+    date: new Date(2022, 4, 2),
+    changes: [
+      {
+        type: 'new',
+        description: 'Add a staging site for testing new features.'
+      }
+    ]
+  },
+  {
     version: '0.4.5',
     date: new Date(2022, 3, 30),
     changes: [
       {
         type: 'fix',
-        description: 'Fix bug where desks don\'t display on weekends'
+        description: 'Fix a bug where desks don\'t display on weekends.'
       }
     ]
   },

@@ -1,12 +1,14 @@
 branch-defaults:
-  default:
-    environment: lcog-team-env
-    group_suffix: null
   production:
     environment: lcog-team-env
+  staging:
+    environment: lcog-team-staging
 environment-defaults:
-  lcog-internal-env:
-    branch: null
+  lcog-team-env:
+    branch: production
+    repository: null
+  lcog-team-staging:
+    branch: staging
     repository: null
 global:
   application_name: lcog-team

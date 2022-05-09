@@ -33,10 +33,6 @@
           <div id="lead-drop-in-key">123</div>
         </div>
         <div class="row items-center q-gutter-sm">
-          <div>Work Station</div>
-          <q-img src="../../assets/floorPlans/desk-standard.png" width=48px />
-        </div>
-        <div class="row items-center q-gutter-sm">
           <div>Ergonomic Work Station</div>
           <q-img src="../../assets/floorPlans/desk-ergo.png" width=48px />
         </div>
@@ -433,20 +429,25 @@ export default class Schaefers1 extends Vue{
         // annotationElem.style.top = (rect.top + rect.height/2 - 70).toString() + 'px'
         
         // On narrower screens, the header takes up 2-4 rows, so we need to nudge the buttons down to match.
-        var extraHeaderSpace = 0
-        if (window.innerWidth < 730) {
-          // If width less than 730px, there are 4 rows of header
-          extraHeaderSpace = 164
-        } else if (window.innerWidth < 820) {
-          // If width less than 820px, there are 3 rows of header
-          extraHeaderSpace = 92
-        } else if (window.innerWidth < 1119) {
-          // If width less that 1119px, there are 2 tall rows of header
-          extraHeaderSpace = 56
-        } else if (window.innerWidth < 1209) {
-          // If width less that 1209px, there are 2 short rows of header
-          extraHeaderSpace = 36
+        var singleRowHeaderSpace = 56
+        var rowsHeaderSpace = 56
+        if (window.innerWidth < 514) {
+          // If width less than 514px, there are 4 tall rows of header
+          rowsHeaderSpace = 220
+        } else if (window.innerWidth < 570) {
+          // If width less than 570px, there are 4 short rows of header
+          rowsHeaderSpace = 193
+        } else if (window.innerWidth < 661) {
+          // If width less than 661px, there are 3 rows of header
+          rowsHeaderSpace = 148
+        } else if (window.innerWidth < 959) {
+          // If width less that 959px, there are 2 tall rows of header
+          rowsHeaderSpace = 112
+        } else if (window.innerWidth < 1050) {
+          // If width less that 1050px, there are 2 short rows of header
+          rowsHeaderSpace = 92
         }
+        var extraHeaderSpace = rowsHeaderSpace - singleRowHeaderSpace
 
         // TODO: Finish and annotate this - can't brain today
         annotationElem.style.left = (rect.left - floorPlanRect.left - rect.width/2 + annotationElem.offsetWidth/2 - 12).toString() + 'px'

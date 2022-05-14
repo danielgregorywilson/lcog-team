@@ -14,10 +14,6 @@
   width: 1366px;
 }
 
-#refresh-timer {
-  // margin-top: -80px;
-}
-
 </style>
 
 <script lang="ts">

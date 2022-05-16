@@ -44,12 +44,17 @@ class Command(BaseCommand):
         if not path:
             path = 'people/management/employees.csv'
         
+        # Keep track of all emails to deactivate removed employees
+        emails_in_file = []
+
         dataReader = csv.reader(open(path), delimiter=',', quotechar='"')
         for row in dataReader:
             # Parse row data
             last_name = row[0]
             first_name = row[1]
             email = row[2].lower()
+            
+            emails_in_file.append(email)
             
             title = row[3]
             job_title = JobTitle.objects.get_or_create(name=title)[0]
@@ -120,6 +125,12 @@ class Command(BaseCommand):
                 self.stdout.write(
                     'Created employee {} {}'.format(employee.user.first_name, employee.user.last_name)
                 )
+
+        # Deactivate any employee not in the list
+        for employee in Employee.active_objects.all():
+            if employee.user.email not in emails_in_file:
+                employee.active = False
+                employee.save()
 
         # Add managers
         dataReader = csv.reader(open(path), delimiter=',', quotechar='"')

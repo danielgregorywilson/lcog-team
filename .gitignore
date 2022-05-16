@@ -17,6 +17,6 @@ sent_emails
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 
-employees-2021-08-12.csv
+caselle-imports
 test_user_data.json
 node_modules

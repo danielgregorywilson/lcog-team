@@ -118,7 +118,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     # A simple list of employees for populating dropdowns
     @action(detail=False, methods=['get'])
     def simple_list(self, request):
-        employees = Employee.objects.all()
+        employees = Employee.active_objects.all()
         serializer = SimpleEmployeeSerializer(employees, many=True)
         return Response(serializer.data)
     

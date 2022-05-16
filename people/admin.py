@@ -26,7 +26,7 @@ class JobTitleAdmin(admin.ModelAdmin):
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ("username", "job_title", "unit_or_program", "manager",)
-    list_filter = ("unit_or_program__division", "unit_or_program",)
+    list_filter = ("active", "unit_or_program__division", "unit_or_program",)
     search_fields = ("user__username", )
 
 

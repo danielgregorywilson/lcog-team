@@ -4,6 +4,24 @@
 
 export const releases = [
   {
+    version: '0.4.8',
+    date: new Date(2022, 4, 16),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Add a screensaver at night to the desk reservation screens.'
+      },
+      {
+        type: 'improved',
+        description: 'Update Schaefers floor plans.'
+      },
+      {
+        type: 'improved',
+        description: 'Allow employees to be archived.'
+      }
+    ]
+  },
+  {
     version: '0.4.7',
     date: new Date(2022, 4, 9),
     changes: [

@@ -10,7 +10,7 @@ from mainsite.helpers import (
     send_signature_email_to_executive_director,
     send_signature_email_to_hr_manager
 )
-from mainsite.models import SecurityMessage
+from mainsite.models import ActiveManager, SecurityMessage
 
 
 # SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE = 60
@@ -59,6 +59,9 @@ class Employee(models.Model):
         verbose_name = _("Employee")
         verbose_name_plural = _("Employees")
         ordering = ["user__username"]
+
+    objects = models.Manager()
+    active_objects = ActiveManager()
 
     def __str__(self):
         return self.user.username

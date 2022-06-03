@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import { Route, RouteConfig } from 'vue-router';
 
+import http from '../http-common';
 import authState from '../store/modules/auth/state'
 
 type Next = (path?: string) => void
@@ -83,6 +84,19 @@ const ifCanViewTeleworkApplication = (to: Route, from: Route, next: Next) => {
 //     next('dashboard')
 //   }
 // }
+
+const ifCanViewDeskReservationReports = (to: Route, from: Route, next: Next) => {
+  http.get('api/v1/current-user/')
+    .then(resp => {
+      if (resp.data.can_view_desk_reservation_reports) {
+        next()
+        return
+      } else {
+        console.info('User cannot view Desk Reservation Reports', to.params.pk, 'Redirecting to dashboard.')
+        next('dashboard')
+      }
+    })
+}
 
 // TODO: Add a reset password view as in Django version, unless we're authenticating with LDAP
 const routes: RouteConfig[] = [
@@ -302,9 +316,10 @@ const routes: RouteConfig[] = [
         ]
       },
       {
-        path: 'report',
-        name: 'report',
+        path: 'reports',
+        name: 'reports',
         component: () => import('src/pages/deskReservation/Report.vue'),
+        beforeEnter: ifCanViewDeskReservationReports
       }
     ]
   },

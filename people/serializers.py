@@ -39,6 +39,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     is_eligible_for_telework_application = serializers.SerializerMethodField()
     can_view_seating_charts = serializers.SerializerMethodField()
     can_edit_seating_charts = serializers.SerializerMethodField()
+    can_view_desk_reservation_reports = serializers.SerializerMethodField()
     is_upper_manager = serializers.SerializerMethodField()
     prs_can_view = serializers.SerializerMethodField()
     notes_can_view = serializers.SerializerMethodField()
@@ -50,7 +51,8 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             'url', 'pk', 'name', 'user', 'email', 'manager', 'is_manager',
             'has_manager', 'is_eligible_for_telework_application',
             'can_view_seating_charts', 'can_edit_seating_charts',
-            'is_upper_manager', 'is_hr_manager', 'is_executive_director',
+            'can_view_desk_reservation_reports', 'is_upper_manager',
+            'is_hr_manager', 'is_executive_director',
             'viewed_security_message', 'prs_can_view', 'notes_can_view',
             'telework_applications_can_view', 'next_to_sign_prs'
         ]
@@ -70,7 +72,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
         return all([ 
             not employee.is_executive_director, # Not the executive director
             not employee.manager.is_executive_director, # Not anyone who reports to the executive director (e.g. finance manager)
-            employee.manager.manager and not employee.manager.manager.is_executive_director, # Not anyone who reports to the above (e.g. finance employees)
+            employee.manager.manager and not employee.manager.manager.is_pexecutive_director, # Not anyone who reports to the above (e.g. finance employees)
             not employee.is_division_director, # No division directors
             not employee.manager.is_division_director, # No program managers
             not employee.is_hr_manager,  # Not the HR manager
@@ -84,6 +86,10 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     @staticmethod
     def get_can_edit_seating_charts(employee):
         return employee.can_edit_seating_charts()
+
+    @staticmethod
+    def get_can_view_desk_reservation_reports(employee):
+        return employee.can_view_desk_reservation_reports()
 
     @staticmethod
     def get_is_upper_manager(employee):

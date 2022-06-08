@@ -69,8 +69,10 @@ class Command(BaseCommand):
             else:
                 department = " ".join(department_col_pieces[0:-1])
             department = department.strip()
-            if department in ['Technology Services', 'Business Services']:
-                unit_or_program = UnitOrProgram.objects.get(name=department)
+            if department in ['Technology Services']:
+                unit_or_program = UnitOrProgram.objects.get(name='Technology Services')
+            elif department in ['Business Services', 'Business Services GS']:
+                unit_or_program = UnitOrProgram.objects.get(name='Business Services')
             elif department in ['MetroTV Services', 'MetroTV Services GS']:
                 unit_or_program = UnitOrProgram.objects.get(name='MetroTV Services')
             elif department in ['Planning Services', 'Planning Svcs', 'Planning Svcs GS', 'Planning Services GS']:

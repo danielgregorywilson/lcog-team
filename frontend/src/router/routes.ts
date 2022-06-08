@@ -4,6 +4,9 @@ import { Route, RouteConfig } from 'vue-router';
 import http from '../http-common';
 import authState from '../store/modules/auth/state'
 
+import { AxiosUserRetrieveOneServerResponse } from '../store/types'
+
+
 type Next = (path?: string) => void
 
 // const ifNotAuthenticated = (to: Route, from: Route, next: Next) => {
@@ -87,7 +90,7 @@ const ifCanViewTeleworkApplication = (to: Route, from: Route, next: Next) => {
 
 const ifCanViewDeskReservationReports = (to: Route, from: Route, next: Next) => {
   http.get('api/v1/current-user/')
-    .then(resp => {
+    .then((resp: AxiosUserRetrieveOneServerResponse) => {
       if (resp.data.can_view_desk_reservation_reports) {
         next()
         return
@@ -95,6 +98,9 @@ const ifCanViewDeskReservationReports = (to: Route, from: Route, next: Next) => 
         console.info('User cannot view Desk Reservation Reports', to.params.pk, 'Redirecting to dashboard.')
         next('dashboard')
       }
+    })
+    .catch(e => {
+      console.error('Error getting current user:', e)
     })
 }
 

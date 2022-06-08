@@ -21,6 +21,7 @@ export interface UserRetrieve {
   is_staff: boolean
   is_manager: boolean
   is_upper_manager: boolean
+  can_view_desk_reservation_reports: boolean
 }
 
 export interface AxiosUserRetrieveOneServerResponse {

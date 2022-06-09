@@ -382,6 +382,15 @@ class Employee(models.Model):
             return True
         else:
             return False
+    
+    def can_view_desk_reservation_reports(self):
+        # Employees with the 'View Desk Reservation Reports' group role can
+        # view them.
+        view_desk_reservation_reports = self.user.groups.filter(name='View Desk Reservation Reports').exists()
+        if view_desk_reservation_reports:
+            return True
+        else:
+            return False
 
     def position_description_link(self):
         # Returns override link if provided, otherwise the link from job title if there is a job title

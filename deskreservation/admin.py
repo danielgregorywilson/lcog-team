@@ -12,7 +12,7 @@ class DeskHoldInline(admin.TabularInline):
 
 @admin.register(Desk)
 class DeskAdmin(admin.ModelAdmin):
-    list_display = ("pk", "building", "floor", "number", "lead", "ergonomic")
+    list_display = ("pk", "active", "building", "floor", "number", "lead", "ergonomic")
     list_filter = ("building", "floor", "lead", "ergonomic")
     inlines = (DeskHoldInline,)
 

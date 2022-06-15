@@ -616,6 +616,7 @@ export interface Desk {
   building: string
   floor: string
   number: string
+  letter?: string
   active: boolean
   lead: boolean
   ergonomic: boolean

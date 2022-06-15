@@ -4,6 +4,16 @@
 
 export const releases = [
   {
+    version: '0.4.10',
+    date: new Date(2022, 5, 14),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Allow for A/B desks in desk reservation app.'
+      }
+    ]
+  },
+  {
     version: '0.4.9',
     date: new Date(2022, 5, 8),
     changes: [

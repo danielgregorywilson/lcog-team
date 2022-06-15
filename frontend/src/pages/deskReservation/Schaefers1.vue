@@ -412,10 +412,6 @@ export default class Schaefers1 extends Vue{
             deskReserved = true
           }
 
-          // const desk  = this.desks.filter((desk: Desk) => {
-          //   return desk.building == this.BUILDING && desk.floor == this.FLOOR && desk.number == text
-          // })[0]
-
           // Determine if the desk is ergo and/or lead
           // Use correct icon based on ergonomic or not
           const deskLogo = desk.ergonomic ? this.ergoDesk : this.standardDesk

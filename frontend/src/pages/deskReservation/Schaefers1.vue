@@ -385,7 +385,14 @@ export default class Schaefers1 extends Vue{
         }
 
         const matchingDesks = this.desks.filter((desk: Desk) => {
-          return desk.building == this.BUILDING && desk.floor == this.FLOOR && desk.number == text
+          let number = ''
+          if (['A', 'B'].indexOf(desk.number.slice(-1)) == -1) {
+            number = desk.number
+          } else {
+            number = desk.number.substring(0, desk.number.length-1)
+            desk.letter = desk.number.slice(-1)
+          }
+          return desk.building == this.BUILDING && desk.floor == this.FLOOR && number == text
         })
         if (!matchingDesks.length) {
           // Hide any desk labels that shouldn't be displayed
@@ -393,103 +400,111 @@ export default class Schaefers1 extends Vue{
           return
         }
 
-        // Determine if desk is already reserved
-        // TODO: Determine if desk is actually still reserved - right now just checking if it has EVER been reserved
-        let deskReserved = false
-        const reservations = this.deskReservations.filter((reservation: DeskReservation) => {
-          return reservation.desk_building == this.BUILDING && reservation.desk_floor == this.FLOOR && reservation.desk_number == text
-        })
-        if (reservations.length) {
-          // Hide any desk labels that shouldn't be displayed
-          deskReserved = true
-        }
-
-        // Determine if the desk is ergo and/or lead
-        const desk  = this.desks.filter((desk: Desk) => {
-          return desk.building == this.BUILDING && desk.floor == this.FLOOR && desk.number == text
-        })[0]
-        // Use correct icon based on ergonomic or not
-        const deskLogo = desk.ergonomic ? this.ergoDesk : this.standardDesk
-        const deskLead = desk.lead
-
-        // Determine if the desk has a hold on it today
-        const heldTodayText = desk.held_today ? '*' : ''
-      
-        // Get the rectangle around the static map label
-        const rect = node.getBoundingClientRect()
-
-        // Create an annotation element to replace the static map label
-        const annotationElem = document.createElement('div')
-        annotationElem.className = 'annotation'
-      
-        annotationElem.innerHTML = `<button class="desk-button" data-pk="${text}"><div>${text}${heldTodayText}</div><img class="desk-ergo" src="${ deskLogo }" /></button>`
-        
-        // Position the annotation directly on top of the map label
-        // annotationElem.style.left = (rect.left + rect.width/2 - 88).toString() + 'px'
-        // annotationElem.style.top = (rect.top + rect.height/2 - 70).toString() + 'px'
-        
-        // On narrower screens, the header takes up 2-4 rows, so we need to nudge the buttons down to match.
-        var singleRowHeaderSpace = 56
-        var rowsHeaderSpace = 56
-        if (window.innerWidth < 514) {
-          // If width less than 514px, there are 4 tall rows of header
-          rowsHeaderSpace = 220
-        } else if (window.innerWidth < 570) {
-          // If width less than 570px, there are 4 short rows of header
-          rowsHeaderSpace = 193
-        } else if (window.innerWidth < 661) {
-          // If width less than 661px, there are 3 rows of header
-          rowsHeaderSpace = 148
-        } else if (window.innerWidth < 959) {
-          // If width less that 959px, there are 2 tall rows of header
-          rowsHeaderSpace = 112
-        } else if (window.innerWidth < 1050) {
-          // If width less that 1050px, there are 2 short rows of header
-          rowsHeaderSpace = 92
-        }
-        var extraHeaderSpace = rowsHeaderSpace - singleRowHeaderSpace
-
-        // TODO: Finish and annotate this - can't brain today
-        annotationElem.style.left = (rect.left - floorPlanRect.left - rect.width/2 + annotationElem.offsetWidth/2 - 12).toString() + 'px'
-        // TODO: Fix and annotate this - can't brain today
-        annotationElem.style.top = (rect.top - floorPlanRect.top + 48 + extraHeaderSpace).toString() + 'px'
-
-        const clickableButton = annotationElem.querySelector('button') as HTMLElement
-
-        if (clickableButton) {
-          if (deskReserved) {
-            clickableButton.style.borderColor = this.redColor
-            clickableButton.classList.add('reserved')
-            clickableButton.addEventListener('click', e => { // eslint-disable-line @typescript-eslint/no-non-null-assertion
-              const target = e.target as HTMLElement
-              const buttonElem = target.closest('button')
-              if (buttonElem) {
-                this.reservedRoomClick(buttonElem)
-              }
-            })
-          } else {
-            if (deskLead) {
-              clickableButton.style.backgroundColor = this.orangeColor
-            } else {
-              clickableButton.style.backgroundColor = this.yellowColor
-            }
-            clickableButton.addEventListener('click', e => { // eslint-disable-line @typescript-eslint/no-non-null-assertion
-              const target = e.target as HTMLElement
-              const buttonElem = target.closest('button')
-              if (buttonElem) {
-                this.roomClick(buttonElem)
-              }
-            })
+        for (let desk of matchingDesks) {
+          
+          // Determine if desk is already reserved
+          let deskReserved = false
+          const reservations = this.deskReservations.filter((reservation: DeskReservation) => {
+            return reservation.desk_building == this.BUILDING && reservation.desk_floor == this.FLOOR && reservation.desk_number == desk.number
+          })
+          if (reservations.length) {
+            // Hide any desk labels that shouldn't be displayed
+            deskReserved = true
           }
-        }
-        
-        document.querySelector('#schaefers-1-page')?.appendChild(annotationElem)
-        
-        // const annotationSize = annotationElem.getBoundingClientRect()
-        
-        // annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
-        // annotationElem.style.marginTop = `-${annotationSize.height/2}px`
 
+          // Determine if the desk is ergo and/or lead
+          // Use correct icon based on ergonomic or not
+          const deskLogo = desk.ergonomic ? this.ergoDesk : this.standardDesk
+          const deskLead = desk.lead
+
+          // Determine if the desk has a hold on it today
+          const heldTodayText = desk.held_today ? '*' : ''
+        
+          // Get the rectangle around the static map label
+          const rect = node.getBoundingClientRect()
+
+          // Create an annotation element to replace the static map label
+          const annotationElem = document.createElement('div')
+          annotationElem.className = 'annotation'
+        
+          annotationElem.innerHTML = `<button class="desk-button" data-pk="${desk.number}"><div>${desk.number}${heldTodayText}</div><img class="desk-ergo" src="${ deskLogo }" /></button>`
+          
+          // Position the annotation directly on top of the map label
+          // annotationElem.style.left = (rect.left + rect.width/2 - 88).toString() + 'px'
+          // annotationElem.style.top = (rect.top + rect.height/2 - 70).toString() + 'px'
+          
+          // On narrower screens, the header takes up 2-4 rows, so we need to nudge the buttons down to match.
+          var singleRowHeaderSpace = 56
+          var rowsHeaderSpace = 56
+          if (window.innerWidth < 514) {
+            // If width less than 514px, there are 4 tall rows of header
+            rowsHeaderSpace = 220
+          } else if (window.innerWidth < 570) {
+            // If width less than 570px, there are 4 short rows of header
+            rowsHeaderSpace = 193
+          } else if (window.innerWidth < 661) {
+            // If width less than 661px, there are 3 rows of header
+            rowsHeaderSpace = 148
+          } else if (window.innerWidth < 959) {
+            // If width less that 959px, there are 2 tall rows of header
+            rowsHeaderSpace = 112
+          } else if (window.innerWidth < 1050) {
+            // If width less that 1050px, there are 2 short rows of header
+            rowsHeaderSpace = 92
+          }
+          var extraHeaderSpace = rowsHeaderSpace - singleRowHeaderSpace
+
+          // Adjust A and B desks so they both show up
+          let deskSplitHorizontalAdjustment = 0
+          if (desk.letter) {
+            if (desk.letter == 'A') {
+              deskSplitHorizontalAdjustment = -34
+            } else {
+              deskSplitHorizontalAdjustment = 34
+            }
+          }
+
+          // TODO: Finish and annotate this - can't brain today
+          annotationElem.style.left = (rect.left - floorPlanRect.left - rect.width/2 + annotationElem.offsetWidth/2 - 12 + deskSplitHorizontalAdjustment).toString() + 'px'
+          // TODO: Fix and annotate this - can't brain today
+          annotationElem.style.top = (rect.top - floorPlanRect.top + 48 + extraHeaderSpace).toString() + 'px'
+
+          const clickableButton = annotationElem.querySelector('button') as HTMLElement
+
+          if (clickableButton) {
+            if (deskReserved) {
+              clickableButton.style.borderColor = this.redColor
+              clickableButton.classList.add('reserved')
+              clickableButton.addEventListener('click', e => { // eslint-disable-line @typescript-eslint/no-non-null-assertion
+                const target = e.target as HTMLElement
+                const buttonElem = target.closest('button')
+                if (buttonElem) {
+                  this.reservedRoomClick(buttonElem)
+                }
+              })
+            } else {
+              if (deskLead) {
+                clickableButton.style.backgroundColor = this.orangeColor
+              } else {
+                clickableButton.style.backgroundColor = this.yellowColor
+              }
+              clickableButton.addEventListener('click', e => { // eslint-disable-line @typescript-eslint/no-non-null-assertion
+                const target = e.target as HTMLElement
+                const buttonElem = target.closest('button')
+                if (buttonElem) {
+                  this.roomClick(buttonElem)
+                }
+              })
+            }
+          }
+          
+          document.querySelector('#schaefers-1-page')?.appendChild(annotationElem)
+          
+          // const annotationSize = annotationElem.getBoundingClientRect()
+          
+          // annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
+          // annotationElem.style.marginTop = `-${annotationSize.height/2}px`
+        }
     })
   }
 

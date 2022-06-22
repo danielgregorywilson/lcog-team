@@ -535,11 +535,13 @@ export default class Schaefers1 extends Vue{
 
     // Draw a red circle around the highlighted desk
     if (this.highlightedDeskNumberX) {
+      const map = document.querySelector('#schaefers-1-page')
       const highlightCircle = document.createElement('div')
       highlightCircle.id = 'highlight'
-      highlightCircle.style.left = (this.highlightedDeskNumberX - 36).toString() + 'px'
+      const mapPadding = map ? map.getBoundingClientRect().left : 0
+      highlightCircle.style.left = (this.highlightedDeskNumberX - 36 - mapPadding).toString() + 'px'
       highlightCircle.style.top = (this.highlightedDeskNumberY - 45).toString() + 'px'
-      document.querySelector('#schaefers-1-page')?.appendChild(highlightCircle)
+      map?.appendChild(highlightCircle)
     }
   }
 

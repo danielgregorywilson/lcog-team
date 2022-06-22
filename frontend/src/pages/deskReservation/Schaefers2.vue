@@ -98,8 +98,12 @@
     text-align: center;
   }
   
-  .desk-ergo {
-    width: 50px;
+  .desk-buttom-number {
+    font-size: 20px;
+  }
+
+  .desk-button-ergo {
+    width: 35px;
   }
 
   .annotation {
@@ -110,6 +114,14 @@
   }
   .annotation button {
     font-size: 10px;
+  }
+
+  #highlight {
+    position: absolute;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    border: 3px solid red;
   }
 </style>
 
@@ -135,7 +147,7 @@ export default class Schaefers2 extends Vue{
 
   private needle = '' // For filtering employee list
   
-  private ignoreList = ['UP', 'DOWN', 'DN']
+  private ignoreList = ['UP', 'DOWN', 'DN', 'DF', 'FE']
   
   private standardDesk = require('../../assets/floorPlans/desk-standard.png') as string // eslint-disable-line @typescript-eslint/no-var-requires
   private ergoDesk = require('../../assets/floorPlans/desk-ergo.png') as string // eslint-disable-line @typescript-eslint/no-var-requires
@@ -144,6 +156,9 @@ export default class Schaefers2 extends Vue{
   private FLOOR = '2'
   private desks: Array<Desk> = []
   private deskReservations: Array<DeskReservation> = []
+  private highlightedDeskNumber = this.$route.params.deskNumber ? this.$route.params.deskNumber : ''
+  private highlightedDeskNumberX = 0
+  private highlightedDeskNumberY = 0
 
   private emptyEmployee = {name: '', pk: -1}
   
@@ -380,6 +395,20 @@ export default class Schaefers2 extends Vue{
           return
         }
 
+        // Set the location of the highlight
+        let setHighlightedXAndY = () => {
+          const rect = node.getBoundingClientRect()
+          this.highlightedDeskNumberX = rect.left
+          this.highlightedDeskNumberY = rect.top
+        }
+        if (text == this.highlightedDeskNumber) {
+          setHighlightedXAndY()
+        } else if (['A', 'B'].indexOf(this.highlightedDeskNumber.slice(-1)) != -1) {
+          if (text == this.highlightedDeskNumber.slice(0, -1)) {
+            setHighlightedXAndY()
+          }
+        }
+
         const matchingDesks = this.desks.filter((desk: Desk) => {
           let number = ''
           if (['A', 'B'].indexOf(desk.number.slice(-1)) == -1) {
@@ -391,13 +420,10 @@ export default class Schaefers2 extends Vue{
           return desk.building == this.BUILDING && desk.floor == this.FLOOR && number == text
         })
         if (!matchingDesks.length) {
-          // Hide any desk labels that shouldn't be displayed
-          node.style.display = 'none'
           return
         }
 
         for (let desk of matchingDesks) {
-
           // Determine if desk is already reserved
           let deskReserved = false
           const reservations = this.deskReservations.filter((reservation: DeskReservation) => {
@@ -423,7 +449,7 @@ export default class Schaefers2 extends Vue{
           const annotationElem = document.createElement('div')
           annotationElem.className = 'annotation'
         
-          annotationElem.innerHTML = `<button class="desk-button" data-pk="${desk.number}"><div>${desk.number}${heldTodayText}</div><img class="desk-ergo" src="${ deskLogo }" /></button>`
+          annotationElem.innerHTML = `<button class="desk-button" data-pk="${desk.number}"><div class="desk-buttom-number">${desk.number}${heldTodayText}</div><img class="desk-button-ergo" src="${ deskLogo }" /></button>`
           
           // Position the annotation directly on top of the map label
           // annotationElem.style.left = (rect.left + rect.width/2 - 88).toString() + 'px'
@@ -461,7 +487,7 @@ export default class Schaefers2 extends Vue{
           }
 
           // TODO: Finish and annotate this - can't brain today
-          annotationElem.style.left = (rect.left - floorPlanRect.left - rect.width/2 + annotationElem.offsetWidth/2 - 12 + deskSplitHorizontalAdjustment).toString() + 'px'
+          annotationElem.style.left = (rect.left - floorPlanRect.left - rect.width/2 + annotationElem.offsetWidth/2 + deskSplitHorizontalAdjustment).toString() + 'px'
           // TODO: Fix and annotate this - can't brain today
           annotationElem.style.top = (rect.top - floorPlanRect.top + 48 + extraHeaderSpace).toString() + 'px'
 
@@ -502,6 +528,15 @@ export default class Schaefers2 extends Vue{
           // annotationElem.style.marginTop = `-${annotationSize.height/2}px`
         }
     })
+
+    // Draw a red circle around the highlighted desk
+    if (this.highlightedDeskNumberX) {
+      const highlightCircle = document.createElement('div')
+      highlightCircle.id = 'highlight'
+      highlightCircle.style.left = (this.highlightedDeskNumberX - 36).toString() + 'px'
+      highlightCircle.style.top = (this.highlightedDeskNumberY - 45).toString() + 'px'
+      document.querySelector('#schaefers-2-page')?.appendChild(highlightCircle)
+    }
   }
 
   private windowResizeEventHandler = this.handleSVG.bind(this)

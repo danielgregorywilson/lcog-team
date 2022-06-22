@@ -291,16 +291,34 @@ const routes: RouteConfig[] = [
             path: '1',
             name: 'schaefers-1',
             component: () => import('src/pages/deskReservation/Schaefers1.vue'),
+            children: [
+              {
+                path: 'desk/:deskNumber',
+                name: 'schaefers-1-desk',
+              }
+            ]
           },
           {
             path: '2',
             name: 'schaefers-2',
             component: () => import('src/pages/deskReservation/Schaefers2.vue'),
+            children: [
+              {
+                path: 'desk/:deskNumber',
+                name: 'schaefers-2-desk',
+              }
+            ]
           },
           {
             path: '3',
             name: 'schaefers-3',
             component: () => import('src/pages/deskReservation/Schaefers3.vue'),
+            children: [
+              {
+                path: 'desk/:deskNumber',
+                name: 'schaefers-3-desk',
+              }
+            ]
           }
         ]
       },

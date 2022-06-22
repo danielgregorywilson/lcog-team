@@ -347,6 +347,20 @@ const routes: RouteConfig[] = [
       }
     ]
   },
+  {
+    // Shortcut path for CIAO to direct to a specific highlighted desk on the
+    // desk reservation map.
+    path: '/desk/:deskNumber',
+    redirect: to => {
+      let name = 'schaefers-1-desk'
+      if (to.params.deskNumber[0] == '2') {
+        name = 'schaefers-2-desk'
+      } else if (to.params.deskNumber[0] == '3') {
+        name = 'schaefers-3-desk'
+      }
+      return { name }
+    }
+  },
 
   // Always leave this as last one,
   // but you can also remove it

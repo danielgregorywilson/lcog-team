@@ -1,46 +1,52 @@
 <template>
   <q-page class="q-mt-xs" id="schaefers-3-page">
     <div class="row justify-between items-center">
-      <div class="row items-center">
-        <q-icon name="help" color="primary" size="48px" class="q-mr-md cursor-pointer" @click="showHelp()" />
-        <div class="row items-center q-gutter-md">
+      <div class="row items-center q-ml-sm">
           <q-btn-group push class="">
             <q-btn push color="primary" glossy label="1F" :to="{ name: 'schaefers-1' }" />
             <q-btn push color="primary" glossy label="2F" :to="{ name: 'schaefers-2' }" />
             <q-btn push color="secondary" glossy label="3F" :to="{ name: 'schaefers-3' }"  />
           </q-btn-group>
         </div>
-      </div>
-      <q-select class="" v-model="selectedEmployee" :options="employees()" option-value="pk" option-label="name" label="Select your name" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
-        <template v-slot:no-option>
-          <q-item>
-            <q-item-section class="text-grey">
-              No results
-            </q-item-section>
-          </q-item>
-        </template>
-        <template v-if="selectedEmployee.name" v-slot:append>
-          <q-icon name="cancel" @click.stop="selectedEmployee = emptyEmployee" class="cursor-pointer" />
-        </template>
-      </q-select>
       <div class="row items-center q-gutter-md">
-        <div class="row items-center q-gutter-sm">
-          <div>Drop-In</div>
-          <div id="drop-in-key">123</div>
-        </div>
-        <div class="row items-center q-gutter-sm">
-          <div>Lead Drop-In</div>
-          <div id="lead-drop-in-key">123</div>
-        </div>
-        <div class="row items-center q-gutter-sm">
-          <div>Ergonomic Work Station</div>
-          <q-img src="../../assets/floorPlans/desk-ergo.png" width=48px />
-        </div>
-        <div class="row items-center q-gutter-sm">
-          <div>*held</div>
+        <q-icon name="help" color="primary" size=48px class="cursor-pointer" @click="showHelp()" />
+        <q-select class="" v-model="selectedEmployee" :options="employees()" option-value="pk" option-label="name" label="Select your name" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
+          <template v-slot:no-option>
+            <q-item>
+              <q-item-section class="text-grey">
+                No results
+              </q-item-section>
+            </q-item>
+          </template>
+          <template v-if="selectedEmployee.name" v-slot:append>
+            <q-icon name="cancel" @click.stop="selectedEmployee = emptyEmployee" class="cursor-pointer" />
+          </template>
+        </q-select>
+        <q-btn color="primary" :disabled="selectedEmployee.pk == -1 || selectedDeskNumber == ''" @click="clickReserve()">Reserve</q-btn>
+      </div>
+      <div class="row q-pa-xs" id="legend">
+        <div class="col">
+          <div class="row justify-center text-uppercase">Legend</div>
+          <div class="row items-center q-gutter-md q-mr-sm">
+            <div class="row items-center q-gutter-sm">
+              <div>Drop-In</div>
+              <div id="drop-in-key"></div>
+            </div>
+            <div class="row items-center q-gutter-sm">
+              <div>Lead Drop-In</div>
+              <div id="lead-drop-in-key"></div>
+            </div>
+            <div class="row items-center q-gutter-sm">
+              <div>Ergonomic Work Station</div>
+              <q-img src="../../assets/floorPlans/desk-ergo.png" width=35px />
+            </div>
+            <div class="row items-center q-gutter-sm">
+              <div>Held</div>
+              <div>*</div>
+            </div>
+          </div>
         </div>
       </div>
-      <q-btn color="primary" :disabled="selectedEmployee.pk == -1 || selectedDeskNumber == ''" @click="clickReserve()">Reserve</q-btn>
     </div>
     
     <div class="row q-gutter-md q-mt-xs">
@@ -82,17 +88,21 @@
 </template>
 
 <style lang="scss"> 
+  #legend {
+    border: 2px black solid;
+  }
+  
   #drop-in-key {
-    width: 48px;
-    height: 48px;
+    width: 35px;
+    height: 35px;
     background-color: yellow;
     border: 1px black solid;
     text-align: center;
   }
   
   #lead-drop-in-key {
-    width: 48px;
-    height: 48px;
+    width: 35px;
+    height: 35px;
     background-color: orange;
     border: 1px black solid;
     text-align: center;
@@ -116,12 +126,12 @@
     font-size: 10px;
   }
 
-  #highlight {
+  .highlight {
     position: absolute;
     border-radius: 50%;
     width: 100px;
     height: 100px;
-    border: 3px solid red;
+    border: 5px solid red;
   }
 </style>
 
@@ -376,6 +386,10 @@ export default class Schaefers3 extends Vue{
     const staleAnnotationNodes = Array.from(document.querySelectorAll('.annotation'))
     staleAnnotationNodes.forEach(node => { node.remove() })
 
+    // Destroy any desk highlight circles
+    const staleHighlightCircles = Array.from(document.querySelectorAll('.highlight'))
+    staleHighlightCircles.forEach(node => { node.remove() })
+
     // Get horizontal and vertical offsets of svg floor plan
     const floorPlanNode = document.getElementsByClassName('floor-plan')[0]
     const floorPlanRect = floorPlanNode.getBoundingClientRect()
@@ -456,23 +470,17 @@ export default class Schaefers3 extends Vue{
           // annotationElem.style.top = (rect.top + rect.height/2 - 70).toString() + 'px'
           
           // On narrower screens, the header takes up 2-4 rows, so we need to nudge the buttons down to match.
-          var singleRowHeaderSpace = 56
-          var rowsHeaderSpace = 56
-          if (window.innerWidth < 514) {
-            // If width less than 514px, there are 4 tall rows of header
-            rowsHeaderSpace = 220
-          } else if (window.innerWidth < 570) {
-            // If width less than 570px, there are 4 short rows of header
-            rowsHeaderSpace = 193
-          } else if (window.innerWidth < 661) {
-            // If width less than 661px, there are 3 rows of header
-            rowsHeaderSpace = 148
-          } else if (window.innerWidth < 959) {
-            // If width less that 959px, there are 2 tall rows of header
-            rowsHeaderSpace = 112
-          } else if (window.innerWidth < 1050) {
-            // If width less that 1050px, there are 2 short rows of header
-            rowsHeaderSpace = 92
+          var singleRowHeaderSpace = 76
+          var rowsHeaderSpace = 76
+          if (window.innerWidth < 519) {
+            // If width less than 519px, there are 3 rows of header
+            rowsHeaderSpace = 213
+          } else if (window.innerWidth < 561) {
+            // If width less that 561px, there are 2 tall rows of header
+            rowsHeaderSpace = 177
+          } else if (window.innerWidth < 1065) {
+            // If width less that 1065px, there are 2 short rows of header
+            rowsHeaderSpace = 132
           }
           var extraHeaderSpace = rowsHeaderSpace - singleRowHeaderSpace
 
@@ -489,7 +497,7 @@ export default class Schaefers3 extends Vue{
           // TODO: Finish and annotate this - can't brain today
           annotationElem.style.left = (rect.left - floorPlanRect.left - rect.width/2 + annotationElem.offsetWidth/2 + deskSplitHorizontalAdjustment).toString() + 'px'
           // TODO: Fix and annotate this - can't brain today
-          annotationElem.style.top = (rect.top - floorPlanRect.top + 48 + extraHeaderSpace).toString() + 'px'
+          annotationElem.style.top = (rect.top - floorPlanRect.top + 68 + extraHeaderSpace).toString() + 'px'
 
           const clickableButton = annotationElem.querySelector('button') as HTMLElement
 
@@ -533,7 +541,7 @@ export default class Schaefers3 extends Vue{
     if (this.highlightedDeskNumberX) {
       const map = document.querySelector('#schaefers-3-page')
       const highlightCircle = document.createElement('div')
-      highlightCircle.id = 'highlight'
+      highlightCircle.classList.add('highlight')
       const mapPadding = map ? map.getBoundingClientRect().left : 0
       highlightCircle.style.left = (this.highlightedDeskNumberX - 36 - mapPadding).toString() + 'px'
       highlightCircle.style.top = (this.highlightedDeskNumberY - 45).toString() + 'px'

@@ -109,6 +109,7 @@ module.exports = configure(function (ctx) {
     devServer: {
       https: false,
       port: 8080,
+      disableHostCheck: true,
       open: false // opens browser window automatically
     },
 

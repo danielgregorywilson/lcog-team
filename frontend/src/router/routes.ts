@@ -291,16 +291,34 @@ const routes: RouteConfig[] = [
             path: '1',
             name: 'schaefers-1',
             component: () => import('src/pages/deskReservation/Schaefers1.vue'),
+            children: [
+              {
+                path: 'desk/:deskNumber',
+                name: 'schaefers-1-desk',
+              }
+            ]
           },
           {
             path: '2',
             name: 'schaefers-2',
             component: () => import('src/pages/deskReservation/Schaefers2.vue'),
+            children: [
+              {
+                path: 'desk/:deskNumber',
+                name: 'schaefers-2-desk',
+              }
+            ]
           },
           {
             path: '3',
             name: 'schaefers-3',
             component: () => import('src/pages/deskReservation/Schaefers3.vue'),
+            children: [
+              {
+                path: 'desk/:deskNumber',
+                name: 'schaefers-3-desk',
+              }
+            ]
           }
         ]
       },
@@ -328,6 +346,20 @@ const routes: RouteConfig[] = [
         beforeEnter: ifCanViewDeskReservationReports
       }
     ]
+  },
+  {
+    // Shortcut path for CIAO to direct to a specific highlighted desk on the
+    // desk reservation map.
+    path: '/desk/:deskNumber',
+    redirect: to => {
+      let name = 'schaefers-1-desk'
+      if (to.params.deskNumber[0] == '2') {
+        name = 'schaefers-2-desk'
+      } else if (to.params.deskNumber[0] == '3') {
+        name = 'schaefers-3-desk'
+      }
+      return { name }
+    }
   },
 
   // Always leave this as last one,

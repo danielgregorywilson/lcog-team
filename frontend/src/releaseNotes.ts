@@ -4,6 +4,20 @@
 
 export const releases = [
   {
+    version: '0.4.11',
+    date: new Date(2022, 5, 28),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Make desk numbers more readable in desk reservation app.'
+      },
+      {
+        type: 'improved',
+        description: 'Allow desk highlighting in desk reservation app.'
+      }
+    ]
+  },
+  {
     version: '0.4.10',
     date: new Date(2022, 5, 14),
     changes: [

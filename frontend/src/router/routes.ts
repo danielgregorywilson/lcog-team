@@ -121,6 +121,10 @@ const routes: RouteConfig[] = [
         name: 'release-notes',
         component: () => import('pages/ReleaseNotes.vue')
       },
+      
+      //////////////////////
+      // RESPONSIBILITIES //
+      //////////////////////
       {
         path: '/responsibilities',
         name: 'responsibilities',
@@ -167,12 +171,53 @@ const routes: RouteConfig[] = [
           }
         ]
       },
+      
+      /////////////////////////
+      // PERFORMANCE REVIEWS //
+      /////////////////////////
       {
         path: '/reviews',
         name: 'reviews',
         component: () => import('pages/PerformanceReviews.vue'),
         beforeEnter: ifManager
       },
+      {
+        path: '/note/new',
+        name: 'note-create',
+        component: () => import('pages/ReviewNoteCreate.vue'),
+        beforeEnter: ifManager
+      },
+      {
+        path: '/note/:pk',
+        name: 'note-details',
+        component: () => import('pages/ReviewNoteDetail.vue'),
+        beforeEnter: ifCanViewNote
+      },
+      {
+        path: '/pr/:pk',
+        name: 'pr-details',
+        component: () => import('pages/PerformanceReviewDetail.vue'),
+        beforeEnter: ifCanViewReview
+      },
+      {
+        path: '/print',
+        component: () => import('layouts/PrintLayout.vue'),
+        children: [
+          {
+            path: 'pr/:pk',
+            name: 'pr-print',
+            component: () => import('pages/PerformanceReviewDetail.vue'),
+            beforeEnter: ifManager,
+            props: {
+              print: true
+            }
+          }
+        ]
+      },
+      
+      //////////////////////
+      // RESPONSIBILITIES //
+      //////////////////////
       {
         path: '/mileage-reimbursement',
         name: 'mileage-reimbursement',
@@ -200,30 +245,42 @@ const routes: RouteConfig[] = [
           // }
         ]
       },
-      {
-        path: '/note/new',
-        name: 'note-create',
-        component: () => import('pages/ReviewNoteCreate.vue'),
-        beforeEnter: ifManager
-      },
-      {
-        path: '/note/:pk',
-        name: 'note-details',
-        component: () => import('pages/ReviewNoteDetail.vue'),
-        beforeEnter: ifCanViewNote
-      },
-      {
-        path: '/pr/:pk',
-        name: 'pr-details',
-        component: () => import('pages/PerformanceReviewDetail.vue'),
-        beforeEnter: ifCanViewReview
-      },
+
+      //////////////
+      // TIME OFF //
+      //////////////
       {
         path: '/timeoff',
         name: 'timeoff',
-        component: () => import('pages/TimeOffRequests.vue'),
-        // beforeEnter: ifAuthenticated
+        component: () => import('src/pages/timeoff/TimeOffBase.vue'),
+        beforeEnter: ifAuthenticated,
+        children: [
+          {
+            path: 'calendar',
+            name: 'timeoff-calendar',
+            component: () => import('src/pages/timeoff/Calendar.vue'),
+          },
+          {
+            path: 'new-request',
+            name: 'timeoff-new-request',
+            component: () => import('src/pages/timeoff/NewRequest.vue'),
+          },
+          {
+            path: 'my-requests',
+            name: 'timeoff-my-requests',
+            component: () => import('src/pages/timeoff/MyRequests.vue'),
+          },
+          {
+            path: 'manage-requests',
+            name: 'timeoff-manage-requests',
+            component: () => import('src/pages/timeoff/ManageRequests.vue'),
+          }
+        ]
       },
+
+      //////////////
+      // TELEWORK //
+      //////////////
       {
         path: '/telework-application',
         name: 'telework-application',
@@ -243,6 +300,10 @@ const routes: RouteConfig[] = [
         component: () => import('pages/TeleworkPolicy.vue'),
         // beforeEnter: ifAuthenticated
       },
+
+      //////////////////////
+      // SECURITY MESSAGE //
+      //////////////////////
       {
         path: '/security-message',
         name: 'security-message',
@@ -251,21 +312,7 @@ const routes: RouteConfig[] = [
       },
     ]
   },
-  {
-    path: '/print',
-    component: () => import('layouts/PrintLayout.vue'),
-    children: [
-      {
-        path: 'pr/:pk',
-        name: 'pr-print',
-        component: () => import('pages/PerformanceReviewDetail.vue'),
-        beforeEnter: ifManager,
-        props: {
-          print: true
-        }
-      }
-    ]
-  },
+  
   {
     path: '/auth',
     component: () => import('layouts/AuthLayout.vue'),
@@ -278,6 +325,10 @@ const routes: RouteConfig[] = [
       },
     ]
   },
+  
+  //////////////////////
+  // DESK RESERVATION //
+  //////////////////////
   {
     path: '/desk-reservation',
     component: () => import('src/pages/deskReservation/DeskReservation.vue'),

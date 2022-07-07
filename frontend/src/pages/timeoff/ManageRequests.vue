@@ -5,7 +5,7 @@
       :columns="columns"
       row-key="pk"
     >
-      <template v-slot:body-cell-approve="props">
+      <template v-slot:body-cell-acknowledge="props">
         <q-td :props="props">
           <q-btn dense round color="red" icon="close" class="q-mr-sm"></q-btn>
           <q-btn dense round color="green" icon="check"></q-btn>

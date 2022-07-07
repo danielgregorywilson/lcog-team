@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'deskreservation',
     'people',
     'responsibilities',
+    'timeoff',
     'rest_framework',
     'rest_framework.authtoken',
     'storages',

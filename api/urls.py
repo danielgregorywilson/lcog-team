@@ -15,6 +15,7 @@ from people.api_views import (
 from responsibilities.api_views import (
     ResponsibilityViewSet, TagViewSet as ResponsibilityTagViewSet
 )
+from timeoff.api_views import TimeOffRequestViewSet
 
 
 urlpatterns = [
@@ -41,6 +42,7 @@ router.register('v1/securitymessage', SecurityMessageViewSet)
 router.register('v1/viewedsecuritymessage', ViewedSecurityMessageViewSet)
 router.register('v1/teleworkapplication', TeleworkApplicationViewSet)
 router.register('v1/teleworksignature', TeleworkSignatureViewSet)
+router.register('v1/timeoffrequest', TimeOffRequestViewSet)
 router.register('v1/trustedip', TrustedIPViewSet, basename='trustedip')
 
 urlpatterns = router.urls + urlpatterns

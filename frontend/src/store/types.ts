@@ -682,6 +682,31 @@ export interface DeskReservationStateInterface {
 }
 
 
+/////////////////////////////////////////////////////////
+// TimeOffRequest Structure from Django Rest Framework //
+/////////////////////////////////////////////////////////
+
+export interface TimeOffRequestCreate {
+  employee_pk: number
+  dates: JSON
+  note: string
+}
+
+export interface TimeOffRequestRetrieve {
+  url: Url
+  pk: number
+  employee_pk: number
+  employee_name: string
+  manager_pk: number
+  dates: JSON
+  acknowledged: boolean
+}
+
+
+/////////////
+// Getters //
+/////////////
+
 export interface VuexStoreGetters {
   'authModule/isAuthenticated': boolean
   'deskReservationModule/allDesks': {
@@ -689,6 +714,10 @@ export interface VuexStoreGetters {
   },
   'deskReservationModule/allDeskReservations': {
     results: Array<DeskReservation>
+  },
+
+  'timeOffModule/myTimeOffRequests': {
+    results: Array<TimeOffRequestRetrieve>
   },
 
   'responsibilityModule/simpleEmployeeList': Array<SimpleEmployeeRetrieve>,

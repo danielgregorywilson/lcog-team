@@ -1,7 +1,7 @@
 <template>
   <div>
     <q-table
-      :data="rows"
+      :data="myTimeOffRequests()"
       :columns="columns"
       row-key="pk"
     />
@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { VuexStoreGetters } from '../../store/types'
+import { TimeOffRequestRetrieve, VuexStoreGetters } from '../../store/types'
 
 @Component
 export default class TimeOffMyRequests extends Vue {
@@ -26,45 +26,34 @@ export default class TimeOffMyRequests extends Vue {
     { name: 'approved', label: 'Approved', field: 'approved', align: 'center' },
   ]
 
-  private rows = [
-    {
-      pk: 1,
-      dates: [ { 'from': '2022/06/09', 'to': '2022/06/16' }, { 'from': '2022/06/17', 'to': '2022/06/18' } ],
-      note: 'Gotta get outta here',
-      approved: false
-    },
-    {
-      pk: 2,
-      dates: [ { 'from': '2022/07/09', 'to': '2022/07/11' } ],
-      note: 'State training',
-      approved: true
-    },
-  ]
-
   private formatDates(datesObj) {
     let str = ''
     for (let i=0; i<datesObj.length; i++) {
       if (i >= 1) {
         str += '; '
       }
-      str += datesObj[i].from + ' - ' + datesObj[i].to
+      if (datesObj[i].constructor == String) {
+        str += datesObj[i]
+      } else {
+        str += datesObj[i].from + ' - ' + datesObj[i].to
+      }
     }
     return str
   }
 
-  // private upcomingTimeOff(): Array<TimeOff> {
-  //   return this.getters['timeOffModule/upcomingTimeOff'].results
-  // }
+  private myTimeOffRequests(): Array<TimeOffRequestRetrieve> {
+    return this.getters['timeOffModule/myTimeOffRequests'].results
+  }
 
-  // private retrieveUpcomingTimeOff(): void {
-  //   this.$store.dispatch('timeOffModule/getUpcomingTimeOff')
-  //     .catch(e => {
-  //       console.error('Error retrieving upcoming time off', e)
-  //     })
-  // }
+  private retrieveMyTimeOffRequests(): void {
+    this.$store.dispatch('timeOffModule/getMyTimeOffRequests')
+      .catch(e => {
+        console.error('Error retrieving my upcoming time off requests', e)
+      })
+  }
 
   mounted() {
-    // this.retrieveUpcomingTimeOff()
+    this.retrieveMyTimeOffRequests()
   }
 }
 </script>

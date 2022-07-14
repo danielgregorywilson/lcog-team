@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { VuexStoreGetters } from '../../store/types'
+import { TimeOffRequestDates, VuexStoreGetters } from '../../store/types'
 
 @Component
 export default class TimeOffManageRequests extends Vue {
@@ -29,7 +29,7 @@ export default class TimeOffManageRequests extends Vue {
 
   private columns = [
     { name: 'employee', label: 'Employee', field: 'employee', sortable: true, align: 'center' },
-    { name: 'dates', label: 'Dates', field: 'dates', format: obj => this.formatDates(obj), sortable: true, align: 'center' },
+    { name: 'dates', label: 'Dates', field: 'dates', format: (obj: TimeOffRequestDates) => this.formatDates(obj), sortable: true, align: 'center' },
     { name: 'note', label: 'Note', field: 'note', align: 'center' },
     { name: 'acknowledge', label: 'Acknowledge?', field: 'acknowledged', align: 'center' },
   ]
@@ -58,13 +58,17 @@ export default class TimeOffManageRequests extends Vue {
     },
   ]
 
-  private formatDates(datesObj) {
+  private formatDates(datesObj: TimeOffRequestDates) {
     let str = ''
     for (let i=0; i<datesObj.length; i++) {
       if (i >= 1) {
         str += '; '
       }
-      str += datesObj[i].from + ' - ' + datesObj[i].to
+      if (datesObj[i].from == datesObj[i].to) {
+        str += datesObj[i].from
+      } else {
+        str += `${datesObj[i].from} - ${datesObj[i].to}`
+      }
     }
     return str
   }

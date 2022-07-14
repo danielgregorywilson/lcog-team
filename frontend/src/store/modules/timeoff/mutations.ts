@@ -3,10 +3,10 @@ import { PerformanceReviewRetrieve, ReviewNoteRetrieve } from 'src/store/types'
 import Vue from 'vue'
 
 import { MutationTree } from 'vuex'
-import { PerformanceReviewStateInterface } from './state'
+import { TimeOffRequestStateInterface } from './state'
 
 
-const mutation: MutationTree<PerformanceReviewStateInterface> = {
+const mutation: MutationTree<TimeOffRequestStateInterface> = {
   setMyTimeOffRequests: (state, resp: {data: Array<TimeOffRequest>}) => {
     Vue.set(state, 'myTimeOffRequests', resp.data)
   },
@@ -35,15 +35,17 @@ const mutation: MutationTree<PerformanceReviewStateInterface> = {
   },
   authLogout: (state) => {
     // Clean up state
-    state.nextPerformanceReview = {pk: undefined, employee_pk: undefined, employee_name: '', performance_period: '', days_until_review: '', status: '', evaluation: ''}
-    state.performanceReview = {pk: undefined, employee_pk: undefined, employee_name: '', performance_period: '', days_until_review: '', status: '', evaluation: ''}
-    state.allPerformanceReviews = []
-    state.allPerformanceReviewsActionRequired = []
-    state.allPerformanceReviewsActionNotRequired = []
-    state.allSignaturePerformanceReviewsActionRequired = []
-    state.allSignaturePerformanceReviewsActionNotRequired = []
-    state.performanceReviewDetails = {}
-    state.allReviewNotes = []
+    state.myTimeOffRequests = []
+    
+    // state.nextPerformanceReview = {pk: undefined, employee_pk: undefined, employee_name: '', performance_period: '', days_until_review: '', status: '', evaluation: ''}
+    // state.performanceReview = {pk: undefined, employee_pk: undefined, employee_name: '', performance_period: '', days_until_review: '', status: '', evaluation: ''}
+    // state.allPerformanceReviews = []
+    // state.allPerformanceReviewsActionRequired = []
+    // state.allPerformanceReviewsActionNotRequired = []
+    // state.allSignaturePerformanceReviewsActionRequired = []
+    // state.allSignaturePerformanceReviewsActionNotRequired = []
+    // state.performanceReviewDetails = {}
+    // state.allReviewNotes = []
   }
 };
 

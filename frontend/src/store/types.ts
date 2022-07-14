@@ -698,10 +698,13 @@ export interface TimeOffRequestRetrieve {
   employee_pk: number
   employee_name: string
   manager_pk: number
-  dates: JSON
+  dates: TimeOffRequestDates
   acknowledged: boolean
 }
 
+export type TimeOffRequestDates = [
+  {from: string; to: string}
+]
 
 /////////////
 // Getters //

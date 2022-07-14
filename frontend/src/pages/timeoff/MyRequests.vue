@@ -4,7 +4,15 @@
       :data="myTimeOffRequests()"
       :columns="columns"
       row-key="pk"
-    />
+    >
+      <template v-slot:body-cell-approved="props">
+        <q-td :props="props">
+          <q-icon v-if="props.row.acknowledged==null" color="orange" name="help" size="lg" />
+          <q-icon v-if="props.row.acknowledged==false" color="red" name="cancel" size="lg" />
+          <q-icon v-if="props.row.acknowledged && props.row.acknowledged==true" color="green" name="check_circle" size="lg" />
+        </q-td>
+      </template>
+    </q-table>
   </div>
 </template>
 

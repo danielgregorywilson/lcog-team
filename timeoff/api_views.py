@@ -35,7 +35,10 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
         the currently authenticated user is the manager.
         """
         user = self.request.user
-        return TimeOffRequest.objects.filter(employee=user.employee)
+        if 'managed' in self.request.GET and is_true_string(self.request.GET['managed']):
+            return TimeOffRequest.objects.filter(employee__manager=user.employee)    
+        else:
+            return TimeOffRequest.objects.filter(employee=user.employee)
 
     def create(self, request):
         dates = request.data['dates']

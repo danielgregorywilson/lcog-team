@@ -10,10 +10,12 @@ export interface TimeOffRequestInterface {
 
 export interface TimeOffRequestStateInterface {
   myTimeOffRequests: Array<TimeOffRequestInterface>
+  managedTimeOffRequests: Array<TimeOffRequestInterface>
 }
 
 const state: TimeOffRequestStateInterface = {
   myTimeOffRequests: [],
+  managedTimeOffRequests: [],
 };
 
 export default state;

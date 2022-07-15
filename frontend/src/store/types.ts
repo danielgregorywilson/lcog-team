@@ -711,7 +711,9 @@ export type TimeOffRequestDates = [
 /////////////
 
 export interface VuexStoreGetters {
-  'authModule/isAuthenticated': boolean
+  'authModule/isAuthenticated': boolean,
+  'userModule/getEmployeeProfile': EmployeeRetrieve,
+
   'deskReservationModule/allDesks': {
     results: Array<Desk>
   },
@@ -720,6 +722,9 @@ export interface VuexStoreGetters {
   },
 
   'timeOffModule/myTimeOffRequests': {
+    results: Array<TimeOffRequestRetrieve>
+  },
+  'timeOffModule/managedTimeOffRequests': {
     results: Array<TimeOffRequestRetrieve>
   },
 

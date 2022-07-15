@@ -6,6 +6,7 @@ class TimeOffRequest(models.Model):
     class Meta:
         verbose_name = _("Time Off Request")
         verbose_name_plural = _("Time Off Requests")
+        ordering = ordering = ["id"]
 
     employee = models.ForeignKey("people.Employee", on_delete=models.CASCADE)
     dates = models.JSONField(default=list)

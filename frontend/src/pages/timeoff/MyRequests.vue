@@ -7,9 +7,21 @@
     >
       <template v-slot:body-cell-approved="props">
         <q-td :props="props">
-          <q-icon v-if="props.row.acknowledged==null" color="orange" name="help" size="lg" />
-          <q-icon v-if="props.row.acknowledged==false" color="red" name="cancel" size="lg" />
-          <q-icon v-if="props.row.acknowledged && props.row.acknowledged==true" color="green" name="check_circle" size="lg" />
+          <q-icon v-if="props.row.acknowledged==null" color="orange" name="help" size="lg">
+            <q-tooltip content-style="font-size: 16px">
+              Your manager has not responded to this request.
+            </q-tooltip>
+          </q-icon>
+          <q-icon v-if="props.row.acknowledged==false" color="red" name="cancel" size="lg">
+            <q-tooltip content-style="font-size: 16px">
+              Your manager has indicated an issue with this request.
+            </q-tooltip>  
+          </q-icon>
+          <q-icon v-if="props.row.acknowledged && props.row.acknowledged==true" color="green" name="check_circle" size="lg">
+            <q-tooltip content-style="font-size: 16px">
+              Your manager has acknowledged this request.
+            </q-tooltip>  
+          </q-icon>
         </q-td>
       </template>
     </q-table>

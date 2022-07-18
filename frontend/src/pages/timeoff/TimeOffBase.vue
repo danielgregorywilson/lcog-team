@@ -27,9 +27,5 @@ export default class TimeOffBase extends Vue {
   private isManager() {
     return this.getters['userModule/getEmployeeProfile'].is_manager
   }
-
-  mounted() {
-    
-  }
 }
 </script>

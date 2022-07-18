@@ -31,14 +31,15 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        This view should return a list of all performance reviews for which
+        This view should return a list of all time off requests for which
         the currently authenticated user is the manager.
         """
         user = self.request.user
-        if 'managed' in self.request.GET and is_true_string(self.request.GET['managed']):
-            return TimeOffRequest.objects.filter(employee__manager=user.employee)    
-        else:
-            return TimeOffRequest.objects.filter(employee=user.employee)
+        if user.is_authenticated:
+            if 'managed' in self.request.GET and is_true_string(self.request.GET['managed']):
+                return TimeOffRequest.objects.filter(employee__manager=user.employee)    
+            else:
+                return TimeOffRequest.objects.filter(employee=user.employee)
 
     def create(self, request):
         dates = request.data['dates']
@@ -115,18 +116,17 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
     #         context={'request': request})
     #     return Response(serialized_review.data)
     
-    # def partial_update(self, request, pk=None):
-    #     """
-    #     Currently just updates the employee's comments. This might need to be
-    #     more general to accept any partial updates.
-    #     """
-    #     pr = PerformanceReview.objects.get(pk=pk)
-    #     pr.evaluation_comments_employee = \
-    #         request.data['evaluation_comments_employee']
-    #     pr.save()
-    #     serialized_review = PerformanceReviewSerializer(pr,
-    #         context={'request': request})
-    #     return Response(serialized_review.data)
+    def partial_update(self, request, pk=None):
+        """
+        Currently just updates the employee's comments. This might need to be
+        more general to accept any partial updates.
+        """
+        tor = TimeOffRequest.objects.get(pk=pk)
+        tor.acknowledged = request.data['acknowledged']
+        tor.save()
+        serialized_tor = TimeOffRequestSerializer(tor,
+            context={'request': request})
+        return Response(serialized_tor.data)
 
     # # TODO: Don't use this - use the ModelViewSet get
     # @action(detail=True, methods=['get'])

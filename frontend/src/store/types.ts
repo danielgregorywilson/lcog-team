@@ -692,6 +692,11 @@ export interface TimeOffRequestCreate {
   note: string
 }
 
+export interface TimeOffRequestAcknowledge {
+  pk: number
+  acknowledge: boolean
+}
+
 export interface TimeOffRequestRetrieve {
   url: Url
   pk: number
@@ -705,6 +710,10 @@ export interface TimeOffRequestRetrieve {
 export type TimeOffRequestDates = [
   {from: string; to: string}
 ]
+
+export interface TimeOffRequestUpdatePartial {
+  acknowledged: boolean
+}
 
 /////////////
 // Getters //

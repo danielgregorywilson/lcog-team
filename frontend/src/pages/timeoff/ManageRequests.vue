@@ -7,8 +7,8 @@
     >
       <template v-slot:body-cell-acknowledge="props">
         <q-td :props="props">
-          <q-btn dense round color="red" icon="close" class="q-mr-sm"></q-btn>
-          <q-btn dense round color="green" icon="check"></q-btn>
+          <q-btn dense round color="red" icon="close" :outline="props.row.acknowledged == null || props.row.acknowledged == true" class="q-mr-sm" @click="acknowledgeRequest(props.row.pk, false)"></q-btn>
+          <q-btn dense round color="green" icon="check" :outline="props.row.acknowledged == null || props.row.acknowledged == false" @click="acknowledgeRequest(props.row.pk, true)"></q-btn>
         </q-td>
       </template>
     </q-table>
@@ -22,6 +22,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { TimeOffRequestDates, TimeOffRequestRetrieve, VuexStoreGetters } from '../../store/types'
+import TimeOffDataService from '../../services/TimeOffDataService'
 
 @Component
 export default class TimeOffManageRequests extends Vue {
@@ -57,6 +58,17 @@ export default class TimeOffManageRequests extends Vue {
     this.$store.dispatch('timeOffModule/getManagedTimeOffRequests')
       .catch(e => {
         console.error('Error retrieving my upcoming time off requests', e)
+      })
+  }
+
+  private acknowledgeRequest(pk: number, approve: boolean): void {
+    TimeOffDataService.updatePartial(pk.toString(), {acknowledged: approve})
+      .then(() => {
+        // TODO: Get just the one we changed, not all of them
+        this.retrieveManagedTimeOffRequests()
+      })
+      .catch(e => {
+        console.error('Error acknowledging time off request', e)
       })
   }
 

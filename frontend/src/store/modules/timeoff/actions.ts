@@ -35,6 +35,18 @@ const actions: ActionTree<TimeOffRequestStateInterface, StateInterface> = {
         console.log(e)
       });
   },
+  acknowledgeTimeOffRequest: ({ dispatch }, timeOffRequest: TimeOffRequestAcknowledge) => {
+    axios({ url: `${ process.env.API_URL ? process.env.API_URL : 'https://api.team.lcog.org/' }api/v1/timeoffrequest`, data: timeOffRequest, method: 'PUT' })
+      .then(() => {
+        dispatch('getMyTimeOffRequests')
+          .catch(e => {
+            console.log(e)
+          })
+      })
+      .catch(e => {
+        console.log(e)
+      });
+  },
 };
 
 export default actions;

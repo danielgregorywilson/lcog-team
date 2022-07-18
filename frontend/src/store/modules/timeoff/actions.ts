@@ -2,11 +2,11 @@ import { ActionTree } from 'vuex';
 import { StateInterface } from '../../index';
 import { TimeOffRequestStateInterface } from './state';
 import axios from 'axios';
-import { TimeOffRequestCreate } from 'src/store/types';
+import { TimeOffRequestAcknowledge, TimeOffRequestCreate } from 'src/store/types';
 
 const actions: ActionTree<TimeOffRequestStateInterface, StateInterface> = {
   getMyTimeOffRequests: ({ commit }) => {
-    axios({ url: `${ process.env.API_URL }api/v1/timeoffrequest` }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
+    axios({ url: `${ process.env.API_URL ? process.env.API_URL : 'https://api.team.lcog.org/' }api/v1/timeoffrequest` })
       .then(resp => {
         commit('setMyTimeOffRequests', resp);
       })
@@ -15,7 +15,7 @@ const actions: ActionTree<TimeOffRequestStateInterface, StateInterface> = {
       });
   },
   getManagedTimeOffRequests: ({ commit }) => {
-    axios({ url: `${ process.env.API_URL }api/v1/timeoffrequest?managed=True` }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
+    axios({ url: `${ process.env.API_URL ? process.env.API_URL : 'https://api.team.lcog.org/' }api/v1/timeoffrequest?managed=True` })
       .then(resp => {
         commit('setManagedTimeOffRequests', resp);
       })
@@ -24,7 +24,7 @@ const actions: ActionTree<TimeOffRequestStateInterface, StateInterface> = {
       });
   },
   createTimeOffRequest: ({ dispatch }, timeOffRequest: TimeOffRequestCreate) => {
-    axios({ url: `${ process.env.API_URL }api/v1/timeoffrequest`, data: timeOffRequest, method: 'POST' }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
+    axios({ url: `${ process.env.API_URL ? process.env.API_URL : 'https://api.team.lcog.org/' }api/v1/timeoffrequest`, data: timeOffRequest, method: 'POST' })
       .then(() => {
         dispatch('getMyTimeOffRequests')
           .catch(e => {

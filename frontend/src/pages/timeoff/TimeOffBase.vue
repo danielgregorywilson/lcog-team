@@ -18,10 +18,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { Notify } from 'quasar'
-import { bus } from '../../App.vue'
-import { Responsibility, SimpleEmployeeRetrieve, VuexStoreGetters } from '../../store/types'
-import ResponsibilityDataService from '../../services/ResponsibilityDataService'
+import { VuexStoreGetters } from '../../store/types'
 
 @Component
 export default class TimeOffBase extends Vue {

@@ -730,6 +730,9 @@ export interface VuexStoreGetters {
     results: Array<DeskReservation>
   },
 
+  'timeOffModule/teamTimeOffRequests': {
+    results: Array<TimeOffRequestRetrieve>
+  },
   'timeOffModule/myTimeOffRequests': {
     results: Array<TimeOffRequestRetrieve>
   },

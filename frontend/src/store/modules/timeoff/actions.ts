@@ -14,6 +14,15 @@ const actions: ActionTree<TimeOffRequestStateInterface, StateInterface> = {
         console.log(e)
       });
   },
+  getTeamTimeOffRequests: ({ commit }) => {
+    axios({ url: `${ process.env.API_URL ? process.env.API_URL : 'https://api.team.lcog.org/' }api/v1/timeoffrequest?team=True` })
+      .then(resp => {
+        commit('setTeamTimeOffRequests', resp);
+      })
+      .catch(e => {
+        console.log(e)
+      });
+  },
   getManagedTimeOffRequests: ({ commit }) => {
     axios({ url: `${ process.env.API_URL ? process.env.API_URL : 'https://api.team.lcog.org/' }api/v1/timeoffrequest?managed=True` })
       .then(resp => {

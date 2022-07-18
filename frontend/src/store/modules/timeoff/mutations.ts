@@ -10,6 +10,9 @@ const mutation: MutationTree<TimeOffRequestStateInterface> = {
   setMyTimeOffRequests: (state, resp: {data: Array<TimeOffRequest>}) => {
     Vue.set(state, 'myTimeOffRequests', resp.data)
   },
+  setTeamTimeOffRequests: (state, resp: {data: Array<TimeOffRequest>}) => {
+    Vue.set(state, 'teamTimeOffRequests', resp.data)
+  },
   setManagedTimeOffRequests: (state, resp: {data: Array<TimeOffRequest>}) => {
     Vue.set(state, 'managedTimeOffRequests', resp.data)
   },

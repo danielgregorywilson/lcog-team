@@ -37,7 +37,9 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_authenticated:
             if 'managed' in self.request.GET and is_true_string(self.request.GET['managed']):
-                return TimeOffRequest.objects.filter(employee__manager=user.employee)    
+                return TimeOffRequest.objects.filter(employee__manager=user.employee)
+            elif 'team' in self.request.GET and is_true_string(self.request.GET['team']):
+                return TimeOffRequest.objects.filter(employee__manager=user.employee.manager)
             else:
                 return TimeOffRequest.objects.filter(employee=user.employee)
 

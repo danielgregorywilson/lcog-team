@@ -703,13 +703,12 @@ export interface TimeOffRequestRetrieve {
   employee_pk: number
   employee_name: string
   manager_pk: number
-  dates: TimeOffRequestDates
+  start_date: Date
+  end_date: Date
   acknowledged: boolean
 }
 
-export type TimeOffRequestDates = [
-  {from: string; to: string}
-]
+export type TimeOffRequestDates = Array<{from: string; to: string}>
 
 export interface TimeOffRequestUpdatePartial {
   acknowledged: boolean

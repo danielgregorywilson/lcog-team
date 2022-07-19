@@ -9,7 +9,8 @@ class TimeOffRequest(models.Model):
         ordering = ordering = ["id"]
 
     employee = models.ForeignKey("people.Employee", on_delete=models.CASCADE)
-    dates = models.JSONField(default=list)
+    start_date = models.DateField(auto_now=False, auto_now_add=False)
+    end_date = models.DateField(auto_now=False, auto_now_add=False)
     note = models.TextField(blank=True, null=True)
     acknowledged = models.BooleanField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)

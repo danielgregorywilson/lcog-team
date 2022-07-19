@@ -44,10 +44,15 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
                 return TimeOffRequest.objects.filter(employee=user.employee)
 
     def create(self, request):
-        dates = request.data['dates']
+        if 'from' in request.data['dates']:
+            start_date = request.data['dates']['from'].replace('/', '-')
+            end_date = request.data['dates']['to'].replace('/', '-')
+        else:
+            start_date = request.data['dates'].replace('/', '-')
+            end_date = request.data['dates'].replace('/', '-')
         note = request.data['note']
         employee = request.user.employee
-        timeoffrequest = TimeOffRequest.objects.create(dates=dates, note=note, employee=employee)
+        timeoffrequest = TimeOffRequest.objects.create(start_date=start_date, end_date=end_date, note=note, employee=employee)
         serialized_timeoffrequest = TimeOffRequestSerializer(timeoffrequest,
             context={'request': request})
         return Response(serialized_timeoffrequest.data)

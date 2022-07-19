@@ -5,6 +5,11 @@
       :columns="columns"
       row-key="pk"
     >
+      <template v-slot:body-cell-dates="props">
+        <q-td key="dates" :props="props">
+          {{ props.row.start_date }} - {{ props.row.end_date }}
+        </q-td>
+      </template>
       <template v-slot:body-cell-acknowledge="props">
         <q-td :props="props">
           <q-btn dense round color="red" icon="close" :outline="props.row.acknowledged == null || props.row.acknowledged == true" class="q-mr-sm" @click="acknowledgeRequest(props.row.pk, false)"></q-btn>
@@ -30,25 +35,10 @@ export default class TimeOffManageRequests extends Vue {
 
   private columns = [
     { name: 'employee', label: 'Employee', field: 'employee_name', sortable: true, align: 'center' },
-    { name: 'dates', label: 'Dates', field: 'dates', format: (obj: TimeOffRequestDates) => this.formatDates(obj), sortable: true, align: 'center' },
+    { name: 'dates', label: 'Dates', field: 'start_date', sortable: true, align: 'center' },
     { name: 'note', label: 'Note', field: 'note', align: 'center' },
     { name: 'acknowledge', label: 'Acknowledge?', field: 'acknowledged', align: 'center' },
   ]
-
-  private formatDates(datesObj: TimeOffRequestDates) {
-    let str = ''
-    for (let i=0; i<datesObj.length; i++) {
-      if (i >= 1) {
-        str += '; '
-      }
-      if (datesObj[i].from == datesObj[i].to) {
-        str += datesObj[i].from
-      } else {
-        str += `${datesObj[i].from} - ${datesObj[i].to}`
-      }
-    }
-    return str
-  }
 
   private managedTimeOffRequests(): Array<TimeOffRequestRetrieve> {
     return this.getters['timeOffModule/managedTimeOffRequests'].results

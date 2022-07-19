@@ -52,16 +52,21 @@ export default class TimeOffCalendar extends Vue {
           date: d.toLocaleDateString('en-us', { weekday: 'long', month: 'long', day: 'numeric' }),
           isToday: isToday,
           requests: apiResults.filter(request => {
-            let inRange = false
-            for (let j=0; j<request.dates.length; j++) {
-              const targetDate = d.setHours(0,0,0,0)
-              const fromDate = new Date(request.dates[j].from).setHours(0,0,0,0)
-              const toDate = new Date(request.dates[j].to).setHours(0,0,0,0)
-              if (fromDate <= targetDate && targetDate <= toDate) {
-                inRange = true
-              }
+            const targetDateMS = d.setHours(0,0,0,0)
+            
+            const fromDate = new Date(request.start_date)
+            const fromTZOffset = fromDate.getTimezoneOffset() * 60000
+            const fromDateMS = new Date(fromDate.getTime() + fromTZOffset).setHours(0,0,0,0)
+            
+            const toDate = new Date(request.end_date)
+            const toTZOffset = toDate.getTimezoneOffset() * 60000
+            const toDateMS = new Date(toDate.getTime() + toTZOffset).setHours(0,0,0,0)
+
+            if (fromDateMS <= targetDateMS && targetDateMS <= toDateMS) {
+              return true
+            } else {
+              return false
             }
-            return inRange
           })
         })
       }

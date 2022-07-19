@@ -1,10 +1,7 @@
 <template>
   <div>
     <div class="q-gutter-md">
-      <q-date
-        v-model="dates"
-        range multiple
-      />
+      <q-date v-model="dates" range/>
     </div>
     <q-input
         v-model="note"
@@ -22,13 +19,13 @@
 <script lang="ts">
 import { Notify } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
-import { VuexStoreGetters } from '../../store/types'
+import { TimeOffRequestDates, VuexStoreGetters } from '../../store/types'
 
 @Component
 export default class TimeOffRequest extends Vue {
   private getters = this.$store.getters as VuexStoreGetters
 
-  private dates = []
+  private dates: TimeOffRequestDates = []
   private note = ''
 
   private formIsFilled(): boolean {

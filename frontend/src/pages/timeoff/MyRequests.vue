@@ -39,7 +39,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { TimeOffRequestDates, TimeOffRequestRetrieve, VuexStoreGetters } from '../../store/types'
+import { TimeOffRequestRetrieve, VuexStoreGetters } from '../../store/types'
 
 @Component
 export default class TimeOffMyRequests extends Vue {

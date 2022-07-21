@@ -738,6 +738,7 @@ export interface VuexStoreGetters {
   'timeOffModule/managedTimeOffRequests': {
     results: Array<TimeOffRequestRetrieve>
   },
+  'timeOffModule/conflictingTimeOffRequests': Array<TimeOffRequestRetrieve>,
 
   'responsibilityModule/simpleEmployeeList': Array<SimpleEmployeeRetrieve>,
   'responsibilityModule/simpleEmployeeDetail': SimpleEmployeeRetrieve,

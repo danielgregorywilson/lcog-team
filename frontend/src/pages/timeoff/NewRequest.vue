@@ -1,7 +1,18 @@
 <template>
   <div>
-    <div class="q-gutter-md">
-      <q-date v-model="dates" range/>
+    <div class="q-gutter-md row">
+      <q-date v-model="dates" range @input="dateChanged()"/>
+      <div v-if="conflictingResponsibilityBuddies().length != 0">
+        <q-icon v-if="true" color="red" name="warning" size="xl" class="q-ml-sm" />
+        <div>
+          <div>One or more team members with shared responsibilities will be also be unavailable:</div>
+          <ul>
+            <li v-for="employee of conflictingResponsibilityBuddies()" :key="employee.pk">
+              <router-link :to="{ name: 'employee-responsibilities', params: { pk: employee.pk } }">{{ employee.name }}</router-link>: {{ employee.responsibility_names[0] }}
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
     <q-input
         v-model="note"
@@ -19,13 +30,13 @@
 <script lang="ts">
 import { Notify } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
-import { TimeOffRequestDates, VuexStoreGetters } from '../../store/types'
+import { TimeOffRequestDates, TimeOffRequestRetrieve, VuexStoreGetters } from '../../store/types'
 
 @Component
 export default class TimeOffRequest extends Vue {
   private getters = this.$store.getters as VuexStoreGetters
 
-  private dates: TimeOffRequestDates = []
+  private dates: Array<TimeOffRequestDates> = []
   private note = ''
 
   private formIsFilled(): boolean {
@@ -36,22 +47,27 @@ export default class TimeOffRequest extends Vue {
     }
   }
 
+  private conflictingResponsibilityBuddies(): Array<TimeOffRequestRetrieve> {
+    return this.getters['timeOffModule/conflictingTimeOffRequests']
+  }
+
+  private dateChanged(): void {
+    // Check if there are any coworkers out with shared responsibilities
+    if (this.dates) {
+      this.$store.dispatch('timeOffModule/getConflictingResponsibilities', { dates: this.dates })
+        .catch(e => {
+          console.error('Error creating review note:', e)
+        })
+    }
+  }
+
   private createTimeOffRequest(): void {
-    // setTimeout(() => {
-    //   this.dates = []
-    //   this.note = ''
-    //   Notify.create('Your request has been submitted')
-    // }, 500)
-    
-    this.$store.dispatch('timeOffModule/createTimeOffRequest', {dates: this.dates, note: this.note})
+    this.$store.dispatch('timeOffModule/createTimeOffRequest', { dates: this.dates, note: this.note })
       .then(() => {
         Notify.create('Created a new time off request.')
         this.$router.push({ name: 'timeoff-my-requests'})
-          .then(() => {
-            // location.reload() // TODO: This seems to be necessary in order to immediately edit a review note after creating it.
-          })
           .catch(e => {
-            console.error('Error navigating to dashboard after creating review note:', e)
+            console.error('Error navigating to My Requests page after creating time off request:', e)
           })
       })
       .catch(e => {

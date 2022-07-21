@@ -5,7 +5,8 @@ import { TimeOffRequestStateInterface } from './state';
 const getters: GetterTree<TimeOffRequestStateInterface, StateInterface> = {
   myTimeOffRequests: state => state.myTimeOffRequests,
   teamTimeOffRequests: state => state.teamTimeOffRequests,
-  managedTimeOffRequests: state => state.managedTimeOffRequests
+  managedTimeOffRequests: state => state.managedTimeOffRequests,
+  conflictingTimeOffRequests: state => state.conflictingTimeOffRequests
 };
 
 export default getters;

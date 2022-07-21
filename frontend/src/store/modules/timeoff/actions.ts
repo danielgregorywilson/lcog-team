@@ -2,11 +2,13 @@ import { ActionTree } from 'vuex';
 import { StateInterface } from '../../index';
 import { TimeOffRequestStateInterface } from './state';
 import axios from 'axios';
-import { TimeOffRequestAcknowledge, TimeOffRequestCreate } from 'src/store/types';
+import { TimeOffRequestAcknowledge, TimeOffRequestCreate, TimeOffRequestDates } from 'src/store/types';
+
+const apiURL = process.env.API_URL ? process.env.API_URL : 'https://api.team.lcog.org/'
 
 const actions: ActionTree<TimeOffRequestStateInterface, StateInterface> = {
   getMyTimeOffRequests: ({ commit }) => {
-    axios({ url: `${ process.env.API_URL ? process.env.API_URL : 'https://api.team.lcog.org/' }api/v1/timeoffrequest` })
+    axios({ url: `${ apiURL }api/v1/timeoffrequest` })
       .then(resp => {
         commit('setMyTimeOffRequests', resp);
       })
@@ -15,7 +17,7 @@ const actions: ActionTree<TimeOffRequestStateInterface, StateInterface> = {
       });
   },
   getTeamTimeOffRequests: ({ commit }) => {
-    axios({ url: `${ process.env.API_URL ? process.env.API_URL : 'https://api.team.lcog.org/' }api/v1/timeoffrequest?team=True` })
+    axios({ url: `${ apiURL }api/v1/timeoffrequest?team=True` })
       .then(resp => {
         commit('setTeamTimeOffRequests', resp);
       })
@@ -24,7 +26,7 @@ const actions: ActionTree<TimeOffRequestStateInterface, StateInterface> = {
       });
   },
   getManagedTimeOffRequests: ({ commit }) => {
-    axios({ url: `${ process.env.API_URL ? process.env.API_URL : 'https://api.team.lcog.org/' }api/v1/timeoffrequest?managed=True` })
+    axios({ url: `${ apiURL }api/v1/timeoffrequest?managed=True` })
       .then(resp => {
         commit('setManagedTimeOffRequests', resp);
       })
@@ -32,8 +34,17 @@ const actions: ActionTree<TimeOffRequestStateInterface, StateInterface> = {
         console.log(e)
       });
   },
+  getConflictingResponsibilities: ({ commit }, data: { dates: Array<TimeOffRequestDates>}) => {
+    axios({ url: `${ apiURL }api/v1/timeoffrequest/conflicting_responsibilities`, data: data, method: 'POST' })
+      .then(resp => {
+        commit('setConflictingResponsibilities', resp);
+      })
+      .catch(e => {
+        console.log(e)
+      });
+  },
   createTimeOffRequest: ({ dispatch }, timeOffRequest: TimeOffRequestCreate) => {
-    axios({ url: `${ process.env.API_URL ? process.env.API_URL : 'https://api.team.lcog.org/' }api/v1/timeoffrequest`, data: timeOffRequest, method: 'POST' })
+    axios({ url: `${ apiURL }api/v1/timeoffrequest`, data: timeOffRequest, method: 'POST' })
       .then(() => {
         dispatch('getMyTimeOffRequests')
           .catch(e => {
@@ -45,7 +56,7 @@ const actions: ActionTree<TimeOffRequestStateInterface, StateInterface> = {
       });
   },
   acknowledgeTimeOffRequest: ({ dispatch }, timeOffRequest: TimeOffRequestAcknowledge) => {
-    axios({ url: `${ process.env.API_URL ? process.env.API_URL : 'https://api.team.lcog.org/' }api/v1/timeoffrequest`, data: timeOffRequest, method: 'PUT' })
+    axios({ url: `${ apiURL }api/v1/timeoffrequest`, data: timeOffRequest, method: 'PUT' })
       .then(() => {
         dispatch('getMyTimeOffRequests')
           .catch(e => {

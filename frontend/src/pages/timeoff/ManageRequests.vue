@@ -12,8 +12,19 @@
       </template>
       <template v-slot:body-cell-acknowledge="props">
         <q-td :props="props">
-          <q-btn dense round color="red" icon="close" :outline="props.row.acknowledged == null || props.row.acknowledged == true" class="q-mr-sm" @click="acknowledgeRequest(props.row.pk, false)"></q-btn>
-          <q-btn dense round color="green" icon="check" :outline="props.row.acknowledged == null || props.row.acknowledged == false" @click="acknowledgeRequest(props.row.pk, true)"></q-btn>
+          <q-btn 
+            dense round color="red" icon="close"
+            :outline="props.row.acknowledged == null || props.row.acknowledged == true"
+            :disable="props.row.acknowledged == false"
+            class="q-mr-sm"
+            @click="acknowledgeRequest(props.row.pk, false)"
+          />
+          <q-btn
+            dense round color="green" icon="check"
+            :outline="props.row.acknowledged == null || props.row.acknowledged == false"
+            :disable="props.row.acknowledged == true"
+            @click="acknowledgeRequest(props.row.pk, true)"
+          />
         </q-td>
       </template>
     </q-table>

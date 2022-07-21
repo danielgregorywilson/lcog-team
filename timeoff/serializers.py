@@ -6,7 +6,7 @@ from people.serializers import EmployeeSerializer
 
 
 class TimeOffRequestSerializer(serializers.HyperlinkedModelSerializer):
-    employee_pk = serializers.IntegerField(source='employee.pk') #TODO: Make IntegerField
+    employee_pk = serializers.IntegerField(source='employee.pk')
     employee_name = serializers.CharField(source='employee.user.get_full_name')
     manager_pk = serializers.IntegerField(source='employee.manager.pk')
  

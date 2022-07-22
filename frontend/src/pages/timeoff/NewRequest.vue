@@ -74,20 +74,5 @@ export default class TimeOffRequest extends Vue {
         console.error('Error creating review note:', e)
       })
   }
-
-  // private upcomingTimeOff(): Array<TimeOff> {
-  //   return this.getters['timeOffModule/upcomingTimeOff'].results
-  // }
-
-  // private retrieveUpcomingTimeOff(): void {
-  //   this.$store.dispatch('timeOffModule/getUpcomingTimeOff')
-  //     .catch(e => {
-  //       console.error('Error retrieving upcoming time off', e)
-  //     })
-  // }
-
-  mounted() {
-    // this.retrieveUpcomingTimeOff()
-  }
 }
 </script>

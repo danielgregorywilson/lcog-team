@@ -10,7 +10,7 @@
           {{ props.row.start_date }} - {{ props.row.end_date }}
         </q-td>
       </template>
-      <template v-slot:body-cell-approved="props">
+      <template v-slot:body-cell-acknowledged="props">
         <q-td :props="props">
           <q-icon v-if="props.row.acknowledged==null" color="orange" name="help" size="lg">
             <q-tooltip content-style="font-size: 16px">
@@ -48,7 +48,7 @@ export default class TimeOffMyRequests extends Vue {
   private columns = [
     { name: 'dates', label: 'Dates', field: 'start_date', sortable: true, align: 'center' },
     { name: 'note', label: 'Note', field: 'note', align: 'center' },
-    { name: 'approved', label: 'Approved', field: 'approved', align: 'center' },
+    { name: 'acknowledged', label: 'Acknowledged', field: 'approved', align: 'center' },
   ]
 
   private myTimeOffRequests(): Array<TimeOffRequestRetrieve> {

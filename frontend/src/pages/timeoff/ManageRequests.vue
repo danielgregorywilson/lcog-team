@@ -11,7 +11,7 @@
         </q-td>
       </template>
       <template v-slot:body-cell-acknowledge="props">
-        <q-td :props="props">
+        <q-td :props="props" class="row justify-center">
           <q-btn 
             dense round color="red" icon="close"
             :outline="props.row.acknowledged == null || props.row.acknowledged == true"
@@ -25,6 +25,18 @@
             :disable="props.row.acknowledged == true"
             @click="acknowledgeRequest(props.row.pk, true)"
           />
+          <div v-if="props.row.conflicts.length != 0" class="q-ml-sm">
+            <q-icon color="orange" name="warning" size="md">
+              <q-tooltip content-class="bg-white text-black" content-style="font-size: 16px">
+                <div>One or more team members with shared responsibilities will be also be unavailable:</div>
+                <ul>
+                  <li v-for="employee of props.row.conflicts" :key="employee.pk">
+                    <router-link :to="{ name: 'employee-responsibilities', params: { pk: employee.pk } }">{{ employee.name }}</router-link>: {{ employee.responsibility_names[0] }}
+                  </li>
+                </ul>
+              </q-tooltip>
+            </q-icon>
+          </div>
         </q-td>
       </template>
     </q-table>

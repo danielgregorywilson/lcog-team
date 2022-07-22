@@ -706,6 +706,7 @@ export interface TimeOffRequestRetrieve {
   start_date: Date
   end_date: Date
   acknowledged: boolean
+  conflicts?: JSON
 }
 
 export type TimeOffRequestDates = Array<{from: string; to: string}>

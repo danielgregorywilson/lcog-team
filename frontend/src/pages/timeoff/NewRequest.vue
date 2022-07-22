@@ -3,7 +3,7 @@
     <div class="q-gutter-md row">
       <q-date v-model="dates" range @input="dateChanged()"/>
       <div v-if="conflictingResponsibilityBuddies().length != 0">
-        <q-icon v-if="true" color="red" name="warning" size="xl" class="q-ml-sm" />
+        <q-icon color="orange" name="warning" size="xl" class="q-ml-sm" />
         <div>
           <div>One or more team members with shared responsibilities will be also be unavailable:</div>
           <ul>

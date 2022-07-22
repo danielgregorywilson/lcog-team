@@ -8,7 +8,7 @@
           <div>One or more team members with shared responsibilities will be also be unavailable:</div>
           <ul>
             <li v-for="employee of conflictingResponsibilityBuddies()" :key="employee.pk">
-              <router-link :to="{ name: 'employee-responsibilities', params: { pk: employee.pk } }">{{ employee.name }}</router-link>: {{ employee.responsibility_names[0] }}
+              <router-link :to="{ name: 'employee-responsibilities', params: { pk: employee.pk } }">{{ employee.name }}</router-link>: {{ employee.responsibility_names[0] }}<span v-if="employee.responsibility_names.length > 1"> and {{ employee.responsibility_names.length - 1 }} more</span>
             </li>
           </ul>
         </div>

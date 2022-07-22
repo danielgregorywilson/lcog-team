@@ -22,7 +22,8 @@ class TimeOffRequest(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     acknowledged_at = models.DateTimeField(blank=True, null=True)
 
-    #TODO: Cached property? When/how to break cache?
+    # TODO: Duplicated in TimeOffRequestViewSet action conflicting_responsibilities
+    # TODO: Cached property? When/how to break cache?
     @property
     # A list of employees with time off requests in the same time period with
     # shared/backup responsibilities.

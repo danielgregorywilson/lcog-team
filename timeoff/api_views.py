@@ -44,20 +44,20 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_authenticated:
             if 'managed' in self.request.GET and is_true_string(self.request.GET['managed']):
-                managed_requests = TimeOffRequest.objects.filter(employee__manager=user.employee)
-                for request in managed_requests:
-                    request.conflicts = [
-                        {
-                            'pk': e.pk,
-                            'name': e.user.get_full_name(),
-                            'responsibility_names': e.responsibility_names
-                        } for e in request.conflicting_responsibilities
-                    ]
-                return managed_requests
+                requests = TimeOffRequest.objects.filter(employee__manager=user.employee)
             elif 'team' in self.request.GET and is_true_string(self.request.GET['team']):
-                return TimeOffRequest.objects.filter(employee__manager=user.employee.manager)
+                requests = TimeOffRequest.objects.filter(employee__manager=user.employee.manager)
             else:
-                return TimeOffRequest.objects.filter(employee=user.employee)
+                requests = TimeOffRequest.objects.filter(employee=user.employee)
+            for request in requests:
+                request.conflicts = [
+                    {
+                        'pk': e.pk,
+                        'name': e.user.get_full_name(),
+                        'responsibility_names': e.responsibility_names
+                    } for e in request.conflicting_responsibilities
+                ]
+            return requests
 
     def create(self, request):
         if 'from' in request.data['dates']:
@@ -158,6 +158,7 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
     #         context={'request': request})
     #     return Response(serialized_review.data)
 
+    # TODO: Duplicated in TimeOffRequest model property .conflicting_responsibilities. Use a generic helper function to handle both?
     # A list of employees with time off requests in the same time period with
     # shared/backup responsibilities.
     @action(detail=False, methods=['post'])

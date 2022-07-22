@@ -16,12 +16,13 @@
             <q-icon v-if="request.acknowledged==false" color="red" name="cancel" size="sm" />
             <q-icon v-if="request.acknowledged && request.acknowledged==true" color="green" name="check_circle" size="sm" />
             <router-link :to="{ name: 'employee-responsibilities', params: { pk: request.employee_pk } }">{{ request.employee_name }}</router-link>
-            <q-icon v-if="true" color="orange" name="warning" size="sm" class="q-ml-sm">
-              <q-tooltip content-style="font-size: 16px">
+            <q-icon v-if="request.conflicts.length != 0" color="orange" name="warning" size="sm" class="q-ml-sm">
+              <q-tooltip  content-style="font-size: 16px">
                 <div>One or more team members with shared responsibilities will be also be unavailable:</div>
                 <ul>
-                  <li>Dan Hogue: Fiddle with the fiddles</li>
-                  <li>Andy Smith: Futz with the futzes</li>
+                  <li v-for="employee of request.conflicts" :key="employee.pk">
+                    {{ employee.name }}: {{ employee.responsibility_names[0] }}<span v-if="employee.responsibility_names.length > 1"> and {{ employee.responsibility_names.length - 1 }} more</span>
+                  </li>
                 </ul>
               </q-tooltip>
             </q-icon>

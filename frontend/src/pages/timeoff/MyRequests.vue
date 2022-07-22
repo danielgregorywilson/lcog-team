@@ -11,7 +11,7 @@
         </q-td>
       </template>
       <template v-slot:body-cell-acknowledged="props">
-        <q-td :props="props">
+        <q-td :props="props" class="row justify-center items-center">
           <q-icon v-if="props.row.acknowledged==null" color="orange" name="help" size="lg">
             <q-tooltip content-style="font-size: 16px">
               Your manager has not responded to this request.
@@ -27,6 +27,18 @@
               Your manager has acknowledged this request.
             </q-tooltip>  
           </q-icon>
+          <div v-if="props.row.conflicts.length != 0" class="q-ml-sm">
+            <q-icon color="orange" name="warning" size="md">
+              <q-tooltip content-style="font-size: 16px">
+                <div>One or more team members with shared responsibilities will be also be unavailable:</div>
+                <ul>
+                  <li v-for="employee of props.row.conflicts" :key="employee.pk">
+                    {{ employee.name }}: {{ employee.responsibility_names[0] }}<span v-if="employee.responsibility_names.length > 1"> and {{ employee.responsibility_names.length - 1 }} more</span>
+                  </li>
+                </ul>
+              </q-tooltip>
+            </q-icon>
+          </div>
         </q-td>
       </template>
     </q-table>

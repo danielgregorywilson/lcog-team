@@ -47,9 +47,9 @@ class TimeOffDataService {
   //   return http.put(`api/v1/performancereview/${performanceReviewPk}/sign/${employeePk}`)
   // }
 
-  // delete(pk: string) {
-  //   return http.delete(`api/v1/performancereview/${pk}`);
-  // }
+  delete(pk: string) {
+    return http.delete(`api/v1/timeoffrequest/${pk}`);
+  }
 
   // deleteAll() {
   //   return http.delete('api/v1/performancereview');

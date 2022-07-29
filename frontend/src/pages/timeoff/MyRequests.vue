@@ -4,7 +4,6 @@
       :data="myTimeOffRequests()"
       :columns="columns"
       row-key="pk"
-      @row-click="clickRow"
     >
       <template v-slot:body-cell-dates="props">
         <q-td key="dates" :props="props">
@@ -42,7 +41,38 @@
           </div>
         </q-td>
       </template>
+      <template v-slot:body-cell-actions="props">
+        <q-td :props="props">
+          <q-btn dense round flat color="grey" class="edit-request" @click="editRequest(props)" icon="edit"></q-btn>
+          <q-btn dense round flat color="grey" class="delete-request" @click="showDeleteDialog(props)" icon="delete"></q-btn>
+        </q-td>
+      </template>
+      <template v-slot:bottom-row>
+        <q-tr @click="clickMakeRequest()" class="cursor-pointer">
+          <q-td colspan="100%">
+            <q-icon name="add" size="md" class="q-pr-sm"/>Request Time Off
+          </q-td>
+        </q-tr>
+      </template>
     </q-table>
+
+    <q-dialog v-model="deleteDialogVisible">
+      <q-card>
+        <q-card-section>
+          <div class="row items-center">
+            <q-avatar icon="insert_chart_outlined" color="primary" text-color="white" />
+            <span class="q-ml-sm">Are you sure you want to delete this request?</span>
+          </div>
+          <div class="row justify-center text-center">{{ deleteDialogDatesText }}</div>
+          <div class="row justify-center text-center">{{ deleteDialogNoteText }}</div>
+        </q-card-section>
+
+        <q-card-actions class="row justify-around">
+          <q-btn flat label="Cancel" color="primary" v-close-popup />
+          <q-btn flat label="Yes, delete it" color="primary" @click="deleteRow()" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -51,6 +81,8 @@
 </style>
 
 <script lang="ts">
+import TimeOffDataService from 'src/services/TimeOffDataService'
+import { Notify } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
 import { TimeOffRequestRetrieve, VuexStoreGetters } from '../../store/types'
 
@@ -67,7 +99,13 @@ export default class TimeOffMyRequests extends Vue {
     { name: 'dates', label: 'Dates', field: 'start_date', sortable: true, align: 'center' },
     { name: 'note', label: 'Note', field: 'note', align: 'center' },
     { name: 'acknowledged', label: 'Acknowledged', field: 'approved', align: 'center' },
+    { name: 'actions', label: 'Actions' },
   ]
+
+  private deleteDialogVisible = false
+  private deleteDialogDatesText = ''
+  private deleteDialogNoteText = ''
+  private rowPkToDelete = ''
 
   private myTimeOffRequests(): Array<TimeOffRequestRetrieve> {
     return this.getters['timeOffModule/myTimeOffRequests'].results
@@ -80,11 +118,36 @@ export default class TimeOffMyRequests extends Vue {
       })
   }
 
-  private clickRow(evt: MouseEvent, row: TimeOffRequestRetrieve): void {
-    const rowPk = row.pk.toString()
+  private editRequest(props: QuasarTimeOffRequestTableRowClickActionProps): void {
+    const rowPk = props.row.pk.toString()
     this.$router.push({ name: 'timeoff-request-detail', params: { pk: rowPk }})
       .catch(e => {
         console.error('Error navigating to time off request detail:', e)
+      })
+  }
+
+  private showDeleteDialog(props: QuasarTimeOffRequestTableRowClickActionProps): void {
+    this.rowPkToDelete = props.row.pk.toString()
+    this.deleteDialogDatesText = `${props.row.start_date.toString()} - ${props.row.end_date.toString()}`
+    this.deleteDialogNoteText = props.row.note
+    this.deleteDialogVisible = true;
+  }
+
+  private deleteRow(): void {
+    TimeOffDataService.delete(this.rowPkToDelete)
+      .then(() => {
+        Notify.create('Deleted a time off request.')
+        this.retrieveMyTimeOffRequests()
+      })
+      .catch(e => {
+        console.error('Error deleting time off request', e)
+      })
+  }
+
+  private clickMakeRequest(): void {
+    this.$router.push({'name': 'timeoff-new-request'})
+      .catch(e => {
+        console.error('Error navigating to new note page', e)
       })
   }
 

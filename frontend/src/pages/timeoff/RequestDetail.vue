@@ -71,7 +71,7 @@ export default class TimeOffRequest extends Vue {
         const endDate: string = response.data.end_date.toString().split('-').join('/')
         this.pk = response.data.pk.toString()
         if (startDate == endDate) {
-          this.dates = [startDate]
+          this.dates = startDate
         } else {
           this.dates = {'from': startDate, 'to': endDate}
         }

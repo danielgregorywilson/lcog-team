@@ -4,7 +4,6 @@
     <div class="q-my-md row justify-between">
       <div class="q-gutter-sm">
         <q-btn :to="{ name: 'timeoff-calendar' }" unelevated rounded color="primary" icon="list" label="Who Is Out?" />
-        <q-btn :to="{ name: 'timeoff-new-request' }" unelevated rounded color="primary" icon="add" label="Request Time Off" />
         <q-btn :to="{ name: 'timeoff-my-requests' }" unelevated rounded color="primary" icon="calendar_today" label="My Requests" />
         <q-btn v-if="isManager()" :to="{ name: 'timeoff-manage-requests' }" unelevated rounded color="primary" icon="book" label="Manage Requests" />
       </div>

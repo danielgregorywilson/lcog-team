@@ -687,7 +687,7 @@ export interface DeskReservationStateInterface {
 // TimeOffRequest Structure from Django Rest Framework //
 /////////////////////////////////////////////////////////
 
-export type TimeOffRequestDates = {from: string; to: string} | Array<string>
+export type TimeOffRequestDates = {from: string; to: string} | string
 
 export interface TimeOffRequestCreate {
   employee_pk: number

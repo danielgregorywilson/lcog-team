@@ -3,6 +3,7 @@
     <q-table
       :data="myTimeOffRequests()"
       :columns="columns"
+      :pagination="tablePagination"
       row-key="pk"
     >
       <template v-slot:body-cell-dates="props">
@@ -101,6 +102,12 @@ export default class TimeOffMyRequests extends Vue {
     { name: 'acknowledged', label: 'Acknowledged', field: 'approved', align: 'center' },
     { name: 'actions', label: 'Actions' },
   ]
+
+  private tablePagination = {
+    sortBy: 'dates',
+    descending: true,
+    rowsPerPage: 10
+  }
 
   private deleteDialogVisible = false
   private deleteDialogDatesText = ''

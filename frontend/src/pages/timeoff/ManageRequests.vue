@@ -3,6 +3,7 @@
     <q-table
       :data="managedTimeOffRequests()"
       :columns="columns"
+      :pagination="tablePagination"
       row-key="pk"
     >
       <template v-slot:body-cell-dates="props">
@@ -62,6 +63,12 @@ export default class TimeOffManageRequests extends Vue {
     { name: 'note', label: 'Note', field: 'note', align: 'center' },
     { name: 'acknowledge', label: 'Acknowledge?', field: 'acknowledged', align: 'center' },
   ]
+
+  private tablePagination = {
+    sortBy: 'dates',
+    descending: true,
+    rowsPerPage: 10
+  }
 
   private managedTimeOffRequests(): Array<TimeOffRequestRetrieve> {
     return this.getters['timeOffModule/managedTimeOffRequests'].results

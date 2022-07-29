@@ -49,6 +49,7 @@ export interface EmployeeRetrieve {
   can_edit_seating_charts: boolean
   prs_can_view: Array<number>
   notes_can_view: Array<number>
+  time_off_requests_can_view: Array<number>
   telework_applications_can_view: Array<number>
   next_to_sign_prs: string
 }
@@ -686,9 +687,11 @@ export interface DeskReservationStateInterface {
 // TimeOffRequest Structure from Django Rest Framework //
 /////////////////////////////////////////////////////////
 
+export type TimeOffRequestDates = {from: string; to: string} | Array<string>
+
 export interface TimeOffRequestCreate {
   employee_pk: number
-  dates: JSON
+  dates: TimeOffRequestDates
   note: string
 }
 
@@ -705,14 +708,22 @@ export interface TimeOffRequestRetrieve {
   manager_pk: number
   start_date: Date
   end_date: Date
+  note: string
   acknowledged: boolean
   conflicts?: JSON
 }
 
-export type TimeOffRequestDates = Array<{from: string; to: string}>
+export interface TimeOffRequestUpdate {
+  dates: TimeOffRequestDates
+  note: string
+}
 
 export interface TimeOffRequestUpdatePartial {
   acknowledged: boolean
+}
+
+export interface AxiosTimeOffRequestRetrieveOneServerResponse {
+  data: TimeOffRequestRetrieve
 }
 
 /////////////

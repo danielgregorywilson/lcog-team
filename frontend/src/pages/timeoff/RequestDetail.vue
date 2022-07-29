@@ -19,7 +19,7 @@
         label="Note"
         class="q-pb-md"
       />
-    <q-btn id="review-note-create-button" color="white" text-color="black" label="Create" :disabled="!formIsFilled()" @click="createTimeOffRequest()" />
+    <q-btn id="review-note-create-button" color="white" text-color="black" label="Update" :disabled="!formIsFilled()" @click="updateTimeOffRequest()" />
   </div>
 </template>
 
@@ -28,14 +28,15 @@
 </style>
 
 <script lang="ts">
-import { Notify } from 'quasar'
+import TimeOffDataService from 'src/services/TimeOffDataService'
 import { Component, Vue } from 'vue-property-decorator'
-import { TimeOffRequestDates, TimeOffRequestRetrieve, VuexStoreGetters } from '../../store/types'
+import { TimeOffRequestDates, TimeOffRequestRetrieve, AxiosTimeOffRequestRetrieveOneServerResponse, VuexStoreGetters } from '../../store/types'
 
 @Component
 export default class TimeOffRequest extends Vue {
   private getters = this.$store.getters as VuexStoreGetters
 
+  private pk = ''
   private dates: TimeOffRequestDates = {'from': '', 'to': ''}
   private note = ''
 
@@ -46,6 +47,8 @@ export default class TimeOffRequest extends Vue {
       return false
     }
   }
+
+  // TODO: Do a valuesAreChanged thing like with ReviewNoteDetail so we aren't always resetting acknowledgements unnecessarily
 
   private conflictingResponsibilityBuddies(): Array<TimeOffRequestRetrieve> {
     return this.getters['timeOffModule/conflictingTimeOffRequests']
@@ -61,21 +64,42 @@ export default class TimeOffRequest extends Vue {
     }
   }
 
-  private createTimeOffRequest(): void {
-    this.$store.dispatch('timeOffModule/createTimeOffRequest', { dates: this.dates, note: this.note })
+  private retrieveRequest(): void {
+    TimeOffDataService.get(this.$route.params.pk)
+      .then((response: AxiosTimeOffRequestRetrieveOneServerResponse) => {
+        const startDate: string = response.data.start_date.toString().split('-').join('/')
+        const endDate: string = response.data.end_date.toString().split('-').join('/')
+        this.pk = response.data.pk.toString()
+        if (startDate == endDate) {
+          this.dates = [startDate]
+        } else {
+          this.dates = {'from': startDate, 'to': endDate}
+        }
+        this.note = response.data.note
+      })
+      .catch(e => {
+        console.error('Error getting review note:', e);
+      });
+  }
+
+  private updateTimeOffRequest(): void {
+    TimeOffDataService.update(this.pk, {
+      dates: this.dates,
+      note: this.note
+    })
       .then(() => {
-        Notify.create('Created a new time off request.')
         this.$router.push({ name: 'timeoff-my-requests'})
-          .then(() => {
-            location.reload() // TODO: This seems to be necessary in order to immediately edit a time off request after creating it.
-          })
           .catch(e => {
             console.error('Error navigating to My Requests page after creating time off request:', e)
           })
       })
       .catch(e => {
-        console.error('Error creating review note:', e)
+        console.error('Error updating time off request:', e)
       })
+  }
+
+  mounted() {
+    this.retrieveRequest();
   }
 }
 </script>

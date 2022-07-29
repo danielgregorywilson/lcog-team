@@ -1,6 +1,6 @@
 import http from '../http-common';
 
-import { TimeOffRequestUpdatePartial } from '../store/types'
+import { TimeOffRequestUpdate, TimeOffRequestUpdatePartial } from '../store/types'
 
 class TimeOffDataService {
   // getAll() {
@@ -23,17 +23,17 @@ class TimeOffDataService {
   //   return http.get('api/v1/performancereview?action_required=False&signature=True');
   // }
 
-  // get(pk: string) {
-  //   return http.get(`api/v1/performancereview/${pk}`);
-  // }
+  get(pk: string) {
+    return http.get(`api/v1/timeoffrequest/${pk}`);
+  }
 
   // create(data: PerformanceReviewCreate) {
   //   return http.post('api/v1/performancereview', data);
   // }
 
-  // update(pk: string, data: PerformanceReviewUpdate) {
-  //   return http.put(`api/v1/performancereview/${pk}`, data);
-  // }
+  update(pk: string, data: TimeOffRequestUpdate) {
+    return http.put(`api/v1/timeoffrequest/${pk}`, data);
+  }
 
   updatePartial(pk: string, data: TimeOffRequestUpdatePartial) {
     return http.patch(`api/v1/timeoffrequest/${pk}`, data);

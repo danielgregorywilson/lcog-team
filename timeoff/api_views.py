@@ -80,64 +80,23 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
     #         context={'request': request})
     #     return Response(serializer.data)
 
-    # def update(self, request, pk=None):
-    #     pr = PerformanceReview.objects.get(pk=pk)
-    #     pr.evaluation_type = request.data['evaluation_type']
-    #     pr.probationary_evaluation_type = \
-    #         request.data['probationary_evaluation_type']
-    #     pr.step_increase = request.data['step_increase']
-    #     pr.top_step_bonus = request.data['top_step_bonus']
-    #     pr.action_other = request.data['action_other']
-    #     pr.factor_job_knowledge = request.data['factor_job_knowledge']
-    #     pr.factor_work_quality = request.data['factor_work_quality']
-    #     pr.factor_work_quantity = request.data['factor_work_quantity']
-    #     pr.factor_work_habits = request.data['factor_work_habits']
-    #     pr.factor_analysis = request.data['factor_analysis']
-    #     pr.factor_initiative = request.data['factor_initiative']
-    #     pr.factor_interpersonal = request.data['factor_interpersonal']
-    #     pr.factor_communication = request.data['factor_communication']
-    #     pr.factor_dependability = request.data['factor_dependability']
-    #     pr.factor_professionalism = request.data['factor_professionalism']
-    #     pr.factor_management = request.data['factor_management']
-    #     pr.factor_supervision = request.data['factor_supervision']
-    #     pr.evaluation_successes = request.data['evaluation_successes']
-    #     pr.evaluation_opportunities = request.data['evaluation_opportunities']
-    #     pr.evaluation_goals_manager = request.data['evaluation_goals_manager']
-    #     pr.evaluation_comments_employee = \
-    #         request.data['evaluation_comments_employee']
-    #     pr.description_reviewed_employee = \
-    #         request.data['description_reviewed_employee']
-    #     if pr.status == PerformanceReview.NEEDS_EVALUATION and all([
-    #         (pr.evaluation_type == 'A' or
-    #             (pr.evaluation_type == 'P' and
-    #                 pr.probationary_evaluation_type != None
-    #             )
-    #         ),
-    #         pr.step_increase != None,
-    #         pr.top_step_bonus != None,
-    #         pr.factor_job_knowledge != None,
-    #         pr.factor_work_quality != None,
-    #         pr.factor_work_quantity != None,
-    #         pr.factor_work_habits != None,
-    #         pr.factor_analysis != None,
-    #         pr.factor_initiative != None,
-    #         pr.factor_interpersonal != None,
-    #         pr.factor_communication != None,
-    #         pr.factor_dependability != None,
-    #         pr.factor_professionalism != None,
-    #         pr.factor_management != None,
-    #         pr.factor_supervision != None,
-    #         len(pr.evaluation_successes) > 0,
-    #         len(pr.evaluation_opportunities) > 0,
-    #         len(pr.evaluation_goals_manager) > 0,
-    #         pr.description_reviewed_employee
-    #     ]):
-    #         pr.status = PerformanceReview.EVALUATION_WRITTEN
-    #         send_evaluation_written_email_to_employee(pr.employee, pr)
-    #     pr.save()
-    #     serialized_review = PerformanceReviewSerializer(pr,
-    #         context={'request': request})
-    #     return Response(serialized_review.data)
+    def update(self, request, pk=None):
+        tor = TimeOffRequest.objects.get(pk=pk)
+        if 'from' in request.data['dates']:
+            start_date = request.data['dates']['from'].replace('/', '-')
+            end_date = request.data['dates']['to'].replace('/', '-')
+        else:
+            start_date = request.data['dates'].replace('/', '-')
+            end_date = request.data['dates'].replace('/', '-')
+        tor.note = request.data['note']
+        if start_date != str(tor.start_date) or end_date != str(tor.end_date):
+            tor.start_date = start_date
+            tor.end_date = end_date
+            tor.acknowledged = None # Reset acknowledged status since we are making a change
+        tor.save()
+        serialized_tor = TimeOffRequestSerializer(tor,
+            context={'request': request})
+        return Response(serialized_tor.data)
     
     def partial_update(self, request, pk=None):
         """

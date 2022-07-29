@@ -4,6 +4,7 @@
       :data="myTimeOffRequests()"
       :columns="columns"
       row-key="pk"
+      @row-click="clickRow"
     >
       <template v-slot:body-cell-dates="props">
         <q-td key="dates" :props="props">
@@ -53,6 +54,11 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { TimeOffRequestRetrieve, VuexStoreGetters } from '../../store/types'
 
+interface QuasarTimeOffRequestTableRowClickActionProps {
+  evt: MouseEvent;
+  row: TimeOffRequestRetrieve;
+}
+
 @Component
 export default class TimeOffMyRequests extends Vue {
   private getters = this.$store.getters as VuexStoreGetters
@@ -71,6 +77,14 @@ export default class TimeOffMyRequests extends Vue {
     this.$store.dispatch('timeOffModule/getMyTimeOffRequests')
       .catch(e => {
         console.error('Error retrieving my upcoming time off requests', e)
+      })
+  }
+
+  private clickRow(evt: MouseEvent, row: TimeOffRequestRetrieve): void {
+    const rowPk = row.pk.toString()
+    this.$router.push({ name: 'timeoff-request-detail', params: { pk: rowPk }})
+      .catch(e => {
+        console.error('Error navigating to time off request detail:', e)
       })
   }
 

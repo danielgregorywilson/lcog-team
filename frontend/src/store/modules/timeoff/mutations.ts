@@ -1,5 +1,4 @@
 import TimeOffRequest from 'src/pages/timeoff/NewRequest.vue';
-import { PerformanceReviewRetrieve, ReviewNoteRetrieve } from 'src/store/types'
 import Vue from 'vue'
 
 import { MutationTree } from 'vuex'
@@ -21,27 +20,27 @@ const mutation: MutationTree<TimeOffRequestStateInterface> = {
   },
 
   
-  setAllReviewNotes: (state, resp: {data: Array<ReviewNoteRetrieve>}) => {
-    Vue.set(state, 'allReviewNotes', resp.data)
-  },
-  setPerformanceReview: (state, resp: {data: PerformanceReviewRetrieve}) => {
-    Vue.set(state, 'performanceReview', resp.data)
-  },
-  setAllPerformanceReviews: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
-    Vue.set(state, 'allPerformanceReviews', resp.data)
-  },
-  setAllPerformanceReviewsActionRequired: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
-    Vue.set(state, 'allPerformanceReviewsActionRequired', resp.data)
-  },
-  setAllPerformanceReviewsActionNotRequired: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
-    Vue.set(state, 'allPerformanceReviewsActionNotRequired', resp.data)
-  },
-  setAllSignaturePerformanceReviewsActionRequired: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
-    Vue.set(state, 'allSignaturePerformanceReviewsActionRequired', resp.data)
-  },
-  setAllSignaturePerformanceReviewsActionNotRequired: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
-    Vue.set(state, 'allSignaturePerformanceReviewsActionNotRequired', resp.data)
-  },
+  // setAllReviewNotes: (state, resp: {data: Array<ReviewNoteRetrieve>}) => {
+  //   Vue.set(state, 'allReviewNotes', resp.data)
+  // },
+  // setPerformanceReview: (state, resp: {data: PerformanceReviewRetrieve}) => {
+  //   Vue.set(state, 'performanceReview', resp.data)
+  // },
+  // setAllPerformanceReviews: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
+  //   Vue.set(state, 'allPerformanceReviews', resp.data)
+  // },
+  // setAllPerformanceReviewsActionRequired: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
+  //   Vue.set(state, 'allPerformanceReviewsActionRequired', resp.data)
+  // },
+  // setAllPerformanceReviewsActionNotRequired: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
+  //   Vue.set(state, 'allPerformanceReviewsActionNotRequired', resp.data)
+  // },
+  // setAllSignaturePerformanceReviewsActionRequired: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
+  //   Vue.set(state, 'allSignaturePerformanceReviewsActionRequired', resp.data)
+  // },
+  // setAllSignaturePerformanceReviewsActionNotRequired: (state, resp: {data: Array<PerformanceReviewRetrieve>}) => {
+  //   Vue.set(state, 'allSignaturePerformanceReviewsActionNotRequired', resp.data)
+  // },
   authLogout: (state) => {
     // Clean up state
     state.myTimeOffRequests = []

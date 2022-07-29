@@ -104,6 +104,15 @@ const ifCanViewDeskReservationReports = (to: Route, from: Route, next: Next) => 
     })
 }
 
+const ifCanViewTimeOffRequest = (to: Route, from: Route, next: Next) => {
+  if (!!authState.token && Vue.prototype.$cookies.get('time_off_requests_can_view') && Vue.prototype.$cookies.get('time_off_requests_can_view').indexOf(parseInt(to.params.pk)) != -1) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    next()
+    return
+  } else {
+    next('dashboard')
+  }
+}
+
 // TODO: Add a reset password view as in Django version, unless we're authenticating with LDAP
 const routes: RouteConfig[] = [
   {
@@ -269,6 +278,12 @@ const routes: RouteConfig[] = [
             path: 'my-requests',
             name: 'timeoff-my-requests',
             component: () => import('src/pages/timeoff/MyRequests.vue'),
+          },
+          {
+            path: 'request-detail/:pk',
+            name: 'timeoff-request-detail',
+            component: () => import('src/pages/timeoff/RequestDetail.vue'),
+            beforeEnter: ifCanViewTimeOffRequest,
           },
           {
             path: 'manage-requests',

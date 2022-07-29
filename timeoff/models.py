@@ -22,7 +22,7 @@ class TimeOffRequest(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     acknowledged_at = models.DateTimeField(blank=True, null=True)
 
-    # TODO: Duplicated in TimeOffRequestViewSet action conflicting_responsibilities
+    # TODO: Duplicated in TimeOffRequestViewSet action conflicting_responsibilities. Use a generic helper function to handle both?
     # TODO: Cached property? When/how to break cache?
     @property
     # A list of employees with time off requests in the same time period with

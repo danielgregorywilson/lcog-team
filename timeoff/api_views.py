@@ -1,27 +1,21 @@
 import datetime
+from time import time
 from responsibilities.models import Responsibility
 
-from rest_framework import permissions, viewsets
+from rest_framework import viewsets
 from rest_framework.decorators import action
-from rest_framework.generics import RetrieveAPIView
-from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.permissions import (
-    BasePermission, DjangoModelPermissionsOrAnonReadOnly, IsAuthenticated,
-    IsAuthenticatedOrReadOnly, SAFE_METHODS
-)
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from django.contrib.auth.models import Group, User
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
-from mainsite.helpers import (
-is_true_string, send_evaluation_written_email_to_employee,
-send_signature_email_to_manager
-)
+from mainsite.helpers import is_true_string
 
 from people.models import Employee
 
+from timeoff.helpers import send_timeoff_request_notification
 from timeoff.models import TimeOffRequest
 
 from timeoff.serializers import (
@@ -73,6 +67,7 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
         note = request.data['note']
         employee = request.user.employee
         timeoffrequest = TimeOffRequest.objects.create(start_date=start_date, end_date=end_date, note=note, employee=employee)
+        send_timeoff_request_notification(employee=employee.manager, tor=timeoffrequest)
         serialized_timeoffrequest = TimeOffRequestSerializer(timeoffrequest,
             context={'request': request})
         return Response(serialized_timeoffrequest.data)

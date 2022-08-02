@@ -2,7 +2,7 @@
   <div>
     <div class="q-gutter-md row">
       <q-date v-model="dates" range @input="dateChanged()"/>
-      <div v-if="conflictingResponsibilityBuddies().length != 0">
+      <div v-if="touchedCalendar && conflictingResponsibilityBuddies().length != 0">
         <q-icon color="orange" name="warning" size="xl" class="q-ml-sm" />
         <div>
           <div>One or more team members with shared responsibilities will be also be unavailable:</div>
@@ -36,11 +36,12 @@ import { TimeOffRequestDates, TimeOffRequestRetrieve, VuexStoreGetters } from '.
 export default class TimeOffRequest extends Vue {
   private getters = this.$store.getters as VuexStoreGetters
 
+  private touchedCalendar = false
   private dates: TimeOffRequestDates = {'from': '', 'to': ''}
   private note = ''
 
   private formIsFilled(): boolean {
-    if (!!this.dates) {
+    if (this.dates && (this.dates.hasOwnProperty('from') && this.dates.from != '') || (!this.dates.hasOwnProperty('from') && this.dates != '')) {
       return true
     } else {
       return false
@@ -53,6 +54,7 @@ export default class TimeOffRequest extends Vue {
 
   private dateChanged(): void {
     // Check if there are any coworkers out with shared responsibilities
+    this.touchedCalendar = true
     if (this.dates) {
       this.$store.dispatch('timeOffModule/getConflictingResponsibilities', { dates: this.dates })
         .catch(e => {
@@ -62,6 +64,9 @@ export default class TimeOffRequest extends Vue {
   }
 
   private createTimeOffRequest(): void {
+    if (this.dates.hasOwnProperty('from') && this.dates.from == '') {
+      return
+    }    
     this.$store.dispatch('timeOffModule/createTimeOffRequest', { dates: this.dates, note: this.note })
       .then(() => {
         Notify.create('Created a new time off request.')

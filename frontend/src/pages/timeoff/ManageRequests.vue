@@ -91,9 +91,5 @@ export default class TimeOffManageRequests extends Vue {
         console.error('Error acknowledging time off request', e)
       })
   }
-
-  mounted() {
-    this.retrieveManagedTimeOffRequests()
-  }
 }
 </script>

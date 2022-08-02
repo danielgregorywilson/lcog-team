@@ -41,7 +41,7 @@ export default class TimeOffRequest extends Vue {
   private note = ''
 
   private formIsFilled(): boolean {
-    if (this.dates && (this.dates.hasOwnProperty('from') && this.dates.from != '') || (!this.dates.hasOwnProperty('from') && this.dates != '')) {
+    if (this.dates && (typeof this.dates != 'string' && this.dates.from != '') || (typeof this.dates == 'string' && this.dates != '')) {
       return true
     } else {
       return false
@@ -64,7 +64,7 @@ export default class TimeOffRequest extends Vue {
   }
 
   private createTimeOffRequest(): void {
-    if (this.dates.hasOwnProperty('from') && this.dates.from == '') {
+    if (typeof this.dates != 'string' && this.dates.from == '') {
       return
     }    
     this.$store.dispatch('timeOffModule/createTimeOffRequest', { dates: this.dates, note: this.note })

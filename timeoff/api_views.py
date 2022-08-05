@@ -72,13 +72,6 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
             context={'request': request})
         return Response(serialized_timeoffrequest.data)
 
-    # def retrieve(self, request, pk=None):
-    #     queryset = PerformanceReview.objects.all()
-    #     pr = get_object_or_404(queryset, pk=pk)
-    #     serializer = PerformanceReviewSerializer(pr, 
-    #         context={'request': request})
-    #     return Response(serializer.data)
-
     def update(self, request, pk=None):
         tor = TimeOffRequest.objects.get(pk=pk)
         if 'from' in request.data['dates']:
@@ -107,14 +100,6 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
         serialized_tor = TimeOffRequestSerializer(tor,
             context={'request': request})
         return Response(serialized_tor.data)
-
-    # # TODO: Don't use this - use the ModelViewSet get
-    # @action(detail=True, methods=['get'])
-    # def get_a_performance_review(self, request, pk=None):
-    #     review = PerformanceReview.objects.get(pk=pk)
-    #     serialized_review = PerformanceReviewSerializer(review,
-    #         context={'request': request})
-    #     return Response(serialized_review.data)
 
     # TODO: Duplicated in TimeOffRequest model property .conflicting_responsibilities. Use a generic helper function to handle both?
     # A list of employees with time off requests in the same time period with

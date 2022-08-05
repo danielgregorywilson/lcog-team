@@ -4,6 +4,16 @@
 
 export const releases = [
   {
+    version: '0.5.0',
+    date: new Date(2022, 5, 28),
+    changes: [
+      {
+        type: 'new',
+        description: 'Time off requests module: request, acknowledge, calendar, weekly report.'
+      },
+    ]
+  },
+  {
     version: '0.4.11',
     date: new Date(2022, 5, 28),
     changes: [

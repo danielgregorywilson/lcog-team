@@ -7,6 +7,7 @@ import performanceReviewModule from './modules/performancereview'
 import responsibilityModule from './modules/responsibility'
 import securityMessageModule from './modules/securitymessage'
 import teleworkModule from './modules/telework'
+import timeOffModule from './modules/timeoff'
 import userModule from './modules/user'
 
 
@@ -39,6 +40,7 @@ export default store(function ({ Vue }) {
       responsibilityModule,
       securityMessageModule,
       teleworkModule,
+      timeOffModule,
       userModule,
     },
 

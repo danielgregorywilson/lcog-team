@@ -62,13 +62,13 @@ export default class ReviewNoteDetail extends Vue{
     ReviewNoteDataService.get(this.$route.params.pk)
       .then((response: AxiosReviewNoteRetrieveOneServerResponse) => {
         this.pk = response.data.pk.toString()
-        this.employee = {label: response.data.employee_name, value: response.data.employee_pk};
-        this.note = response.data.note;
+        this.employee = {label: response.data.employee_name, value: response.data.employee_pk}
+        this.note = response.data.note
         this.employeeCurrentVal = this.employee
         this.noteCurrentVal = this.note
       })
       .catch(e => {
-        console.error('Error getting review note:', e);
+        console.error('Error getting review note:', e)
       });
   }
 

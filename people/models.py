@@ -1,6 +1,7 @@
 import datetime
 from mainsite.models import SecurityMessage
 
+from django.apps import apps
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -360,6 +361,12 @@ class Employee(models.Model):
             application_ids += employee_application_ids
         return list(application_ids)
     
+    def time_off_requests_can_view(self):
+        # You can view/edit all requests you made.
+        TimeOffRequestModel = apps.get_model('timeoff', 'TimeOffRequest') # Avoid circular import
+        tor_ids = map(lambda tor: tor.id, TimeOffRequestModel.objects.filter(employee=self))
+        return list(tor_ids)
+
     def can_view_seating_charts(self):
         # You can view seating charts if you are an ED, HR Manager, or Division
         # Director. Employees with the 'HR Employee' or 'View Seating Charts'

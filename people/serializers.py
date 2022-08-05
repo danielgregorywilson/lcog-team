@@ -43,6 +43,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     is_upper_manager = serializers.SerializerMethodField()
     prs_can_view = serializers.SerializerMethodField()
     notes_can_view = serializers.SerializerMethodField()
+    time_off_requests_can_view = serializers.SerializerMethodField()
     next_to_sign_prs = serializers.SerializerMethodField()
     
     class Meta:
@@ -54,7 +55,8 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             'can_view_desk_reservation_reports', 'is_upper_manager',
             'is_hr_manager', 'is_executive_director',
             'viewed_security_message', 'prs_can_view', 'notes_can_view',
-            'telework_applications_can_view', 'next_to_sign_prs'
+            'telework_applications_can_view', 'time_off_requests_can_view',
+            'next_to_sign_prs'
         ]
 
     @staticmethod
@@ -106,6 +108,10 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     @staticmethod
     def get_telework_applications_can_view(employee):
         return employee.telework_applications_can_view()
+
+    @staticmethod
+    def get_time_off_requests_can_view(employee):
+        return employee.time_off_requests_can_view()
 
     @staticmethod
     def get_next_to_sign_prs(employee):

@@ -49,6 +49,7 @@ export interface EmployeeRetrieve {
   can_edit_seating_charts: boolean
   prs_can_view: Array<number>
   notes_can_view: Array<number>
+  time_off_requests_can_view: Array<number>
   telework_applications_can_view: Array<number>
   next_to_sign_prs: string
 }
@@ -682,14 +683,74 @@ export interface DeskReservationStateInterface {
 }
 
 
+/////////////////////////////////////////////////////////
+// TimeOffRequest Structure from Django Rest Framework //
+/////////////////////////////////////////////////////////
+
+export type TimeOffRequestDates = {from: string; to: string} | string
+
+export interface TimeOffRequestCreate {
+  employee_pk: number
+  dates: TimeOffRequestDates
+  note: string
+}
+
+export interface TimeOffRequestAcknowledge {
+  pk: number
+  acknowledge: boolean
+}
+
+export interface TimeOffRequestRetrieve {
+  url: Url
+  pk: number
+  employee_pk: number
+  employee_name: string
+  manager_pk: number
+  start_date: Date
+  end_date: Date
+  note: string
+  acknowledged: boolean
+  conflicts?: JSON
+}
+
+export interface TimeOffRequestUpdate {
+  dates: TimeOffRequestDates
+  note: string
+}
+
+export interface TimeOffRequestUpdatePartial {
+  acknowledged: boolean
+}
+
+export interface AxiosTimeOffRequestRetrieveOneServerResponse {
+  data: TimeOffRequestRetrieve
+}
+
+/////////////
+// Getters //
+/////////////
+
 export interface VuexStoreGetters {
-  'authModule/isAuthenticated': boolean
+  'authModule/isAuthenticated': boolean,
+  'userModule/getEmployeeProfile': EmployeeRetrieve,
+
   'deskReservationModule/allDesks': {
     results: Array<Desk>
   },
   'deskReservationModule/allDeskReservations': {
     results: Array<DeskReservation>
   },
+
+  'timeOffModule/teamTimeOffRequests': {
+    results: Array<TimeOffRequestRetrieve>
+  },
+  'timeOffModule/myTimeOffRequests': {
+    results: Array<TimeOffRequestRetrieve>
+  },
+  'timeOffModule/managedTimeOffRequests': {
+    results: Array<TimeOffRequestRetrieve>
+  },
+  'timeOffModule/conflictingTimeOffRequests': Array<TimeOffRequestRetrieve>,
 
   'responsibilityModule/simpleEmployeeList': Array<SimpleEmployeeRetrieve>,
   'responsibilityModule/simpleEmployeeDetail': SimpleEmployeeRetrieve,

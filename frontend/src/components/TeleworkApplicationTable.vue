@@ -88,7 +88,6 @@ interface QuasarTeleworkApplicationTableRowClickActionProps {
 export default class TeleworkApplicationTable extends Vue {
   @Prop({required: true}) readonly signature!: boolean
   private teleworkApplications(): Array<ReviewNoteRetrieve> {
-    // debugger
     if (this.signature) {
       return this.$store.getters['teleworkModule/allTeleworkApplicationsSignatureRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
     } else {

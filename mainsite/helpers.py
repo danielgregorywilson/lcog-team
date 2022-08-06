@@ -356,3 +356,12 @@ def is_true_string(str):
     if str in ['true', 'True']:
         return True
     return False
+
+
+# d = datetime.date(2022, 8, 4)
+# next_monday = next_weekday(d, 0) # 0=Monday, 1=Tuesday, 2=Wednesday...
+def next_weekday(d, weekday):
+    days_ahead = weekday - d.weekday()
+    if days_ahead <= 0: # Target day already happened this week
+        days_ahead += 7
+    return d + datetime.timedelta(days_ahead)

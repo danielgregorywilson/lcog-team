@@ -15,7 +15,10 @@ from mainsite.helpers import is_true_string
 
 from people.models import Employee
 
-from timeoff.helpers import send_timeoff_request_notification
+from timeoff.helpers import (
+    send_employee_manager_acknowledged_timeoff_request_notification,
+    send_manager_new_timeoff_request_notification
+)
 from timeoff.models import TimeOffRequest
 
 from timeoff.serializers import (
@@ -67,7 +70,7 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
         note = request.data['note']
         employee = request.user.employee
         timeoffrequest = TimeOffRequest.objects.create(start_date=start_date, end_date=end_date, note=note, employee=employee)
-        send_timeoff_request_notification(employee=employee.manager, tor=timeoffrequest)
+        send_manager_new_timeoff_request_notification(timeoffrequest)
         serialized_timeoffrequest = TimeOffRequestSerializer(timeoffrequest,
             context={'request': request})
         return Response(serialized_timeoffrequest.data)
@@ -97,6 +100,7 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
         tor = TimeOffRequest.objects.get(pk=pk)
         tor.acknowledged = request.data['acknowledged']
         tor.save()
+        send_employee_manager_acknowledged_timeoff_request_notification(tor)
         serialized_tor = TimeOffRequestSerializer(tor,
             context={'request': request})
         return Response(serialized_tor.data)

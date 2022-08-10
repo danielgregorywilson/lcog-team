@@ -263,6 +263,7 @@ const routes: RouteConfig[] = [
         name: 'timeoff',
         component: () => import('src/pages/timeoff/TimeOffBase.vue'),
         beforeEnter: ifAuthenticated,
+        redirect: {name: 'timeoff-my-requests'},
         children: [
           {
             path: 'calendar',

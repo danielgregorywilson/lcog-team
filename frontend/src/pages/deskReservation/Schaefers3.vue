@@ -322,7 +322,11 @@ export default class Schaefers3 extends Vue{
         if (response.data.created) {
           Notify.create(`Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`)  
         } else {
-          Notify.create({message: `Sorry! Desk ${response.data.desk_number} is already reserved for ${response.data.employee_name}. Please choose another`, type: 'negative'})
+          if (response.data.desk_held) {
+            Notify.create({message: `Sorry! Desk ${response.data.desk_number} is held today. Please choose another`, type: 'negative'})
+          } else {
+            Notify.create({message: `Sorry! Desk ${response.data.desk_number} is already reserved for ${response.data.employee_name}. Please choose another`, type: 'negative'})
+          }
         }
         
         // TODO: Temporarily restoring to remove sockets for production
@@ -415,10 +419,10 @@ export default class Schaefers3 extends Vue{
           this.highlightedDeskNumberX = rect.left
           this.highlightedDeskNumberY = rect.top
         }
-        if (text == this.highlightedDeskNumber) {
+        if (text.toLowerCase() == this.highlightedDeskNumber.toLowerCase()) {
           setHighlightedXAndY()
-        } else if (['A', 'B'].indexOf(this.highlightedDeskNumber.slice(-1)) != -1) {
-          if (text == this.highlightedDeskNumber.slice(0, -1)) {
+        } else if (['a', 'b'].indexOf(this.highlightedDeskNumber.toLowerCase().slice(-1)) != -1) {
+          if (text.toLowerCase() == this.highlightedDeskNumber.slice(0, -1).toLowerCase()) {
             setHighlightedXAndY()
           }
         }

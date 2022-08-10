@@ -415,10 +415,10 @@ export default class Schaefers2 extends Vue{
           this.highlightedDeskNumberX = rect.left
           this.highlightedDeskNumberY = rect.top
         }
-        if (text == this.highlightedDeskNumber) {
+        if (text.toLowerCase() == this.highlightedDeskNumber.toLowerCase()) {
           setHighlightedXAndY()
-        } else if (['A', 'B'].indexOf(this.highlightedDeskNumber.slice(-1)) != -1) {
-          if (text == this.highlightedDeskNumber.slice(0, -1)) {
+        } else if (['a', 'b'].indexOf(this.highlightedDeskNumber.toLowerCase().slice(-1)) != -1) {
+          if (text.toLowerCase() == this.highlightedDeskNumber.slice(0, -1).toLowerCase()) {
             setHighlightedXAndY()
           }
         }

@@ -8,7 +8,7 @@ from people.models import Employee
 from timeoff.models import TimeOffRequest
 
 
-def send_timeoff_request_notification(employee, tor):
+def send_manager_new_timeoff_request_notification(tor):
     current_site = Site.objects.get_current()
     url = current_site.domain + '/timeoff/manage-requests'
     if tor.start_date == tor.end_date:
@@ -17,8 +17,33 @@ def send_timeoff_request_notification(employee, tor):
         message = f'{tor.employee.user.get_full_name()} has requested time off from {tor.start_date} to {tor.end_date}. View and acknowledge here: {url}',
 
     send_email(
-        employee.user.email,
+        tor.employee.manager.user.email,
         f'New time off request: {tor.employee.user.get_full_name()}',
+        message[0],
+        message[0]
+    )
+
+
+def send_employee_manager_acknowledged_timeoff_request_notification(tor):
+    current_site = Site.objects.get_current()
+    url = current_site.domain + '/timeoff/my-requests'
+    employee = tor.employee
+    manager_name = employee.manager.user.get_full_name()
+    
+    dates_str = ''
+    if tor.start_date == tor.end_date:
+        dates_str = f'on {tor.start_date}'
+    else:
+        dates_str = f'from {tor.start_date} to {tor.end_date}'
+    
+    if tor.acknowledged:
+        message = f'Your manager {manager_name} has acknowledged your time off {dates_str}. View here: {url}',
+    else:
+        message = f'Your manager {manager_name} has indicated a problem with your time off {dates_str}. View here: {url}',
+
+    send_email(
+        employee.user.email,
+        f'Time off request response',
         message[0],
         message[0]
     )

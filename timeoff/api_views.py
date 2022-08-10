@@ -15,7 +15,10 @@ from mainsite.helpers import is_true_string
 
 from people.models import Employee
 
-from timeoff.helpers import send_timeoff_request_notification
+from timeoff.helpers import (
+    send_employee_manager_acknowledged_timeoff_request_notification,
+    send_manager_new_timeoff_request_notification
+)
 from timeoff.models import TimeOffRequest
 
 from timeoff.serializers import (
@@ -67,17 +70,10 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
         note = request.data['note']
         employee = request.user.employee
         timeoffrequest = TimeOffRequest.objects.create(start_date=start_date, end_date=end_date, note=note, employee=employee)
-        send_timeoff_request_notification(employee=employee.manager, tor=timeoffrequest)
+        send_manager_new_timeoff_request_notification(timeoffrequest)
         serialized_timeoffrequest = TimeOffRequestSerializer(timeoffrequest,
             context={'request': request})
         return Response(serialized_timeoffrequest.data)
-
-    # def retrieve(self, request, pk=None):
-    #     queryset = PerformanceReview.objects.all()
-    #     pr = get_object_or_404(queryset, pk=pk)
-    #     serializer = PerformanceReviewSerializer(pr, 
-    #         context={'request': request})
-    #     return Response(serializer.data)
 
     def update(self, request, pk=None):
         tor = TimeOffRequest.objects.get(pk=pk)
@@ -104,17 +100,10 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
         tor = TimeOffRequest.objects.get(pk=pk)
         tor.acknowledged = request.data['acknowledged']
         tor.save()
+        send_employee_manager_acknowledged_timeoff_request_notification(tor)
         serialized_tor = TimeOffRequestSerializer(tor,
             context={'request': request})
         return Response(serialized_tor.data)
-
-    # # TODO: Don't use this - use the ModelViewSet get
-    # @action(detail=True, methods=['get'])
-    # def get_a_performance_review(self, request, pk=None):
-    #     review = PerformanceReview.objects.get(pk=pk)
-    #     serialized_review = PerformanceReviewSerializer(review,
-    #         context={'request': request})
-    #     return Response(serialized_review.data)
 
     # TODO: Duplicated in TimeOffRequest model property .conflicting_responsibilities. Use a generic helper function to handle both?
     # A list of employees with time off requests in the same time period with

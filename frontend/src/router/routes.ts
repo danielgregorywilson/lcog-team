@@ -138,6 +138,7 @@ const routes: RouteConfig[] = [
         path: '/responsibilities',
         name: 'responsibilities',
         component: () => import('src/pages/responsibilities/Responsibilities.vue'),
+        redirect: {name: 'all-responsibilities'},
         children: [
           {
             path: 'all',

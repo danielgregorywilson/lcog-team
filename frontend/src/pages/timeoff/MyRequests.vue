@@ -1,36 +1,44 @@
 <template>
   <div>
     <q-table
+      :dense="$q.screen.lt.sm"
       :data="myTimeOffRequests()"
       :columns="columns"
       :pagination="tablePagination"
       row-key="pk"
     >
+      <template v-slot:header-cell-acknowledged="props">
+        <q-th :props="props">
+          <div v-if="$q.screen.gt.xs">{{ props.col.label }}</div>
+          <div v-if="$q.screen.lt.sm"><q-icon name="thumb_up" size="1.5em" /></div>
+        </q-th>
+      </template>
       <template v-slot:body-cell-dates="props">
         <q-td key="dates" :props="props">
-          {{ props.row.start_date }} - {{ props.row.end_date }}
+          <div v-if="$q.screen.gt.xs">{{ props.row.start_date }} - {{ props.row.end_date }}</div>
+          <div v-if="$q.screen.xs">
+            <div>{{ props.row.start_date }}</div>
+            <div>{{ props.row.end_date }}</div>
+          </div>
         </q-td>
       </template>
       <template v-slot:body-cell-acknowledged="props">
-        <q-td :props="props" class="row justify-center items-center">
-          <q-icon v-if="props.row.acknowledged==null" color="orange" name="help" size="lg">
-            <q-tooltip content-style="font-size: 16px">
-              Your manager has not responded to this request.
-            </q-tooltip>
-          </q-icon>
-          <q-icon v-if="props.row.acknowledged==false" color="red" name="cancel" size="lg">
-            <q-tooltip content-style="font-size: 16px">
-              Your manager has indicated an issue with this request.
-            </q-tooltip>  
-          </q-icon>
-          <q-icon v-if="props.row.acknowledged && props.row.acknowledged==true" color="green" name="check_circle" size="lg">
-            <q-tooltip content-style="font-size: 16px">
-              Your manager has acknowledged this request.
-            </q-tooltip>  
-          </q-icon>
-          <div v-if="props.row.conflicts.length != 0" class="q-ml-sm">
+        <q-td :props="props">
+          <div v-if="props.row.conflicts.length != 0">
             <q-icon color="orange" name="warning" size="md">
               <q-tooltip content-style="font-size: 16px">
+                <div v-if="props.row.acknowledged==null" class="q-mb-sm row items-center">
+                  <q-icon v-if="props.row.acknowledged==null" color="orange" name="help" size="lg" class="q-mr-sm" />
+                  <div>Your manager has not responded to this request.</div>
+                </div>
+                <div v-if="props.row.acknowledged==false" class="q-mb-sm row items-center">
+                  <q-icon v-if="props.row.acknowledged==false" color="red" name="cancel" size="lg" class="q-mr-sm" />
+                  <div>Your manager has indicated an issue with this request.</div>
+                </div>
+                <div v-if="props.row.acknowledged && props.row.acknowledged==true" class="q-mb-sm row items-center">
+                  <q-icon v-if="props.row.acknowledged && props.row.acknowledged==true" color="green" name="check_circle" size="lg" class="q-mr-sm" />
+                  <div>Your manager has acknowledged this request.</div>
+                </div>
                 <div>One or more team members with shared responsibilities will be also be unavailable:</div>
                 <ul>
                   <li v-for="employee of props.row.conflicts" :key="employee.pk">
@@ -38,6 +46,23 @@
                   </li>
                 </ul>
               </q-tooltip>
+            </q-icon>
+          </div>
+          <div v-else>
+            <q-icon v-if="props.row.acknowledged==null" color="orange" name="help" size="lg">
+              <q-tooltip content-style="font-size: 16px">
+                Your manager has not responded to this request.
+              </q-tooltip>
+            </q-icon>
+            <q-icon v-if="props.row.acknowledged==false" color="red" name="cancel" size="lg">
+              <q-tooltip content-style="font-size: 16px">
+                Your manager has indicated an issue with this request.
+              </q-tooltip>  
+            </q-icon>
+            <q-icon v-if="props.row.acknowledged && props.row.acknowledged==true" color="green" name="check_circle" size="lg">
+              <q-tooltip content-style="font-size: 16px">
+                Your manager has acknowledged this request.
+              </q-tooltip>  
             </q-icon>
           </div>
         </q-td>

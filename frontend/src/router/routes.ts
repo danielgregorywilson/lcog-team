@@ -109,7 +109,7 @@ const ifCanViewTimeOffRequest = (to: Route, from: Route, next: Next) => {
     next()
     return
   } else {
-    next({name: 'timeoff'})
+    next('/timeoff')
   }
 }
 

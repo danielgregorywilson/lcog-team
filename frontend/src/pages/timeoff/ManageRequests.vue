@@ -5,6 +5,7 @@
       :columns="columns"
       :pagination="tablePagination"
       row-key="pk"
+      :grid="$q.screen.lt.md"
     >
       <template v-slot:body-cell-dates="props">
         <q-td key="dates" :props="props">
@@ -39,6 +40,50 @@
             </q-icon>
           </div>
         </q-td>
+      </template>
+      <!-- For grid mode, we need to specify everything in order for our action buttons to render -->
+      <template v-slot:item="props">
+        <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
+          <q-card class="q-py-sm">
+            <q-list dense>
+              <q-item v-for="col in props.cols" :key="col.name">
+                <div class="q-table__grid-item-row">
+                  <div class="q-table__grid-item-title">{{ col.label }}</div>
+                  <div class="q-table__grid-item-value" v-if="col.name != 'acknowledge'">
+                    {{ col.value }}
+                  </div>
+                  <div class="q-table__grid-item-value row q-gutter-sm" v-else>
+                    <q-btn 
+                      dense round color="red" icon="close"
+                      :outline="props.row.acknowledged == null || props.row.acknowledged == true"
+                      :disable="props.row.acknowledged == false"
+                      class="q-mr-sm"
+                      @click="acknowledgeRequest(props.row.pk, false)"
+                    />
+                    <q-btn
+                      dense round color="green" icon="check"
+                      :outline="props.row.acknowledged == null || props.row.acknowledged == false"
+                      :disable="props.row.acknowledged == true"
+                      @click="acknowledgeRequest(props.row.pk, true)"
+                    />
+                    <div v-if="props.row.conflicts.length != 0" class="q-ml-sm">
+                      <q-icon color="orange" name="warning" size="md">
+                        <q-tooltip content-style="font-size: 16px">
+                          <div>One or more team members with shared responsibilities will be also be unavailable:</div>
+                          <ul>
+                            <li v-for="employee of props.row.conflicts" :key="employee.pk">
+                              {{ employee.name }}: {{ employee.responsibility_names[0] }}<span v-if="employee.responsibility_names.length > 1"> and {{ employee.responsibility_names.length - 1 }} more</span>
+                            </li>
+                          </ul>
+                        </q-tooltip>
+                      </q-icon>
+                    </div>
+                  </div>
+                </div>
+              </q-item>
+            </q-list>
+          </q-card>
+        </div>
       </template>
     </q-table>
   </div>

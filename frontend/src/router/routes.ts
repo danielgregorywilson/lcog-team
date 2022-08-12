@@ -109,7 +109,7 @@ const ifCanViewTimeOffRequest = (to: Route, from: Route, next: Next) => {
     next()
     return
   } else {
-    next('dashboard')
+    next({name: 'timeoff'})
   }
 }
 
@@ -138,6 +138,7 @@ const routes: RouteConfig[] = [
         path: '/responsibilities',
         name: 'responsibilities',
         component: () => import('src/pages/responsibilities/Responsibilities.vue'),
+        redirect: {name: 'all-responsibilities'},
         children: [
           {
             path: 'all',

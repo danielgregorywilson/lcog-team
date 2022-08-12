@@ -104,6 +104,12 @@
 
 <style lang="scss">
 
+.q-table {
+  .table-note {
+    white-space: normal;
+  }
+}
+
 </style>
 
 <script lang="ts">
@@ -123,7 +129,7 @@ export default class TimeOffMyRequests extends Vue {
 
   private columns = [
     { name: 'dates', label: 'Dates', field: 'start_date', sortable: true, align: 'center' },
-    { name: 'note', label: 'Note', field: 'note', align: 'center' },
+    { name: 'note', label: 'Note', field: 'note', align: 'center', classes: 'table-note' },
     { name: 'acknowledged', label: 'Acknowledged', field: 'approved', align: 'center' },
     { name: 'actions', label: 'Actions' },
   ]

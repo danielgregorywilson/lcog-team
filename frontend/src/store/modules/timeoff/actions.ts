@@ -50,6 +50,8 @@ const actions: ActionTree<TimeOffRequestStateInterface, StateInterface> = {
           .catch(e => {
             console.log(e)
           })
+        dispatch('userModule/userRequest', null, { root: true })
+          .catch(err => console.log(err))
       })
       .catch(e => {
         console.log(e)

@@ -57,16 +57,16 @@
 
 <style lang="scss">
 .q-table {
-    .table-description {
-      white-space: normal;
-    }
-    .table-link {
-      white-space: normal;
-    }
-    .table-tags {
-      white-space: normal;
-    }
+  .table-description {
+    white-space: normal;
   }
+  .table-link {
+    white-space: normal;
+  }
+  .table-tags {
+    white-space: normal;
+  }
+}
 
 
  @media only screen and (max-width: 1600px) {

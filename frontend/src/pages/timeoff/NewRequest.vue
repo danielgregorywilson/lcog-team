@@ -32,6 +32,14 @@ import { Notify } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
 import { TimeOffRequestDates, TimeOffRequestRetrieve, VuexStoreGetters } from '../../store/types'
 
+const newRequestMessages = [
+  'Good for you! You deserve a break.',
+  'Rest does not need to be earned, and we\'re glad you\'re taking it.',
+  'Ditch the grind. Relax!',
+  'You need rest. You deserve rest.',
+  'Your team appreciates you! Come back refreshed.',
+]
+
 @Component
 export default class TimeOffRequest extends Vue {
   private getters = this.$store.getters as VuexStoreGetters
@@ -63,17 +71,18 @@ export default class TimeOffRequest extends Vue {
     }
   }
 
+  private randomChoice(array: Array<string>) {
+    return array[Math.floor(Math.random() * array.length)];
+  }
+
   private createTimeOffRequest(): void {
     if (typeof this.dates != 'string' && this.dates.from == '') {
       return
     }    
     this.$store.dispatch('timeOffModule/createTimeOffRequest', { dates: this.dates, note: this.note })
       .then(() => {
-        Notify.create('Created a new time off request.')
+        Notify.create(`Time off successfully recorded. ${this.randomChoice(newRequestMessages)}`)
         this.$router.push({ name: 'timeoff-my-requests'})
-          .then(() => {
-            location.reload() // TODO: This seems to be necessary in order to immediately edit a time off request after creating it.
-          })
           .catch(e => {
             console.error('Error navigating to My Requests page after creating time off request:', e)
           })

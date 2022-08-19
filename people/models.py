@@ -75,6 +75,7 @@ class Employee(models.Model):
 
     active = models.BooleanField(default=True)
     user = models.OneToOneField("auth.User", verbose_name=_("user"), on_delete=models.CASCADE)
+    number = models.IntegerField("number", unique=True, blank=True, null=True)
     manager = models.ForeignKey("self", related_name="direct_reports", blank=True, null=True, verbose_name=_("manager"), on_delete=models.SET_NULL)
     unit_or_program = models.ForeignKey("people.UnitOrProgram", verbose_name=_("unit/program"), on_delete=models.SET_NULL, blank=True, null=True)
     job_title = models.ForeignKey("people.JobTitle", verbose_name=_("job title"), on_delete=models.SET_NULL, blank=True, null=True)

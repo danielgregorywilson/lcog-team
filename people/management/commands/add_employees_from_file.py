@@ -1,8 +1,7 @@
 import csv
 
 from django.contrib.auth.models import User
-from django.core.management.base import BaseCommand, CommandError
-from django.db.models.manager import Manager
+from django.core.management.base import BaseCommand
 
 from people.models import Division, Employee, JobTitle, UnitOrProgram
 
@@ -44,28 +43,29 @@ class Command(BaseCommand):
         if not path:
             path = 'people/management/employees.csv'
         
-        # Keep track of all emails to deactivate removed employees
-        emails_in_file = []
+        # Keep track of all employee numbers to deactivate removed employees
+        numbers_in_file = []
 
         dataReader = csv.reader(open(path), delimiter=',', quotechar='"')
         for row in dataReader:
             # Parse row data
-            last_name = row[0]
-            first_name = row[1]
-            email = row[2].lower()
+            number = row[0]
+            last_name = row[1]
+            first_name = row[2]
+            email = row[3].lower()
             
-            emails_in_file.append(email)
+            numbers_in_file.append(number)
             
-            title = row[3]
+            title = row[4]
             job_title = JobTitle.objects.get_or_create(name=title)[0]
             
-            department_col_pieces = row[4].split(' ')
+            department_col_pieces = row[5].split(' ')
             if department_col_pieces[0] == 'PR':
                 department_col_pieces = department_col_pieces[1:]
             if department_col_pieces[-1] == 'Admin':
                 department_col_pieces = department_col_pieces[0:-1]
             if len(department_col_pieces) == 1:
-                department = row[4]
+                department = row[5]
             else:
                 department = " ".join(department_col_pieces[0:-1])
             department = department.strip()
@@ -88,9 +88,9 @@ class Command(BaseCommand):
             else:
                 raise ValueError('Unknown department {}'.format(department))
 
-            # Get or create user by email. Update user names if necessary.
+            # Get or create user by employee number. Update user names if necessary.
             try:
-                user = User.objects.get(email=email)
+                user = User.objects.get(employee__number=number)
                 if user.first_name != first_name or user.last_name != last_name:
                     user.first_name = first_name
                     user.last_name = last_name
@@ -98,8 +98,14 @@ class Command(BaseCommand):
                     self.stdout.write(
                         'Updated user {} {} name'.format(user.first_name, user.last_name)
                     )
+                if user.email != email:
+                    user.email = email
+                    user.save()
+                    self.stdout.write(
+                        'Updated user {} {} email to {}'.format(user.first_name, user.last_name, user.email)
+                    )
             except User.DoesNotExist:
-                user = User.objects.create(email=email, username=email.split('@')[0], first_name=first_name, last_name=last_name,)
+                user = User.objects.create(email=email, username=email.split('@')[0], first_name=first_name, last_name=last_name)
                 self.stdout.write(
                     'Created user {} {}'.format(user.first_name, user.last_name)
                 )
@@ -123,24 +129,24 @@ class Command(BaseCommand):
                             'Updated employee {} {} department'.format(employee.user.first_name, employee.user.last_name)
                         )
             except Employee.DoesNotExist:
-                employee = Employee.objects.create(user=user, job_title=job_title, unit_or_program=unit_or_program)
+                employee = Employee.objects.create(user=user, number=number, job_title=job_title, unit_or_program=unit_or_program)
                 self.stdout.write(
                     'Created employee {} {}'.format(employee.user.first_name, employee.user.last_name)
                 )
 
         # Deactivate any employee not in the list
         for employee in Employee.active_objects.all():
-            if employee.user.email not in emails_in_file:
+            if employee.number not in numbers_in_file:
                 employee.active = False
                 employee.save()
 
         # Add managers
         dataReader = csv.reader(open(path), delimiter=',', quotechar='"')
         for row in dataReader:
-            email = row[2].lower()
-            user = User.objects.get(email=email)
+            number = row[0]
+            user = User.objects.get(employee__number=number)
             employee = Employee.objects.get(user=user)
-            department_col_pieces = row[4].split(' ')
+            department_col_pieces = row[5].split(' ')
             if department_col_pieces[0] == 'PR':
                 department_col_pieces = department_col_pieces[1:]
             if department_col_pieces[-1] == 'Admin':

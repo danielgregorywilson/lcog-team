@@ -54,7 +54,7 @@ class Command(BaseCommand):
             first_name = row[2]
             email = row[3].lower()
             
-            numbers_in_file.append(number)
+            numbers_in_file.append(int(number))
             
             title = row[4]
             job_title = JobTitle.objects.get_or_create(name=title)[0]

@@ -122,16 +122,26 @@ const linksData: Array<LinkData> = [
   //   link: '/dashboard'
   // },
   {
+    title: 'Time Off',
+    icon: 'schedule',
+    link: '/timeoff'
+  },
+  {
+    title: 'Responsibilities',
+    icon: 'list',
+    link: '/responsibilities'
+  },
+  {
     title: 'Performance Reviews',
     icon: 'assignment_turned_in',
     link: '/reviews',
     managerOnly: true
   },
-  // {
-  //   title: 'Time off Requests',
-  //   icon: 'schedule',
-  //   link: '/timeoff'
-  // },
+  {
+    title: 'Schaefers Desk Reservation',
+    icon: 'laptop',
+    link: '/desk-reservation/schaefers/1',
+  },
   {
     title: 'My Telework Application',
     icon: 'home_work',

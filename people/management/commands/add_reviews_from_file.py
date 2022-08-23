@@ -1,11 +1,11 @@
 import csv
 import datetime
 
-from django.contrib.auth.models import User
-from django.core.management.base import BaseCommand, CommandError
-from django.db.models.manager import Manager
+from django.core.management.base import BaseCommand
+from django.core.exceptions import MultipleObjectsReturned
 
-from people.models import Employee, JobTitle, PerformanceReview, UnitOrProgram
+from people.models import Employee, PerformanceReview
+
 
 class Command(BaseCommand):
     help = 'Imports reviews after exporting from Caselle'
@@ -31,11 +31,11 @@ class Command(BaseCommand):
                         self.check_review_rows(employee_review_rows, employee)
 
                     # Start a new employee section
-                    parts = row[0].split(',')
-                    last_name = parts[0]
-                    first_name = parts[1].strip().split(' ')[0]
+                    number = row[1]
                     try:
-                        employee = Employee.objects.get(user__last_name=last_name, user__first_name__startswith=first_name)
+                        employee = Employee.objects.get(number=number)
+                    except MultipleObjectsReturned:
+                        import pdb; pdb.set_trace();
                     except Employee.DoesNotExist:
                         # If the employee is not otherwise in the system, ignore them
                         continue
@@ -49,7 +49,8 @@ class Command(BaseCommand):
 
     def check_review_rows(self, rows, employee):
         # Get the most recent review
-        sorted_rows = sorted(rows, key=lambda row: datetime.datetime.strptime(row[9], '%m/%d/%Y'))
+        filtered_rows = filter(lambda row: row[9] != '', rows) # Remove rows without a date
+        sorted_rows = sorted(filtered_rows, key=lambda row: datetime.datetime.strptime(row[9], '%m/%d/%Y'))
         most_recent_row = sorted_rows[-1]
         
         # Get the most recent review information

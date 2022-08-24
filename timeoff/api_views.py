@@ -40,7 +40,9 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
         """
         user = self.request.user
         if user.is_authenticated:
-            if 'managed' in self.request.GET and is_true_string(self.request.GET['managed']):
+            if user.is_superuser:
+                requests = TimeOffRequest.objects.all()
+            elif 'managed' in self.request.GET and is_true_string(self.request.GET['managed']):
                 requests = TimeOffRequest.objects.filter(employee__manager=user.employee)
             elif 'team' in self.request.GET and is_true_string(self.request.GET['team']):
                 requests = TimeOffRequest.objects.filter(
@@ -54,7 +56,7 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
                 request.conflicts = [
                     {
                         'pk': e.pk,
-                        'name': e.user.get_full_name(),
+                        'name': e.name,
                         'responsibility_names': e.responsibility_names
                     } for e in request.conflicting_responsibilities
                 ]

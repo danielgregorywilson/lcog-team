@@ -76,6 +76,7 @@ class Employee(models.Model):
     active = models.BooleanField(default=True)
     user = models.OneToOneField("auth.User", verbose_name=_("user"), on_delete=models.CASCADE)
     number = models.IntegerField("number", unique=True, blank=True, null=True)
+    display_name = models.CharField(_("display name"), max_length=100, blank=True, null=True)
     manager = models.ForeignKey("self", related_name="direct_reports", blank=True, null=True, verbose_name=_("manager"), on_delete=models.SET_NULL)
     unit_or_program = models.ForeignKey("people.UnitOrProgram", verbose_name=_("unit/program"), on_delete=models.SET_NULL, blank=True, null=True)
     job_title = models.ForeignKey("people.JobTitle", verbose_name=_("job title"), on_delete=models.SET_NULL, blank=True, null=True)
@@ -88,6 +89,13 @@ class Employee(models.Model):
     is_executive_director = models.BooleanField(_("is the executive director"), default=False)
 
     viewed_security_message = models.BooleanField(_("has viewed security message"), default=False)
+
+    @property
+    def name(self):
+        if self.display_name:
+            return self.display_name
+        else:
+            return self.user.get_full_name()
 
     @property
     def is_program_manager(self):
@@ -606,7 +614,7 @@ class PerformanceReview(models.Model):
                     title = None
             signature = Signature.objects.filter(review=self, employee=employee).first()
             if signature:
-                signatures.append([title, signature.employee.user.get_full_name(), signature.date, None, False]) # Not ready to sign because there is a signature
+                signatures.append([title, signature.employee.name, signature.date, None, False]) # Not ready to sign because there is a signature
             else:
                 ready_to_sign = False
                 if title in ["Employee", "Manager"]:
@@ -639,7 +647,7 @@ class PerformanceReview(models.Model):
             hr_manager = Employee.objects.filter(is_hr_manager=True).first()
             hr_signature = Signature.objects.filter(review=self, employee=hr_manager).first()
             if hr_signature:
-                signatures.append(["Human Resources Manager", hr_manager.user.get_full_name(), hr_signature.date, None, False]) # Not ready to sign because there is a signature
+                signatures.append(["Human Resources Manager", hr_manager.name, hr_signature.date, None, False]) # Not ready to sign because there is a signature
             else:
                 # If last manager has signed, we are ready
                 direct_report_signature = Signature.objects.filter(review=self, employee=last_employee_in_chain).first()
@@ -651,7 +659,7 @@ class PerformanceReview(models.Model):
             ed = Employee.objects.filter(is_executive_director=True).first()
             ed_signature = Signature.objects.filter(review=self, employee=ed).first()
             if ed_signature:
-                signatures.append(["Executive Director", ed.user.get_full_name(), ed_signature.date, None, False]) # Not ready to sign because there is a signature
+                signatures.append(["Executive Director", ed.name, ed_signature.date, None, False]) # Not ready to sign because there is a signature
             else:
                 # If HR manager has signed, we are ready
                 ready_to_sign = False
@@ -702,7 +710,7 @@ class Signature(models.Model):
         verbose_name_plural = _("PR Signatures")
 
     def __str__(self):
-        return f"{self.employee.user.get_full_name()}'s approval of {self.review.employee.user.get_full_name()}'s performance review"
+        return f"{self.employee.name}'s approval of {self.review.employee.name}'s performance review"
 
     review = models.ForeignKey("people.PerformanceReview", verbose_name=_("performance review"), on_delete=models.CASCADE)
     employee = models.ForeignKey("people.Employee", on_delete=models.CASCADE)
@@ -863,9 +871,9 @@ class TeleworkApplication(models.Model):
     def program_manager_name(self):
         if self.employee.has_program_manager:
             if self.employee.manager.job_title.name == 'Program Manager':
-                return self.employee.manager.user.get_full_name()
+                return self.employee.manager.name
             elif self.employee.manager.manager.job_title.name == 'Program Manager':
-                return self.employee.manager.manager.user.get_full_name()
+                return self.employee.manager.manager.name
             else:
                 return 'NO PROGRAM MANAGER FOUND'
         else:
@@ -943,7 +951,7 @@ class TeleworkApplication(models.Model):
         """
         signature = TeleworkSignature.objects.filter(application=self, employee=self.employee, index=index).first()
         if signature:
-            return[index, "Employee", signature.employee.user.get_full_name(), signature.date, None, False] # Not ready to sign because there is a signature
+            return[index, "Employee", signature.employee.name, signature.date, None, False] # Not ready to sign because there is a signature
         else:
             return [index, "Employee", None, None, self.employee.pk, True]
 
@@ -987,7 +995,7 @@ class TeleworkApplication(models.Model):
     def manager_signature(self):
         signature = TeleworkSignature.objects.filter(application=self, employee=self.employee.manager, index=0).first()
         if signature:
-            return[0, "Manager", signature.employee.user.get_full_name(), signature.date, None, False] # Not ready to sign because there is a signature
+            return[0, "Manager", signature.employee.name, signature.date, None, False] # Not ready to sign because there is a signature
         else:
             return [0, "Manager", None, None, self.employee.manager.pk, True]
     
@@ -1016,7 +1024,7 @@ class TeleworkApplication(models.Model):
                 return
         signature = TeleworkSignature.objects.filter(application=self, employee=program_manager, index=index).first()
         if signature:
-            return[index, "Program Manager", signature.employee.user.get_full_name(), signature.date, None, False] # Not ready to sign because there is a signature
+            return[index, "Program Manager", signature.employee.name, signature.date, None, False] # Not ready to sign because there is a signature
         else:
             return [index, "Program Manager", None, None, program_manager.pk, True]
 
@@ -1040,7 +1048,7 @@ class TeleworkApplication(models.Model):
                 return
         signature = TeleworkSignature.objects.filter(application=self, employee=director, index=0).first()
         if signature:
-            return[0, "Division Director", signature.employee.user.get_full_name(), signature.date, None, False] # Not ready to sign because there is a signature
+            return[0, "Division Director", signature.employee.name, signature.date, None, False] # Not ready to sign because there is a signature
         else:
             return [0, "Division Director", None, None, director.pk, True]
 
@@ -1050,7 +1058,7 @@ class TeleworkSignature(models.Model):
         verbose_name_plural = _("Telework Signatures")
 
     def __str__(self):
-        return f"{self.employee.user.get_full_name()}'s approval of {self.application.employee.user.get_full_name()}'s telework application"
+        return f"{self.employee.name}'s approval of {self.application.employee.name}'s telework application"
 
     application = models.ForeignKey("people.TeleworkApplication", verbose_name=_("telework application"), on_delete=models.CASCADE)
     employee = models.ForeignKey("people.Employee", on_delete=models.CASCADE)
@@ -1145,7 +1153,7 @@ class DeskReservation(models.Model):
         # ordering = ["name"]
     
     def __str__(self):
-        return f"Desk reservation for {self.employee.user.get_full_name()}"
+        return f"Desk reservation for {self.employee.name}"
 
     objects = models.Manager()
     currently_reserved_objects = CurrentlyReservedManager()

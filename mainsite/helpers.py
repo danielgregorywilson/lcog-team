@@ -42,9 +42,9 @@ def send_evaluation_written_email_to_employee(employee, review):
     url = current_site.domain + '/dashboard'
     send_email(
         employee.user.email,
-        f'Signature required: {review.employee.manager.user.get_full_name()} has completed your performance evaluation',
-        f'Your manager {review.employee.manager.user.get_full_name()} has completed your evaluation for an upcoming performance review, which requires your signature. View and sign here: {url}',
-        f'Your manager {review.employee.manager.user.get_full_name()} has completed your evaluation for an upcoming performance review, which requires your signature. View and sign here: {url}'
+        f'Signature required: {review.employee.manager.name} has completed your performance evaluation',
+        f'Your manager {review.employee.manager.name} has completed your evaluation for an upcoming performance review, which requires your signature. View and sign here: {url}',
+        f'Your manager {review.employee.manager.name} has completed your evaluation for an upcoming performance review, which requires your signature. View and sign here: {url}'
     )
     next_reminder = datetime.datetime.today() + datetime.timedelta(days=EMPLOYEE_SIGNATURE_REMINDER)
     SignatureReminder.objects.create(review=review, employee=employee, next_date=next_reminder)
@@ -57,9 +57,9 @@ def send_signature_email_to_manager(employee, review):
     url = current_site.domain + '/pr/' + str(review.pk)
     send_email(
         employee.user.email,
-        f'Signature required: Performance evaluation for {review.employee.user.get_full_name()}',
-        f'{review.employee.manager.user.get_full_name()} has completed an evaluation for {review.employee.user.get_full_name()}, which requires your signature. View and sign here: {url}',
-        f'{review.employee.manager.user.get_full_name()} has completed an evaluation for {review.employee.user.get_full_name()}, which requires your signature. View and sign here: {url}'
+        f'Signature required: Performance evaluation for {review.employee.name}',
+        f'{review.employee.manager.name} has completed an evaluation for {review.employee.name}, which requires your signature. View and sign here: {url}',
+        f'{review.employee.manager.name} has completed an evaluation for {review.employee.name}, which requires your signature. View and sign here: {url}'
     )
     next_reminder = datetime.datetime.today() + datetime.timedelta(days=MANAGER_SIGNATURE_REMINDER)
     SignatureReminder.objects.create(review=review, employee=employee, next_date=next_reminder)
@@ -86,8 +86,8 @@ def send_completed_email_to_hr_manager(review):
     send_email(
         hr_manager.user.email,
         f'A Performance Evaluation has been completed',
-        f'{executive_director.user.get_full_name()} has approved a performance evaluation for {review.employee.user.get_full_name()}. Please print it here: {url}',
-        f'{executive_director.user.get_full_name()} has approved a performance evaluation for {review.employee.user.get_full_name()}. Please print it here: {url}'
+        f'{executive_director.name} has approved a performance evaluation for {review.employee.name}. Please print it here: {url}',
+        f'{executive_director.name} has approved a performance evaluation for {review.employee.name}. Please print it here: {url}'
     )
 
 
@@ -127,13 +127,13 @@ def send_pr_reminder_emails():
             url = current_site.domain + '/pr/' + str(pr.pk)
             # Notification #1
             # Notification #2
-            add_reminder(pr.employee.manager.user.email, 'review_to_write', 'Upcoming performance review', f'A review for {pr.employee.user.get_full_name()} is due in {pr.days_until_due()} days on {pr.effective_date}. Write an evaluation here: {url}', f'A review for {pr.employee.user.get_full_name()} is due in {pr.days_until_due()} days on {pr.effective_date}. Write an evaluation here: <a href="{url}">{url}</a>')
+            add_reminder(pr.employee.manager.user.email, 'review_to_write', 'Upcoming performance review', f'A review for {pr.employee.name} is due in {pr.days_until_due()} days on {pr.effective_date}. Write an evaluation here: {url}', f'A review for {pr.employee.name} is due in {pr.days_until_due()} days on {pr.effective_date}. Write an evaluation here: <a href="{url}">{url}</a>')
         if days_until_due <= 30:
             url = current_site.domain + '/pr/' + str(pr.pk)
             # Notification #3
-            add_reminder(pr.employee.manager.user.email, 'review_to_write', 'Performance review behind schedule', f'A review for {pr.employee.user.get_full_name()} is due in {pr.days_until_due()} days on {pr.effective_date}. Write an evaluation here: {url}', f'A review for {pr.employee.user.get_full_name()} is due in {pr.days_until_due()} days on {pr.effective_date}. Write an evaluation here: <a href="{url}">{url}</a>')
+            add_reminder(pr.employee.manager.user.email, 'review_to_write', 'Performance review behind schedule', f'A review for {pr.employee.name} is due in {pr.days_until_due()} days on {pr.effective_date}. Write an evaluation here: {url}', f'A review for {pr.employee.name} is due in {pr.days_until_due()} days on {pr.effective_date}. Write an evaluation here: <a href="{url}">{url}</a>')
             # Notification #4: Reminder to manager's manager
-            add_reminder(pr.employee.manager.manager.user.email, 'review_to_write_other', 'Performance review behind schedule', f'A review for {pr.employee.user.get_full_name()} is due from {pr.employee.manager.user.get_full_name()} in {pr.days_until_due()} days on {pr.effective_date}. Contact them here: {pr.employee.manager.user.email}', f'A review for {pr.employee.user.get_full_name()} is due from {pr.employee.manager.user.get_full_name()} in {pr.days_until_due()} days on {pr.effective_date}. Contact them here: <a href="mailto:{pr.employee.manager.user.email}">{pr.employee.manager.user.email}</a>')
+            add_reminder(pr.employee.manager.manager.user.email, 'review_to_write_other', 'Performance review behind schedule', f'A review for {pr.employee.name} is due from {pr.employee.manager.name} in {pr.days_until_due()} days on {pr.effective_date}. Contact them here: {pr.employee.manager.user.email}', f'A review for {pr.employee.name} is due from {pr.employee.manager.name} in {pr.days_until_due()} days on {pr.effective_date}. Contact them here: <a href="mailto:{pr.employee.manager.user.email}">{pr.employee.manager.user.email}</a>')
     
     #################################################################
     ### Reminders to get an employee to sign their own evaluation ###
@@ -154,12 +154,12 @@ def send_pr_reminder_emails():
             if employee_reminder:
                 if today >= employee_reminder.next_date:
                     # Notification #6: Remind employee a subsequent time to sign own evaluation
-                    add_reminder(employee.user.email, 'signature_required', f'Signature required: {employee.manager.user.get_full_name()} has completed your performance evaluation', f'Your manager {employee.manager.user.get_full_name()} has completed your evaluation for an upcoming performance review, which requires your signature. View and sign here: {url}', f'Your manager {employee.manager.user.get_full_name()} has completed your evaluation for an upcoming performance review, which requires your signature. View and sign here: <a href="{url}">{url}</a>')
+                    add_reminder(employee.user.email, 'signature_required', f'Signature required: {employee.manager.name} has completed your performance evaluation', f'Your manager {employee.manager.name} has completed your evaluation for an upcoming performance review, which requires your signature. View and sign here: {url}', f'Your manager {employee.manager.name} has completed your evaluation for an upcoming performance review, which requires your signature. View and sign here: <a href="{url}">{url}</a>')
                     next_reminder = datetime.datetime.today() + datetime.timedelta(days=EMPLOYEE_SIGNATURE_REMINDER)
                     SignatureReminder.objects.create(review=pr, employee=employee, next_date=next_reminder)
             else:
                 # Notification #6
-                add_reminder(employee.user.email, 'signature_required', f'Signature required: {employee.manager.user.get_full_name()} has completed your performance evaluation', f'Your manager {employee.manager.user.get_full_name()} has completed your evaluation for an upcoming performance review, which requires your signature. View and sign here: {url}', f'Your manager {employee.manager.user.get_full_name()} has completed your evaluation for an upcoming performance review, which requires your signature. View and sign here: <a href="{url}">{url}</a>')
+                add_reminder(employee.user.email, 'signature_required', f'Signature required: {employee.manager.name} has completed your performance evaluation', f'Your manager {employee.manager.name} has completed your evaluation for an upcoming performance review, which requires your signature. View and sign here: {url}', f'Your manager {employee.manager.name} has completed your evaluation for an upcoming performance review, which requires your signature. View and sign here: <a href="{url}">{url}</a>')
                 next_reminder = datetime.datetime.today() + datetime.timedelta(days=EMPLOYEE_SIGNATURE_REMINDER)
                 SignatureReminder.objects.create(review=pr, employee=employee, next_date=next_reminder)
             
@@ -167,7 +167,7 @@ def send_pr_reminder_emails():
             if manager_reminder:
                 if today >= manager_reminder.date + datetime.timedelta(days=ESCALATION_TO_NEXT_MANAGER_REMINDER):
                     # Notification #7: Escalate to employee's manager to get employee to sign their evaluation
-                    add_reminder(employee.manager.user.email, 'signature_required_other', f'A performance review is behind schedule', f'A signature is required by {employee.user.get_full_name()} for their evaluation. Contact them here: {employee.user.email}', f'A signature is required by {employee.user.get_full_name()} for their evaluation. Contact them here: <a href="mailto:{employee.user.email}">{employee.user.email}</a>')
+                    add_reminder(employee.manager.user.email, 'signature_required_other', f'A performance review is behind schedule', f'A signature is required by {employee.name} for their evaluation. Contact them here: {employee.user.email}', f'A signature is required by {employee.name} for their evaluation. Contact them here: <a href="mailto:{employee.user.email}">{employee.user.email}</a>')
                     # We don't need to make another reminder because this same reminder will trigger every subsequent day
         
     #####################################################################################
@@ -194,12 +194,12 @@ def send_pr_reminder_emails():
             if today >= reminders.latest().next_date: # If it's time to send another reminder
                 if employee == pr.employee.manager:
                     # Notification #8: Manager reminded to sign an evaluation they wrote
-                    add_reminder(employee.user.email, 'signature_required', f'Signature required: Performance evaluation for {pr.employee.user.get_full_name()}', f'Your evaluation for {pr.employee.user.get_full_name()} requires your signature. View and sign here: {url}', f'Your evaluation for {pr.employee.user.get_full_name()} requires your signature. View and sign here: <a href="{url}">{url}</a>')
+                    add_reminder(employee.user.email, 'signature_required', f'Signature required: Performance evaluation for {pr.employee.name}', f'Your evaluation for {pr.employee.name} requires your signature. View and sign here: {url}', f'Your evaluation for {pr.employee.name} requires your signature. View and sign here: <a href="{url}">{url}</a>')
                     next_reminder = datetime.datetime.today() + datetime.timedelta(days=MANAGER_SIGNATURE_REMINDER)
                     SignatureReminder.objects.create(review=pr, employee=employee, next_date=next_reminder)
                 else:
                     # Notification #11: Upper manager reminded to sign an evaluation
-                    add_reminder(employee.user.email, 'signature_required', f'Signature required: Performance evaluation for {pr.employee.user.get_full_name()}', f'{pr.employee.manager.user.get_full_name()} has completed an evaluation for {pr.employee.user.get_full_name()}, which requires your signature. View and sign here: {url}', f'{pr.employee.manager.user.get_full_name()} has completed an evaluation for {pr.employee.user.get_full_name()}, which requires your signature. View and sign here: <a href="{url}">{url}</a>')
+                    add_reminder(employee.user.email, 'signature_required', f'Signature required: Performance evaluation for {pr.employee.name}', f'{pr.employee.manager.name} has completed an evaluation for {pr.employee.name}, which requires your signature. View and sign here: {url}', f'{pr.employee.manager.name} has completed an evaluation for {pr.employee.name}, which requires your signature. View and sign here: <a href="{url}">{url}</a>')
                     next_reminder = datetime.datetime.today() + datetime.timedelta(days=MANAGER_SIGNATURE_REMINDER)
                     SignatureReminder.objects.create(review=pr, employee=employee, next_date=next_reminder)
 
@@ -208,17 +208,17 @@ def send_pr_reminder_emails():
                     earliest_reminder = reminders.earliest()
                     if today >= earliest_reminder.date + datetime.timedelta(days=ESCALATION_TO_NEXT_MANAGER_REMINDER):
                         # Notification #9, Notification #12: Escalate to manager's manager to get manager to sign evaluation
-                        add_reminder(employee.manager.user.email, 'signature_required_other', f'A performance review is behind schedule', f'A signature is required by {employee.user.get_full_name()} for their evaluation. Contact them here: {employee.user.email}', f'A signature is required by {employee.user.get_full_name()} for their evaluation. Contact them here: <a href="mailto:{employee.user.email}">{employee.user.email}</a>')
+                        add_reminder(employee.manager.user.email, 'signature_required_other', f'A performance review is behind schedule', f'A signature is required by {employee.name} for their evaluation. Contact them here: {employee.user.email}', f'A signature is required by {employee.name} for their evaluation. Contact them here: <a href="mailto:{employee.user.email}">{employee.user.email}</a>')
                         # We don't need to make another reminder because this same reminder will trigger every subsequent day
         else:
             if employee == pr.employee.manager:
                 # Notification #8
-                add_reminder(employee.user.email, 'signature_required', f'Signature required: Performance evaluation for {pr.employee.user.get_full_name()}', f'Your evaluation for {pr.employee.user.get_full_name()} requires your signature. View and sign here: {url}', f'Your evaluation for {pr.employee.user.get_full_name()} requires your signature. View and sign here: <a href="{url}">{url}</a>')
+                add_reminder(employee.user.email, 'signature_required', f'Signature required: Performance evaluation for {pr.employee.name}', f'Your evaluation for {pr.employee.name} requires your signature. View and sign here: {url}', f'Your evaluation for {pr.employee.name} requires your signature. View and sign here: <a href="{url}">{url}</a>')
                 next_reminder = datetime.datetime.today() + datetime.timedelta(days=MANAGER_SIGNATURE_REMINDER)
                 SignatureReminder.objects.create(review=pr, employee=employee, next_date=next_reminder)
             else:
                 # Notification #11
-                add_reminder(employee.user.email, 'signature_required', f'Signature required: Performance evaluation for {pr.employee.user.get_full_name()}', f'{pr.employee.manager.user.get_full_name()} has completed an evaluation for {pr.employee.user.get_full_name()}, which requires your signature. View and sign here: {url}', f'{pr.employee.manager.user.get_full_name()} has completed an evaluation for {pr.employee.user.get_full_name()}, which requires your signature. View and sign here: <a href="{url}">{url}</a>')
+                add_reminder(employee.user.email, 'signature_required', f'Signature required: Performance evaluation for {pr.employee.name}', f'{pr.employee.manager.name} has completed an evaluation for {pr.employee.name}, which requires your signature. View and sign here: {url}', f'{pr.employee.manager.name} has completed an evaluation for {pr.employee.name}, which requires your signature. View and sign here: <a href="{url}">{url}</a>')
                 next_reminder = datetime.datetime.today() + datetime.timedelta(days=MANAGER_SIGNATURE_REMINDER)
                 SignatureReminder.objects.create(review=pr, employee=employee, next_date=next_reminder)
 
@@ -237,7 +237,7 @@ def send_pr_reminder_emails():
             ed_reminder = hr_reminders.earliest()
             
             def add_hr_reminder():
-                add_reminder(hr_manager.user.email, 'signature_required', f'Signature required: A Performance Evaluation has been approved by the division director', f'{employee.manager.user.get_full_name()} has completed an evaluation for {employee.user.get_full_name()}, which requires your signature. View and sign here: {url}', f'{employee.manager.user.get_full_name()} has completed an evaluation for {employee.user.get_full_name()}, which requires your signature. View and sign here: <a href="{url}">{url}</a>')
+                add_reminder(hr_manager.user.email, 'signature_required', f'Signature required: A Performance Evaluation has been approved by the division director', f'{employee.manager.name} has completed an evaluation for {employee.name}, which requires your signature. View and sign here: {url}', f'{employee.manager.name} has completed an evaluation for {employee.name}, which requires your signature. View and sign here: <a href="{url}">{url}</a>')
                 next_reminder = datetime.datetime.today() + datetime.timedelta(days=HR_SIGNATURE_REMINDER_SUBSEQUENT)
                 SignatureReminder.objects.create(review=pr, employee=hr_manager, next_date=next_reminder)
 
@@ -254,7 +254,7 @@ def send_pr_reminder_emails():
             if ed_reminder:
                 if today >= ed_reminder.date + datetime.timedelta(days=ESCALATION_TO_NEXT_MANAGER_REMINDER):
                     # Notification #15: Escalate to Executive Director to get HR Manager to sign the evaluation
-                    add_reminder(executive_director.user.email, 'signature_required_other', f'A performance review is behind schedule', f'A signature is required by {hr_manager.user.get_full_name()} for an evaluation for {employee.user.get_full_name()}. Contact them here: {hr_manager.user.email}', f'A signature is required by {hr_manager.user.get_full_name()} for an evaluation for {employee.user.get_full_name()}. Contact them here: <a href="mailto:{hr_manager.user.email}">{hr_manager.user.email}</a>')
+                    add_reminder(executive_director.user.email, 'signature_required_other', f'A performance review is behind schedule', f'A signature is required by {hr_manager.name} for an evaluation for {employee.name}. Contact them here: {hr_manager.user.email}', f'A signature is required by {hr_manager.name} for an evaluation for {employee.name}. Contact them here: <a href="mailto:{hr_manager.user.email}">{hr_manager.user.email}</a>')
                     # We don't need to make another reminder because this same reminder will trigger every subsequent day
 
     ###################################################################################################
@@ -274,7 +274,7 @@ def send_pr_reminder_emails():
             
             # Reminder to Executive Director
             def add_ed_reminder():
-                add_reminder(executive_director.user.email, 'signature_required', f'Signature required: A Performance Evaluation has been approved by {hr_manager.user.get_full_name()}', f'{employee.manager.user.get_full_name()} has completed an evaluation for {employee.user.get_full_name()}, which requires your signature. View and sign here: {url}', f'{employee.manager.user.get_full_name()} has completed an evaluation for {employee.user.get_full_name()}, which requires your signature. View and sign here: <a href="{url}">{url}</a>')
+                add_reminder(executive_director.user.email, 'signature_required', f'Signature required: A Performance Evaluation has been approved by {hr_manager.name}', f'{employee.manager.name} has completed an evaluation for {employee.name}, which requires your signature. View and sign here: {url}', f'{employee.manager.name} has completed an evaluation for {employee.name}, which requires your signature. View and sign here: <a href="{url}">{url}</a>')
                 next_reminder = datetime.datetime.today() + datetime.timedelta(days=ED_SIGNATURE_REMINDER_SUBSEQUENT)
                 SignatureReminder.objects.create(review=pr, employee=executive_director, next_date=next_reminder)
             
@@ -290,7 +290,7 @@ def send_pr_reminder_emails():
             if hr_reminder:
                 if today >= hr_reminder.date + datetime.timedelta(days=ESCALATION_TO_NEXT_MANAGER_REMINDER):
                     # Notification #18: Escalate to HR Manager to get Executive Director to sign the evaluation
-                    add_reminder(hr_manager.user.email, 'signature_required_other', f'A performance review is behind schedule', f'A signature is required by {executive_director.user.get_full_name()} for an evaluation for {employee.user.get_full_name()}. Contact them here: {executive_director.user.email}', f'A signature is required by {executive_director.user.get_full_name()} for an evaluation for {employee.user.get_full_name()}. Contact them here: <a href="mailto:{executive_director.user.email}">{executive_director.user.email}</a>')
+                    add_reminder(hr_manager.user.email, 'signature_required_other', f'A performance review is behind schedule', f'A signature is required by {executive_director.name} for an evaluation for {employee.name}. Contact them here: {executive_director.user.email}', f'A signature is required by {executive_director.name} for an evaluation for {employee.name}. Contact them here: <a href="mailto:{executive_director.user.email}">{executive_director.user.email}</a>')
                     # We don't need to make another reminder because this same reminder will trigger every subsequent day
 
     ####################################################

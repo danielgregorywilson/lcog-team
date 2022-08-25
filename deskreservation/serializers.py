@@ -41,6 +41,6 @@ class DeskReservationSerializer(serializers.HyperlinkedModelSerializer):
     @staticmethod
     def get_employee_name(reservation):
         if reservation.employee:
-            return reservation.employee.user.get_full_name()
+            return reservation.employee.name
         else:
             return ''

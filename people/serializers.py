@@ -32,7 +32,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
-    name = serializers.CharField(source='user.get_full_name')
+    name = serializers.CharField()
     email = serializers.EmailField(source='user.email')
     is_manager = serializers.SerializerMethodField()
     has_manager = serializers.SerializerMethodField()
@@ -121,17 +121,17 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
         if employee.is_executive_director:
             return ""
         elif employee.is_hr_manager:
-            return Employee.objects.filter(is_executive_director=True).first().user.get_full_name()
+            return Employee.objects.filter(is_executive_director=True).first().name
         elif employee.is_division_director:
-            return Employee.objects.filter(is_hr_manager=True).first().user.get_full_name()
+            return Employee.objects.filter(is_hr_manager=True).first().name
         elif employee.manager:
-            return employee.manager.user.get_full_name()
+            return employee.manager.name
         else:
             return ""
 
 
 class SimpleEmployeeSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(source='user.get_full_name')
+    name = serializers.CharField(source='name')
 
     class Meta:
         model = Employee
@@ -140,12 +140,12 @@ class SimpleEmployeeSerializer(serializers.ModelSerializer):
 
 class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     employee_pk = serializers.CharField(source='employee.pk') #TODO: Make IntegerField
-    employee_name = serializers.CharField(source='employee.user.get_full_name')
+    employee_name = serializers.CharField(source='employee.name')
     employee_division = serializers.SerializerMethodField()
     employee_unit_or_program = serializers.SerializerMethodField()
     employee_job_title = serializers.CharField(source='employee.job_title.name')
     manager_pk = serializers.IntegerField(source='employee.manager.pk')
-    manager_name = serializers.CharField(source='employee.manager.user.get_full_name')
+    manager_name = serializers.CharField(source='employee.manager.name')
     days_until_review = serializers.SerializerMethodField()
     status = serializers.CharField(source='get_status_display')
     all_required_signatures = serializers.SerializerMethodField()
@@ -246,7 +246,7 @@ class SignatureSerializer(serializers.HyperlinkedModelSerializer):
 class ReviewNoteSerializer(serializers.HyperlinkedModelSerializer):
     pk = serializers.IntegerField()
     employee_pk = serializers.IntegerField(source='employee.pk')
-    employee_name = serializers.CharField(source='employee.user.get_full_name')
+    employee_name = serializers.CharField(source='employee.name')
     date = serializers.DateField()
     note = serializers.CharField()
     
@@ -264,10 +264,10 @@ class ViewedSecurityMessageSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class TeleworkApplicationSerializer(serializers.HyperlinkedModelSerializer):
-    employee_name = serializers.CharField(source='employee.user.get_full_name')
+    employee_name = serializers.CharField(source='employee.name')
     employee_pk = serializers.IntegerField(source='employee.pk')
     manager_pk = serializers.IntegerField(source='employee.manager.pk')
-    manager_name = serializers.CharField(source='employee.manager.user.get_full_name')
+    manager_name = serializers.CharField(source='employee.manager.name')
     status = serializers.CharField(source='get_status_display')
     program_manager_signature_0 = serializers.SerializerMethodField()
     employee_signature_0 = serializers.SerializerMethodField()

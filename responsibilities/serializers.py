@@ -44,14 +44,14 @@ class ResponsibilitySerializer(serializers.HyperlinkedModelSerializer):
     @staticmethod
     def get_primary_employee_name(responsibility):
         if responsibility.primary_employee:
-            return responsibility.primary_employee.user.get_full_name()
+            return responsibility.primary_employee.name
         else:
             return ''
     
     @staticmethod
     def get_secondary_employee_name(responsibility):
         if responsibility.secondary_employee:
-            return responsibility.secondary_employee.user.get_full_name()
+            return responsibility.secondary_employee.name
         else:
             return ''
 

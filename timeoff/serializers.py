@@ -7,7 +7,7 @@ from people.serializers import EmployeeSerializer
 
 class TimeOffRequestSerializer(serializers.HyperlinkedModelSerializer):
     employee_pk = serializers.IntegerField(source='employee.pk')
-    employee_name = serializers.CharField(source='employee.user.get_full_name')
+    employee_name = serializers.CharField(source='employee.name')
     manager_pk = serializers.IntegerField(source='employee.manager.pk')
     conflicts = serializers.ListField(required=False)
  

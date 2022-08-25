@@ -106,7 +106,7 @@ class DeskReservation(models.Model):
         ordering = ["-pk"]
     
     def __str__(self):
-        return f"Desk reservation for {self.employee.user.get_full_name()}"
+        return f"Desk reservation for {self.employee.name}"
 
     objects = models.Manager()
     currently_reserved_objects = CurrentlyReservedManager()

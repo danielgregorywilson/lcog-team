@@ -9,7 +9,7 @@
     <div class="q-py-md">
       <div class="text-h4 q-mb-md">Your Next Review</div>
       <div v-if="getNextReview().employee_pk">
-        <div class="q-mb-sm">Current Perforance Period: {{ getNextReview().period_start_date | readableDate }} - {{ getNextReview().period_end_date | readableDate }}</div>
+        <div class="q-mb-sm">Current Performance Period: {{ getNextReview().period_start_date | readableDate }} - {{ getNextReview().period_end_date | readableDate }}</div>
         <div v-if="nextReviewNeedsEvaluation()">Your manager has not yet completed their evaluation.</div>
         <div v-if="!nextReviewNeedsEvaluation() && !userSignedNextEvaluation()">
           <div>Your manager has completed their evaluation and it is ready for your review.</div>

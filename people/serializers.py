@@ -130,6 +130,15 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             return ""
 
 
+class EmployeeProfileSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='name')
+    number = serializers.IntegerField(source='number')
+
+    class Meta:
+        model = Employee
+        fields = ['pk', 'name', 'number']
+
+
 class SimpleEmployeeSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='name')
 

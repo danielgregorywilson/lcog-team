@@ -327,6 +327,16 @@ const routes: RouteConfig[] = [
         component: () => import('pages/SecurityMessage.vue'),
         beforeEnter: ifAuthenticated
       },
+
+      /////////////
+      // PROFILE //
+      /////////////
+      {
+        path: '/profile',
+        name: 'profile',
+        component: () => import('pages/Profile.vue'),
+        beforeEnter: ifAuthenticated
+      },
     ]
   },
   

@@ -20,7 +20,7 @@ from people.models import (
     TeleworkSignature, ViewedSecurityMessage
 )
 from people.serializers import (
-    EmployeeSerializer, FileUploadSerializer, GroupSerializer,
+    EmployeeProfileSerializer, EmployeeSerializer, FileUploadSerializer, GroupSerializer,
     PerformanceReviewFileUploadSerializer, PerformanceReviewSerializer,
     ReviewNoteSerializer, SignatureSerializer, SimpleEmployeeSerializer,
     TeleworkApplicationFileUploadSerializer, TeleworkApplicationSerializer,
@@ -107,6 +107,19 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         else:
             queryset = Employee.objects.none()
         return queryset
+    
+    # @action(detail=True, methods=['get'])
+    # def get_profile(self, request):
+    #     serialized_profile = EmployeeProfileSerializer(request.user.employee,
+    #         context={'request': request})
+    #     return Response(serialized_profile.data)
+
+    @action(detail=True, methods=['put'])
+    def update_profile(self, request):
+        import pdb; pdb.set_trace();
+        serialized_profile = EmployeeProfileSerializer(request.user.employee,
+            context={'request': request})
+        return Response(serialized_profile.data)
     
     @action(detail=True, methods=['get'])
     def employee_next_performance_review(self, request, pk=None):

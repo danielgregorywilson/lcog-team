@@ -45,11 +45,10 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
             elif 'managed' in self.request.GET and is_true_string(self.request.GET['managed']):
                 requests = TimeOffRequest.objects.filter(employee__manager=user.employee)
             elif 'team' in self.request.GET and is_true_string(self.request.GET['team']):
-                requests = TimeOffRequest.objects.filter(
-                    Q(employee__manager=user.employee.manager) | # Your team members
-                    Q(employee=user.employee.manager) | # Your manager
-                    Q(employee__manager=user.employee) # Your direct reports
-                )
+                # Show requests from everyone including and under your program manager
+                program_manager = user.employee.get_program_manager
+                program_manager_and_descendants = program_manager.get_descendants_of_employee(program_manager)
+                requests = TimeOffRequest.objects.filter(employee__in=program_manager_and_descendants)
             else:
                 requests = TimeOffRequest.objects.filter(employee=user.employee)
             for request in requests:

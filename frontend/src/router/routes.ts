@@ -301,7 +301,6 @@ const routes: RouteConfig[] = [
       {
         path: '/telework-application',
         name: 'telework-application',
-        // component: () => import('pages/TeleworkApplication.vue'),
         component: () => import('pages/TeleworkApplicationGetOrCreate.vue'),
         beforeEnter: ifEligibleForTeleworkApplication
       },
@@ -325,6 +324,16 @@ const routes: RouteConfig[] = [
         path: '/security-message',
         name: 'security-message',
         component: () => import('pages/SecurityMessage.vue'),
+        beforeEnter: ifAuthenticated
+      },
+
+      /////////////
+      // PROFILE //
+      /////////////
+      {
+        path: '/profile',
+        name: 'profile',
+        component: () => import('pages/Profile.vue'),
         beforeEnter: ifAuthenticated
       },
     ]

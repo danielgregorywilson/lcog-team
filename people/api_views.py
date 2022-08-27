@@ -107,19 +107,17 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         else:
             queryset = Employee.objects.none()
         return queryset
-    
-    # @action(detail=True, methods=['get'])
-    # def get_profile(self, request):
-    #     serialized_profile = EmployeeProfileSerializer(request.user.employee,
-    #         context={'request': request})
-    #     return Response(serialized_profile.data)
 
-    @action(detail=True, methods=['put'])
-    def update_profile(self, request):
-        import pdb; pdb.set_trace();
-        serialized_profile = EmployeeProfileSerializer(request.user.employee,
+    def partial_update(self, request, pk=None):
+        """
+        Currently just updates the employee's display name.
+        """
+        employee = Employee.objects.get(pk=pk)
+        employee.display_name = request.data['display_name']
+        employee.save()
+        serialized_employee = EmployeeSerializer(employee,
             context={'request': request})
-        return Response(serialized_profile.data)
+        return Response(serialized_employee.data)
     
     @action(detail=True, methods=['get'])
     def employee_next_performance_review(self, request, pk=None):

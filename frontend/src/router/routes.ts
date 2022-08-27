@@ -301,7 +301,6 @@ const routes: RouteConfig[] = [
       {
         path: '/telework-application',
         name: 'telework-application',
-        // component: () => import('pages/TeleworkApplication.vue'),
         component: () => import('pages/TeleworkApplicationGetOrCreate.vue'),
         beforeEnter: ifEligibleForTeleworkApplication
       },

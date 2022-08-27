@@ -25,6 +25,7 @@ export default class TeleworkApplicationGetOrCreate extends Vue {
 
   private getOrCreateTeleworkApplication(): Promise<AxiosTeleworkApplicationRetrieveOneServerResponse> {
     return new Promise((resolve, reject) => {
+      // We cannot guarantee the user has arrived in vuex state immediately, so request it again here
       this.$store.dispatch('userModule/simpleUserRequest')
         .then((simpleUserresponse: AxiosEmployeeRetrieveOneServerResponse) => {
           // Now that we have the user's pk, get or create a Telework Application for that user

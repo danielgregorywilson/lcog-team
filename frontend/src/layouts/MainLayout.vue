@@ -67,6 +67,7 @@
             v-for="link in navLinks"
             :key="link.title"
             v-bind="link"
+            :id="link.id"
           />
         </div>
         <q-item
@@ -97,6 +98,10 @@
       background-position: 0% 0% !important;
     }
   }
+
+  #nav-profile {
+    border-top: 1px black solid;
+  }
 </style>
 
 <script lang="ts">
@@ -111,16 +116,12 @@ interface LinkData {
   title: string;
   icon: string;
   link: string;
+  id?: string;
   managerOnly?: boolean;
   eligibleForTeleworkApplicationOnly?: boolean;
 }
 
 const linksData: Array<LinkData> = [
-  // {
-  //   title: 'Dashboard',
-  //   icon: 'dashboard',
-  //   link: '/dashboard'
-  // },
   {
     title: 'Time Off',
     icon: 'schedule',
@@ -157,6 +158,12 @@ const linksData: Array<LinkData> = [
     title: 'Security Message',
     icon: 'security',
     link: '/security-message'
+  },
+  {
+    title: 'My Profile',
+    icon: 'person',
+    link: '/profile',
+    id: 'nav-profile'
   },
 ];
 

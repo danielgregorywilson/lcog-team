@@ -108,6 +108,17 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             queryset = Employee.objects.none()
         return queryset
     
+    def partial_update(self, request, pk=None):
+        """
+        Currently just updates the employee's display name.
+        """
+        employee = Employee.objects.get(pk=pk)
+        employee.display_name = request.data['display_name']
+        employee.save()
+        serialized_employee = EmployeeSerializer(employee,
+             context={'request': request})
+        return Response(serialized_employee.data)
+
     @action(detail=True, methods=['get'])
     def employee_next_performance_review(self, request, pk=None):
         next_review = request.user.employee.employee_next_review()

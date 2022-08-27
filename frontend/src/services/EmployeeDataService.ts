@@ -1,5 +1,8 @@
 import http from '../http-common';
 
+import { EmployeeUpdatePartial } from '../store/types'
+
+
 class EmployeeDataService {
   getAll() {
     return http.get('api/v1/employee');
@@ -7,6 +10,11 @@ class EmployeeDataService {
 
   getDirectReports() {
     return http.get('api/v1/employee?direct-reports=True');
+  }
+
+  // For updating employee profile
+  updatePartial(pk: number, data: EmployeeUpdatePartial) {
+    return http.patch(`api/v1/employee/${pk}`, data)
   }
 
   getEmployeeNextPerformanceReview(pk: number) {

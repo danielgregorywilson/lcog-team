@@ -59,6 +59,11 @@ export interface SimpleEmployeeRetrieve {
   name: string
 }
 
+// For updating employee profile
+export interface EmployeeUpdatePartial {
+  display_name?: string
+}
+
 export interface AxiosEmployeeRetrieveOneServerResponse {
   data: EmployeeRetrieve
 }

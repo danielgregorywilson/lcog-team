@@ -4,6 +4,20 @@
 
 export const releases = [
   {
+    version: '0.7.1',
+    date: new Date(2022, 7, 26),
+    changes: [
+      {
+        type: 'new',
+        description: 'Add profile edit page.'
+      },
+      {
+        type: 'fix',
+        description: 'Time off calendar now shows your whole team.'
+      },
+    ]
+  },
+  {
     version: '0.7.0',
     date: new Date(2022, 7, 24),
     changes: [

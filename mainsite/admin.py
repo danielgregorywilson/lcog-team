@@ -50,11 +50,11 @@ class UserCreationForm(BaseUserCreationForm):
 
 
 admin.site.unregister(Group)
-class UserInLine(admin.TabularInline):
+class UserInline(admin.TabularInline):
     model = Group.user_set.through
     extra = 0
 
 
 @admin.register(Group)
 class GenericGroup(GroupAdmin):
-    inlines = [UserInLine]
+    inlines = [UserInline]

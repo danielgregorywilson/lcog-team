@@ -55,10 +55,13 @@ else:
 INSTALLED_APPS = [
     'api',
     'mainsite',
+
     'deskreservation',
     'people',
     'responsibilities',
     'timeoff',
+    'workflows',
+    
     'rest_framework',
     'rest_framework.authtoken',
     'storages',

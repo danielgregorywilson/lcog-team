@@ -26,6 +26,7 @@
 1988,Blanchard,Sarah,sblanchard@lcog.org,Division Support Specialist,PR S&DS Bruns
 1670,Blankenship,Marcie,MBLANKENSHIP@Lcog.org,Adult Protective Servs. Specialist,PR S&DS Newall
 1972,Blas,Abigail,ablas@lcog.org,Eligibility Specialist,PR S&DS Iverson
+2005,Boehringer,Kris,kboehringer@lcog.org,Senior Meals Site Coordinator,PR S&DS Demsky
 1348,Bowes,Brendan,bbowes@lcog.org,Lead Worker,PR S&DS Estep
 1283,Brendle,Nancy,nbrendle@lcog.org,TAD / Case Manager,PR S&DS Ceniga
 1971,Breton,Lizbeth,lbreton@lcog.org,Case Manager.,PR S&DS Faherty
@@ -46,7 +47,6 @@
 1696,Campbell,Nathan,ncampbell@lcog.org,Temporary Worker,PR Technology Services Hogue
 1976,Carmer,Amy,acarmer@lcog.org,Eligibility Specialist,PR S&DS Davies
 1960,Casey,Erika,ecasey@lcog.org,Case Manager.,PR S&DS Johnson
-1886,Castrejon Perez,Laura,lcastrejonperez@lcog.org,Eligibility Specialist,PR S&DS Iverson
 1556,Ceniga,Bonnie,bceniga@lcog.org,Unit Manager,PR S&DS Goodman
 1818,Chapman,Sarah,schapman@lcog.org,Case Manager.,PR S&DS Miller
 1852,Chen,Dongmei,dchen@lcog.org,GIS Associate,PR Planning Services DenOuden
@@ -65,7 +65,7 @@
 1752,Corson,Denny,dstorment@lcog.org,Case Manager,PR S&DS Faherty
 1709,Crisp,Chelsie,CCrisp@Lcog.org,Case Manager,PR S&DS Johnson
 1776,Cross,Kathleen,kcross@lcog.org,Senior Meals Site Coordinator,PR S&DS Demsky
-1441,Crowder,Jordan,jcrowder@lcog.org,AIC Program Manager,PR S&DS Sheelar Admin
+1441,Crowder,Jordan,jcrowder@lcog.org,Program Manager,PR S&DS Sheelar Admin
 1507,Crowder,Rebecca,rcrowder@lcog.org,Adult Protective Servs. Specialist,PR S&DS Newall
 1666,Currier,Ellen,ECURRIER@Lcog.org,Principal Planner,PR Transport Services Thompson
 1537,Dare,Heather,hdare@lcog.org,Case Manager,PR S&DS Vann
@@ -88,7 +88,7 @@
 1497,Estrada,Leah,lestrada@lcog.org,Case Manager,PR S&DS Miller
 1750,Evans,Michelle,mmeyer@lcog.org,Case Manager,PR S&DS Wright
 1417,Faherty,Jennifer,jfaherty@lcog.org,Unit Manager,PR S&DS Goodman
-1998,Fletcher,Janelle,jlfletcher@lcog.org,Case Manager,PR S&DS Quaempts
+1998,Fletcher,Janelle,jlfletcher@lcog.org,Case Manager,PR S&DS Miller
 1846,Flores,Elizabeth,lwhitesides@lcog.org,Adult Protective Servs. Specialist,PR S&DS Newall
 1850,Flournoy,Dawn,DFLOURNOY-DAVIS@lcog.org,Case Manager.,PR S&DS Miller
 1661,Ford-Mackey,Sherri,SFORD-MACKEY@Lcog.org,Case Manager,PR S&DS Davies
@@ -175,18 +175,18 @@
 1993,Mallory,Lori,lmallory@lcog.org,Eligibility Specialist,PR S&DS Iverson
 1536,Malos,Jessica,jmalos@lcog.org,Eligibility Specialist,PR S&DS Iverson
 1649,Marelli,Margie,mmarelli@lcog.org,Unit Manager,PR S&DS Crowder
+2000,Marple,Stacey,smarple@lcog.org,Program Manager,PR Business Services GS Wisth
 1663,Mather,Allen,AMATHER@Lcog.org,Senior Meals Site Coordinator,PR S&DS Demsky
 1987,Matsuno,Joey,jmatusuno@lcog.org,Temporary Worker,PR MetroTV Services Moyer
 1738,McCarthy,James,jmccarthy@lcog.org,Adult Protective Servs. Specialist,PR S&DS Cole
 1244,McCluskey,Roberta,rmccluskey@lcog.org,Adult Protective Servs. Specialist,PR S&DS Newall
-1979,McNeil,Grace,gmcneil@lcog.org,Division Support Specialist,PR S&DS Marelli
 1027,Miller,Carrie,cmiller@lcog.org,Unit Manager,PR S&DS Goodman
 1967,Mitchell,Shari,smitchell@lcog.org,Eligibility Specialist,PR S&DS Vann
 1879,Monette,Frances,amonette@lcog.org,Case Manager,PR S&DS Faherty
 1810,Moore,Kathleen,kmoore@lcog.org,LAN Administrator,PR S&DS Leyba
 1955,Moore,Kelsey,kcmoore@lcog.org,Transportation Options Specialist,PR Transport Services Thompson
 1795,Morel,Melissa,mmorel@lcog.org,HCW Specialist,PR S&DS Bruns
-1997,Mosser,Amira,amosser@lcog.org,Eligibility Specialist,PR S&DS Glover
+1997,Mosser,Amira,amosser@lcog.org,Eligibility Specialist,PR S&DS Iverson
 1048,Moyer,Neil,nmoyer@lcog.org,Program Manager,PR MetroTV Services GS Wisth
 1655,Murphree,Cynthia,cmurphree@lcog.org,Case Manager,PR S&DS Miller
 1011,Nakagome,Shugo,snakagome@lcog.org,Network Architect,PR Administration Leyba
@@ -194,7 +194,7 @@
 1845,Napoleon,Jane,jnapoleon@lcog.org,Eligibility Specialist,PR S&DS Davies
 1982,Nasholm,Matthew,mnasholm@lcog.org,IT / Telecom Administrator,PR Technology Services Leyba
 1883,Navarrete,Nikki,nnavarrete@lcog.org,Roving Senior Meals Site Coordinator,PR S&DS Demsky
-1669,Nichols,Deidre,deidrelnichols@gmail.com,Case Manager.,PR S&DS Wright
+1669,Nichols,Deidre,dnichols@lcog.org,Case Manager.,PR S&DS Wright
 1832,Norton,Sandy,snorton@lcog.org,Division Support Specialist,PR S&DS Vann
 1897,O'Connor,Tessa,toconnor@lcog.org,Eligibility Specialist,PR S&DS Quaempts
 90,Olivares,Gloria,GOlivares@lcog.org,Lead Worker,PR S&DS Estep
@@ -290,7 +290,6 @@
 1713,Wilbur,Brandon,BWilbur@Lcog.org,Adult Protective Servs. Specialist,PR S&DS Cole
 1527,Wilbur,Nicole,nnewall@lcog.org,Unit Manager,PR S&DS Suratt
 1932,Willey,Angela,awilley@lcog.org,Eligibility Specialist,PR S&DS Iverson
-1999,Willis,Alicia,awillis@lcog.org,Case Manager,PR S&DS Miller
 1430,Wilson,Brendalee,bwilson@lcog.org,Executive Director,Administration
 1859,Wilson,Daniel,dwilson@lcog.org,Senior Web Developer,PR Technology Services Leyba
 1770,Wilson,Katherine,kwilson@lcog.org,Associate Planner,PR Planning Services Thompson

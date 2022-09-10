@@ -1,7 +1,47 @@
 <template>
   <q-page class="q-pa-md">
     <div class="text-h4">EIS</div>
+    <div class="text-h5" v-if="currentWorkflowInstance().process_instances">
+      {{currentWorkflowInstance().workflow.name}}: {{currentWorkflowInstance().process_instances[0].process.name}}
+    </div>
     <div class="q-mt-sm">
+      <q-stepper
+        v-if="currentWorkflowInstance().process_instances"
+        v-model="currentStepInstance"
+        vertical
+        color="primary"
+        animated
+      >
+        <q-step
+          v-for="instance of currentWorkflowInstance().process_instances[0].step_instances"
+          :key="instance.pk"
+          :name="instance.pk"
+          :title="instance.step.name"
+          icon="settings"
+          :done="!!instance.completed_at"
+        >
+          <div>{{ instance.step.description }}</div>
+          <q-stepper-navigation>
+            <div v-if="instance.step.choices_prompt">
+              {{instance.step.choices_prompt}}
+              <q-btn
+                v-for="choice of instance.step.next_step_choices"
+                class="q-ml-sm"
+                :key="choice.pk"
+                @click="completeStep(instance.pk, choice.next_step_pk)"
+                color="primary"
+                :label="choice.choice_text"
+              />
+            </div>
+            <div v-else>
+              <q-btn @click="completeStep(instance.pk)" color="primary" label="Continue" />
+            </div>
+          </q-stepper-navigation>
+        </q-step>
+      </q-stepper>
+    </div>
+    
+    <!-- <div class="q-mt-sm">
       <q-stepper
         v-model="step"
         vertical
@@ -62,7 +102,7 @@
           </q-stepper-navigation>
         </q-step>
       </q-stepper>
-    </div>
+    </div> -->
   </q-page>
 </template>
 
@@ -71,21 +111,26 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { VuexStoreGetters } from '../../store/types'
+import { VuexStoreGetters, WorkflowInstanceRetrieve } from '../../store/types'
 
 @Component
 export default class EIS extends Vue {
   private getters = this.$store.getters as VuexStoreGetters
 
-  private step = 1;
+  private currentStepInstance = -1;
+  private workflowInstancePk = 1
 
   // private isManager() {
   //   return this.getters['userModule/getEmployeeProfile'].is_manager
   // }
 
-  // private managedTimeOffRequests(): Array<TimeOffRequestRetrieve> {
-  //   return this.getters['timeOffModule/managedTimeOffRequests'].results
-  // }
+  private currentWorkflowInstance(): WorkflowInstanceRetrieve {
+    return this.getters['workflowModule/currentWorkflowInstance']
+  }
+
+  // private currentStepInstance(): number {
+  //   return this.currentWorkflowInstance().process_instances[0].current_step_instance.pk
+  // } 
 
   // private numUnacknowledgedManagedTimeOffRequests(): number {
   //   const tors = this.getters['timeOffModule/managedTimeOffRequests'].results
@@ -96,15 +141,33 @@ export default class EIS extends Vue {
   //   }
   // }
 
-  // private retrieveManagedTimeOffRequests(): void {
-  //   this.$store.dispatch('timeOffModule/getManagedTimeOffRequests')
-  //     .catch(e => {
-  //       console.error('Error retrieving my upcoming time off requests', e)
-  //     })
-  // }
+  private retrieveWorkflowInstance(): void {
+    this.$store.dispatch('workflowModule/getCurrentWorkflowInstance', {pk: this.workflowInstancePk})
+      .then(() => {
+        if (!this.currentWorkflowInstance().process_instances[0].completed_at) {
+          this.currentStepInstance = this.currentWorkflowInstance().process_instances[0].current_step_instance.pk
+        } else {
+          // Process Instance is complete
+          this.currentStepInstance = -1
+        }
+      })
+      .catch(e => {
+        console.error('Error retrieving workflow instance', e)
+      })
+  }
+
+  private completeStep(stepInstancePk: number, nextStepPk?: number): void {
+    this.$store.dispatch('workflowModule/completeStepInstance', { stepInstancePk, nextStepPk })
+      .then(() => {
+        this.retrieveWorkflowInstance()
+      })
+      .catch(e => {
+        console.error('Error retrieving workflow instance', e)
+      })
+  }
 
   mounted() {
-    // this.retrieveManagedTimeOffRequests()
+    this.retrieveWorkflowInstance()
   }
 }
 </script>

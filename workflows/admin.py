@@ -2,12 +2,12 @@ from django.contrib import admin
 from django.utils.safestring import mark_safe
 from django.urls import reverse
 
-from workflows.models import Process, Role, Step, StepChoice, Workflow
+from workflows.models import Process, ProcessInstance, Role, Step, StepChoice, StepInstance, Workflow, WorkflowInstance
 
 
 @admin.register(Workflow)
 class WorkflowAdmin(admin.ModelAdmin):
-    list_display = ("name",)
+    list_display = ("name", "version")
 
 
 @admin.register(Role)
@@ -49,7 +49,7 @@ class StepInline(admin.TabularInline):
 
 @admin.register(Process)
 class ProcessAdmin(admin.ModelAdmin):
-    list_display = ("name", "workflow")
+    list_display = ("name", "workflow", "version")
     list_filter = ("workflow",)
     inlines = (StepInline,)
 
@@ -66,4 +66,16 @@ class StepAdmin(admin.ModelAdmin):
     inlines = (StepChoiceInline,)
 
 
+@admin.register(WorkflowInstance)
+class WorkflowInstanceAdmin(admin.ModelAdmin):
+    pass
 
+
+@admin.register(ProcessInstance)
+class ProcessInstanceAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(StepInstance)
+class StepInstanceAdmin(admin.ModelAdmin):
+    pass

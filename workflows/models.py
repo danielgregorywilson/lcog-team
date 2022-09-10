@@ -11,6 +11,7 @@ class Workflow(models.Model):
         return f"Workflow: {self.name}"
     
     name = models.CharField(max_length=100)
+    version = models.IntegerField(default=1)
 
     # TODO: Complete when all child processes are complete
 
@@ -29,6 +30,7 @@ class Process(models.Model):
     
     name = models.CharField(max_length=100)
     workflow = models.ForeignKey(Workflow, related_name="processes", on_delete=models.CASCADE)
+    version = models.IntegerField(default=1)
 
     #TODO: Complete when step marked "end" is completed
 
@@ -99,7 +101,14 @@ class HasTimeStampsMixin(models.Model):
 
 
 class WorkflowInstance(HasTimeStampsMixin):
+    class Meta:
+        ordering = ["pk"]
+
     workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE)
+
+    @property
+    def current_step_instance(self):
+        import pdb; pdb.set_trace();
 
 
 class ProcessInstance(HasTimeStampsMixin):
@@ -109,8 +118,11 @@ class ProcessInstance(HasTimeStampsMixin):
 
 
 class StepInstance(HasTimeStampsMixin):
+    class Meta:
+        ordering = ["pk"]
+    
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
     process_instance = models.ForeignKey(ProcessInstance, on_delete=models.CASCADE)
-    completed_by = models.ForeignKey("people.Employee", null=True, on_delete=models.SET_NULL)
+    completed_by = models.ForeignKey("people.Employee", blank=True, null=True, on_delete=models.SET_NULL)
 
     #TODO: Complete method fills completed_at, completed_by, and current_step_instance and completed_at on Workflow instance

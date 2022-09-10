@@ -16,6 +16,10 @@ from responsibilities.api_views import (
     ResponsibilityViewSet, TagViewSet as ResponsibilityTagViewSet
 )
 from timeoff.api_views import TimeOffRequestViewSet
+from workflows.api_views import (
+    ProcessInstanceViewSet, ProcessViewSet, RoleViewSet, StepChoiceViewSet,
+    StepInstanceViewSet, StepViewSet, WorkflowInstanceViewSet, WorkflowViewSet
+)
 
 
 urlpatterns = [
@@ -44,5 +48,14 @@ router.register('v1/teleworkapplication', TeleworkApplicationViewSet)
 router.register('v1/teleworksignature', TeleworkSignatureViewSet)
 router.register('v1/timeoffrequest', TimeOffRequestViewSet)
 router.register('v1/trustedip', TrustedIPViewSet, basename='trustedip')
+# Workflow
+router.register('v1/process', ProcessViewSet)
+router.register('v1/processinstance', ProcessInstanceViewSet)
+router.register('v1/role', RoleViewSet)
+router.register('v1/step', StepViewSet)
+router.register('v1/stepchoice', StepChoiceViewSet)
+router.register('v1/stepinstance', StepInstanceViewSet)
+router.register('v1/workflow', WorkflowViewSet)
+router.register('v1/workflowinstance', WorkflowInstanceViewSet)
 
 urlpatterns = router.urls + urlpatterns

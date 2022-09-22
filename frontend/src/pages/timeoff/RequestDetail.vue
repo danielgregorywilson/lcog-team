@@ -16,10 +16,15 @@
     </div>
     <q-input
         v-model="note"
-        label="Note"
+        label="Public Note (visible to team members)"
         class="q-pb-md"
-      />
-    <q-btn id="review-note-create-button" color="white" text-color="black" label="Update" :disabled="!formIsFilled()" @click="updateTimeOffRequest()" />
+    />
+    <q-input
+      v-model="privateNote"
+      label="Private Note (visible to manager only)"
+      class="q-pb-md"
+    />
+    <q-btn color="white" text-color="black" label="Update" :disabled="!formIsFilled()" @click="updateTimeOffRequest()" />
   </div>
 </template>
 
@@ -39,6 +44,7 @@ export default class TimeOffRequest extends Vue {
   private pk = ''
   private dates: TimeOffRequestDates = {'from': '', 'to': ''}
   private note = ''
+  private privateNote = ''
 
   private formIsFilled(): boolean {
     if (!!this.dates) {
@@ -59,7 +65,7 @@ export default class TimeOffRequest extends Vue {
     if (this.dates) {
       this.$store.dispatch('timeOffModule/getConflictingResponsibilities', { dates: this.dates })
         .catch(e => {
-          console.error('Error creating review note:', e)
+          console.error('Error getting conflicting responsibilities:', e)
         })
     }
   }
@@ -76,16 +82,18 @@ export default class TimeOffRequest extends Vue {
           this.dates = {'from': startDate, 'to': endDate}
         }
         this.note = response.data.note
+        this.privateNote = response.data.private_note
       })
       .catch(e => {
-        console.error('Error getting review note:', e);
+        console.error('Error getting time off request:', e);
       });
   }
 
   private updateTimeOffRequest(): void {
     TimeOffDataService.update(this.pk, {
       dates: this.dates,
-      note: this.note
+      note: this.note,
+      privateNote: this.privateNote
     })
       .then(() => {
         this.$router.push({ name: 'timeoff-my-requests'})

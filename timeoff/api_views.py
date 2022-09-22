@@ -22,16 +22,22 @@ from timeoff.helpers import (
 from timeoff.models import TimeOffRequest
 
 from timeoff.serializers import (
-    ConflictingResponsibilitiesSerializer, TimeOffRequestSerializer
+    ConflictingResponsibilitiesSerializer, TimeOffRequestPrivateSerializer,
+    TimeOffRequestPublicSerializer
 )
 
 
 class TimeOffRequestViewSet(viewsets.ModelViewSet):
     queryset = TimeOffRequest.objects.all()
-    serializer_class = TimeOffRequestSerializer
     # permission_classes = [
     #     IsAuthenticatedOrReadOnly
     # ]
+
+    def get_serializer_class(self):
+        if 'team' in self.request.GET and is_true_string(self.request.GET['team']):
+            return TimeOffRequestPublicSerializer
+        else:
+            return TimeOffRequestPrivateSerializer
 
     def get_queryset(self):
         """
@@ -69,11 +75,15 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
             start_date = request.data['dates'].replace('/', '-')
             end_date = request.data['dates'].replace('/', '-')
         note = request.data['note']
+        private_note = request.data['privateNote']
         employee = request.user.employee
-        timeoffrequest = TimeOffRequest.objects.create(start_date=start_date, end_date=end_date, note=note, employee=employee)
+        timeoffrequest = TimeOffRequest.objects.create(
+            start_date=start_date, end_date=end_date, note=note,
+            private_note=private_note, employee=employee
+        )
         send_manager_new_timeoff_request_notification(timeoffrequest)
-        serialized_timeoffrequest = TimeOffRequestSerializer(timeoffrequest,
-            context={'request': request})
+        serialized_timeoffrequest = TimeOffRequestPrivateSerializer(
+            timeoffrequest, context={'request': request})
         return Response(serialized_timeoffrequest.data)
 
     def update(self, request, pk=None):
@@ -85,12 +95,13 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
             start_date = request.data['dates'].replace('/', '-')
             end_date = request.data['dates'].replace('/', '-')
         tor.note = request.data['note']
+        tor.private_note = request.data['privateNote']
         if start_date != str(tor.start_date) or end_date != str(tor.end_date):
             tor.start_date = start_date
             tor.end_date = end_date
             tor.acknowledged = None # Reset acknowledged status since we are making a change
         tor.save()
-        serialized_tor = TimeOffRequestSerializer(tor,
+        serialized_tor = TimeOffRequestPrivateSerializer(tor,
             context={'request': request})
         return Response(serialized_tor.data)
     
@@ -102,7 +113,7 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
         tor.acknowledged = request.data['acknowledged']
         tor.save()
         send_employee_manager_acknowledged_timeoff_request_notification(tor)
-        serialized_tor = TimeOffRequestSerializer(tor,
+        serialized_tor = TimeOffRequestPrivateSerializer(tor,
             context={'request': request})
         return Response(serialized_tor.data)
 

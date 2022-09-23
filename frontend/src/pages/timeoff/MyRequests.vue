@@ -22,6 +22,13 @@
           </div>
         </q-td>
       </template>
+      <template v-slot:body-cell-notes="props">
+        <q-td key="notes" :props="props">
+          <span v-if="props.row.note && !props.row.private_note">{{ props.row.note }}</span>
+          <span v-if="!props.row.note && props.row.private_note"><span class="text-bold">Private:</span> {{ props.row.private_note }}</span>
+          <span v-if="props.row.note && props.row.private_note"><span class="text-bold">Public:</span> {{ props.row.note }} / <span class="text-bold">Private:</span> {{ props.row.private_note }}</span>
+        </q-td>
+      </template>
       <template v-slot:body-cell-acknowledged="props">
         <q-td :props="props">
           <div v-if="props.row.conflicts.length != 0">
@@ -129,7 +136,7 @@ export default class TimeOffMyRequests extends Vue {
 
   private columns = [
     { name: 'dates', label: 'Dates', field: 'start_date', sortable: true, align: 'center' },
-    { name: 'note', label: 'Note', field: 'note', align: 'center', classes: 'table-note' },
+    { name: 'notes', label: 'Note', field: 'notes', align: 'center', classes: 'table-note' },
     { name: 'acknowledged', label: 'Acknowledged', field: 'approved', align: 'center' },
     { name: 'actions', label: 'Actions' },
   ]

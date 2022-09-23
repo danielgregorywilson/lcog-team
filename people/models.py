@@ -187,7 +187,7 @@ class Employee(models.Model):
     
     def get_descendants_of_employee(self, employee):
         employee_and_descendants = [employee]
-        descendants = employee.direct_reports.all()
+        descendants = employee.direct_reports.filter(active=True)
         for descendant in descendants:
             employee_and_descendants += self.get_descendants_of_employee(descendant)
         return employee_and_descendants

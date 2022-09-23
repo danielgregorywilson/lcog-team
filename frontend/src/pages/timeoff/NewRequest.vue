@@ -15,11 +15,16 @@
       </div>
     </div>
     <q-input
-        v-model="note"
-        label="Note"
-        class="q-pb-md"
-      />
-    <q-btn id="review-note-create-button" color="white" text-color="black" label="Create" :disabled="!formIsFilled()" @click="createTimeOffRequest()" />
+      v-model="note"
+      label="Public Note (visible to team members)"
+      class="q-pb-md"
+    />
+    <q-input
+      v-model="privateNote"
+      label="Private Note (visible to manager only)"
+      class="q-pb-md"
+    />
+    <q-btn color="white" text-color="black" label="Create" :disabled="!formIsFilled()" @click="createTimeOffRequest()" />
   </div>
 </template>
 
@@ -47,6 +52,7 @@ export default class TimeOffRequest extends Vue {
   private touchedCalendar = false
   private dates: TimeOffRequestDates = {'from': '', 'to': ''}
   private note = ''
+  private privateNote = ''
 
   private formIsFilled(): boolean {
     if (this.dates && (typeof this.dates != 'string' && this.dates.from != '') || (typeof this.dates == 'string' && this.dates != '')) {
@@ -66,7 +72,7 @@ export default class TimeOffRequest extends Vue {
     if (this.dates) {
       this.$store.dispatch('timeOffModule/getConflictingResponsibilities', { dates: this.dates })
         .catch(e => {
-          console.error('Error creating review note:', e)
+          console.error('Error getting conflicting responsibilities:', e)
         })
     }
   }
@@ -79,7 +85,7 @@ export default class TimeOffRequest extends Vue {
     if (typeof this.dates != 'string' && this.dates.from == '') {
       return
     }    
-    this.$store.dispatch('timeOffModule/createTimeOffRequest', { dates: this.dates, note: this.note })
+    this.$store.dispatch('timeOffModule/createTimeOffRequest', { dates: this.dates, note: this.note, privateNote: this.privateNote })
       .then(() => {
         Notify.create(`Time off successfully recorded. ${this.randomChoice(newRequestMessages)}`)
         this.$router.push({ name: 'timeoff-my-requests'})
@@ -88,7 +94,7 @@ export default class TimeOffRequest extends Vue {
           })
       })
       .catch(e => {
-        console.error('Error creating review note:', e)
+        console.error('Error creating time off request:', e)
       })
   }
 }

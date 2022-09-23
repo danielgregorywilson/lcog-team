@@ -698,6 +698,7 @@ export interface TimeOffRequestCreate {
   employee_pk: number
   dates: TimeOffRequestDates
   note: string
+  privateNote: string
 }
 
 export interface TimeOffRequestAcknowledge {
@@ -714,6 +715,7 @@ export interface TimeOffRequestRetrieve {
   start_date: Date
   end_date: Date
   note: string
+  private_note: string
   acknowledged: boolean
   conflicts?: JSON
 }
@@ -721,6 +723,7 @@ export interface TimeOffRequestRetrieve {
 export interface TimeOffRequestUpdate {
   dates: TimeOffRequestDates
   note: string
+  privateNote: string
 }
 
 export interface TimeOffRequestUpdatePartial {

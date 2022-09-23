@@ -12,6 +12,13 @@
           {{ props.row.start_date }} - {{ props.row.end_date }}
         </q-td>
       </template>
+      <template v-slot:body-cell-notes="props">
+        <q-td key="notes" :props="props">
+          <span v-if="props.row.note && !props.row.private_note">{{ props.row.note }}</span>
+          <span v-if="!props.row.note && props.row.private_note"><span class="text-bold">Private:</span> {{ props.row.private_note }}</span>
+          <span v-if="props.row.note && props.row.private_note"><span class="text-bold">Public:</span> {{ props.row.note }} / <span class="text-bold">Private:</span> {{ props.row.private_note }}</span>
+        </q-td>
+      </template>
       <template v-slot:body-cell-acknowledge="props">
         <q-td :props="props" class="row justify-center items-center">
           <q-btn 
@@ -105,7 +112,7 @@ export default class TimeOffManageRequests extends Vue {
   private columns = [
     { name: 'employee', label: 'Employee', field: 'employee_name', sortable: true, align: 'center' },
     { name: 'dates', label: 'Dates', field: 'start_date', sortable: true, align: 'center' },
-    { name: 'note', label: 'Note', field: 'note', align: 'center' },
+    { name: 'notes', label: 'Notes', field: 'notes', align: 'center' },
     { name: 'acknowledge', label: 'Acknowledge?', field: 'acknowledged', align: 'center' },
   ]
 

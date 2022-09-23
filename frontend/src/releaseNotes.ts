@@ -4,6 +4,20 @@
 
 export const releases = [
   {
+    version: '0.8.0',
+    date: new Date(2022, 8, 23),
+    changes: [
+      {
+        type: 'new',
+        description: 'Add weekly time-off notifications for IS team.'
+      },
+      {
+        type: 'new',
+        description: 'Add time off request private notes visible only to manager.'
+      },
+    ]
+  },
+  {
     version: '0.7.1',
     date: new Date(2022, 7, 26),
     changes: [

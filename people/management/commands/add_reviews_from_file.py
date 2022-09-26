@@ -23,7 +23,12 @@ class Command(BaseCommand):
         for row in dataReader:
             # Parse row data
             if len(row):
-                if row[0] in ['Employee Name', 'Notes: ', '04/19/2019 12:50 PM - clid1559"']:
+                if row[0] in [
+                    'Employee Name',
+                    'Notes: ',
+                    '04/19/2019 12:50 PM - clid1559"',
+                    '8/1/20.\n\n12/11/2020 07:05 PM - clid1559'
+                ]:
                     continue
                 if row[0]:
                     # Check review rows for the previous employee

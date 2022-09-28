@@ -561,9 +561,19 @@ class PerformanceReview(models.Model):
 
     evaluation_successes = models.TextField(_("employee's successes"), blank=True, null=True)
     evaluation_opportunities = models.TextField(_("opportunities for growth"), blank=True, null=True)
-    evaluation_goals_manager = models.TextField(_("goals for the comind year (manager)"), blank=True, null=True)
-    evaluation_goals_employee = models.TextField(_("goals for the comind year (employee)"), blank=True, null=True)
+    evaluation_goals_manager = models.TextField(_("goals for the coming year (manager)"), blank=True, null=True)
+    evaluation_goals_employee = models.TextField(_("goals for the coming year (employee)"), blank=True, null=True)
     evaluation_comments_employee = models.TextField(_("employee comments"), blank=True, null=True)
+
+    # Employee Self-Evaluation
+    self_evaluation_date = models.DateField(blank=True, null=True)
+    self_evaluation_accomplishments = models.TextField(_("employee self-evaluation accomplishments"), blank=True, null=True)
+    self_evaluation_help = models.TextField(_("employee self-evaluation help"), blank=True, null=True)
+    self_evaluation_communications = models.TextField(_("employee self-evaluation communications"), blank=True, null=True)
+    self_evaluation_abilities = models.TextField(_("employee self-evaluation abilities"), blank=True, null=True)
+    self_evaluation_training = models.TextField(_("employee self-evaluation training"), blank=True, null=True)
+    self_evaluation_goals = models.TextField(_("employee self-evaluation goals"), blank=True, null=True)
+    self_evaluation_future = models.TextField(_("employee self-evaluation future"), blank=True, null=True)
 
     description_reviewed_employee = models.BooleanField(_("position description has been reviewed with employee"), default=False)
     signed_position_description = models.FileField(_("signed position description"), upload_to="uploads/signed-position-descriptions", blank=True, null=True)

@@ -1,27 +1,41 @@
+# LCOG Team App Backend Readme
 # lcog-team
 
 # Run the backend locally
 # MacOS
 `source ../env/bin/activate && ./manage.py runserver`
 # Windows
-`.\env_20220114\Scripts\activate && .\manage.py runserver`
+`..\env_20220216\Scripts\activate; .\manage.py runserver`
 
 # Run the frontend locally
 `cd frontend && quasar dev`
 
 # Setting up the backend for the first time
 1) Ensure that .env file is in place (in OneDrive). Ensure settings are such that sqlite db is used
-2) Run migrations
+2) Create a python virtualenv
+MacOS `virtualenv env_20220216`
+Windows `python -m venv env_20220216`
+3) Activate virtualenv
+MacOS `source ./env/bin/activate`
+Windows `.\env_20220216\Scripts\activate`
+4) Install requirements
+MacOS `pip install -r ./code/requirements.txt`
+Windows `pip install -r .\code\requirements-windows.txt`
+5) Run migrations
 MacOS `./manage.py migrate`
 Windows `.\manage.py migrate`
-3) Create a superuser
-MacOS `./manage.py createsuperuser --username=dwilsonsu`
-Windows `.\manage.py createsuperuser --username=dwilsonsu`
-4) Run commands to import employees and reviews from Caselle
+6) Create a superuser
+MacOS `./manage.py createsuperuser --username=USERNAME`
+Windows `.\code\manage.py createsuperuser --username=USERNAME`
+7) Run commands to import employees and reviews from Caselle
+8) Add settings_local.py file from an existing install
+9) Run the backend locally
+MacOS `./manage.py runserver`
+Windows `.\manage.py runserver`
 
 # Setting up the frontend for the first time
-
-
+1) Install node requirements
+`npm install`
 
 # Cypress e2e tests
 Open Cypress launcher to run individual tests

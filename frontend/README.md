@@ -1,7 +1,10 @@
 # LCOG Team App Frontend Readme
 
 # Run the frontend locally
+# MacOS
 `cd frontend && quasar dev`
+# Windows
+`cd frontend; quasar dev`
 
 # Setting up the frontend for the first time
 1) Install node requirements

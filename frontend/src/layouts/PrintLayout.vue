@@ -11,7 +11,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 
 @Component({})
-export default class MainLayout extends Vue{
+export default class PrintLayout extends Vue{
 
 };
 </script>

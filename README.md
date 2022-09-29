@@ -1,13 +1,10 @@
-# lcog-team
+# LCOG Team App Backend Readme
 
 # Run the backend locally
 # MacOS
 `source ../env/bin/activate && ./manage.py runserver`
 # Windows
 `..\env_20220216\Scripts\activate; .\manage.py runserver`
-
-# Run the frontend locally
-`cd frontend && quasar dev`
 
 # Setting up the backend for the first time
 1) Ensure that .env file is in place (in OneDrive). Ensure settings are such that sqlite db is used
@@ -31,10 +28,6 @@ Windows `.\code\manage.py createsuperuser --username=USERNAME`
 9) Run the backend locally
 MacOS `./manage.py runserver`
 Windows `.\manage.py runserver`
-
-# Setting up the frontend for the first time
-1) Install node requirements
-`npm install`
 
 # Cypress e2e tests
 Open Cypress launcher to run individual tests

@@ -1,4 +1,3 @@
-# LCOG Team App Backend Readme
 # lcog-team
 
 # Run the backend locally

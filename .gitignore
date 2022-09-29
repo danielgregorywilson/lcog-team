@@ -20,3 +20,4 @@ sent_emails
 caselle-imports
 test_user_data.json
 node_modules
+package-lock.json

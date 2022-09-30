@@ -209,21 +209,6 @@ const routes: RouteConfig[] = [
         component: () => import('pages/PerformanceReviewDetail.vue'),
         beforeEnter: ifCanViewReview
       },
-      {
-        path: '/print',
-        component: () => import('layouts/PrintLayout.vue'),
-        children: [
-          {
-            path: 'pr/:pk',
-            name: 'pr-print',
-            component: () => import('pages/PerformanceReviewDetail.vue'),
-            beforeEnter: ifManager,
-            props: {
-              print: true
-            }
-          }
-        ]
-      },
       
       //////////////////////
       // RESPONSIBILITIES //
@@ -336,6 +321,22 @@ const routes: RouteConfig[] = [
         component: () => import('pages/Profile.vue'),
         beforeEnter: ifAuthenticated
       },
+    ]
+  },
+  // Print Layout
+  {
+    path: '/print',
+    component: () => import('layouts/PrintLayout.vue'),
+    children: [
+      {
+        path: 'pr/:pk',
+        name: 'pr-print',
+        component: () => import('pages/PerformanceReviewDetail.vue'),
+        beforeEnter: ifManager,
+        props: {
+          print: true
+        }
+      }
     ]
   },
   

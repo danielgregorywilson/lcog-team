@@ -1,11 +1,14 @@
-# Quasar App (lcog-team)
+# LCOG Team App Frontend Readme
 
-A Quasar Framework app
+# Run the frontend locally
+# MacOS
+`cd frontend && quasar dev`
+# Windows
+`cd frontend; quasar dev`
 
-## Install the dependencies
-```bash
-yarn
-```
+# Setting up the frontend for the first time
+1) Install node requirements
+`npm install`
 
 ### Start the app in development mode (hot-code reloading, error reporting, etc.)
 ```bash

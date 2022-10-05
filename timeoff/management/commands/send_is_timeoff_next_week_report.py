@@ -7,7 +7,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         num_tor_days, num_employees = send_is_timeoff_next_week_report()
-        # TODO: Output some data about how many emails sent, etc.
         if num_tor_days == 0:
             message = f'No time off notifications sent to the IS team.'
         else:

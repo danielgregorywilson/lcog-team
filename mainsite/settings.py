@@ -37,7 +37,8 @@ if ENVIRONMENT == 'STAGING':
     ALLOWED_HOSTS = [
         'team-app-staging.s3-website-us-west-2.amazonaws.com', # Staging frontend
         'lcog-team-staging.us-west-2.elasticbeanstalk.com', # Staging backend
-        os.environ.get('EC2_IP'), # IP of EC2 instance
+        os.environ.get('EC2_PUBLIC_IP'), # Public IP of EC2 instance
+        os.environ.get('EC2_PRIVATE_IP'), # Private IP of EC2 instance
         os.environ.get('EBS_DOMAIN'), # Domain of Elastic Beanstalk instance
     ]
 else:
@@ -45,7 +46,8 @@ else:
     ALLOWED_HOSTS = [
         'team.lcog.org', # Prod frontend
         'api.team.lcog.org', # Prod backend
-        os.environ.get('EC2_IP'), # IP of EC2 instance
+        os.environ.get('EC2_PUBLIC_IP'), # Public IP of EC2 instance
+        os.environ.get('EC2_PRIVATE_IP'), # Private IP of EC2 instance
         os.environ.get('EBS_DOMAIN'), # Domain of Elastic Beanstalk instance
     ]
 

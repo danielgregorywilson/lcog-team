@@ -1,7 +1,11 @@
 from datetime import datetime, time
 
 from django.contrib.sites.models import Site
+from django.core.mail import EmailMessage
 from django.db.models import Q
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+
 
 from mainsite.helpers import next_weekday, send_email
 from people.models import Employee
@@ -134,6 +138,13 @@ def send_team_timeoff_next_week_report(manager_username: str, team_name: str):
 
     if num_tors == 0:
         return num_tors, len(team)
+
+    html_template = 'templates/email/team-timeoff.html'
+    html_message = render_to_string(html_template, { 'context': context, })
+
+    html_content = render_to_string('mail_template.html', {'varname':'value'}) # render with dynamic value
+    text_content = strip_tags(html_content) # Strip the html tag. So people can see the pure text at least.
+
 
     plain_message = f'{team_name}\n'
     plain_message += 'Who is out next week:\n'

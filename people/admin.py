@@ -1,10 +1,12 @@
 from django.contrib import admin
 
 from .models import (
-    Division, Employee, JobTitle, PerformanceReview, ReviewNote, Signature,
-    SignatureReminder, TeleworkApplication, TeleworkSignature, UnitOrProgram,
+    Division, Employee, EmployeeSelfEvaluation, JobTitle, PerformanceReview,
+    ReviewNote, SelfEvaluationSignature, SelfEvaluationSignatureReminder, Signature, SignatureReminder,
+    TeleworkApplication, TeleworkSignature, UnitOrProgram,
     ViewedSecurityMessage
 )
+from mainsite.admin import EditLinkToInlineObject
 
 
 class UnitOrProgramInline(admin.TabularInline):
@@ -30,6 +32,12 @@ class EmployeeAdmin(admin.ModelAdmin):
     search_fields = ("user__username", )
 
 
+class SelfEvaluationInline(EditLinkToInlineObject, admin.StackedInline):
+    model = EmployeeSelfEvaluation
+    readonly_fields = ('edit_link',)
+    extra = 0
+
+
 class SignatureReminderInline(admin.TabularInline):
     model = SignatureReminder
     fields = ("employee", "date", "next_date")
@@ -48,7 +56,7 @@ class SignatureInline(admin.TabularInline):
 class PerformanceReviewAdmin(admin.ModelAdmin):
     list_display = ("username", "status", "effective_date")
     search_fields = ("employee__user__username", )
-    inlines = (SignatureInline, SignatureReminderInline)
+    inlines = (SignatureInline, SignatureReminderInline, SelfEvaluationInline)
 
     def get_form(self, request, obj=None, **kwargs):
         pr_exists = hasattr(obj, 'pk')
@@ -71,6 +79,22 @@ class PerformanceReviewAdmin(admin.ModelAdmin):
             self.exclude = ()
         form = super(PerformanceReviewAdmin, self).get_form(request, obj, **kwargs)
         return form
+
+
+class SelfEvaluationSignatureInline(admin.TabularInline):
+    model = SelfEvaluationSignature
+    extra = 0
+
+
+class SelfEvaluationSignatureReminderInline(admin.TabularInline):
+    model = SelfEvaluationSignatureReminder
+    extra = 0
+
+
+@admin.register(EmployeeSelfEvaluation)
+class SelfEvaluationAdmin(admin.ModelAdmin):
+    model = EmployeeSelfEvaluation
+    inlines = (SelfEvaluationSignatureInline, SelfEvaluationSignatureReminderInline)
 
 
 @admin.register(ReviewNote)

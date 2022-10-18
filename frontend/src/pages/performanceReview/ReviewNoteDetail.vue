@@ -18,9 +18,9 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { AxiosEmployeeRetrieveManyServerResponse, AxiosReviewNoteRetrieveOneServerResponse, AxiosReviewNoteUpdateServerResponse } from '../store/types'
-import EmployeeDataService from '../services/EmployeeDataService'
-import ReviewNoteDataService from '../services/ReviewNoteDataService'
+import { AxiosEmployeeRetrieveManyServerResponse, AxiosReviewNoteRetrieveOneServerResponse, AxiosReviewNoteUpdateServerResponse } from '../../store/types'
+import EmployeeDataService from '../../services/EmployeeDataService'
+import ReviewNoteDataService from '../../services/ReviewNoteDataService'
 
 
 @Component

@@ -19,8 +19,8 @@
 <script lang="ts">
 import { Notify } from 'quasar'
 import { Component, Vue } from 'vue-property-decorator'
-import { AxiosEmployeeRetrieveManyServerResponse } from '../store/types'
-import EmployeeDataService from '../services/EmployeeDataService'
+import { AxiosEmployeeRetrieveManyServerResponse } from '../../store/types'
+import EmployeeDataService from '../../services/EmployeeDataService'
 
 
 interface EmployeeOption {

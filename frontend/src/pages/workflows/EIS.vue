@@ -118,7 +118,7 @@ export default class EIS extends Vue {
   private getters = this.$store.getters as VuexStoreGetters
 
   private currentStepInstance = -1;
-  private workflowInstancePk = 1
+  private workflowInstancePk = 46
 
   // private isManager() {
   //   return this.getters['userModule/getEmployeeProfile'].is_manager

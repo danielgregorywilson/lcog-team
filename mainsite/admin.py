@@ -59,7 +59,7 @@ class UserInline(admin.TabularInline):
 
 @admin.register(Group)
 class GenericGroup(GroupAdmin):
-    inlines = [UserInLine]
+    inlines = [UserInline]
 
 
 # Provide a link to the detail page of an object

@@ -341,7 +341,7 @@ const routes: RouteConfig[] = [
       {
         path: 'pr/:pk',
         name: 'pr-print',
-        component: () => import('pages/PerformanceReviewDetail.vue'),
+        component: () => import('pages/performanceReview/PerformanceReviewDetail.vue'),
         beforeEnter: ifManager,
         props: {
           print: true

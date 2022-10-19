@@ -9,6 +9,7 @@ import securityMessageModule from './modules/securitymessage'
 import teleworkModule from './modules/telework'
 import timeOffModule from './modules/timeoff'
 import userModule from './modules/user'
+import workflowModule from './modules/workflow'
 
 
 // import example from './module-example';
@@ -42,6 +43,7 @@ export default store(function ({ Vue }) {
       teleworkModule,
       timeOffModule,
       userModule,
+      workflowModule,
     },
 
     // enable strict mode (adds overhead!)

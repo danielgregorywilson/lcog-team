@@ -734,6 +734,21 @@ export interface AxiosTimeOffRequestRetrieveOneServerResponse {
   data: TimeOffRequestRetrieve
 }
 
+
+///////////////////////////////////////////////////
+// Workflow Structure from Django Rest Framework //
+///////////////////////////////////////////////////
+
+export interface WorkflowInstanceRetrieve {
+  pk: number
+  workflow: number
+}
+
+export interface AxiosTimeOffRequestRetrieveOneServerResponse {
+  data: TimeOffRequestRetrieve
+}
+
+
 /////////////
 // Getters //
 /////////////
@@ -742,6 +757,7 @@ export interface VuexStoreGetters {
   'authModule/isAuthenticated': boolean,
   'userModule/getEmployeeProfile': EmployeeRetrieve,
 
+  // Desk Reservation
   'deskReservationModule/allDesks': {
     results: Array<Desk>
   },
@@ -749,6 +765,7 @@ export interface VuexStoreGetters {
     results: Array<DeskReservation>
   },
 
+  // Time Off
   'timeOffModule/teamTimeOffRequests': {
     results: Array<TimeOffRequestRetrieve>
   },
@@ -760,6 +777,7 @@ export interface VuexStoreGetters {
   },
   'timeOffModule/conflictingTimeOffRequests': Array<TimeOffRequestRetrieve>,
 
+  // Responsibilities
   'responsibilityModule/simpleEmployeeList': Array<SimpleEmployeeRetrieve>,
   'responsibilityModule/simpleEmployeeDetail': SimpleEmployeeRetrieve,
   'responsibilityModule/allResponsibilities': {
@@ -775,4 +793,7 @@ export interface VuexStoreGetters {
     results: Array<SimpleResponsibilityTagRetrieve>
   },
   'responsibilityModule/simpleTagList': Array<SimpleResponsibilityTagRetrieve>,
+
+  // Workflows
+  'workflowModule/currentWorkflowInstance': WorkflowInstanceRetrieve
 }

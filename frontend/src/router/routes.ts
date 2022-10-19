@@ -210,9 +210,9 @@ const routes: RouteConfig[] = [
         beforeEnter: ifCanViewReview
       },
       
-      //////////////////////
-      // RESPONSIBILITIES //
-      //////////////////////
+      ///////////////////////////
+      // MILEAGE REIMBURSEMENT //
+      ///////////////////////////
       {
         path: '/mileage-reimbursement',
         name: 'mileage-reimbursement',
@@ -278,6 +278,16 @@ const routes: RouteConfig[] = [
             component: () => import('src/pages/timeoff/ManageRequests.vue'),
           }
         ]
+      },
+
+      /////////
+      // EIS //
+      /////////
+      {
+        path: '/eis',
+        name: 'eis',
+        component: () => import('src/pages/workflows/EIS.vue'),
+        beforeEnter: ifAuthenticated,
       },
 
       //////////////

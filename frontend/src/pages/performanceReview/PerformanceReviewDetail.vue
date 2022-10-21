@@ -4,7 +4,7 @@
       <!-- Logo appears in print view only -->
       <q-img
         id="lcog-logo"
-        src="../assets/lcog-banner.png"
+        src="../../assets/lcog-banner.png"
       />
       <h4 class="text-bold text-center">Performance Evaluation Report</h4>
       <div class="eval-grid-container">
@@ -675,10 +675,10 @@
 import { date as quasarDate, scroll } from 'quasar'
 const { getScrollTarget, setScrollPosition } = scroll
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import PerformanceReviewDataService from '../services/PerformanceReviewDataService'
-import { AxiosManagerReviewNotesForEmployeeServerResponse, AxiosPerformanceReviewUpdateServerResponse, PerformanceReviewRetrieve, ReviewNoteRetrieve, FileUploadDescriptionUploadServerResponse } from '../store/types'
-import '../filters'
-import ReviewNoteDataService from '../services/ReviewNoteDataService'
+import PerformanceReviewDataService from '../../services/PerformanceReviewDataService'
+import { AxiosManagerReviewNotesForEmployeeServerResponse, AxiosPerformanceReviewUpdateServerResponse, PerformanceReviewRetrieve, ReviewNoteRetrieve, FileUploadDescriptionUploadServerResponse } from '../../store/types'
+import '../../filters'
+import ReviewNoteDataService from '../../services/ReviewNoteDataService'
 
 @Component
 export default class PerformanceReviewDetail extends Vue {

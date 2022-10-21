@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </head>
+    <body style="margin: 15px;">
+        <h1>{{context.team_name}} Team</h1>
+        <h3>Who is out next week</h3>
+        <p><strong>Monday, {{context.next_monday|date:"F"}} {{context.next_monday.day}}:</strong></p>
+        <ul>
+            {% for tor in context.monday_tors %}
+                <li>{{tor.employee.name}}</li>
+            {% endfor %}
+        </ul>
+        <p><strong>Tuesday, {{context.next_tuesday|date:"F"}} {{context.next_tuesday.day}}:</strong></p>
+        <ul>
+            {% for tor in context.tuesday_tors %}
+                <li>{{tor.employee.name}}</li>
+            {% endfor %}
+        </ul>
+        <p><strong>Wednesday, {{context.next_wednesday|date:"F"}} {{context.next_wednesday.day}}:</strong></p>
+        <ul>
+            {% for tor in context.wednesday_tors %}
+                <li>{{tor.employee.name}}</li>
+            {% endfor %}
+        </ul>
+        <p><strong>Thursday, {{context.next_thursday|date:"F"}} {{context.next_thursday.day}}:</strong></p>
+        <ul>
+            {% for tor in context.thursday_tors %}
+                <li>{{tor.employee.name}}</li>
+            {% endfor %}
+        </ul>
+        <p><strong>Friday, {{context.next_friday|date:"F"}} {{context.next_friday.day}}:</strong></p>
+        <ul>
+            {% for tor in context.friday_tors %}
+                <li>{{tor.employee.name}}</li>
+            {% endfor %}
+        </ul>
+        <p>View the full calendar: <a href="{{context.url}}">{{context.url}}</a></p>
+    </body>
+</html>

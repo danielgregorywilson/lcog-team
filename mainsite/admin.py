@@ -5,7 +5,9 @@ from django.contrib.auth import password_validation
 from django.contrib.auth.admin import GroupAdmin, UserAdmin as BaseUserAdmin
 from django.contrib.auth.forms import UserCreationForm as BaseUserCreationForm
 from django.contrib.auth.models import Group, User
-from django.utils.translation import gettext, gettext_lazy as _
+from django.urls import reverse
+from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
 
 from mainsite.models import ImageUpload, SecurityMessage
 
@@ -50,11 +52,22 @@ class UserCreationForm(BaseUserCreationForm):
 
 
 admin.site.unregister(Group)
-class UserInLine(admin.TabularInline):
+class UserInline(admin.TabularInline):
     model = Group.user_set.through
     extra = 0
 
 
 @admin.register(Group)
 class GenericGroup(GroupAdmin):
-    inlines = [UserInLine]
+    inlines = [UserInline]
+
+
+# Provide a link to the detail page of an object
+class EditLinkToInlineObject(object):
+    def edit_link(self, instance):
+        url = reverse('admin:%s_%s_change' % (
+            instance._meta.app_label,  instance._meta.model_name),  args=[instance.pk] )
+        if instance.pk:
+            return mark_safe(u'<a href="{u}">edit</a>'.format(u=url))
+        else:
+            return ''

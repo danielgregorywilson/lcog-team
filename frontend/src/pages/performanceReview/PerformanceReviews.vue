@@ -22,8 +22,8 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import ReviewNoteTable from '../components/ReviewNoteTable.vue';
-import PerformanceReviewTable from '../components/PerformanceReviewTable.vue';
+import ReviewNoteTable from '../../components/ReviewNoteTable.vue';
+import PerformanceReviewTable from '../../components/PerformanceReviewTable.vue';
 
 @Component({
   components: { PerformanceReviewTable, ReviewNoteTable }

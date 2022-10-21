@@ -20,7 +20,7 @@ const actions: ActionTree<WorkflowStateInterface, StateInterface> = {
       })
   },
 
-  completeStepInstance: ({dispatch}, data: {stepInstancePk: number, nextStepPk: number}) => {
+  completeStepInstance: ({}, data: {stepInstancePk: number, nextStepPk: number}) => {
     return new Promise((resolve, reject) => {
       axios({ url: `${ apiURL }api/v1/stepinstance/${ data.stepInstancePk }`, data, method: 'PATCH' })
         .then(resp => {

@@ -11,7 +11,7 @@ const mutation: MutationTree<WorkflowStateInterface> = {
   },
   authLogout: (state) => {
     // Clean up state
-    state.currentWorkflowInstance = {pk: -1, workflow: -1}
+    state.currentWorkflowInstance = {pk: -1, workflow: -1, process_instances: []}
   }
 };
 

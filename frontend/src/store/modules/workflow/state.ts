@@ -5,7 +5,7 @@ export interface WorkflowStateInterface {
 }
 
 const blankWorkflowInstance = {
-  pk: -1, workflow: -1
+  pk: -1, workflow: -1, process_instances: []
 }
 
 const state: WorkflowStateInterface = {

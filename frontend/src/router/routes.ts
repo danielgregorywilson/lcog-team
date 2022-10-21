@@ -128,7 +128,7 @@ const routes: RouteConfig[] = [
       {
         path: 'release-notes',
         name: 'release-notes',
-        component: () => import('pages/ReleaseNotes.vue')
+        component: () => import('src/pages/ReleaseNotes.vue')
       },
       
       //////////////////////
@@ -188,31 +188,31 @@ const routes: RouteConfig[] = [
       {
         path: '/reviews',
         name: 'reviews',
-        component: () => import('pages/PerformanceReviews.vue'),
+        component: () => import('pages/performanceReview/PerformanceReviews.vue'),
         beforeEnter: ifManager
       },
       {
         path: '/note/new',
         name: 'note-create',
-        component: () => import('pages/ReviewNoteCreate.vue'),
+        component: () => import('src/pages/performanceReview/ReviewNoteCreate.vue'),
         beforeEnter: ifManager
       },
       {
         path: '/note/:pk',
         name: 'note-details',
-        component: () => import('pages/ReviewNoteDetail.vue'),
+        component: () => import('src/pages/performanceReview/ReviewNoteDetail.vue'),
         beforeEnter: ifCanViewNote
       },
       {
         path: '/pr/:pk',
         name: 'pr-details',
-        component: () => import('pages/PerformanceReviewDetail.vue'),
+        component: () => import('pages/performanceReview/PerformanceReviewDetail.vue'),
         beforeEnter: ifCanViewReview
       },
       
-      //////////////////////
-      // RESPONSIBILITIES //
-      //////////////////////
+      ///////////////////////////
+      // MILEAGE REIMBURSEMENT //
+      ///////////////////////////
       {
         path: '/mileage-reimbursement',
         name: 'mileage-reimbursement',
@@ -280,6 +280,16 @@ const routes: RouteConfig[] = [
         ]
       },
 
+      /////////
+      // EIS //
+      /////////
+      {
+        path: '/eis',
+        name: 'eis',
+        component: () => import('src/pages/workflows/EIS.vue'),
+        beforeEnter: ifAuthenticated,
+      },
+
       //////////////
       // TELEWORK //
       //////////////
@@ -331,7 +341,7 @@ const routes: RouteConfig[] = [
       {
         path: 'pr/:pk',
         name: 'pr-print',
-        component: () => import('pages/PerformanceReviewDetail.vue'),
+        component: () => import('pages/performanceReview/PerformanceReviewDetail.vue'),
         beforeEnter: ifManager,
         props: {
           print: true

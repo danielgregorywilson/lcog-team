@@ -1,4 +1,5 @@
 from datetime import datetime
+import os
 
 from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
@@ -85,9 +86,13 @@ def send_team_timeoff_next_week_report(manager_username: str, team_name: str):
         'next_thursday': next_thursday, 'next_friday': next_friday,
         'monday_tors': monday_tors, 'tuesday_tors': tuesday_tors,
         'wednesday_tors': wednesday_tors, 'thursday_tors': thursday_tors,
-        'friday_tors': friday_tors, 'url': url
+        'friday_tors': friday_tors, 'url': url,
+        'from_email': os.environ.get('FROM_EMAIL')
     }, })
     plaintext_message = strip_tags(html_message)
+
+    # file1 = open('email.html', 'w')
+    # file1.write(html_message)
 
     for recipient in team:
         send_email(
@@ -104,3 +109,46 @@ def send_test_timeoff_next_week_report():
 
 def send_is_timeoff_next_week_report():
     return send_team_timeoff_next_week_report('hleyba', 'IS')
+
+def send_daily_helpdesk_timeoff_today_report():
+    current_site = Site.objects.get_current()
+    url = current_site.domain + '/timeoff/calendar'
+    team_name = 'IS'
+    thomas = Employee.objects.get(user__username='tlemelin')
+    kathleen = Employee.objects.get(user__username='kmoore')
+    tony = Employee.objects.get(user__username='tshireman')
+    andy = Employee.objects.get(user__username='asmith')
+    matt = Employee.objects.get(user__username='mnasholm')
+    dan = Employee.objects.get(user__username='dhogue')
+    danw = Employee.objects.get(user__username='dwilson')
+    help_desk = [thomas, kathleen, tony, andy, matt, dan, danw]
+    manager = Employee.objects.get(user__username='hleyba')
+    is_team = manager.get_descendants_of_employee(manager)
+    tors = TimeOffRequest.objects.filter(employee__in=is_team)
+    
+    today = datetime.now().date()
+    today_tors = tors.filter(start_date__lte=today, end_date__gte=today)
+    num_tors = today_tors.count()
+
+    if num_tors == 0:
+        return num_tors, len(help_desk)
+
+    html_template = '../templates/email/team-timeoff-today.html'
+    html_message = render_to_string(html_template, { 'context': {
+        'team_name': team_name, 'today': today, 'today_tors': today_tors,
+        'url': url, 'from_email': os.environ.get('FROM_EMAIL')
+    }, })
+    plaintext_message = strip_tags(html_message)
+
+    # file1 = open('email.html', 'w')
+    # file1.write(html_message)
+
+    for recipient in help_desk:
+        send_email(
+            recipient.user.email,
+            f'{team_name} Time Off Today: {today:%A} {today:%B} {today.day}, {today.year}',
+            plaintext_message,
+            html_message
+        )
+    
+    return num_tors, len(help_desk)

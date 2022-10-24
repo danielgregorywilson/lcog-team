@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </head>
+    <body style="margin: 15px;">
+        <h1>{{context.team_name}} Team</h1>
+        <h3>Who is out today</h3>
+        <p><strong>{{context.today|date:"l"}}, {{context.today|date:"F"}} {{context.today.day}}:</strong></p>
+        <ul>
+            {% for tor in context.today_tors %}
+                <li>{{tor.employee.name}}</li>
+            {% endfor %}
+        </ul>
+        <p>View the full calendar: <a href="{{context.url}}">{{context.url}}</a></p>
+        <p>For questions about these messages, contact <a href="mailto:{{context.from_email}}">{{context.from_email}}</a></p>
+    </body>
+</html>

@@ -53,7 +53,8 @@ def send_employee_manager_acknowledged_timeoff_request_notification(tor):
 
 def send_team_timeoff_next_week_report(manager_username: str, team_name: str):
     current_site = Site.objects.get_current()
-    url = current_site.domain + '/timeoff/calendar'
+    calendar_url = current_site.domain + '/timeoff/calendar'
+    profile_url = current_site.domain + '/profile'
     manager = Employee.objects.get(user__username=manager_username)
     team = manager.get_descendants_of_employee(manager)
     tors = TimeOffRequest.objects.filter(employee__in=team)
@@ -86,8 +87,8 @@ def send_team_timeoff_next_week_report(manager_username: str, team_name: str):
         'next_thursday': next_thursday, 'next_friday': next_friday,
         'monday_tors': monday_tors, 'tuesday_tors': tuesday_tors,
         'wednesday_tors': wednesday_tors, 'thursday_tors': thursday_tors,
-        'friday_tors': friday_tors, 'url': url,
-        'from_email': os.environ.get('FROM_EMAIL')
+        'friday_tors': friday_tors, 'calendar_url': calendar_url,
+        'profile_url': profile_url, 'from_email': os.environ.get('FROM_EMAIL')
     }, })
     plaintext_message = strip_tags(html_message)
 
@@ -113,7 +114,8 @@ def send_is_timeoff_next_week_report():
 
 def send_daily_helpdesk_timeoff_today_report():
     current_site = Site.objects.get_current()
-    url = current_site.domain + '/timeoff/calendar'
+    calendar_url = current_site.domain + '/timeoff/calendar'
+    profile_url = current_site.domain + '/profile'
     team_name = 'IS'
     thomas = Employee.objects.get(user__username='tlemelin')
     kathleen = Employee.objects.get(user__username='kmoore')
@@ -137,7 +139,8 @@ def send_daily_helpdesk_timeoff_today_report():
     html_template = '../templates/email/team-timeoff-today.html'
     html_message = render_to_string(html_template, { 'context': {
         'team_name': team_name, 'today': today, 'today_tors': today_tors,
-        'url': url, 'from_email': os.environ.get('FROM_EMAIL')
+        'calendar_url': calendar_url, 'profile_url': profile_url,
+        'from_email': os.environ.get('FROM_EMAIL')
     }, })
     plaintext_message = strip_tags(html_message)
 

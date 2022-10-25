@@ -4,6 +4,20 @@
 
 export const releases = [
   {
+    version: '0.8.4',
+    date: new Date(2022, 9, 25),
+    changes: [
+      {
+        type: 'new',
+        description: 'Manage email notification preferences on user profile screen.'
+      },
+      {
+        type: 'improved',
+        description: 'Calendar widget display improvements.'
+      },
+    ]
+  },
+  {
     version: '0.8.3',
     date: new Date(2022, 9, 24),
     changes: [

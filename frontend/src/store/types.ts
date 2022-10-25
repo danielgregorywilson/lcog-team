@@ -52,6 +52,10 @@ export interface EmployeeRetrieve {
   time_off_requests_can_view: Array<number>
   telework_applications_can_view: Array<number>
   next_to_sign_prs: string
+  email_opt_out_all: boolean
+  email_opt_out_timeoff_all: boolean
+  email_opt_out_timeoff_weekly: boolean
+  email_opt_out_timeoff_daily: boolean
 }
 
 export interface SimpleEmployeeRetrieve {
@@ -62,6 +66,10 @@ export interface SimpleEmployeeRetrieve {
 // For updating employee profile
 export interface EmployeeUpdatePartial {
   display_name?: string
+  email_opt_out_all: boolean
+  email_opt_out_timeoff_all: boolean
+  email_opt_out_timeoff_weekly: boolean
+  email_opt_out_timeoff_daily: boolean
 }
 
 export interface AxiosEmployeeRetrieveOneServerResponse {

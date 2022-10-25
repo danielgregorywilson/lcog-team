@@ -56,7 +56,9 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             'is_hr_manager', 'is_executive_director',
             'viewed_security_message', 'prs_can_view', 'notes_can_view',
             'telework_applications_can_view', 'time_off_requests_can_view',
-            'next_to_sign_prs'
+            'next_to_sign_prs', 'email_opt_out_all',
+            'email_opt_out_timeoff_all', 'email_opt_out_timeoff_weekly',
+            'email_opt_out_timeoff_daily'
         ]
 
     @staticmethod

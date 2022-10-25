@@ -1,8 +1,8 @@
 from django.contrib import admin
 
 from .models import (
-    Division, Employee, EmployeeSelfEvaluation, JobTitle, PerformanceReview,
-    ReviewNote, SelfEvaluationSignature, SelfEvaluationSignatureReminder, Signature, SignatureReminder,
+    Division, Employee, JobTitle, PerformanceReview,
+    ReviewNote, Signature, SignatureReminder,
     TeleworkApplication, TeleworkSignature, UnitOrProgram,
     ViewedSecurityMessage
 )
@@ -32,10 +32,10 @@ class EmployeeAdmin(admin.ModelAdmin):
     search_fields = ("user__username", )
 
 
-class SelfEvaluationInline(EditLinkToInlineObject, admin.StackedInline):
-    model = EmployeeSelfEvaluation
-    readonly_fields = ('edit_link',)
-    extra = 0
+# class SelfEvaluationInline(EditLinkToInlineObject, admin.StackedInline):
+#     model = EmployeeSelfEvaluation
+#     readonly_fields = ('edit_link',)
+#     extra = 0
 
 
 class SignatureReminderInline(admin.TabularInline):
@@ -56,7 +56,8 @@ class SignatureInline(admin.TabularInline):
 class PerformanceReviewAdmin(admin.ModelAdmin):
     list_display = ("username", "status", "effective_date")
     search_fields = ("employee__user__username", )
-    inlines = (SignatureInline, SignatureReminderInline, SelfEvaluationInline)
+    inlines = (SignatureInline, SignatureReminderInline)
+    # inlines = (SignatureInline, SignatureReminderInline, SelfEvaluationInline)
 
     def get_form(self, request, obj=None, **kwargs):
         pr_exists = hasattr(obj, 'pk')
@@ -81,20 +82,20 @@ class PerformanceReviewAdmin(admin.ModelAdmin):
         return form
 
 
-class SelfEvaluationSignatureInline(admin.TabularInline):
-    model = SelfEvaluationSignature
-    extra = 0
+# class SelfEvaluationSignatureInline(admin.TabularInline):
+#     model = SelfEvaluationSignature
+#     extra = 0
 
 
-class SelfEvaluationSignatureReminderInline(admin.TabularInline):
-    model = SelfEvaluationSignatureReminder
-    extra = 0
+# class SelfEvaluationSignatureReminderInline(admin.TabularInline):
+#     model = SelfEvaluationSignatureReminder
+#     extra = 0
 
 
-@admin.register(EmployeeSelfEvaluation)
-class SelfEvaluationAdmin(admin.ModelAdmin):
-    model = EmployeeSelfEvaluation
-    inlines = (SelfEvaluationSignatureInline, SelfEvaluationSignatureReminderInline)
+# @admin.register(EmployeeSelfEvaluation)
+# class SelfEvaluationAdmin(admin.ModelAdmin):
+#     model = EmployeeSelfEvaluation
+#     inlines = (SelfEvaluationSignatureInline, SelfEvaluationSignatureReminderInline)
 
 
 @admin.register(ReviewNote)

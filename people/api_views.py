@@ -110,10 +110,14 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     
     def partial_update(self, request, pk=None):
         """
-        Currently just updates the employee's display name.
+        Updates the employee's display name and email preferences.
         """
         employee = Employee.objects.get(pk=pk)
         employee.display_name = request.data['display_name']
+        employee.email_opt_out_all = request.data['email_opt_out_all']
+        employee.email_opt_out_timeoff_all = request.data['email_opt_out_timeoff_all']
+        employee.email_opt_out_timeoff_weekly = request.data['email_opt_out_timeoff_weekly']
+        employee.email_opt_out_timeoff_daily = request.data['email_opt_out_timeoff_daily']
         employee.save()
         serialized_employee = EmployeeSerializer(employee,
              context={'request': request})

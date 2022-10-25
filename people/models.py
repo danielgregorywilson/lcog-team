@@ -186,6 +186,18 @@ class Employee(models.Model):
                 pass
         super().save(*args, **kwargs)
 
+    def should_receive_email_of_type(self, type, subtype):
+        if self.email_opt_out_all:
+            return False
+        if type == 'timeoff':
+            if self.email_opt_out_timeoff_all:
+                return False
+            if subtype == 'weekly' and self.email_opt_out_timeoff_weekly:
+                return False
+            if subtype == 'daily' and self.email_opt_out_timeoff_daily:
+                return False
+        return True
+
     def employee_next_review(self):
         return self.performancereview_set.all().order_by("period_end_date").first()
 

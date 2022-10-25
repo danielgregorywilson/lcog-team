@@ -95,12 +95,13 @@ def send_team_timeoff_next_week_report(manager_username: str, team_name: str):
     # file1.write(html_message)
 
     for recipient in team:
-        send_email(
-            recipient.user.email,
-            f'{team_name} Time Off Next Week: {next_monday:%A} {next_monday:%B} {next_monday.day} - {next_friday:%A} {next_friday:%B} {next_friday.day}, {next_friday.year}',
-            plaintext_message,
-            html_message
-        )
+        if recipient.should_receive_email_of_type('timeoff', 'weekly'):
+            send_email(
+                recipient.user.email,
+                f'{team_name} Time Off Next Week: {next_monday:%A} {next_monday:%B} {next_monday.day} - {next_friday:%A} {next_friday:%B} {next_friday.day}, {next_friday.year}',
+                plaintext_message,
+                html_message
+            )
     
     return num_tors, len(team)
 
@@ -144,11 +145,12 @@ def send_daily_helpdesk_timeoff_today_report():
     # file1.write(html_message)
 
     for recipient in help_desk:
-        send_email(
-            recipient.user.email,
-            f'{team_name} Time Off Today: {today:%A} {today:%B} {today.day}, {today.year}',
-            plaintext_message,
-            html_message
-        )
+        if recipient.should_receive_email_of_type('timeoff', 'daily'):
+            send_email(
+                recipient.user.email,
+                f'{team_name} Time Off Today: {today:%A} {today:%B} {today.day}, {today.year}',
+                plaintext_message,
+                html_message
+            )
     
     return num_tors, len(help_desk)

@@ -16,15 +16,15 @@ export default {
             } else {
                 // Check columns that were requested
                 const matchCriteria: Array<boolean> = []
-                if (filterOn.indexOf('name') != -1) {
+                if (filterOn.includes('name')) {
                     const nameMatches = row.name.toLowerCase().includes(searchTerm)
                     matchCriteria.push(nameMatches)
                 }
-                if (filterOn.indexOf('description') != -1) {
+                if (filterOn.includes('description')) {
                     const descriptionMatches = row.description.toLowerCase().includes(searchTerm)
                     matchCriteria.push(descriptionMatches)
                 }
-                if (filterOn.indexOf('tags') != -1) {
+                if (filterOn.includes('tags')) {
                     let tagsMatch = false
                     for (let i=0; i<row.tags.length; i++) {
                         if (row.tags[i].name.toLowerCase().includes(searchTerm)) {

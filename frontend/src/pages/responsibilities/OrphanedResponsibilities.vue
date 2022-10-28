@@ -15,7 +15,7 @@
           <template v-slot:prepend>
             <q-icon name="search">
               <q-tooltip>
-                Type to search on Name, Description, or Tag name
+                Type to search on Name, Description, Tag name, or Employee Name
               </q-tooltip>
             </q-icon>
           </template>
@@ -114,7 +114,7 @@ export default class OrphanedResponsibilities extends Vue {
   }
 
   private tableFilterMethod(rows: Array<Responsibility>, term: string) {
-    return shared.tableFilterMethod(rows, term, ['name', 'description', 'tags'])
+    return shared.tableFilterMethod(rows, term, ['name', 'description', 'tags', 'primaryEmployee', 'secondaryEmployee'])
   }
 
   private navigateToTag(tagPk: string): void {

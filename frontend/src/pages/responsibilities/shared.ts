@@ -2,7 +2,7 @@ import { Responsibility } from '../../store/types'
 
 
 export default {
-    tableFilterMethod(rows: Array<Responsibility>, term: string, filterOn: Array<'name'|'description'|'tags'>) {
+    tableFilterMethod(rows: Array<Responsibility>, term: string, filterOn: Array<'name'|'description'|'tags'|'primaryEmployee'|'secondaryEmployee'>) {
         // rows contain the entire data
         // terms contains whatever you have as filter
     
@@ -32,6 +32,20 @@ export default {
                         }
                     }
                     matchCriteria.push(tagsMatch)
+                }
+                if (filterOn.includes('primaryEmployee')) {
+                    let primaryEmployeeMatches = false
+                    if (row.primary_employee_name) {
+                        primaryEmployeeMatches = row.primary_employee_name.toLowerCase().includes(searchTerm)
+                    }
+                    matchCriteria.push(primaryEmployeeMatches)
+                }
+                if (filterOn.includes('secondaryEmployee')) {
+                    let secondaryEmployeeMatches = false
+                    if (row.secondary_employee_name) {
+                        secondaryEmployeeMatches = row.secondary_employee_name.toLowerCase().includes(searchTerm)
+                    }
+                    matchCriteria.push(secondaryEmployeeMatches)
                 }
                 if (matchCriteria.some(c => !!c)) {
                     return true

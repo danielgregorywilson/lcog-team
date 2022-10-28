@@ -1,7 +1,7 @@
 <template>
   <div>
     <q-table
-      :title="`Responsibilities for ${tagName()}`"
+      :title="`${tagName()} Responsibilities`"
       :data="tagResponsibilities()"
       :columns="tableColumns"
       :pagination="initialTablePagination"
@@ -14,7 +14,7 @@
           <template v-slot:prepend>
             <q-icon name="search">
               <q-tooltip>
-                Type to search on Name, Description, or Tag name
+                Type to search on Name, Description, Tag name, or Employee Name
               </q-tooltip>
             </q-icon>
           </template>
@@ -97,7 +97,7 @@ export default class TaggedResponsibility extends Vue {
   }
 
   private tableFilterMethod(rows: Array<Responsibility>, term: string) {
-    return shared.tableFilterMethod(rows, term, ['name', 'description', 'tags'])
+    return shared.tableFilterMethod(rows, term, ['name', 'description', 'tags', 'primaryEmployee', 'secondaryEmployee'])
   }
 
   private tagResponsibilities() {

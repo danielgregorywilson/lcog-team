@@ -80,6 +80,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { bus } from '../../App.vue'
 import { Responsibility, VuexStoreGetters } from '../../store/types'
+import shared from './shared'
 
 @Component
 export default class OrphanedResponsibilities extends Vue {
@@ -113,35 +114,7 @@ export default class OrphanedResponsibilities extends Vue {
   }
 
   private tableFilterMethod(rows: Array<Responsibility>, term: string) {
-    // rows contain the entire data
-    // terms contains whatever you have as filter
-    // TODO: Make this a shared util with other tables
-
-    const searchTerm = term ? term.toLowerCase() : ''
-
-    const filteredRows = rows.filter(
-      (row) =>{
-        if (searchTerm == '') {
-          // If no search term, return all rows
-          return true
-        } else {
-          // Check name, description, and tags
-          const nameMatches = row.name.toLowerCase().includes(searchTerm)
-          const descriptionMatches = row.description.toLowerCase().includes(searchTerm)
-          let tagsMatch = false
-          for (let i=0; i<row.tags.length; i++) {
-            if (row.tags[i].name.toLowerCase().includes(searchTerm)) {
-              tagsMatch = true
-            }
-          }
-          if (nameMatches || descriptionMatches || tagsMatch) {
-            return true
-          }
-          // Assume row doesn't match
-          return false
-        }
-      })
-    return filteredRows
+    return shared.tableFilterMethod(rows, term, ['name', 'description', 'tags'])
   }
 
   private navigateToTag(tagPk: string): void {

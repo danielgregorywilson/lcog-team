@@ -48,11 +48,8 @@
                     </q-item-section>
                   </q-item>
                 </template>
-                <template v-if="addFormNewTag.name" v-slot:append>
-                  <q-icon name="cancel" @click.stop="addFormNewTag = ''" class="cursor-pointer" />
-                </template>
               </q-select>
-              <q-btn label="Add" color="primary" :disable="!addFormNewTag" @click="addFormAddTag(addFormNewTag)"/>
+              <q-btn label="Add" color="primary" :disable="!addFormNewTag" @click="addFormAddTag()"/>
             </div>
             <q-select v-model="addFormPrimaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
               <template v-slot:no-option>
@@ -121,9 +118,6 @@
                       No results
                     </q-item-section>
                   </q-item>
-                </template>
-                <template v-if="editFormNewTag.name" v-slot:append>
-                  <q-icon name="cancel" @click.stop="editFormNewTag = ''" class="cursor-pointer" />
                 </template>
               </q-select>
               <q-btn label="Add" color="primary" :disable="!editFormNewTag" @click="editFormAddTag(editFormNewTag)"/>
@@ -232,38 +226,38 @@ import ResponsibilityDataService from '../../services/ResponsibilityDataService'
 
 @Component
 export default class Responsibilities extends Vue {
-  private emptyEmployee = {name: '', pk: -1}
+  public emptyEmployee = {name: '', pk: -1}
   
-  private addDialogVisible = false
-  private addFormName = ''
-  private addFormDescription = ''
-  private addFormLink = ''
-  private addFormTags: Array<{'name': string}> = []
-  private addFormNewTag = ''
-  private addFormPrimaryEmployee = this.emptyEmployee
-  private addFormSecondaryEmployee = this.emptyEmployee
+  public addDialogVisible = false
+  public addFormName = ''
+  public addFormDescription = ''
+  public addFormLink = ''
+  public addFormTags: Array<{'name': string}> = []
+  public addFormNewTag = ''
+  public addFormPrimaryEmployee = this.emptyEmployee
+  public addFormSecondaryEmployee = this.emptyEmployee
 
-  private editDialogVisible = false
-  private pkToEdit = -1
-  private editFormName = ''
-  private editFormDescription = ''
-  private editFormLink = ''
-  private editFormTags: Array<ResponsibilityTag> = []
-  private editFormNewTag = ''
-  private editFormPrimaryEmployee = this.emptyEmployee
-  private editFormSecondaryEmployee = this.emptyEmployee
+  public editDialogVisible = false
+  public pkToEdit = -1
+  public editFormName = ''
+  public editFormDescription = ''
+  public editFormLink = ''
+  public editFormTags: Array<ResponsibilityTag> = []
+  public editFormNewTag = ''
+  public editFormPrimaryEmployee = this.emptyEmployee
+  public editFormSecondaryEmployee = this.emptyEmployee
   
-  private deleteDialogVisible = false
-  private deleteDialogResponsibilityName = ''
-  private rowPkToDelete = ''
+  public deleteDialogVisible = false
+  public deleteDialogResponsibilityName = ''
+  public rowPkToDelete = ''
 
-  private editTagDialogVisible = false
-  private tagPkToEdit = -1
-  private editTagFormName = ''
+  public editTagDialogVisible = false
+  public tagPkToEdit = -1
+  public editTagFormName = ''
 
-  private deleteTagDialogVisible = false
-  private deleteTagDialogName = ''
-  private tagPkToDelete = ''
+  public deleteTagDialogVisible = false
+  public deleteTagDialogName = ''
+  public tagPkToDelete = ''
 
   private getters = this.$store.getters as VuexStoreGetters
 
@@ -273,7 +267,7 @@ export default class Responsibilities extends Vue {
   ///////////////
   // EMPLOYEES //
   ///////////////
-  private employees(): Array<SimpleEmployeeRetrieve> {    
+  public employees(): Array<SimpleEmployeeRetrieve> {    
     const employees = this.getters['responsibilityModule/simpleEmployeeList']
     return employees.filter((employee) => {
       return employee.name.toLowerCase().indexOf(this.needle) != -1
@@ -287,7 +281,7 @@ export default class Responsibilities extends Vue {
       })
   }
 
-  private filterFn (val: string, update: Function) { // eslint-disable-line @typescript-eslint/ban-types
+  public filterFn (val: string, update: Function) { // eslint-disable-line @typescript-eslint/ban-types
     update(() => {
       this.needle = val.toLowerCase()
     })
@@ -296,7 +290,7 @@ export default class Responsibilities extends Vue {
   //////////
   // TAGS //
   //////////
-  private tags(): Array<SimpleResponsibilityTagRetrieve> {    
+  public tags(): Array<SimpleResponsibilityTagRetrieve> {    
     const tags = this.getters['responsibilityModule/simpleTagList']
     return tags.filter((tag) => {
       return tag.name.toLowerCase().indexOf(this.tagNeedle) != -1
@@ -310,33 +304,33 @@ export default class Responsibilities extends Vue {
       })
   }
 
-  private tagFilterFn (val: string, update: Function) { // eslint-disable-line @typescript-eslint/ban-types
+  public tagFilterFn (val: string, update: Function) { // eslint-disable-line @typescript-eslint/ban-types
     update(() => {
       this.tagNeedle = val.toLowerCase()
     })
   }
 
-  private setNewEditTagName(val: string) {
+  public setNewEditTagName(val: string) {
     this.editFormNewTag = val
   }
 
   //////////////
   // ADD FORM //
   //////////////
-  private setNewAddTagName(val: string) {
+  public setNewAddTagName(val: string) {
     this.addFormNewTag = val
   }
   
-  private addFormAddTag(): void {
+  public addFormAddTag(): void {
     this.addFormTags.push({'name': this.addFormNewTag})
     this.addFormNewTag = ''
   }
 
-  private addFormRemoveTag(tagIndex: number): void {
+  public addFormRemoveTag(tagIndex: number): void {
     this.addFormTags.splice(tagIndex, 1)
   }
   
-  private clearAddForm() {
+  public clearAddForm() {
     this.addFormName = ''
     this.addFormDescription = ''
     this.addFormLink = ''
@@ -346,7 +340,7 @@ export default class Responsibilities extends Vue {
     this.addFormSecondaryEmployee = this.emptyEmployee
   }
 
-  private onAddFormSubmit () {
+  public onAddFormSubmit () {
     this.createResponsibility()
       .then(() => {
         this.updateResponsibiliyLists()
@@ -399,20 +393,20 @@ export default class Responsibilities extends Vue {
     this.editDialogVisible = true
   }
 
-  private editFormAddTag(editFormNewTag: string): void {
+  public editFormAddTag(editFormNewTag: string): void {
     let newTags = [...this.editFormTags]
     newTags.push({'name': editFormNewTag})
     this.editFormTags = newTags
     this.editFormNewTag = ''
   }
 
-  private editFormRemoveTag(tagIndex: number): void {
+  public editFormRemoveTag(tagIndex: number): void {
     let newTags = [...this.editFormTags]
     newTags.splice(tagIndex, 1)
     this.editFormTags = newTags
   }
 
-  private clearEditForm() {
+  public clearEditForm() {
     this.pkToEdit = -1
     this.editFormName = ''
     this.editFormDescription = ''
@@ -423,7 +417,7 @@ export default class Responsibilities extends Vue {
     this.editFormSecondaryEmployee = this.emptyEmployee
   }
 
-  private onEditFormSubmit () {
+  public onEditFormSubmit () {
     this.editResponsibility()
       .then(() => {
         this.updateResponsibiliyLists()
@@ -461,13 +455,13 @@ export default class Responsibilities extends Vue {
   // DELETE RESPONSIBILITY FORM //
   ////////////////////////////////
 
-  private openDeleteDialog(row: Responsibility) {
+  public openDeleteDialog(row: Responsibility) {
     this.rowPkToDelete = row.pk.toString()
     this.deleteDialogResponsibilityName = row.name
     this.deleteDialogVisible = true;
   }
 
-  private deleteRow(): void {
+  public deleteRow(): void {
     ResponsibilityDataService.delete(this.rowPkToDelete)
       .then(() => {
         this.updateResponsibiliyLists()
@@ -482,7 +476,7 @@ export default class Responsibilities extends Vue {
   // EDIT TAG FORM //
   ///////////////////
 
-  private openTagEditDialog(tag: ResponsibilityTag) {
+  public openTagEditDialog(tag: ResponsibilityTag) {
     if (tag.pk) {
       this.tagPkToEdit = tag.pk
       this.editTagFormName = tag.name
@@ -490,12 +484,12 @@ export default class Responsibilities extends Vue {
     }
   }
 
-  private clearTagEditForm() {
+  public clearTagEditForm() {
     this.tagPkToEdit = -1
     this.editTagFormName = ''
   }
 
-  private onTagEditFormSubmit () {
+  public onTagEditFormSubmit () {
     this.editTag()
       .then(() => {
         this.updateTagLists()
@@ -508,7 +502,7 @@ export default class Responsibilities extends Vue {
       })
   }
 
-  private editTag() {
+  public editTag() {
     return new Promise((resolve, reject) => {
       ResponsibilityDataService.updateTag(this.tagPkToEdit.toString(), {
         name: this.editTagFormName,
@@ -527,7 +521,7 @@ export default class Responsibilities extends Vue {
   // DELETE TAG FORM //
   /////////////////////
 
-  private openDeleteTagDialog(row: ResponsibilityTag) {
+  public openDeleteTagDialog(row: ResponsibilityTag) {
     if (row.pk) {
       this.tagPkToDelete = row.pk.toString()
       this.deleteTagDialogName = row.name
@@ -535,7 +529,7 @@ export default class Responsibilities extends Vue {
     }
   }
 
-  private deleteTag(): void {
+  public deleteTag(): void {
     ResponsibilityDataService.deleteTag(this.tagPkToDelete)
       .then(() => {
         this.updateTagLists()

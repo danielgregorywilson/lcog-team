@@ -26,7 +26,8 @@
       :filter="tableFilter"
       :filter-method="tableFilterMethod"
       row-key="pk"
-      :dense="$q.screen.lt.lg"
+      :dense="$q.screen.lt.xl"
+      :grid="$q.screen.lt.lg"
     >
       <template v-slot:top-right>
         <q-input borderless dense clearable debounce="300" v-model="tableFilter" placeholder="Search">
@@ -69,6 +70,43 @@
           </q-td>
         </q-tr>
       </template>
+      <!-- For grid mode, we need to specify everything in order for our action buttons to render -->
+      <template v-slot:item="props">
+        <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 grid-style-transition">
+          <q-card class="q-py-sm">
+            <q-list dense>
+              <q-item v-for="col in props.cols" :key="col.name">
+                <div class="q-table__grid-item-row">
+                  <div class="q-table__grid-item-title">{{ col.label }}</div>
+                  <div class="q-table__grid-item-value" v-if="['name', 'description'].includes(col.name)">
+                    {{ col.value }}
+                  </div>
+                  <div class="q-table__grid-item-value" v-else-if="col.name == 'link'">
+                    <a :href="col.value">{{ col.value }}</a>
+                  </div>
+                  <div class="q-table__grid-item-value" v-else-if="col.name == 'tags'">
+                    <q-chip v-for="tag of col.value" :key="tag.name" clickable @click="navigateToTag(tag.pk)" color="secondary" text-color="white">{{ tag.name }}</q-chip>
+                  </div>
+                  <div class="q-table__grid-item-value" v-else-if="col.name == 'primary_employee_name'">
+                    <router-link v-if="props.row.primary_employee_pk" :to="{ name: 'employee-responsibilities', params: { pk: props.row.primary_employee_pk} }">
+                      {{ props.row.primary_employee_name }}
+                    </router-link>
+                  </div>
+                  <div class="q-table__grid-item-value" v-else-if="col.name == 'secondary_employee_name'">
+                    <router-link v-if="props.row.secondary_employee_pk" :to="{ name: 'employee-responsibilities', params: { pk: props.row.secondary_employee_pk} }">
+                      {{ props.row.secondary_employee_name }}
+                    </router-link>
+                  </div>
+                  <div class="q-table__grid-item-value row q-gutter-sm" v-else>
+                    <q-btn class="col edit-button" dense round flat color="grey" @click="showEditDialog(props.row)" icon="edit"></q-btn>
+                    <q-btn class="col delete-button" dense round flat color="grey" @click="showDeleteDialog(props.row)" icon="delete"></q-btn>
+                  </div>
+                </div>
+              </q-item>
+            </q-list>
+          </q-card>
+        </div>
+      </template>
     </q-table>
 
     <q-table
@@ -86,7 +124,7 @@
           <template v-slot:prepend>
             <q-icon name="search">
               <q-tooltip>
-                Type to search on Name, Description, or Tag name
+                Type to search on Name, Description, Tag name, or Employee Name
               </q-tooltip>
             </q-icon>
           </template>
@@ -153,6 +191,7 @@ import { Component, Vue } from 'vue-property-decorator'
 import { bus } from '../../App.vue'
 import ResponsibilityDataService from '../../services/ResponsibilityDataService'
 import { Responsibility, VuexStoreGetters } from '../../store/types'
+import shared from './shared'
 
 @Component
 export default class EmployeeResponsibilites extends Vue {
@@ -162,19 +201,19 @@ export default class EmployeeResponsibilites extends Vue {
     return routeParts[routeParts.length - 1] === 'secondary'
   }
   
-  private tableFilter = ''
+  public tableFilter = ''
 
-  private employeeName(): string {
+  public employeeName(): string {
     return this.getters['responsibilityModule/simpleEmployeeDetail'].name
   }
 
-  private displayEmployeeSecondaryResponsibilities = false
+  public displayEmployeeSecondaryResponsibilities = false
 
   private deleteDialogVisible = false
   private deleteDialogResponsibilityName = ''
   private rowPkToDelete = ''
 
-  private tableColumns = [
+  public tableColumns = [
     { name: 'name', required: true, label: 'Name', field: 'name', sortable: true, align: 'left' },
     { name: 'description', required: false, label: 'Description', field: 'description', sortable: false, align: 'left', classes: 'table-description', headerClasses: 'table-description' },
     { name: 'link', required: false, label: 'Link', field: 'link', sortable: false, align: 'left', classes: 'table-link', headerClasses: 'table-link' },
@@ -184,13 +223,13 @@ export default class EmployeeResponsibilites extends Vue {
     { name: 'actions', label: 'Actions', },
   ]
 
-  private initialTablePagination = {
+  public initialTablePagination = {
     rowsPerPage: 50
   }
 
   private getters = this.$store.getters as VuexStoreGetters
 
-  private toggleResponsibilityType(): void {
+  public toggleResponsibilityType(): void {
     let routeName
     if (this.secondary()) {
       routeName = 'employee-responsibilities'
@@ -210,36 +249,8 @@ export default class EmployeeResponsibilites extends Vue {
       })
   }
 
-  private tableFilterMethod(rows: Array<Responsibility>, term: string) {
-    // rows contain the entire data
-    // terms contains whatever you have as filter
-    // TODO: Make this a shared util with other tables
-
-    const searchTerm = term ? term.toLowerCase() : ''
-
-    const filteredRows = rows.filter(
-      (row) =>{
-        if (searchTerm == '') {
-          // If no search term, return all rows
-          return true
-        } else {
-          // Check name, description, and tags
-          const nameMatches = row.name.toLowerCase().includes(searchTerm)
-          const descriptionMatches = row.description.toLowerCase().includes(searchTerm)
-          let tagsMatch = false
-          for (let i=0; i<row.tags.length; i++) {
-            if (row.tags[i].name.toLowerCase().includes(searchTerm)) {
-              tagsMatch = true
-            }
-          }
-          if (nameMatches || descriptionMatches || tagsMatch) {
-            return true
-          }
-          // Assume row doesn't match
-          return false
-        }
-      })
-    return filteredRows
+  public tableFilterMethod(rows: Array<Responsibility>, term: string) {
+    return shared.tableFilterMethod(rows, term, ['name', 'description', 'tags', 'primaryEmployee', 'secondaryEmployee'])
   }
 
   private employeeResponsibilities(secondary=false): Array<Responsibility> {
@@ -257,11 +268,11 @@ export default class EmployeeResponsibilites extends Vue {
     }
   }
 
-  private employeePrimaryResponsibilities(): Array<Responsibility> {
+  public employeePrimaryResponsibilities(): Array<Responsibility> {
     return this.employeeResponsibilities()
   }
 
-  private employeeSecondaryResponsibilities(): Array<Responsibility> {
+  public employeeSecondaryResponsibilities(): Array<Responsibility> {
     return this.employeeResponsibilities(true)
   }
 
@@ -306,7 +317,7 @@ export default class EmployeeResponsibilites extends Vue {
       })
   }
 
-  private navigateToTag(tagPk: string): void {
+  public navigateToTag(tagPk: string): void {
     this.$router.push({ name: 'tagged-responsibilities', params: { pk: tagPk }})
       .catch(e => {
         console.error('Error navigating to tag detail:', e)
@@ -319,11 +330,11 @@ export default class EmployeeResponsibilites extends Vue {
     return n !== Infinity && String(n) === str && n >= 0;
   }
 
-  private showEditDialog(row: Responsibility): void {
+  public showEditDialog(row: Responsibility): void {
     bus.$emit('emitOpenEditDialog', row) // eslint-disable-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   }
 
-  private showDeleteDialog(row: Responsibility): void {
+  public showDeleteDialog(row: Responsibility): void {
     bus.$emit('emitOpenDeleteDialog', row) // eslint-disable-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   }
 

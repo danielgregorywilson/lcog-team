@@ -4,6 +4,20 @@
 
 export const releases = [
   {
+    version: '0.8.5',
+    date: new Date(2022, 10, 3),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Filter responsibilities by employee name.'
+      },
+      {
+        type: 'improved',
+        description: 'Responsibilities mobile views.'
+      },
+    ]
+  },
+  {
     version: '0.8.4',
     date: new Date(2022, 9, 25),
     changes: [

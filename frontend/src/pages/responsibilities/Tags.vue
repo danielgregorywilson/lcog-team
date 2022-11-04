@@ -44,6 +44,7 @@ import { Component, Vue } from 'vue-property-decorator'
 import { bus } from '../../App.vue'
 import ResponsibilityDataService from '../../services/ResponsibilityDataService'
 import { Responsibility, ResponsibilityTag, VuexStoreGetters } from '../../store/types'
+import shared from './shared'
 
 @Component
 export default class Tags extends Vue {
@@ -94,28 +95,7 @@ export default class Tags extends Vue {
   }
 
   private tableFilterMethod(rows: Array<Responsibility>, term: string) {
-    // rows contain the entire data
-    // terms contains whatever you have as filter
-    // TODO: Make this a shared util with other tables - pass in which columns to check
-
-    const searchTerm = term ? term.toLowerCase() : ''
-
-    const filteredRows = rows.filter(
-      (row) =>{
-        if (searchTerm == '') {
-          // If no search term, return all rows
-          return true
-        } else {
-          // Check name, description, and tags
-          const nameMatches = row.name.toLowerCase().includes(searchTerm)
-          if (nameMatches) {
-            return true
-          }
-          // Assume row doesn't match
-          return false
-        }
-      })
-    return filteredRows
+    return shared.tableFilterMethod(rows, term, ['name',])
   }
 
   private navigateToTag(tagPk: string): void {

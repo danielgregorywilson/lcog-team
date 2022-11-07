@@ -4,6 +4,16 @@
 
 export const releases = [
   {
+    version: '0.8.6',
+    date: new Date(2022, 10, 7),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Block access to desk reservation pages for non-authenticated users unless they are on the LCOG network.'
+      },
+    ]
+  },
+  {
     version: '0.8.5',
     date: new Date(2022, 10, 3),
     changes: [

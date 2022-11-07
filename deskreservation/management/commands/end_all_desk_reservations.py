@@ -10,4 +10,5 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         count = end_all_desk_reservations()
         # TODO: Output some data about how many reservations ended, etc.
-        self.stdout.write(self.style.SUCCESS(f"Ended all active desk reservations. Count: { count } Timestamp: { datetime.now() }"))
+        message = f'{ datetime.now() } - Ended all active desk reservations. Count: { count }'
+        self.stdout.write(self.style.SUCCESS(message))

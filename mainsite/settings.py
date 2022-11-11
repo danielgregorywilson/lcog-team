@@ -35,8 +35,8 @@ ENVIRONMENT = os.environ.get('ENVIRONMENT')
 
 if ENVIRONMENT == 'STAGING': 
     ALLOWED_HOSTS = [
-        'team-app-staging.s3-website-us-west-2.amazonaws.com', # Staging frontend
-        'lcog-team-staging.us-west-2.elasticbeanstalk.com', # Staging backend
+        'team-staging.lcog.org', # Staging frontend
+        'api.team-staging.lcog.org', # Staging backend
         os.environ.get('EC2_PUBLIC_IP'), # Public IP of EC2 instance
         os.environ.get('EC2_PRIVATE_IP'), # Private IP of EC2 instance
         os.environ.get('EBS_DOMAIN'), # Domain of Elastic Beanstalk instance

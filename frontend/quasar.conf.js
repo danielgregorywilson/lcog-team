@@ -53,11 +53,11 @@ module.exports = configure(function (ctx) {
       vueRouterMode: 'history', // available values: 'hash', 'history'
       distDir: ctx.debug ? `dist/${ctx.modeName}-dev` : `dist/${ctx.modeName}`,
       env: {
-        API_URL: ctx.dev ? 'http://lcog-team:8000/' : (ctx.debug ? 'https://lcog-team-staging.us-west-2.elasticbeanstalk.com/' : 'https://api.team.lcog.org/'),
+        API_URL: ctx.dev ? 'http://lcog-team:8000/' : (ctx.debug ? 'https://api.team-staging.lcog.org/' : 'https://api.team.lcog.org/'),
         APP_VERSION_TAG: gitDescribeSync().tag,
         DEPLOY_MODE: ctx.dev ? 'DEVELOPMENT' : (ctx.debug ? 'STAGING' : 'PRODUCTION'),
-        DASHBOARD_URL: ctx.dev ? 'http://lcog-team:8080/dashboard' : (ctx.debug ? 'http://team-app-staging.s3-website-us-west-2.amazonaws.com/dashboard' : 'https://team.lcog.org/dashboard'),
-        WEBSOCKET_URL: ctx.dev ? 'ws://lcog-team:8000/' : (ctx.debug ? 'https://lcog-team-staging.us-west-2.elasticbeanstalk.com/' : 'ws://api.team.lcog.org/')
+        DASHBOARD_URL: ctx.dev ? 'http://lcog-team:8080/dashboard' : (ctx.debug ? 'https://team-staging.lcog.org/dashboard' : 'https://team.lcog.org/dashboard'),
+        WEBSOCKET_URL: ctx.dev ? 'ws://lcog-team:8000/' : (ctx.debug ? 'https://api.team-staging.lcog.org/' : 'ws://api.team.lcog.org/')
       },
 
       // transpile: false,

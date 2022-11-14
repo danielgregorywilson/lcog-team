@@ -295,7 +295,7 @@ REST_FRAMEWORK_TRUSTED_IPS_LIST = []
 
 # Frontend
 if ENVIRONMENT == 'STAGING': 
-    FRONTEND_DOMAIN = 'http://team-app-staging.s3-website-us-west-2.amazonaws.com'
+    FRONTEND_DOMAIN = 'https://team-staging.lcog.org'
 else:
     # Production
     FRONTEND_DOMAIN = 'https://team.lcog.org'

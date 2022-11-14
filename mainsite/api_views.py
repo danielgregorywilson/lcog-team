@@ -46,7 +46,9 @@ class TrustedIPViewSet(viewsets.ViewSet):
         settings_ips = settings.REST_FRAMEWORK_TRUSTED_IPS_LIST
         trusted_ips = list(admin_ips) + settings_ips
         client_ip = request.META['REMOTE_ADDR']
-        return Response(client_ip in trusted_ips)
+        print(client_ip, trusted_ips)
+        return Response("CLIENTIP", client_ip, "TRUSTEDIPS", trusted_ips)
+        # return Response(client_ip in trusted_ips)
 
 
 class SecurityMessageViewSet(viewsets.ModelViewSet):

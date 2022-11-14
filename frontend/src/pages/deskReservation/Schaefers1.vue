@@ -595,9 +595,12 @@ export default class Schaefers1 extends Vue{
 
     // Boot session to dashboard if not authenticated or IP not in trusted IP lists
     const isAuthenticated = this.getters['authModule/isAuthenticated']
+    console.log("Authenticated???")
     if (!isAuthenticated) {
+      console.log("Not authenticated")
       TrustedIPDataService.getTrustedIPs()
         .then((response: {data: boolean}) => {
+          console.log(response.data)
           const addressIsSafe = response.data
           if (!addressIsSafe) {
             this.$router.push('/')

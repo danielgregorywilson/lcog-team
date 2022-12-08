@@ -4,6 +4,16 @@
 
 export const releases = [
   {
+    version: '0.8.7',
+    date: new Date(2022, 11, 8),
+    changes: [
+      {
+        type: 'new',
+        description: 'Add a Schaefers lobby kiosk landing page'
+      },
+    ]
+  },
+  {
     version: '0.8.6',
     date: new Date(2022, 10, 7),
     changes: [

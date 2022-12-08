@@ -110,9 +110,16 @@ class Command(BaseCommand):
                     'Created user {} {}'.format(user.first_name, user.last_name)
                 )
                 
-            # Get or create employee. Update employee department if necessary.
+            # Get or create employee. Activate them if they are a returning
+            # employee. Update employee title and department if necessary.
             try:
                 employee = Employee.objects.get(user=user)
+                if not employee.active:
+                    employee.active = True
+                    employee.save()
+                    self.stdout.write(
+                        'Reactivated returning employee {} {}'.format(employee.user.first_name, employee.user.last_name)
+                    )
                 updated_title = employee.job_title != job_title
                 updated_department = employee.unit_or_program != unit_or_program
                 if updated_title or updated_department:

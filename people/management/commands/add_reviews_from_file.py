@@ -28,7 +28,9 @@ class Command(BaseCommand):
                     'Notes: ',
                     '04/19/2019 12:50 PM - clid1559"',
                     '8/1/20.\n\n12/11/2020 07:05 PM - clid1559',
-                    '$2,187.68.\n06/26/2020 04:37 PM - clid1559'
+                    '$2,187.68.\n06/26/2020 04:37 PM - clid1559',
+                    'Report Criteria:',
+                    'Include review notes'
                 ]:
                     continue
                 if row[0]:

@@ -450,6 +450,15 @@ const routes: RouteConfig[] = [
     }
   },
 
+  /////////////////////
+  // SCHAEFERS KIOSK //
+  /////////////////////
+  {
+    path: '/kiosk',
+    name: 'schaefers-kiosk',
+    component: () => import('src/pages/SchaefersKiosk.vue'),
+  },
+
   // Always leave this as last one,
   // but you can also remove it
   {

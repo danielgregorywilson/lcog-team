@@ -46,7 +46,12 @@ class TrustedIPViewSet(viewsets.ViewSet):
         admin_ips = map(lambda ip: ip.address, TrustedIPAddress.objects.all())
         settings_ips = settings.REST_FRAMEWORK_TRUSTED_IPS_LIST
         trusted_ips = list(admin_ips) + settings_ips
-        client_ip = request.META['REMOTE_ADDR']
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            client_ip = x_forwarded_for.split(',')[0]
+        else:
+            client_ip = request.META.get('REMOTE_ADDR')
+        print(client_ip, trusted_ips)
         return Response(client_ip in trusted_ips)
 
 

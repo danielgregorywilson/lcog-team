@@ -42,7 +42,7 @@ class TrustedIPViewSet(viewsets.ViewSet):
     serializer_class = TrustedIPSerializer
 
     def list(self, request):
-        return Response(True) #TODO: Remove
+        # return Response(True) #TODO: Remove
         admin_ips = map(lambda ip: ip.address, TrustedIPAddress.objects.all())
         settings_ips = settings.REST_FRAMEWORK_TRUSTED_IPS_LIST
         trusted_ips = list(admin_ips) + settings_ips

@@ -31,6 +31,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(strtobool(os.getenv('DEBUG', 'True')))
 
+SECURE_SSL_REDIRECT = bool(strtobool(os.getenv('USE_SSL', 'True')))
+SESSION_COOKIE_SECURE = bool(strtobool(os.getenv('USE_SSL', 'True')))
+CSRF_COOKIE_SECURE = bool(strtobool(os.getenv('USE_SSL', 'True')))
+
 ENVIRONMENT = os.environ.get('ENVIRONMENT')
 
 if ENVIRONMENT == 'STAGING': 

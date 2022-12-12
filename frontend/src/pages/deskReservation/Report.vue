@@ -158,7 +158,7 @@ export default class Report extends Vue{
 
   private download_employee_desk_usage_report(data: GetEmployeeDeskReservationDataInterface) {
     // Define the heading for each row of the data
-    var csv = 'Desk,Total Hours,Days Utilized,Most Frequent Desk\n'
+    var csv = 'Employee,Total Hours,Days Utilized,Most Frequent Desk\n'
 
     // Merge the data with CSV
     Object.keys(data).forEach((key) => {

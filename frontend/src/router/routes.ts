@@ -459,6 +459,15 @@ const routes: RouteConfig[] = [
     component: () => import('src/pages/SchaefersKiosk.vue'),
   },
 
+  /////////////////////////
+  // MEALS ON WHEELS MAP //
+  /////////////////////////
+  {
+    path: '/mow-map',
+    name: 'mow-map',
+    component: () => import('src/pages/MOWMap.vue'),
+  },
+
   // Always leave this as last one,
   // but you can also remove it
   {

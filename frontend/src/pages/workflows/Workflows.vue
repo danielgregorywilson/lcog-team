@@ -1,33 +1,34 @@
 <template>
   <q-page class="q-pa-md">
-    WORKFLOWS
     <div class="q-py-md" v-if="isManager()">
       <div class="row items-center q-mb-md">
-        <q-avatar icon="insert_chart_outlined" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
-        <div class="text-h4">Review Notes</div>
+        <q-avatar icon="person_add" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
+        <div class="text-h4">Employees Onboarding</div>
       </div>
-      <review-note-table />
+      <div class="text-h6">Action Required</div>
+      <workflow-table :actionRequired="true" />
+      <div class="text-h6">No Action Required</div>
+      <workflow-table :actionRequired="false" />
     </div>
     <div class="q-py-md" v-if="isManager()">
       <div class="row items-center q-mb-md">
-        <q-avatar icon="assignment_ind" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
-        <div class="text-h4">Current Reviews (For Managers)</div>
+        <q-avatar icon="person_remove" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
+        <div class="text-h4">Employees Exiting</div>
       </div>
       <div class="text-h6">Action Required</div>
-        <performance-review-table :actionRequired="true" />
+      <workflow-table :actionRequired="true" />
       <div class="text-h6">No Action Required</div>
-        <performance-review-table :actionRequired="false" />
+      <workflow-table :actionRequired="false" />
     </div>
   </q-page>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import ReviewNoteTable from '../../components/ReviewNoteTable.vue';
-import PerformanceReviewTable from '../../components/PerformanceReviewTable.vue';
+import WorkflowTable from '../../components/WorkflowTable.vue';
 
 @Component({
-  components: { PerformanceReviewTable, ReviewNoteTable }
+  components: { WorkflowTable, }
 })
 export default class Workflows extends Vue {
   private currentIndex = -1;

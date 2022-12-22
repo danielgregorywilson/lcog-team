@@ -129,7 +129,7 @@ const linksData: Array<LinkData> = [
   },
   {
     title: 'Responsibilities',
-    icon: 'list',
+    icon: 'hardware',
     link: '/responsibilities'
   },
   {

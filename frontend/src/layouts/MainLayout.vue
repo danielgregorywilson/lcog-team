@@ -133,6 +133,12 @@ const linksData: Array<LinkData> = [
     link: '/responsibilities'
   },
   {
+    title: 'Workflows',
+    icon: 'double_arrow',
+    link: '/workflows',
+    // managerOnly: true
+  },
+  {
     title: 'Performance Reviews',
     icon: 'assignment_turned_in',
     link: '/reviews',

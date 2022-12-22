@@ -280,9 +280,16 @@ const routes: RouteConfig[] = [
         ]
       },
 
-      /////////
-      // EIS //
-      /////////
+      ///////////////
+      // Workflows //
+      ///////////////
+      {
+        path: '/workflows',
+        name: 'workflow-dashboard',
+        component: () => import('pages/workflows/Workflows.vue'),
+        // beforeEnter: ifManager
+      },
+      // TODO: Remove EIS demo page
       {
         path: '/eis',
         name: 'eis',

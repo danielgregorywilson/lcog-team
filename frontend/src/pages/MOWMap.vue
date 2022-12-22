@@ -58,8 +58,8 @@ export default class MOWMap extends Vue{
     { label: 'North', value: 'north', color: 'yellow' },
     { label: 'Will', value: 'will', color: 'indigo' }
   ]
-  public selectedRoutes = ["Gateway", "Marcola", "MC", "PU", "Short", "Long", "North", "Will"]
-  public newAddress = ""
+  public selectedRoutes = ['Gateway', 'Marcola', 'MC', 'PU', 'Short', 'Long', 'North', 'Will']
+  public newAddress = ''
   public showWaitlisted = true
 }
 </script>

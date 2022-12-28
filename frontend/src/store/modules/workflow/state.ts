@@ -2,6 +2,10 @@ import { WorkflowInstanceRetrieve } from '../../types'
 
 export interface WorkflowStateInterface {
   currentWorkflowInstance: WorkflowInstanceRetrieve
+  workflowsActionRequired: Array<WorkflowInstanceRetrieve>
+  workflowsComplete: Array<WorkflowInstanceRetrieve>
+  workflowsIncomplete: Array<WorkflowInstanceRetrieve>
+  allWorkflows: Array<WorkflowInstanceRetrieve>
 }
 
 const blankWorkflowInstance = {
@@ -9,7 +13,8 @@ const blankWorkflowInstance = {
 }
 
 const state: WorkflowStateInterface = {
-  currentWorkflowInstance: blankWorkflowInstance,
+  currentWorkflowInstance: blankWorkflowInstance, workflowsActionRequired: [],
+  workflowsComplete: [], workflowsIncomplete: [], allWorkflows: []
 };
 
 export default state;

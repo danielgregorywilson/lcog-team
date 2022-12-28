@@ -19,7 +19,41 @@ const actions: ActionTree<WorkflowStateInterface, StateInterface> = {
         });
       })
   },
-
+  // All workflows, optionally filtered to ongoing/completed
+  getWorkflows: ({ commit }, data: {complete?: boolean, actionRequired?: boolean}) => {
+    let targetUrl: string
+    let mutation: string
+    if (data == undefined) {
+      targetUrl = `${ apiURL }api/v1/workflowinstance`
+      mutation = 'setAllWorkflows'
+    } else if (data.actionRequired !== undefined && data.actionRequired) {
+      targetUrl = `${ apiURL }api/v1/workflowinstance?action_required=true`
+      mutation = 'setWorkflowsActionRequired'
+    } else {
+      if (data.complete !== undefined) {
+        if (data.complete) {
+          targetUrl = `${ apiURL }api/v1/workflowinstance?complete=true`
+          mutation = 'setWorkflowsComplete'
+        } else {
+          targetUrl = `${ apiURL }api/v1/workflowinstance?complete=false`
+          mutation = 'setWorkflowsIncomplete'
+        }
+      } else {
+        // Todo: All? Error?
+      }
+    }
+    return new Promise((resolve, reject) => {
+      axios({ url: targetUrl })
+      .then(resp => {
+        commit(mutation, resp);
+        resolve(resp);
+      })
+      .catch(e => {
+        console.error('Error getting workflows of type', mutation, e)
+        reject(e)
+      });
+    })
+  },
   completeStepInstance: ({}, data: {stepInstancePk: number, nextStepPk: number}) => {
     return new Promise((resolve, reject) => {
       axios({ url: `${ apiURL }api/v1/stepinstance/${ data.stepInstancePk }`, data, method: 'PATCH' })

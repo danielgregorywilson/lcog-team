@@ -41,8 +41,7 @@ class WorkflowViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        This view should return a list of all time off requests for which
-        the currently authenticated user is the manager.
+
         """
         user = self.request.user
         if user.is_authenticated:
@@ -105,20 +104,24 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
     #     IsAuthenticatedOrReadOnly
     # ]
 
-    # def get_queryset(self):
-    #     """
-    #     This view should return a list of all time off requests for which
-    #     the currently authenticated user is the manager.
-    #     """
-    #     import pdb; pdb.set_trace();
-    #     user = self.request.user
-    #     if user.is_authenticated:
-    #         import pdb; pdb.set_trace();
-    #         if user.is_superuser:
-    #             instances = WorkflowInstance.objects.all()
-    #         else:
-    #             instances = WorkflowInstance.objects.none()
-    #         return instances
+    def get_queryset(self):
+        """
+
+        """
+        user = self.request.user
+        if user.is_authenticated:
+            action_required = self.request.query_params.get('action_required',
+                None)
+            complete = self.request.query_params.get('complete', None)
+            if action_required is not None and is_true_string(action_required):
+                queryset = WorkflowInstance.action_required.get_queryset(user)
+            
+            
+            if user.is_superuser:
+                instances = WorkflowInstance.objects.all()
+            else:
+                instances = WorkflowInstance.objects.none()
+            return instances
 
     # def create(self, request):
     #     if 'from' in request.data['dates']:

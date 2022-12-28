@@ -1,7 +1,7 @@
 <template>
   <div class="q-py-sm">
     <q-table
-      :data="performanceReviews()"
+      :data="workflows()"
       :columns="columns()"
       :dense="$q.screen.lt.lg"
       :grid="$q.screen.lt.md"
@@ -82,12 +82,12 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { ReviewNoteRetrieve } from '../store/types'
+import { WorkflowInstanceRetrieve } from '../store/types'
 import { bus } from '../App.vue'
 import { PerformanceReviewRetrieve } from '../store/types'
 import '../filters'
 
-interface EvaluationColumn {
+interface WorkflowColumn {
   name: string;
   required?: boolean;
   label: string;
@@ -105,42 +105,28 @@ interface QuasarPerformanceReviewTableRowClickActionProps {
 
 @Component
 export default class WorkflowTable extends Vue {
-  @Prop() readonly signature!: boolean
-  @Prop({required: true}) readonly actionRequired!: boolean
-  private performanceReviews(): Array<ReviewNoteRetrieve> {
-    if (this.signature) {
-      if (this.actionRequired) {
-        return this.$store.getters['performanceReviewModule/allSignaturePerformanceReviewsActionRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+  @Prop() readonly complete!: boolean
+  @Prop() readonly actionRequired!: boolean
+  private workflows(): Array<WorkflowInstanceRetrieve> {
+    if (this.actionRequired !== undefined && this.actionRequired) {
+      return this.$store.getters['workflowModule/workflowsActionRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+    } else if (this.complete !== undefined) {
+      if (this.complete) {
+        return this.$store.getters['workflowModule/workflowsComplete'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
       } else {
-        return this.$store.getters['performanceReviewModule/allSignaturePerformanceReviewsActionNotRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+        return this.$store.getters['workflowModule/workflowsIncomplete'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
       }
     } else {
-      if (this.actionRequired) {
-        return this.$store.getters['performanceReviewModule/allPerformanceReviewsActionRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
-      } else {
-        return this.$store.getters['performanceReviewModule/allPerformanceReviewsActionNotRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
-      }
+      return this.$store.getters['workflowModule/allWorkflows'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
     }
   }
-  private columns(): Array<EvaluationColumn> {
-    if (this.signature) {
-      return [
-        { name: 'employeeName', label: 'Employee', align: 'center', field: 'employee_name', sortable: true },
-        { name: 'managerName', label: 'Manager', align: 'center', field: 'manager_name', sortable: true },
-        { name: 'performancePeriod', align: 'center', label: 'Performance Period', field: 'performance_period', sortable: true },
-        { name: 'daysUntilReview', align: 'center', label: 'Days Until Review', field: 'days_until_review', sortable: true },
-        { name: 'status', align: 'center', label: 'Status', field: 'status' },
-        { name: 'actions', label: 'Actions', align: 'around', },
-      ]
-    } else {
-      return [
-        { name: 'employeeName', label: 'Employee', align: 'center', field: 'employee_name', sortable: true },
-        { name: 'performancePeriod', align: 'center', label: 'Performance Period', field: 'performance_period', sortable: true },
-        { name: 'daysUntilReview', align: 'center', label: 'Days Until Review', field: 'days_until_review', sortable: true },
-        { name: 'status', align: 'center', label: 'Status', field: 'status' },
-        { name: 'actions', label: 'Actions', align: 'around', },
-      ]
-    }
+  private columns(): Array<WorkflowColumn> {
+    return [
+      { name: 'pk', label: 'PK', align: 'center', field: 'pk', sortable: true },
+      { name: 'dateCreated', align: 'center', label: 'Workflow Start Date', field: 'date_created', sortable: true },
+      { name: 'percentComplete', align: 'center', label: '% Complete', field: 'status' },
+      { name: 'actions', label: 'Actions', align: 'around', },
+    ]
   }
 
   private noDataLabel(): string {
@@ -151,60 +137,58 @@ export default class WorkflowTable extends Vue {
     }
   }
 
-  private retrievePerformanceReviews(): void {
-    if (this.signature) {
-      if (this.actionRequired) {
-        this.$store.dispatch('performanceReviewModule/getAllSignaturePerformanceReviewsActionRequired')
+  private retrieveWorkflows(): void {
+    if (this.actionRequired) {
+      this.$store.dispatch('workflowModule/getWorkflows', {actionRequired: true})
         .catch(e => {
-          console.error('Error retrieving getAllSignaturePerformanceReviewsActionRequired:', e)
+          console.error('Error retrieving workflows with action required:', e)
         })
-      } else {
-        this.$store.dispatch('performanceReviewModule/getAllSignaturePerformanceReviewsActionNotRequired')
+    } else if (this.complete == undefined) {
+      this.$store.dispatch('workflowModule/getWorkflows')
         .catch(e => {
-          console.error('Error retrieving getAllSignaturePerformanceReviewsActionNotRequired:', e)
+          console.error('Error retrieving all workflows:', e)
         })
-      }
     } else {
-      if (this.actionRequired) {
-        this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionRequired')
-        .catch(e => {
-          console.error('Error retrieving getAllPerformanceReviewsActionRequired:', e)
-        })
+      if (this.complete) {
+        this.$store.dispatch('workflowModule/getWorkflows', {complete: true})
+          .catch(e => {
+            console.error('Error retrieving complete workflows:', e)
+          })
       } else {
-        this.$store.dispatch('performanceReviewModule/getAllPerformanceReviewsActionNotRequired')
-        .catch(e => {
-          console.error('Error retrieving getAllPerformanceReviewsActionNotRequired:', e)
-        })
+        this.$store.dispatch('workflowModule/getWorkflows', {complete: false})
+          .catch(e => {
+            console.error('Error retrieving incomplete workflows:', e)
+          })
       }
     }
   }
 
   private editEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {
-    this.$router.push(`pr/${ props.row.pk }`)
-      .catch(e => {
-        console.error('Error navigating to PR detail:', e)
-      })
+    // this.$router.push(`pr/${ props.row.pk }`)
+    //   .catch(e => {
+    //     console.error('Error navigating to PR detail:', e)
+    //   })
   }
 
   private printEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {
-    this.$router.push(`print/pr/${ props.row.pk }`)
-      .catch(e => {
-        console.error('Error printing PR:', e)
-      })
+    // this.$router.push(`print/pr/${ props.row.pk }`)
+    //   .catch(e => {
+    //     console.error('Error printing PR:', e)
+    //   })
   }
 
   private printEvaluationPositionDescription(props: QuasarPerformanceReviewTableRowClickActionProps): void {
-    window.location.href = props.row.signed_position_description
+    // window.location.href = props.row.signed_position_description
   }
 
   created() {
-    bus.$on('updateTeleworkApplicationTables', () => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      this.retrievePerformanceReviews()
-    })
+    // bus.$on('updateTeleworkApplicationTables', () => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    //   this.retrievePerformanceReviews()
+    // })
   }
 
   mounted() {
-    this.retrievePerformanceReviews();
+    this.retrieveWorkflows();
   }
 }
 </script>

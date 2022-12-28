@@ -143,22 +143,22 @@ const linksData: Array<LinkData> = [
     icon: 'laptop',
     link: '/desk-reservation/schaefers/1',
   },
-  {
-    title: 'My Telework Application',
-    icon: 'home_work',
-    link: '/telework-application',
-    eligibleForTeleworkApplicationOnly: true
-  },
+  // {
+  //   title: 'My Telework Application',
+  //   icon: 'home_work',
+  //   link: '/telework-application',
+  //   eligibleForTeleworkApplicationOnly: true
+  // },
   // {
   //   title: 'Telework Policy',
   //   icon: 'computer',
   //   link: '/telework'
   // },
-  {
-    title: 'Security Message',
-    icon: 'security',
-    link: '/security-message'
-  },
+  // {
+  //   title: 'Security Message',
+  //   icon: 'security',
+  //   link: '/security-message'
+  // },
   {
     title: 'My Profile',
     icon: 'person',

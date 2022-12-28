@@ -26,6 +26,7 @@
                 </ul>
               </q-tooltip>
             </q-icon>
+            <span v-if="request.note" class="text-italic"> - {{ request.note }}</span>
           </div>
         </ul>
       </div>

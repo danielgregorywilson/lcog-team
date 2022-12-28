@@ -97,7 +97,11 @@
 </template>
 
 <style lang="scss">
-
+@media only screen and (max-width: 1600px) {
+  .q-table td {
+    white-space: normal;
+  }
+}
 </style>
 
 <script lang="ts">

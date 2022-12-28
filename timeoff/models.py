@@ -78,8 +78,8 @@ class TimeOffRequest(models.Model):
 class TimeOffRequestTemporaryApprover(models.Model):
     """
     Manually set approvers in-stead of an employee for a given time period.
-    During this period, approvals that would have gone to this person would go
-    to someone else.
+    During this period, approvals that would have gone to this person would
+    also go to someone else.
     """
     employee_on_leave = models.ForeignKey("people.Employee",
         related_name="time_off_request_approvers_on_leave",

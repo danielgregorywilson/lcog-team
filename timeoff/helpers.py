@@ -26,11 +26,14 @@ def send_manager_new_timeoff_request_notification(tor):
     )
 
 
-def send_employee_manager_acknowledged_timeoff_request_notification(tor):
+def send_employee_manager_acknowledged_timeoff_request_notification(tor, manager=None):
     current_site = Site.objects.get_current()
     url = current_site.domain + '/timeoff/my-requests'
     employee = tor.employee
-    manager_name = employee.manager.name
+    if manager:
+        manager_name = manager.name
+    else:
+        manager_name = employee.manager.name
     
     dates_str = ''
     if tor.start_date == tor.end_date:
@@ -39,9 +42,9 @@ def send_employee_manager_acknowledged_timeoff_request_notification(tor):
         dates_str = f'from {tor.start_date} to {tor.end_date}'
     
     if tor.acknowledged:
-        message = f'Your manager {manager_name} has acknowledged your time off {dates_str}. View here: {url}',
+        message = f'{manager_name} has acknowledged your time off {dates_str}. View here: {url}',
     else:
-        message = f'Your manager {manager_name} has indicated a problem with your time off {dates_str}. View here: {url}',
+        message = f'{manager_name} has indicated a problem with your time off {dates_str}. View here: {url}',
 
     send_email(
         employee.user.email,

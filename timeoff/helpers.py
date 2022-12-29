@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 import os
 
 from django.contrib.sites.models import Site
@@ -7,7 +7,7 @@ from django.utils.html import strip_tags
 
 from mainsite.helpers import next_weekday, send_email
 from people.models import Employee
-from timeoff.models import TimeOffRequest
+from timeoff.models import TimeOffRequest, TimeOffRequestTemporaryApprover
 
 
 def send_manager_new_timeoff_request_notification(tor):
@@ -17,16 +17,32 @@ def send_manager_new_timeoff_request_notification(tor):
         message = f'{tor.employee.name} has requested time off on {tor.start_date}. View and acknowledge here: {url}',
     else:
         message = f'{tor.employee.name} has requested time off from {tor.start_date} to {tor.end_date}. View and acknowledge here: {url}',
+    emails = [tor.employee.manager.user.email]
 
-    send_email(
-        tor.employee.manager.user.email,
-        f'New time off request: {tor.employee.name}',
-        message[0],
-        message[0]
+    # If this user is a temporary approver for someone else,
+    # send them the notification as well.
+    temporary_approvers = TimeOffRequestTemporaryApprover.objects.filter(
+        employee_on_leave=tor.employee.manager,
+        start_date__lte=date.today(),
+        end_date__gte=date.today()
     )
+    for approver in temporary_approvers:
+        emails.append(approver.employee_in_stead.user.email)
+
+    for email in emails:
+        send_email(
+            email,
+            f'New time off request: {tor.employee.name}',
+            message[0],
+            message[0]
+        )
 
 
 def send_employee_manager_acknowledged_timeoff_request_notification(tor, manager=None):
+    """
+    Manager is specified in the event of a temporary request approver while a
+    manager is on leave.
+    """
     current_site = Site.objects.get_current()
     url = current_site.domain + '/timeoff/my-requests'
     employee = tor.employee

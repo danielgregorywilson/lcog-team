@@ -19,7 +19,7 @@ from timeoff.helpers import (
     send_employee_manager_acknowledged_timeoff_request_notification,
     send_manager_new_timeoff_request_notification
 )
-from timeoff.models import TimeOffRequest
+from timeoff.models import TimeOffRequest, TimeOffRequestTemporaryApprover
 
 from timeoff.serializers import (
     ConflictingResponsibilitiesSerializer, TimeOffRequestPrivateSerializer,
@@ -50,6 +50,17 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
                 requests = TimeOffRequest.objects.all()
             elif 'managed' in self.request.GET and is_true_string(self.request.GET['managed']):
                 requests = TimeOffRequest.objects.filter(employee__manager=user.employee)
+                # If this user is a temporary approver for someone else,
+                # also show their requests.
+                temporary_approvers = TimeOffRequestTemporaryApprover.objects.filter(
+                    employee_in_stead=user.employee,
+                    start_date__lte=datetime.date.today(),
+                    end_date__gte=datetime.date.today()
+                )
+                for approver in temporary_approvers:
+                    employee_on_leave = approver.employee_on_leave
+                    employee_requests = TimeOffRequest.objects.filter(employee__manager=employee_on_leave)
+                    requests = requests | employee_requests
             elif 'team' in self.request.GET and is_true_string(self.request.GET['team']):
                 # Show requests from everyone including and under your program manager
                 program_manager = user.employee.get_program_manager
@@ -112,7 +123,8 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
         tor = TimeOffRequest.objects.get(pk=pk)
         tor.acknowledged = request.data['acknowledged']
         tor.save()
-        send_employee_manager_acknowledged_timeoff_request_notification(tor)
+        send_employee_manager_acknowledged_timeoff_request_notification(
+            tor, request.user.employee)
         serialized_tor = TimeOffRequestPrivateSerializer(tor,
             context={'request': request})
         return Response(serialized_tor.data)

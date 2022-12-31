@@ -4,6 +4,20 @@
 
 export const releases = [
   {
+    version: '0.9.0',
+    date: new Date(2022, 11, 30),
+    changes: [
+      {
+        type: 'new',
+        description: 'Time Off approvers can set temporary approvers in their stead while they are on leave'
+      },
+      {
+        type: 'improved',
+        description: 'Various Time Off app improvements'
+      },
+    ]
+  },
+  {
     version: '0.8.8',
     date: new Date(2022, 11, 8),
     changes: [

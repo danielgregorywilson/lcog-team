@@ -56,7 +56,12 @@
               <q-item v-for="col in props.cols" :key="col.name">
                 <div class="q-table__grid-item-row">
                   <div class="q-table__grid-item-title">{{ col.label }}</div>
-                  <div class="q-table__grid-item-value" v-if="col.name != 'acknowledge'">
+                  <div class="q-table__grid-item-value" v-if="col.name == 'notes'">
+                    <span v-if="props.row.note && !props.row.private_note">{{ props.row.note }}</span>
+                    <span v-if="!props.row.note && props.row.private_note"><span class="text-bold">Private:</span> {{ props.row.private_note }}</span>
+                    <span v-if="props.row.note && props.row.private_note"><span class="text-bold">Public:</span> {{ props.row.note }} / <span class="text-bold">Private:</span> {{ props.row.private_note }}</span>
+                  </div>
+                  <div class="q-table__grid-item-value" v-else-if="col.name != 'acknowledge'">
                     {{ col.value }}
                   </div>
                   <div class="q-table__grid-item-value row q-gutter-sm" v-else>
@@ -97,7 +102,11 @@
 </template>
 
 <style lang="scss">
-
+@media only screen and (max-width: 1600px) {
+  .q-table td {
+    white-space: normal;
+  }
+}
 </style>
 
 <script lang="ts">

@@ -130,7 +130,7 @@ class Employee(models.Model):
     def get_program_manager(self):
         current_employee = self
         if current_employee.manager.is_division_director:
-            return None
+            return self
         while True:
             if current_employee.manager.is_division_director:
                 return current_employee

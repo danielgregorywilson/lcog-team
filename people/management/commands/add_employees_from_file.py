@@ -146,6 +146,9 @@ class Command(BaseCommand):
             if employee.number not in numbers_in_file:
                 employee.active = False
                 employee.save()
+                self.stdout.write(
+                    'Deactivated employee {} {}'.format(employee.user.first_name, employee.user.last_name)
+                )
 
         # Add managers
         dataReader = csv.reader(open(path), delimiter=',', quotechar='"')

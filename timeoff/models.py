@@ -17,8 +17,10 @@ class TimeOffRequest(models.Model):
     employee = models.ForeignKey("people.Employee", on_delete=models.CASCADE)
     start_date = models.DateField(auto_now=False, auto_now_add=False)
     end_date = models.DateField(auto_now=False, auto_now_add=False)
-    note = models.TextField(blank=True, null=True, help_text="Visible to team members")
-    private_note = models.TextField(blank=True, null=True, help_text="Visible only to manager")
+    note = models.TextField(blank=True, null=True,
+        help_text="Visible to team members")
+    private_note = models.TextField(blank=True, null=True,
+        help_text="Visible only to manager")
     acknowledged = models.BooleanField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     acknowledged_at = models.DateTimeField(blank=True, null=True)
@@ -71,3 +73,19 @@ class TimeOffRequest(models.Model):
                     buddy.responsibility_names = [r.name for r in conflicting_responsibilities]
         
         return responsibility_buddies
+
+
+class TimeOffRequestTemporaryApprover(models.Model):
+    """
+    Manually set approvers in-stead of an employee for a given time period.
+    During this period, approvals that would have gone to this person would
+    also go to someone else.
+    """
+    employee_on_leave = models.ForeignKey("people.Employee",
+        related_name="time_off_request_approvers_on_leave",
+        on_delete=models.CASCADE)
+    employee_in_stead = models.ForeignKey("people.Employee",
+        related_name="time_off_request_approvers_in_stead",
+        on_delete=models.CASCADE)
+    start_date = models.DateField(auto_now=False, auto_now_add=False)
+    end_date = models.DateField(auto_now=False, auto_now_add=False)

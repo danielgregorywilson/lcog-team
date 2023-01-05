@@ -3,30 +3,30 @@
     <q-table
       :data="workflows()"
       :columns="columns()"
-      :dense="$q.screen.lt.lg"
       :grid="$q.screen.lt.md"
       :no-data-label="noDataLabel()"
       row-key="name"
+      @row-click="clickRow"
     >
       <!-- Slots for header cells: Shrink the width when the screen is too small to see the whole table width -->
-      <template v-slot:header-cell-employeeName="props">
+      <!-- <template v-slot:header-cell-employeeName="props">
         <th v-if="$q.screen.lt.lg" style="white-space: normal;">{{props.col.label}}</th>
         <th v-else>{{props.col.label}}</th>
       </template>
       <template v-slot:header-cell-daysUntilReview="props">
         <th v-if="$q.screen.lt.lg" style="white-space: normal;">{{props.col.label}}</th>
         <th v-else>{{props.col.label}}</th>
-      </template>
+      </template> -->
       <!-- Slots for body cells: Show dates in a familiar format; make sure status can wrap, and display action buttons -->
-      <template v-slot:body-cell-performancePeriod="props">
-        <q-td key="performancePeriod" :props="props">
-          {{ props.row.period_start_date | readableDate }} - {{ props.row.period_end_date | readableDate }}
+      <template v-slot:body-cell-startedAt="props">
+        <q-td key="startedAt" :props="props">
+          {{ props.row.started_at | readableDate }}
         </q-td>
       </template>
-      <template v-slot:body-cell-status="props">
+      <!-- <template v-slot:body-cell-status="props">
         <q-td style="white-space: normal;" :props="props">{{ props.row.status }}</q-td>
-      </template>
-      <template v-slot:body-cell-actions="props">
+      </template> -->
+      <!-- <template v-slot:body-cell-actions="props">
         <q-td :props="props">
           <div class="row">
             <q-btn class="col edit-button" dense round flat color="grey" @click="editEvaluation(props)" icon="edit"></q-btn>
@@ -38,9 +38,9 @@
             </q-btn>
           </div>
         </q-td>
-      </template>
+      </template> -->
       <!-- For grid mode, we need to specify everything in order for our action buttons to render -->
-      <template v-slot:item="props">
+      <!-- <template v-slot:item="props">
         <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
           <q-card class="q-py-sm">
             <q-list dense>
@@ -64,7 +64,7 @@
             </q-list>
           </q-card>
         </div>
-      </template>
+      </template> -->
     </q-table>
   </div>
 </template>
@@ -83,7 +83,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { WorkflowInstanceRetrieve } from '../store/types'
-import { bus } from '../App.vue'
+// import { bus } from '../App.vue'
 import { PerformanceReviewRetrieve } from '../store/types'
 import '../filters'
 
@@ -123,9 +123,9 @@ export default class WorkflowTable extends Vue {
   private columns(): Array<WorkflowColumn> {
     return [
       { name: 'pk', label: 'PK', align: 'center', field: 'pk', sortable: true },
-      { name: 'dateCreated', align: 'center', label: 'Workflow Start Date', field: 'date_created', sortable: true },
+      { name: 'startedAt', align: 'center', label: 'Workflow Start Date', field: 'started_at', sortable: true },
       { name: 'percentComplete', align: 'center', label: '% Complete', field: 'status' },
-      { name: 'actions', label: 'Actions', align: 'around', },
+      // { name: 'actions', label: 'Actions', align: 'around', },
     ]
   }
 
@@ -161,6 +161,13 @@ export default class WorkflowTable extends Vue {
           })
       }
     }
+  }
+
+  private clickRow(evt, row, index): void {
+    this.$router.push({name: 'workflow-instance-detail', params: {pk: row.pk}} )
+      .catch(e => {
+        console.error('Error navigating to PR detail:', e)
+      })
   }
 
   private editEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {

@@ -289,6 +289,12 @@ const routes: RouteConfig[] = [
         component: () => import('pages/workflows/Workflows.vue'),
         // beforeEnter: ifManager
       },
+      {
+        path: '/wf/:pk',
+        name: 'workflow-instance-detail',
+        component: () => import('src/pages/workflows/WorkflowInstanceDetail.vue'),
+        // beforeEnter: ifCanViewTimeOffRequest,
+      },
       // TODO: Remove EIS demo page
       {
         path: '/eis',

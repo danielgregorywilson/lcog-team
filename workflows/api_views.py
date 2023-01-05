@@ -104,24 +104,24 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
     #     IsAuthenticatedOrReadOnly
     # ]
 
-    def get_queryset(self):
-        """
+    # def get_queryset(self):
+    #     """
 
-        """
-        user = self.request.user
-        if user.is_authenticated:
-            action_required = self.request.query_params.get('action_required',
-                None)
-            complete = self.request.query_params.get('complete', None)
-            if action_required is not None and is_true_string(action_required):
-                queryset = WorkflowInstance.action_required.get_queryset(user)
+    #     """
+    #     user = self.request.user
+    #     if user.is_authenticated:
+    #         action_required = self.request.query_params.get('action_required',
+    #             None)
+    #         complete = self.request.query_params.get('complete', None)
+    #         if action_required is not None and is_true_string(action_required):
+    #             queryset = WorkflowInstance.action_required.get_queryset(user)
             
             
-            if user.is_superuser:
-                instances = WorkflowInstance.objects.all()
-            else:
-                instances = WorkflowInstance.objects.none()
-            return instances
+    #         if user.is_superuser:
+    #             instances = WorkflowInstance.objects.all()
+    #         else:
+    #             instances = WorkflowInstance.objects.none()
+    #         return instances
 
     # def create(self, request):
     #     if 'from' in request.data['dates']:

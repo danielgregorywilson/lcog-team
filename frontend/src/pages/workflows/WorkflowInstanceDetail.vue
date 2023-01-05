@@ -1,12 +1,12 @@
 <template>
   <q-page class="q-pa-md">
     <div class="text-h4">EIS</div>
-    <div class="text-h5" v-if="currentWorkflowInstance().process_instances">
+    <div class="text-h5" v-if="currentWorkflowInstance().process_instances.length">
       {{currentWorkflowInstance().workflow.name}}: {{currentWorkflowInstance().process_instances[0].process.name}}
     </div>
     <div class="q-mt-sm">
       <q-stepper
-        v-if="currentWorkflowInstance().process_instances"
+        v-if="currentWorkflowInstance().process_instances.length"
         v-model="currentStepInstance"
         vertical
         color="primary"
@@ -117,6 +117,7 @@ import { VuexStoreGetters, WorkflowInstanceRetrieve } from '../../store/types'
 export default class EIS extends Vue {
   private getters = this.$store.getters as VuexStoreGetters
 
+  private wfInstancePk = -1
   private currentStepInstance = -1;
   private workflowInstancePk = 46
 
@@ -141,19 +142,35 @@ export default class EIS extends Vue {
   //   }
   // }
 
-  private retrieveWorkflowInstance(): void {
-    this.$store.dispatch('workflowModule/getCurrentWorkflowInstance', {pk: this.workflowInstancePk})
+  private retrieveWorkflowInstance() {
+    return new Promise((resolve, reject) => {
+      this.$store.dispatch('workflowModule/getCurrentWorkflowInstance', {pk: this.$route.params.pk})
       .then(() => {
-        if (!this.currentWorkflowInstance().process_instances[0].completed_at) {
-          this.currentStepInstance = this.currentWorkflowInstance().process_instances[0].current_step_instance.pk
+        const wfInstance: WorkflowInstanceRetrieve = this.$store.getters['workflowModule/currentWorkflowInstance']
+        if (!wfInstance) {
+            console.log('Workflow instance does not seem to exist. Redirecting...')
+            this.$router.push('/')
+              .catch(e => {
+                console.error('Error navigating to dashboard upon not finding a matching Workflow Instance:', e)
+                reject(e)
+              })
+            return
+          }
+        this.wfInstancePk = wfInstance.pk
+        if (!wfInstance.process_instances[0].completed_at) {
+          this.currentStepInstance = wfInstance.process_instances[0].current_step_instance.pk
         } else {
           // Process Instance is complete
           this.currentStepInstance = -1
         }
+        resolve('Got Workflow Instance')
       })
       .catch(e => {
         console.error('Error retrieving workflow instance', e)
+        reject(e)
       })
+    })
+    
   }
 
   private completeStep(stepInstancePk: number, nextStepPk?: number): void {

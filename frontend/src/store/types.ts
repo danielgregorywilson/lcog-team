@@ -747,13 +747,26 @@ export interface AxiosTimeOffRequestRetrieveOneServerResponse {
 // Workflow Structure from Django Rest Framework //
 ///////////////////////////////////////////////////
 
+type Workflow = {
+  pk: number
+  name: string
+  version: number
+}
+
+type Process = {
+  pk: number
+  name: string
+  workflow: Workflow
+  version: number
+}
+
 type StepInstance = {
   pk: number
 }
 
 type ProcessInstance = {
   pk: number
-  process: number
+  process: Process
   current_step_instance: StepInstance
   started_at: string
   completed_at: string
@@ -762,6 +775,8 @@ type ProcessInstance = {
 export interface WorkflowInstanceRetrieve {
   pk: number
   workflow: number
+  started_at: Date
+  completed_at: Date
   process_instances: Array<ProcessInstance>
 }
 

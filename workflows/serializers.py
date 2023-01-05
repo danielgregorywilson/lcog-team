@@ -85,6 +85,7 @@ class WorkflowInstanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkflowInstance
         fields = [
-            'url', 'pk', 'workflow', 'process_instances'
+            'url', 'pk', 'workflow', 'started_at', 'completed_at',
+            'process_instances'
         ]
         depth = 1

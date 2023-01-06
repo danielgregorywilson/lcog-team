@@ -123,20 +123,21 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
     #             instances = WorkflowInstance.objects.none()
     #         return instances
 
-    # def create(self, request):
-    #     if 'from' in request.data['dates']:
-    #         start_date = request.data['dates']['from'].replace('/', '-')
-    #         end_date = request.data['dates']['to'].replace('/', '-')
-    #     else:
-    #         start_date = request.data['dates'].replace('/', '-')
-    #         end_date = request.data['dates'].replace('/', '-')
-    #     note = request.data['note']
-    #     employee = request.user.employee
-    #     timeoffrequest = TimeOffRequest.objects.create(start_date=start_date, end_date=end_date, note=note, employee=employee)
-    #     send_manager_new_timeoff_request_notification(timeoffrequest)
-    #     serialized_timeoffrequest = TimeOffRequestSerializer(timeoffrequest,
-    #         context={'request': request})
-    #     return Response(serialized_timeoffrequest.data)
+    def create(self, request):
+        if self.request.data['type'] == 'new_employee_onboarding':
+            wf = Workflow.objects.get(name="New Employee Onboarding")
+            wfi = WorkflowInstance.objects.create(workflow=wf)
+            # Create process instances
+            for process in wf.processes.all():
+                pi = ProcessInstance.objects.create(process=process, workflow_instance=wfi)
+                first_step = process.step_set.filter(order=0)[0]
+                si = StepInstance.objects.create(step=first_step, process_instance=pi)
+                pi.current_step_instance = si
+                pi.save()
+            serialized_wfi = WorkflowInstanceSerializer(wfi,
+                context={'request': request}
+            )
+            return Response(serialized_wfi.data)
 
     # def update(self, request, pk=None):
     #     tor = TimeOffRequest.objects.get(pk=pk)

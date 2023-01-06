@@ -192,7 +192,7 @@ export default class TimeOffMyRequests extends Vue {
   private clickMakeRequest(): void {
     this.$router.push({'name': 'timeoff-new-request'})
       .catch(e => {
-        console.error('Error navigating to new note page', e)
+        console.error('Error navigating to new request page', e)
       })
   }
 

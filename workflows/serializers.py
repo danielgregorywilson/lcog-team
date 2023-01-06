@@ -81,11 +81,16 @@ class ProcessInstanceSerializer(serializers.ModelSerializer):
 class WorkflowInstanceSerializer(serializers.ModelSerializer):
     process_instances = ProcessInstanceSerializer(source='processinstance_set',
         many=True)
+    percent_complete = serializers.SerializerMethodField()
 
     class Meta:
         model = WorkflowInstance
         fields = [
             'url', 'pk', 'workflow', 'started_at', 'completed_at',
-            'process_instances'
+            'process_instances', 'percent_complete'
         ]
         depth = 1
+
+    @staticmethod
+    def get_percent_complete(wfi):
+        return wfi.percent_complete

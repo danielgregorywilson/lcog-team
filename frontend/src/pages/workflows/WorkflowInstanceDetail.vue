@@ -146,7 +146,7 @@ export default class EIS extends Vue {
     return new Promise((resolve, reject) => {
       this.$store.dispatch('workflowModule/getCurrentWorkflowInstance', {pk: this.$route.params.pk})
       .then(() => {
-        const wfInstance: WorkflowInstanceRetrieve = this.$store.getters['workflowModule/currentWorkflowInstance']
+        const wfInstance: WorkflowInstanceRetrieve = this.getters['workflowModule/currentWorkflowInstance'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access
         if (!wfInstance) {
             console.log('Workflow instance does not seem to exist. Redirecting...')
             this.$router.push('/')
@@ -177,6 +177,9 @@ export default class EIS extends Vue {
     this.$store.dispatch('workflowModule/completeStepInstance', { stepInstancePk, nextStepPk })
       .then(() => {
         this.retrieveWorkflowInstance()
+          .catch(e => {
+            console.error('Error retrieving workflow instance:', e)
+          })
       })
       .catch(e => {
         console.error('Error retrieving workflow instance', e)
@@ -185,6 +188,9 @@ export default class EIS extends Vue {
 
   mounted() {
     this.retrieveWorkflowInstance()
+      .catch(e => {
+        console.error('Error retrieving workflow instance:', e)
+      })
   }
 }
 </script>

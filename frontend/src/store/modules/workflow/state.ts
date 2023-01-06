@@ -9,7 +9,7 @@ export interface WorkflowStateInterface {
 }
 
 const blankWorkflowInstance = {
-  pk: -1, workflow: -1, process_instances: []
+  pk: -1, workflow: -1, process_instances: [], started_at: '', completed_at: ''
 }
 
 const state: WorkflowStateInterface = {

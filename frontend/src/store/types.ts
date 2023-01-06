@@ -775,8 +775,8 @@ type ProcessInstance = {
 export interface WorkflowInstanceRetrieve {
   pk: number
   workflow: number
-  started_at: Date
-  completed_at: Date
+  started_at: string
+  completed_at: string
   process_instances: Array<ProcessInstance>
 }
 

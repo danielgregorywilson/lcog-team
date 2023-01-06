@@ -110,6 +110,10 @@ class WorkflowInstance(HasTimeStampsMixin):
     def current_step_instance(self):
         import pdb; pdb.set_trace();
 
+    @property
+    def percent_complete(self):
+        return '50%'
+
 
 class ProcessInstance(HasTimeStampsMixin):
     process = models.ForeignKey("workflows.Process", on_delete=models.CASCADE)

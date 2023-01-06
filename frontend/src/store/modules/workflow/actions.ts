@@ -6,6 +6,18 @@ import axios from 'axios';
 const apiURL = process.env.API_URL ? process.env.API_URL : 'https://api.team.lcog.org/'
 
 const actions: ActionTree<WorkflowStateInterface, StateInterface> = {
+  createNewEmployeeOnboarding: ({}) => {
+    return new Promise((resolve, reject) => {
+      axios({ url: `${ apiURL }api/v1/workflowinstance`, method: 'POST', data: {type: 'new_employee_onboarding'} })
+        .then(resp => {
+          resolve(resp)
+        })
+        .catch(e => {
+          console.error(e)
+          reject(e)
+        });  
+    })
+  },
   getCurrentWorkflowInstance: ({ commit }, data: {pk: number}) => {
     return new Promise((resolve, reject) => {
       axios({ url: `${ apiURL }api/v1/workflowinstance/${ data.pk }` })

@@ -65,6 +65,13 @@
           </q-card>
         </div>
       </template> -->
+      <template v-slot:bottom-row>
+        <q-tr @click="clickAddWorkflow('newEmployeeOnboarding')" class="cursor-pointer">
+          <q-td colspan="100%">
+            <q-icon name="add" size="md" class="q-pr-sm"/>New Position To Fill
+          </q-td>
+        </q-tr>
+      </template>
     </q-table>
   </div>
 </template>
@@ -84,7 +91,6 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { WorkflowInstanceRetrieve } from '../store/types'
 // import { bus } from '../App.vue'
-import { PerformanceReviewRetrieve } from '../store/types'
 import '../filters'
 
 interface WorkflowColumn {
@@ -98,9 +104,10 @@ interface WorkflowColumn {
   headerStyle?: string;
 }
 
-interface QuasarPerformanceReviewTableRowClickActionProps {
+interface QuasarWorkflowInstanceTableRowClickActionProps {
   evt: MouseEvent;
-  row: PerformanceReviewRetrieve;
+  row: WorkflowInstanceRetrieve;
+  index: number;
 }
 
 @Component
@@ -124,7 +131,7 @@ export default class WorkflowTable extends Vue {
     return [
       { name: 'pk', label: 'PK', align: 'center', field: 'pk', sortable: true },
       { name: 'startedAt', align: 'center', label: 'Workflow Start Date', field: 'started_at', sortable: true },
-      { name: 'percentComplete', align: 'center', label: '% Complete', field: 'status' },
+      { name: 'percentComplete', align: 'center', label: '% Complete', field: 'percent_complete', sortable: true },
       // { name: 'actions', label: 'Actions', align: 'around', },
     ]
   }
@@ -163,29 +170,52 @@ export default class WorkflowTable extends Vue {
     }
   }
 
-  private clickRow(evt, row, index): void {
-    this.$router.push({name: 'workflow-instance-detail', params: {pk: row.pk}} )
+  private clickRow(evt: MouseEvent, row: WorkflowInstanceRetrieve): void {
+    const rowPk = row.pk.toString()
+    this.$router.push({name: 'workflow-instance-detail', params: {pk: rowPk}} )
       .catch(e => {
         console.error('Error navigating to PR detail:', e)
       })
   }
 
-  private editEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {
-    // this.$router.push(`pr/${ props.row.pk }`)
-    //   .catch(e => {
-    //     console.error('Error navigating to PR detail:', e)
-    //   })
-  }
+  // private editEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {
+  //   // this.$router.push(`pr/${ props.row.pk }`)
+  //   //   .catch(e => {
+  //   //     console.error('Error navigating to PR detail:', e)
+  //   //   })
+  // }
 
-  private printEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {
-    // this.$router.push(`print/pr/${ props.row.pk }`)
-    //   .catch(e => {
-    //     console.error('Error printing PR:', e)
-    //   })
-  }
+  // private printEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {
+  //   // this.$router.push(`print/pr/${ props.row.pk }`)
+  //   //   .catch(e => {
+  //   //     console.error('Error printing PR:', e)
+  //   //   })
+  // }
 
-  private printEvaluationPositionDescription(props: QuasarPerformanceReviewTableRowClickActionProps): void {
-    // window.location.href = props.row.signed_position_description
+  // private printEvaluationPositionDescription(props: QuasarPerformanceReviewTableRowClickActionProps): void {
+  //   // window.location.href = props.row.signed_position_description
+  // }
+
+  public clickAddWorkflow(type: 'newEmployeeOnboarding' | 'newEmployeeOffboarding'): void {
+    switch (type) {
+      case 'newEmployeeOnboarding':
+        this.$store.dispatch('workflowModule/createNewEmployeeOnboarding')
+          .then((workflowInstance) => {
+            this.$router.push({name: 'workflow-instance-detail', params: {pk: workflowInstance.data.pk}})
+              .catch(e => {
+                console.error('Error navigating to new employee page', e)
+              })
+          })
+          .catch(e => {
+            console.error('Error creating a new employee onboarding workflow instance', e)
+          })
+        break
+      case 'newEmployeeOffboarding':
+        // TODO
+        break
+      default:
+        break
+    }
   }
 
   created() {

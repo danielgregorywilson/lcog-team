@@ -32,6 +32,12 @@ class Process(models.Model):
     workflow = models.ForeignKey(Workflow, related_name="processes", on_delete=models.CASCADE)
     version = models.IntegerField(default=1)
 
+    @property
+    def total_steps(self):
+        return 1000
+        import pdb; pdb.set_trace()
+        # TODO
+
     #TODO: Complete when step marked "end" is completed
 
 
@@ -77,6 +83,51 @@ class Step(models.Model):
         else:
             return None
 
+    @property
+    def num_steps_before(self):
+        """
+        Count the number of steps before the current step. Since there are
+        multiple possible paths to the beginning of a process, just get one
+        route back and call that sufficient.
+        TODO: Rewrite to calculate the best-case (quickest) path back (or worst
+        case, or average of all cases)
+        """
+        num_steps = 0
+        current_step = self
+        while True:
+            if current_step.start == True:
+                # We have reached the beginning of the process.
+                break
+            else:
+                # Here we just get the first previous step we can
+                previous_step = Step.objects.filter(next_step=self).first()
+                if not previous_step:
+                    # In the case of a choice, there is no next step, so find
+                    # the step that leads to this one with choices.
+                    step_choice = StepChoice.objects.filter(next_step=self).first()
+                    previous_step = step_choice.step
+                if not previous_step:
+                    raise Exception("Couldn't find a previous step.")
+                # Move back one step
+                current_step = previous_step
+                num_steps += 1
+        return num_steps
+
+    @property
+    def num_steps_after(self):
+        num_steps = 0
+        current_step = self.process.step_set.get(start=True)
+        while True:
+            if current_step == self:
+                break
+            if current_step.end == True:
+                raise Exception("Got to the end of the Process without finding the step")
+        return num_steps
+
+        
+        import pdb; pdb.set_trace()
+        # TODO
+
     #TODO: On save, error if no next and not end
     #TODO: Properties for next step, previous step, is first step and is last step
 
@@ -112,13 +163,38 @@ class WorkflowInstance(HasTimeStampsMixin):
 
     @property
     def percent_complete(self):
-        return '50%'
+        pis = self.processinstance_set.all()
+        total_steps = sum([pi.total_steps for pi in pis])
+        complete_steps = sum([pi.complete_steps for pi in pis])
+        return int((complete_steps / total_steps) * 100)
 
 
 class ProcessInstance(HasTimeStampsMixin):
     process = models.ForeignKey("workflows.Process", on_delete=models.CASCADE)
     workflow_instance = models.ForeignKey(WorkflowInstance, on_delete=models.CASCADE)
     current_step_instance = models.ForeignKey("workflows.StepInstance", blank=True, null=True, on_delete=models.SET_NULL)
+
+    @property
+    def percent_complete(self):
+        if not self.current_step_instance:
+            return 100
+        else:
+            num_steps_before = self.current_step_instance.step.num_steps_before
+            print("PI STEPS", self.pk, num_steps_before)
+            num_steps_after = self.current_step_instance.step.num_steps_after
+            total_steps = num_steps_before + 1 + num_steps_after
+            return int((num_steps_before / total_steps) * 100)
+
+    @property
+    def total_steps(self):
+        return self.process.total_steps
+    
+    @property
+    def complete_steps(self):
+        if not self.current_step_instance:
+            return self.total_steps
+        else:
+            return self.current_step_instance.step.num_steps_before
 
 
 class StepInstance(HasTimeStampsMixin):
@@ -128,5 +204,9 @@ class StepInstance(HasTimeStampsMixin):
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
     process_instance = models.ForeignKey(ProcessInstance, on_delete=models.CASCADE)
     completed_by = models.ForeignKey("people.Employee", blank=True, null=True, on_delete=models.SET_NULL)
+
+    @property
+    def is_complete(self):
+        return bool(self.completed_by)
 
     #TODO: Complete method fills completed_at, completed_by, and current_step_instance and completed_at on Workflow instance

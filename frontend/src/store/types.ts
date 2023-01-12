@@ -760,13 +760,30 @@ type Process = {
   version: number
 }
 
+type Step = {
+  pk: number
+  name: string
+  description: string
+  choices_prompt: string
+  next_step_choices: Array<StepChoice>
+}
+
+type StepChoice = {
+  pk: number
+  choice_text: string
+  next_step_pk: number
+}
+
 type StepInstance = {
   pk: number
+  step: Step
+  completed_at: string
 }
 
 type ProcessInstance = {
   pk: number
   process: Process
+  step_instances: Array<StepInstance>
   current_step_instance: StepInstance
   started_at: string
   completed_at: string
@@ -774,7 +791,7 @@ type ProcessInstance = {
 
 export interface WorkflowInstanceRetrieve {
   pk: number
-  workflow: number
+  workflow: Workflow
   started_at: string
   completed_at: string
   process_instances: Array<ProcessInstance>

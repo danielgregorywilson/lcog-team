@@ -1,8 +1,13 @@
 <template>
   <q-page class="q-pa-md">
-    <div class="text-h4">EIS</div>
+    <div class="text-h4">{{currentWorkflowInstance().workflow.name}}</div>
+    <div v-for="pi of currentWorkflowInstance().process_instances">
+      <div class="text-h5">{{pi.process.name}}</div>
+      <process-instance-detail />
+    </div>
+    
     <div class="text-h5" v-if="currentWorkflowInstance().process_instances.length">
-      {{currentWorkflowInstance().workflow.name}}: {{currentWorkflowInstance().process_instances[0].process.name}}
+      {{currentWorkflowInstance().process_instances[0].process.name}}
     </div>
     <div class="q-mt-sm">
       <q-stepper
@@ -111,21 +116,24 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import ProcessInstanceDetail from '../../components/workflows/ProcessInstanceDetail.vue'
 import { VuexStoreGetters, WorkflowInstanceRetrieve } from '../../store/types'
 
-@Component
+@Component({
+  components: { ProcessInstanceDetail }
+})
 export default class EIS extends Vue {
   private getters = this.$store.getters as VuexStoreGetters
 
   private wfInstancePk = -1
-  private currentStepInstance = -1;
+  public currentStepInstance = -1;
   private workflowInstancePk = 46
 
   // private isManager() {
   //   return this.getters['userModule/getEmployeeProfile'].is_manager
   // }
 
-  private currentWorkflowInstance(): WorkflowInstanceRetrieve {
+  public currentWorkflowInstance(): WorkflowInstanceRetrieve {
     return this.getters['workflowModule/currentWorkflowInstance']
   }
 
@@ -173,7 +181,7 @@ export default class EIS extends Vue {
     
   }
 
-  private completeStep(stepInstancePk: number, nextStepPk?: number): void {
+  public completeStep(stepInstancePk: number, nextStepPk?: number): void {
     this.$store.dispatch('workflowModule/completeStepInstance', { stepInstancePk, nextStepPk })
       .then(() => {
         this.retrieveWorkflowInstance()

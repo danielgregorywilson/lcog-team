@@ -52,15 +52,12 @@ export default class ProcessInstanceDetail extends Vue {
 
   public completeStep(stepInstancePk: number, nextStepPk?: number): void {
     this.$store.dispatch('workflowModule/completeStepInstance', { stepInstancePk, nextStepPk })
-      // .then(() => {
-      //   this.retrieveWorkflowInstance()
-      //     .catch(e => {
-      //       console.error('Error retrieving workflow instance:', e)
-      //     })
-      // })
-      // .catch(e => {
-      //   console.error('Error retrieving workflow instance', e)
-      // })
+      .then(() => {
+        this.$emit('completed-step')
+      })
+      .catch(e => {
+        console.error('Error completing step instance', e)
+      })
   }
 }
 </script>

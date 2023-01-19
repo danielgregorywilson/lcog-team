@@ -90,7 +90,6 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { WorkflowInstanceRetrieve } from '../store/types'
-// import { bus } from '../App.vue'
 import '../filters'
 
 interface WorkflowColumn {
@@ -114,7 +113,7 @@ interface QuasarWorkflowInstanceTableRowClickActionProps {
 export default class WorkflowTable extends Vue {
   @Prop() readonly complete!: boolean
   @Prop() readonly actionRequired!: boolean
-  private workflows(): Array<WorkflowInstanceRetrieve> {
+  public workflows(): Array<WorkflowInstanceRetrieve> {
     if (this.actionRequired !== undefined && this.actionRequired) {
       return this.$store.getters['workflowModule/workflowsActionRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
     } else if (this.complete !== undefined) {
@@ -127,7 +126,7 @@ export default class WorkflowTable extends Vue {
       return this.$store.getters['workflowModule/allWorkflows'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
     }
   }
-  private columns(): Array<WorkflowColumn> {
+  public columns(): Array<WorkflowColumn> {
     return [
       { name: 'pk', label: 'PK', align: 'center', field: 'pk', sortable: true },
       { name: 'startedAt', align: 'center', label: 'Workflow Start Date', field: 'started_at', sortable: true },
@@ -136,7 +135,7 @@ export default class WorkflowTable extends Vue {
     ]
   }
 
-  private noDataLabel(): string {
+  public noDataLabel(): string {
     if (this.actionRequired) {
       return 'Great work! All done here.'
     } else {
@@ -170,7 +169,7 @@ export default class WorkflowTable extends Vue {
     }
   }
 
-  private clickRow(evt: MouseEvent, row: WorkflowInstanceRetrieve): void {
+  public clickRow(evt: MouseEvent, row: WorkflowInstanceRetrieve): void {
     const rowPk = row.pk.toString()
     this.$router.push({name: 'workflow-instance-detail', params: {pk: rowPk}} )
       .catch(e => {
@@ -216,12 +215,6 @@ export default class WorkflowTable extends Vue {
       default:
         break
     }
-  }
-
-  created() {
-    // bus.$on('updateTeleworkApplicationTables', () => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    //   this.retrievePerformanceReviews()
-    // })
   }
 
   mounted() {

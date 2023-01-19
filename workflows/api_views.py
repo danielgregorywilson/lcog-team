@@ -130,7 +130,7 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
             # Create process instances
             for process in wf.processes.all():
                 pi = ProcessInstance.objects.create(process=process, workflow_instance=wfi)
-                first_step = process.step_set.filter(order=0)[0]
+                first_step = process.step_set.filter(start=True)[0]
                 si = StepInstance.objects.create(step=first_step, process_instance=pi)
                 pi.current_step_instance = si
                 pi.save()

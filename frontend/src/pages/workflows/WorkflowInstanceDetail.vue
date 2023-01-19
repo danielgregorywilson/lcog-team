@@ -3,7 +3,7 @@
     <div class="text-h4">{{currentWorkflowInstance().workflow.name}}</div>
     <div v-for="pi of currentWorkflowInstance().process_instances">
       <div class="text-h5">{{pi.process.name}}</div>
-      <process-instance-detail :pi="pi"  />
+      <process-instance-detail :pi="pi" @completed-step="retrieveWorkflowInstance"  />
     </div>
     <!-- <hr />
     <div class="text-h5" v-if="currentWorkflowInstance().process_instances.length">
@@ -116,6 +116,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import { bus } from '../../App.vue'
 import ProcessInstanceDetail from '../../components/workflows/ProcessInstanceDetail.vue'
 import { VuexStoreGetters, WorkflowInstanceRetrieve } from '../../store/types'
 
@@ -150,7 +151,7 @@ export default class EIS extends Vue {
   //   }
   // }
 
-  private retrieveWorkflowInstance() {
+  public retrieveWorkflowInstance() {
     return new Promise((resolve, reject) => {
       this.$store.dispatch('workflowModule/getCurrentWorkflowInstance', {pk: this.$route.params.pk})
       .then(() => {

@@ -7,6 +7,9 @@ class Workflow(models.Model):
     """
     A high-level workflow, e.g. new employee onboarding.
     """
+    class Meta:
+        ordering = ["pk"]
+    
     def __str__(self):
         return f"Workflow: {self.name}"
     
@@ -35,10 +38,10 @@ class Process(models.Model):
     @property
     def total_steps(self):
         return 1000
-        import pdb; pdb.set_trace()
         # TODO
 
     #TODO: Complete when step marked "end" is completed
+    # TODO: On save, make sure there is a start and end step if there are any steps
 
 
 class Role(models.Model):
@@ -63,6 +66,8 @@ class Step(models.Model):
     role = models.ForeignKey(Role, blank=True, null=True, on_delete=models.SET_NULL, help_text=_("The set of employees responsible for completing this step"))
     next_step = models.ForeignKey("self",  blank=True, null=True, on_delete=models.SET_NULL, help_text=_("The next step, when there is only one"))
     choices_prompt = models.CharField(max_length=200, blank=True, help_text=_("The prompt for when there are multiple next step choices"))
+
+    # TODO: On save, make sure there is only one start and end step for a given process
 
     # TODO: These checks are not working with StepInline readonly_fields
     # def clean(self):
@@ -100,11 +105,11 @@ class Step(models.Model):
                 break
             else:
                 # Here we just get the first previous step we can
-                previous_step = Step.objects.filter(next_step=self).first()
+                previous_step = Step.objects.filter(next_step=current_step).first()
                 if not previous_step:
                     # In the case of a choice, there is no next step, so find
                     # the step that leads to this one with choices.
-                    step_choice = StepChoice.objects.filter(next_step=self).first()
+                    step_choice = StepChoice.objects.filter(next_step=current_step).first()
                     previous_step = step_choice.step
                 if not previous_step:
                     raise Exception("Couldn't find a previous step.")
@@ -124,10 +129,6 @@ class Step(models.Model):
                 raise Exception("Got to the end of the Process without finding the step")
         return num_steps
 
-        
-        import pdb; pdb.set_trace()
-        # TODO
-
     #TODO: On save, error if no next and not end
     #TODO: Properties for next step, previous step, is first step and is last step
 
@@ -140,6 +141,9 @@ class StepChoice(models.Model):
 
 
 class HasTimeStampsMixin(models.Model):
+    class Meta:
+        abstract = True
+
     started_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(blank=True, null=True)
 
@@ -157,19 +161,24 @@ class WorkflowInstance(HasTimeStampsMixin):
 
     workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE)
 
-    @property
-    def current_step_instance(self):
-        import pdb; pdb.set_trace();
+    # @property
+    # def current_step_instance(self):
+    #     import pdb; pdb.set_trace();
 
     @property
     def percent_complete(self):
         pis = self.processinstance_set.all()
         total_steps = sum([pi.total_steps for pi in pis])
+        if total_steps == 0:
+            return 0
         complete_steps = sum([pi.complete_steps for pi in pis])
         return int((complete_steps / total_steps) * 100)
 
 
 class ProcessInstance(HasTimeStampsMixin):
+    class Meta:
+        ordering = ["pk"]
+    
     process = models.ForeignKey("workflows.Process", on_delete=models.CASCADE)
     workflow_instance = models.ForeignKey(WorkflowInstance, on_delete=models.CASCADE)
     current_step_instance = models.ForeignKey("workflows.StepInstance", blank=True, null=True, on_delete=models.SET_NULL)

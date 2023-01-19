@@ -780,7 +780,7 @@ type StepInstance = {
   completed_at: string
 }
 
-type ProcessInstance = {
+export type ProcessInstance = {
   pk: number
   process: Process
   step_instances: Array<StepInstance>

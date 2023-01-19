@@ -1,35 +1,34 @@
 <template>
   <div>
     <q-stepper
-      v-if="currentWorkflowInstance().process_instances.length"
-      v-model="currentStepInstance"
+      v-model="pi.current_step_instance.pk"
       vertical
       color="primary"
       animated
     >
       <q-step
-        v-for="instance of currentWorkflowInstance().process_instances[0].step_instances"
-        :key="instance.pk"
-        :name="instance.pk"
-        :title="instance.step.name"
+        v-for="si of pi.step_instances"
+        :key="si.pk"
+        :name="si.pk"
+        :title="si.step.name"
         icon="settings"
-        :done="!!instance.completed_at"
+        :done="!!si.completed_at"
       >
-        <div>{{ instance.step.description }}</div>
+        <div>{{ si.step.description }}</div>
         <q-stepper-navigation>
-          <div v-if="instance.step.choices_prompt">
-            {{instance.step.choices_prompt}}
+          <div v-if="si.step.choices_prompt">
+            {{si.step.choices_prompt}}
             <q-btn
-              v-for="choice of instance.step.next_step_choices"
+              v-for="choice of si.step.next_step_choices"
               class="q-ml-sm"
               :key="choice.pk"
-              @click="completeStep(instance.pk, choice.next_step_pk)"
+              @click="completeStep(si.pk, choice.next_step_pk)"
               color="primary"
               :label="choice.choice_text"
             />
           </div>
           <div v-else>
-            <q-btn @click="completeStep(instance.pk)" color="primary" label="Continue" />
+            <q-btn @click="completeStep(si.pk)" color="primary" label="Continue" />
           </div>
         </q-stepper-navigation>
       </q-step>
@@ -37,16 +36,32 @@
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 
 </style>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
+import { ProcessInstance } from '../../store/types'
 
 @Component
 export default class ProcessInstanceDetail extends Vue {
+  @Prop({required: true}) readonly pi!: ProcessInstance
+  
+  // public currentStepInstance = -1;
 
+  public completeStep(stepInstancePk: number, nextStepPk?: number): void {
+    this.$store.dispatch('workflowModule/completeStepInstance', { stepInstancePk, nextStepPk })
+      // .then(() => {
+      //   this.retrieveWorkflowInstance()
+      //     .catch(e => {
+      //       console.error('Error retrieving workflow instance:', e)
+      //     })
+      // })
+      // .catch(e => {
+      //   console.error('Error retrieving workflow instance', e)
+      // })
+  }
 }
 </script>
   

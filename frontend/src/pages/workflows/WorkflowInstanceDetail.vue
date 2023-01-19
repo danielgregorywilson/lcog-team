@@ -3,9 +3,9 @@
     <div class="text-h4">{{currentWorkflowInstance().workflow.name}}</div>
     <div v-for="pi of currentWorkflowInstance().process_instances">
       <div class="text-h5">{{pi.process.name}}</div>
-      <process-instance-detail />
+      <process-instance-detail :pi="pi"  />
     </div>
-    
+    <!-- <hr />
     <div class="text-h5" v-if="currentWorkflowInstance().process_instances.length">
       {{currentWorkflowInstance().process_instances[0].process.name}}
     </div>
@@ -44,7 +44,7 @@
           </q-stepper-navigation>
         </q-step>
       </q-stepper>
-    </div>
+    </div> -->
     
     <!-- <div class="q-mt-sm">
       <q-stepper
@@ -181,18 +181,18 @@ export default class EIS extends Vue {
     
   }
 
-  public completeStep(stepInstancePk: number, nextStepPk?: number): void {
-    this.$store.dispatch('workflowModule/completeStepInstance', { stepInstancePk, nextStepPk })
-      .then(() => {
-        this.retrieveWorkflowInstance()
-          .catch(e => {
-            console.error('Error retrieving workflow instance:', e)
-          })
-      })
-      .catch(e => {
-        console.error('Error retrieving workflow instance', e)
-      })
-  }
+  // public completeStep(stepInstancePk: number, nextStepPk?: number): void {
+  //   this.$store.dispatch('workflowModule/completeStepInstance', { stepInstancePk, nextStepPk })
+  //     .then(() => {
+  //       this.retrieveWorkflowInstance()
+  //         .catch(e => {
+  //           console.error('Error retrieving workflow instance:', e)
+  //         })
+  //     })
+  //     .catch(e => {
+  //       console.error('Error retrieving workflow instance', e)
+  //     })
+  // }
 
   mounted() {
     this.retrieveWorkflowInstance()

@@ -21,7 +21,7 @@ class RoleAdmin(admin.ModelAdmin):
         return qs.prefetch_related('members')
 
     def members_list(self, obj):
-        return "\n".join([employee.name for employee in obj.members.all()])
+        return ",\n".join([employee.name for employee in obj.members.all()])
 
 
 class StepInline(admin.TabularInline):

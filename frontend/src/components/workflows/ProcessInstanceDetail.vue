@@ -25,10 +25,16 @@
               @click="completeStep(si.pk, choice.next_step_pk)"
               color="primary"
               :label="choice.choice_text"
+              :disable="!canCompleteStep(si.step)"
             />
           </div>
           <div v-else>
-            <q-btn @click="completeStep(si.pk)" color="primary" label="Continue" />
+            <q-btn
+              :disable="!canCompleteStep(si.step)"
+              @click="completeStep(si.pk)"
+              color="primary"
+              label="Continue"
+            />
           </div>
         </q-stepper-navigation>
       </q-step>
@@ -42,13 +48,22 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { ProcessInstance } from '../../store/types'
+import { ProcessInstance, Step } from '../../store/types'
 
 @Component
 export default class ProcessInstanceDetail extends Vue {
   @Prop({required: true}) readonly pi!: ProcessInstance
   
   // public currentStepInstance = -1;
+
+  public canCompleteStep(step: Step): boolean {
+    if (step.role) {
+      return this.$store.getters['userModule/getEmployeeProfile'].workflow_roles.indexOf(step.role.pk) != -1
+    } else {
+      // TODO: What should happen if no role assigned? Only admins? Everyone? Require all steps to have roles?
+      return true
+    }
+  }
 
   public completeStep(stepInstancePk: number, nextStepPk?: number): void {
     this.$store.dispatch('workflowModule/completeStepInstance', { stepInstancePk, nextStepPk })

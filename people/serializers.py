@@ -45,6 +45,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     notes_can_view = serializers.SerializerMethodField()
     time_off_requests_can_view = serializers.SerializerMethodField()
     next_to_sign_prs = serializers.SerializerMethodField()
+    workflow_roles = serializers.SerializerMethodField()
     
     class Meta:
         model = Employee
@@ -58,7 +59,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             'telework_applications_can_view', 'time_off_requests_can_view',
             'next_to_sign_prs', 'email_opt_out_all',
             'email_opt_out_timeoff_all', 'email_opt_out_timeoff_weekly',
-            'email_opt_out_timeoff_daily'
+            'email_opt_out_timeoff_daily', 'workflow_roles'
         ]
 
     @staticmethod
@@ -130,6 +131,11 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             return employee.manager.name
         else:
             return ""
+    
+    @staticmethod
+    def get_workflow_roles(employee):
+        workflow_roles_ids = map(lambda role: role.id, employee.workflow_roles.all())
+        return list(workflow_roles_ids)
 
 
 class SimpleEmployeeSerializer(serializers.ModelSerializer):

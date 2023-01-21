@@ -119,6 +119,7 @@ interface LinkData {
   id?: string;
   managerOnly?: boolean;
   eligibleForTeleworkApplicationOnly?: boolean;
+  hasWorkflowRoles?: boolean
 }
 
 const linksData: Array<LinkData> = [
@@ -136,7 +137,7 @@ const linksData: Array<LinkData> = [
     title: 'Workflows',
     icon: 'double_arrow',
     link: '/workflows',
-    // managerOnly: true
+    hasWorkflowRoles: true
   },
   {
     title: 'Performance Reviews',

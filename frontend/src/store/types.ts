@@ -56,6 +56,7 @@ export interface EmployeeRetrieve {
   email_opt_out_timeoff_all: boolean
   email_opt_out_timeoff_weekly: boolean
   email_opt_out_timeoff_daily: boolean
+  workflow_roles: Array<number>
 }
 
 export interface SimpleEmployeeRetrieve {
@@ -760,10 +761,18 @@ type Process = {
   version: number
 }
 
-type Step = {
+type Role = {
   pk: number
   name: string
   description: string
+  members: Array<EmployeeRetrieve>
+}
+
+export type Step = {
+  pk: number
+  name: string
+  description: string
+  role: Role
   choices_prompt: string
   next_step_choices: Array<StepChoice>
 }

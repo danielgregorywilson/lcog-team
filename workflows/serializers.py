@@ -25,6 +25,7 @@ class StepChoiceSerializer(serializers.HyperlinkedModelSerializer):
 
 class StepSerializer(serializers.HyperlinkedModelSerializer):
     next_step_choices = StepChoiceSerializer(many=True)
+    role = RoleSerializer()
     
     class Meta:
         model = Step

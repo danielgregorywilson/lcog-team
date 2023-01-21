@@ -1,6 +1,6 @@
 <template>
   <q-page class="q-pa-md">
-    <div class="q-py-md" v-if="isManager()">
+    <div class="q-py-md" v-if="hasWorkflowRoles()">
       <div class="row items-center q-mb-md">
         <q-avatar icon="person_add" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
         <div class="text-h4">Employees Onboarding</div>
@@ -37,8 +37,8 @@ import WorkflowTable from '../../components/WorkflowTable.vue';
 export default class Workflows extends Vue {
   private currentIndex = -1;
   private title = '';
-  private isManager() {
-    return this.$store.getters['userModule/getEmployeeProfile'].is_manager // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+  public hasWorkflowRoles() {
+    return this.$store.getters['userModule/getEmployeeProfile'].workflow_roles.length
   }
 };
 </script>

@@ -3,6 +3,15 @@ from django.db import models
 from django.utils.translation import gettext as _
 
 
+class Role(models.Model):
+    def __str__(self):
+        return self.name
+
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=300, blank=True)
+    members = models.ManyToManyField("people.Employee", related_name="workflow_roles", blank=True)
+
+
 class Workflow(models.Model):
     """
     A high-level workflow, e.g. new employee onboarding.
@@ -14,6 +23,7 @@ class Workflow(models.Model):
         return f"Workflow: {self.name}"
     
     name = models.CharField(max_length=100)
+    role = models.ForeignKey(Role, blank=True, null=True, on_delete=models.SET_NULL, help_text=_("The set of employees with full admin access to this workflow"))
     version = models.IntegerField(default=1)
 
     # TODO: Complete when all child processes are complete
@@ -33,6 +43,7 @@ class Process(models.Model):
     
     name = models.CharField(max_length=100)
     workflow = models.ForeignKey(Workflow, related_name="processes", on_delete=models.CASCADE)
+    role = models.ForeignKey(Role, blank=True, null=True, on_delete=models.SET_NULL, help_text=_("The set of employees with full admin access to this process"))
     version = models.IntegerField(default=1)
 
     @property
@@ -42,15 +53,6 @@ class Process(models.Model):
 
     #TODO: Complete when step marked "end" is completed
     # TODO: On save, make sure there is a start and end step if there are any steps
-
-
-class Role(models.Model):
-    def __str__(self):
-        return self.name
-
-    name = models.CharField(max_length=100)
-    description = models.CharField(max_length=300, blank=True)
-    members = models.ManyToManyField("people.Employee", related_name="workflow_roles", blank=True)
 
 
 class Step(models.Model):

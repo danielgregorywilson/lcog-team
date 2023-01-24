@@ -751,6 +751,7 @@ export interface AxiosTimeOffRequestRetrieveOneServerResponse {
 type Workflow = {
   pk: number
   name: string
+  role: Role
   version: number
 }
 
@@ -758,6 +759,7 @@ type Process = {
   pk: number
   name: string
   workflow: Workflow
+  role: Role
   version: number
 }
 
@@ -772,9 +774,12 @@ export type Step = {
   pk: number
   name: string
   description: string
+  process: Process
   role: Role
   choices_prompt: string
   next_step_choices: Array<StepChoice>
+  workflow_role_pk: number
+  process_role_pk: number
 }
 
 type StepChoice = {

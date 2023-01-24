@@ -57,7 +57,17 @@ export default class ProcessInstanceDetail extends Vue {
   // public currentStepInstance = -1;
 
   public canCompleteStep(step: Step): boolean {
-    if (step.role) {
+    if (this.$store.getters['userModule/getEmployeeProfile'].is_all_workflows_admin) {
+      // If they are an All-Workflows-Admin, allow completion
+      return true
+    } else if (step.workflow_role_pk) {
+      // If they are an admin of the workflow, allow completion
+      return this.$store.getters['userModule/getEmployeeProfile'].workflow_roles.indexOf(step.workflow_role_pk) != -1
+    } else if (step.process_role_pk) {
+      // If they are an admin of the process, allow completion
+      return this.$store.getters['userModule/getEmployeeProfile'].workflow_roles.indexOf(step.process_role_pk) != -1
+    } else if (step.role) {
+      // If they are assigned to the step's role, allow completion
       return this.$store.getters['userModule/getEmployeeProfile'].workflow_roles.indexOf(step.role.pk) != -1
     } else {
       // TODO: What should happen if no role assigned? Only admins? Everyone? Require all steps to have roles?

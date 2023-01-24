@@ -26,13 +26,24 @@ class StepChoiceSerializer(serializers.HyperlinkedModelSerializer):
 class StepSerializer(serializers.HyperlinkedModelSerializer):
     next_step_choices = StepChoiceSerializer(many=True)
     role = RoleSerializer()
+    process_role_pk = serializers.SerializerMethodField()
+    workflow_role_pk = serializers.SerializerMethodField()
     
     class Meta:
         model = Step
         fields = [
             'url', 'pk', 'order', 'start', 'end', 'name', 'description',
-            'choices_prompt', 'role', 'next_step', 'next_step_choices'
+            'choices_prompt', 'role', 'next_step', 'next_step_choices',
+            'process_role_pk', 'workflow_role_pk'
         ]
+    
+    @staticmethod
+    def get_process_role_pk(step):
+        return step.process.role.pk if step.process.role else None
+    
+    @staticmethod
+    def get_workflow_role_pk(step):
+        return step.process.workflow.role.pk if step.process.workflow.role else None
 
 
 class ProcessSerializer(serializers.ModelSerializer):

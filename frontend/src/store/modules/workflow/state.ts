@@ -1,11 +1,11 @@
-import { WorkflowInstanceRetrieve } from '../../types'
+import { WorkflowInstance } from '../../types'
 
 export interface WorkflowStateInterface {
-  currentWorkflowInstance: WorkflowInstanceRetrieve
-  workflowsActionRequired: Array<WorkflowInstanceRetrieve>
-  workflowsComplete: Array<WorkflowInstanceRetrieve>
-  workflowsIncomplete: Array<WorkflowInstanceRetrieve>
-  allWorkflows: Array<WorkflowInstanceRetrieve>
+  currentWorkflowInstance: WorkflowInstance
+  workflowsActionRequired: Array<WorkflowInstance>
+  workflowsComplete: Array<WorkflowInstance>
+  workflowsIncomplete: Array<WorkflowInstance>
+  allWorkflows: Array<WorkflowInstance>
 }
 
 const blankWorkflowInstance = {

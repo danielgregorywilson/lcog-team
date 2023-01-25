@@ -803,7 +803,7 @@ export type ProcessInstance = {
   completed_at: string
 }
 
-export interface WorkflowInstanceRetrieve {
+export interface WorkflowInstance {
   pk: number
   workflow: Workflow
   started_at: string
@@ -862,6 +862,6 @@ export interface VuexStoreGetters {
   'responsibilityModule/simpleTagList': Array<SimpleResponsibilityTagRetrieve>,
 
   // Workflows
-  'workflowModule/currentWorkflowInstance': WorkflowInstanceRetrieve,
+  'workflowModule/currentWorkflowInstance': WorkflowInstance,
   'workflowModule/processInstanceCurrentStepPks': {number: number}
 }

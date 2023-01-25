@@ -111,7 +111,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { VuexStoreGetters, WorkflowInstanceRetrieve } from '../../store/types'
+import { VuexStoreGetters, WorkflowInstance } from '../../store/types'
 
 @Component
 export default class EIS extends Vue {
@@ -124,7 +124,7 @@ export default class EIS extends Vue {
   //   return this.getters['userModule/getEmployeeProfile'].is_manager
   // }
 
-  private currentWorkflowInstance(): WorkflowInstanceRetrieve {
+  private currentWorkflowInstance(): WorkflowInstance {
     return this.getters['workflowModule/currentWorkflowInstance']
   }
 

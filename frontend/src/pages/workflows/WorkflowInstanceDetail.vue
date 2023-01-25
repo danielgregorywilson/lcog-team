@@ -15,7 +15,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { bus } from '../../App.vue'
 import ProcessInstanceDetail from '../../components/workflows/ProcessInstanceDetail.vue'
-import { VuexStoreGetters, WorkflowInstanceRetrieve } from '../../store/types'
+import { VuexStoreGetters, WorkflowInstance } from '../../store/types'
 
 @Component({
   components: { ProcessInstanceDetail }
@@ -26,7 +26,7 @@ export default class EIS extends Vue {
   private wfInstancePk = -1
   public currentStepInstance = -1;
 
-  public currentWorkflowInstance(): WorkflowInstanceRetrieve {
+  public currentWorkflowInstance(): WorkflowInstance {
     return this.getters['workflowModule/currentWorkflowInstance']
   }
 
@@ -34,7 +34,7 @@ export default class EIS extends Vue {
     return new Promise((resolve, reject) => {
       this.$store.dispatch('workflowModule/getCurrentWorkflowInstance', {pk: this.$route.params.pk})
       .then(() => {
-        const wfInstance: WorkflowInstanceRetrieve = this.getters['workflowModule/currentWorkflowInstance'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access
+        const wfInstance: WorkflowInstance = this.getters['workflowModule/currentWorkflowInstance'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access
         if (!wfInstance) {
             console.log('Workflow instance does not seem to exist. Redirecting...')
             this.$router.push('/')

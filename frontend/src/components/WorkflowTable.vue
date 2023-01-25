@@ -6,7 +6,6 @@
       :grid="$q.screen.lt.md"
       :no-data-label="noDataLabel()"
       row-key="name"
-      @row-click="clickRow"
     >
       <!-- Slots for header cells: Shrink the width when the screen is too small to see the whole table width -->
       <!-- <template v-slot:header-cell-employeeName="props">
@@ -21,6 +20,12 @@
       <template v-slot:body-cell-startedAt="props">
         <q-td key="startedAt" :props="props">
           {{ props.row.started_at | readableDate }}
+        </q-td>
+      </template>
+      <template v-slot:body-cell-actions="props">
+        <q-td key="actions" :props="props">
+          <q-btn class="col edit-button" dense round flat color="grey" @click="editWorkflowInstance(props.row)" icon="edit"></q-btn>
+          <q-btn v-if="canDeleteWorkflowInstance(props.row)" class="col delete-button" dense round flat color="grey" @click="showDeleteDialog(props.row)" icon="delete"></q-btn>
         </q-td>
       </template>
       <!-- <template v-slot:body-cell-status="props">
@@ -40,7 +45,7 @@
         </q-td>
       </template> -->
       <!-- For grid mode, we need to specify everything in order for our action buttons to render -->
-      <!-- <template v-slot:item="props">
+      <template v-slot:item="props">
         <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
           <q-card class="q-py-sm">
             <q-list dense>
@@ -51,20 +56,15 @@
                     {{ col.value }}
                   </div>
                   <div class="q-table__grid-item-value row q-gutter-sm" v-else>
-                    <q-btn class="col edit-button" dense round flat color="grey" @click="editEvaluation(props)" icon="edit"></q-btn>
-                    <q-btn class="col print-button" dense round flat color="grey" @click="printEvaluation(props)" icon="print">
-                      <q-tooltip content-style="font-size: 16px">Print Performance Review Form</q-tooltip>
-                    </q-btn>
-                    <q-btn v-if="props.row.signed_position_description" class="col print-button" dense round flat color="grey" @click="printEvaluationPositionDescription(props)" icon="print">
-                      <q-tooltip content-style="font-size: 16px">Print Signed Position Description</q-tooltip>
-                    </q-btn>
+                    <q-btn class="col edit-button" dense round flat color="grey" @click="showEditDialog(props.row)" icon="edit"></q-btn>
+                    <q-btn class="col delete-button" dense round flat color="grey" @click="showDeleteDialog(props.row)" icon="delete"></q-btn>
                   </div>
                 </div>
               </q-item>
             </q-list>
           </q-card>
         </div>
-      </template> -->
+      </template>
       <template v-slot:bottom-row>
         <q-tr @click="clickAddWorkflow('newEmployeeOnboarding')" class="cursor-pointer">
           <q-td colspan="100%">
@@ -73,6 +73,24 @@
         </q-tr>
       </template>
     </q-table>
+
+    <q-dialog v-model="deleteDialogVisible">
+      <q-card>
+        <q-card-section>
+          <div class="row items-center">
+            <q-avatar icon="insert_chart_outlined" color="primary" text-color="white" />
+            <span class="q-ml-sm">Are you sure you want to delete this workflow?</span>
+          </div>
+          <div class="row justify-center text-center">TEMP</div>
+          <div class="row justify-center text-center">INFO</div>
+        </q-card-section>
+
+        <q-card-actions class="row justify-around">
+          <q-btn flat label="Cancel" color="primary" v-close-popup />
+          <q-btn flat label="Yes, delete it" color="primary" @click="deleteRow()" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -88,8 +106,10 @@
 </style>
 
 <script lang="ts">
+import { Notify } from 'quasar'
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { WorkflowInstanceRetrieve } from '../store/types'
+import WorkflowInstanceDataService from '../services/WorkflowInstanceDataService';
+import { WorkflowInstance } from '../store/types'
 import '../filters'
 
 interface WorkflowColumn {
@@ -103,17 +123,11 @@ interface WorkflowColumn {
   headerStyle?: string;
 }
 
-interface QuasarWorkflowInstanceTableRowClickActionProps {
-  evt: MouseEvent;
-  row: WorkflowInstanceRetrieve;
-  index: number;
-}
-
 @Component
 export default class WorkflowTable extends Vue {
   @Prop() readonly complete!: boolean
   @Prop() readonly actionRequired!: boolean
-  public workflows(): Array<WorkflowInstanceRetrieve> {
+  public workflows(): Array<WorkflowInstance> {
     if (this.actionRequired !== undefined && this.actionRequired) {
       return this.$store.getters['workflowModule/workflowsActionRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
     } else if (this.complete !== undefined) {
@@ -131,7 +145,7 @@ export default class WorkflowTable extends Vue {
       { name: 'pk', label: 'PK', align: 'center', field: 'pk', sortable: true },
       { name: 'startedAt', align: 'center', label: 'Workflow Start Date', field: 'started_at', sortable: true },
       { name: 'percentComplete', align: 'center', label: '% Complete', field: 'percent_complete', sortable: true },
-      // { name: 'actions', label: 'Actions', align: 'around', },
+      { name: 'actions', label: 'Actions', align: 'center' },
     ]
   }
 
@@ -142,6 +156,11 @@ export default class WorkflowTable extends Vue {
       return 'Nothing to show.'
     }
   }
+
+  public deleteDialogVisible = false
+  // private deleteDialogEmployeeName = ''
+  // private deleteDialogNoteText = ''
+  private rowPkToDelete = ''
 
   private retrieveWorkflows(): void {
     if (this.actionRequired) {
@@ -169,11 +188,45 @@ export default class WorkflowTable extends Vue {
     }
   }
 
-  public clickRow(evt: MouseEvent, row: WorkflowInstanceRetrieve): void {
+  public editWorkflowInstance(row: WorkflowInstance): void {
     const rowPk = row.pk.toString()
     this.$router.push({name: 'workflow-instance-detail', params: {pk: rowPk}} )
       .catch(e => {
         console.error('Error navigating to PR detail:', e)
+      })
+  }
+
+  public canDeleteWorkflowInstance(workflowInstance: WorkflowInstance): boolean {
+    if (workflowInstance.completed_at) {
+      return false
+    }
+    if (this.$store.getters['userModule/getEmployeeProfile'].is_all_workflows_admin) {
+      // If they are an All-Workflows-Admin, allow delete
+      return true
+    } else if (workflowInstance.workflow.role) {
+      // If they are an admin of the workflow, allow delete
+      return this.$store.getters['userModule/getEmployeeProfile'].workflow_roles.indexOf(workflowInstance.workflow.role) != -1
+    } else {
+      // TODO: What should happen if no role assigned? Only admins? Everyone? Require all steps to have roles?
+      return false
+    }
+  }
+
+  private showDeleteDialog(row: WorkflowInstance): void {
+    this.rowPkToDelete = row.pk.toString()
+    // this.deleteDialogEmployeeName = props.row.employee_name
+    // this.deleteDialogNoteText = props.row.note
+    this.deleteDialogVisible = true;
+  }
+
+  private deleteRow(): void {
+    WorkflowInstanceDataService.delete(this.rowPkToDelete)
+      .then(() => {
+        Notify.create('Deleted a workflow.')
+        this.retrieveWorkflows()
+      })
+      .catch(e => {
+        console.error('Error deleting workflow', e)
       })
   }
 

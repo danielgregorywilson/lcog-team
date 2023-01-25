@@ -8,6 +8,17 @@ const getters: GetterTree<WorkflowStateInterface, StateInterface> = {
   workflowsComplete: state => state.workflowsComplete,
   workflowsIncomplete: state => state.workflowsIncomplete,
   allWorkflows: state => state.allWorkflows,
+  processInstanceCurrentStepPks: state => {
+    const d = {}
+    state.currentWorkflowInstance.process_instances.forEach(pi => {
+      if (pi.current_step_instance) {
+        d[pi.pk] = pi.current_step_instance.pk  
+      } else {
+        d[pi.pk] = -1
+      }
+    })
+    return d
+  }
 };
 
 export default getters;

@@ -1,7 +1,7 @@
 <template>
   <div>
     <q-stepper
-      v-model="pi.current_step_instance.pk"
+      v-model="currentStepInstance"
       vertical
       color="primary"
       animated
@@ -25,12 +25,12 @@
               @click="completeStep(si.pk, choice.next_step_pk)"
               color="primary"
               :label="choice.choice_text"
-              :disable="!canCompleteStep(si.step)"
+              :disable="!canCompleteStepInstance(si)"
             />
           </div>
           <div v-else>
             <q-btn
-              :disable="!canCompleteStep(si.step)"
+              :disable="!canCompleteStepInstance(si)"
               @click="completeStep(si.pk)"
               color="primary"
               label="Continue"
@@ -48,15 +48,26 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { ProcessInstance, Step } from '../../store/types'
+import { bus } from '../../App.vue'
+import { ProcessInstance, StepInstance, VuexStoreGetters } from '../../store/types'
 
 @Component
 export default class ProcessInstanceDetail extends Vue {
   @Prop({required: true}) readonly pi!: ProcessInstance
-  
-  // public currentStepInstance = -1;
 
-  public canCompleteStep(step: Step): boolean {
+  private getters = this.$store.getters as VuexStoreGetters
+
+  public currentStepInstance = -1;
+
+  public setCurrentStepInstance() {
+    this.currentStepInstance = this.getters['workflowModule/processInstanceCurrentStepPks'][this.pi.pk]
+  }
+
+  public canCompleteStepInstance(stepInstance: StepInstance): boolean {
+    if (stepInstance.completed_at) {
+      return false
+    }
+    const step = stepInstance.step
     if (this.$store.getters['userModule/getEmployeeProfile'].is_all_workflows_admin) {
       // If they are an All-Workflows-Admin, allow completion
       return true
@@ -78,12 +89,25 @@ export default class ProcessInstanceDetail extends Vue {
   public completeStep(stepInstancePk: number, nextStepPk?: number): void {
     this.$store.dispatch('workflowModule/completeStepInstance', { stepInstancePk, nextStepPk })
       .then(() => {
+        this.setCurrentStepInstance()
         this.$emit('completed-step')
       })
       .catch(e => {
         console.error('Error completing step instance', e)
       })
   }
+
+  created() {
+    // We trigger updating the current step instance in WorkflowInstanceDetail when we complete a step and reload it.
+    bus.$on('updateProcessInstances', () => {
+      this.setCurrentStepInstance()
+    })
+  }
+
+  mounted() {
+    this.setCurrentStepInstance()
+  }
+
 }
 </script>
   

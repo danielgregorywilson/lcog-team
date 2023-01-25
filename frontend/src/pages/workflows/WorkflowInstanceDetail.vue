@@ -51,6 +51,7 @@ export default class EIS extends Vue {
           // Process Instance is complete
           this.currentStepInstance = -1
         }
+        bus.$emit('updateProcessInstances') // Trigger ProcessInstanceDetail to get a new current step
         resolve('Got Workflow Instance')
       })
       .catch(e => {

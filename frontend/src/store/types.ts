@@ -788,7 +788,7 @@ type StepChoice = {
   next_step_pk: number
 }
 
-type StepInstance = {
+export type StepInstance = {
   pk: number
   step: Step
   completed_at: string
@@ -862,5 +862,6 @@ export interface VuexStoreGetters {
   'responsibilityModule/simpleTagList': Array<SimpleResponsibilityTagRetrieve>,
 
   // Workflows
-  'workflowModule/currentWorkflowInstance': WorkflowInstanceRetrieve
+  'workflowModule/currentWorkflowInstance': WorkflowInstanceRetrieve,
+  'workflowModule/processInstanceCurrentStepPks': {number: number}
 }

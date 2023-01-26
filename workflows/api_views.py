@@ -128,12 +128,8 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
             wf = Workflow.objects.get(name="New Employee Onboarding")
             wfi = WorkflowInstance.objects.create(workflow=wf)
             # Create process instances
-            for process in wf.processes.all():
-                pi = ProcessInstance.objects.create(process=process, workflow_instance=wfi)
-                first_step = process.step_set.filter(start=True)[0]
-                si = StepInstance.objects.create(step=first_step, process_instance=pi)
-                pi.current_step_instance = si
-                pi.save()
+            for process in wf.processes.filter(workflow_start=True):
+                process.create_process_instance(wfi)
             serialized_wfi = WorkflowInstanceSerializer(wfi,
                 context={'request': request}
             )
@@ -305,6 +301,12 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
             )
             processinstance.current_step_instance = new_stepinstance
         processinstance.save()
+
+        # If step instance completion triggers a new process, start it
+        workflow_instance = stepinstance.process_instance.workflow_instance
+        if stepinstance.step.trigger_processes.count():
+            for process in stepinstance.step.trigger_processes.all():
+                process.create_process_instance(workflow_instance)
 
         serialized_stepinstance = StepInstanceSerializer(stepinstance,
             context={'request': request})

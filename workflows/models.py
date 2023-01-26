@@ -43,6 +43,7 @@ class Process(models.Model):
     
     name = models.CharField(max_length=100)
     workflow = models.ForeignKey(Workflow, related_name="processes", on_delete=models.CASCADE)
+    workflow_start = models.BooleanField(default=False, help_text=_("Start this process when a workflow begins."))
     role = models.ForeignKey(Role, blank=True, null=True, on_delete=models.SET_NULL, help_text=_("The set of employees with full admin access to this process"))
     version = models.IntegerField(default=1)
 
@@ -50,6 +51,13 @@ class Process(models.Model):
     def total_steps(self):
         return 1000
         # TODO
+
+    def create_process_instance(self, wfi):
+        pi = ProcessInstance.objects.create(process=self, workflow_instance=wfi)
+        first_step = self.step_set.filter(start=True)[0]
+        si = StepInstance.objects.create(step=first_step, process_instance=pi)
+        pi.current_step_instance = si
+        pi.save()
 
     #TODO: Complete when step marked "end" is completed
     # TODO: On save, make sure there is a start and end step if there are any steps
@@ -68,6 +76,7 @@ class Step(models.Model):
     role = models.ForeignKey(Role, blank=True, null=True, on_delete=models.SET_NULL, help_text=_("The set of employees responsible for completing this step"))
     next_step = models.ForeignKey("self",  blank=True, null=True, on_delete=models.SET_NULL, help_text=_("The next step, when there is only one"))
     choices_prompt = models.CharField(max_length=200, blank=True, help_text=_("The prompt for when there are multiple next step choices"))
+    trigger_processes = models.ManyToManyField(Process, related_name="triggering_steps", blank=True)
 
     # TODO: On save, make sure there is only one start and end step for a given process
 

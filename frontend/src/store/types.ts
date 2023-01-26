@@ -776,6 +776,7 @@ export type Step = {
   description: string
   process: Process
   role: Role
+  next_step: Step
   choices_prompt: string
   next_step_choices: Array<StepChoice>
   workflow_role_pk: number

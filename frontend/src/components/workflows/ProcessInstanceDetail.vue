@@ -16,7 +16,15 @@
       >
         <div>{{ si.step.description }}</div>
         <q-stepper-navigation>
-          <div v-if="si.step.choices_prompt">
+          <div v-if="si.step.next_step">
+            <q-btn
+              :disable="!canCompleteStepInstance(si)"
+              @click="completeStep(si.pk)"
+              color="primary"
+              label="Continue"
+            />
+          </div>
+          <div v-else>
             {{si.step.choices_prompt}}
             <q-btn
               v-for="choice of si.step.next_step_choices"
@@ -26,14 +34,6 @@
               color="primary"
               :label="choice.choice_text"
               :disable="!canCompleteStepInstance(si)"
-            />
-          </div>
-          <div v-else>
-            <q-btn
-              :disable="!canCompleteStepInstance(si)"
-              @click="completeStep(si.pk)"
-              color="primary"
-              label="Continue"
             />
           </div>
         </q-stepper-navigation>

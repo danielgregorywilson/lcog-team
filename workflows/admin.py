@@ -63,6 +63,7 @@ class StepChoiceInline(admin.TabularInline):
 
 @admin.register(Step)
 class StepAdmin(admin.ModelAdmin):
+    list_filter = ("process",)
     inlines = (StepChoiceInline,)
 
 

@@ -68,12 +68,21 @@ class WorkflowSerializer(serializers.HyperlinkedModelSerializer):
 
 class StepInstanceSerializer(serializers.ModelSerializer):
     step = StepSerializer(required=False)
+    completed_by_name = serializers.SerializerMethodField()
     
     class Meta:
         model = StepInstance
         fields = [
             'url', 'pk', 'started_at', 'completed_at', 'step', 'completed_by',
+            'completed_by_name'
         ]
+    
+    @staticmethod
+    def get_completed_by_name(stepinstance):
+        if stepinstance.completed_by:
+            return stepinstance.completed_by.name
+        else:
+            return None
 
 
 class ProcessInstanceSerializer(serializers.ModelSerializer):

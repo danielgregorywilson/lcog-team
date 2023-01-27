@@ -792,7 +792,9 @@ type StepChoice = {
 export type StepInstance = {
   pk: number
   step: Step
-  completed_at: string
+  completed_at: Date
+  completed_by: number
+  completed_by_name: string
 }
 
 export type ProcessInstance = {

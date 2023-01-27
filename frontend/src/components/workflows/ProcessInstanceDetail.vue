@@ -2,6 +2,7 @@
   <div>
     <q-stepper
       v-model="currentStepInstance"
+      header-nav
       vertical
       color="primary"
       animated
@@ -11,11 +12,14 @@
         :key="si.pk"
         :name="si.pk"
         :title="si.step.name"
-        icon="settings"
+        icon="play_arrow"
+        :active-icon="stepInstanceIsComplete(si) ? 'edit' : 'play_arrow'"
+        :color="si.pk == currentStepInstance ? 'primary' : 'secondary'"
         :done="!!si.completed_at"
       >
         <div>{{ si.step.description }}</div>
-        <q-stepper-navigation>
+        <div v-if="si.completed_at">Completed by {{ si.completed_by_name }} on {{ formatDate(si.completed_at, 'dddd, M/D/YY [at] HH:MM') }}</div>
+        <q-stepper-navigation v-if="!stepInstanceIsComplete(si)">
           <div v-if="si.step.next_step">
             <q-btn
               :disable="!canCompleteStepInstance(si)"
@@ -47,13 +51,17 @@
 </style>
 
 <script lang="ts">
+import { date } from 'quasar'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { bus } from '../../App.vue'
 import { ProcessInstance, StepInstance, VuexStoreGetters } from '../../store/types'
+// import { readableDate } from '../../filters'
 
 @Component
 export default class ProcessInstanceDetail extends Vue {
   @Prop({required: true}) readonly pi!: ProcessInstance
+
+  public formatDate = date.formatDate
 
   private getters = this.$store.getters as VuexStoreGetters
 
@@ -61,6 +69,14 @@ export default class ProcessInstanceDetail extends Vue {
 
   public setCurrentStepInstance() {
     this.currentStepInstance = this.getters['workflowModule/processInstanceCurrentStepPks'][this.pi.pk]
+  }
+
+  public stepInstanceIsComplete(stepInstance: StepInstance): boolean {
+    if (stepInstance.completed_at) {
+      return true
+    } else {
+      return false
+    }
   }
 
   public canCompleteStepInstance(stepInstance: StepInstance): boolean {

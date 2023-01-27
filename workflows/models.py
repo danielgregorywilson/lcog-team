@@ -36,7 +36,7 @@ class Process(models.Model):
     e.g. HR and IS processes for new employee onboarding
     """
     def __str__(self):
-        return f"Process: {self.name}"
+        return f"Process: {self.name} v{self.version}"
 
     class Meta:
         verbose_name_plural = _("Processes")
@@ -65,7 +65,7 @@ class Process(models.Model):
 
 class Step(models.Model):
     def __str__(self):
-        return self.name
+        return f"{self.order} - {self.name}"
 
     process = models.ForeignKey(Process, on_delete=models.CASCADE)
     order = models.IntegerField(help_text=_("Display order in admin Process detail"), default=0)

@@ -18,7 +18,7 @@
         :done="!!si.completed_at"
       >
         <div>{{ si.step.description }}</div>
-        <div v-if="si.completed_at">Completed by {{ si.completed_by_name }} on {{ formatDate(si.completed_at, 'dddd, M/D/YY [at] HH:MM') }}</div>
+        <div v-if="si.completed_at" class="text-secondary">Completed by {{ si.completed_by_name }} on {{ formatDate(si.completed_at, 'dddd, M/D/YY [at] HH:MM') }}</div>
         <q-stepper-navigation v-if="!stepInstanceIsComplete(si)">
           <div v-if="si.step.next_step">
             <q-btn

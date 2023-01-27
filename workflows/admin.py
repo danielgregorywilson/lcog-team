@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.forms import BaseInlineFormSet, ModelForm
 from django.utils.safestring import mark_safe
 from django.urls import reverse
 
@@ -24,8 +25,41 @@ class RoleAdmin(admin.ModelAdmin):
         return ",\n".join([employee.name for employee in obj.members.all()])
 
 
+class GetParentFormSet(BaseInlineFormSet):
+    """
+    Used to access the parent model instance in an inline model form
+    """
+    def get_form_kwargs(self, index):
+        kwargs = super().get_form_kwargs(index)
+        kwargs['parent_object'] = self.instance
+        return kwargs
+
+
+class StepForm(ModelForm):
+    """Used in Step Admin for next_step"""
+    def __init__(self, *args, **kwargs):
+        super(StepForm, self).__init__(*args, **kwargs)
+        self.fields['next_step'].queryset = Step.objects.filter(process=self.instance.process).exclude(pk=self.instance.pk).order_by('order')
+
+
+class StepInlineForm(ModelForm):
+    """Used in Process Admin for child Steps' next_steps"""
+    def __init__(self, *args, parent_object, **kwargs):
+        super(StepInlineForm, self).__init__(*args, **kwargs)
+        self.fields['next_step'].queryset = Step.objects.filter(process=parent_object).exclude(pk=self.instance.pk).order_by('order')
+
+
+class StepChoiceForm(ModelForm):
+    """Used in Step Admin for Step choices"""
+    def __init__(self, *args, parent_object, **kwargs):
+        super(StepChoiceForm, self).__init__(*args, **kwargs)
+        self.fields['next_step'].queryset = Step.objects.filter(process=parent_object.process).exclude(pk=parent_object.pk).order_by('order')         
+
+
 class StepInline(admin.TabularInline):
     model = Step
+    formset = GetParentFormSet
+    form = StepInlineForm
     ordering = ('order',)
     readonly_fields = ("edit_link", "next_step_choices")
     extra = 0
@@ -56,6 +90,8 @@ class ProcessAdmin(admin.ModelAdmin):
 
 class StepChoiceInline(admin.TabularInline):
     model = StepChoice
+    formset = GetParentFormSet
+    form = StepChoiceForm
     fk_name = "step"
     ordering = ('order',)
     extra = 0
@@ -63,7 +99,9 @@ class StepChoiceInline(admin.TabularInline):
 
 @admin.register(Step)
 class StepAdmin(admin.ModelAdmin):
+    list_display = ("name",)
     list_filter = ("process",)
+    form = StepForm
     inlines = (StepChoiceInline,)
 
 

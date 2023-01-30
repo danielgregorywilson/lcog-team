@@ -3,7 +3,10 @@ from django.forms import BaseInlineFormSet, ModelForm
 from django.utils.safestring import mark_safe
 from django.urls import reverse
 
-from workflows.models import Process, ProcessInstance, Role, Step, StepChoice, StepInstance, Workflow, WorkflowInstance
+from workflows.models import (
+    Action, Process, ProcessInstance, Role, Step, StepChoice, StepInstance,
+    Workflow, WorkflowInstance
+)
 
 
 @admin.register(Workflow)
@@ -103,6 +106,11 @@ class StepAdmin(admin.ModelAdmin):
     list_filter = ("process",)
     form = StepForm
     inlines = (StepChoiceInline,)
+
+
+@admin.register(Action)
+class ActionAdmin(admin.ModelAdmin):
+    list_display = ("name", "type")
 
 
 @admin.register(WorkflowInstance)

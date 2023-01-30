@@ -770,6 +770,14 @@ type Role = {
   members: Array<EmployeeRetrieve>
 }
 
+export type Action = {
+  pk: number
+  type: string
+  name: string
+  description: string
+  url: URL
+}
+
 export type Step = {
   pk: number
   name: string
@@ -781,6 +789,8 @@ export type Step = {
   next_step_choices: Array<StepChoice>
   workflow_role_pk: number
   process_role_pk: number
+  completion_action: Action
+  optional_actions: Array<Action>
 }
 
 type StepChoice = {

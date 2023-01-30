@@ -18,6 +18,7 @@
         :done="!!si.completed_at"
       >
         <div>{{ si.step.description }}</div>
+        <step-action v-for="action of si.step.optional_actions" :action="action" :key="action.pk" />
         <div v-if="si.completed_at" class="text-secondary">Completed by {{ si.completed_by_name }} on {{ formatDate(si.completed_at, 'dddd, M/D/YY [at] HH:MM') }}</div>
         <q-stepper-navigation v-if="!stepInstanceIsComplete(si)">
           <div v-if="si.step.next_step">
@@ -25,7 +26,7 @@
               :disable="!canCompleteStepInstance(si)"
               @click="completeStep(si.pk)"
               color="primary"
-              label="Continue"
+              label="Mark as Complete"
             />
           </div>
           <div v-else>
@@ -54,10 +55,13 @@
 import { date } from 'quasar'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { bus } from '../../App.vue'
+import StepAction from '../../components/workflows/StepAction.vue'
 import { ProcessInstance, StepInstance, VuexStoreGetters } from '../../store/types'
 // import { readableDate } from '../../filters'
 
-@Component
+@Component({
+  components: { StepAction }
+})
 export default class ProcessInstanceDetail extends Vue {
   @Prop({required: true}) readonly pi!: ProcessInstance
 

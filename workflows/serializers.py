@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
 from workflows.models import (
-    Process, ProcessInstance, Role, Step, StepChoice, StepInstance, Workflow,
-    WorkflowInstance
+    Action, Process, ProcessInstance, Role, Step, StepChoice, StepInstance,
+    Workflow, WorkflowInstance
 )
 
 
@@ -23,18 +23,27 @@ class StepChoiceSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
 
+class ActionSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Action
+        fields = '__all__'
+
+
 class StepSerializer(serializers.HyperlinkedModelSerializer):
     next_step_choices = StepChoiceSerializer(many=True)
     role = RoleSerializer()
     process_role_pk = serializers.SerializerMethodField()
     workflow_role_pk = serializers.SerializerMethodField()
+    completion_action = ActionSerializer()
+    optional_actions = ActionSerializer(many=True)
     
     class Meta:
         model = Step
         fields = [
             'url', 'pk', 'order', 'start', 'end', 'name', 'description',
             'choices_prompt', 'role', 'next_step', 'next_step_choices',
-            'process_role_pk', 'workflow_role_pk'
+            'process_role_pk', 'workflow_role_pk', 'completion_action',
+            'optional_actions'
         ]
     
     @staticmethod

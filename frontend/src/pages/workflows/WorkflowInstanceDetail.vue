@@ -23,7 +23,6 @@ import { VuexStoreGetters, WorkflowInstance } from '../../store/types'
 export default class EIS extends Vue {
   private getters = this.$store.getters as VuexStoreGetters
 
-  private wfInstancePk = -1
   public currentStepInstance = -1;
 
   public currentWorkflowInstance(): WorkflowInstance {
@@ -44,7 +43,6 @@ export default class EIS extends Vue {
               })
             return
           }
-        this.wfInstancePk = wfInstance.pk
         if (!wfInstance.process_instances[0].completed_at) {
           this.currentStepInstance = wfInstance.process_instances[0].current_step_instance.pk
         } else {

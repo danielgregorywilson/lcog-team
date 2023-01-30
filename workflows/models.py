@@ -63,6 +63,36 @@ class Process(models.Model):
     # TODO: On save, make sure there is a start and end step if there are any steps
 
 
+class Action(models.Model):
+    LINK = 'LINK'
+    API = 'API'
+    EMAIL = 'EMAIL'
+    ACTION_TYPE_CHOICES = [
+        (LINK, 'Navigate to Link'),
+        (API, 'Make API call'),
+        (EMAIL, 'Send an email'),
+    ]
+    
+    type = models.CharField(_("action type"), max_length=5, choices=ACTION_TYPE_CHOICES, blank=True, null=True)
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=300, blank=True)
+    url = models.URLField(blank=True)
+
+    def __str__(self):
+        return self.name
+
+    def clean(self):
+        # A link must have a URL
+        if self.type == self.LINK and not self.url:
+            raise ValidationError("A link must have a URL")
+        elif self.type == self.API:
+            # TODO
+            pass
+        elif self.type == self.EMAIL:
+            # TODO
+            pass
+
+
 class Step(models.Model):
     def __str__(self):
         return f"{self.order} - {self.name}"
@@ -77,6 +107,8 @@ class Step(models.Model):
     next_step = models.ForeignKey("self",  blank=True, null=True, on_delete=models.SET_NULL, help_text=_("The next step, when there is only one"))
     choices_prompt = models.CharField(max_length=200, blank=True, help_text=_("The prompt for when there are multiple next step choices"))
     trigger_processes = models.ManyToManyField(Process, related_name="triggering_steps", blank=True)
+    completion_action = models.ForeignKey(Action, blank=True, null=True, on_delete=models.SET_NULL, help_text=_("Action to trigger as this step completes"))
+    optional_actions = models.ManyToManyField(Action, blank=True, related_name="triggering_steps")
 
     # TODO: On save, make sure there is only one start and end step for a given process
 

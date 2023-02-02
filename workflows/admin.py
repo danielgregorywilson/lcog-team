@@ -4,8 +4,8 @@ from django.utils.safestring import mark_safe
 from django.urls import reverse
 
 from workflows.models import (
-    Action, Process, ProcessInstance, Role, Step, StepChoice, StepInstance,
-    Workflow, WorkflowInstance
+    Action, EmployeeTransition, Process, ProcessInstance, Role, Step,
+    StepChoice, StepInstance, Workflow, WorkflowInstance
 )
 
 
@@ -125,4 +125,9 @@ class ProcessInstanceAdmin(admin.ModelAdmin):
 
 @admin.register(StepInstance)
 class StepInstanceAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(EmployeeTransition)
+class EmployeeTransitionAdmin(admin.ModelAdmin):
     pass

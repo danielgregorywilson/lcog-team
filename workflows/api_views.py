@@ -21,8 +21,8 @@ from timeoff.helpers import (
     send_manager_new_timeoff_request_notification
 )
 from workflows.models import (
-    Process, ProcessInstance, Role, Step, StepChoice, StepInstance, Workflow,
-    WorkflowInstance
+    EmployeeTransition, Process, ProcessInstance, Role, Step, StepChoice,
+    StepInstance, Workflow, WorkflowInstance
 )
 
 from workflows.serializers import (
@@ -125,8 +125,9 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         if self.request.data['type'] == 'new_employee_onboarding':
+            et = EmployeeTransition.objects.create(type=EmployeeTransition.TRANSITION_TYPE_NEW)
             wf = Workflow.objects.get(name="New Employee Onboarding")
-            wfi = WorkflowInstance.objects.create(workflow=wf)
+            wfi = WorkflowInstance.objects.create(workflow=wf, transition=et)
             # Create process instances
             for process in wf.processes.filter(workflow_start=True):
                 process.create_process_instance(wfi)

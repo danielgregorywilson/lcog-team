@@ -1,11 +1,12 @@
 <template>
-  <q-page class="q-pa-md">
-    <div class="text-h4">{{currentWorkflowInstance().workflow.name}}</div>
-    <div v-for="pi of currentWorkflowInstance().process_instances">
-      <div class="text-h5">{{pi.process.name}}</div>
-      <process-instance-detail :pi="pi" @completed-step="retrieveWorkflowInstance"  />
-    </div>
-  </q-page>
+<q-page class="q-pa-md">
+  <div class="text-h4">{{currentWorkflowInstance().workflow.name}}</div>
+  <q-btn-group push v-if="hasEmployeeTransition()">
+    <q-btn push color="secondary" glossy label="Processes" :to="{name: 'workflow-processes', params: {pk: currentWorkflowInstance().pk}}" />
+    <q-btn push color="primary" glossy label="Employee Transition Form" :to="{name: 'workflow-transition-form', params: {pk: currentWorkflowInstance().pk}}" />
+  </q-btn-group>
+  <router-view :key="$route.path" />
+</q-page>
 </template>
 
 <style scoped lang="scss">
@@ -14,19 +15,19 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { bus } from '../../App.vue'
-import ProcessInstanceDetail from '../../components/workflows/ProcessInstanceDetail.vue'
 import { VuexStoreGetters, WorkflowInstance } from '../../store/types'
 
-@Component({
-  components: { ProcessInstanceDetail }
-})
-export default class EIS extends Vue {
+@Component
+export default class WorkflowInstanceDetail extends Vue {
   private getters = this.$store.getters as VuexStoreGetters
-
-  public currentStepInstance = -1;
 
   public currentWorkflowInstance(): WorkflowInstance {
     return this.getters['workflowModule/currentWorkflowInstance']
+  }
+
+  public hasEmployeeTransition() {
+    // TODO
+    return true
   }
 
   public retrieveWorkflowInstance() {
@@ -35,19 +36,13 @@ export default class EIS extends Vue {
       .then(() => {
         const wfInstance: WorkflowInstance = this.getters['workflowModule/currentWorkflowInstance'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access
         if (!wfInstance) {
-            console.log('Workflow instance does not seem to exist. Redirecting...')
-            this.$router.push('/')
-              .catch(e => {
-                console.error('Error navigating to dashboard upon not finding a matching Workflow Instance:', e)
-                reject(e)
-              })
-            return
-          }
-        if (!wfInstance.process_instances[0].completed_at) {
-          this.currentStepInstance = wfInstance.process_instances[0].current_step_instance.pk
-        } else {
-          // Process Instance is complete
-          this.currentStepInstance = -1
+          console.log('Workflow instance does not seem to exist. Redirecting...')
+          this.$router.push('/')
+            .catch(e => {
+              console.error('Error navigating to dashboard upon not finding a matching Workflow Instance:', e)
+              reject(e)
+            })
+          return
         }
         bus.$emit('updateProcessInstances') // Trigger ProcessInstanceDetail to get a new current step
         resolve('Got Workflow Instance')
@@ -57,7 +52,13 @@ export default class EIS extends Vue {
         reject(e)
       })
     })
-    
+  }
+
+  created() {
+    // We trigger updating the current step instance in WorkflowInstanceDetail when we complete a step and reload it.
+    bus.$on('completedStep', () => {
+      this.retrieveWorkflowInstance()
+    })
   }
 
   mounted() {

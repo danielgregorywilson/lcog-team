@@ -294,6 +294,20 @@ const routes: RouteConfig[] = [
         name: 'workflow-instance-detail',
         component: () => import('src/pages/workflows/WorkflowInstanceDetail.vue'),
         // beforeEnter: ifCanViewTimeOffRequest,
+        children: [
+          {
+            path: 'processes',
+            name: 'workflow-processes',
+            component: () => import('src/pages/workflows/WorkflowProcesses.vue')
+            // TODO: beforeEnter: TODO
+          },
+          {
+            path: 'transition',
+            name: 'workflow-transition-form',
+            component: () => import('src/pages/workflows/EmployeeTransition.vue')
+            // TODO: beforeEnter: TODO
+          }
+        ]
       },
       // TODO: Remove EIS demo page
       {

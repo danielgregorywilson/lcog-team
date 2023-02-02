@@ -824,6 +824,10 @@ export interface WorkflowInstance {
   process_instances: Array<ProcessInstance>
 }
 
+export interface EmployeeTransition {
+  pk: number
+}
+
 export interface AxiosTimeOffRequestRetrieveOneServerResponse {
   data: TimeOffRequestRetrieve
 }
@@ -876,5 +880,6 @@ export interface VuexStoreGetters {
 
   // Workflows
   'workflowModule/currentWorkflowInstance': WorkflowInstance,
+  'workflowModule/currentEmployeeTransition': EmployeeTransition,
   'workflowModule/processInstanceCurrentStepPks': {number: number}
 }

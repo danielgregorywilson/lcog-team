@@ -24,8 +24,9 @@
       </template>
       <template v-slot:body-cell-actions="props">
         <q-td key="actions" :props="props">
-          <q-btn class="col edit-button" dense round flat color="grey" @click="editWorkflowInstance(props.row)" icon="edit"></q-btn>
-          <q-btn v-if="canDeleteWorkflowInstance(props.row)" class="col delete-button" dense round flat color="grey" @click="showDeleteDialog(props.row)" icon="delete"></q-btn>
+          <q-btn class="col" dense round flat color="grey" @click="editWorkflowInstance(props.row)" icon="play_arrow"></q-btn>
+          <q-btn v-if="workflowHasTransition(props.row) && canViewTransition(props.row)" class="col" dense round flat color="grey" @click="editTransitionForm(props.row)" icon="assignment"></q-btn>
+          <q-btn v-if="canDeleteWorkflowInstance(props.row)" class="col" dense round flat color="grey" @click="showDeleteDialog(props.row)" icon="delete"></q-btn>
         </q-td>
       </template>
       <!-- <template v-slot:body-cell-status="props">
@@ -56,8 +57,9 @@
                     {{ col.value }}
                   </div>
                   <div class="q-table__grid-item-value row q-gutter-sm" v-else>
-                    <q-btn class="col edit-button" dense round flat color="grey" @click="showEditDialog(props.row)" icon="edit"></q-btn>
-                    <q-btn class="col delete-button" dense round flat color="grey" @click="showDeleteDialog(props.row)" icon="delete"></q-btn>
+                    <q-btn class="col" dense round flat color="grey" @click="editWorkflowInstance(props.row)" icon="play_arrow"></q-btn>
+                    <q-btn v-if="workflowHasTransition(props.row) && canViewTransition(props.row)" class="col" dense round flat color="grey" @click="editTransitionForm(props.row)" icon="assignment"></q-btn>
+                    <q-btn v-if="canDeleteWorkflowInstance(props.row)" class="col" dense round flat color="grey" @click="showDeleteDialog(props.row)" icon="delete"></q-btn>
                   </div>
                 </div>
               </q-item>
@@ -188,11 +190,27 @@ export default class WorkflowTable extends Vue {
     }
   }
 
-  public editWorkflowInstance(row: WorkflowInstance): void {
-    const rowPk = row.pk.toString()
-    this.$router.push({name: 'workflow-instance-detail', params: {pk: rowPk}} )
+  public editWorkflowInstance(workflowInstance: WorkflowInstance): void {
+    const rowPk = workflowInstance.pk.toString()
+    this.$router.push({name: 'workflow-processes', params: {pk: rowPk}})
       .catch(e => {
-        console.error('Error navigating to PR detail:', e)
+        console.error('Error navigating to workflow instance detail:', e)
+      })
+  }
+
+  public workflowHasTransition(workflowInstance: WorkflowInstance): boolean {
+    return true
+  }
+
+  public canViewTransition(workflowInstance: WorkflowInstance): boolean {
+    return true
+  }
+
+  public editTransitionForm(workflowInstance: WorkflowInstance) {
+    const rowPk = workflowInstance.pk.toString()
+    this.$router.push({name: 'workflow-transition-form', params: {pk: rowPk}} )
+      .catch(e => {
+        console.error('Error navigating to workflow transition form:', e)
       })
   }
 
@@ -212,14 +230,14 @@ export default class WorkflowTable extends Vue {
     }
   }
 
-  private showDeleteDialog(row: WorkflowInstance): void {
+  public showDeleteDialog(row: WorkflowInstance): void {
     this.rowPkToDelete = row.pk.toString()
     // this.deleteDialogEmployeeName = props.row.employee_name
     // this.deleteDialogNoteText = props.row.note
     this.deleteDialogVisible = true;
   }
 
-  private deleteRow(): void {
+  public deleteRow(): void {
     WorkflowInstanceDataService.delete(this.rowPkToDelete)
       .then(() => {
         Notify.create('Deleted a workflow.')

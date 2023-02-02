@@ -110,7 +110,7 @@ export default class ProcessInstanceDetail extends Vue {
     this.$store.dispatch('workflowModule/completeStepInstance', { stepInstancePk, nextStepPk })
       .then(() => {
         this.setCurrentStepInstance()
-        this.$emit('completed-step')
+        bus.$emit('completedStep')
       })
       .catch(e => {
         console.error('Error completing step instance', e)

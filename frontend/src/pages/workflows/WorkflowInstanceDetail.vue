@@ -26,7 +26,7 @@ export default class WorkflowInstanceDetail extends Vue {
   }
 
   public hasEmployeeTransition() {
-    // TODO
+    // TODO: If not, then just show the processes and no subnav
     return true
   }
 

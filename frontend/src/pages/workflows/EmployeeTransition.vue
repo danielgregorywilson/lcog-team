@@ -1,10 +1,28 @@
 <template>
   <div class="q-pt-md">
-    TRANSITION
+    <div class="label-radio-triplet">
+      <div class="text-bold" id="step-increase">Step Increase:</div>
+      <q-radio v-model="type" val="N" />
+      <div>New</div>
+      <q-radio v-model="type" val="R" />
+      <div>Return</div>
+      <q-radio v-model="type" val="M" />
+      <div>Change/Modify</div>
+      <q-radio v-model="type" val="E" />
+      <div>Exit</div>
+    </div>
+
+    {{currentEmployeeTransition()}}
   </div>
 </template>
 
 <style scoped lang="scss">
+.label-radio-triplet {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    grid-template-columns: auto auto auto auto auto auto auto auto auto;
+  }
 </style>
 
 <script lang="ts">
@@ -19,7 +37,11 @@ export default class EmployeeTransition extends Vue {
     return this.getters['workflowModule/currentEmployeeTransition']
   }
 
+  public type = ''
+
   public retrieveEmployeeTransition() {
+    
+    
     return new Promise((resolve, reject) => {
       this.$store.dispatch('workflowModule/getCurrentEmployeeTransition', {pk: this.$route.params.pk})
         .then(() => {

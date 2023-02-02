@@ -822,6 +822,7 @@ export interface WorkflowInstance {
   started_at: string
   completed_at: string
   process_instances: Array<ProcessInstance>
+  transition: EmployeeTransition
 }
 
 export interface EmployeeTransition {

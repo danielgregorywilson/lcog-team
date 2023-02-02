@@ -17,12 +17,12 @@ const blankWorkflow = {
   pk: -1, name: '', version: -1, role: blankRole
 }
 
-const blankWorkflowInstance = {
-  pk: -1, workflow: blankWorkflow, process_instances: [], started_at: '', completed_at: ''
-}
-
 const blankEmployeeTransition = {
   pk: -1
+}
+
+export const blankWorkflowInstance = {
+  pk: -1, workflow: blankWorkflow, transition: blankEmployeeTransition, process_instances: [], started_at: '', completed_at: ''
 }
 
 const state: WorkflowStateInterface = {

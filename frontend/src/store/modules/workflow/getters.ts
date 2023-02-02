@@ -4,6 +4,7 @@ import { WorkflowStateInterface } from './state';
 
 const getters: GetterTree<WorkflowStateInterface, StateInterface> = {
   currentWorkflowInstance: state => state.currentWorkflowInstance,
+  currentEmployeeTransition: state => state.currentWorkflowInstance.transition,
   workflowsActionRequired: state => state.workflowsActionRequired,
   workflowsComplete: state => state.workflowsComplete,
   workflowsIncomplete: state => state.workflowsIncomplete,

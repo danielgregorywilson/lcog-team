@@ -1,8 +1,8 @@
 import Vue from 'vue'
 
 import { MutationTree } from 'vuex'
-import { WorkflowStateInterface } from './state'
-import { WorkflowInstance } from '../../types'
+import { blankWorkflowInstance, WorkflowStateInterface } from './state'
+import { EmployeeTransition, WorkflowInstance } from '../../types'
 
 
 const mutation: MutationTree<WorkflowStateInterface> = {
@@ -23,7 +23,7 @@ const mutation: MutationTree<WorkflowStateInterface> = {
   },
   authLogout: (state) => {
     // Clean up state
-    state.currentWorkflowInstance = {pk: -1, workflow: -1, process_instances: [], started_at: '', completed_at: ''}
+    state.currentWorkflowInstance = blankWorkflowInstance
   }
 };
 

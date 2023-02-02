@@ -139,12 +139,12 @@ const linksData: Array<LinkData> = [
     link: '/workflows',
     hasWorkflowRoles: true
   },
-  {
-    title: 'Performance Reviews',
-    icon: 'assignment_turned_in',
-    link: '/reviews',
-    managerOnly: true
-  },
+  // {
+  //   title: 'Performance Reviews',
+  //   icon: 'assignment_turned_in',
+  //   link: '/reviews',
+  //   managerOnly: true
+  // },
   {
     title: 'Schaefers Desk Reservation',
     icon: 'laptop',

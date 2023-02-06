@@ -304,7 +304,7 @@ const routes: RouteConfig[] = [
           {
             path: 'transition',
             name: 'workflow-transition-form',
-            component: () => import('src/pages/workflows/EmployeeTransition.vue')
+            component: () => import('src/pages/workflows/EmployeeTransitionDetail.vue')
             // TODO: beforeEnter: TODO
           }
         ]

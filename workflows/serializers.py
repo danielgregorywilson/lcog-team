@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
 from workflows.models import (
-    Action, Process, ProcessInstance, Role, Step, StepChoice, StepInstance,
-    Workflow, WorkflowInstance
+    Action, EmployeeTransition, Process, ProcessInstance, Role, Step,
+    StepChoice, StepInstance, Workflow, WorkflowInstance
 )
 
 
@@ -108,10 +108,24 @@ class ProcessInstanceSerializer(serializers.ModelSerializer):
         depth = 1
 
 
+class EmployeeTransitionSerializer(serializers.ModelSerializer):
+    # process_instances = ProcessInstanceSerializer(source='processinstance_set',
+    #     many=True)
+    # percent_complete = serializers.SerializerMethodField()
+
+    class Meta:
+        model = EmployeeTransition
+        # fields = '__all__'
+        fields = [
+            'url', 'pk', 'type'
+        ]
+
+
 class WorkflowInstanceSerializer(serializers.ModelSerializer):
     process_instances = ProcessInstanceSerializer(source='processinstance_set',
         many=True)
     percent_complete = serializers.SerializerMethodField()
+    transition = EmployeeTransitionSerializer()
 
     class Meta:
         model = WorkflowInstance

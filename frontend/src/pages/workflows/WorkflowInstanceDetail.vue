@@ -63,6 +63,7 @@ export default class WorkflowInstanceDetail extends Vue {
 
   mounted() {
     this.retrieveWorkflowInstance()
+      .then(() => bus.$emit('workflowInstanceRetrieved'))
       .catch(e => {
         console.error('Error retrieving workflow instance:', e)
       })

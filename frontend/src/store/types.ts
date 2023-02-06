@@ -825,9 +825,15 @@ export interface WorkflowInstance {
   transition: EmployeeTransition
 }
 
-export interface EmployeeTransition {
+interface EmployeeTransitionBase {
+  type: string
+}
+
+export interface EmployeeTransition extends EmployeeTransitionBase {
   pk: number
 }
+
+export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {}
 
 export interface AxiosTimeOffRequestRetrieveOneServerResponse {
   data: TimeOffRequestRetrieve

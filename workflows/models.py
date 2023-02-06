@@ -73,6 +73,9 @@ class EmployeeTransition(models.Model):
         (UNION_MANAGEMENT, 'Management')
     ]
 
+    class Meta:
+        ordering = ["pk"]
+
     type = models.CharField(
         _("transition type"), max_length=1, choices=TRANSITION_TYPE_CHOICES,
         blank=True, null=True

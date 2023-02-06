@@ -17,8 +17,9 @@ from responsibilities.api_views import (
 )
 from timeoff.api_views import TimeOffRequestViewSet
 from workflows.api_views import (
-    ProcessInstanceViewSet, ProcessViewSet, RoleViewSet, StepChoiceViewSet,
-    StepInstanceViewSet, StepViewSet, WorkflowInstanceViewSet, WorkflowViewSet
+    EmployeeTransitionViewSet, ProcessInstanceViewSet, ProcessViewSet,
+    RoleViewSet, StepChoiceViewSet, StepInstanceViewSet, StepViewSet,
+    WorkflowInstanceViewSet, WorkflowViewSet
 )
 
 
@@ -57,5 +58,6 @@ router.register('v1/stepchoice', StepChoiceViewSet)
 router.register('v1/stepinstance', StepInstanceViewSet)
 router.register('v1/workflow', WorkflowViewSet)
 router.register('v1/workflowinstance', WorkflowInstanceViewSet)
+router.register('v1/employeetransition', EmployeeTransitionViewSet)
 
 urlpatterns = router.urls + urlpatterns

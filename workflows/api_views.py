@@ -26,9 +26,9 @@ from workflows.models import (
 )
 
 from workflows.serializers import (
-    ProcessInstanceSerializer, ProcessSerializer, RoleSerializer,
-    StepChoiceSerializer, StepInstanceSerializer, StepSerializer,
-    WorkflowInstanceSerializer, WorkflowSerializer
+    EmployeeTransitionSerializer, ProcessInstanceSerializer, ProcessSerializer,
+    RoleSerializer, StepChoiceSerializer, StepInstanceSerializer,
+    StepSerializer, WorkflowInstanceSerializer, WorkflowSerializer
 )
 
 
@@ -135,6 +135,76 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
                 context={'request': request}
             )
             return Response(serialized_wfi.data)
+
+    # def update(self, request, pk=None):
+    #     tor = TimeOffRequest.objects.get(pk=pk)
+    #     if 'from' in request.data['dates']:
+    #         start_date = request.data['dates']['from'].replace('/', '-')
+    #         end_date = request.data['dates']['to'].replace('/', '-')
+    #     else:
+    #         start_date = request.data['dates'].replace('/', '-')
+    #         end_date = request.data['dates'].replace('/', '-')
+    #     tor.note = request.data['note']
+    #     if start_date != str(tor.start_date) or end_date != str(tor.end_date):
+    #         tor.start_date = start_date
+    #         tor.end_date = end_date
+    #         tor.acknowledged = None # Reset acknowledged status since we are making a change
+    #     tor.save()
+    #     serialized_tor = TimeOffRequestSerializer(tor,
+    #         context={'request': request})
+    #     return Response(serialized_tor.data)
+    
+    # def partial_update(self, request, pk=None):
+    #     """
+    #     Acknowledge a time off request.
+    #     """
+    #     tor = TimeOffRequest.objects.get(pk=pk)
+    #     tor.acknowledged = request.data['acknowledged']
+    #     tor.save()
+    #     send_employee_manager_acknowledged_timeoff_request_notification(tor)
+    #     serialized_tor = TimeOffRequestSerializer(tor,
+    #         context={'request': request})
+    #     return Response(serialized_tor.data)
+
+
+class EmployeeTransitionViewSet(viewsets.ModelViewSet):
+    queryset = EmployeeTransition.objects.all()
+    serializer_class = EmployeeTransitionSerializer
+    # permission_classes = [
+    #     IsAuthenticatedOrReadOnly
+    # ]
+
+    # def get_queryset(self):
+    #     """
+
+    #     """
+    #     user = self.request.user
+    #     if user.is_authenticated:
+    #         action_required = self.request.query_params.get('action_required',
+    #             None)
+    #         complete = self.request.query_params.get('complete', None)
+    #         if action_required is not None and is_true_string(action_required):
+    #             queryset = WorkflowInstance.action_required.get_queryset(user)
+            
+            
+    #         if user.is_superuser:
+    #             instances = WorkflowInstance.objects.all()
+    #         else:
+    #             instances = WorkflowInstance.objects.none()
+    #         return instances
+
+    # def create(self, request):
+    #     if self.request.data['type'] == 'new_employee_onboarding':
+    #         et = EmployeeTransition.objects.create(type=EmployeeTransition.TRANSITION_TYPE_NEW)
+    #         wf = Workflow.objects.get(name="New Employee Onboarding")
+    #         wfi = WorkflowInstance.objects.create(workflow=wf, transition=et)
+    #         # Create process instances
+    #         for process in wf.processes.filter(workflow_start=True):
+    #             process.create_process_instance(wfi)
+    #         serialized_wfi = WorkflowInstanceSerializer(wfi,
+    #             context={'request': request}
+    #         )
+    #         return Response(serialized_wfi.data)
 
     # def update(self, request, pk=None):
     #     tor = TimeOffRequest.objects.get(pk=pk)

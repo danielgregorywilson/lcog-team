@@ -109,6 +109,7 @@ class ProcessInstanceSerializer(serializers.ModelSerializer):
 
 
 class EmployeeTransitionSerializer(serializers.ModelSerializer):
+    submitter_name = serializers.CharField(source='submitter.name')
     # process_instances = ProcessInstanceSerializer(source='processinstance_set',
     #     many=True)
     # percent_complete = serializers.SerializerMethodField()
@@ -117,7 +118,10 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
         model = EmployeeTransition
         # fields = '__all__'
         fields = [
-            'url', 'pk', 'type'
+            'url', 'pk', 'type', 'date_submitted', 'submitter_name',
+            'employee_first_name', 'employee_middle_initial',
+            'employee_last_name', 'employee_preferred_name', 'employee_number',
+            'employee_id', 'employee_email'
         ]
 
 

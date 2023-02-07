@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-import datetime
+from datetime import datetime
 from time import time
 
 from rest_framework import viewsets
@@ -11,6 +11,7 @@ from django.contrib.auth.models import Group, User
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.utils.timezone import get_current_timezone
 
 from mainsite.helpers import is_true_string
 
@@ -206,35 +207,56 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
     #         )
     #         return Response(serialized_wfi.data)
 
-    # def update(self, request, pk=None):
-    #     tor = TimeOffRequest.objects.get(pk=pk)
-    #     if 'from' in request.data['dates']:
-    #         start_date = request.data['dates']['from'].replace('/', '-')
-    #         end_date = request.data['dates']['to'].replace('/', '-')
-    #     else:
-    #         start_date = request.data['dates'].replace('/', '-')
-    #         end_date = request.data['dates'].replace('/', '-')
-    #     tor.note = request.data['note']
-    #     if start_date != str(tor.start_date) or end_date != str(tor.end_date):
-    #         tor.start_date = start_date
-    #         tor.end_date = end_date
-    #         tor.acknowledged = None # Reset acknowledged status since we are making a change
-    #     tor.save()
-    #     serialized_tor = TimeOffRequestSerializer(tor,
-    #         context={'request': request})
-    #     return Response(serialized_tor.data)
+    def update(self, request, pk=None):
+        t = EmployeeTransition.objects.get(pk=pk)
+        submitter = Employee.objects.get(pk=request.data['submitter_pk'])
+        t.submitter = submitter
+        t.date_submitted = datetime.now(tz=get_current_timezone())
+
+        t.type = request.data['type']
+        t.employee_first_name = request.data['employee_first_name']
+        t.employee_middle_initial = request.data['employee_middle_initial']
+        t.employee_last_name = request.data['employee_last_name']
+        t.employee_preferred_name = request.data['employee_preferred_name']
+        t.employee_id = request.data['employee_id']
+        
+        number = request.data['employee_number']
+        if number == '':
+            number = None
+        t.employee_number = number
+        
+        t.employee_email = request.data['employee_email']
+
+
+        # tor = TimeOffRequest.objects.get(pk=pk)
+        # if 'from' in request.data['dates']:
+        #     start_date = request.data['dates']['from'].replace('/', '-')
+        #     end_date = request.data['dates']['to'].replace('/', '-')
+        # else:
+        #     start_date = request.data['dates'].replace('/', '-')
+        #     end_date = request.data['dates'].replace('/', '-')
+        # tor.note = request.data['note']
+        # if start_date != str(tor.start_date) or end_date != str(tor.end_date):
+        #     tor.start_date = start_date
+        #     tor.end_date = end_date
+        #     tor.acknowledged = None # Reset acknowledged status since we are making a change
+        t.save()
+        serialized_transition = EmployeeTransitionSerializer(t,
+            context={'request': request})
+        return Response(serialized_transition.data)
     
-    # def partial_update(self, request, pk=None):
-    #     """
-    #     Acknowledge a time off request.
-    #     """
-    #     tor = TimeOffRequest.objects.get(pk=pk)
-    #     tor.acknowledged = request.data['acknowledged']
-    #     tor.save()
-    #     send_employee_manager_acknowledged_timeoff_request_notification(tor)
-    #     serialized_tor = TimeOffRequestSerializer(tor,
-    #         context={'request': request})
-    #     return Response(serialized_tor.data)
+    def partial_update(self, request, pk=None):
+        """
+        Acknowledge a time off request.
+        """
+        import pdb; pdb.set_trace()
+        tor = TimeOffRequest.objects.get(pk=pk)
+        tor.acknowledged = request.data['acknowledged']
+        tor.save()
+        send_employee_manager_acknowledged_timeoff_request_notification(tor)
+        serialized_tor = TimeOffRequestSerializer(tor,
+            context={'request': request})
+        return Response(serialized_tor.data)
 
 
 class ProcessViewSet(viewsets.ModelViewSet):

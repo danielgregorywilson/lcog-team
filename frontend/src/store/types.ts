@@ -825,18 +825,51 @@ export interface WorkflowInstance {
   transition: EmployeeTransition
 }
 
+export type EmployeeID = 'CLSD' | 'CLID' | ''
+
+// TODO: REMOVE?
 interface EmployeeTransitionBase {
   type: string
+  date_submitted: Date
+  submitter: EmployeeRetrieve
+  employee_first_name: string
+  employee_middle_initial: string
+  employee_last_name: string
+  employee_preferred_name: string
+  employee_number: number
+  employee_id: EmployeeID
+  employee_email: string
 }
 
-export interface EmployeeTransition extends EmployeeTransitionBase {
+export interface EmployeeTransition {
   pk: number
+  type: string
+  date_submitted: Date
+  submitter_name: string
+  employee_first_name: string
+  employee_middle_initial: string
+  employee_last_name: string
+  employee_preferred_name: string
+  employee_number: string
+  employee_id: EmployeeID
+  employee_email: string
 }
 
-export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {}
+export interface EmployeeTransitionUpdate {
+  type?: string
+  submitter_pk: number
+  employee_first_name?: string
+  employee_middle_initial?: string
+  employee_last_name?: string
+  employee_preferred_name?: string
+  employee_number?: string
+  employee_id?: EmployeeID
+  employee_email?: string
+}
 
-export interface AxiosTimeOffRequestRetrieveOneServerResponse {
-  data: TimeOffRequestRetrieve
+
+export interface AxiosEmployeeTransitionUpdateServerResponse {
+  data: EmployeeTransition
 }
 
 

@@ -1,7 +1,6 @@
 <template>
   <div class="q-pt-md">
-    <div class="label-radio-triplet">
-      <div class="text-bold" id="step-increase">Step Increase:</div>
+    <div class="row items-center">
       <q-radio v-model="type" val="N" />
       <div>New</div>
       <q-radio v-model="type" val="R" />
@@ -11,6 +10,25 @@
       <q-radio v-model="type" val="E" />
       <div>Exit</div>
     </div>
+    <div class="row">
+      <q-input v-model="dateSubmitted" label="Date Submitted" class="q-mr-md" disable />
+      <q-input v-model="submitterName" label="Submitter" disable />
+    </div>
+    <div class="row">
+      <q-input v-model="employeeFirstName" label="First" class="q-mr-md" />
+      <q-input v-model="employeeMiddleInitial" maxlength="1" label="M" class="q-mr-md" style="width: 1em" />
+      <q-input v-model="employeeLastName" label="Last" />
+    </div>
+    <div class="row">
+      <q-input v-model="employeePreferredName" label="Preferred Name, if different" style="width: 25em" />
+    </div>
+    <div class="row">
+      <q-select v-model="employeeID" :options="['CLSD', 'CLID']" label="Employee ID" class="q-mr-sm"/>
+      <q-input v-model="employeeNumber" label="Employee Number" />
+    </div>
+    <div class="row">
+      <q-input v-model="employeeEmail" type="email" label="Email" hint="Email" />
+    </div>
 
     {{currentEmployeeTransition()}}
 
@@ -18,7 +36,7 @@
     <div style="height: 80px;"></div>
 
     <div id="sticky-footer" class="row justify-between" v-if="true">
-      <q-btn id="update-button" class="col-1" color="white" text-color="black" label="Update" :disabled="!valuesAreChanged()" @click="updateTransition()" />
+      <q-btn id="update-button" class="col-1" color="white" text-color="black" label="Submit" :disabled="!valuesAreChanged()" @click="updateTransition()" />
       <!-- <q-btn v-if="this.showErrorButton && this.formErrorItems().length > 0" label="Show missing fields" icon="check" color="warning" @click="openErrorDialog('right')" /> -->
       <!-- <div class="col-3 self-center status">Current Status: {{ status }}</div> -->
     </div>
@@ -26,19 +44,17 @@
 </template>
 
 <style scoped lang="scss">
-.label-radio-triplet {
-    display: grid;
-    justify-content: center;
-    align-items: center;
-    grid-template-columns: auto auto auto auto auto auto auto auto auto;
-  }
+
 </style>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { bus } from '../../App.vue'
 import EmployeeTransitionDataService from '../../services/EmployeeTransitionDataService'
-import { EmployeeTransition, VuexStoreGetters, WorkflowInstance } from '../../store/types'
+import {
+  AxiosEmployeeTransitionUpdateServerResponse, EmployeeID, EmployeeTransition,
+  VuexStoreGetters
+} from '../../store/types'
 
 @Component
 export default class EmployeeTransitionDetail extends Vue {
@@ -52,6 +68,23 @@ export default class EmployeeTransitionDetail extends Vue {
 
   public typeCurrentVal = ''
   public type = ''
+  public dateSubmitted?: Date = new Date()
+  public submitterName = ''
+  
+  public employeeFirstNameCurrentVal = ''
+  public employeeFirstName = ''
+  public employeeMiddleInitialCurrentVal = ''
+  public employeeMiddleInitial = ''
+  public employeeLastNameCurrentVal = ''
+  public employeeLastName = ''
+  public employeePreferredNameCurrentVal = ''
+  public employeePreferredName = ''
+  public employeeNumberCurrentVal = ''
+  public employeeNumber = ''
+  public employeeIDCurrentVal: EmployeeID = ''
+  public employeeID: EmployeeID = ''
+  public employeeEmailCurrentVal = ''
+  public employeeEmail = ''
 
   public retrieveEmployeeTransition() {
     const t = this.currentEmployeeTransition()
@@ -61,6 +94,24 @@ export default class EmployeeTransitionDetail extends Vue {
     this.type = t.type
     this.typeCurrentVal = this.type
 
+    this.dateSubmitted = t.date_submitted
+    this.submitterName = t.submitter_name
+
+    this.employeeFirstName = t.employee_first_name
+    this.employeeFirstNameCurrentVal = this.employeeFirstName
+    this.employeeMiddleInitial = t.employee_middle_initial
+    this.employeeMiddleInitialCurrentVal = this.employeeMiddleInitial
+    this.employeeLastName = t.employee_last_name
+    this.employeeLastNameCurrentVal = this.employeeLastName
+    this.employeePreferredName = t.employee_preferred_name
+    this.employeePreferredNameCurrentVal = this.employeePreferredName
+    this.employeeNumber = t.employee_number
+    this.employeeNumberCurrentVal = this.employeeNumber
+    this.employeeID = t.employee_id
+    this.employeeIDCurrentVal = this.employeeID
+    this.employeeEmail = t.employee_email
+    this.employeeEmailCurrentVal = this.employeeEmail
+    
 
 
     
@@ -94,30 +145,15 @@ export default class EmployeeTransitionDetail extends Vue {
   }
 
   public valuesAreChanged(): boolean {
-    return true
     if (
-      this.type == this.typeCurrentVal
-      // this.probationaryEvaluationType == this.probationaryEvaluationTypeCurrentVal &&
-      // this.stepIncrease == this.stepIncreaseCurrentVal &&
-      // this.topStepBonus == this.topStepBonusCurrentVal &&
-      // this.actionOther == this.actionOtherCurrentVal &&
-      // this.factorJobKnowledge == this.factorJobKnowledgeCurrentVal &&
-      // this.factorWorkQuality == this.factorWorkQualityCurrentVal &&
-      // this.factorWorkQuantity == this.factorWorkQuantityCurrentVal &&
-      // this.factorWorkHabits == this.factorWorkHabitsCurrentVal &&
-      // this.factorAnalysis == this.factorAnalysisCurrentVal &&
-      // this.factorInitiative == this.factorInitiativeCurrentVal &&
-      // this.factorInterpersonal == this.factorInterpersonalCurrentVal &&
-      // this.factorCommunication == this.factorCommunicationCurrentVal &&
-      // this.factorDependability == this.factorDependabilityCurrentVal &&
-      // this.factorProfessionalism == this.factorProfessionalismCurrentVal &&
-      // this.factorManagement == this.factorManagementCurrentVal &&
-      // this.factorSupervision == this.factorSupervisionCurrentVal &&
-      // this.evaluationSuccesses == this.evaluationSuccessesCurrentVal &&
-      // this.evaluationOpportunities == this.evaluationOpportunitiesCurrentVal &&
-      // this.evaluationGoalsManager == this.evaluationGoalsManagerCurrentVal &&
-      // this.evaluationCommentsEmployee == this.evaluationCommentsEmployeeCurrentVal &&
-      // this.descriptionReviewedEmployee == this.descriptionReviewedEmployeeCurrentVal
+      this.type == this.typeCurrentVal &&
+      this.employeeFirstName == this.employeeFirstNameCurrentVal &&
+      this.employeeMiddleInitial == this.employeeMiddleInitialCurrentVal &&
+      this.employeeLastName == this.employeeLastNameCurrentVal &&
+      this.employeePreferredName == this.employeePreferredNameCurrentVal &&
+      this.employeeID == this.employeeIDCurrentVal &&
+      this.employeeNumber == this.employeeNumberCurrentVal &&
+      this.employeeEmail == this.employeeEmailCurrentVal
     ) {
       return false
     } else {
@@ -129,65 +165,30 @@ export default class EmployeeTransitionDetail extends Vue {
     return new Promise((resolve, reject) => {
       EmployeeTransitionDataService.update(this.transitionPk, {
         type: this.type,
-        // probationary_evaluation_type: this.probationaryEvaluationType,
-        // step_increase: this.stepIncrease,
-        // top_step_bonus: this.topStepBonus,
-        // action_other: this.actionOther,
-        // factor_job_knowledge: this.factorJobKnowledge,
-        // factor_work_quality: this.factorWorkQuality,
-        // factor_work_quantity: this.factorWorkQuantity,
-        // factor_work_habits: this.factorWorkHabits,
-        // factor_analysis: this.factorAnalysis,
-        // factor_initiative: this.factorInitiative,
-        // factor_interpersonal: this.factorInterpersonal,
-        // factor_communication: this.factorCommunication,
-        // factor_dependability: this.factorDependability,
-        // factor_professionalism: this.factorProfessionalism,
-        // factor_management: this.factorManagement,
-        // factor_supervision: this.factorSupervision,
-        // evaluation_successes: this.evaluationSuccesses,
-        // evaluation_opportunities: this.evaluationOpportunities,
-        // evaluation_goals_manager: this.evaluationGoalsManager,
-        // evaluation_comments_employee: this.evaluationCommentsEmployee,
-        // description_reviewed_employee: this.descriptionReviewedEmployee
+        
+        submitter_pk: this.$store.getters['userModule/getEmployeeProfile'].pk,
+        
+        employee_first_name: this.employeeFirstName,
+        employee_middle_initial: this.employeeMiddleInitial,
+        employee_last_name: this.employeeLastName,
+        employee_preferred_name: this.employeePreferredName,
+        employee_id: this.employeeID,
+        employee_number: this.employeeNumber,
+        employee_email: this.employeeEmail
       })
-      .then((response: AxiosPerformanceReviewUpdateServerResponse) => {
+      .then((response: AxiosEmployeeTransitionUpdateServerResponse) => {
         this.typeCurrentVal = response.data.type
         
-        // this.status = response.data.status
+        this.dateSubmitted = response.data.date_submitted
+        this.submitterName = response.data.submitter.name
 
-        // this.evaluationTypeCurrentVal = response.data.evaluation_type
-        // this.probationaryEvaluationTypeCurrentVal = response.data.probationary_evaluation_type
-        // this.stepIncreaseCurrentVal = response.data.step_increase
-        // this.topStepBonusCurrentVal = response.data.top_step_bonus
-        // this.actionOtherCurrentVal = response.data.action_other
-
-        // this.factorJobKnowledgeCurrentVal = response.data.factor_job_knowledge
-        // this.factorWorkQualityCurrentVal = response.data.factor_work_quality
-        // this.factorWorkQuantityCurrentVal = response.data.factor_work_quantity
-        // this.factorWorkHabitsCurrentVal = response.data.factor_work_habits
-        // this.factorAnalysisCurrentVal = response.data.factor_analysis
-        // this.factorInitiativeCurrentVal = response.data.factor_initiative
-        // this.factorInterpersonalCurrentVal = response.data.factor_interpersonal
-        // this.factorCommunicationCurrentVal = response.data.factor_communication
-        // this.factorDependabilityCurrentVal = response.data.factor_dependability
-        // this.factorProfessionalismCurrentVal = response.data.factor_professionalism
-        // this.factorManagementCurrentVal = response.data.factor_management
-        // this.factorSupervisionCurrentVal = response.data.factor_supervision
-
-        // this.evaluationSuccessesCurrentVal = response.data.evaluation_successes
-        // this.evaluationOpportunitiesCurrentVal = response.data.evaluation_opportunities
-        // this.evaluationGoalsManagerCurrentVal = response.data.evaluation_goals_manager
-        // this.evaluationCommentsEmployeeCurrentVal = response.data.evaluation_comments_employee
-
-        // this.descriptionReviewedEmployeeCurrentVal = response.data.description_reviewed_employee
-
-        // this.signatures = response.data.all_required_signatures
-
-
-
-
-
+        this.employeeFirstNameCurrentVal = response.data.employee_first_name
+        this.employeeMiddleInitialCurrentVal = response.data.employee_middle_initial
+        this.employeeLastNameCurrentVal = response.data.employee_last_name
+        this.employeePreferredNameCurrentVal = response.data.employee_preferred_name
+        this.employeeIDCurrentVal = response.data.employee_id
+        this.employeeNumberCurrentVal = response.data.employee_number
+        this.employeeEmailCurrentVal = response.data.employee_email
 
         // if (this.formErrorItems().length > 0) {
         //   this.showErrorButton = true

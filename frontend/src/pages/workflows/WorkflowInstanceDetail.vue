@@ -2,8 +2,8 @@
 <q-page class="q-pa-md">
   <div class="text-h4">{{currentWorkflowInstance().workflow.name}}</div>
   <q-btn-group push v-if="hasEmployeeTransition()">
-    <q-btn push color="secondary" glossy label="Processes" :to="{name: 'workflow-processes', params: {pk: currentWorkflowInstance().pk}}" />
-    <q-btn push color="primary" glossy label="Employee Transition Form" :to="{name: 'workflow-transition-form', params: {pk: currentWorkflowInstance().pk}}" />
+    <q-btn push :color="isSelected('workflow-processes')" glossy label="Processes" :to="{name: 'workflow-processes', params: {pk: currentWorkflowInstance().pk}}" />
+    <q-btn push :color="isSelected('workflow-transition-form')" glossy label="Employee Transition Form" :to="{name: 'workflow-transition-form', params: {pk: currentWorkflowInstance().pk}}" />
   </q-btn-group>
   <router-view :key="$route.path" />
 </q-page>
@@ -28,6 +28,14 @@ export default class WorkflowInstanceDetail extends Vue {
   public hasEmployeeTransition() {
     // TODO: If not, then just show the processes and no subnav
     return true
+  }
+
+  public isSelected(currentRouteName: string) {
+    if (this.$route.name == currentRouteName) {
+      return 'primary'
+    } else {
+      return 'grey'
+    }
   }
 
   public retrieveWorkflowInstance() {

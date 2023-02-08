@@ -853,6 +853,32 @@ export interface EmployeeTransition {
   employee_number: string
   employee_id: EmployeeID
   employee_email: string
+  title: string
+  fte: string
+  salary_range: string
+  salary_step: string
+  bilingual: boolean
+  manager_pk: number
+  manager_name: string
+  unit: string
+  transition_date: Date
+  preliminary_hire: boolean
+  delete_profile: boolean
+  office_location: string
+  cubicle_number: string
+  union_affiliation: string
+  teleworking: boolean
+  desk_phone: boolean
+  current_phone: string
+  new_phone: string
+  load_code: string
+  should_delete: boolean
+  reassign_to: string
+  business_cards: boolean
+  prox_card_needed: boolean
+  prox_card_returned: boolean
+  access_emails: EmployeeRetrieve
+  special_instructions: string
 }
 
 export interface EmployeeTransitionUpdate {
@@ -865,6 +891,32 @@ export interface EmployeeTransitionUpdate {
   employee_number?: string
   employee_id?: EmployeeID
   employee_email?: string
+  title?: string
+  fte?: string
+  salary_range?: string
+  salary_step?: string
+  bilingual?: boolean
+  manager_pk?: number
+  manager_name?: string
+  unit?: string
+  transition_date?: Date
+  preliminary_hire?: boolean
+  delete_profile?: boolean
+  office_location?: string
+  cubicle_number?: string
+  union_affiliation?: string
+  teleworking?: boolean
+  desk_phone?: boolean
+  current_phone?: string
+  new_phone?: string
+  load_code?: string
+  should_delete?: boolean
+  reassign_to?: string
+  business_cards?: boolean
+  prox_card_needed?: boolean
+  prox_card_returned?: boolean
+  access_emails?: EmployeeRetrieve
+  special_instructions?: string
 }
 
 

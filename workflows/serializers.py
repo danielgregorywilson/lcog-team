@@ -110,19 +110,38 @@ class ProcessInstanceSerializer(serializers.ModelSerializer):
 
 class EmployeeTransitionSerializer(serializers.ModelSerializer):
     submitter_name = serializers.CharField(source='submitter.name', required=False)
-    # process_instances = ProcessInstanceSerializer(source='processinstance_set',
-    #     many=True)
-    # percent_complete = serializers.SerializerMethodField()
+    manager_pk = serializers.SerializerMethodField()
+    manager_name = serializers.SerializerMethodField()
 
     class Meta:
         model = EmployeeTransition
-        # fields = '__all__'
         fields = [
             'url', 'pk', 'type', 'date_submitted', 'submitter_name',
             'employee_first_name', 'employee_middle_initial',
             'employee_last_name', 'employee_preferred_name', 'employee_number',
-            'employee_id', 'employee_email'
+            'employee_id', 'employee_email', 'title', 'fte', 'salary_range',
+            'salary_step', 'bilingual', 'manager_pk', 'manager_name', 'unit',
+            'transition_date', 'preliminary_hire', 'delete_profile',
+            'office_location', 'cubicle_number', 'union_affiliation',
+            'teleworking', 'desk_phone', 'current_phone', 'new_phone',
+            'load_code', 'should_delete', 'reassign_to', 'business_cards',
+            'prox_card_needed', 'prox_card_returned', 'access_emails',
+            'special_instructions'
         ]
+    
+    @staticmethod
+    def get_manager_pk(transition):
+        if transition.manager:
+            return transition.manager.pk
+        else:
+            return -1
+
+    @staticmethod
+    def get_manager_name(transition):
+        if transition.manager:
+            return transition.manager.name
+        else:
+            return ''
 
 
 class WorkflowInstanceSerializer(serializers.ModelSerializer):

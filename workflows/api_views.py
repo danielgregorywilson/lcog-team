@@ -232,20 +232,31 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         t.employee_number = number
         
         t.employee_email = request.data['employee_email']
-
-
-        # tor = TimeOffRequest.objects.get(pk=pk)
-        # if 'from' in request.data['dates']:
-        #     start_date = request.data['dates']['from'].replace('/', '-')
-        #     end_date = request.data['dates']['to'].replace('/', '-')
-        # else:
-        #     start_date = request.data['dates'].replace('/', '-')
-        #     end_date = request.data['dates'].replace('/', '-')
-        # tor.note = request.data['note']
-        # if start_date != str(tor.start_date) or end_date != str(tor.end_date):
-        #     tor.start_date = start_date
-        #     tor.end_date = end_date
-        #     tor.acknowledged = None # Reset acknowledged status since we are making a change
+        t.title = request.data['title']
+        t.fte = request.data['fte']
+        t.salary_range = request.data['salary_range']
+        t.salary_step = request.data['salary_step']
+        t.bilingual = request.data['bilingual']
+        t.manager = Employee.objects.get(pk=request.data['manager']['pk']) if request.data['manager']['pk'] != -1 else None
+        t.unit = request.data['unit']
+        t.transition_date = request.data['transition_date']
+        t.preliminary_hire = request.data['preliminary_hire']
+        t.delete_profile = request.data['delete_profile']
+        t.office_location = request.data['office_location']
+        t.cubicle_number = request.data['cubicle_number']
+        t.union_affiliation = request.data['union_affiliation']
+        t.teleworking = request.data['teleworking']
+        t.desk_phone = request.data['desk_phone']
+        t.current_phone = request.data['current_phone']
+        t.new_phone = request.data['new_phone']
+        t.load_code = request.data['load_code']
+        t.should_delete = request.data['should_delete']
+        t.reassign_to = request.data['reassign_to']
+        t.business_cards = request.data['business_cards']
+        t.prox_card_needed = request.data['prox_card_needed']
+        t.prox_card_returned = request.data['prox_card_returned']
+        t.access_emails = request.data['access_emails']
+        t.special_instructions = request.data['special_instructions']
         t.save()
         serialized_transition = EmployeeTransitionSerializer(t,
             context={'request': request})

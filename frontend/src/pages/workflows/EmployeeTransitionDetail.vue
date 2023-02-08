@@ -16,20 +16,40 @@
     </div>
     <div class="row">
       <q-input v-model="employeeFirstName" label="First" class="q-mr-md" />
-      <q-input v-model="employeeMiddleInitial" maxlength="1" label="M" class="q-mr-md" style="width: 1em" />
+      <q-input v-model="employeeMiddleInitial" mask="A" label="M" class="q-mr-md" style="width: 1em" />
       <q-input v-model="employeeLastName" label="Last" />
     </div>
     <div class="row">
       <q-input v-model="employeePreferredName" label="Preferred Name, if different" style="width: 25em" />
     </div>
     <div class="row">
-      <q-select v-model="employeeID" :options="['CLSD', 'CLID']" label="Employee ID" class="q-mr-sm"/>
-      <q-input v-model="employeeNumber" label="Employee Number" />
+      <q-select v-model="employeeID" :options="['CLSD', 'CLID']" label="Employee ID" class="q-mr-sm" style="width: 126px;"/>
+      <q-input v-model="employeeNumber" label="Employee Number" mask="####" />
     </div>
     <div class="row">
-      <q-input v-model="employeeEmail" type="email" label="Email" hint="Email" />
+      <q-input v-model="employeeEmail" type="email" label="Email" />
+    </div>
+    <div class="row">
+      <q-input v-model="title" label="Title" class="q-mr-sm" />
+      <q-input v-model="fte" label="FTE" mask="#.##" />
+    </div>
+    <div class="row">
+      <q-select v-model="salaryRange" :options="Array.from({length: 50}, (x, i) => i+1)" label="Salary Range" class="q-mr-sm" style="width: 131px;"/>
+      <q-select v-model="salaryStep" :options="Array.from({length: 10}, (x, i) => i+1)" label="Salary Step" class="q-mr-sm" style="width: 131px;"/>
+      <q-checkbox v-model="bilingual" label="Bilingual" />
+    </div>
+    <div class="row">
+      <EmployeeSelect
+        label="Manager"
+        :employee="manager"
+        v-on:input="manager=$event"
+        v-on:clear="manager=emptyEmployee"
+        class="q-mr-sm"
+      />
+      <!-- <q-input v-model="unit" label="Unit" mask="#.##" /> -->
     </div>
 
+    <hr class="q-my-md" />
     {{currentEmployeeTransition()}}
 
     <!-- Spacing for footer -->
@@ -52,13 +72,16 @@ import { Component, Vue } from 'vue-property-decorator'
 import { bus } from '../../App.vue'
 import EmployeeTransitionDataService from '../../services/EmployeeTransitionDataService'
 import {
-  AxiosEmployeeTransitionUpdateServerResponse, EmployeeID, EmployeeTransition,
-  VuexStoreGetters
+  AxiosEmployeeTransitionUpdateServerResponse, EmployeeID, EmployeeTransition, VuexStoreGetters
 } from '../../store/types'
+import EmployeeSelect from '../../components/EmployeeSelect.vue'
 
-@Component
+@Component({
+  components: { EmployeeSelect }
+})
 export default class EmployeeTransitionDetail extends Vue {
   private getters = this.$store.getters as VuexStoreGetters
+  public emptyEmployee = {name: '', pk: -1}
 
   public currentEmployeeTransition(): EmployeeTransition {
     return this.getters['workflowModule/currentEmployeeTransition']
@@ -85,6 +108,56 @@ export default class EmployeeTransitionDetail extends Vue {
   public employeeID: EmployeeID = ''
   public employeeEmailCurrentVal = ''
   public employeeEmail = ''
+  public titleCurrentVal = ''
+  public title = ''
+  public fteCurrentVal = ''
+  public fte = ''
+  public salaryRangeCurrentVal = ''
+  public salaryRange = ''
+  public salaryStepCurrentVal = ''
+  public salaryStep = ''
+  public bilingualCurrentVal = false
+  public bilingual = false
+  public managerCurrentVal = this.emptyEmployee
+  public manager = this.emptyEmployee
+  public unitCurrentVal = ''
+  public unit = ''
+  public transitionDateCurrentVal?: Date = new Date()
+  public transitionDate?: Date = new Date()
+  public preliminaryHireCurrentVal = false
+  public preliminaryHire = false
+  public deleteProfileCurrentVal = false
+  public deleteProfile = false
+  public officeLocationCurrentVal = ''
+  public officeLocation = ''
+  public cubicleNumberCurrentVal = ''
+  public cubicleNumber = ''
+  public unionAffiliationCurrentVal = ''
+  public unionAffiliation = ''
+  public teleworkingCurrentVal = false
+  public teleworking = false
+  public deskPhoneCurrentVal = false
+  public deskPhone = false
+  public currentPhoneCurrentVal = ''
+  public currentPhone = ''
+  public newPhoneCurrentVal = ''
+  public newPhone = ''
+  public loadCodeCurrentVal = ''
+  public loadCode = ''
+  public shouldDeleteCurrentVal = false
+  public shouldDelete = false
+  public reassignToCurrentVal = ''
+  public reassignTo = ''
+  public businessCardsCurrentVal = false
+  public businessCards = false
+  public proxCardNeededCurrentVal = false
+  public proxCardNeeded = false
+  public proxCardReturnedCurrentVal = false
+  public proxCardReturned = false
+  public accessEmailsCurrentVal = ''
+  public accessEmails = ''
+  public specialInstructionsCurrentVal = ''
+  public specialInstructions = ''
 
   public retrieveEmployeeTransition() {
     const t = this.currentEmployeeTransition()
@@ -111,6 +184,56 @@ export default class EmployeeTransitionDetail extends Vue {
     this.employeeIDCurrentVal = this.employeeID
     this.employeeEmail = t.employee_email
     this.employeeEmailCurrentVal = this.employeeEmail
+    this.title = t.title
+    this.titleCurrentVal = this.title
+    this.fte = t.fte
+    this.fteCurrentVal = this.fte
+    this.salaryRange = t.salary_range
+    this.salaryRangeCurrentVal = this.salaryRange
+    this.salaryStep = t.salary_step
+    this.salaryStepCurrentVal = this.salaryStep
+    this.bilingual = t.bilingual
+    this.bilingualCurrentVal = this.bilingual
+    this.manager = {pk: t.manager_pk, name: t.manager_name}
+    this.managerCurrentVal = this.manager
+    this.unit = t.unit
+    this.unitCurrentVal = this.unit
+    this.transitionDate = t.transition_date
+    this.transitionDateCurrentVal = this.transitionDate
+    this.preliminaryHire = t.preliminary_hire
+    this.preliminaryHireCurrentVal = this.preliminaryHire
+    this.deleteProfile = t.delete_profile
+    this.deleteProfileCurrentVal = this.deleteProfile
+    this.officeLocation = t.office_location
+    this.officeLocationCurrentVal = this.officeLocation
+    this.cubicleNumber = t.cubicle_number
+    this.cubicleNumberCurrentVal = this.cubicleNumber
+    this.unionAffiliation = t.union_affiliation
+    this.unionAffiliationCurrentVal = this.unionAffiliation
+    this.teleworking = t.teleworking
+    this.teleworkingCurrentVal = this.teleworking
+    this.deskPhone = t.desk_phone
+    this.deskPhoneCurrentVal = this.deskPhone
+    this.currentPhone = t.current_phone
+    this.currentPhoneCurrentVal = this.currentPhone
+    this.newPhone = t.new_phone
+    this.newPhoneCurrentVal = this.newPhone
+    this.loadCode = t.load_code
+    this.loadCodeCurrentVal = this.loadCode
+    this.shouldDelete = t.should_delete
+    this.shouldDeleteCurrentVal = this.shouldDelete
+    this.reassignTo = t.reassign_to
+    this.reassignToCurrentVal = this.reassignTo
+    this.businessCards = t.business_cards
+    this.businessCardsCurrentVal = this.businessCards
+    this.proxCardNeeded = t.prox_card_needed
+    this.proxCardNeededCurrentVal = this.proxCardNeeded
+    this.proxCardReturned = t.prox_card_returned
+    this.proxCardReturnedCurrentVal = this.proxCardReturned
+    this.accessEmails = t.access_emails
+    this.accessEmailsCurrentVal = this.accessEmails
+    this.specialInstructions = t.special_instructions
+    this.specialInstructionsCurrentVal = this.specialInstructions
     
 
 
@@ -153,7 +276,32 @@ export default class EmployeeTransitionDetail extends Vue {
       this.employeePreferredName == this.employeePreferredNameCurrentVal &&
       this.employeeID == this.employeeIDCurrentVal &&
       this.employeeNumber == this.employeeNumberCurrentVal &&
-      this.employeeEmail == this.employeeEmailCurrentVal
+      this.employeeEmail == this.employeeEmailCurrentVal &&
+      this.title == this.titleCurrentVal &&
+      this.fte == this.fteCurrentVal &&
+      this.salaryRange == this.salaryRangeCurrentVal &&
+      this.salaryStep == this.salaryStepCurrentVal &&
+      this.bilingual == this.bilingualCurrentVal &&
+      this.manager.pk == this.managerCurrentVal.pk &&
+      this.unit == this.unitCurrentVal &&
+      this.transitionDate == this.transitionDateCurrentVal &&
+      this.preliminaryHire == this.preliminaryHireCurrentVal &&
+      this.deleteProfile == this.deleteProfileCurrentVal &&
+      this.officeLocation == this.officeLocationCurrentVal &&
+      this.cubicleNumber == this.cubicleNumberCurrentVal &&
+      this.unionAffiliation == this.unionAffiliationCurrentVal &&
+      this.teleworking == this.teleworkingCurrentVal &&
+      this.deskPhone == this.deskPhoneCurrentVal &&
+      this.currentPhone == this.currentPhoneCurrentVal &&
+      this.newPhone == this.newPhoneCurrentVal &&
+      this.loadCode == this.loadCodeCurrentVal &&
+      this.shouldDelete == this.shouldDeleteCurrentVal &&
+      this.reassignTo == this.reassignToCurrentVal &&
+      this.businessCards == this.businessCardsCurrentVal &&
+      this.proxCardNeeded == this.proxCardNeededCurrentVal &&
+      this.proxCardReturned == this.proxCardReturnedCurrentVal &&
+      this.accessEmails == this.accessEmailsCurrentVal &&
+      this.specialInstructions == this.specialInstructionsCurrentVal
     ) {
       return false
     } else {
@@ -161,7 +309,7 @@ export default class EmployeeTransitionDetail extends Vue {
     }
   }
 
-  private updateTransition() {
+  public updateTransition() {
     return new Promise((resolve, reject) => {
       EmployeeTransitionDataService.update(this.transitionPk, {
         type: this.type,
@@ -174,7 +322,32 @@ export default class EmployeeTransitionDetail extends Vue {
         employee_preferred_name: this.employeePreferredName,
         employee_id: this.employeeID,
         employee_number: this.employeeNumber,
-        employee_email: this.employeeEmail
+        employee_email: this.employeeEmail,
+        title: this.title,
+        fte: this.fte,
+        salary_range: this.salaryRange,
+        salary_step: this.salaryStep,
+        bilingual: this.bilingual,
+        manager: this.manager,
+        unit: this.unit,
+        transition_date: this.transitionDate,
+        preliminary_hire: this.preliminaryHire,
+        delete_profile: this.deleteProfile,
+        office_location: this.officeLocation,
+        cubicle_number: this.cubicleNumber,
+        union_affiliation: this.unionAffiliation,
+        teleworking: this.teleworking,
+        desk_phone: this.deskPhone,
+        current_phone: this.currentPhone,
+        new_phone: this.newPhone,
+        load_code: this.loadCode,
+        should_delete: this.shouldDelete,
+        reassign_to: this.reassignTo,
+        business_cards: this.businessCards,
+        prox_card_needed: this.proxCardNeeded,
+        prox_card_returned: this.proxCardReturned,
+        access_emails: this.accessEmails,
+        special_instructions: this.specialInstructions
       })
       .then((response: AxiosEmployeeTransitionUpdateServerResponse) => {
         this.typeCurrentVal = response.data.type
@@ -189,6 +362,31 @@ export default class EmployeeTransitionDetail extends Vue {
         this.employeeIDCurrentVal = response.data.employee_id
         this.employeeNumberCurrentVal = response.data.employee_number
         this.employeeEmailCurrentVal = response.data.employee_email
+        this.titleCurrentVal = response.data.title
+        this.fteCurrentVal = response.data.fte
+        this.salaryRangeCurrentVal = response.data.salary_range
+        this.salaryStepCurrentVal = response.data.salary_step
+        this.bilingualCurrentVal = response.data.bilingual
+        this.managerCurrentVal = {pk: response.data.manager_pk, name: response.data.manager_name}
+        this.unitCurrentVal = response.data.unit
+        this.transitionDateCurrentVal = response.data.transition_date
+        this.preliminaryHireCurrentVal = response.data.preliminary_hire
+        this.deleteProfileCurrentVal = response.data.delete_profile
+        this.officeLocationCurrentVal = response.data.office_location
+        this.cubicleNumberCurrentVal = response.data.cubicle_number
+        this.unionAffiliationCurrentVal = response.data.union_affiliation
+        this.teleworkingCurrentVal = response.data.teleworking
+        this.deskPhoneCurrentVal = response.data.desk_phone
+        this.currentPhoneCurrentVal = response.data.current_phone
+        this.newPhoneCurrentVal = response.data.new_phone
+        this.loadCodeCurrentVal = response.data.load_code
+        this.shouldDeleteCurrentVal = response.data.should_delete
+        this.reassignToCurrentVal = response.data.reassign_to
+        this.businessCardsCurrentVal = response.data.business_cards
+        this.proxCardNeededCurrentVal = response.data.prox_card_needed
+        this.proxCardReturnedCurrentVal = response.data.prox_card_returned
+        this.accessEmailsCurrentVal = response.data.access_emails
+        this.specialInstructionsCurrentVal = response.data.special_instructions
 
         // if (this.formErrorItems().length > 0) {
         //   this.showErrorButton = true

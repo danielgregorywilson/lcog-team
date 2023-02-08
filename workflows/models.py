@@ -112,7 +112,6 @@ class EmployeeTransition(models.Model):
     cubicle_number = models.PositiveSmallIntegerField(blank=True, null=True)
     union_affiliation = models.CharField(max_length=1, choices=UNION_CHOICES)
     teleworking = models.BooleanField(default=False)
-    preliminary_hire = models.BooleanField(default=False)
     desk_phone = models.BooleanField(default=False)
     current_phone = models.CharField(max_length=8, blank=True)
     new_phone = models.CharField(max_length=8, blank=True)

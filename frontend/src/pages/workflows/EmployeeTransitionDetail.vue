@@ -1,13 +1,13 @@
 <template>
   <div class="q-pt-md">
     <div class="row items-center">
-      <q-radio v-model="type" val="N" />
+      <q-radio v-model="type" val="N" disable />
       <div>New</div>
-      <q-radio v-model="type" val="R" />
+      <q-radio v-model="type" val="R" disable />
       <div>Return</div>
-      <q-radio v-model="type" val="M" />
+      <q-radio v-model="type" val="M" disable />
       <div>Change/Modify</div>
-      <q-radio v-model="type" val="E" />
+      <q-radio v-model="type" val="E" disable />
       <div>Exit</div>
     </div>
     <div class="row">
@@ -180,7 +180,7 @@ export default class EmployeeTransitionDetail extends Vue {
         this.typeCurrentVal = response.data.type
         
         this.dateSubmitted = response.data.date_submitted
-        this.submitterName = response.data.submitter.name
+        this.submitterName = response.data.submitter_name
 
         this.employeeFirstNameCurrentVal = response.data.employee_first_name
         this.employeeMiddleInitialCurrentVal = response.data.employee_middle_initial
@@ -194,6 +194,11 @@ export default class EmployeeTransitionDetail extends Vue {
         //   this.showErrorButton = true
         // }
 
+        this.$store.dispatch('workflowModule/getCurrentWorkflowInstance', {pk: this.$route.params.pk})
+          .catch(e => {
+            console.error('Error getting getCurrentWorkflowInstance after updaing EmployeeTransition:', e)
+            reject(e)
+          })
 
         resolve('Updated')
       })

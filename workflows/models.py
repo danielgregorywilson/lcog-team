@@ -117,7 +117,7 @@ class EmployeeTransition(models.Model):
     current_phone = models.CharField(max_length=8, blank=True)
     new_phone = models.CharField(max_length=8, blank=True)
     load_code = models.CharField(max_length=50, blank=True)
-    delete = models.BooleanField(default=False)
+    should_delete = models.BooleanField(default=False)
     reassign_to = models.CharField(max_length=50, blank=True)
     business_cards = models.BooleanField(default=False)
     prox_card_needed = models.BooleanField(default=False)
@@ -181,8 +181,7 @@ class Process(models.Model):
 
     @property
     def total_steps(self):
-        return 1000
-        # TODO
+        return self.step_set.filter(end=True).first().num_steps_before + 1
 
     def create_process_instance(self, wfi):
         pi = ProcessInstance.objects.create(
@@ -325,14 +324,20 @@ class Step(models.Model):
     @property
     def num_steps_after(self):
         num_steps = 0
-        current_step = self.process.step_set.get(start=True)
+        current_step = self
         while True:
-            if current_step == self:
-                break
             if current_step.end == True:
-                raise Exception(
-                    "Got to the end of the Process without finding the step"
-                )
+                break
+            else:
+                if current_step.next_step:
+                    current_step = current_step.next_step
+                else:
+                    step_choice = StepChoice.objects.filter(
+                        step=current_step
+                    ).first()
+                    if not step_choice:
+                        raise Exception("Couldn't find a next step.")
+                    current_step = step_choice.next_step
         return num_steps
 
     #TODO: On save, error if no next and not end
@@ -388,6 +393,11 @@ class WorkflowInstance(HasTimeStampsMixin):
             return 0
         complete_steps = sum([pi.complete_steps for pi in pis])
         return int((complete_steps / total_steps) * 100)
+    
+    @property
+    def employee_name(self):
+        if self.transition:
+            return f'{self.transition.employee_first_name} {self.transition.employee_last_name}'
 
 
 class ProcessInstance(HasTimeStampsMixin):

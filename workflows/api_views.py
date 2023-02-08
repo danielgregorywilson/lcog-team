@@ -167,6 +167,12 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
     #         context={'request': request})
     #     return Response(serialized_tor.data)
 
+    def destroy(self, request, pk=None):
+        instance = self.get_object()
+        if instance.transition:
+            instance.transition.delete()
+        return super().destroy(request, pk)
+
 
 class EmployeeTransitionViewSet(viewsets.ModelViewSet):
     queryset = EmployeeTransition.objects.all()

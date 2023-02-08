@@ -22,6 +22,15 @@
           {{ props.row.started_at | readableDate }}
         </q-td>
       </template>
+      <template v-slot:body-cell-percentComplete="props">
+        <q-td key="percentComplete" :props="props">
+          <q-linear-progress size="25px" :value="props.row.percent_complete/100" color="primary">
+            <div class="absolute-full flex flex-center">
+              <q-badge color="white" text-color="primary" :label="`${props.row.percent_complete}%`" />
+            </div>
+          </q-linear-progress>
+      </q-td>
+      </template>
       <template v-slot:body-cell-actions="props">
         <q-td key="actions" :props="props">
           <q-btn class="col" dense round flat color="grey" @click="editWorkflowInstance(props.row)" icon="play_arrow"></q-btn>
@@ -144,7 +153,7 @@ export default class WorkflowTable extends Vue {
   }
   public columns(): Array<WorkflowColumn> {
     return [
-      { name: 'pk', label: 'PK', align: 'center', field: 'pk', sortable: true },
+      { name: 'name', label: 'Name', align: 'center', field: 'employee_name' },
       { name: 'startedAt', align: 'center', label: 'Workflow Start Date', field: 'started_at', sortable: true },
       { name: 'percentComplete', align: 'center', label: '% Complete', field: 'percent_complete', sortable: true },
       { name: 'actions', label: 'Actions', align: 'center' },
@@ -271,7 +280,7 @@ export default class WorkflowTable extends Vue {
       case 'newEmployeeOnboarding':
         this.$store.dispatch('workflowModule/createNewEmployeeOnboarding')
           .then((workflowInstance) => {
-            this.$router.push({name: 'workflow-instance-detail', params: {pk: workflowInstance.data.pk}})
+            this.$router.push({name: 'workflow-transition-form', params: {pk: workflowInstance.data.pk}})
               .catch(e => {
                 console.error('Error navigating to new employee page', e)
               })

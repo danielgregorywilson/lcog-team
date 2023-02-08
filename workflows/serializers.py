@@ -109,7 +109,7 @@ class ProcessInstanceSerializer(serializers.ModelSerializer):
 
 
 class EmployeeTransitionSerializer(serializers.ModelSerializer):
-    submitter_name = serializers.CharField(source='submitter.name')
+    submitter_name = serializers.CharField(source='submitter.name', required=False)
     # process_instances = ProcessInstanceSerializer(source='processinstance_set',
     #     many=True)
     # percent_complete = serializers.SerializerMethodField()
@@ -128,17 +128,23 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
 class WorkflowInstanceSerializer(serializers.ModelSerializer):
     process_instances = ProcessInstanceSerializer(source='processinstance_set',
         many=True)
-    percent_complete = serializers.SerializerMethodField()
     transition = EmployeeTransitionSerializer()
+    percent_complete = serializers.SerializerMethodField()
+    employee_name = serializers.SerializerMethodField()
 
     class Meta:
         model = WorkflowInstance
         fields = [
             'url', 'pk', 'workflow', 'started_at', 'completed_at',
-            'process_instances', 'percent_complete', 'transition'
+            'process_instances', 'transition', 'percent_complete',
+            'employee_name'
         ]
         depth = 1
 
     @staticmethod
     def get_percent_complete(wfi):
         return wfi.percent_complete
+
+    @staticmethod
+    def get_employee_name(wfi):
+        return wfi.employee_name

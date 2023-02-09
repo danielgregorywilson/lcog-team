@@ -22,6 +22,11 @@
           {{ props.row.started_at | readableDate }}
         </q-td>
       </template>
+      <template v-slot:body-cell-transitionDate="props">
+        <q-td key="transitionDate" :props="props">
+          {{ props.row.transition_date | readableDate }}
+        </q-td>
+      </template>
       <template v-slot:body-cell-percentComplete="props">
         <q-td key="percentComplete" :props="props">
           <q-linear-progress size="25px" :value="props.row.percent_complete/100" color="primary">
@@ -92,8 +97,8 @@
             <q-avatar icon="insert_chart_outlined" color="primary" text-color="white" />
             <span class="q-ml-sm">Are you sure you want to delete this workflow?</span>
           </div>
-          <div class="row justify-center text-center">TEMP</div>
-          <div class="row justify-center text-center">INFO</div>
+          <div class="row justify-center text-center">Position: {{ deleteDialogPositionName }}</div>
+          <div class="row justify-center text-center">{{ deleteDialogPercentComplete }}% Complete</div>
         </q-card-section>
 
         <q-card-actions class="row justify-around">
@@ -153,8 +158,10 @@ export default class WorkflowTable extends Vue {
   }
   public columns(): Array<WorkflowColumn> {
     return [
+      { name: 'position', label: 'Position', align: 'center', field: 'title' },
       { name: 'name', label: 'Name', align: 'center', field: 'employee_name' },
       { name: 'startedAt', align: 'center', label: 'Workflow Start Date', field: 'started_at', sortable: true },
+      { name: 'transitionDate', align: 'center', label: 'Transition Date', field: 'transition_date', sortable: true },
       { name: 'percentComplete', align: 'center', label: '% Complete', field: 'percent_complete', sortable: true },
       { name: 'actions', label: 'Actions', align: 'center' },
     ]
@@ -169,8 +176,8 @@ export default class WorkflowTable extends Vue {
   }
 
   public deleteDialogVisible = false
-  // private deleteDialogEmployeeName = ''
-  // private deleteDialogNoteText = ''
+  private deleteDialogPositionName = 'Not Set'
+  private deleteDialogPercentComplete = '0'
   private rowPkToDelete = ''
 
   private retrieveWorkflows(): void {
@@ -241,8 +248,8 @@ export default class WorkflowTable extends Vue {
 
   public showDeleteDialog(row: WorkflowInstance): void {
     this.rowPkToDelete = row.pk.toString()
-    // this.deleteDialogEmployeeName = props.row.employee_name
-    // this.deleteDialogNoteText = props.row.note
+    this.deleteDialogPositionName = row.title
+    this.deleteDialogPercentComplete = row.percent_complete
     this.deleteDialogVisible = true;
   }
 

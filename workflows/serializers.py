@@ -112,6 +112,8 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
     submitter_name = serializers.CharField(source='submitter.name', required=False)
     manager_pk = serializers.SerializerMethodField()
     manager_name = serializers.SerializerMethodField()
+    unit_pk = serializers.SerializerMethodField()
+    unit_name = serializers.SerializerMethodField()
 
     class Meta:
         model = EmployeeTransition
@@ -120,13 +122,13 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
             'employee_first_name', 'employee_middle_initial',
             'employee_last_name', 'employee_preferred_name', 'employee_number',
             'employee_id', 'employee_email', 'title', 'fte', 'salary_range',
-            'salary_step', 'bilingual', 'manager_pk', 'manager_name', 'unit',
-            'transition_date', 'preliminary_hire', 'delete_profile',
-            'office_location', 'cubicle_number', 'union_affiliation',
-            'teleworking', 'desk_phone', 'current_phone', 'new_phone',
-            'load_code', 'should_delete', 'reassign_to', 'business_cards',
-            'prox_card_needed', 'prox_card_returned', 'access_emails',
-            'special_instructions'
+            'salary_step', 'bilingual', 'manager_pk', 'manager_name',
+            'unit_pk', 'unit_name', 'transition_date', 'preliminary_hire',
+            'delete_profile', 'office_location', 'cubicle_number',
+            'union_affiliation', 'teleworking', 'desk_phone', 'current_phone',
+            'new_phone', 'load_code', 'should_delete', 'reassign_to',
+            'business_cards', 'prox_card_needed', 'prox_card_returned',
+            'access_emails', 'special_instructions'
         ]
     
     @staticmethod
@@ -142,6 +144,23 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
             return transition.manager.name
         else:
             return ''
+    
+    @staticmethod
+    def get_unit_pk(transition):
+        if transition.unit:
+            return transition.unit.pk
+        else:
+            return -1
+
+    @staticmethod
+    def get_unit_name(transition):
+        if transition.unit:
+            if transition.unit.name:
+                return f'{transition.unit.division.name} - {transition.unit.name}'
+            else:
+                return transition.unit.division.name
+        else:
+            return ''
 
 
 class WorkflowInstanceSerializer(serializers.ModelSerializer):
@@ -150,13 +169,15 @@ class WorkflowInstanceSerializer(serializers.ModelSerializer):
     transition = EmployeeTransitionSerializer()
     percent_complete = serializers.SerializerMethodField()
     employee_name = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
+    transition_date = serializers.SerializerMethodField()
 
     class Meta:
         model = WorkflowInstance
         fields = [
             'url', 'pk', 'workflow', 'started_at', 'completed_at',
             'process_instances', 'transition', 'percent_complete',
-            'employee_name'
+            'employee_name', 'title', 'transition_date'
         ]
         depth = 1
 
@@ -167,3 +188,11 @@ class WorkflowInstanceSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_employee_name(wfi):
         return wfi.employee_name
+    
+    @staticmethod
+    def get_title(wfi):
+        return wfi.title
+
+    @staticmethod
+    def get_transition_date(wfi):
+        return wfi.transition_date

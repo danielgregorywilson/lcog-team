@@ -397,6 +397,16 @@ class WorkflowInstance(HasTimeStampsMixin):
     def employee_name(self):
         if self.transition:
             return f'{self.transition.employee_first_name} {self.transition.employee_last_name}'
+    
+    @property
+    def title(self):
+        if self.transition:
+            return self.transition.title
+    
+    @property
+    def transition_date(self):
+        if self.transition:
+            return self.transition.transition_date
 
 
 class ProcessInstance(HasTimeStampsMixin):

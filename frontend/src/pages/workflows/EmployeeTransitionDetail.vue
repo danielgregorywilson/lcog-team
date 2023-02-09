@@ -46,7 +46,25 @@
         v-on:clear="manager=emptyEmployee"
         class="q-mr-sm"
       />
-      <!-- <q-input v-model="unit" label="Unit" mask="#.##" /> -->
+      <UnitSelect
+        label="Unit"
+        :unit="unit"
+        v-on:input="unit=$event"
+        v-on:clear="unit=emptyUnit"
+        class="q-mr-sm"
+      />
+    </div>
+    <div class="row q-mt-md"><div v-if="type=='E'">End Date/Time</div><div v-else>Start Date/Time</div></div>
+    <div class="row q-my-sm">
+      <q-date
+        v-model="transitionDate"
+        mask="YYYY-MM-DD HH:mm"
+        class="q-mr-md"
+      />
+      <q-time
+        v-model="transitionDate"
+        mask="YYYY-MM-DD HH:mm"
+      />
     </div>
 
     <hr class="q-my-md" />
@@ -75,13 +93,16 @@ import {
   AxiosEmployeeTransitionUpdateServerResponse, EmployeeID, EmployeeTransition, VuexStoreGetters
 } from '../../store/types'
 import EmployeeSelect from '../../components/EmployeeSelect.vue'
+import UnitSelect from 'src/components/UnitSelect.vue'
+import { runInThisContext } from 'vm'
 
 @Component({
-  components: { EmployeeSelect }
+  components: { EmployeeSelect, UnitSelect }
 })
 export default class EmployeeTransitionDetail extends Vue {
   private getters = this.$store.getters as VuexStoreGetters
   public emptyEmployee = {name: '', pk: -1}
+  public emptyUnit = {name: '', pk: -1}
 
   public currentEmployeeTransition(): EmployeeTransition {
     return this.getters['workflowModule/currentEmployeeTransition']
@@ -120,8 +141,8 @@ export default class EmployeeTransitionDetail extends Vue {
   public bilingual = false
   public managerCurrentVal = this.emptyEmployee
   public manager = this.emptyEmployee
-  public unitCurrentVal = ''
-  public unit = ''
+  public unitCurrentVal = this.emptyUnit
+  public unit = this.emptyUnit
   public transitionDateCurrentVal?: Date = new Date()
   public transitionDate?: Date = new Date()
   public preliminaryHireCurrentVal = false
@@ -196,7 +217,7 @@ export default class EmployeeTransitionDetail extends Vue {
     this.bilingualCurrentVal = this.bilingual
     this.manager = {pk: t.manager_pk, name: t.manager_name}
     this.managerCurrentVal = this.manager
-    this.unit = t.unit
+    this.unit = {pk: t.unit_pk, name: t.unit_name}
     this.unitCurrentVal = this.unit
     this.transitionDate = t.transition_date
     this.transitionDateCurrentVal = this.transitionDate
@@ -283,7 +304,7 @@ export default class EmployeeTransitionDetail extends Vue {
       this.salaryStep == this.salaryStepCurrentVal &&
       this.bilingual == this.bilingualCurrentVal &&
       this.manager.pk == this.managerCurrentVal.pk &&
-      this.unit == this.unitCurrentVal &&
+      this.unit.pk == this.unitCurrentVal.pk &&
       this.transitionDate == this.transitionDateCurrentVal &&
       this.preliminaryHire == this.preliminaryHireCurrentVal &&
       this.deleteProfile == this.deleteProfileCurrentVal &&
@@ -368,7 +389,7 @@ export default class EmployeeTransitionDetail extends Vue {
         this.salaryStepCurrentVal = response.data.salary_step
         this.bilingualCurrentVal = response.data.bilingual
         this.managerCurrentVal = {pk: response.data.manager_pk, name: response.data.manager_name}
-        this.unitCurrentVal = response.data.unit
+        this.unitCurrentVal = {pk: response.data.unit_pk, name: response.data.unit_name}
         this.transitionDateCurrentVal = response.data.transition_date
         this.preliminaryHireCurrentVal = response.data.preliminary_hire
         this.deleteProfileCurrentVal = response.data.delete_profile

@@ -15,7 +15,7 @@ from django.utils.timezone import get_current_timezone
 
 from mainsite.helpers import is_true_string
 
-from people.models import Employee
+from people.models import Employee, UnitOrProgram
 
 from timeoff.helpers import (
     send_employee_manager_acknowledged_timeoff_request_notification,
@@ -237,8 +237,10 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         t.salary_range = request.data['salary_range']
         t.salary_step = request.data['salary_step']
         t.bilingual = request.data['bilingual']
-        t.manager = Employee.objects.get(pk=request.data['manager']['pk']) if request.data['manager']['pk'] != -1 else None
-        t.unit = request.data['unit']
+        t.manager = Employee.objects.get(pk=request.data['manager']['pk']) if \
+            request.data['manager']['pk'] != -1 else None
+        t.unit = UnitOrProgram.objects.get(pk=request.data['unit']['pk']) if \
+            request.data['unit']['pk'] != -1 else None
         t.transition_date = request.data['transition_date']
         t.preliminary_hire = request.data['preliminary_hire']
         t.delete_profile = request.data['delete_profile']

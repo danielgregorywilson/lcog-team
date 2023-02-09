@@ -77,6 +77,12 @@ const actions: ActionTree<WorkflowStateInterface, StateInterface> = {
           reject(e)
         });
     })
+  },
+  authLogout: ({commit}) => {
+    return new Promise((resolve) => {
+      commit('authLogout')
+      resolve('Successfully triggered logout')
+    })
   }
 };
 

@@ -1,6 +1,6 @@
 <template>
 <q-page class="q-pa-md">
-  <div class="text-h4">{{currentWorkflowInstance().workflow.name}}</div>
+  <div class="text-h4 q-mb-sm">{{currentWorkflowInstance().workflow.name}}</div>
   <q-btn-group push v-if="hasEmployeeTransition()">
     <q-btn push :color="isSelected('workflow-processes')" glossy label="Processes" :to="{name: 'workflow-processes', params: {pk: currentWorkflowInstance().pk}}" />
     <q-btn push :color="isSelected('workflow-transition-form')" glossy label="Employee Transition Form" :to="{name: 'workflow-transition-form', params: {pk: currentWorkflowInstance().pk}}" />

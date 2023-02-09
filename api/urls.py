@@ -10,7 +10,8 @@ from people.api_views import (
     CurrentUserView, EmployeeViewSet, FileUploadViewSet, GroupViewSet,
     PerformanceReviewViewSet, ReviewNoteViewSet, SignatureViewSet,
     TeleworkApplicationFileUploadViewSet, TeleworkApplicationViewSet,
-    TeleworkSignatureViewSet, UserViewSet, ViewedSecurityMessageViewSet
+    TeleworkSignatureViewSet, UnitViewSet, UserViewSet,
+    ViewedSecurityMessageViewSet
 )
 from responsibilities.api_views import (
     ResponsibilityViewSet, TagViewSet as ResponsibilityTagViewSet
@@ -56,6 +57,7 @@ router.register('v1/role', RoleViewSet)
 router.register('v1/step', StepViewSet)
 router.register('v1/stepchoice', StepChoiceViewSet)
 router.register('v1/stepinstance', StepInstanceViewSet)
+router.register('v1/unit', UnitViewSet)
 router.register('v1/workflow', WorkflowViewSet)
 router.register('v1/workflowinstance', WorkflowInstanceViewSet)
 router.register('v1/employeetransition', EmployeeTransitionViewSet)

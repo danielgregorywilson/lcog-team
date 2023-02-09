@@ -15,7 +15,7 @@
     <template v-slot:no-option>
       <q-item>
         <q-item-section class="text-grey">
-          No results {{ employee }}
+          No results
         </q-item-section>
       </q-item>
     </template>
@@ -27,7 +27,6 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { ProvidePlugin } from 'webpack'
 import { SimpleEmployeeRetrieve, VuexStoreGetters } from '../store/types'
 
 @Component
@@ -38,17 +37,17 @@ export default class EmployeeSelect extends Vue {
   @Prop({required: true}) readonly label!: string
   @Prop({required: true}) employee!: {name: string, pk: number}
 
-  private needle = '' // For filtering employee lists
+  private needle = '' // For filtering employee list
 
   private retrieveSimpleEmployeeList(): void {
-    this.$store.dispatch('responsibilityModule/getSimpleEmployeeList')
+    this.$store.dispatch('peopleModule/getSimpleEmployeeList')
       .catch(e => {
         console.error('Error retrieving simple employee list', e)
       })
   }
 
   public employees(): Array<SimpleEmployeeRetrieve> {    
-    const employees = this.getters['responsibilityModule/simpleEmployeeList']
+    const employees = this.getters['peopleModule/simpleEmployeeList']
     return employees.filter((employee) => {
       return employee.name.toLowerCase().indexOf(this.needle) != -1
     })

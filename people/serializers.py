@@ -6,11 +6,25 @@ from rest_framework import serializers
 
 from people.models import (
     Employee, PerformanceReview, ReviewNote, Signature, TeleworkApplication,
-    TeleworkSignature, ViewedSecurityMessage
+    TeleworkSignature, UnitOrProgram, ViewedSecurityMessage
 )
 
 
-# Serializers define the API representation.
+class UnitSerializer(serializers.HyperlinkedModelSerializer):
+    name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UnitOrProgram
+        fields = ['pk', 'name']
+    
+    @staticmethod
+    def get_name(unit):
+        if unit.name != '-':
+            return f'{unit.division.name} - {unit.name}'
+        else:
+            return unit.division.name
+
+
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     name = serializers.CharField(source='get_full_name')
     

@@ -83,6 +83,23 @@ export interface AxiosEmployeeRetrieveManyServerResponse {
   }
 }
 
+
+/////////////////////////////////////////////////
+// People Structure from Django Rest Framework //
+/////////////////////////////////////////////////
+
+export interface Unit {
+  pk: number
+  name: string
+}
+
+export interface PeopleStateInterface {
+  simpleEmployeeList: Array<SimpleEmployeeRetrieve>
+  simpleEmployeeDetail: SimpleEmployeeRetrieve
+  unitList: Array<Unit>
+}
+
+
 ////////////////////////////////////////////////////////////
 // PerformanceReview Structure from Django Rest Framework //
 ////////////////////////////////////////////////////////////
@@ -591,8 +608,6 @@ export interface ResponsibilityStateInterface {
   employeeSecondaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
   tagWithResponsibilities: Array<EmployeeResponsibilitiesInterface>
   allTags: { results: Array<ResponsibilityTag> }
-  simpleEmployeeList: Array<SimpleEmployeeRetrieve>
-  simpleEmployeeDetail: SimpleEmployeeRetrieve
   simpleTagList: Array<SimpleResponsibilityTagRetrieve>
 }
 
@@ -823,6 +838,8 @@ export interface WorkflowInstance {
   completed_at: string
   process_instances: Array<ProcessInstance>
   transition: EmployeeTransition
+  title: string
+  percent_complete: string
 }
 
 export type EmployeeID = 'CLSD' | 'CLID' | ''
@@ -860,7 +877,8 @@ export interface EmployeeTransition {
   bilingual: boolean
   manager_pk: number
   manager_name: string
-  unit: string
+  unit_pk: number
+  unit_name: string
   transition_date: Date
   preliminary_hire: boolean
   delete_profile: boolean
@@ -898,7 +916,8 @@ export interface EmployeeTransitionUpdate {
   bilingual?: boolean
   manager_pk?: number
   manager_name?: string
-  unit?: string
+  unit_pk?: number
+  unit_name?: string
   transition_date?: Date
   preliminary_hire?: boolean
   delete_profile?: boolean
@@ -941,6 +960,13 @@ export interface VuexStoreGetters {
     results: Array<DeskReservation>
   },
 
+  // People
+  'peopleModule/simpleEmployeeList': Array<SimpleEmployeeRetrieve>,
+  'peopleModule/simpleEmployeeDetail': SimpleEmployeeRetrieve,
+  'peopleModule/unitList': {
+    results: Array<Unit>
+  },
+
   // Time Off
   'timeOffModule/teamTimeOffRequests': {
     results: Array<TimeOffRequestRetrieve>
@@ -954,8 +980,6 @@ export interface VuexStoreGetters {
   'timeOffModule/conflictingTimeOffRequests': Array<TimeOffRequestRetrieve>,
 
   // Responsibilities
-  'responsibilityModule/simpleEmployeeList': Array<SimpleEmployeeRetrieve>,
-  'responsibilityModule/simpleEmployeeDetail': SimpleEmployeeRetrieve,
   'responsibilityModule/allResponsibilities': {
     results: Array<Responsibility>
   },

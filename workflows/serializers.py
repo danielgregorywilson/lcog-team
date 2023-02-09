@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
 from workflows.models import (
-    Process, ProcessInstance, Role, Step, StepChoice, StepInstance, Workflow,
-    WorkflowInstance
+    Action, EmployeeTransition, Process, ProcessInstance, Role, Step,
+    StepChoice, StepInstance, Workflow, WorkflowInstance
 )
 
 
@@ -23,15 +23,36 @@ class StepChoiceSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
 
+class ActionSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Action
+        fields = '__all__'
+
+
 class StepSerializer(serializers.HyperlinkedModelSerializer):
     next_step_choices = StepChoiceSerializer(many=True)
+    role = RoleSerializer()
+    process_role_pk = serializers.SerializerMethodField()
+    workflow_role_pk = serializers.SerializerMethodField()
+    completion_action = ActionSerializer()
+    optional_actions = ActionSerializer(many=True)
     
     class Meta:
         model = Step
         fields = [
             'url', 'pk', 'order', 'start', 'end', 'name', 'description',
-            'choices_prompt', 'role', 'next_step', 'next_step_choices'
+            'choices_prompt', 'role', 'next_step', 'next_step_choices',
+            'process_role_pk', 'workflow_role_pk', 'completion_action',
+            'optional_actions'
         ]
+    
+    @staticmethod
+    def get_process_role_pk(step):
+        return step.process.role.pk if step.process.role else None
+    
+    @staticmethod
+    def get_workflow_role_pk(step):
+        return step.process.workflow.role.pk if step.process.workflow.role else None
 
 
 class ProcessSerializer(serializers.ModelSerializer):
@@ -56,12 +77,21 @@ class WorkflowSerializer(serializers.HyperlinkedModelSerializer):
 
 class StepInstanceSerializer(serializers.ModelSerializer):
     step = StepSerializer(required=False)
+    completed_by_name = serializers.SerializerMethodField()
     
     class Meta:
         model = StepInstance
         fields = [
             'url', 'pk', 'started_at', 'completed_at', 'step', 'completed_by',
+            'completed_by_name'
         ]
+    
+    @staticmethod
+    def get_completed_by_name(stepinstance):
+        if stepinstance.completed_by:
+            return stepinstance.completed_by.name
+        else:
+            return None
 
 
 class ProcessInstanceSerializer(serializers.ModelSerializer):
@@ -78,13 +108,91 @@ class ProcessInstanceSerializer(serializers.ModelSerializer):
         depth = 1
 
 
+class EmployeeTransitionSerializer(serializers.ModelSerializer):
+    submitter_name = serializers.CharField(source='submitter.name', required=False)
+    manager_pk = serializers.SerializerMethodField()
+    manager_name = serializers.SerializerMethodField()
+    unit_pk = serializers.SerializerMethodField()
+    unit_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = EmployeeTransition
+        fields = [
+            'url', 'pk', 'type', 'date_submitted', 'submitter_name',
+            'employee_first_name', 'employee_middle_initial',
+            'employee_last_name', 'employee_preferred_name', 'employee_number',
+            'employee_id', 'employee_email', 'title', 'fte', 'salary_range',
+            'salary_step', 'bilingual', 'manager_pk', 'manager_name',
+            'unit_pk', 'unit_name', 'transition_date', 'preliminary_hire',
+            'delete_profile', 'office_location', 'cubicle_number',
+            'union_affiliation', 'teleworking', 'desk_phone', 'current_phone',
+            'new_phone', 'load_code', 'should_delete', 'reassign_to',
+            'business_cards', 'prox_card_needed', 'prox_card_returned',
+            'access_emails', 'special_instructions'
+        ]
+    
+    @staticmethod
+    def get_manager_pk(transition):
+        if transition.manager:
+            return transition.manager.pk
+        else:
+            return -1
+
+    @staticmethod
+    def get_manager_name(transition):
+        if transition.manager:
+            return transition.manager.name
+        else:
+            return ''
+    
+    @staticmethod
+    def get_unit_pk(transition):
+        if transition.unit:
+            return transition.unit.pk
+        else:
+            return -1
+
+    @staticmethod
+    def get_unit_name(transition):
+        if transition.unit:
+            if transition.unit.name:
+                return f'{transition.unit.division.name} - {transition.unit.name}'
+            else:
+                return transition.unit.division.name
+        else:
+            return ''
+
+
 class WorkflowInstanceSerializer(serializers.ModelSerializer):
     process_instances = ProcessInstanceSerializer(source='processinstance_set',
         many=True)
+    transition = EmployeeTransitionSerializer()
+    percent_complete = serializers.SerializerMethodField()
+    employee_name = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
+    transition_date = serializers.SerializerMethodField()
 
     class Meta:
         model = WorkflowInstance
         fields = [
-            'url', 'pk', 'workflow', 'process_instances'
+            'url', 'pk', 'workflow', 'started_at', 'completed_at',
+            'process_instances', 'transition', 'percent_complete',
+            'employee_name', 'title', 'transition_date'
         ]
         depth = 1
+
+    @staticmethod
+    def get_percent_complete(wfi):
+        return wfi.percent_complete
+
+    @staticmethod
+    def get_employee_name(wfi):
+        return wfi.employee_name
+    
+    @staticmethod
+    def get_title(wfi):
+        return wfi.title
+
+    @staticmethod
+    def get_transition_date(wfi):
+        return wfi.transition_date

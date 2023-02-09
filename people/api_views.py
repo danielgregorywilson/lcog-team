@@ -17,14 +17,14 @@ from mainsite.helpers import (
 )
 from people.models import (
     Employee, PerformanceReview, ReviewNote, Signature, TeleworkApplication,
-    TeleworkSignature, ViewedSecurityMessage
+    TeleworkSignature, UnitOrProgram, ViewedSecurityMessage
 )
 from people.serializers import (
     EmployeeSerializer, FileUploadSerializer, GroupSerializer,
     PerformanceReviewFileUploadSerializer, PerformanceReviewSerializer,
     ReviewNoteSerializer, SignatureSerializer, SimpleEmployeeSerializer,
     TeleworkApplicationFileUploadSerializer, TeleworkApplicationSerializer,
-    TeleworkSignatureSerializer, UserSerializer,
+    TeleworkSignatureSerializer, UnitSerializer, UserSerializer,
     ViewedSecurityMessageSerializer
 )
 
@@ -53,6 +53,14 @@ class IsAdmin(BasePermission):
             request.user and
             request.user.is_staff
         )
+
+
+class UnitViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = UnitOrProgram.objects.all()
+    serializer_class = UnitSerializer
 
 
 class CurrentUserView(RetrieveAPIView):

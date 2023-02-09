@@ -1,12 +1,12 @@
 <template>
   <q-page class="q-pa-md">
     <div class="text-h4">EIS</div>
-    <div class="text-h5" v-if="currentWorkflowInstance().process_instances">
+    <div class="text-h5" v-if="currentWorkflowInstance().process_instances.length">
       {{currentWorkflowInstance().workflow.name}}: {{currentWorkflowInstance().process_instances[0].process.name}}
     </div>
     <div class="q-mt-sm">
       <q-stepper
-        v-if="currentWorkflowInstance().process_instances"
+        v-if="currentWorkflowInstance().process_instances.length"
         v-model="currentStepInstance"
         vertical
         color="primary"
@@ -111,7 +111,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { VuexStoreGetters, WorkflowInstanceRetrieve } from '../../store/types'
+import { VuexStoreGetters, WorkflowInstance } from '../../store/types'
 
 @Component
 export default class EIS extends Vue {
@@ -124,7 +124,7 @@ export default class EIS extends Vue {
   //   return this.getters['userModule/getEmployeeProfile'].is_manager
   // }
 
-  private currentWorkflowInstance(): WorkflowInstanceRetrieve {
+  private currentWorkflowInstance(): WorkflowInstance {
     return this.getters['workflowModule/currentWorkflowInstance']
   }
 

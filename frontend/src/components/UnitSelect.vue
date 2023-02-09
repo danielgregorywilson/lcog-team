@@ -1,6 +1,6 @@
 <template>
   <q-select
-    v-model="unit"
+    v-model="selectedUnit"
     :options="units()"
     option-value="pk"
     option-label="name"
@@ -10,17 +10,17 @@
     fill-input
     input-debounce="500"
     @filter="filterFn"
-    @input="$emit('input', unit)"
+    @input="$emit('input', selectedUnit)"
     class="unit-select"
   >
     <template v-slot:no-option>
       <q-item>
         <q-item-section class="text-grey">
-          No results
+          No results {{ selectedUnit }}
         </q-item-section>
       </q-item>
     </template>
-    <template v-if="unit.name" v-slot:append>
+    <template v-if="selectedUnit.name" v-slot:append>
       <q-icon name="cancel" @click.stop="clearUnit()" class="cursor-pointer" />
     </template>
   </q-select>
@@ -45,6 +45,7 @@ export default class UnitSelect extends Vue {
   @Prop({required: true}) unit!: {name: string, pk: number}
 
   private needle = '' // For filtering unit list
+  public selectedUnit = this.emptyUnit
 
   private retrieveUnitList(): void {
     this.$store.dispatch('peopleModule/getUnitList')
@@ -71,7 +72,7 @@ export default class UnitSelect extends Vue {
   }
 
   public clearUnit() {
-    this.unit = this.emptyUnit
+    this.selectedUnit = this.emptyUnit
     this.$emit('clear')
   }
 
@@ -79,6 +80,11 @@ export default class UnitSelect extends Vue {
     if (!this.units().length) {
       this.retrieveUnitList()
     }
+    this.selectedUnit = this.unit
+  }
+
+  unmounted() {
+    this.selectedUnit = this.unit
   }
 
 }

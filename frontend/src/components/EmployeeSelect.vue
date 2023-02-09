@@ -1,6 +1,6 @@
 <template>
   <q-select
-    v-model="employee"
+    v-model="selectedEmployee"
     :options="employees()"
     option-value="pk"
     option-label="name"
@@ -10,7 +10,7 @@
     fill-input
     input-debounce="500"
     @filter="filterFn"
-    @input="$emit('input', employee)"
+    @input="$emit('input', selectedEmployee)"
   >
     <template v-slot:no-option>
       <q-item>
@@ -19,7 +19,7 @@
         </q-item-section>
       </q-item>
     </template>
-    <template v-if="employee.name" v-slot:append>
+    <template v-if="selectedEmployee.name" v-slot:append>
       <q-icon name="cancel" @click.stop="clearEmployee()" class="cursor-pointer" />
     </template>
   </q-select>
@@ -38,6 +38,7 @@ export default class EmployeeSelect extends Vue {
   @Prop({required: true}) employee!: {name: string, pk: number}
 
   private needle = '' // For filtering employee list
+  public selectedEmployee = this.emptyEmployee
 
   private retrieveSimpleEmployeeList(): void {
     this.$store.dispatch('peopleModule/getSimpleEmployeeList')
@@ -60,7 +61,7 @@ export default class EmployeeSelect extends Vue {
   }
 
   public clearEmployee() {
-    this.employee = this.emptyEmployee
+    this.selectedEmployee = this.emptyEmployee
     this.$emit('clear')
   }
 
@@ -68,6 +69,11 @@ export default class EmployeeSelect extends Vue {
     if (!this.employees().length) {
       this.retrieveSimpleEmployeeList()
     }
+    this.selectedEmployee = this.employee
+  }
+
+  updated() {
+    this.selectedEmployee = this.employee
   }
 
 }

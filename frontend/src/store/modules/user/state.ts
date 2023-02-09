@@ -17,6 +17,7 @@ export interface EmployeeProfileInterface {
   telework_applications_can_view: Array<number>
   time_off_requests_can_view: Array<number>
   next_to_sign_prs: string
+  workflow_roles: Array<number>
 }
 
 export interface UserStateInterface {
@@ -26,7 +27,12 @@ export interface UserStateInterface {
 
 const state: UserStateInterface = {
   status: '',
-  profile: {employee_pk: -1, username: '', email: '', name: '', is_manager: false, has_manager: false, is_eligible_for_telework_application: false, can_view_seating_charts: false, can_edit_seating_charts: false, is_upper_manager: false, is_hr_manager: false, is_executive_director: false, viewed_security_message: false, prs_can_view: [], notes_can_view: [], telework_applications_can_view: [], time_off_requests_can_view: [], next_to_sign_prs: ''}
+  profile: {
+    employee_pk: -1, username: '', email: '', name: '', is_manager: false, has_manager: false, is_eligible_for_telework_application: false,
+    can_view_seating_charts: false, can_edit_seating_charts: false, is_upper_manager: false, is_hr_manager: false, is_executive_director: false,
+    viewed_security_message: false, prs_can_view: [], notes_can_view: [], telework_applications_can_view: [], time_off_requests_can_view: [],
+    next_to_sign_prs: '', workflow_roles: []
+  }
 };
 
 export default state;

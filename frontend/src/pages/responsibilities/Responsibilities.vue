@@ -221,7 +221,10 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { Notify } from 'quasar'
 import { bus } from '../../App.vue'
-import { Responsibility, ResponsibilityTag, SimpleEmployeeRetrieve, SimpleResponsibilityTagRetrieve, VuexStoreGetters } from '../../store/types'
+import { 
+  Responsibility, ResponsibilityTag, SimpleEmployeeRetrieve, SimpleResponsibilityTagRetrieve,
+  VuexStoreGetters 
+} from '../../store/types'
 import ResponsibilityDataService from '../../services/ResponsibilityDataService'
 
 @Component

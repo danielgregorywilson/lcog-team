@@ -119,6 +119,7 @@ interface LinkData {
   id?: string;
   managerOnly?: boolean;
   eligibleForTeleworkApplicationOnly?: boolean;
+  hasWorkflowRoles?: boolean
 }
 
 const linksData: Array<LinkData> = [
@@ -133,11 +134,17 @@ const linksData: Array<LinkData> = [
     link: '/responsibilities'
   },
   {
-    title: 'Performance Reviews',
-    icon: 'assignment_turned_in',
-    link: '/reviews',
-    managerOnly: true
+    title: 'Workflows',
+    icon: 'double_arrow',
+    link: '/workflows',
+    hasWorkflowRoles: true
   },
+  // {
+  //   title: 'Performance Reviews',
+  //   icon: 'assignment_turned_in',
+  //   link: '/reviews',
+  //   managerOnly: true
+  // },
   {
     title: 'Schaefers Desk Reservation',
     icon: 'laptop',

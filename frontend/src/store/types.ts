@@ -56,6 +56,7 @@ export interface EmployeeRetrieve {
   email_opt_out_timeoff_all: boolean
   email_opt_out_timeoff_weekly: boolean
   email_opt_out_timeoff_daily: boolean
+  workflow_roles: Array<number>
 }
 
 export interface SimpleEmployeeRetrieve {
@@ -81,6 +82,23 @@ export interface AxiosEmployeeRetrieveManyServerResponse {
     results: Array<EmployeeRetrieve>
   }
 }
+
+
+/////////////////////////////////////////////////
+// People Structure from Django Rest Framework //
+/////////////////////////////////////////////////
+
+export interface Unit {
+  pk: number
+  name: string
+}
+
+export interface PeopleStateInterface {
+  simpleEmployeeList: Array<SimpleEmployeeRetrieve>
+  simpleEmployeeDetail: SimpleEmployeeRetrieve
+  unitList: Array<Unit>
+}
+
 
 ////////////////////////////////////////////////////////////
 // PerformanceReview Structure from Django Rest Framework //
@@ -590,8 +608,6 @@ export interface ResponsibilityStateInterface {
   employeeSecondaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
   tagWithResponsibilities: Array<EmployeeResponsibilitiesInterface>
   allTags: { results: Array<ResponsibilityTag> }
-  simpleEmployeeList: Array<SimpleEmployeeRetrieve>
-  simpleEmployeeDetail: SimpleEmployeeRetrieve
   simpleTagList: Array<SimpleResponsibilityTagRetrieve>
 }
 
@@ -747,26 +763,184 @@ export interface AxiosTimeOffRequestRetrieveOneServerResponse {
 // Workflow Structure from Django Rest Framework //
 ///////////////////////////////////////////////////
 
-type StepInstance = {
+type Workflow = {
   pk: number
+  name: string
+  role: Role
+  version: number
 }
 
-type ProcessInstance = {
+type Process = {
   pk: number
-  process: number
+  name: string
+  workflow: Workflow
+  role: Role
+  version: number
+}
+
+type Role = {
+  pk: number
+  name: string
+  description: string
+  members: Array<EmployeeRetrieve>
+}
+
+export type Action = {
+  pk: number
+  type: string
+  name: string
+  description: string
+  url: URL
+}
+
+export type Step = {
+  pk: number
+  name: string
+  description: string
+  process: Process
+  role: Role
+  next_step: Step
+  choices_prompt: string
+  next_step_choices: Array<StepChoice>
+  workflow_role_pk: number
+  process_role_pk: number
+  completion_action: Action
+  optional_actions: Array<Action>
+}
+
+type StepChoice = {
+  pk: number
+  choice_text: string
+  next_step_pk: number
+}
+
+export type StepInstance = {
+  pk: number
+  step: Step
+  completed_at: Date
+  completed_by: number
+  completed_by_name: string
+}
+
+export type ProcessInstance = {
+  pk: number
+  process: Process
+  step_instances: Array<StepInstance>
   current_step_instance: StepInstance
   started_at: string
   completed_at: string
 }
 
-export interface WorkflowInstanceRetrieve {
+export interface WorkflowInstance {
   pk: number
-  workflow: number
+  workflow: Workflow
+  started_at: string
+  completed_at: string
   process_instances: Array<ProcessInstance>
+  transition: EmployeeTransition
+  title: string
+  percent_complete: string
 }
 
-export interface AxiosTimeOffRequestRetrieveOneServerResponse {
-  data: TimeOffRequestRetrieve
+export type EmployeeID = 'CLSD' | 'CLID' | ''
+
+// TODO: REMOVE?
+interface EmployeeTransitionBase {
+  type: string
+  date_submitted: Date
+  submitter: EmployeeRetrieve
+  employee_first_name: string
+  employee_middle_initial: string
+  employee_last_name: string
+  employee_preferred_name: string
+  employee_number: number
+  employee_id: EmployeeID
+  employee_email: string
+}
+
+export interface EmployeeTransition {
+  pk: number
+  type: string
+  date_submitted: Date
+  submitter_name: string
+  employee_first_name: string
+  employee_middle_initial: string
+  employee_last_name: string
+  employee_preferred_name: string
+  employee_number: string
+  employee_id: EmployeeID
+  employee_email: string
+  title: string
+  fte: string
+  salary_range: string
+  salary_step: string
+  bilingual: boolean
+  manager_pk: number
+  manager_name: string
+  unit_pk: number
+  unit_name: string
+  transition_date: Date
+  preliminary_hire: boolean
+  delete_profile: boolean
+  office_location: string
+  cubicle_number: string
+  union_affiliation: string
+  teleworking: boolean
+  desk_phone: boolean
+  current_phone: string
+  new_phone: string
+  load_code: string
+  should_delete: boolean
+  reassign_to: string
+  business_cards: boolean
+  prox_card_needed: boolean
+  prox_card_returned: boolean
+  access_emails: EmployeeRetrieve
+  special_instructions: string
+}
+
+export interface EmployeeTransitionUpdate {
+  type?: string
+  submitter_pk: number
+  employee_first_name?: string
+  employee_middle_initial?: string
+  employee_last_name?: string
+  employee_preferred_name?: string
+  employee_number?: string
+  employee_id?: EmployeeID
+  employee_email?: string
+  title?: string
+  fte?: string
+  salary_range?: string
+  salary_step?: string
+  bilingual?: boolean
+  manager_pk?: number
+  manager_name?: string
+  unit_pk?: number
+  unit_name?: string
+  transition_date?: Date
+  preliminary_hire?: boolean
+  delete_profile?: boolean
+  office_location?: string
+  cubicle_number?: string
+  union_affiliation?: string
+  teleworking?: boolean
+  desk_phone?: boolean
+  current_phone?: string
+  new_phone?: string
+  load_code?: string
+  should_delete?: boolean
+  reassign_to?: string
+  business_cards?: boolean
+  prox_card_needed?: boolean
+  prox_card_returned?: boolean
+  access_emails?: EmployeeRetrieve
+  special_instructions?: string
+}
+
+
+export interface AxiosEmployeeTransitionUpdateServerResponse {
+  data: EmployeeTransition
 }
 
 
@@ -786,6 +960,13 @@ export interface VuexStoreGetters {
     results: Array<DeskReservation>
   },
 
+  // People
+  'peopleModule/simpleEmployeeList': Array<SimpleEmployeeRetrieve>,
+  'peopleModule/simpleEmployeeDetail': SimpleEmployeeRetrieve,
+  'peopleModule/unitList': {
+    results: Array<Unit>
+  },
+
   // Time Off
   'timeOffModule/teamTimeOffRequests': {
     results: Array<TimeOffRequestRetrieve>
@@ -799,8 +980,6 @@ export interface VuexStoreGetters {
   'timeOffModule/conflictingTimeOffRequests': Array<TimeOffRequestRetrieve>,
 
   // Responsibilities
-  'responsibilityModule/simpleEmployeeList': Array<SimpleEmployeeRetrieve>,
-  'responsibilityModule/simpleEmployeeDetail': SimpleEmployeeRetrieve,
   'responsibilityModule/allResponsibilities': {
     results: Array<Responsibility>
   },
@@ -816,5 +995,7 @@ export interface VuexStoreGetters {
   'responsibilityModule/simpleTagList': Array<SimpleResponsibilityTagRetrieve>,
 
   // Workflows
-  'workflowModule/currentWorkflowInstance': WorkflowInstanceRetrieve
+  'workflowModule/currentWorkflowInstance': WorkflowInstance,
+  'workflowModule/currentEmployeeTransition': EmployeeTransition,
+  'workflowModule/processInstanceCurrentStepPks': {number: number}
 }

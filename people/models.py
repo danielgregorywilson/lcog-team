@@ -435,6 +435,18 @@ class Employee(models.Model):
             return self.job_title.position_description_link
         return None
 
+    def is_all_workflows_admin(self):
+        role = apps.get_model('workflows', 'Role').objects.get(name="All Workflows Admins")
+        return self in role.members.all()
+
+    def admin_of_workflows(self):
+        all_workflows = apps.get_model('workflows', 'Workflow').objects.all().select_related('role')
+        return [workflow.id for workflow in list(all_workflows) if workflow.role and self in workflow.role.members.all()]
+    
+    def admin_of_processes(self):
+        all_processes = apps.get_model('workflows', 'Process').objects.all().select_related('role')
+        return [process.id for process in list(all_processes) if process.role and self in process.role.members.all()]
+
 
 class ManagerUpcomingReviewsManager(models.Manager):
     def get_queryset(self, user):

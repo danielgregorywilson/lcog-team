@@ -69,6 +69,12 @@ const actions: ActionTree<TimeOffRequestStateInterface, StateInterface> = {
         console.log(e)
       });
   },
+  authLogout: ({commit}) => {
+    return new Promise((resolve) => {
+      commit('authLogout')
+      resolve('Successfully triggered logout')
+    })
+  }
 };
 
 export default actions;

@@ -24,7 +24,7 @@ import { Action } from '../../store/types'
 export default class StepAction extends Vue {
 @Prop({required: true}) readonly action!: Action
 
-public navigateToURL(url: URL) {
+public navigateToURL(url: string) {
   window.open(url, '_blank');
 }
 

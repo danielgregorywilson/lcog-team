@@ -29,16 +29,19 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import WorkflowTable from '../../components/WorkflowTable.vue';
+import { VuexStoreGetters } from '../../store/types'
+import WorkflowTable from '../../components/WorkflowTable.vue'
 
 @Component({
   components: { WorkflowTable, }
 })
 export default class Workflows extends Vue {
+  private getters = this.$store.getters as VuexStoreGetters
+
   private currentIndex = -1;
   private title = '';
   public hasWorkflowRoles() {
-    return this.$store.getters['userModule/getEmployeeProfile'].workflow_roles.length
+    return this.getters['userModule/getEmployeeProfile'].workflow_roles.length
   }
 };
 </script>

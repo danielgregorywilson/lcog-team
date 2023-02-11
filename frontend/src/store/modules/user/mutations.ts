@@ -21,7 +21,7 @@ const mutation: MutationTree<UserStateInterface> = {
     Vue.prototype.$cookies.set('notes_can_view', resp.data.notes_can_view) // eslint-disable-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     Vue.prototype.$cookies.set('telework_applications_can_view', resp.data.telework_applications_can_view) // eslint-disable-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     Vue.prototype.$cookies.set('time_off_requests_can_view', resp.data.time_off_requests_can_view) // eslint-disable-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    Vue.prototype.$cookies.set('workflow_roles', resp.data.workflow_roles)
+    Vue.prototype.$cookies.set('workflow_roles', resp.data.workflow_roles) // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   },
   userError: (state) => {
     state.status = 'error'
@@ -42,7 +42,7 @@ const mutation: MutationTree<UserStateInterface> = {
     Vue.prototype.$cookies.remove('notes_can_view') // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     Vue.prototype.$cookies.remove('telework_applications_can_view') // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     Vue.prototype.$cookies.remove('time_off_requests_can_view') // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    Vue.prototype.$cookies.remove('workflow_roles')
+    Vue.prototype.$cookies.remove('workflow_roles') // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   }
 };
 

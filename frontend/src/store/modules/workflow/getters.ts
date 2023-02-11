@@ -10,7 +10,7 @@ const getters: GetterTree<WorkflowStateInterface, StateInterface> = {
   workflowsIncomplete: state => state.workflowsIncomplete,
   allWorkflows: state => state.allWorkflows,
   processInstanceCurrentStepPks: state => {
-    const d = {}
+    const d: {[pk: number]: number} = {}
     state.currentWorkflowInstance.process_instances.forEach(pi => {
       if (pi.current_step_instance) {
         d[pi.pk] = pi.current_step_instance.pk  

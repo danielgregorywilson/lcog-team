@@ -237,7 +237,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         t.salary_range = request.data['salary_range']
         t.salary_step = request.data['salary_step']
         t.bilingual = request.data['bilingual']
-        t.manager = Employee.objects.get(pk=request.data['manager']['pk']) if \
+        t.manager = Employee.objects.get(pk=request.data['manager_pk']) if \
             request.data['manager']['pk'] != -1 else None
         t.unit = UnitOrProgram.objects.get(pk=request.data['unit']['pk']) if \
             request.data['unit']['pk'] != -1 else None
@@ -257,7 +257,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         t.business_cards = request.data['business_cards']
         t.prox_card_needed = request.data['prox_card_needed']
         t.prox_card_returned = request.data['prox_card_returned']
-        t.access_emails = request.data['access_emails']
+        t.access_emails = request.data['access_emails_pk']
         t.special_instructions = request.data['special_instructions']
         t.save()
         serialized_transition = EmployeeTransitionSerializer(t,

@@ -1,6 +1,6 @@
 <template>
 <div class="q-pt-md">
-  <div v-for="pi of currentWorkflowInstance().process_instances">
+  <div v-for="pi of currentWorkflowInstance().process_instances" :key="pi.pk">
     <div class="text-h5">{{pi.process.name}}</div>
     <process-instance-detail :pi="pi" />
   </div>
@@ -12,7 +12,6 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { bus } from '../../App.vue'
 import ProcessInstanceDetail from '../../components/workflows/ProcessInstanceDetail.vue'
 import { VuexStoreGetters, WorkflowInstance } from '../../store/types'
 

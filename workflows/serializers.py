@@ -114,6 +114,8 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
     manager_name = serializers.SerializerMethodField()
     unit_pk = serializers.SerializerMethodField()
     unit_name = serializers.SerializerMethodField()
+    access_emails_pk = serializers.SerializerMethodField()
+    access_emails_name = serializers.SerializerMethodField()
 
     class Meta:
         model = EmployeeTransition
@@ -128,7 +130,7 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
             'union_affiliation', 'teleworking', 'desk_phone', 'current_phone',
             'new_phone', 'load_code', 'should_delete', 'reassign_to',
             'business_cards', 'prox_card_needed', 'prox_card_returned',
-            'access_emails', 'special_instructions'
+            'access_emails_pk', 'access_emails_name', 'special_instructions'
         ]
     
     @staticmethod
@@ -159,6 +161,20 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
                 return f'{transition.unit.division.name} - {transition.unit.name}'
             else:
                 return transition.unit.division.name
+        else:
+            return ''
+    
+    @staticmethod
+    def get_access_emails_pk(transition):
+        if transition.access_emails:
+            return transition.access_emails.pk
+        else:
+            return -1
+
+    @staticmethod
+    def get_access_emails_name(transition):
+        if transition.access_emails:
+            return transition.access_emails.name
         else:
             return ''
 

@@ -90,11 +90,10 @@ import { Component, Vue } from 'vue-property-decorator'
 import { bus } from '../../App.vue'
 import EmployeeTransitionDataService from '../../services/EmployeeTransitionDataService'
 import {
-  AxiosEmployeeTransitionUpdateServerResponse, EmployeeID, EmployeeTransition, VuexStoreGetters
+  AxiosEmployeeTransitionUpdateServerResponse, EmployeeTransition, VuexStoreGetters
 } from '../../store/types'
 import EmployeeSelect from '../../components/EmployeeSelect.vue'
 import UnitSelect from 'src/components/UnitSelect.vue'
-import { runInThisContext } from 'vm'
 
 @Component({
   components: { EmployeeSelect, UnitSelect }
@@ -125,8 +124,8 @@ export default class EmployeeTransitionDetail extends Vue {
   public employeePreferredName = ''
   public employeeNumberCurrentVal = ''
   public employeeNumber = ''
-  public employeeIDCurrentVal: EmployeeID = ''
-  public employeeID: EmployeeID = ''
+  public employeeIDCurrentVal = '' // TODO This should be EmployeeID
+  public employeeID = '' // TODO This should be EmployeeID
   public employeeEmailCurrentVal = ''
   public employeeEmail = ''
   public titleCurrentVal = ''
@@ -175,8 +174,8 @@ export default class EmployeeTransitionDetail extends Vue {
   public proxCardNeeded = false
   public proxCardReturnedCurrentVal = false
   public proxCardReturned = false
-  public accessEmailsCurrentVal = ''
-  public accessEmails = ''
+  public accessEmailsCurrentVal = this.emptyEmployee
+  public accessEmails = this.emptyEmployee
   public specialInstructionsCurrentVal = ''
   public specialInstructions = ''
 
@@ -200,8 +199,8 @@ export default class EmployeeTransitionDetail extends Vue {
     this.employeePreferredName = t.employee_preferred_name
     this.employeePreferredNameCurrentVal = this.employeePreferredName
     this.employeeNumber = t.employee_number
-    this.employeeNumberCurrentVal = this.employeeNumber
     this.employeeID = t.employee_id
+    this.employeeNumberCurrentVal = this.employeeNumber
     this.employeeIDCurrentVal = this.employeeID
     this.employeeEmail = t.employee_email
     this.employeeEmailCurrentVal = this.employeeEmail
@@ -251,7 +250,7 @@ export default class EmployeeTransitionDetail extends Vue {
     this.proxCardNeededCurrentVal = this.proxCardNeeded
     this.proxCardReturned = t.prox_card_returned
     this.proxCardReturnedCurrentVal = this.proxCardReturned
-    this.accessEmails = t.access_emails
+    this.accessEmails = {pk: t.access_emails_pk, name: t.access_emails_name}
     this.accessEmailsCurrentVal = this.accessEmails
     this.specialInstructions = t.special_instructions
     this.specialInstructionsCurrentVal = this.specialInstructions
@@ -335,7 +334,7 @@ export default class EmployeeTransitionDetail extends Vue {
       EmployeeTransitionDataService.update(this.transitionPk, {
         type: this.type,
         
-        submitter_pk: this.$store.getters['userModule/getEmployeeProfile'].pk,
+        submitter_pk: this.getters['userModule/getEmployeeProfile'].pk,
         
         employee_first_name: this.employeeFirstName,
         employee_middle_initial: this.employeeMiddleInitial,
@@ -349,8 +348,8 @@ export default class EmployeeTransitionDetail extends Vue {
         salary_range: this.salaryRange,
         salary_step: this.salaryStep,
         bilingual: this.bilingual,
-        manager: this.manager,
-        unit: this.unit,
+        manager_pk: this.manager.pk,
+        unit_pk: this.unit.pk,
         transition_date: this.transitionDate,
         preliminary_hire: this.preliminaryHire,
         delete_profile: this.deleteProfile,
@@ -367,7 +366,7 @@ export default class EmployeeTransitionDetail extends Vue {
         business_cards: this.businessCards,
         prox_card_needed: this.proxCardNeeded,
         prox_card_returned: this.proxCardReturned,
-        access_emails: this.accessEmails,
+        access_emails_pk: this.accessEmails.pk,
         special_instructions: this.specialInstructions
       })
       .then((response: AxiosEmployeeTransitionUpdateServerResponse) => {
@@ -406,7 +405,7 @@ export default class EmployeeTransitionDetail extends Vue {
         this.businessCardsCurrentVal = response.data.business_cards
         this.proxCardNeededCurrentVal = response.data.prox_card_needed
         this.proxCardReturnedCurrentVal = response.data.prox_card_returned
-        this.accessEmailsCurrentVal = response.data.access_emails
+        this.accessEmailsCurrentVal = {pk: response.data.access_emails_pk, name: response.data.access_emails_name}
         this.specialInstructionsCurrentVal = response.data.special_instructions
 
         // if (this.formErrorItems().length > 0) {

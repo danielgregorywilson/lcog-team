@@ -2,7 +2,7 @@ import Vue from 'vue'
 
 import { MutationTree } from 'vuex'
 import { blankWorkflowInstance, WorkflowStateInterface } from './state'
-import { EmployeeTransition, WorkflowInstance } from '../../types'
+import { WorkflowInstance } from '../../types'
 
 
 const mutation: MutationTree<WorkflowStateInterface> = {

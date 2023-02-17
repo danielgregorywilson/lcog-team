@@ -608,6 +608,8 @@ export interface ResponsibilityStateInterface {
   employeeSecondaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
   tagWithResponsibilities: Array<EmployeeResponsibilitiesInterface>
   allTags: { results: Array<ResponsibilityTag> }
+  simpleEmployeeList: Array<SimpleEmployeeRetrieve>
+  simpleEmployeeDetail: SimpleEmployeeRetrieve
   simpleTagList: Array<SimpleResponsibilityTagRetrieve>
 }
 
@@ -854,7 +856,7 @@ interface EmployeeTransitionBase {
   employee_last_name: string
   employee_preferred_name: string
   employee_number: number
-  employee_id: EmployeeID
+  employee_id: string // TODO This should be EmployeeID
   employee_email: string
 }
 
@@ -868,7 +870,7 @@ export interface EmployeeTransition {
   employee_last_name: string
   employee_preferred_name: string
   employee_number: string
-  employee_id: EmployeeID
+  employee_id: string // TODO This should be EmployeeID
   employee_email: string
   title: string
   fte: string
@@ -895,7 +897,8 @@ export interface EmployeeTransition {
   business_cards: boolean
   prox_card_needed: boolean
   prox_card_returned: boolean
-  access_emails: EmployeeRetrieve
+  access_emails_pk: number
+  access_emails_name: string
   special_instructions: string
 }
 
@@ -907,7 +910,7 @@ export interface EmployeeTransitionUpdate {
   employee_last_name?: string
   employee_preferred_name?: string
   employee_number?: string
-  employee_id?: EmployeeID
+  employee_id?: string // TODO This should be EmployeeID
   employee_email?: string
   title?: string
   fte?: string
@@ -915,9 +918,7 @@ export interface EmployeeTransitionUpdate {
   salary_step?: string
   bilingual?: boolean
   manager_pk?: number
-  manager_name?: string
   unit_pk?: number
-  unit_name?: string
   transition_date?: Date
   preliminary_hire?: boolean
   delete_profile?: boolean
@@ -934,13 +935,16 @@ export interface EmployeeTransitionUpdate {
   business_cards?: boolean
   prox_card_needed?: boolean
   prox_card_returned?: boolean
-  access_emails?: EmployeeRetrieve
+  access_emails_pk?: number
   special_instructions?: string
 }
 
-
 export interface AxiosEmployeeTransitionUpdateServerResponse {
   data: EmployeeTransition
+}
+
+export interface AxiosWorkflowCreateServerResponse {
+  data: WorkflowInstance
 }
 
 
@@ -951,6 +955,8 @@ export interface AxiosEmployeeTransitionUpdateServerResponse {
 export interface VuexStoreGetters {
   'authModule/isAuthenticated': boolean,
   'userModule/getEmployeeProfile': EmployeeRetrieve,
+  'userModule/hasWorkflowRoles': boolean,
+  'userModule/isManager': boolean,
 
   // Desk Reservation
   'deskReservationModule/allDesks': {
@@ -994,8 +1000,12 @@ export interface VuexStoreGetters {
   },
   'responsibilityModule/simpleTagList': Array<SimpleResponsibilityTagRetrieve>,
 
+  // TODO: Remove
+  'responsibilityModule/simpleEmployeeList': Array<SimpleEmployeeRetrieve>,
+  'responsibilityModule/simpleEmployeeDetail': SimpleEmployeeRetrieve,
+
   // Workflows
   'workflowModule/currentWorkflowInstance': WorkflowInstance,
   'workflowModule/currentEmployeeTransition': EmployeeTransition,
-  'workflowModule/processInstanceCurrentStepPks': {number: number}
+  'workflowModule/processInstanceCurrentStepPks': Array<number>
 }

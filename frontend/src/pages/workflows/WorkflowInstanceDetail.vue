@@ -66,6 +66,10 @@ export default class WorkflowInstanceDetail extends Vue {
     // We trigger updating the current step instance in WorkflowInstanceDetail when we complete a step and reload it.
     bus.$on('completedStep', () => {
       this.retrieveWorkflowInstance()
+        .then(() => bus.$emit('workflowInstanceRetrieved'))
+        .catch(e => {
+          console.error('Error retrieving workflow instance:', e)
+        })
     })
   }
 

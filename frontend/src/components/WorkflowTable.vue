@@ -125,7 +125,7 @@
 import { Notify } from 'quasar'
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import WorkflowInstanceDataService from '../services/WorkflowInstanceDataService';
-import { WorkflowInstance } from '../store/types'
+import { AxiosWorkflowCreateServerResponse, WorkflowInstance } from '../store/types'
 import '../filters'
 
 interface WorkflowColumn {
@@ -214,11 +214,11 @@ export default class WorkflowTable extends Vue {
       })
   }
 
-  public workflowHasTransition(workflowInstance: WorkflowInstance): boolean {
+  public workflowHasTransition(): boolean {
     return true
   }
 
-  public canViewTransition(workflowInstance: WorkflowInstance): boolean {
+  public canViewTransition(): boolean {
     return true
   }
 
@@ -286,8 +286,8 @@ export default class WorkflowTable extends Vue {
     switch (type) {
       case 'newEmployeeOnboarding':
         this.$store.dispatch('workflowModule/createNewEmployeeOnboarding')
-          .then((workflowInstance) => {
-            this.$router.push({name: 'workflow-transition-form', params: {pk: workflowInstance.data.pk}})
+          .then((response: AxiosWorkflowCreateServerResponse) => {
+            this.$router.push({name: 'workflow-transition-form', params: {pk: response.data.pk.toString()}})
               .catch(e => {
                 console.error('Error navigating to new employee page', e)
               })

@@ -225,12 +225,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         t.employee_last_name = request.data['employee_last_name']
         t.employee_preferred_name = request.data['employee_preferred_name']
         t.employee_id = request.data['employee_id']
-        
-        number = request.data['employee_number']
-        if number == '':
-            number = None
-        t.employee_number = number
-        
+        t.employee_number = request.data['employee_number']
         t.employee_email = request.data['employee_email']
         t.title = request.data['title']
         t.fte = request.data['fte']
@@ -248,9 +243,10 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         t.cubicle_number = request.data['cubicle_number']
         t.union_affiliation = request.data['union_affiliation']
         t.teleworking = request.data['teleworking']
-        t.desk_phone = request.data['desk_phone']
         t.current_phone = request.data['current_phone']
-        t.new_phone = request.data['new_phone']
+        t.desk_phone = request.data['desk_phone']
+        t.phone_request = request.data['phone_request']
+        t.phone_request_data = request.data['phone_request_data']
         t.load_code = request.data['load_code']
         t.should_delete = request.data['should_delete']
         t.reassign_to = request.data['reassign_to']
@@ -266,18 +262,18 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             context={'request': request})
         return Response(serialized_transition.data)
     
-    def partial_update(self, request, pk=None):
-        """
-        Acknowledge a time off request.
-        """
-        import pdb; pdb.set_trace()
-        tor = TimeOffRequest.objects.get(pk=pk)
-        tor.acknowledged = request.data['acknowledged']
-        tor.save()
-        send_employee_manager_acknowledged_timeoff_request_notification(tor)
-        serialized_tor = TimeOffRequestSerializer(tor,
-            context={'request': request})
-        return Response(serialized_tor.data)
+    # def partial_update(self, request, pk=None):
+    #     """
+    #     Acknowledge a time off request.
+    #     """
+    #     import pdb; pdb.set_trace()
+    #     tor = TimeOffRequest.objects.get(pk=pk)
+    #     tor.acknowledged = request.data['acknowledged']
+    #     tor.save()
+    #     send_employee_manager_acknowledged_timeoff_request_notification(tor)
+    #     serialized_tor = TimeOffRequestSerializer(tor,
+    #         context={'request': request})
+    #     return Response(serialized_tor.data)
 
 
 class ProcessViewSet(viewsets.ModelViewSet):

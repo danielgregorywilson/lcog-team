@@ -73,6 +73,21 @@ class EmployeeTransition(models.Model):
         (UNION_MANAGEMENT, 'Management')
     ]
 
+    PHONE_REQUEST_NEW = 'NN'
+    PHONE_REQUEST_REMOVE = 'RP'
+    PHONE_REQUEST_DELETE_NUM = 'DN'
+    PHONE_REQUEST_REASSIGN = 'RT'
+    PHONE_REQIUEST_CHANGE = 'CN'
+    PHONE_REQUEST_DELETE_VM = 'DV'
+    PHONE_REQUEST_CHOICES = [
+        (PHONE_REQUEST_NEW, 'New number needed'),
+        (PHONE_REQUEST_REMOVE, 'Remove phone'),
+        (PHONE_REQUEST_DELETE_NUM, 'Delete number'),
+        (PHONE_REQUEST_REASSIGN, 'Reassign to:'),
+        (PHONE_REQIUEST_CHANGE, 'Change name display to:'),
+        (PHONE_REQUEST_DELETE_VM, 'Delete voicemail box')
+    ]
+
     class Meta:
         ordering = ["pk"]
 
@@ -112,9 +127,10 @@ class EmployeeTransition(models.Model):
     cubicle_number = models.PositiveSmallIntegerField(blank=True, null=True)
     union_affiliation = models.CharField(max_length=1, choices=UNION_CHOICES)
     teleworking = models.BooleanField(default=False)
+    current_phone = models.CharField(max_length=10, blank=True)
     desk_phone = models.BooleanField(default=False)
-    current_phone = models.CharField(max_length=8, blank=True)
-    new_phone = models.CharField(max_length=8, blank=True)
+    phone_request = models.CharField(max_length=2, choices=PHONE_REQUEST_CHOICES, blank=True)
+    phone_request_data = models.CharField(max_length=50, blank=True)
     load_code = models.CharField(max_length=50, blank=True)
     should_delete = models.BooleanField(default=False)
     reassign_to = models.CharField(max_length=50, blank=True)

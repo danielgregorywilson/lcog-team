@@ -1,4 +1,6 @@
 <template>
+<div>
+  <div style="display: none">{{ unit }}</div> <!-- TODO: This is a hack to force the component to render the currently selected unit -->
   <q-select
     v-model="selectedUnit"
     :options="units()"
@@ -16,7 +18,7 @@
     <template v-slot:no-option>
       <q-item>
         <q-item-section class="text-grey">
-          No results {{ selectedUnit }}
+          No results
         </q-item-section>
       </q-item>
     </template>
@@ -24,6 +26,7 @@
       <q-icon name="cancel" @click.stop="clearUnit()" class="cursor-pointer" />
     </template>
   </q-select>
+</div>
 </template>
 
 <style scoped lang="scss">
@@ -47,7 +50,7 @@ export default class UnitSelect extends Vue {
   private needle = '' // For filtering unit list
   public selectedUnit = this.emptyUnit
 
-  private retrieveUnitList(): void {
+  private retrieveUnitList() {
     this.$store.dispatch('peopleModule/getUnitList')
       .catch(e => {
         console.error('Error retrieving unit list', e)
@@ -80,10 +83,9 @@ export default class UnitSelect extends Vue {
     if (!this.units().length) {
       this.retrieveUnitList()
     }
-    this.selectedUnit = this.unit
   }
 
-  unmounted() {
+  updated() {
     this.selectedUnit = this.unit
   }
 

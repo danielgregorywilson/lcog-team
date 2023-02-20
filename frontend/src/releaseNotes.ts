@@ -11,6 +11,10 @@ export const releases = [
         type: 'new',
         description: 'Workflows module to facilitate and automate business processes'
       },
+      {
+        type: 'new',
+        description: 'Employee onboarding workflow with staff transition form'
+      },
     ]
   },
   {

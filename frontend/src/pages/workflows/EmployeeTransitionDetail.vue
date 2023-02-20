@@ -1,5 +1,6 @@
 <template>
   <div class="q-pt-md">
+    <div class="text-h6 transition-form-section-heading">Type</div>
     <div class="row items-center">
       <q-radio v-model="type" val="N" disable />
       <div>New</div>
@@ -10,33 +11,66 @@
       <q-radio v-model="type" val="E" disable />
       <div>Exit</div>
     </div>
+    <div class="text-h6 transition-form-section-heading">Submission Info</div>
     <div class="row">
       <q-input v-model="dateSubmitted" label="Date Submitted" class="q-mr-md" disable />
       <q-input v-model="submitterName" label="Submitter" disable />
     </div>
+    <div class="text-h6 transition-form-section-heading">Employee</div>
     <div class="row">
       <q-input v-model="employeeFirstName" label="First" class="q-mr-md" />
       <q-input v-model="employeeMiddleInitial" mask="A" label="M" class="q-mr-md" style="width: 1em" />
-      <q-input v-model="employeeLastName" label="Last" />
-    </div>
-    <div class="row">
+      <q-input v-model="employeeLastName" label="Last" class="q-mr-md" />
       <q-input v-model="employeePreferredName" label="Preferred Name, if different" style="width: 25em" />
     </div>
     <div class="row">
-      <q-select v-model="employeeID" :options="['CLSD', 'CLID']" label="Employee ID" class="q-mr-sm" style="width: 126px;"/>
-      <q-input v-model="employeeNumber" label="Employee Number" mask="####" />
-    </div>
-    <div class="row">
+      <q-select
+        v-model="employeeID"
+        :options="['CLSD', 'CLID']"
+        label="Employee ID"
+        class="q-mr-sm"
+        style="width: 130px;"
+      >
+        <template v-if="employeeID" v-slot:append>
+          <q-icon name="cancel" @click.stop="employeeID=''" class="cursor-pointer" />
+        </template>
+      </q-select>
+      <q-input v-model="employeeNumber" type="number" label="Employee Number" mask="####" class="q-mr-md" />
       <q-input v-model="employeeEmail" type="email" label="Email" />
     </div>
+    <div class="text-h6 transition-form-section-heading">Position</div>
     <div class="row">
-      <q-input v-model="title" label="Title" class="q-mr-sm" />
-      <q-input v-model="fte" label="FTE" mask="#.##" />
+      <q-input v-model="title" label="Title" class="q-mr-md" />
+      <q-input v-model="fte" label="FTE" mask="#.##" class="q-mr-md" />
+      <q-checkbox v-model="bilingual" label="Bilingual" />
     </div>
     <div class="row">
-      <q-select v-model="salaryRange" :options="Array.from({length: 50}, (x, i) => i+1)" label="Salary Range" class="q-mr-sm" style="width: 131px;"/>
-      <q-select v-model="salaryStep" :options="Array.from({length: 10}, (x, i) => i+1)" label="Salary Step" class="q-mr-sm" style="width: 131px;"/>
-      <q-checkbox v-model="bilingual" label="Bilingual" />
+      <q-select
+        v-model="salaryRange"
+        :options="Array.from({length: 50}, (x, i) => i+1)"
+        label="Salary Range"
+        class="q-mr-md"
+        style="width: 133px;"
+        clearable
+      />
+      <q-select
+        v-model="salaryStep"
+        :options="Array.from({length:10}, (x, i) => i+1)"
+        label="Salary Step"
+        class="q-mr-md"
+        style="width: 131px;"
+        clearable
+      />
+      <q-select
+        v-model="unionAffiliation"
+        :options="['Non-Represented','EA', 'SEIU', 'Management']"
+        label="Union Affiliation"
+        style="width: 172px;"
+      >
+        <template v-if="unionAffiliation" v-slot:append>
+          <q-icon name="cancel" @click.stop="unionAffiliation=''" class="cursor-pointer" />
+        </template>
+      </q-select>
     </div>
     <div class="row">
       <EmployeeSelect
@@ -44,16 +78,16 @@
         :employee="manager"
         v-on:input="manager=$event"
         v-on:clear="manager=emptyEmployee"
-        class="q-mr-sm"
+        class="q-mr-md"
       />
       <UnitSelect
         label="Unit"
         :unit="unit"
         v-on:input="unit=$event"
         v-on:clear="unit=emptyUnit"
-        class="q-mr-sm"
       />
     </div>
+    <div class="text-h6 transition-form-section-heading">Work Details</div>
     <div class="row q-mt-md"><div v-if="type=='E'">End Date/Time</div><div v-else>Start Date/Time</div></div>
     <div class="row q-my-sm">
       <q-date
@@ -66,9 +100,108 @@
         mask="YYYY-MM-DD HH:mm"
       />
     </div>
-
-    <hr class="q-my-md" />
-    {{currentEmployeeTransition()}}
+    <div class="row q-my-sm">
+      <q-checkbox v-model="preliminaryHire" v-if="employeeID == 'CLSD'" label="Preliminary Hire" />
+      <q-checkbox v-model="deleteProfile" label="Delete Profile" />
+    </div>
+    <div class="row">
+      <q-select
+        v-model="officeLocation"
+        :options="[
+          'Cottage Grove', 'Florence', 'Junction City', 'Oakridge', 'PPB - 4th Floor', 'PPB - 5th Floor',
+          'Schaefers - Basement', 'Schaefers - 1st Floor', 'Schaefers - 2nd Floor', 'Schaefers - 3rd Floor',
+          'Senior Meals Site', 'Veneta']"
+        label="Office Location"
+        class="q-mr-md"
+        style="width: 193px;"
+      >
+        <template v-if="officeLocation" v-slot:append>
+          <q-icon name="cancel" @click.stop="officeLocation=''" class="cursor-pointer" />
+        </template>
+      </q-select>
+      <q-input v-model="cubicleNumber" type="number" label="Cubicle Number" mask="###" class="q-mr-md" />
+      <q-checkbox v-model="teleworking" label="Teleworking" />
+    </div>
+    <div class="text-h6 transition-form-section-heading">Phone</div>
+    <div class="row">
+      <q-input
+        v-model="currentPhone"
+        type="tel"
+        label="Phone Number"
+        mask="(###) ###-####"
+        fill-mask
+        class="q-mr-md"
+      />
+      <q-checkbox v-model="deskPhone" label="Desk Phone Needed" class="q-mr-md" />
+      <q-select
+        v-model="phoneRequest"
+        :options="[
+          'New number needed', 'Remove phone', 'Delete number', 'Reassign to:',
+          'Change name display to:', 'Delete voicemail box'
+        ]"
+        label="Phone Update"
+        style="width: 218px;"
+        class="q-mr-md"
+      >
+        <template v-if="phoneRequest" v-slot:append>
+          <q-icon name="cancel" @click.stop="phoneRequest=''" class="cursor-pointer" />
+        </template>
+      </q-select>
+      <q-input
+        v-model="phoneRequestData"
+        v-if="['Reassign to:', 'Change name display to:'].indexOf(phoneRequest) != -1"
+        label="To whom?"
+      />
+    </div>
+    <div class="row">
+      <q-input
+        v-model="loadCode"
+        v-if="employeeID == 'CLSD'"
+        label="Load Code"
+      />
+    </div>
+    <div class="row">
+      <q-checkbox v-model="shouldDelete" label="Delete?" />
+    </div>
+    <div class="row">
+      <q-input
+        v-model="reassignTo"
+        label="Reassign to"
+      />
+    </div>
+    <div class="row">
+      <q-checkbox v-model="businessCards" label="Order Business Cards" />
+    </div>
+    <div class="text-h6 transition-form-section-heading">Proxy Card/Photo ID</div>
+    <div class="row">
+      <q-checkbox v-model="proxCardNeeded" label="Needed" />
+      <q-checkbox v-model="proxCardReturned" label="Turned In" />
+    </div>
+    <div class="text-h6 transition-form-section-heading">Computer Profile</div>
+    <div class="row">
+      <div>
+        Email account will be disabled (no incoming or outgoing emails) on End Date
+        <span class="text-underline">unless otherwise specified in special instructions</span>.
+      </div>
+    </div>
+    <div class="row">
+      <q-checkbox
+        v-model="showAccessEmails"
+        label="Does someone need to access current emails?"
+        class="q-mr-md" />
+      <EmployeeSelect
+        v-if="showAccessEmails"
+        label="Who?"
+        :employee="accessEmails"
+        v-on:input="accessEmails=$event"
+        v-on:clear="accessEmails=emptyEmployee"
+        class="q-mr-md"
+      />
+    </div>
+    <div class="text-h6 transition-form-section-heading">Special Instructions</div>
+    <div class="row">
+      <q-input v-model="specialInstructions" autogrow style="width:100%" />
+    </div>
 
     <!-- Spacing for footer -->
     <div style="height: 80px;"></div>
@@ -82,7 +215,31 @@
 </template>
 
 <style scoped lang="scss">
+.text-underline {
+  text-decoration: underline;
+}
+.transition-form-section-heading {
+  border-bottom: 2px solid black;
+  margin: 10px 0;
+}
+#sticky-footer {
+  padding: 10px;
+  background-color: rgb(25, 118, 210);
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 2;
 
+  .status {
+    color: white;
+  }
+}
+@media only screen and (min-width: 1024px) {
+  #sticky-footer {
+    left: 209px;
+  }
+}
 </style>
 
 <script lang="ts">
@@ -113,7 +270,6 @@ export default class EmployeeTransitionDetail extends Vue {
   public type = ''
   public dateSubmitted?: Date = new Date()
   public submitterName = ''
-  
   public employeeFirstNameCurrentVal = ''
   public employeeFirstName = ''
   public employeeMiddleInitialCurrentVal = ''
@@ -132,10 +288,10 @@ export default class EmployeeTransitionDetail extends Vue {
   public title = ''
   public fteCurrentVal = ''
   public fte = ''
-  public salaryRangeCurrentVal = ''
-  public salaryRange = ''
-  public salaryStepCurrentVal = ''
-  public salaryStep = ''
+  public salaryRangeCurrentVal: number | null = null
+  public salaryRange: number | null = null
+  public salaryStepCurrentVal: number | null = null
+  public salaryStep: number | null = null
   public bilingualCurrentVal = false
   public bilingual = false
   public managerCurrentVal = this.emptyEmployee
@@ -150,18 +306,20 @@ export default class EmployeeTransitionDetail extends Vue {
   public deleteProfile = false
   public officeLocationCurrentVal = ''
   public officeLocation = ''
-  public cubicleNumberCurrentVal = ''
-  public cubicleNumber = ''
+  public cubicleNumberCurrentVal: number | null = null
+  public cubicleNumber: number | null = null
   public unionAffiliationCurrentVal = ''
   public unionAffiliation = ''
   public teleworkingCurrentVal = false
   public teleworking = false
-  public deskPhoneCurrentVal = false
-  public deskPhone = false
   public currentPhoneCurrentVal = ''
   public currentPhone = ''
-  public newPhoneCurrentVal = ''
-  public newPhone = ''
+  public deskPhoneCurrentVal = false
+  public deskPhone = false
+  public phoneRequestCurrentVal = ''
+  public phoneRequest = ''
+  public phoneRequestDataCurrentVal = ''
+  public phoneRequestData = ''
   public loadCodeCurrentVal = ''
   public loadCode = ''
   public shouldDeleteCurrentVal = false
@@ -174,6 +332,8 @@ export default class EmployeeTransitionDetail extends Vue {
   public proxCardNeeded = false
   public proxCardReturnedCurrentVal = false
   public proxCardReturned = false
+  public showAccessEmailsCurrentVal = false
+  public showAccessEmails = false
   public accessEmailsCurrentVal = this.emptyEmployee
   public accessEmails = this.emptyEmployee
   public specialInstructionsCurrentVal = ''
@@ -232,12 +392,14 @@ export default class EmployeeTransitionDetail extends Vue {
     this.unionAffiliationCurrentVal = this.unionAffiliation
     this.teleworking = t.teleworking
     this.teleworkingCurrentVal = this.teleworking
-    this.deskPhone = t.desk_phone
-    this.deskPhoneCurrentVal = this.deskPhone
     this.currentPhone = t.current_phone
     this.currentPhoneCurrentVal = this.currentPhone
-    this.newPhone = t.new_phone
-    this.newPhoneCurrentVal = this.newPhone
+    this.deskPhone = t.desk_phone
+    this.deskPhoneCurrentVal = this.deskPhone
+    this.phoneRequest = t.phone_request
+    this.phoneRequestCurrentVal = this.phoneRequest
+    this.phoneRequestData = t.phone_request_data
+    this.phoneRequestDataCurrentVal = this.phoneRequestData
     this.loadCode = t.load_code
     this.loadCodeCurrentVal = this.loadCode
     this.shouldDelete = t.should_delete
@@ -250,6 +412,10 @@ export default class EmployeeTransitionDetail extends Vue {
     this.proxCardNeededCurrentVal = this.proxCardNeeded
     this.proxCardReturned = t.prox_card_returned
     this.proxCardReturnedCurrentVal = this.proxCardReturned
+    if (t.access_emails_pk != -1) {
+      this.showAccessEmails = true
+      this.showAccessEmailsCurrentVal = true
+    } 
     this.accessEmails = {pk: t.access_emails_pk, name: t.access_emails_name}
     this.accessEmailsCurrentVal = this.accessEmails
     this.specialInstructions = t.special_instructions
@@ -287,7 +453,7 @@ export default class EmployeeTransitionDetail extends Vue {
     // })
   }
 
-  public valuesAreChanged(): boolean {
+  public valuesAreChanged(): boolean { 
     if (
       this.type == this.typeCurrentVal &&
       this.employeeFirstName == this.employeeFirstNameCurrentVal &&
@@ -311,16 +477,18 @@ export default class EmployeeTransitionDetail extends Vue {
       this.cubicleNumber == this.cubicleNumberCurrentVal &&
       this.unionAffiliation == this.unionAffiliationCurrentVal &&
       this.teleworking == this.teleworkingCurrentVal &&
-      this.deskPhone == this.deskPhoneCurrentVal &&
       this.currentPhone == this.currentPhoneCurrentVal &&
-      this.newPhone == this.newPhoneCurrentVal &&
+      this.deskPhone == this.deskPhoneCurrentVal &&
+      this.phoneRequest == this.phoneRequestCurrentVal &&
+      this.phoneRequestData == this.phoneRequestDataCurrentVal &&
       this.loadCode == this.loadCodeCurrentVal &&
       this.shouldDelete == this.shouldDeleteCurrentVal &&
       this.reassignTo == this.reassignToCurrentVal &&
       this.businessCards == this.businessCardsCurrentVal &&
       this.proxCardNeeded == this.proxCardNeededCurrentVal &&
       this.proxCardReturned == this.proxCardReturnedCurrentVal &&
-      this.accessEmails == this.accessEmailsCurrentVal &&
+      this.showAccessEmails == this.showAccessEmailsCurrentVal &&
+      this.accessEmails.pk == this.accessEmailsCurrentVal.pk &&
       this.specialInstructions == this.specialInstructionsCurrentVal
     ) {
       return false
@@ -331,11 +499,17 @@ export default class EmployeeTransitionDetail extends Vue {
 
   public updateTransition() {
     return new Promise((resolve, reject) => {
+      const currentPhoneVal = this.currentPhone == '(___) ___-____' ? '' : this.currentPhone
+      if (['Reassign to:', 'Change name display to:'].indexOf(this.phoneRequest) == -1) {
+        this.phoneRequestData = ''
+      }
+      if (!this.showAccessEmails) {
+        this.accessEmails = this.emptyEmployee
+      }
+      
       EmployeeTransitionDataService.update(this.transitionPk, {
         type: this.type,
-        
         submitter_pk: this.getters['userModule/getEmployeeProfile'].pk,
-        
         employee_first_name: this.employeeFirstName,
         employee_middle_initial: this.employeeMiddleInitial,
         employee_last_name: this.employeeLastName,
@@ -357,9 +531,10 @@ export default class EmployeeTransitionDetail extends Vue {
         cubicle_number: this.cubicleNumber,
         union_affiliation: this.unionAffiliation,
         teleworking: this.teleworking,
+        current_phone: currentPhoneVal,
         desk_phone: this.deskPhone,
-        current_phone: this.currentPhone,
-        new_phone: this.newPhone,
+        phone_request: this.phoneRequest,
+        phone_request_data: this.phoneRequestData,
         load_code: this.loadCode,
         should_delete: this.shouldDelete,
         reassign_to: this.reassignTo,
@@ -396,15 +571,17 @@ export default class EmployeeTransitionDetail extends Vue {
         this.cubicleNumberCurrentVal = response.data.cubicle_number
         this.unionAffiliationCurrentVal = response.data.union_affiliation
         this.teleworkingCurrentVal = response.data.teleworking
-        this.deskPhoneCurrentVal = response.data.desk_phone
         this.currentPhoneCurrentVal = response.data.current_phone
-        this.newPhoneCurrentVal = response.data.new_phone
+        this.deskPhoneCurrentVal = response.data.desk_phone
+        this.phoneRequestCurrentVal = response.data.phone_request
+        this.phoneRequestDataCurrentVal = response.data.phone_request_data
         this.loadCodeCurrentVal = response.data.load_code
         this.shouldDeleteCurrentVal = response.data.should_delete
         this.reassignToCurrentVal = response.data.reassign_to
         this.businessCardsCurrentVal = response.data.business_cards
         this.proxCardNeededCurrentVal = response.data.prox_card_needed
         this.proxCardReturnedCurrentVal = response.data.prox_card_returned
+        this.showAccessEmailsCurrentVal = this.showAccessEmails
         this.accessEmailsCurrentVal = {pk: response.data.access_emails_pk, name: response.data.access_emails_name}
         this.specialInstructionsCurrentVal = response.data.special_instructions
 

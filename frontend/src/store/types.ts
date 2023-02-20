@@ -846,21 +846,13 @@ export interface WorkflowInstance {
 
 export type EmployeeID = 'CLSD' | 'CLID' | ''
 
-// TODO: REMOVE?
 interface EmployeeTransitionBase {
-  type: string
-  date_submitted: Date
-  submitter: EmployeeRetrieve
-  employee_first_name: string
-  employee_middle_initial: string
-  employee_last_name: string
-  employee_preferred_name: string
-  employee_number: number
-  employee_id: string // TODO This should be EmployeeID
-  employee_email: string
+  salary_range: number | null
+  salary_step: number | null
+  cubicle_number: number | null
 }
 
-export interface EmployeeTransition {
+export interface EmployeeTransition extends EmployeeTransitionBase {
   pk: number
   type: string
   date_submitted: Date
@@ -874,8 +866,6 @@ export interface EmployeeTransition {
   employee_email: string
   title: string
   fte: string
-  salary_range: string
-  salary_step: string
   bilingual: boolean
   manager_pk: number
   manager_name: string
@@ -885,12 +875,13 @@ export interface EmployeeTransition {
   preliminary_hire: boolean
   delete_profile: boolean
   office_location: string
-  cubicle_number: string
+  cubicle_number: number | null
   union_affiliation: string
   teleworking: boolean
-  desk_phone: boolean
   current_phone: string
-  new_phone: string
+  desk_phone: boolean
+  phone_request: string
+  phone_request_data: string
   load_code: string
   should_delete: boolean
   reassign_to: string
@@ -902,7 +893,7 @@ export interface EmployeeTransition {
   special_instructions: string
 }
 
-export interface EmployeeTransitionUpdate {
+export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   type?: string
   submitter_pk: number
   employee_first_name?: string
@@ -914,8 +905,6 @@ export interface EmployeeTransitionUpdate {
   employee_email?: string
   title?: string
   fte?: string
-  salary_range?: string
-  salary_step?: string
   bilingual?: boolean
   manager_pk?: number
   unit_pk?: number
@@ -923,12 +912,12 @@ export interface EmployeeTransitionUpdate {
   preliminary_hire?: boolean
   delete_profile?: boolean
   office_location?: string
-  cubicle_number?: string
   union_affiliation?: string
   teleworking?: boolean
-  desk_phone?: boolean
   current_phone?: string
-  new_phone?: string
+  desk_phone?: boolean
+  phone_request?: string
+  phone_request_data?: string
   load_code?: string
   should_delete?: boolean
   reassign_to?: string

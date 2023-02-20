@@ -3,6 +3,7 @@ import { StateInterface } from '../../index'
 import { PeopleStateInterface } from '../../types'
 import axios from 'axios'
 
+
 function getApiUrl(): string {
   if (process.env.API_URL) {
     return process.env.API_URL
@@ -31,13 +32,17 @@ const actions: ActionTree<PeopleStateInterface, StateInterface> = {
       })
   },
   getUnitList: ({ commit }) => {
-    axios({ url: `${ getApiUrl() }api/v1/unit`}) // eslint-disable-line @typescript-eslint/restrict-template-expressions
+    return new Promise((resolve, reject) => {
+      axios({ url: `${ getApiUrl() }api/v1/unit`}) // eslint-disable-line @typescript-eslint/restrict-template-expressions
       .then(resp => {
         commit('setUnitList', resp)
+        resolve('Successfully got unit list')
       })
       .catch(e => {
         console.error('Error getting unit list:', e)
+        reject('Error getting unit list')
       })
+    })
   },
   authLogout: ({commit}) => {
     return new Promise((resolve) => {

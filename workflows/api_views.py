@@ -233,10 +233,17 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         t.salary_range = request.data['salary_range']
         t.salary_step = request.data['salary_step']
         t.bilingual = request.data['bilingual']
-        t.manager = Employee.objects.get(pk=request.data['manager_pk']) if \
-            request.data['manager_pk'] != -1 else None
-        t.unit = UnitOrProgram.objects.get(pk=request.data['unit_pk']) if \
-            request.data['unit_pk'] != -1 else None
+        
+        if 'manager_pk' in request.data and request.data['manager_pk'] != -1:
+            t.manager = Employee.objects.get(pk=request.data['manager_pk'])    
+        else:
+            t.manager = None        
+        
+        if 'unit_pk' in request.data and request.data['unit_pk'] != -1:
+            t.unit = UnitOrProgram.objects.get(pk=request.data['unit_pk'])
+        else:
+            t.unit = None
+        
         t.transition_date = request.data['transition_date']
         t.preliminary_hire = request.data['preliminary_hire']
         t.delete_profile = request.data['delete_profile']
@@ -254,10 +261,14 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         t.business_cards = request.data['business_cards']
         t.prox_card_needed = request.data['prox_card_needed']
         t.prox_card_returned = request.data['prox_card_returned']
-        t.access_emails = Employee.objects.get(
-            pk=request.data['access_emails_pk']
-        ) if request.data['access_emails_pk'] != -1 else None
+        
+        if 'access_emails_pk' in request.data and request.data['access_emails_pk'] != -1:
+            t.access_emails = Employee.objects.get(pk=request.data['access_emails_pk'])    
+        else:
+            t.access_emails = None 
+        
         t.special_instructions = request.data['special_instructions']
+        
         t.save()
         serialized_transition = EmployeeTransitionSerializer(t,
             context={'request': request})

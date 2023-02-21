@@ -6,11 +6,25 @@ from rest_framework import serializers
 
 from people.models import (
     Employee, PerformanceReview, ReviewNote, Signature, TeleworkApplication,
-    TeleworkSignature, ViewedSecurityMessage
+    TeleworkSignature, UnitOrProgram, ViewedSecurityMessage
 )
 
 
-# Serializers define the API representation.
+class UnitSerializer(serializers.HyperlinkedModelSerializer):
+    name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UnitOrProgram
+        fields = ['pk', 'name']
+    
+    @staticmethod
+    def get_name(unit):
+        if unit.name != '-':
+            return f'{unit.division.name} - {unit.name}'
+        else:
+            return unit.division.name
+
+
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     name = serializers.CharField(source='get_full_name')
     
@@ -45,6 +59,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     notes_can_view = serializers.SerializerMethodField()
     time_off_requests_can_view = serializers.SerializerMethodField()
     next_to_sign_prs = serializers.SerializerMethodField()
+    workflow_roles = serializers.SerializerMethodField()
     
     class Meta:
         model = Employee
@@ -58,7 +73,8 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             'telework_applications_can_view', 'time_off_requests_can_view',
             'next_to_sign_prs', 'email_opt_out_all',
             'email_opt_out_timeoff_all', 'email_opt_out_timeoff_weekly',
-            'email_opt_out_timeoff_daily'
+            'email_opt_out_timeoff_daily', 'is_all_workflows_admin',
+            'admin_of_workflows', 'admin_of_processes', 'workflow_roles'
         ]
 
     @staticmethod
@@ -130,6 +146,23 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             return employee.manager.name
         else:
             return ""
+    
+    @staticmethod
+    def get_workflow_roles(employee):
+        workflow_roles_ids = map(lambda role: role.id, employee.workflow_roles.all())
+        return list(workflow_roles_ids)
+
+    @staticmethod
+    def get_is_all_workflows_admin(employee):
+        return employee.is_all_workflows_admin
+
+    @staticmethod
+    def get_is_admin_of_workflows(employee):
+        return employee.is_admin_of_workflows
+    
+    @staticmethod
+    def get_is_admin_of_processes(employee):
+        return employee.is_admin_of_processes
 
 
 class SimpleEmployeeSerializer(serializers.ModelSerializer):

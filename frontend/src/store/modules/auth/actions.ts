@@ -52,13 +52,21 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
   authLogout: ({commit, dispatch}) => {
     return new Promise((resolve) => {
       commit('authLogout')
-      dispatch('userModule/authLogout', null, { root: true })
+      dispatch('peopleModule/authLogout', null, { root: true })
         .catch(err => console.log(err))
       dispatch('performanceReviewModule/authLogout', null, { root: true })
+        .catch(err => console.log(err))
+      dispatch('responsibilityModule/authLogout', null, { root: true })
         .catch(err => console.log(err))
       dispatch('securityMessageModule/authLogout', null, { root: true })
         .catch(err => console.log(err))
       dispatch('teleworkModule/authLogout', null, { root: true })
+        .catch(err => console.log(err))
+      dispatch('timeOffModule/authLogout', null, { root: true })
+        .catch(err => console.log(err))
+      dispatch('userModule/authLogout', null, { root: true })
+        .catch(err => console.log(err))
+      dispatch('workflowModule/authLogout', null, { root: true })
         .catch(err => console.log(err))
       localStorage.removeItem('user-token') // clear your user's token from localstorage
       resolve('Successfully logged user out')

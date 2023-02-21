@@ -10,15 +10,17 @@ from people.api_views import (
     CurrentUserView, EmployeeViewSet, FileUploadViewSet, GroupViewSet,
     PerformanceReviewViewSet, ReviewNoteViewSet, SignatureViewSet,
     TeleworkApplicationFileUploadViewSet, TeleworkApplicationViewSet,
-    TeleworkSignatureViewSet, UserViewSet, ViewedSecurityMessageViewSet
+    TeleworkSignatureViewSet, UnitViewSet, UserViewSet,
+    ViewedSecurityMessageViewSet
 )
 from responsibilities.api_views import (
     ResponsibilityViewSet, TagViewSet as ResponsibilityTagViewSet
 )
 from timeoff.api_views import TimeOffRequestViewSet
 from workflows.api_views import (
-    ProcessInstanceViewSet, ProcessViewSet, RoleViewSet, StepChoiceViewSet,
-    StepInstanceViewSet, StepViewSet, WorkflowInstanceViewSet, WorkflowViewSet
+    EmployeeTransitionViewSet, ProcessInstanceViewSet, ProcessViewSet,
+    RoleViewSet, StepChoiceViewSet, StepInstanceViewSet, StepViewSet,
+    WorkflowInstanceViewSet, WorkflowViewSet
 )
 
 
@@ -55,7 +57,9 @@ router.register('v1/role', RoleViewSet)
 router.register('v1/step', StepViewSet)
 router.register('v1/stepchoice', StepChoiceViewSet)
 router.register('v1/stepinstance', StepInstanceViewSet)
+router.register('v1/unit', UnitViewSet)
 router.register('v1/workflow', WorkflowViewSet)
 router.register('v1/workflowinstance', WorkflowInstanceViewSet)
+router.register('v1/employeetransition', EmployeeTransitionViewSet)
 
 urlpatterns = router.urls + urlpatterns

@@ -138,7 +138,7 @@ export default class AllResponsibilities extends Vue {
     { name: 'tags', required: false, label: 'Tags', field: 'tags', sortable: false, align: 'left', classes: 'table-tags', headerClasses: 'table-tags' },
     { name: 'primary_employee_name', label: 'Primary Employee', field: 'primary_employee_name', sortable: true },
     { name: 'secondary_employee_name', label: 'Secondary Employee', field: 'secondary_employee_name', sortable: true },
-    { name: 'actions', label: 'Actions', },
+    { name: 'actions', label: 'Actions', align: 'around' },
   ]
 
   public initialTablePagination = {

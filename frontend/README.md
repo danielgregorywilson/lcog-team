@@ -7,6 +7,8 @@
 `cd frontend; quasar dev`
 
 # Setting up the frontend for the first time
+0) Set up NVM: https://github.com/coreybutler/nvm-windows
+1) Use Node v16.15.0
 1) Install node requirements
 `npm install`
 

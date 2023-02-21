@@ -129,7 +129,7 @@ class EmployeeTransition(models.Model):
     teleworking = models.BooleanField(default=False)
     current_phone = models.CharField(max_length=10, blank=True)
     desk_phone = models.BooleanField(default=False)
-    phone_request = models.CharField(max_length=20, choices=PHONE_REQUEST_CHOICES, blank=True)
+    phone_request = models.CharField(max_length=30, choices=PHONE_REQUEST_CHOICES, blank=True)
     phone_request_data = models.CharField(max_length=50, blank=True)
     load_code = models.CharField(max_length=50, blank=True)
     should_delete = models.BooleanField(default=False)

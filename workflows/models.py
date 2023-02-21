@@ -125,7 +125,7 @@ class EmployeeTransition(models.Model):
     delete_profile = models.BooleanField(default=False)
     office_location = models.CharField(max_length=3, choices=LOCATION_CHOICES)
     cubicle_number = models.PositiveSmallIntegerField(blank=True, null=True)
-    union_affiliation = models.CharField(max_length=1, choices=UNION_CHOICES)
+    union_affiliation = models.CharField(max_length=2, choices=UNION_CHOICES)
     teleworking = models.BooleanField(default=False)
     current_phone = models.CharField(max_length=10, blank=True)
     desk_phone = models.BooleanField(default=False)

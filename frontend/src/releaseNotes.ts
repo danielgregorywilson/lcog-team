@@ -4,6 +4,20 @@
 
 export const releases = [
   {
+    version: '0.10.0',
+    date: new Date(2023, 1, 8),
+    changes: [
+      {
+        type: 'new',
+        description: 'Workflows module to facilitate and automate business processes'
+      },
+      {
+        type: 'new',
+        description: 'Employee onboarding workflow with staff transition form'
+      },
+    ]
+  },
+  {
     version: '0.9.0',
     date: new Date(2022, 11, 30),
     changes: [

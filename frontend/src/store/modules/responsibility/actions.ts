@@ -91,7 +91,7 @@ const actions: ActionTree<ResponsibilityStateInterface, StateInterface> = {
     })
   },
   getSimpleEmployeeList: ({ commit }) => {
-    axios({ url: `${ process.env.API_URL }api/v1/employee/simple_list`}) // eslint-disable-line @typescript-eslint/restrict-template-expressions
+    axios({ url: `${ getApiUrl() }api/v1/employee/simple_list`}) // eslint-disable-line @typescript-eslint/restrict-template-expressions
       .then(resp => {
         commit('setSimpleEmployeeList', resp)
       })
@@ -100,7 +100,7 @@ const actions: ActionTree<ResponsibilityStateInterface, StateInterface> = {
       })
   },
   getSimpleEmployeeDetail: ({ commit }, data: {pk: number}) => {
-    axios({ url: `${ process.env.API_URL }api/v1/employee/${ data.pk }/simple_detail`}) // eslint-disable-line @typescript-eslint/restrict-template-expressions
+    axios({ url: `${ getApiUrl() }api/v1/employee/${ data.pk }/simple_detail`}) // eslint-disable-line @typescript-eslint/restrict-template-expressions
       .then(resp => {
         commit('setSimpleEmployeeDetail', resp)
       })
@@ -109,7 +109,7 @@ const actions: ActionTree<ResponsibilityStateInterface, StateInterface> = {
       })
   },
   getSimpleTagList: ({ commit }) => {
-    axios({ url: `${ process.env.API_URL }api/v1/responsibilitytags/simple_list`}) // eslint-disable-line @typescript-eslint/restrict-template-expressions
+    axios({ url: `${ getApiUrl() }api/v1/responsibilitytags/simple_list`}) // eslint-disable-line @typescript-eslint/restrict-template-expressions
       .then(resp => {
         commit('setSimpleTagList', resp)
       })

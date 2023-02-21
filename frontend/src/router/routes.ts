@@ -280,9 +280,36 @@ const routes: RouteConfig[] = [
         ]
       },
 
-      /////////
-      // EIS //
-      /////////
+      ///////////////
+      // Workflows //
+      ///////////////
+      {
+        path: '/workflows',
+        name: 'workflow-dashboard',
+        component: () => import('pages/workflows/Workflows.vue'),
+        // beforeEnter: ifManager
+      },
+      {
+        path: '/wf/:pk',
+        name: 'workflow-instance-detail',
+        component: () => import('src/pages/workflows/WorkflowInstanceDetail.vue'),
+        // beforeEnter: ifCanViewTimeOffRequest,
+        children: [
+          {
+            path: 'processes',
+            name: 'workflow-processes',
+            component: () => import('src/pages/workflows/WorkflowProcesses.vue')
+            // TODO: beforeEnter: TODO
+          },
+          {
+            path: 'transition',
+            name: 'workflow-transition-form',
+            component: () => import('src/pages/workflows/EmployeeTransitionDetail.vue')
+            // TODO: beforeEnter: TODO
+          }
+        ]
+      },
+      // TODO: Remove EIS demo page
       {
         path: '/eis',
         name: 'eis',

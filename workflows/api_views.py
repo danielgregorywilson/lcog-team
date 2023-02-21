@@ -215,7 +215,8 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk=None):
         t = EmployeeTransition.objects.get(pk=pk)
-        submitter = Employee.objects.get(pk=request.data['submitter_pk'])
+        submitter = Employee.objects.get(pk=request.data['submitter_pk']) if \
+            'submitter_pk' in request.data else None
         t.submitter = submitter
         t.date_submitted = datetime.now(tz=get_current_timezone())
 

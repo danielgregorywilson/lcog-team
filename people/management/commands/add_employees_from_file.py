@@ -143,7 +143,7 @@ class Command(BaseCommand):
 
         # Deactivate any employee not in the list
         for employee in Employee.active_objects.all():
-            if employee.number not in numbers_in_file:
+            if employee.number not in numbers_in_file and not employee.temporary:
                 employee.active = False
                 employee.save()
                 self.stdout.write(

@@ -74,6 +74,7 @@ class Employee(models.Model):
         return self.user.username
 
     active = models.BooleanField(default=True)
+    temporary = models.BooleanField(default=False, verbose_name=_("temporary employee"), help_text="Employee is temporary or exists for test purposes. They are not present in the payroll system, but should not be deactivated.")
     user = models.OneToOneField("auth.User", verbose_name=_("user"), on_delete=models.CASCADE)
     number = models.IntegerField("number", unique=True, blank=True, null=True)
     

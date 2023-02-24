@@ -5,10 +5,10 @@ from mainsite.helpers import get_lat_long
 
 
 class Route(models.Model):
-    route_name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.route_name
+        return self.name
     
 
 class Stop(models.Model):

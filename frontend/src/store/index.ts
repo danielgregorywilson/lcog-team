@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import VueCookies from 'vue-cookies'
 import authModule from './modules/auth'
 import deskReservationModule from './modules/deskreservation'
+import mealsModule from './modules/meals'
 import peopleModule from './modules/people'
 import performanceReviewModule from './modules/performancereview'
 import responsibilityModule from './modules/responsibility'
@@ -38,6 +39,7 @@ export default store(function ({ Vue }) {
     modules: {
       authModule,
       deskReservationModule,
+      mealsModule,
       peopleModule,
       performanceReviewModule,
       responsibilityModule,

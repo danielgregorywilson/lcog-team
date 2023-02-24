@@ -6,6 +6,7 @@ from django.urls import include, path
 from deskreservation.api_views import DeskReservationViewSet, DeskViewSet
 from mainsite.api_views import TrustedIPViewSet, SecurityMessageViewSet
 from mainsite.views import obtain_auth_token_without_password
+from meals.api_views import MealStopViewSet
 from people.api_views import (
     CurrentUserView, EmployeeViewSet, FileUploadViewSet, GroupViewSet,
     PerformanceReviewViewSet, ReviewNoteViewSet, SignatureViewSet,
@@ -61,5 +62,8 @@ router.register('v1/unit', UnitViewSet)
 router.register('v1/workflow', WorkflowViewSet)
 router.register('v1/workflowinstance', WorkflowInstanceViewSet)
 router.register('v1/employeetransition', EmployeeTransitionViewSet)
+# Meals on Wheels
+router.register('v1/mealstop', MealStopViewSet)
+
 
 urlpatterns = router.urls + urlpatterns

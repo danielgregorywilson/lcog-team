@@ -937,6 +937,27 @@ export interface AxiosWorkflowCreateServerResponse {
 }
 
 
+////////////////////////////////////////////////
+// Meals Structure from Django Rest Framework //
+////////////////////////////////////////////////
+
+export type Stop = {
+  first_name: string
+  last_name: string
+  address: string
+  city: string
+  zip_code: number
+  latitude: number
+  longitude: number
+  phone: string
+  phone_notes: string
+  notes: string
+  route: string
+  created_at: Date
+  updated_at: Date
+}
+
+
 /////////////
 // Getters //
 /////////////

@@ -45,4 +45,40 @@ class TrustedIPAddress(models.Model):
 
     address = models.GenericIPAddressField()
     description = models.CharField(max_length=255)
+
+
+class State(models.Model):
+    class Meta:
+        verbose_name = _("State")
+        verbose_name_plural = _("States")
+
+    def __str__(self):
+        return self.name
+
+    name = models.CharField(_("name"), max_length=255)
+
+
+class ZipCode(models.Model):
+    class Meta: 
+        verbose_name = _("Zip Code")
+        verbose_name_plural = _("Zip Codes")
+
+    def __str__(self):
+        return self.code
+
+    code = models.CharField(_("code"), max_length=5)
     
+
+class City(models.Model):
+    class Meta:
+        verbose_name = _("City")
+        verbose_name_plural = _("Cities")
+
+    def __str__(self):
+        return self.name
+
+    name = models.CharField(_("name"), max_length=255)
+    state = models.ForeignKey(State, on_delete=models.CASCADE)
+
+
+

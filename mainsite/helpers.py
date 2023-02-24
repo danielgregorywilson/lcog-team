@@ -2,10 +2,12 @@ import datetime
 import os
 
 from django.apps import apps
-from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.mail import send_mail
 from django.urls import reverse
+
+import requests
+import urllib.parse
 
 
 SEND_MANAGER_FIRST_REMINDER_NEW_PR_DAYS_BEFORE = 60
@@ -365,3 +367,11 @@ def next_weekday(d, weekday):
     if days_ahead <= 0: # Target day already happened this week
         days_ahead += 7
     return d + datetime.timedelta(days_ahead)
+
+
+def get_lat_long(address, city, zip):
+    url = 'https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(f'${address}, ${city} ${zip}') +'?format=json'
+    response = requests.get(url).json()
+    if response:
+        return response[0]["lat"], response[0]["lon"]
+    return None, None

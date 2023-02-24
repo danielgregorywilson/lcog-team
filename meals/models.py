@@ -23,6 +23,8 @@ class Stop(models.Model):
     phone_notes = models.CharField(max_length=300, blank=True)
     notes = models.CharField(max_length=300)
     route = models.ForeignKey(Route, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def save(self):
         if not self.latitude and not self.longitude:

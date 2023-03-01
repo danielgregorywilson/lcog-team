@@ -8,7 +8,15 @@
             <h5 class="q-ma-none row">Select Routes</h5>
             <div class="q-pa-md row">
               <q-option-group
-                :options="routeOptions"
+                class="col"
+                :options="hotRouteOptions"
+                type="checkbox"
+                v-model="selectedRoutes"
+                @input="updateMapVisibility"
+              />
+              <q-option-group
+                class="col"
+                :options="coldRouteOptions"
                 type="checkbox"
                 v-model="selectedRoutes"
                 @input="updateMapVisibility"
@@ -49,12 +57,16 @@ import { Component, Vue } from 'vue-property-decorator'
 import mapboxgl from "mapbox-gl";
 import { VuexStoreGetters } from '../store/types'
 
-type RouteName = 'Gateway' | 'Marcola' | 'MC' | 'PU' | 'Short' | 'Long' | 'North' | 'Will'
-type RouteColor = 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'pink' | 'yellow' | 'indigo'
-type RouteGetter = 'mealsModule/gatewayStops' | 'mealsModule/marcolaStops' | 'mealsModule/MCStops' | 'mealsModule/PUStops' | 'mealsModule/shortStops' | 'mealsModule/longStops' | 'mealsModule/northStops' | 'mealsModule/willStops'
+type RouteLabel = 'Gateway' | 'Marcola' | 'MC' | 'Short' | 'Long' | 'North' | 'Will' | 'Tu1' | 'Tu2' | 'Tu3' | 'Thur1' | 'Thur2' | 'Thur3' | 'PU'
+type RouteName = 'Gateway' | 'Marcola' | 'MC' | 'Short' | 'Long' | 'North' | 'Will' | 'hotPU' | 'Tu1' | 'Tu2' | 'Tu3' | 'Thur1' | 'Thur2' | 'Thur3' | 'coldPU'
+type RouteColor = 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'indigo' | 'violet' | 'pink'
+type RouteGetter = 
+  'mealsModule/gatewayStops' | 'mealsModule/marcolaStops' | 'mealsModule/MCStops' | 'mealsModule/shortStops' | 'mealsModule/longStops' |
+  'mealsModule/northStops' | 'mealsModule/willStops' | 'mealsModule/hotPUStops' | 'mealsModule/tu1Stops' | 'mealsModule/tu2Stops' |
+  'mealsModule/tu3Stops' | 'mealsModule/thur1Stops' | 'mealsModule/thur2Stops' | 'mealsModule/thur3Stops' | 'mealsModule/coldPUStops'
 
 interface RouteOption {
-  label: RouteName,
+  label: RouteLabel,
   value: RouteName,
   color: RouteColor,
   getter: RouteGetter
@@ -64,17 +76,26 @@ interface RouteOption {
 export default class MOWMap extends Vue{
   private getters = this.$store.getters as VuexStoreGetters
 
-  public routeOptions: Array<RouteOption> = [
-    { label: 'Gateway', value: 'Gateway', color: 'blue', getter: 'mealsModule/gatewayStops'},
-    { label: 'Marcola', value: 'Marcola', color: 'green', getter: 'mealsModule/marcolaStops'},
-    { label: 'MC', value: 'MC', color: 'purple', getter: 'mealsModule/MCStops'},
-    { label: 'PU', value: 'PU', color: 'orange', getter: 'mealsModule/PUStops'},
-    { label: 'Short', value: 'Short', color: 'red', getter: 'mealsModule/shortStops'},
-    { label: 'Long', value: 'Long', color: 'pink', getter: 'mealsModule/longStops'},
-    { label: 'North', value: 'North', color: 'yellow', getter: 'mealsModule/northStops'},
-    { label: 'Will', value: 'Will', color: 'indigo', getter: 'mealsModule/willStops'}
+  public hotRouteOptions: Array<RouteOption> = [
+    { label: 'Gateway', value: 'Gateway', color: 'red', getter: 'mealsModule/gatewayStops'},
+    { label: 'Marcola', value: 'Marcola', color: 'orange', getter: 'mealsModule/marcolaStops'},
+    { label: 'MC', value: 'MC', color: 'yellow', getter: 'mealsModule/MCStops'},
+    { label: 'Short', value: 'Short', color: 'green', getter: 'mealsModule/shortStops'},
+    { label: 'Long', value: 'Long', color: 'blue', getter: 'mealsModule/longStops'},
+    { label: 'North', value: 'North', color: 'indigo', getter: 'mealsModule/northStops'},
+    { label: 'Will', value: 'Will', color: 'violet', getter: 'mealsModule/willStops'},
+    { label: 'PU', value: 'hotPU', color: 'pink', getter: 'mealsModule/hotPUStops'}
   ]
-  public selectedRoutes = ['Gateway', 'Marcola', 'MC', 'PU', 'Short', 'Long', 'North', 'Will']
+  public coldRouteOptions: Array<RouteOption> = [
+    { label: 'Tu1', value: 'Tu1', color: 'red', getter: 'mealsModule/tu1Stops'},
+    { label: 'Tu2', value: 'Tu2', color: 'orange', getter: 'mealsModule/tu2Stops'},
+    { label: 'Tu3', value: 'Tu3', color: 'yellow', getter: 'mealsModule/tu3Stops'},
+    { label: 'Thur1', value: 'Thur1', color: 'green', getter: 'mealsModule/thur1Stops'},
+    { label: 'Thur2', value: 'Thur2', color: 'blue', getter: 'mealsModule/thur2Stops'},
+    { label: 'Thur3', value: 'Thur3', color: 'violet', getter: 'mealsModule/thur3Stops'},
+    { label: 'PU', value: 'coldPU', color: 'pink', getter: 'mealsModule/coldPUStops'}
+  ]
+  public selectedRoutes = ['Gateway', 'Marcola', 'MC', 'Short', 'Long', 'North', 'Will']
   public newAddress = ''
   public showWaitlisted = true
 
@@ -95,7 +116,7 @@ export default class MOWMap extends Vue{
       this.map.addControl(new mapboxgl.NavigationControl());
 
       this.map.on('load', () => {
-        for(let route of this.routeOptions) {
+        for(let route of this.hotRouteOptions) {
 
           let addresses = []
           const stops = this.getters[route.getter]
@@ -168,7 +189,7 @@ export default class MOWMap extends Vue{
   }
 
   updateMapVisibility() {
-    for (let route of this.routeOptions) {
+    for (let route of this.hotRouteOptions) {
       if (this.selectedRoutes.includes(route.value)) {
         this.map.setLayoutProperty(route.value + '-routes', 'visibility', 'visible')
       } else {

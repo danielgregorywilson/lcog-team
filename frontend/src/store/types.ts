@@ -949,6 +949,8 @@ export type Stop = {
   zip_code: number
   latitude: number
   longitude: number
+  meal_type: 'hot' | 'cold'
+  waitlist: boolean
   phone: string
   phone_notes: string
   notes: string
@@ -980,11 +982,18 @@ export interface VuexStoreGetters {
   'mealsModule/gatewayStops': Array<Stop>,
   'mealsModule/marcolaStops': Array<Stop>,
   'mealsModule/MCStops': Array<Stop>,
-  'mealsModule/PUStops': Array<Stop>,
   'mealsModule/shortStops': Array<Stop>,
   'mealsModule/longStops': Array<Stop>,
   'mealsModule/northStops': Array<Stop>,
   'mealsModule/willStops': Array<Stop>,
+  'mealsModule/hotPUStops': Array<Stop>,
+  'mealsModule/tu1Stops': Array<Stop>,
+  'mealsModule/tu2Stops': Array<Stop>,
+  'mealsModule/tu3Stops': Array<Stop>,
+  'mealsModule/thur1Stops': Array<Stop>,
+  'mealsModule/thur2Stops': Array<Stop>,
+  'mealsModule/thur3Stops': Array<Stop>,
+  'mealsModule/coldPUStops': Array<Stop>,
 
   // People
   'peopleModule/simpleEmployeeList': Array<SimpleEmployeeRetrieve>,

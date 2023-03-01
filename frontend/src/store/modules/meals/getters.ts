@@ -7,11 +7,13 @@ const getters: GetterTree<MealStateInterface, StateInterface> = {
   gatewayStops: state => state.stops.results.filter(stop => stop.route === 'Gateway'),
   marcolaStops: state => state.stops.results.filter(stop => stop.route === 'Marcola'),
   MCStops: state => state.stops.results.filter(stop => stop.route === 'MC'),
-  PUStops: state => state.stops.results.filter(stop => stop.route === 'PU'),
   shortStops: state => state.stops.results.filter(stop => stop.route === 'Short'),
   longStops: state => state.stops.results.filter(stop => stop.route === 'Long'),
   northStops: state => state.stops.results.filter(stop => stop.route === 'North'),
-  willStops: state => state.stops.results.filter(stop => stop.route === 'Will')
+  willStops: state => state.stops.results.filter(stop => stop.route === 'Will'),
+  hotPUStops: state => state.stops.results.filter(stop => stop.route === 'PU' && stop.meal_type === 'hot'),
+
+  
 };
 
 export default getters;

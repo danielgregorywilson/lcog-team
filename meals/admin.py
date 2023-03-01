@@ -8,5 +8,5 @@ class RouteAdmin(admin.ModelAdmin):
 
 @admin.register(Stop)
 class StopAdmin(admin.ModelAdmin):
-    list_display = ("pk", "first_name", "last_name", "route")
-    list_filter = ("route", "meal_type")
+    list_display = ("pk", "first_name", "last_name", "route", "meal_type", "waitlist")
+    list_filter = ("route", "meal_type", "waitlist")

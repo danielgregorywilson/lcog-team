@@ -6,8 +6,8 @@ import { Stop } from '../../types'
 
 
 const mutation: MutationTree<MealStateInterface> = {
-  setMeals: (state, resp: {data: Array<Stop>}) => {
-    Vue.set(state, 'allWorkflows', resp.data)
+  setMealStops: (state, resp: {data: Array<Stop>}) => {
+    Vue.set(state, 'stops', resp.data)
   },
   authLogout: (state) => {
     // Clean up state

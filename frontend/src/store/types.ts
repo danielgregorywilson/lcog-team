@@ -976,6 +976,16 @@ export interface VuexStoreGetters {
     results: Array<DeskReservation>
   },
 
+  // Meals
+  'mealsModule/gatewayStops': Array<Stop>,
+  'mealsModule/marcolaStops': Array<Stop>,
+  'mealsModule/MCStops': Array<Stop>,
+  'mealsModule/PUStops': Array<Stop>,
+  'mealsModule/shortStops': Array<Stop>,
+  'mealsModule/longStops': Array<Stop>,
+  'mealsModule/northStops': Array<Stop>,
+  'mealsModule/willStops': Array<Stop>,
+
   // People
   'peopleModule/simpleEmployeeList': Array<SimpleEmployeeRetrieve>,
   'peopleModule/simpleEmployeeDetail': SimpleEmployeeRetrieve,

@@ -8,7 +8,7 @@ const apiURL = process.env.API_URL ? process.env.API_URL : 'https://api.team.lco
 const actions: ActionTree<MealStateInterface, StateInterface> = {
   getMealStops: ({ commit }) => {
     return new Promise((resolve, reject) => {
-      axios({ url: `${ apiURL }api/v1/meals`, method: 'GET' })
+      axios({ url: `${ apiURL }api/v1/mealstop`, method: 'GET' })
       .then(resp => {
         commit('setMealStops', resp);
         resolve(resp);

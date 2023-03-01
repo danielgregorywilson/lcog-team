@@ -47,41 +47,32 @@
 
 import { Component, Vue } from 'vue-property-decorator'
 import mapboxgl from "mapbox-gl";
+import { VuexStoreGetters } from '../store/types'
+
+type RouteName = 'Gateway' | 'Marcola' | 'MC' | 'PU' | 'Short' | 'Long' | 'North' | 'Will'
+type RouteColor = 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'pink' | 'yellow' | 'indigo'
+type RouteGetter = 'mealsModule/gatewayStops' | 'mealsModule/marcolaStops' | 'mealsModule/MCStops' | 'mealsModule/PUStops' | 'mealsModule/shortStops' | 'mealsModule/longStops' | 'mealsModule/northStops' | 'mealsModule/willStops'
+
+interface RouteOption {
+  label: RouteName,
+  value: RouteName,
+  color: RouteColor,
+  getter: RouteGetter
+}
 
 @Component
 export default class MOWMap extends Vue{
-  public routeOptions = [
-    { label: 'Gateway', value: 'Gateway', color: 'blue', addresses: [
-      {
-        'type': 'Feature',
-        'geometry': {
-          'type': 'Point',
-          'coordinates': [-123.0062619, 44.0538149]
-        }
-      },
-      {
-        'type': 'Feature',
-        'geometry': {
-          'type': 'Point',
-          'coordinates': [-122.9803587, 44.0482189]
-        }
-      },
-      {
-        'type': 'Feature',
-        'geometry': {
-          'type': 'Point',
-          'coordinates': [-122.975543, 44.059392]
-          }
-      }
-    ] 
-    },
-    { label: 'Marcola', value: 'Marcola', color: 'green', addresses: [] },
-    { label: 'MC', value: 'MC', color: 'purple', addresses: [] },
-    { label: 'PU', value: 'PU', color: 'orange', addresses: [] },
-    { label: 'Short', value: 'Short', color: 'red', addresses: [] },
-    { label: 'Long', value: 'Long', color: 'pink', addresses: [] },
-    { label: 'North', value: 'North', color: 'yellow', addresses: [] },
-    { label: 'Will', value: 'Will', color: 'indigo', addresses: [] }
+  private getters = this.$store.getters as VuexStoreGetters
+
+  public routeOptions: Array<RouteOption> = [
+    { label: 'Gateway', value: 'Gateway', color: 'blue', getter: 'mealsModule/gatewayStops'},
+    { label: 'Marcola', value: 'Marcola', color: 'green', getter: 'mealsModule/marcolaStops'},
+    { label: 'MC', value: 'MC', color: 'purple', getter: 'mealsModule/MCStops'},
+    { label: 'PU', value: 'PU', color: 'orange', getter: 'mealsModule/PUStops'},
+    { label: 'Short', value: 'Short', color: 'red', getter: 'mealsModule/shortStops'},
+    { label: 'Long', value: 'Long', color: 'pink', getter: 'mealsModule/longStops'},
+    { label: 'North', value: 'North', color: 'yellow', getter: 'mealsModule/northStops'},
+    { label: 'Will', value: 'Will', color: 'indigo', getter: 'mealsModule/willStops'}
   ]
   public selectedRoutes = ['Gateway', 'Marcola', 'MC', 'PU', 'Short', 'Long', 'North', 'Will']
   public newAddress = ''
@@ -89,16 +80,8 @@ export default class MOWMap extends Vue{
 
   private accessToken = process.env.VUE_APP_MAP_ACCESS_TOKEN
   private map = {}
-  private center = [-123.0044045, 44.0535664]
-  private zoom = 13
-
-  private gatewayVisibility() {
-    if (this.selectedRoutes.includes('Gateway')) {
-      return 'visible'
-    } else {
-      return 'none'
-    }
-  }
+  private center = [-122.94329319107005, 44.08711374902461]
+  private zoom = 10
 
   private createMap() {
     try {
@@ -113,12 +96,27 @@ export default class MOWMap extends Vue{
 
       this.map.on('load', () => {
         for(let route of this.routeOptions) {
+
+          let addresses = []
+          const stops = this.getters[route.getter]
+          for (let address of stops) {
+            if (address.route === route.value) {
+              addresses.push({
+                'type': 'Feature',
+                'geometry': {
+                  'type': 'Point',
+                  'coordinates': [address.longitude, address.latitude]
+                }
+              })
+            }
+          }
+
           // Add the vector tileset as a source.
           this.map.addSource(route.value + 'Routes', {
             'type': 'geojson',
             'data': {
               'type': 'FeatureCollection',
-              'features': route.addresses
+              'features': addresses
             }
           });
           
@@ -137,6 +135,12 @@ export default class MOWMap extends Vue{
           });
         }
       });
+
+      // When panning the map, update the center coordinates
+      this.map.on('dragend', () => {
+        const center = this.map.getCenter()
+        this.center = [center.lng, center.lat]
+      });
       
     } catch (err) {
       console.log("Error rendering map:", err)
@@ -144,8 +148,23 @@ export default class MOWMap extends Vue{
     
   }
 
+  private getMealStops() {
+    return new Promise((resolve, reject) => {
+      this.$store.dispatch('mealsModule/getMealStops')
+        .then(() => {
+          resolve('Got meal stops')
+        })
+        .catch((err) => {
+          reject(err)
+        })
+    })
+  }
+
   mounted() {
-    this.createMap()
+    this.getMealStops()
+      .then(() => {
+        this.createMap()
+      })
   }
 
   updateMapVisibility() {

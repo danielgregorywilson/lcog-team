@@ -12,6 +12,9 @@ class Route(models.Model):
     
 
 class Stop(models.Model):
+    class Meta:
+        ordering = ["address"]
+
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     address = models.CharField(max_length=100)
@@ -28,9 +31,13 @@ class Stop(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def save(self):
+    def save(self, *args, **kwargs):
         if not self.latitude and not self.longitude:
             self.latitude, self.longitude = get_lat_long(
                 self.address, self.city.name, self.zip_code.code
             )
-        super(Stop, self).save()
+            if not self.latitude:
+                self.latitude = 0
+            if not self.longitude:
+                self.longitude = 0
+        super().save(*args, **kwargs)

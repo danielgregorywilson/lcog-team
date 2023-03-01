@@ -370,6 +370,8 @@ def next_weekday(d, weekday):
 
 
 def get_lat_long(address, city, zip):
+    if '#' in address:
+        address = address[:address.index('#')] # Remove the unit number
     url = 'https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(f'${address}, ${city} ${zip}') +'?format=json'
     response = requests.get(url).json()
     if response:

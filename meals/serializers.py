@@ -12,6 +12,6 @@ class MealStopSerializer(serializers.HyperlinkedModelSerializer):
         model = Stop
         fields = (
             'first_name', 'last_name', 'address', 'city', 'zip_code',
-            'latitude', 'longitude', 'phone', 'phone_notes', 'notes', 'route',
-            'created_at', 'updated_at'
+            'latitude', 'longitude', 'meal_type', 'waitlist', 'phone',
+            'phone_notes', 'notes', 'route', 'created_at', 'updated_at'
         )

@@ -12,6 +12,13 @@ class Route(models.Model):
     
 
 class Stop(models.Model):
+    TYPE_CHOICE_HOT = 'hot'
+    TYPE_CHOICE_COLD = 'cold'
+    TYPE_CHOICES = (
+        (TYPE_CHOICE_HOT, "hot"),
+        (TYPE_CHOICE_COLD, "cold")
+    )
+    
     class Meta:
         ordering = ["address"]
 
@@ -24,6 +31,10 @@ class Stop(models.Model):
     longitude = models.DecimalField(
         max_digits=10, decimal_places=7, blank=True
     )
+    meal_type = models.CharField(
+        max_length=4, choices=TYPE_CHOICES, default=TYPE_CHOICE_HOT, blank=True
+    )
+    waitlist = models.BooleanField(default=False)
     phone = models.CharField(max_length=100)
     phone_notes = models.CharField(max_length=300, blank=True)
     notes = models.CharField(max_length=300)

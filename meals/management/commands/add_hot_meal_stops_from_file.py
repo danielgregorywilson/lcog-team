@@ -6,7 +6,7 @@ from mainsite.models import City, State, ZipCode
 from meals.models import Route, Stop
 
 class Command(BaseCommand):
-    help = 'Imports meal delivery addresses from a CSV file.'
+    help = 'Imports hot meal delivery addresses from a CSV file.'
 
     def handle(self, *args, **options): 
         # Import from file
@@ -22,13 +22,15 @@ class Command(BaseCommand):
             zip = row[4].strip()
             directions = row[5].strip()
             phone = row[6].strip()
-            route_name = row[7].strip()
-            override_lat = float(row[8].strip()) if row[8].strip() else None
-            override_long = float(row[9].strip()) if row[9].strip() else None
+            phone_notes = row[7].strip()
+            route_name = row[8].strip()
+            override_lat = float(row[9].strip()) if row[9].strip() else None
+            override_long = float(row[10].strip()) if row[10].strip() else None
             
             # Skip rows already imported
             existing_stop = Stop.objects.filter(
-                last_name=last_name, first_name=first_name, address=address
+                last_name=last_name, first_name=first_name, address=address,
+                meal_type='hot'
             )
             if existing_stop.count():
                 print(
@@ -59,26 +61,30 @@ class Command(BaseCommand):
                      stop = Stop.objects.create(
                         first_name=first_name, last_name=last_name,
                         address=address, city=city, zip_code=zip_code,
-                        phone=phone, notes=directions, route=route,
-                        latitude=override_lat, longitude=override_long
+                        phone=phone, phone_notes=phone_notes, notes=directions,
+                        route=route, latitude=override_lat,
+                        longitude=override_long
                     )
                 else:
                     stop = Stop.objects.create(
                         first_name=first_name, last_name=last_name,
                         address=address, city=city, zip_code=zip_code,
-                        phone=phone, notes=directions, route=route
+                        phone=phone, phone_notes=phone_notes,
+                        notes=directions, route=route
                     )
                 if stop.latitude == 0:
                     if override_lat:
                         stop.latitude = override_lat
                         stop.save()
                     else:
+                        print('No override lat')
                         import pdb; pdb.set_trace();
                 if stop.longitude == 0:
                     if override_long:
                         stop.longitude = override_long
                         stop.save()
                     else:
+                        print('No override long')
                         import pdb; pdb.set_trace();
                 print(
                     f"Added {first_name} {last_name} at {address} to",

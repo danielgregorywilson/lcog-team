@@ -9,4 +9,4 @@ class RouteAdmin(admin.ModelAdmin):
 @admin.register(Stop)
 class StopAdmin(admin.ModelAdmin):
     list_display = ("pk", "first_name", "last_name", "route")
-    list_filter = ("route",)
+    list_filter = ("route", "meal_type")

@@ -1187,7 +1187,7 @@ export default class PerformanceReviewDetail extends Vue {
     this.retrievePerformanceReview()
       .then(() => {
         if (this.print) {
-          setTimeout(() => window.print(), 200) // Wait briefly for logo image to load
+          setTimeout(() => window.print(), 200) // TODO: Wait briefly for logo image to load
         }
       })
       .catch(e => {

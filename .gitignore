@@ -18,6 +18,7 @@ sent_emails
 !.elasticbeanstalk/*.global.yml
 
 caselle-imports
+meals-imports
 test_user_data.json
 node_modules
 package-lock.json

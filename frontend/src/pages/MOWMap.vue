@@ -7,22 +7,26 @@
           <div class="q-mr-lg">
             <h5 class="q-ma-none row">Select Routes</h5>
             <div class="q-pa-md row">
-              <q-option-group
-                class="col"
-                :options="hotRouteOptions"
-                type="checkbox"
-                v-model="selectedRoutes"
-                @input="updateMapVisibility"
-              />
-              <q-option-group
-                class="col"
-                :options="coldRouteOptions"
-                type="checkbox"
-                v-model="selectedRoutes"
-                @input="updateMapVisibility"
-              />
+              <div class="col">
+                <q-checkbox v-model="allHot" label="All Hot" @input="toggleAllHot" class="all-toggle"></q-checkbox>
+                <q-option-group
+                  :options="hotRouteOptions"
+                  type="checkbox"
+                  v-model="selectedHotRoutes"
+                  @input="updateMapVisibility"
+                />
+              </div>
+              <div class="col">
+                <q-checkbox v-model="allCold" label="All Cold" @input="toggleAllCold" class="all-toggle"></q-checkbox>
+                <q-option-group
+                  :options="coldRouteOptions"
+                  type="checkbox"
+                  v-model="selectedColdRoutes"
+                  @input="updateMapVisibility"
+                />
+              </div>
             </div>
-            <q-checkbox v-model="showWaitlisted" label="Show Waitlisted" class="row" />
+            <q-toggle v-model="showWaitlisted" label="Show Waitlisted" class="row" @input="updateMapVisibility" />
             <q-btn color="primary" label="Print selected" class="row q-mt-md" />
           </div>
           <div id="map"></div>
@@ -49,10 +53,13 @@
     width: 900px;
     height: 500px;
   }
+
+  .all-toggle {
+    border-bottom: 1px solid black;
+  }
 </style>
 
 <script lang="ts">
-
 import { Component, Vue } from 'vue-property-decorator'
 import mapboxgl from "mapbox-gl";
 import { VuexStoreGetters } from '../store/types'
@@ -64,41 +71,52 @@ type RouteGetter =
   'mealsModule/gatewayStops' | 'mealsModule/marcolaStops' | 'mealsModule/MCStops' | 'mealsModule/shortStops' | 'mealsModule/longStops' |
   'mealsModule/northStops' | 'mealsModule/willStops' | 'mealsModule/hotPUStops' | 'mealsModule/tu1Stops' | 'mealsModule/tu2Stops' |
   'mealsModule/tu3Stops' | 'mealsModule/thur1Stops' | 'mealsModule/thur2Stops' | 'mealsModule/thur3Stops' | 'mealsModule/coldPUStops'
+type WaitlistRouteGetter =
+  'mealsModule/gatewayWaitlistStops' | 'mealsModule/marcolaWaitlistStops' | 'mealsModule/MCWaitlistStops' | 'mealsModule/shortWaitlistStops' |
+  'mealsModule/longWaitlistStops' | 'mealsModule/northWaitlistStops' | 'mealsModule/willWaitlistStops' | 'mealsModule/hotPUWaitlistStops' |
+  'mealsModule/tu1WaitlistStops' | 'mealsModule/tu2WaitlistStops' | 'mealsModule/tu3WaitlistStops' | 'mealsModule/thur1WaitlistStops' |
+  'mealsModule/thur2WaitlistStops' | 'mealsModule/thur3WaitlistStops' | 'mealsModule/coldPUWaitlistStops'
 
 interface RouteOption {
   label: RouteLabel,
   value: RouteValue,
   color: RouteColor,
   getter: RouteGetter
+  waitlistGetter: WaitlistRouteGetter
 }
 
 @Component
 export default class MOWMap extends Vue{
   private getters = this.$store.getters as VuexStoreGetters
+  public allHot = false
+  public allCold = false
 
   public hotRouteOptions: Array<RouteOption> = [
-    { label: 'Gateway', value: 'Gateway', color: 'red', getter: 'mealsModule/gatewayStops'},
-    { label: 'Marcola', value: 'Marcola', color: 'orange', getter: 'mealsModule/marcolaStops'},
-    { label: 'MC', value: 'MC', color: 'yellow', getter: 'mealsModule/MCStops'},
-    { label: 'Short', value: 'Short', color: 'green', getter: 'mealsModule/shortStops'},
-    { label: 'Long', value: 'Long', color: 'blue', getter: 'mealsModule/longStops'},
-    { label: 'North', value: 'North', color: 'indigo', getter: 'mealsModule/northStops'},
-    { label: 'Will', value: 'Will', color: 'violet', getter: 'mealsModule/willStops'},
-    { label: 'PU', value: 'hotPU', color: 'pink', getter: 'mealsModule/hotPUStops'}
+    { label: 'Gateway', value: 'Gateway', color: 'red', getter: 'mealsModule/gatewayStops', waitlistGetter: 'mealsModule/gatewayWaitlistStops'},
+    { label: 'Marcola', value: 'Marcola', color: 'orange', getter: 'mealsModule/marcolaStops', waitlistGetter: 'mealsModule/marcolaWaitlistStops'},
+    { label: 'MC', value: 'MC', color: 'yellow', getter: 'mealsModule/MCStops', waitlistGetter: 'mealsModule/MCWaitlistStops'},
+    { label: 'Short', value: 'Short', color: 'green', getter: 'mealsModule/shortStops', waitlistGetter: 'mealsModule/shortWaitlistStops'},
+    { label: 'Long', value: 'Long', color: 'blue', getter: 'mealsModule/longStops', waitlistGetter: 'mealsModule/longWaitlistStops'},
+    { label: 'North', value: 'North', color: 'indigo', getter: 'mealsModule/northStops', waitlistGetter: 'mealsModule/northWaitlistStops'},
+    { label: 'Will', value: 'Will', color: 'violet', getter: 'mealsModule/willStops', waitlistGetter: 'mealsModule/willWaitlistStops'},
+    { label: 'PU', value: 'hotPU', color: 'pink', getter: 'mealsModule/hotPUStops', waitlistGetter: 'mealsModule/hotPUWaitlistStops'}
   ]
   public coldRouteOptions: Array<RouteOption> = [
-    { label: 'Tu1', value: 'Tu1', color: 'red', getter: 'mealsModule/tu1Stops'},
-    { label: 'Tu2', value: 'Tu2', color: 'orange', getter: 'mealsModule/tu2Stops'},
-    { label: 'Tu3', value: 'Tu3', color: 'yellow', getter: 'mealsModule/tu3Stops'},
-    { label: 'Thur1', value: 'Thur1', color: 'green', getter: 'mealsModule/thur1Stops'},
-    { label: 'Thur2', value: 'Thur2', color: 'blue', getter: 'mealsModule/thur2Stops'},
-    { label: 'Thur3', value: 'Thur3', color: 'violet', getter: 'mealsModule/thur3Stops'},
-    { label: 'PU', value: 'coldPU', color: 'pink', getter: 'mealsModule/coldPUStops'}
+    { label: 'Tu1', value: 'Tu1', color: 'red', getter: 'mealsModule/tu1Stops', waitlistGetter: 'mealsModule/tu1WaitlistStops'},
+    { label: 'Tu2', value: 'Tu2', color: 'orange', getter: 'mealsModule/tu2Stops', waitlistGetter: 'mealsModule/tu2WaitlistStops'},
+    { label: 'Tu3', value: 'Tu3', color: 'yellow', getter: 'mealsModule/tu3Stops', waitlistGetter: 'mealsModule/tu3WaitlistStops'},
+    { label: 'Thur1', value: 'Thur1', color: 'green', getter: 'mealsModule/thur1Stops', waitlistGetter: 'mealsModule/thur1WaitlistStops'},
+    { label: 'Thur2', value: 'Thur2', color: 'blue', getter: 'mealsModule/thur2Stops', waitlistGetter: 'mealsModule/thur2WaitlistStops'},
+    { label: 'Thur3', value: 'Thur3', color: 'violet', getter: 'mealsModule/thur3Stops', waitlistGetter: 'mealsModule/thur3WaitlistStops'},
+    { label: 'PU', value: 'coldPU', color: 'pink', getter: 'mealsModule/coldPUStops', waitlistGetter: 'mealsModule/coldPUWaitlistStops'}
   ]
   private allRouteOptions = [...this.hotRouteOptions, ...this.coldRouteOptions]
-  public selectedRoutes = ['Gateway', 'Marcola', 'MC', 'Short', 'Long', 'North', 'Will']
+  private allHotRoutes = ['Gateway', 'Marcola', 'MC', 'Short', 'Long', 'North', 'Will', 'hotPU']
+  private allColdRoutes = ['Tu1', 'Tu2', 'Tu3', 'Thur1', 'Thur2', 'Thur3', 'coldPU']
+  public selectedHotRoutes = ['Gateway', 'Marcola', 'MC', 'Short', 'Long', 'North', 'Will']
+  public selectedColdRoutes = []
   public newAddress = ''
-  public showWaitlisted = true
+  public showWaitlisted = false
 
   private accessToken = process.env.VUE_APP_MAP_ACCESS_TOKEN
   private map = {}
@@ -118,49 +136,62 @@ export default class MOWMap extends Vue{
 
       this.map.on('load', () => {
         for(let route of this.allRouteOptions) {
+          for (let waitlistOption of ['current', 'waitlisted']) {
 
-          let visibility = "none"
-          if (this.selectedRoutes.indexOf(route.value) != -1) {
-            visibility = "visible"
-          }
-
-          let addresses = []
-          const stops = this.getters[route.getter]
-          if (route.label == 'PU') {
-            // debugger
-          }
-          for (let address of stops) {
-            addresses.push({
-              'type': 'Feature',
-              'geometry': {
-                'type': 'Point',
-                'coordinates': [address.longitude, address.latitude]
-              }
-            })
-          }
-
-          // Add the vector tileset as a source.
-          this.map.addSource(route.value + 'Routes', {
-            'type': 'geojson',
-            'data': {
-              'type': 'FeatureCollection',
-              'features': addresses
+            // Set the visibility of the route based on whether it is selected or not.
+            let visibility = "none"
+            // Returns true if the waitlist option for this route matches the currently selected show waitlisted option.
+            const waitlistOptionMatchesShowWaitlisted = (waitlistOption == 'waitlisted') == this.showWaitlisted
+            if ([...this.selectedHotRoutes, ...this.selectedColdRoutes].includes(route.value) && waitlistOptionMatchesShowWaitlisted) {
+              visibility = "visible"
             }
-          });
-          
-          this.map.addLayer({
-            'id': route.value + '-routes',
-            'type': 'circle',
-            'source': route.value + 'Routes',
-            'layout' : {
-              'visibility': visibility
-            },
-            'paint': {
-              'circle-radius': 6,
-              'circle-color': route.color
-            },
-            'filter': ['==', '$type', 'Point']
-          });
+
+            // Get the stops for the route.
+            let stops
+            let sourceInfix = ''
+            if (waitlistOption == 'current') {
+              stops = this.getters[route.getter]
+            } else {
+              stops = this.getters[route.waitlistGetter]
+              sourceInfix = 'Waitlist'
+            }
+
+            // Create an array of addresses for the route.
+            let addresses = []
+            for (let address of stops) {
+              addresses.push({
+                'type': 'Feature',
+                'geometry': {
+                  'type': 'Point',
+                  'coordinates': [address.longitude, address.latitude]
+                }
+              })
+            }
+
+            // Add the addresses as a map source.
+            this.map.addSource(route.value + sourceInfix + 'Routes', {
+              'type': 'geojson',
+              'data': {
+                'type': 'FeatureCollection',
+                'features': addresses
+              }
+            });
+            
+            // Add the addresses as a layer on the map.
+            this.map.addLayer({
+              'id': route.value + sourceInfix.toLowerCase() + '-routes',
+              'type': 'circle',
+              'source': route.value + sourceInfix + 'Routes',
+              'layout' : {
+                'visibility': visibility
+              },
+              'paint': {
+                'circle-radius': 6,
+                'circle-color': route.color
+              },
+              'filter': ['==', '$type', 'Point']
+            });
+          }
         }
       });
 
@@ -197,12 +228,40 @@ export default class MOWMap extends Vue{
 
   updateMapVisibility() {
     for (let route of this.allRouteOptions) {
-      if (this.selectedRoutes.includes(route.value)) {
-        this.map.setLayoutProperty(route.value + '-routes', 'visibility', 'visible')
-      } else {
-        this.map.setLayoutProperty(route.value + '-routes', 'visibility', 'none')
+      for (let waitlistOption of ['current', 'waitlisted']) {
+        // Returns true if the waitlist option for this route matches the currently selected show waitlisted option.
+        const waitlistOptionMatchesShowWaitlisted = (waitlistOption == 'waitlisted') == this.showWaitlisted
+        let sourceInfix = ''
+        if (waitlistOption == 'waitlisted') {
+          sourceInfix = 'waitlist'
+        }
+        if ([...this.selectedHotRoutes, ...this.selectedColdRoutes].includes(route.value) && waitlistOptionMatchesShowWaitlisted) {
+          this.map.setLayoutProperty(route.value + sourceInfix + '-routes', 'visibility', 'visible')
+        } else {
+          this.map.setLayoutProperty(route.value + sourceInfix + '-routes', 'visibility', 'none')
+        }
+        this.allHot = this.selectedHotRoutes.length == this.allHotRoutes.length
+        this.allCold = this.selectedColdRoutes.length == this.allColdRoutes.length
       }
     }
+  }
+
+  toggleAllHot() {
+    if (this.allHot) {
+      this.selectedHotRoutes = ['Gateway', 'Marcola', 'MC', 'Short', 'Long', 'North', 'Will', 'hotPU']
+    } else {
+      this.selectedHotRoutes = []
+    }
+    this.updateMapVisibility()
+  }
+
+  toggleAllCold() {
+    if (this.allCold) {
+      this.selectedColdRoutes = ['Tu1', 'Tu2', 'Tu3', 'Thur1', 'Thur2', 'Thur3', 'coldPU']
+    } else {
+      this.selectedColdRoutes = []
+    }
+    this.updateMapVisibility()
   }
 
 }

@@ -30,7 +30,7 @@ class Command(BaseCommand):
             # Skip rows already imported
             existing_stop = Stop.objects.filter(
                 last_name=last_name, first_name=first_name, address=address,
-                meal_type='hot'
+                meal_type='hot', waitlist=False
             )
             if existing_stop.count():
                 print(

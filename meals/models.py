@@ -45,7 +45,8 @@ class Stop(models.Model):
     def save(self, *args, **kwargs):
         if not self.latitude and not self.longitude:
             self.latitude, self.longitude = get_lat_long(
-                self.address, self.city.name, self.zip_code.code
+                self.address, self.city.name, self.city.state.name,
+                self.zip_code.code
             )
             if not self.latitude:
                 self.latitude = 0

@@ -5,7 +5,6 @@
         <h4>Meals on Wheels Delivery Routes</h4>
         <div class="row justify-around">
           <div class="q-mr-lg">
-            <h5 class="q-ma-none row">Select Routes</h5>
             <div class="q-pa-md row">
               <div class="col">
                 <q-checkbox v-model="allHot" label="All Hot" @input="toggleAllHot" class="all-toggle"></q-checkbox>
@@ -111,10 +110,10 @@ export default class MOWMap extends Vue{
     { label: 'PU', value: 'coldPU', color: 'pink', getter: 'mealsModule/coldPUStops', waitlistGetter: 'mealsModule/coldPUWaitlistStops'}
   ]
   private allRouteOptions = [...this.hotRouteOptions, ...this.coldRouteOptions]
-  private allHotRoutes = ['Gateway', 'Marcola', 'MC', 'Short', 'Long', 'North', 'Will', 'hotPU']
-  private allColdRoutes = ['Tu1', 'Tu2', 'Tu3', 'Thur1', 'Thur2', 'Thur3', 'coldPU']
-  public selectedHotRoutes = ['Gateway', 'Marcola', 'MC', 'Short', 'Long', 'North', 'Will']
-  public selectedColdRoutes = []
+  private allHotRoutes: Array<RouteValue> = ['Gateway', 'Marcola', 'MC', 'Short', 'Long', 'North', 'Will', 'hotPU']
+  private allColdRoutes: Array<RouteValue> = ['Tu1', 'Tu2', 'Tu3', 'Thur1', 'Thur2', 'Thur3', 'coldPU']
+  public selectedHotRoutes: Array<RouteValue> = ['Gateway', 'Marcola', 'MC', 'Short', 'Long', 'North', 'Will']
+  public selectedColdRoutes: Array<RouteValue> = []
   public newAddress = ''
   public showWaitlisted = false
 
@@ -137,15 +136,6 @@ export default class MOWMap extends Vue{
       this.map.on('load', () => {
         for(let route of this.allRouteOptions) {
           for (let waitlistOption of ['current', 'waitlisted']) {
-
-            // Set the visibility of the route based on whether it is selected or not.
-            let visibility = "none"
-            // Returns true if the waitlist option for this route matches the currently selected show waitlisted option.
-            const waitlistOptionMatchesShowWaitlisted = (waitlistOption == 'waitlisted') == this.showWaitlisted
-            if ([...this.selectedHotRoutes, ...this.selectedColdRoutes].includes(route.value) && waitlistOptionMatchesShowWaitlisted) {
-              visibility = "visible"
-            }
-
             // Get the stops for the route.
             let stops
             let sourceInfix = ''
@@ -182,9 +172,6 @@ export default class MOWMap extends Vue{
               'id': route.value + sourceInfix.toLowerCase() + '-routes',
               'type': 'circle',
               'source': route.value + sourceInfix + 'Routes',
-              'layout' : {
-                'visibility': visibility
-              },
               'paint': {
                 'circle-radius': 6,
                 'circle-color': route.color
@@ -193,6 +180,7 @@ export default class MOWMap extends Vue{
             });
           }
         }
+        this.updateMapVisibility()
       });
 
       // When panning the map, update the center coordinates
@@ -226,7 +214,26 @@ export default class MOWMap extends Vue{
       })
   }
 
+  toggleAllHot() {
+    if (this.allHot) {
+      this.selectedHotRoutes = ['Gateway', 'Marcola', 'MC', 'Short', 'Long', 'North', 'Will', 'hotPU']
+    } else {
+      this.selectedHotRoutes = []
+    }
+    this.updateMapVisibility()
+  }
+
+  toggleAllCold() {
+    if (this.allCold) {
+      this.selectedColdRoutes = ['Tu1', 'Tu2', 'Tu3', 'Thur1', 'Thur2', 'Thur3', 'coldPU']
+    } else {
+      this.selectedColdRoutes = []
+    }
+    this.updateMapVisibility()
+  }
+
   updateMapVisibility() {
+    // Set route visibility and trigger the map to fit.
     for (let route of this.allRouteOptions) {
       for (let waitlistOption of ['current', 'waitlisted']) {
         // Returns true if the waitlist option for this route matches the currently selected show waitlisted option.
@@ -244,24 +251,30 @@ export default class MOWMap extends Vue{
         this.allCold = this.selectedColdRoutes.length == this.allColdRoutes.length
       }
     }
+    this.fitMapToStops()
   }
 
-  toggleAllHot() {
-    if (this.allHot) {
-      this.selectedHotRoutes = ['Gateway', 'Marcola', 'MC', 'Short', 'Long', 'North', 'Will', 'hotPU']
-    } else {
-      this.selectedHotRoutes = []
+  fitMapToStops() {
+    // Fit the map to the bounds of the selected routes.
+    const bounds = new mapboxgl.LngLatBounds()
+    for (let route of this.allRouteOptions) {
+      for (let waitlistOption of ['current', 'waitlisted']) {
+        // Returns true if the waitlist option for this route matches the currently selected show waitlisted option.
+        const waitlistOptionMatchesShowWaitlisted = (waitlistOption == 'waitlisted') == this.showWaitlisted
+        if ([...this.selectedHotRoutes, ...this.selectedColdRoutes].includes(route.value) && waitlistOptionMatchesShowWaitlisted) {
+          let stops
+          if (waitlistOption == 'current') {
+            stops = this.getters[route.getter]
+          } else {
+            stops = this.getters[route.waitlistGetter]
+          }
+          for (let stop of stops) {
+            bounds.extend([stop.longitude, stop.latitude])
+          }
+        }
+      }
     }
-    this.updateMapVisibility()
-  }
-
-  toggleAllCold() {
-    if (this.allCold) {
-      this.selectedColdRoutes = ['Tu1', 'Tu2', 'Tu3', 'Thur1', 'Thur2', 'Thur3', 'coldPU']
-    } else {
-      this.selectedColdRoutes = []
-    }
-    this.updateMapVisibility()
+    this.map.fitBounds(bounds, {padding: 50})
   }
 
 }

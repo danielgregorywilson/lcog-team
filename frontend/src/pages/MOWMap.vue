@@ -58,7 +58,7 @@ import mapboxgl from "mapbox-gl";
 import { VuexStoreGetters } from '../store/types'
 
 type RouteLabel = 'Gateway' | 'Marcola' | 'MC' | 'Short' | 'Long' | 'North' | 'Will' | 'Tu1' | 'Tu2' | 'Tu3' | 'Thur1' | 'Thur2' | 'Thur3' | 'PU'
-type RouteName = 'Gateway' | 'Marcola' | 'MC' | 'Short' | 'Long' | 'North' | 'Will' | 'hotPU' | 'Tu1' | 'Tu2' | 'Tu3' | 'Thur1' | 'Thur2' | 'Thur3' | 'coldPU'
+type RouteValue = 'Gateway' | 'Marcola' | 'MC' | 'Short' | 'Long' | 'North' | 'Will' | 'hotPU' | 'Tu1' | 'Tu2' | 'Tu3' | 'Thur1' | 'Thur2' | 'Thur3' | 'coldPU'
 type RouteColor = 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'indigo' | 'violet' | 'pink'
 type RouteGetter = 
   'mealsModule/gatewayStops' | 'mealsModule/marcolaStops' | 'mealsModule/MCStops' | 'mealsModule/shortStops' | 'mealsModule/longStops' |
@@ -67,7 +67,7 @@ type RouteGetter =
 
 interface RouteOption {
   label: RouteLabel,
-  value: RouteName,
+  value: RouteValue,
   color: RouteColor,
   getter: RouteGetter
 }
@@ -95,6 +95,7 @@ export default class MOWMap extends Vue{
     { label: 'Thur3', value: 'Thur3', color: 'violet', getter: 'mealsModule/thur3Stops'},
     { label: 'PU', value: 'coldPU', color: 'pink', getter: 'mealsModule/coldPUStops'}
   ]
+  private allRouteOptions = [...this.hotRouteOptions, ...this.coldRouteOptions]
   public selectedRoutes = ['Gateway', 'Marcola', 'MC', 'Short', 'Long', 'North', 'Will']
   public newAddress = ''
   public showWaitlisted = true
@@ -116,20 +117,26 @@ export default class MOWMap extends Vue{
       this.map.addControl(new mapboxgl.NavigationControl());
 
       this.map.on('load', () => {
-        for(let route of this.hotRouteOptions) {
+        for(let route of this.allRouteOptions) {
+
+          let visibility = "none"
+          if (this.selectedRoutes.indexOf(route.value) != -1) {
+            visibility = "visible"
+          }
 
           let addresses = []
           const stops = this.getters[route.getter]
+          if (route.label == 'PU') {
+            // debugger
+          }
           for (let address of stops) {
-            if (address.route === route.value) {
-              addresses.push({
-                'type': 'Feature',
-                'geometry': {
-                  'type': 'Point',
-                  'coordinates': [address.longitude, address.latitude]
-                }
-              })
-            }
+            addresses.push({
+              'type': 'Feature',
+              'geometry': {
+                'type': 'Point',
+                'coordinates': [address.longitude, address.latitude]
+              }
+            })
           }
 
           // Add the vector tileset as a source.
@@ -146,7 +153,7 @@ export default class MOWMap extends Vue{
             'type': 'circle',
             'source': route.value + 'Routes',
             'layout' : {
-              'visibility': "visible"
+              'visibility': visibility
             },
             'paint': {
               'circle-radius': 6,
@@ -189,7 +196,7 @@ export default class MOWMap extends Vue{
   }
 
   updateMapVisibility() {
-    for (let route of this.hotRouteOptions) {
+    for (let route of this.allRouteOptions) {
       if (this.selectedRoutes.includes(route.value)) {
         this.map.setLayoutProperty(route.value + '-routes', 'visibility', 'visible')
       } else {

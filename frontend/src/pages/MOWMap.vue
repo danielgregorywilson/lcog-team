@@ -2,9 +2,9 @@
   <q-layout view="lHh Lpr lFf">
     <q-page-container>
       <q-page class="q-mx-lg" id="page">
-        <h4>Meals on Wheels Delivery Routes</h4>
+        <p id="page-title" class="text-h4 q-my-lg text-center">Meals on Wheels Delivery Routes</p>
         <div class="row justify-around">
-          <div class="q-mr-lg">
+          <div class="q-mr-lg" id="map-controls">
             <div class="q-pa-md row">
               <div class="col">
                 <q-checkbox v-model="allHot" label="All Hot" @input="toggleAllHot" class="all-toggle"></q-checkbox>
@@ -26,18 +26,20 @@
               </div>
             </div>
             <q-toggle v-model="showWaitlisted" label="Show Waitlisted" class="row" @input="updateMapVisibility" />
-            <q-btn color="primary" label="Print selected" class="row q-mt-md" />
+            <q-btn color="primary" label="Print selected" class="row q-mt-md" @click="printPage"/>
           </div>
           <div id="map"></div>
         </div>
-        <q-input v-model="newAddress" label="Add a Delivery Address">
-          <template v-slot:prepend>
-            <q-icon name="place" />
-          </template>
-          <template v-slot:append>
-            <q-icon name="close" @click="newAddress = ''" class="cursor-pointer" />
-          </template>
-        </q-input>
+        <div id="add-address-container">
+          <q-input v-model="newAddress" label="Add a Delivery Address">
+            <template v-slot:prepend>
+              <q-icon name="place" />
+            </template>
+            <template v-slot:append>
+              <q-icon name="close" @click="newAddress = ''" class="cursor-pointer" />
+            </template>
+          </q-input>
+        </div>
       </q-page>
     </q-page-container>
   </q-layout>
@@ -56,6 +58,28 @@
   .all-toggle {
     border-bottom: 1px solid black;
   }
+
+  @media print {
+    @page { size: landscape; }
+
+    #page-title {
+      margin-top: 10px;
+    }
+
+    #map-controls {
+      display: none;
+    }
+
+    .mapboxgl-control-container {
+      display: none;
+    }
+
+    #add-address-container {
+      display: none;
+    }
+  }
+
+
 </style>
 
 <script lang="ts">
@@ -275,6 +299,10 @@ export default class MOWMap extends Vue{
       }
     }
     this.map.fitBounds(bounds, {padding: 50})
+  }
+
+  printPage() {
+    window.print()
   }
 
 }

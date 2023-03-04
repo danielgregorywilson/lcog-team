@@ -19,6 +19,18 @@ const actions: ActionTree<MealStateInterface, StateInterface> = {
       });
     })
   },
+  getAddressLatLong: ({ commit }, data: {address: string, city: string, state: string, zip: string}) => {
+    return new Promise((resolve, reject) => {
+      axios({ url: `${ apiURL }api/v1/address-lat-long/?address=${ data.address }&city=${ data.city }&state=${ data.state }&zip=${ data.zip }`, method: 'GET' })
+      .then(resp => {
+        resolve(resp);
+      })
+      .catch(e => {
+        console.error('Error getting lat/long', e)
+        reject(e)
+      });
+    })
+  },
   authLogout: ({commit}) => {
     return new Promise((resolve) => {
       commit('authLogout')

@@ -6,6 +6,8 @@ from .models import Stop
 class MealStopSerializer(serializers.HyperlinkedModelSerializer):
     city = serializers.CharField(source='city.name')
     zip_code = serializers.CharField(source='zip_code.code')
+    latitude = serializers.FloatField()
+    longitude = serializers.FloatField()
     route = serializers.CharField(source='route.name')
 
     class Meta:

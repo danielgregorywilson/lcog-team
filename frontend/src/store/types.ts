@@ -941,7 +941,7 @@ export interface AxiosWorkflowCreateServerResponse {
 // Meals Structure from Django Rest Framework //
 ////////////////////////////////////////////////
 
-export type Stop = {
+export interface Stop {
   first_name: string
   last_name: string
   address: string
@@ -955,10 +955,10 @@ export type Stop = {
   phone_notes: string
   notes: string
   route: string
-  created_at: Date
-  updated_at: Date
+  created_at?: Date
+  updated_at?: Date
+  new?: boolean
 }
-
 
 /////////////
 // Getters //

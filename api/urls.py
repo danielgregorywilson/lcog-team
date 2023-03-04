@@ -6,7 +6,7 @@ from django.urls import include, path
 from deskreservation.api_views import DeskReservationViewSet, DeskViewSet
 from mainsite.api_views import TrustedIPViewSet, SecurityMessageViewSet
 from mainsite.views import obtain_auth_token_without_password
-from meals.api_views import MealStopViewSet
+from meals.api_views import AddressLatLong, MealStopViewSet
 from people.api_views import (
     CurrentUserView, EmployeeViewSet, FileUploadViewSet, GroupViewSet,
     PerformanceReviewViewSet, ReviewNoteViewSet, SignatureViewSet,
@@ -30,6 +30,11 @@ urlpatterns = [
     path('api-token-auth/', obtain_auth_token_without_password),
     path('api-token-auth-password/', obtain_auth_token),
     path('v1/current-user/', CurrentUserView.as_view(), name='current_user'),
+    path(
+        'v1/address-lat-long/',
+        AddressLatLong.as_view(),
+        name='address_lat_long'
+    )
 ]
 
 router = routers.DefaultRouter(trailing_slash=False)

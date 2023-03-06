@@ -473,6 +473,16 @@ export default class MOWMap extends Vue{
     if (!route) {
       return
     }
+
+    // If the new route is not currently checked, check it.
+    if (!this.selectedHotRoutes.includes(this.newStopRoute) && !this.selectedColdRoutes.includes(this.newStopRoute)) {
+      if (this.allHotRoutes.includes(this.newStopRoute)) {
+        this.selectedHotRoutes.push(this.newStopRoute)
+      } else {
+        this.selectedColdRoutes.push(this.newStopRoute)
+      }
+      this.updateMapVisibility()
+    }
     
     // Remove the old route.
     const routeName = this.newStopRoute + 'Routes'

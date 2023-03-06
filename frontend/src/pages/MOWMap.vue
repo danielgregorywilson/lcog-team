@@ -137,11 +137,27 @@ interface RouteOption {
   waitlistGetter: WaitlistRouteGetter
 }
 
+interface RouteStats {
+  current: number,
+  waitlisted: number,
+  center: mapboxgl.LngLatLike,
+  averageDistance: number,
+  maxDistance: number
+}
+
+interface RoutesStats {
+  [key: string]: RouteStats
+}
+
+type WaitlistOption = 'current' | 'waitlisted'
+
 @Component
 export default class MOWMap extends Vue{
   private getters = this.$store.getters as VuexStoreGetters
   public allHot = false
   public allCold = false
+
+  private waitlistOptions: Array<WaitlistOption> = ['current', 'waitlisted']
 
   public hotRouteOptions: Array<RouteOption> = [
     { label: 'Gateway', value: 'Gateway', color: 'red', getter: 'mealsModule/gatewayStops', waitlistGetter: 'mealsModule/gatewayWaitlistStops'},
@@ -176,31 +192,31 @@ export default class MOWMap extends Vue{
   public newStopLongitude = -1
   public newStopCityOptions = ['Dexter', 'Eugene', 'Leaburg', 'Lowell', 'Marcola', 'Springfield']
   public newStopStateOptions = ['OR']
-  public newStopRoute = ''
+  public newStopRoute: RouteValue = 'Gateway'
   public showWaitlisted = false
 
-  public routeStats = {
-    'Gateway': {current: 0, waitlisted: 0, center: [0, 0], averageDistance: 0, maxDistance: 0},
-    'Marcola': {current: 0, waitlisted: 0, center: [0, 0], averageDistance: 0, maxDistance: 0},
-    'MC': {current: 0, waitlisted: 0, center: [0, 0], averageDistance: 0, maxDistance: 0},
-    'Short': {current: 0, waitlisted: 0, center: [0, 0], averageDistance: 0, maxDistance: 0},
-    'Long': {current: 0, waitlisted: 0, center: [0, 0], averageDistance: 0, maxDistance: 0},
-    'North': {current: 0, waitlisted: 0, center: [0, 0], averageDistance: 0, maxDistance: 0},
-    'Will': {current: 0, waitlisted: 0, center: [0, 0], averageDistance: 0, maxDistance: 0},
-    'hotPU': {current: 0, waitlisted: 0, center: [0, 0], averageDistance: 0, maxDistance: 0},
-    'Tu1': {current: 0, waitlisted: 0, center: [0, 0], averageDistance: 0, maxDistance: 0},
-    'Tu2': {current: 0, waitlisted: 0, center: [0, 0], averageDistance: 0, maxDistance: 0},
-    'Tu3': {current: 0, waitlisted: 0, center: [0, 0], averageDistance: 0, maxDistance: 0},
-    'Thur1': {current: 0, waitlisted: 0, center: [0, 0], averageDistance: 0, maxDistance: 0},
-    'Thur2': {current: 0, waitlisted: 0, center: [0, 0], averageDistance: 0, maxDistance: 0},
-    'Thur3': {current: 0, waitlisted: 0, center: [0, 0], averageDistance: 0, maxDistance: 0},
-    'coldPU': {current: 0, waitlisted: 0, center: [0, 0], averageDistance: 0, maxDistance: 0}
+  public routeStats: RoutesStats = {
+    'Gateway': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
+    'Marcola': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
+    'MC': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
+    'Short': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
+    'Long': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
+    'North': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
+    'Will': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
+    'hotPU': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
+    'Tu1': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
+    'Tu2': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
+    'Tu3': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
+    'Thur1': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
+    'Thur2': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
+    'Thur3': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
+    'coldPU': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0}
   }
 
   // Mapbox
   private accessToken = process.env.VUE_APP_MAP_ACCESS_TOKEN
   private map: mapboxgl.Map = {} as mapboxgl.Map
-  private center = [-122.94329319107005, 44.08711374902461]
+  private center: mapboxgl.LngLatLike = [-122.94329319107005, 44.08711374902461]
   private zoom = 10
 
   private getMealStops() {
@@ -228,7 +244,7 @@ export default class MOWMap extends Vue{
 
       this.map.on('load', () => {
         for(let route of this.allRouteOptions) {
-          for (let waitlistOption of ['current', 'waitlisted']) {
+          for (let waitlistOption of this.waitlistOptions) {
             this.compileRouteAndAddToMap(route, waitlistOption)
           }
         }
@@ -312,25 +328,25 @@ export default class MOWMap extends Vue{
       this.routeStats[route.value].current = stops.length
        
       // Calculate the center of the route.
-      let center = [0, 0]
+      let center: mapboxgl.LngLatLike = {lng: 0, lat: 0}
       for (let stop of stops) {
-        center[0] += stop.longitude
-        center[1] += stop.latitude
+        center.lng += stop.longitude
+        center.lat += stop.latitude
       }
-      center[0] /= stops.length
-      center[1] /= stops.length
+      center.lng /= stops.length
+      center.lat /= stops.length
 
       // Calculate the average distance from the center.
       let averageDistance = 0
       for (let stop of stops) {
-        averageDistance += this.calculateDistance(stop.latitude, stop.longitude, center[1], center[0])
+        averageDistance += this.calculateDistance(stop.latitude, stop.longitude, center.lat, center.lng)
       }
       averageDistance /= stops.length
 
       // Calculate the maximum distance from the center.
       let maxDistance = 0
       for (let stop of stops) {
-        let distance = this.calculateDistance(stop.latitude, stop.longitude, center[1], center[0])
+        let distance = this.calculateDistance(stop.latitude, stop.longitude, center.lat, center.lng)
         if (distance > maxDistance) {
           maxDistance = distance
         }
@@ -378,7 +394,7 @@ export default class MOWMap extends Vue{
     this.updateMapVisibility()
   }
 
-  private updateMapVisibility() {
+  public updateMapVisibility() {
     // Set route visibility and trigger the map to fit.
     for (let route of this.allRouteOptions) {
       for (let waitlistOption of ['current', 'waitlisted']) {
@@ -451,7 +467,7 @@ export default class MOWMap extends Vue{
     let shortestDistance
     let shortestDistanceRoute
     for (let route of this.allRouteOptions) {
-      let distance = this.calculateDistance(this.newStopLatitude, this.newStopLongitude, this.routeStats[route.value].center[1], this.routeStats[route.value].center[0])
+      let distance = this.calculateDistance(this.newStopLatitude, this.newStopLongitude, this.routeStats[route.value].center.lat, this.routeStats[route.value].center.lng)
       if (shortestDistance == undefined || distance < shortestDistance) {
         shortestDistance = distance
         shortestDistanceRoute = route

@@ -31,18 +31,34 @@
           <div id="map"></div>
         </div>
         <div id="add-address-container">
-          <div class="text-h6">Add a Stop</div>
-          <div class="row q-gutter-md">
-            <q-input v-model="newStopAddress" label="Address" class="col" id="new-stop-address">
-              <template v-slot:prepend>
-                <q-icon name="place" />
-              </template>
-            </q-input>
-            <q-select v-model="newStopCity" :options="newStopCityOptions" label="City" id="new-stop-city" />
-            <q-select v-model="newStopState" :options="newStopStateOptions" label="State" id="new-stop-state" />
-            <q-input v-model="newStopZip" mask="#####" label="Zip" class="col" id="new-stop-zip" />
+          <div class="text-h6 row items-center q-my-sm">
+            <q-btn round color="primary" :icon="showNewStopForm ? 'remove' : 'add'" @click="showNewStopForm = !showNewStopForm" class="q-mr-sm"/>
+            <div>Add a Stop</div>
           </div>
-          <q-btn color="primary" label="Check Address" class="q-mt-sm" @click="checkAddress" />
+          <div id="addStopForm" v-if="showNewStopForm">
+            <div class="row q-gutter-md">
+              <q-input v-model="newStopFirstName" label="First Name" id="new-stop-first-name" />
+              <q-input v-model="newStopLastName" label="Last Name" id="new-stop-last-name" />
+              <q-input v-model="newStopPhone" label="Phone" id="new-stop-phone" />
+              <q-input v-model="newStopPhoneNotes" label="Phone Notes" id="new-stop-phone-notes" class="col" />
+            </div>
+            <div class="row q-gutter-md">
+              <q-input v-model="newStopAddress" name="street-address" label="Address" class="col" id="new-stop-address">
+                <template v-slot:prepend>
+                  <q-icon name="place" />
+                </template>
+              </q-input>
+              <q-select v-model="newStopCity" :options="newStopCityOptions" label="City" name="city" id="new-stop-city" />
+              <q-select v-model="newStopState" :options="newStopStateOptions" label="State" id="new-stop-state" />
+              <q-input v-model="newStopZip" mask="#####" name="postal-code" label="Zip" class="col" id="new-stop-zip" />
+            </div>
+            <div class="row q-gutter-md">
+              <q-select v-model="newStopMealType" label="Meal Type" :options="newStopMealTypeOptions" id="new-stop-meal-type" />
+              <!-- <q-checkbox v-model="newStopWaitlist" label="Waitlist" id="new-stop-waitlist" /> -->
+              <q-input v-model="newStopNotes" label="Notes" id="new-stop-notes" class="col" />
+            </div>
+          </div>
+          <q-btn color="primary" label="Check Address" class="q-mt-sm" :disabled="!newStopAddress" @click="checkAddress" />
           {{ newStopLatitude }}, {{ newStopLongitude }}, {{ newStopRoute }}
         </div>
         <div id="route-stats" class="row q-gutter-md">
@@ -75,8 +91,17 @@
   }
 
   // New Stop Form
+  #addStopForm {
+    background-color: lightgray;
+    padding: 10px 30px 30px 30px
+  }
+
   #new-stop-state {
     min-width: 29px;
+  }
+
+  #new-stop-meal-type {
+    min-width: 56px;
   }
 
   .star-marker {
@@ -184,16 +209,27 @@ export default class MOWMap extends Vue{
   public allRoutes = [...this.allHotRoutes, ...this.allColdRoutes]
   public selectedHotRoutes: Array<RouteValue> = ['Gateway', 'Marcola', 'MC', 'Short', 'Long', 'North', 'Will']
   public selectedColdRoutes: Array<RouteValue> = []
+  public showWaitlisted = false
+
+  public showNewStopForm = true
+  public newStopFirstName = ''
+  public newStopLastName = ''
   public newStopAddress = ''
   public newStopCity = 'Springfield'
   public newStopState = 'OR'
   public newStopZip = ''
+  public newStopPhone = ''
+  public newStopPhoneNotes = ''
+  public newStopNotes = ''
+  public newStopMealType = 'Hot'
+  public newStopWaitlist = true
   public newStopLatitude = -1
   public newStopLongitude = -1
   public newStopCityOptions = ['Dexter', 'Eugene', 'Leaburg', 'Lowell', 'Marcola', 'Springfield']
   public newStopStateOptions = ['OR']
+  public newStopMealTypeOptions = ['Hot', 'Cold']
   public newStopRoute: RouteValue = 'Gateway'
-  public showWaitlisted = false
+  
 
   public routeStats: RoutesStats = {
     'Gateway': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
@@ -282,7 +318,7 @@ export default class MOWMap extends Vue{
       // Add the new stop to the stops array so that the map will resize to include it.
       stops.push(newStop)
 
-      this.addPulsingDotToMap(newStop, route)
+      this.addNewStopMarkerToMap(newStop, route)
     }
 
     // Create an array of addresses for the route.
@@ -508,14 +544,14 @@ export default class MOWMap extends Vue{
     // Add the new stop to the route.
     const newStop = {
       first_name: this.newStopFirstName, last_name: this.newStopLastName, address: this.newStopAddress,
-      city: this.newStopCity, zip: this.newStopZip, latitude: this.newStopLatitude, longitude: this.newStopLongitude,
+      city: this.newStopCity, zip_code: this.newStopZip, latitude: this.newStopLatitude, longitude: this.newStopLongitude,
       meal_type: this.newStopMealType, waitlist: this.newStopWaitlist, phone: this.newStopPhone,
-      phoneNotes: this.newPhoneNotes, notes: this.newStopNotes, route: this.newStopRoute, new: true
+      phone_notes: this.newStopPhoneNotes, notes: this.newStopNotes, route: this.newStopRoute, new: true
     }
     this.compileRouteAndAddToMap(route, 'current', newStop)
   }
 
-  addPulsingDotToMap(newStop: Stop, route: RouteOption) {
+  addNewStopMarkerToMap(newStop: Stop, route: RouteOption) {
     const geojson = {
       type: 'FeatureCollection',
       features: [

@@ -57,8 +57,19 @@
               <!-- <q-checkbox v-model="newStopWaitlist" label="Waitlist" id="new-stop-waitlist" /> -->
               <q-input v-model="newStopNotes" label="Notes" id="new-stop-notes" class="col" />
             </div>
+            <div class="row q-gutter-md items-center" v-if="showNewStopRoute">
+              <q-select
+                v-model="newStopRoute"
+                label="Route"
+                :options="newStopMealType == 'Hot' ? allHotRoutes : allColdRoutes"
+                id="new-stop-route"
+                @input="addNewStopToMap"
+              />
+              <q-checkbox v-model="newStopWaitlist" label="Waitlist" id="new-stop-waitlist" />
+              <q-btn color="primary" label="Add Stop" class="q-mt-sm" :disabled="!showNewStopRoute" @click="addStopToRoute" />
+            </div>
           </div>
-          <q-btn color="primary" label="Check Address" class="q-mt-sm" :disabled="!newStopAddress" @click="checkAddress" />
+          <q-btn color="primary" label="Check Address" class="q-mt-sm" :disabled="!newStopAddress || showNewStopRoute" @click="checkAddress" />
           {{ newStopLatitude }}, {{ newStopLongitude }}, {{ newStopRoute }}
         </div>
         <div id="route-stats" class="row q-gutter-md">
@@ -101,6 +112,10 @@
   }
 
   #new-stop-meal-type {
+    min-width: 56px;
+  }
+
+  #new-stop-route {
     min-width: 56px;
   }
 
@@ -204,14 +219,15 @@ export default class MOWMap extends Vue{
     { label: 'PU', value: 'coldPU', color: 'pink', getter: 'mealsModule/coldPUStops', waitlistGetter: 'mealsModule/coldPUWaitlistStops'}
   ]
   private allRouteOptions = [...this.hotRouteOptions, ...this.coldRouteOptions]
-  private allHotRoutes: Array<RouteValue> = ['Gateway', 'Marcola', 'MC', 'Short', 'Long', 'North', 'Will', 'hotPU']
-  private allColdRoutes: Array<RouteValue> = ['Tu1', 'Tu2', 'Tu3', 'Thur1', 'Thur2', 'Thur3', 'coldPU']
+  public allHotRoutes: Array<RouteValue> = ['Gateway', 'Marcola', 'MC', 'Short', 'Long', 'North', 'Will', 'hotPU']
+  public allColdRoutes: Array<RouteValue> = ['Tu1', 'Tu2', 'Tu3', 'Thur1', 'Thur2', 'Thur3', 'coldPU']
   public allRoutes = [...this.allHotRoutes, ...this.allColdRoutes]
   public selectedHotRoutes: Array<RouteValue> = ['Gateway', 'Marcola', 'MC', 'Short', 'Long', 'North', 'Will']
   public selectedColdRoutes: Array<RouteValue> = []
   public showWaitlisted = false
 
   public showNewStopForm = true
+  public showNewStopRoute = false
   public newStopFirstName = ''
   public newStopLastName = ''
   public newStopAddress = ''
@@ -515,10 +531,11 @@ export default class MOWMap extends Vue{
       this.addNewStopToMap()
       this.calculateRouteStats()
       this.fitMapToStops()
+      this.showNewStopRoute = true
     }
   }
 
-  private addNewStopToMap() {
+  public addNewStopToMap() {
     // Add the new stop to the route
    
     // const route = this.allRouteOptions.find(route => route.value == this.newStopRoute)
@@ -574,6 +591,23 @@ export default class MOWMap extends Vue{
     el.className = 'star-marker';
     el.style.backgroundColor = route.color;
     new mapboxgl.Marker(el).setLngLat(geojson.features[0].geometry.coordinates).addTo(this.map);
+  }
+
+  addStopToRoute() {
+    return
+    this.$store.dispatch('mealsModule/addStopToRoute', {
+      stop: this.newStop, route: this.newStopRoute
+    })
+      .then(() => {
+        this.$store.dispatch('mealsModule/getStops')
+          .then(() => {
+            this.$store.dispatch('mealsModule/getWaitlistedStops')
+              .then(() => {
+                this.calculateRouteStats()
+                this.fitMapToStops()
+              })
+          })
+      })
   }
 
   mounted() {

@@ -120,6 +120,7 @@ interface LinkData {
   managerOnly?: boolean;
   eligibleForTeleworkApplicationOnly?: boolean;
   hasWorkflowRoles?: boolean
+  canViewMOWRoutes?: boolean
 }
 
 const linksData: Array<LinkData> = [
@@ -148,7 +149,13 @@ const linksData: Array<LinkData> = [
   {
     title: 'Schaefers Desk Reservation',
     icon: 'laptop',
-    link: '/desk-reservation/schaefers/1',
+    link: '/desk-reservation/schaefers/1'
+  },
+  {
+    title: 'Meals on Wheels Map',
+    icon: 'map',
+    link: '/mow-map',
+    canViewMOWRoutes: true
   },
   // {
   //   title: 'My Telework Application',

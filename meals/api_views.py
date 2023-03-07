@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -11,15 +12,32 @@ from mainsite.helpers import get_lat_long
 from mainsite.models import City, ZipCode
 
 
+class MealStopPermission(BasePermission):
+    """
+    Manager or employee may update the Performance Review.
+    Others may read only.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        # Read and modify permissions are allowed with the relevant permission groups.
+        if request.method in SAFE_METHODS:
+            request.user.has_perm('meals.view_stop')
+        else:
+            request.user.groups.filter(name='Manage Meals on Wheels Stops').exists()
+
+
 class MealStopViewSet(viewsets.ModelViewSet):
     """
     API endpoint for Meals on Wheels Stops.
     """
     queryset = Stop.objects.all()
     serializer_class = MealStopSerializer
+    permission_classes = [MealStopPermission]
     pagination_class = LargeResultsSetPagination
 
     def create(self, request):
+        if not request.user.groups.filter(name='Manage Meals on Wheels Stops').exists():
+            return Response({'created': False, 'error': 'You do not have permission to create a new stop.'})
         city = City.objects.get(name=request.data['city'])
         meal_type = Stop.TYPE_CHOICE_HOT if request.data['meal_type'] == 'Hot' else Stop.TYPE_CHOICE_COLD
         route_name = 'PU' if request.data['route_name'] in ['hotPU', 'coldPU'] else request.data['route_name']

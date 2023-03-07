@@ -29,14 +29,16 @@ export default class NavLink extends Vue{
   @Prop({default: false}) readonly managerOnly!: boolean
   @Prop({default: false}) readonly eligibleForTeleworkApplicationOnly!: boolean
   @Prop({default: false}) readonly hasWorkflowRoles!: boolean
+  @Prop({default: false}) readonly canViewMOWRoutes!: boolean
 
   private getters = this.$store.getters as VuexStoreGetters
 
   private isVisible(): boolean {
     const shouldNotViewBecauseNotManager = this.managerOnly && this.getters['userModule/isManager']
     const shouldNotViewBecauseNotEligibleForTeleworkApplication = this.eligibleForTeleworkApplicationOnly && !this.getters['userModule/getEmployeeProfile'].is_eligible_for_telework_application
-    const shouldNotViewBeacuseNoWorkflowRoles = this.hasWorkflowRoles && !this.getters['userModule/hasWorkflowRoles']
-    if (shouldNotViewBecauseNotManager || shouldNotViewBecauseNotEligibleForTeleworkApplication || shouldNotViewBeacuseNoWorkflowRoles) {
+    const shouldNotViewBecauseNoWorkflowRoles = this.hasWorkflowRoles && !this.getters['userModule/hasWorkflowRoles']
+    const cannotViewMealsOnWheelsRoutes = this.canViewMOWRoutes && !this.getters['userModule/getEmployeeProfile'].can_view_mow_routes
+    if (shouldNotViewBecauseNotManager || shouldNotViewBecauseNotEligibleForTeleworkApplication || shouldNotViewBecauseNoWorkflowRoles || cannotViewMealsOnWheelsRoutes) {
       return false
     } else {
       return true

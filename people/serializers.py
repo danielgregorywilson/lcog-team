@@ -60,6 +60,8 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     time_off_requests_can_view = serializers.SerializerMethodField()
     next_to_sign_prs = serializers.SerializerMethodField()
     workflow_roles = serializers.SerializerMethodField()
+    can_view_mow_routes = serializers.SerializerMethodField()
+    can_manage_mow_stops = serializers.SerializerMethodField()
     
     class Meta:
         model = Employee
@@ -74,7 +76,8 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             'next_to_sign_prs', 'email_opt_out_all',
             'email_opt_out_timeoff_all', 'email_opt_out_timeoff_weekly',
             'email_opt_out_timeoff_daily', 'is_all_workflows_admin',
-            'admin_of_workflows', 'admin_of_processes', 'workflow_roles'
+            'admin_of_workflows', 'admin_of_processes', 'workflow_roles',
+            'can_view_mow_routes', 'can_manage_mow_stops'
         ]
 
     @staticmethod
@@ -163,6 +166,14 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     @staticmethod
     def get_is_admin_of_processes(employee):
         return employee.is_admin_of_processes
+
+    @staticmethod
+    def get_can_view_mow_routes(employee):
+        return employee.can_view_mow_routes()
+
+    @staticmethod
+    def get_can_manage_mow_stops(employee):
+        return employee.can_manage_mow_stops()
 
 
 class SimpleEmployeeSerializer(serializers.ModelSerializer):

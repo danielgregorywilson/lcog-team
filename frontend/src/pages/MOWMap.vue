@@ -30,7 +30,7 @@
           </div>
           <div id="map"></div>
         </div>
-        <div id="add-address-container" class="q-mt-md">
+        <div id="add-address-container" class="q-mt-md" v-if="canManageMOWStops()">
           <div class="text-h6 row items-center q-my-sm">
             <div class="q-mr-sm">Add a Stop</div>
             <q-btn round color="primary" :icon="showNewStopForm ? 'remove' : 'add'" @click="showNewStopForm = !showNewStopForm"/>
@@ -503,6 +503,10 @@ export default class MOWMap extends Vue{
     window.print()
   }
 
+  public canManageMOWStops() {
+    return this.$store.getters['userModule/canManageMOWStops']
+  }
+
   public checkAddress() {
     this.$store.dispatch(
       'mealsModule/getAddressLatLong', {
@@ -519,7 +523,7 @@ export default class MOWMap extends Vue{
 
   private chooseStopRoute() {
     // TODO: Super simple. Consider things like the number of stops on a route and the distance from the center relative to other stops on the route.
-    // Find the route with the center with the shortest distance from the new stop.
+    // Find the route with the center with the shortest distance from the new stop. About 18-20 addresses should be on each route
     let shortestDistance
     let shortestDistanceRoute
     const routeOptions = this.newStopMealType == 'Hot' ? this.hotRouteOptions : this.coldRouteOptions

@@ -57,6 +57,8 @@ export interface EmployeeRetrieve {
   email_opt_out_timeoff_weekly: boolean
   email_opt_out_timeoff_daily: boolean
   workflow_roles: Array<number>
+  can_view_mow_routes: boolean
+  can_manage_mow_stops: boolean
 }
 
 export interface SimpleEmployeeRetrieve {

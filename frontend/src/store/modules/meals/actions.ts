@@ -31,6 +31,23 @@ const actions: ActionTree<MealStateInterface, StateInterface> = {
       });
     })
   },
+  addMealStop: ({}, data: {
+    first_name: string, last_name: string, address: string, city: string,
+    zip_code: string, meal_type: string, waitlist: boolean, phone: string,
+    phone_notes: string, notes: string, route: string
+  }) => {
+    return new Promise((resolve, reject) => {
+      axios({ url: `${ apiURL }api/v1/mealstop`, method: 'POST', data: data })
+      .then(resp => {
+        resolve(resp);
+      })
+      .catch(e => {
+        console.error('Error adding meal stop', e)
+        reject(e)
+      });
+    })
+  },
+
   authLogout: ({commit}) => {
     return new Promise((resolve) => {
       commit('authLogout')

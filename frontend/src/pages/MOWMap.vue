@@ -30,10 +30,10 @@
           </div>
           <div id="map"></div>
         </div>
-        <div id="add-address-container">
+        <div id="add-address-container" class="q-mt-md">
           <div class="text-h6 row items-center q-my-sm">
-            <q-btn round color="primary" :icon="showNewStopForm ? 'remove' : 'add'" @click="showNewStopForm = !showNewStopForm" class="q-mr-sm"/>
-            <div>Add a Stop</div>
+            <div class="q-mr-sm">Add a Stop</div>
+            <q-btn round color="primary" :icon="showNewStopForm ? 'remove' : 'add'" @click="showNewStopForm = !showNewStopForm"/>
           </div>
           <div id="addStopForm" v-if="showNewStopForm">
             <div class="row q-gutter-md">
@@ -68,18 +68,22 @@
               <q-checkbox v-model="newStopWaitlist" label="Waitlist" id="new-stop-waitlist" />
               <q-btn color="primary" label="Add Stop" class="q-mt-sm" :disabled="!showNewStopRoute" @click="addStopToRoute" />
             </div>
+            <div class="row">
+              <q-btn color="primary" label="Check Address" class="q-mt-sm" :disabled="!newStopAddress || !newStopZip || showNewStopRoute" @click="checkAddress" />
+            </div>
           </div>
-          <q-btn color="primary" label="Check Address" class="q-mt-sm" :disabled="!newStopAddress || showNewStopRoute" @click="checkAddress" />
-          {{ newStopLatitude }}, {{ newStopLongitude }}, {{ newStopRoute }}
         </div>
-        <div id="route-stats" class="row q-gutter-md">
-          <div v-for="route in allRoutes" :key="allRoutes.indexOf(route)">
-            <div class="text-h6">{{ route }}</div>
-            <div>Current: {{ routeStats[route].current }}</div>
-            <div>Waitlisted: {{ routeStats[route].waitlisted }}</div>
-            <div>Center: {{ routeStats[route].center }}</div>
-            <div>Average Distance: {{ routeStats[route].averageDistance }}</div>
-            <div>Max Distance: {{ routeStats[route].maxDistance }}</div>
+        <div id="route-stats" style="display: none">
+          <div>{{ newStopLatitude }}, {{ newStopLongitude }}, {{ newStopRoute }}</div>
+          <div class="row q-gutter-md">
+            <div v-for="route in allRoutes" :key="allRoutes.indexOf(route)">
+              <div class="text-h6">{{ route }}</div>
+              <div>Current: {{ routeStats[route].current }}</div>
+              <div>Waitlisted: {{ routeStats[route].waitlisted }}</div>
+              <div>Center: {{ routeStats[route].center }}</div>
+              <div>Average Distance: {{ routeStats[route].averageDistance }}</div>
+              <div>Max Distance: {{ routeStats[route].maxDistance }}</div>
+            </div>
           </div>
         </div>
       </q-page>
@@ -156,8 +160,8 @@ import { Component, Vue } from 'vue-property-decorator'
 import mapboxgl from "mapbox-gl";
 import { Stop, VuexStoreGetters } from '../store/types'
 
-type RouteLabel = 'Gateway' | 'Marcola' | 'MC' | 'Short' | 'Long' | 'North' | 'Will' | 'Tu1' | 'Tu2' | 'Tu3' | 'Thur1' | 'Thur2' | 'Thur3' | 'PU'
-type RouteValue = 'Gateway' | 'Marcola' | 'MC' | 'Short' | 'Long' | 'North' | 'Will' | 'hotPU' | 'Tu1' | 'Tu2' | 'Tu3' | 'Thur1' | 'Thur2' | 'Thur3' | 'coldPU'
+type RouteLabel = 'Gateway' | 'Marcola' | 'MC' | 'Short' | 'Long' | 'North' | 'Will' | 'Tu 1' | 'Tu 2' | 'Tu 3' | 'Thur 1' | 'Thur 2' | 'Thur 3' | 'PU'
+type RouteValue = 'Gateway' | 'Marcola' | 'MC' | 'Short' | 'Long' | 'North' | 'Will' | 'hotPU' | 'Tu 1' | 'Tu 2' | 'Tu 3' | 'Thur 1' | 'Thur 2' | 'Thur 3' | 'coldPU'
 type RouteColor = 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'indigo' | 'violet' | 'pink'
 type RouteGetter = 
   'mealsModule/gatewayStops' | 'mealsModule/marcolaStops' | 'mealsModule/MCStops' | 'mealsModule/shortStops' | 'mealsModule/longStops' |
@@ -210,23 +214,23 @@ export default class MOWMap extends Vue{
     { label: 'PU', value: 'hotPU', color: 'pink', getter: 'mealsModule/hotPUStops', waitlistGetter: 'mealsModule/hotPUWaitlistStops'}
   ]
   public coldRouteOptions: Array<RouteOption> = [
-    { label: 'Tu1', value: 'Tu1', color: 'red', getter: 'mealsModule/tu1Stops', waitlistGetter: 'mealsModule/tu1WaitlistStops'},
-    { label: 'Tu2', value: 'Tu2', color: 'orange', getter: 'mealsModule/tu2Stops', waitlistGetter: 'mealsModule/tu2WaitlistStops'},
-    { label: 'Tu3', value: 'Tu3', color: 'yellow', getter: 'mealsModule/tu3Stops', waitlistGetter: 'mealsModule/tu3WaitlistStops'},
-    { label: 'Thur1', value: 'Thur1', color: 'green', getter: 'mealsModule/thur1Stops', waitlistGetter: 'mealsModule/thur1WaitlistStops'},
-    { label: 'Thur2', value: 'Thur2', color: 'blue', getter: 'mealsModule/thur2Stops', waitlistGetter: 'mealsModule/thur2WaitlistStops'},
-    { label: 'Thur3', value: 'Thur3', color: 'violet', getter: 'mealsModule/thur3Stops', waitlistGetter: 'mealsModule/thur3WaitlistStops'},
+    { label: 'Tu 1', value: 'Tu 1', color: 'red', getter: 'mealsModule/tu1Stops', waitlistGetter: 'mealsModule/tu1WaitlistStops'},
+    { label: 'Tu 2', value: 'Tu 2', color: 'orange', getter: 'mealsModule/tu2Stops', waitlistGetter: 'mealsModule/tu2WaitlistStops'},
+    { label: 'Tu 3', value: 'Tu 3', color: 'yellow', getter: 'mealsModule/tu3Stops', waitlistGetter: 'mealsModule/tu3WaitlistStops'},
+    { label: 'Thur 1', value: 'Thur 1', color: 'green', getter: 'mealsModule/thur1Stops', waitlistGetter: 'mealsModule/thur1WaitlistStops'},
+    { label: 'Thur 2', value: 'Thur 2', color: 'blue', getter: 'mealsModule/thur2Stops', waitlistGetter: 'mealsModule/thur2WaitlistStops'},
+    { label: 'Thur 3', value: 'Thur 3', color: 'violet', getter: 'mealsModule/thur3Stops', waitlistGetter: 'mealsModule/thur3WaitlistStops'},
     { label: 'PU', value: 'coldPU', color: 'pink', getter: 'mealsModule/coldPUStops', waitlistGetter: 'mealsModule/coldPUWaitlistStops'}
   ]
   private allRouteOptions = [...this.hotRouteOptions, ...this.coldRouteOptions]
   public allHotRoutes: Array<RouteValue> = ['Gateway', 'Marcola', 'MC', 'Short', 'Long', 'North', 'Will', 'hotPU']
-  public allColdRoutes: Array<RouteValue> = ['Tu1', 'Tu2', 'Tu3', 'Thur1', 'Thur2', 'Thur3', 'coldPU']
+  public allColdRoutes: Array<RouteValue> = ['Tu 1', 'Tu 2', 'Tu 3', 'Thur 1', 'Thur 2', 'Thur 3', 'coldPU']
   public allRoutes = [...this.allHotRoutes, ...this.allColdRoutes]
   public selectedHotRoutes: Array<RouteValue> = ['Gateway', 'Marcola', 'MC', 'Short', 'Long', 'North', 'Will']
   public selectedColdRoutes: Array<RouteValue> = []
   public showWaitlisted = false
 
-  public showNewStopForm = true
+  public showNewStopForm = false
   public showNewStopRoute = false
   public newStopFirstName = ''
   public newStopLastName = ''
@@ -239,8 +243,8 @@ export default class MOWMap extends Vue{
   public newStopNotes = ''
   public newStopMealType = 'Hot'
   public newStopWaitlist = true
-  public newStopLatitude = -1
   public newStopLongitude = -1
+  public newStopLatitude = -1
   public newStopCityOptions = ['Dexter', 'Eugene', 'Leaburg', 'Lowell', 'Marcola', 'Springfield']
   public newStopStateOptions = ['OR']
   public newStopMealTypeOptions = ['Hot', 'Cold']
@@ -256,12 +260,12 @@ export default class MOWMap extends Vue{
     'North': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
     'Will': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
     'hotPU': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
-    'Tu1': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
-    'Tu2': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
-    'Tu3': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
-    'Thur1': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
-    'Thur2': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
-    'Thur3': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
+    'Tu 1': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
+    'Tu 2': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
+    'Tu 3': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
+    'Thur 1': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
+    'Thur 2': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
+    'Thur 3': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0},
     'coldPU': {current: 0, waitlisted: 0, center: { lng: 0, lat: 0 }, averageDistance: 0, maxDistance: 0}
   }
 
@@ -439,7 +443,7 @@ export default class MOWMap extends Vue{
 
   public toggleAllCold() {
     if (this.allCold) {
-      this.selectedColdRoutes = ['Tu1', 'Tu2', 'Tu3', 'Thur1', 'Thur2', 'Thur3', 'coldPU']
+      this.selectedColdRoutes = ['Tu 1', 'Tu 2', 'Tu 3', 'Thur 1', 'Thur 2', 'Thur 3', 'coldPU']
     } else {
       this.selectedColdRoutes = []
     }
@@ -594,28 +598,40 @@ export default class MOWMap extends Vue{
   }
 
   addStopToRoute() {
-    return
-    this.$store.dispatch('mealsModule/addStopToRoute', {
-      stop: this.newStop, route: this.newStopRoute
+    this.$store.dispatch('mealsModule/addMealStop', {
+      first_name: this.newStopFirstName, last_name: this.newStopLastName, address: this.newStopAddress,
+      city: this.newStopCity, zip: this.newStopZip, meal_type: this.newStopMealType,
+      waitlist: this.newStopWaitlist, phone: this.newStopPhone, phone_notes: this.newStopPhoneNotes,
+      notes: this.newStopNotes, route_name: this.newStopRoute
     })
       .then(() => {
-        this.$store.dispatch('mealsModule/getStops')
-          .then(() => {
-            this.$store.dispatch('mealsModule/getWaitlistedStops')
-              .then(() => {
-                this.calculateRouteStats()
-                this.fitMapToStops()
-              })
-          })
+        this.initializeComponent()
+      })
+  }
+
+  initializeComponent() {
+    this.showNewStopForm = false
+    this.showNewStopRoute = false
+    this.newStopFirstName = ''
+    this.newStopLastName = ''
+    this.newStopAddress = ''
+    this.newStopCity = 'Springfield'
+    this.newStopState = 'OR'
+    this.newStopZip = ''
+    this.newStopPhone = ''
+    this.newStopPhoneNotes = ''
+    this.newStopNotes = ''
+    this.newStopMealType = 'Hot'
+    this.newStopWaitlist = true
+    this.getMealStops()
+      .then(() => {
+        this.createMap() // TODO: When redrawing the map, there is a warning about the map already existing.
+        this.calculateRouteStats()
       })
   }
 
   mounted() {
-    this.getMealStops()
-      .then(() => {
-        this.createMap()
-        this.calculateRouteStats()
-      })
+    this.initializeComponent()
   }
 
 }

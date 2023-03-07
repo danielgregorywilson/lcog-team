@@ -297,6 +297,7 @@ export default class MOWMap extends Vue{
         zoom: this.zoom
       })
       this.map.addControl(new mapboxgl.NavigationControl());
+      this.map.addControl(new mapboxgl.FullscreenControl());
 
       this.map.on('load', () => {
         for(let route of this.allRouteOptions) {

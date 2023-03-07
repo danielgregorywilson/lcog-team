@@ -502,7 +502,8 @@ export default class MOWMap extends Vue{
     // Find the route with the center with the shortest distance from the new stop.
     let shortestDistance
     let shortestDistanceRoute
-    for (let route of this.allRouteOptions) {
+    const routeOptions = this.newStopMealType == 'Hot' ? this.hotRouteOptions : this.coldRouteOptions
+    for (let route of routeOptions) {
       let distance = this.calculateDistance(this.newStopLatitude, this.newStopLongitude, this.routeStats[route.value].center.lat, this.routeStats[route.value].center.lng)
       if (shortestDistance == undefined || distance < shortestDistance) {
         shortestDistance = distance
@@ -510,7 +511,7 @@ export default class MOWMap extends Vue{
       }
     }
     if (shortestDistanceRoute) {
-      this.newStopRoute = shortestDistanceRoute?.value
+      this.newStopRoute = shortestDistanceRoute.value
       this.addNewStopToMap()
       this.calculateRouteStats()
       this.fitMapToStops()

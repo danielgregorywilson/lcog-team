@@ -4,6 +4,20 @@
 
 export const releases = [
   {
+    version: '0.11.0',
+    date: new Date(2023, 2, 7),
+    changes: [
+      {
+        type: 'new',
+        description: 'Meals on Wheels module to track and manage delivery routes'
+      },
+      {
+        type: 'improved',
+        description: 'Do not require the Workflow Action urls be valid urls'
+      },
+    ]
+  },
+  {
     version: '0.10.0',
     date: new Date(2023, 1, 8),
     changes: [

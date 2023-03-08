@@ -635,7 +635,17 @@ export default class MOWMap extends Vue{
       })
   }
 
+  private getCurrentUser(): void {
+    if (this.$store.getters['authModule/isAuthenticated'] && !this.$store.getters['userModule/isProfileLoaded']) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access
+      this.$store.dispatch('userModule/userRequest')
+        .catch(e => {
+          console.error('Error getting user from store', e)
+        })
+    }
+  }
+
   mounted() {
+    this.getCurrentUser()
     this.initializeComponent()
   }
 

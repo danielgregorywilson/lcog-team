@@ -971,6 +971,8 @@ export interface VuexStoreGetters {
   'userModule/getEmployeeProfile': EmployeeRetrieve,
   'userModule/hasWorkflowRoles': boolean,
   'userModule/isManager': boolean,
+  'userModule/canViewMOWRoutes': boolean,
+  'userModule/canManageMOWStops': boolean,
 
   // Desk Reservation
   'deskReservationModule/allDesks': {

@@ -158,6 +158,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import mapboxgl from "mapbox-gl";
+import { Feature, GeoJsonProperties, Geometry } from "GeoJSON"
 import { Stop, VuexStoreGetters } from '../store/types'
 
 type RouteLabel = 'Gateway' | 'Marcola' | 'MC' | 'Short' | 'Long' | 'North' | 'Will' | 'Tu 1' | 'Tu 2' | 'Tu 3' | 'Thur 1' | 'Thur 2' | 'Thur 3' | 'PU'
@@ -184,7 +185,7 @@ interface RouteOption {
 interface RouteStats {
   current: number,
   waitlisted: number,
-  center: mapboxgl.LngLatLike,
+  center: {lng: number, lat: number},
   averageDistance: number,
   maxDistance: number
 }
@@ -241,13 +242,13 @@ export default class MOWMap extends Vue{
   public newStopPhone = ''
   public newStopPhoneNotes = ''
   public newStopNotes = ''
-  public newStopMealType = 'Hot'
+  public newStopMealType: "Hot" | "Cold" = 'Hot'
   public newStopWaitlist = true
   public newStopLongitude = -1
   public newStopLatitude = -1
   public newStopCityOptions = ['Dexter', 'Eugene', 'Leaburg', 'Lowell', 'Marcola', 'Springfield']
   public newStopStateOptions = ['OR']
-  public newStopMealTypeOptions = ['Hot', 'Cold']
+  public newStopMealTypeOptions = [{label: 'Hot', value: 'hot'}, {label: 'Cold', value: 'cold'}]
   public newStopRoute: RouteValue = 'Gateway'
   
 
@@ -343,14 +344,16 @@ export default class MOWMap extends Vue{
     }
 
     // Create an array of addresses for the route.
-    let addresses = []
+    // let addresses = []
+    let addresses = [] as Feature<Geometry, GeoJsonProperties>[]
     for (let address of stops) {
       addresses.push({
         'type': 'Feature',
         'geometry': {
           'type': 'Point',
           'coordinates': [address.longitude, address.latitude]
-        }
+        },
+        'properties': {}
       })
     }
 
@@ -359,7 +362,7 @@ export default class MOWMap extends Vue{
       'type': 'geojson',
       'data': {
         'type': 'FeatureCollection',
-        'features': addresses
+        'features': addresses,
       }
     });
     
@@ -505,7 +508,7 @@ export default class MOWMap extends Vue{
   }
 
   public canManageMOWStops() {
-    return this.$store.getters['userModule/canManageMOWStops']
+    return this.getters['userModule/canManageMOWStops']
   }
 
   public checkAddress() {
@@ -569,10 +572,11 @@ export default class MOWMap extends Vue{
     this.map.removeSource(routeName)
    
     // Add the new stop to the route.
-    const newStop = {
+    const meal_type_lower = this.newStopMealType.toLowerCase() as 'hot' | 'cold'
+    const newStop: Stop = {
       first_name: this.newStopFirstName, last_name: this.newStopLastName, address: this.newStopAddress,
-      city: this.newStopCity, zip_code: this.newStopZip, latitude: this.newStopLatitude, longitude: this.newStopLongitude,
-      meal_type: this.newStopMealType, waitlist: this.newStopWaitlist, phone: this.newStopPhone,
+      city: this.newStopCity, zip_code: parseInt(this.newStopZip), latitude: this.newStopLatitude, longitude: this.newStopLongitude,
+      meal_type: meal_type_lower, waitlist: this.newStopWaitlist, phone: this.newStopPhone,
       phone_notes: this.newStopPhoneNotes, notes: this.newStopNotes, route: this.newStopRoute, new: true
     }
     this.compileRouteAndAddToMap(route, 'current', newStop)
@@ -586,7 +590,7 @@ export default class MOWMap extends Vue{
           type: 'Feature',
           geometry: {
             type: 'Point',
-            coordinates: [newStop.longitude, newStop.latitude]
+            coordinates: [newStop.longitude, newStop.latitude] as [number, number]
           },
           properties: {
             title: 'Mapbox',

@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'mainsite',
 
     'deskreservation',
+    'meals',
     'people',
     'responsibilities',
     'timeoff',

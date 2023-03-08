@@ -16,7 +16,9 @@
     "@types/es6-promise": "^3.3.0",
     "axios": "^0.18.1",
     "core-js": "^3.6.5",
+    "dotenv": "^16.0.3",
     "git-describe": "^4.1.0",
+    "mapbox-gl": "^2.13.0",
     "msal": "^1.4.10",
     "quasar": "^1.18.5",
     "typescript": "^4.9.4",
@@ -27,6 +29,8 @@
   },
   "devDependencies": {
     "@quasar/app": "^2.2.11",
+    "@quasar/quasar-app-extension-dotenv": "^1.1.0",
+    "@types/mapbox-gl": "^2.7.10",
     "@types/node": "^10.17.35",
     "@typescript-eslint/eslint-plugin": "^3.3.0",
     "@typescript-eslint/parser": "^3.3.0",

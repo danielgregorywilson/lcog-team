@@ -6,7 +6,9 @@ const getters: GetterTree<UserStateInterface, StateInterface> = {
   getEmployeeProfile: state => state.profile,
   isProfileLoaded: state => !!state.profile.name,
   isManager: state => state.profile.is_manager,
-  hasWorkflowRoles: state => !!state.profile.workflow_roles.length
+  hasWorkflowRoles: state => !!state.profile.workflow_roles.length,
+  canViewMOWRoutes: state => state.profile.can_view_mow_routes,
+  canManageMOWStops: state => state.profile.can_manage_mow_stops
 };
 
 export default getters;

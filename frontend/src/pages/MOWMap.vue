@@ -157,9 +157,9 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import mapboxgl from "mapbox-gl";
-import { Feature, GeoJsonProperties, Geometry } from "GeoJSON"
-import { Stop, VuexStoreGetters } from '../store/types'
+import mapboxgl from 'mapbox-gl';
+import { Feature, GeoJsonProperties, Geometry } from 'GeoJSON'
+import { AxiosGetAddressCoordinatesServerResponse, Stop, VuexStoreGetters } from '../store/types'
 
 type RouteLabel = 'Gateway' | 'Marcola' | 'MC' | 'Short' | 'Long' | 'North' | 'Will' | 'Tu 1' | 'Tu 2' | 'Tu 3' | 'Thur 1' | 'Thur 2' | 'Thur 3' | 'PU'
 type RouteValue = 'Gateway' | 'Marcola' | 'MC' | 'Short' | 'Long' | 'North' | 'Will' | 'hotPU' | 'Tu 1' | 'Tu 2' | 'Tu 3' | 'Thur 1' | 'Thur 2' | 'Thur 3' | 'coldPU'
@@ -242,7 +242,7 @@ export default class MOWMap extends Vue{
   public newStopPhone = ''
   public newStopPhoneNotes = ''
   public newStopNotes = ''
-  public newStopMealType: "Hot" | "Cold" = 'Hot'
+  public newStopMealType: 'Hot' | 'Cold' = 'Hot'
   public newStopWaitlist = true
   public newStopLongitude = -1
   public newStopLatitude = -1
@@ -292,8 +292,8 @@ export default class MOWMap extends Vue{
     try {
       this.map = new mapboxgl.Map({
         accessToken: this.accessToken,
-        container: "map",
-        style: "mapbox://styles/mapbox/streets-v11",
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
         center: this.center,
         zoom: this.zoom
       })
@@ -316,7 +316,7 @@ export default class MOWMap extends Vue{
       });
       
     } catch (err) {
-      console.log("Error rendering map:", err)
+      console.log('Error rendering map:', err)
     }
   }
 
@@ -518,10 +518,13 @@ export default class MOWMap extends Vue{
         state: this.newStopState, zip: this.newStopZip
       }
     )
-      .then((response) => {
+      .then((response: AxiosGetAddressCoordinatesServerResponse) => {
         this.newStopLatitude = response.data.lat
         this.newStopLongitude = response.data.long
         this.chooseStopRoute()
+      })
+      .catch((e) => {
+        console.error('Error checking address', e)
       })
   }
 
@@ -616,6 +619,9 @@ export default class MOWMap extends Vue{
       .then(() => {
         this.initializeComponent()
       })
+      .catch((e) => {
+        console.error('Error adding meal stop', e)
+      })
   }
 
   initializeComponent() {
@@ -637,13 +643,16 @@ export default class MOWMap extends Vue{
         this.createMap() // TODO: When redrawing the map, there is a warning about the map already existing.
         this.calculateRouteStats()
       })
+      .catch((e) => {
+        console.error('Error getting meal stops:', e)
+      })
   }
 
   private getCurrentUser(): void {
     if (this.$store.getters['authModule/isAuthenticated'] && !this.$store.getters['userModule/isProfileLoaded']) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access
       this.$store.dispatch('userModule/userRequest')
         .catch(e => {
-          console.error('Error getting user from store', e)
+          console.error('Error getting user from store:', e)
         })
     }
   }

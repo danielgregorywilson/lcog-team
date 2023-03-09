@@ -7,6 +7,16 @@ const routes: RouteRecordRaw[] = [
     children: [{ path: '', component: () => import('pages/IndexPage.vue') }],
   },
 
+  /////////////////////////
+  // MEALS ON WHEELS MAP //
+  /////////////////////////
+  {
+    path: '/mow-map',
+    name: 'mow-map',
+    component: () => import('src/pages/meals/MOWMap.vue'),
+    // beforeEnter: ifCanViewMealsOnWheelsRoutes
+  },
+
   // Always leave this as last one,
   // but you can also remove it
   {

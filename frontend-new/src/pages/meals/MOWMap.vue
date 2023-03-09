@@ -496,7 +496,7 @@ function fitMapToStops() {
         if (waitlistOption == 'current') {
           stops = store[route.getter]
         } else {
-          stops = store[route.getter]
+          stops = store[route.waitlistGetter]
         }
         for (let stop of stops) {
           bounds.extend([stop.longitude, stop.latitude])

@@ -1,5 +1,7 @@
 # LCOG Team App Backend Readme
 
+Python 3.11.2 
+
 # Run the backend locally
 # MacOS
 `source ../env/bin/activate && ./manage.py runserver`

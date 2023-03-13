@@ -6,16 +6,16 @@ Python 3.11.2
 # MacOS
 `source ../env/bin/activate && ./manage.py runserver`
 # Windows
-`..\env_20220216\Scripts\activate; .\manage.py runserver`
+`..\env_20230309\Scripts\activate; .\manage.py runserver`
 
 # Setting up the backend for the first time
 1) Ensure that .env file is in place (in OneDrive). Ensure settings are such that sqlite db is used
 2) Create a python virtualenv
-MacOS `virtualenv env_20220216`
-Windows `python -m venv env_20220216`
+MacOS `virtualenv env_20230309`
+Windows `python -m venv env_20230309`
 3) Activate virtualenv
 MacOS `source ./env/bin/activate`
-Windows `.\env_20220216\Scripts\activate`
+Windows `.\env_20230309\Scripts\activate`
 4) Install requirements
 MacOS `pip install -r ./code/requirements.txt`
 Windows `pip install -r .\code\requirements-windows.txt`
@@ -30,6 +30,10 @@ Windows `.\code\manage.py createsuperuser --username=USERNAME`
 9) Run the backend locally
 MacOS `./manage.py runserver`
 Windows `.\manage.py runserver`
+
+# Install Elastic Beanstalk CLI
+https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3-install.html
+Manually install the CLI using pip. Modify environment variable PATH from instructions.
 
 # Cypress e2e tests
 Open Cypress launcher to run individual tests

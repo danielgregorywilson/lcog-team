@@ -2,6 +2,11 @@
 
 A Quasar Project
 
+Node 18.15.0
+Vue 3
+Quasar 2
+Pinia 
+
 ## Install the dependencies
 ```bash
 yarn

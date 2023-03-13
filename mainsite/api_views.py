@@ -1,5 +1,6 @@
-from rest_framework import permissions, viewsets
+from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from django.conf import settings
@@ -8,6 +9,9 @@ from django.shortcuts import get_object_or_404
 from mainsite.models import SecurityMessage, TrustedIPAddress
 from mainsite.serializers import TrustedIPSerializer, SecurityMessageSerializer
 
+class LargeResultsSetPagination(PageNumberPagination):
+    page_size = 1000
+    page_size_query_param = 'page_size'
 
 # class EitherAuthenticatedOrOnSafelistPermission(permissions.BasePermission):
 #     """

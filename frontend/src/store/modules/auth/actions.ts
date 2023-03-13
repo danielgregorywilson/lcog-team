@@ -52,6 +52,8 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
   authLogout: ({commit, dispatch}) => {
     return new Promise((resolve) => {
       commit('authLogout')
+      dispatch('mealsModule/authLogout', null, { root: true })
+        .catch(err => console.log(err))
       dispatch('peopleModule/authLogout', null, { root: true })
         .catch(err => console.log(err))
       dispatch('performanceReviewModule/authLogout', null, { root: true })

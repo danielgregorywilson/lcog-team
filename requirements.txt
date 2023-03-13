@@ -1,23 +1,24 @@
-asgiref==3.4.1
-backports.zoneinfo==0.2.1
-boto3==1.18.5                # For AWS deployment
-botocore==1.21.5
+asgiref==3.6.0
+# backports.zoneinfo==0.2.1  # TODO: Removed this on rebuild upgrade Python 3.10 - 3.11: Breaks, but maybe I don't need it?
+boto3==1.26.88               # For AWS deployment
+botocore==1.29.88
 channels==3.0.4              # Websockets for Django - for use on desk reservation kiosk app
 channels-redis==3.3.1        # Redis channel layer for Django Channels - for use on desk reservation kiosk app
 daphne==3.0.2                # Daphne server for handling Websockets connections on production
-Django==4.0.1                # The Django
-django-ckeditor==6.1.0       # Rich text fields
-django-cors-headers==3.7.0   # To access API from Vue frontend
-django-js-asset==1.2.2
-django-storages==1.11.1      # Static and media file storage
-djangorestframework==3.12.4  # API framework
+Django==4.1.7                # The Django
+django-ckeditor==6.5.1       # Rich text fields
+django-cors-headers==3.14.0   # To access API from Vue frontend
+django-js-asset==2.0.0
+django-storages==1.13.2      # Static and media file storage
+djangorestframework==3.14.0  # API framework
 jmespath==0.10.0
-Pillow==8.3.1                # For image uploads
-psycopg2-binary==2.9.1       # Postgres driver - binary to install correctly
+Pillow==9.4.0                # For image uploads
+psycopg2-binary==2.9.5       # Postgres driver - binary to install correctly
 python-dateutil==2.8.2
 python-dotenv==0.18.0        # Secrets manager
 pytz==2021.1
-s3transfer==0.5.0
+requests==2.28.2             # HTTP requests
+s3transfer==0.6.0
 six==1.16.0
 sqlparse==0.4.1
 supervisor==4.2.4            # Process control system for running Daphne on production

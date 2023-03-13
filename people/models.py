@@ -447,6 +447,20 @@ class Employee(models.Model):
     def admin_of_processes(self):
         all_processes = apps.get_model('workflows', 'Process').objects.all().select_related('role')
         return [process.id for process in list(all_processes) if process.role and self in process.role.members.all()]
+    
+    def can_view_mow_routes(self):
+        view_mow_routes = self.user.groups.filter(name='View Meals on Wheels Routes').exists()
+        if view_mow_routes:
+            return True
+        else:
+            return False
+    
+    def can_manage_mow_stops(self):
+        manage_mow_stops = self.user.groups.filter(name='Manage Meals on Wheels Stops').exists()
+        if manage_mow_stops:
+            return True
+        else:
+            return False
 
 
 class ManagerUpcomingReviewsManager(models.Manager):

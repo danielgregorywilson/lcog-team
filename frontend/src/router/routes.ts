@@ -113,6 +113,16 @@ const ifCanViewTimeOffRequest = (to: Route, from: Route, next: Next) => {
   }
 }
 
+const ifCanViewMealsOnWheelsRoutes = (to: Route, from: Route, next: Next) => {
+  if (!!authState.token && Vue.prototype.$cookies.get('can_view_mow_routes') == 'true') { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    next()
+    return
+  } else {
+    console.info('User cannot view Meals on Wheels routes. Redirecting to dashboard.')
+    next('dashboard')
+  }
+}
+
 // TODO: Add a reset password view as in Django version, unless we're authenticating with LDAP
 const routes: RouteConfig[] = [
   {
@@ -493,6 +503,7 @@ const routes: RouteConfig[] = [
     path: '/mow-map',
     name: 'mow-map',
     component: () => import('src/pages/MOWMap.vue'),
+    beforeEnter: ifCanViewMealsOnWheelsRoutes
   },
 
   // Always leave this as last one,

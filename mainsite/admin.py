@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
-from mainsite.models import ImageUpload, SecurityMessage
+from .models import City, ImageUpload, SecurityMessage, State, ZipCode
 
 
 @admin.register(ImageUpload)
@@ -71,3 +71,17 @@ class EditLinkToInlineObject(object):
             return mark_safe(u'<a href="{u}">edit</a>'.format(u=url))
         else:
             return ''
+
+
+@admin.register(City)
+class CityAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(State)
+class StateAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(ZipCode)
+class ZipCodeAdmin(admin.ModelAdmin):
+    pass

@@ -120,6 +120,7 @@ interface LinkData {
   managerOnly?: boolean;
   eligibleForTeleworkApplicationOnly?: boolean;
   hasWorkflowRoles?: boolean
+  canViewMOWRoutes?: boolean
 }
 
 const linksData: Array<LinkData> = [
@@ -148,7 +149,13 @@ const linksData: Array<LinkData> = [
   {
     title: 'Schaefers Desk Reservation',
     icon: 'laptop',
-    link: '/desk-reservation/schaefers/1',
+    link: '/desk-reservation/schaefers/1'
+  },
+  {
+    title: 'Meals on Wheels Map',
+    icon: 'map',
+    link: '/mow-map',
+    canViewMOWRoutes: true
   },
   // {
   //   title: 'My Telework Application',
@@ -182,22 +189,22 @@ interface LayoutData {
   components: { NavLink }
 })
 export default class MainLayout extends Vue{
-  private leftDrawerOpen = false;
-  private navLinks: Array<LinkData> = linksData;
+  public leftDrawerOpen = false;
+  public navLinks: Array<LinkData> = linksData;
   
-  private appVersionTag() {
+  public appVersionTag() {
     return process.env.APP_VERSION_TAG
   }
 
-  private isAuthenticated(): boolean {
+  public isAuthenticated(): boolean {
     return this.$store.getters['authModule/isAuthenticated'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
   }
   
-  private name() {
+  public name() {
     return this.$store.getters['userModule/getEmployeeProfile'].name // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
   }
 
-  public getCurrentUser(): void {
+  private getCurrentUser(): void {
     if (this.$store.getters['authModule/isAuthenticated'] && !this.$store.getters['userModule/isProfileLoaded']) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access
       this.$store.dispatch('userModule/userRequest')
         .catch(e => {

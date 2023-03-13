@@ -57,6 +57,8 @@ export interface EmployeeRetrieve {
   email_opt_out_timeoff_weekly: boolean
   email_opt_out_timeoff_daily: boolean
   workflow_roles: Array<number>
+  can_view_mow_routes: boolean
+  can_manage_mow_stops: boolean
 }
 
 export interface SimpleEmployeeRetrieve {
@@ -937,6 +939,33 @@ export interface AxiosWorkflowCreateServerResponse {
 }
 
 
+////////////////////////////////////////////////
+// Meals Structure from Django Rest Framework //
+////////////////////////////////////////////////
+
+export interface Stop {
+  first_name: string
+  last_name: string
+  address: string
+  city: string
+  zip_code: number
+  latitude: number
+  longitude: number
+  meal_type: 'hot' | 'cold'
+  waitlist: boolean
+  phone: string
+  phone_notes: string
+  notes: string
+  route: string
+  created_at?: Date
+  updated_at?: Date
+  new?: boolean
+}
+
+export interface AxiosGetAddressCoordinatesServerResponse {
+  data: {lat: number, long: number}
+}
+
 /////////////
 // Getters //
 /////////////
@@ -946,6 +975,8 @@ export interface VuexStoreGetters {
   'userModule/getEmployeeProfile': EmployeeRetrieve,
   'userModule/hasWorkflowRoles': boolean,
   'userModule/isManager': boolean,
+  'userModule/canViewMOWRoutes': boolean,
+  'userModule/canManageMOWStops': boolean,
 
   // Desk Reservation
   'deskReservationModule/allDesks': {
@@ -954,6 +985,38 @@ export interface VuexStoreGetters {
   'deskReservationModule/allDeskReservations': {
     results: Array<DeskReservation>
   },
+
+  // Meals
+  'mealsModule/gatewayStops': Array<Stop>,
+  'mealsModule/marcolaStops': Array<Stop>,
+  'mealsModule/MCStops': Array<Stop>,
+  'mealsModule/shortStops': Array<Stop>,
+  'mealsModule/longStops': Array<Stop>,
+  'mealsModule/northStops': Array<Stop>,
+  'mealsModule/willStops': Array<Stop>,
+  'mealsModule/hotPUStops': Array<Stop>,
+  'mealsModule/tu1Stops': Array<Stop>,
+  'mealsModule/tu2Stops': Array<Stop>,
+  'mealsModule/tu3Stops': Array<Stop>,
+  'mealsModule/thur1Stops': Array<Stop>,
+  'mealsModule/thur2Stops': Array<Stop>,
+  'mealsModule/thur3Stops': Array<Stop>,
+  'mealsModule/coldPUStops': Array<Stop>,
+  'mealsModule/gatewayWaitlistStops': Array<Stop>,
+  'mealsModule/marcolaWaitlistStops': Array<Stop>,
+  'mealsModule/MCWaitlistStops': Array<Stop>,
+  'mealsModule/shortWaitlistStops': Array<Stop>,
+  'mealsModule/longWaitlistStops': Array<Stop>,
+  'mealsModule/northWaitlistStops': Array<Stop>,
+  'mealsModule/willWaitlistStops': Array<Stop>,
+  'mealsModule/hotPUWaitlistStops': Array<Stop>,
+  'mealsModule/tu1WaitlistStops': Array<Stop>,
+  'mealsModule/tu2WaitlistStops': Array<Stop>,
+  'mealsModule/tu3WaitlistStops': Array<Stop>,
+  'mealsModule/thur1WaitlistStops': Array<Stop>,
+  'mealsModule/thur2WaitlistStops': Array<Stop>,
+  'mealsModule/thur3WaitlistStops': Array<Stop>,
+  'mealsModule/coldPUWaitlistStops': Array<Stop>,
 
   // People
   'peopleModule/simpleEmployeeList': Array<SimpleEmployeeRetrieve>,

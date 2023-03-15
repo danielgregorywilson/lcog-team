@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia';
 import { Stop, AxiosAuthResponse, UserRetrieve } from 'src/types';
 import axios from 'axios';
+import { useUserStore } from './user';
 
 // TODO
 // const apiURL = process.env.API_URL ? process.env.API_URL : 'https://api.team.lcog.org/'
-const apiURL = 'http://lcog-team:8000/'
+const apiURL = 'http://localhost:8000/'
+const userStore = useUserStore()
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -19,8 +21,9 @@ export const useAuthStore = defineStore('auth', {
 
   actions: {
     // Old way of logging in via /auth/login
-    authRequest: ({commit, dispatch}, user: UserRetrieve) => {
+    authRequest: (user: UserRetrieve) => {
       return new Promise((resolve, reject) => { // The Promise used for router redirect in login
+        debugger
         commit('authRequest')
         axios({url: `${ process.env.API_URL }api/api-token-auth-password/`, data: user, method: 'POST' }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
           .then((resp: AxiosAuthResponse) => {
@@ -41,22 +44,23 @@ export const useAuthStore = defineStore('auth', {
       })
     },
     // Log in with Microsoft Azure SSO
-    setAuth: (user: UserRetrieve) => {
+    setAuth(user: UserRetrieve) {
       return new Promise((resolve, reject) => { // The Promise used for router redirect in login
-        commit('setAuth')
+        this.status = 'loading'
         axios({url: `${ process.env.API_URL }api/api-token-auth/`, data: user, method: 'POST' }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
           .then((resp: AxiosAuthResponse) => {
             const token = resp.data.token
             localStorage.setItem('user-token', token) // store the token in localstorage
             axios.defaults.headers.common['Authorization'] = `Token ${token}` // eslint-disable-line @typescript-eslint/no-unsafe-member-access
-            commit('authSuccess', token)
+            this.status = 'success'
+            this.token = token
             // you have your token, now log in your user :)
-            dispatch('userModule/userRequest', null, { root: true })
+            userStore.userRequest()
               .catch(err => console.log(err))
             resolve(resp)
           })
         .catch(err => {
-          commit('authError', err) // TODO: Mutation doesn't need err
+          this.status = 'error'
           localStorage.removeItem('user-token') // if the request fails, remove any possible user token if possible
           reject(err)
         })

@@ -4,7 +4,7 @@ import axios from 'axios';
 
 // TODO
 // const apiURL = process.env.API_URL ? process.env.API_URL : 'https://api.team.lcog.org/'
-const apiURL = 'http://lcog-team:8000/'
+const apiURL = 'http://localhost:8000/'
 
 export const useMealsStore = defineStore('meals', {
   state: () => ({

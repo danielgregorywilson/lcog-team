@@ -71,11 +71,11 @@ module.exports = configure(function (ctx) {
       // publicPath: '/',
       // analyze: true,
       env: {
-        API_URL: ctx.dev ? 'http://lcog-team:8000/' : (ctx.debug ? 'https://api.team-staging.lcog.org/' : 'https://api.team.lcog.org/'),
+        API_URL: ctx.dev ? 'http://localhost:8000/' : (ctx.debug ? 'https://api.team-staging.lcog.org/' : 'https://api.team.lcog.org/'),
         APP_VERSION_TAG: gitDescribeSync().tag,
         DEPLOY_MODE: ctx.dev ? 'DEVELOPMENT' : (ctx.debug ? 'STAGING' : 'PRODUCTION'),
-        DASHBOARD_URL: ctx.dev ? 'http://lcog-team:9000/dashboard' : (ctx.debug ? 'https://team-staging.lcog.org/dashboard' : 'https://team.lcog.org/dashboard'),
-        WEBSOCKET_URL: ctx.dev ? 'ws://lcog-team:8000/' : (ctx.debug ? 'https://api.team-staging.lcog.org/' : 'ws://api.team.lcog.org/')
+        DASHBOARD_URL: ctx.dev ? 'http://localhost:9000/dashboard' : (ctx.debug ? 'https://team-staging.lcog.org/dashboard' : 'https://team.lcog.org/dashboard'),
+        WEBSOCKET_URL: ctx.dev ? 'ws://localhost:8000/' : (ctx.debug ? 'https://api.team-staging.lcog.org/' : 'ws://api.team.lcog.org/')
       },
       // rawDefine: {}
       // ignorePublicFolder: true,

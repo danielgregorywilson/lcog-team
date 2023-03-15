@@ -10,9 +10,10 @@
 
 
 const { configure } = require('quasar/wrappers');
+const { gitDescribeSync } = require('git-describe');
 const path = require('path');
 
-module.exports = configure(function (/* ctx */) {
+module.exports = configure(function (ctx) {
   return {
     eslint: {
       // fix: true,
@@ -60,7 +61,7 @@ module.exports = configure(function (/* ctx */) {
         node: 'node16'
       },
 
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      vueRouterMode: 'history', // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
@@ -69,12 +70,18 @@ module.exports = configure(function (/* ctx */) {
 
       // publicPath: '/',
       // analyze: true,
-      // env: {},
+      env: {
+        API_URL: ctx.dev ? 'http://lcog-team:8000/' : (ctx.debug ? 'https://api.team-staging.lcog.org/' : 'https://api.team.lcog.org/'),
+        APP_VERSION_TAG: gitDescribeSync().tag,
+        DEPLOY_MODE: ctx.dev ? 'DEVELOPMENT' : (ctx.debug ? 'STAGING' : 'PRODUCTION'),
+        DASHBOARD_URL: ctx.dev ? 'http://lcog-team:9000/dashboard' : (ctx.debug ? 'https://team-staging.lcog.org/dashboard' : 'https://team.lcog.org/dashboard'),
+        WEBSOCKET_URL: ctx.dev ? 'ws://lcog-team:8000/' : (ctx.debug ? 'https://api.team-staging.lcog.org/' : 'ws://api.team.lcog.org/')
+      },
       // rawDefine: {}
       // ignorePublicFolder: true,
       // minify: false,
       // polyfillModulePreload: true,
-      // distDir
+      distDir: ctx.debug ? `dist/${ctx.modeName}-dev` : `dist/${ctx.modeName}`,
 
       // extendViteConf (viteConf) {},
       // viteVuePluginOptions: {},

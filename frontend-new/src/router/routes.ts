@@ -4,7 +4,20 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/IndexPage.vue') }],
+    children: [
+      // { path: '', component: () => import('pages/IndexPage.vue') }
+      { path: '/', redirect: '/dashboard' },
+      {
+        path: '/dashboard',
+        name: 'dashboard',
+        component: () => import('pages/Dashboard.vue')
+      },
+      {
+        path: 'release-notes',
+        name: 'release-notes',
+        component: () => import('src/pages/ReleaseNotes.vue')
+      },
+    ],
   },
 
   /////////////////////////

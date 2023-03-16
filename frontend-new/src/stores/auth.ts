@@ -10,7 +10,7 @@ const userStore = useUserStore()
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    token: localStorage.getItem('-token') || '',
+    token: localStorage.getItem('user-token') || '',
     status: '',
   }),
 
@@ -44,7 +44,7 @@ export const useAuthStore = defineStore('auth', {
       })
     },
     // Log in with Microsoft Azure SSO
-    setAuth(user: UserRetrieve) {
+    setAuth(user: { username: string, firstName: string, lastName: string }) {
       return new Promise((resolve, reject) => { // The Promise used for router redirect in login
         this.status = 'loading'
         axios({url: `${ process.env.API_URL }api/api-token-auth/`, data: user, method: 'POST' }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
@@ -66,28 +66,30 @@ export const useAuthStore = defineStore('auth', {
         })
       })
     },
-    authLogout: () => {
+    authLogout() {
       return new Promise((resolve) => {
-        commit('authLogout')
-        dispatch('mealsModule/authLogout', null, { root: true })
-          .catch(err => console.log(err))
-        dispatch('peopleModule/authLogout', null, { root: true })
-          .catch(err => console.log(err))
-        dispatch('performanceReviewModule/authLogout', null, { root: true })
-          .catch(err => console.log(err))
-        dispatch('responsibilityModule/authLogout', null, { root: true })
-          .catch(err => console.log(err))
-        dispatch('securityMessageModule/authLogout', null, { root: true })
-          .catch(err => console.log(err))
-        dispatch('teleworkModule/authLogout', null, { root: true })
-          .catch(err => console.log(err))
-        dispatch('timeOffModule/authLogout', null, { root: true })
-          .catch(err => console.log(err))
-        dispatch('userModule/authLogout', null, { root: true })
-          .catch(err => console.log(err))
-        dispatch('workflowModule/authLogout', null, { root: true })
-          .catch(err => console.log(err))
+        this.$reset()
         localStorage.removeItem('user-token') // clear your user's token from localstorage
+        
+        // dispatch('mealsModule/authLogout', null, { root: true })
+        //   .catch(err => console.log(err))
+        // dispatch('peopleModule/authLogout', null, { root: true })
+        //   .catch(err => console.log(err))
+        // dispatch('performanceReviewModule/authLogout', null, { root: true })
+        //   .catch(err => console.log(err))
+        // dispatch('responsibilityModule/authLogout', null, { root: true })
+        //   .catch(err => console.log(err))
+        // dispatch('securityMessageModule/authLogout', null, { root: true })
+        //   .catch(err => console.log(err))
+        // dispatch('teleworkModule/authLogout', null, { root: true })
+        //   .catch(err => console.log(err))
+        // dispatch('timeOffModule/authLogout', null, { root: true })
+        //   .catch(err => console.log(err))
+        userStore.authLogout()
+          .catch(err => console.log(err))
+        // dispatch('workflowModule/authLogout', null, { root: true })
+        //   .catch(err => console.log(err))
+        
         resolve('Successfully logged user out')
       })
     }

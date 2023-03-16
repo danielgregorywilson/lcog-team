@@ -3,7 +3,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import axios from 'axios'
+import { defineComponent } from 'vue'
+
+const token = localStorage.getItem('user-token')
+if (token) {
+  axios.defaults.headers.common['Authorization'] = `Token ${ token }`
+}
 
 export default defineComponent({
   name: 'App'

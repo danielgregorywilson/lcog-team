@@ -211,7 +211,7 @@ export default defineComponent({
     },
 
     getCurrentUser(): void {
-      if (this.authStore['isAuthenticated'] && !this.userStore['isProfileLoaded']) {
+      if (this.authStore.isAuthenticated && !this.userStore.isProfileLoaded) {
         this.userStore.userRequest()
           .catch(e => {
             console.error('Error getting user from store', e)
@@ -243,11 +243,13 @@ export default defineComponent({
     },
 
     logout() {
-      if (process.env.DEV) {
-        this.logoutDev()
-      } else {
-        this.logoutWithMicrosoft()
-      }
+      // TODO: Old logout
+      // if (process.env.DEV) {
+      //   this.logoutDev()
+      // } else {
+      //   this.logoutWithMicrosoft()
+      // }
+      this.logoutWithMicrosoft()
     },
 
     logoutWithMicrosoft() {
@@ -290,6 +292,10 @@ export default defineComponent({
       myMSALObj,
       loginRequest
     }
+  },
+
+  mounted() {
+    this.getCurrentUser();
   }
 });
 </script>

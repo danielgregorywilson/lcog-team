@@ -1,8 +1,6 @@
 import { defineStore } from 'pinia';
-import { Stop, AxiosAuthResponse, UserRetrieve, EmployeeRetrieve } from 'src/types';
+import { AxiosAuthResponse, UserRetrieve, EmployeeRetrieve } from 'src/types';
 import axios from 'axios';
-import Vue from 'vue'
-import VueCookies from 'vue-cookies'
 import { useCookies } from "vue3-cookies"
 
 // TODO
@@ -51,33 +49,32 @@ export const useUserStore = defineStore('user', {
     // For requesting user on login
     userRequest() {
       return new Promise((resolve, reject) => {
-        this.status = 'loading';
+        this.status = 'loading'
         axios({ url: `${ process.env.API_URL }api/v1/current-user/` })
           .then((resp: {data: EmployeeRetrieve}) => {
-
             this.status = 'success'
             const { cookies } = useCookies()
-            this.profile.employee_pk = resp.data.pk,
-            // this.profile.username = resp.data.user.username,
-            this.profile.email = resp.data.email,
-            this.profile.name = resp.data.name,
-            this.profile.is_manager = resp.data.is_manager,
-            this.profile.has_manager = resp.data.has_manager,
-            this.profile.is_eligible_for_telework_application = resp.data.is_eligible_for_telework_application,
-            this.profile.can_view_seating_charts = resp.data.can_view_seating_charts,
-            this.profile.can_edit_seating_charts = resp.data.can_edit_seating_charts,
-            this.profile.is_upper_manager = resp.data.is_upper_manager,
-            this.profile.is_hr_manager = resp.data.is_hr_manager,
-            this.profile.is_executive_director = resp.data.is_executive_director,
-            this.profile.viewed_security_message = resp.data.viewed_security_message,
-            this.profile.prs_can_view = resp.data.prs_can_view,
-            this.profile.notes_can_view = resp.data.notes_can_view,
-            this.profile.telework_applications_can_view = resp.data.telework_applications_can_view,
-            this.profile.time_off_requests_can_view = resp.data.time_off_requests_can_view,
-            this.profile.next_to_sign_prs = resp.data.next_to_sign_prs,
-            this.profile.workflow_roles = resp.data.workflow_roles,
-            this.profile.can_view_mow_routes = resp.data.can_view_mow_routes,
-            this.profile.can_manage_mow_stops = resp.data.can_manage_mow_stops,
+            this.profile.employee_pk = resp.data.pk
+            this.profile.username = resp.data.username
+            this.profile.email = resp.data.email
+            this.profile.name = resp.data.name
+            this.profile.is_manager = resp.data.is_manager
+            this.profile.has_manager = resp.data.has_manager
+            this.profile.is_eligible_for_telework_application = resp.data.is_eligible_for_telework_application
+            this.profile.can_view_seating_charts = resp.data.can_view_seating_charts
+            this.profile.can_edit_seating_charts = resp.data.can_edit_seating_charts
+            this.profile.is_upper_manager = resp.data.is_upper_manager
+            this.profile.is_hr_manager = resp.data.is_hr_manager
+            this.profile.is_executive_director = resp.data.is_executive_director
+            this.profile.viewed_security_message = resp.data.viewed_security_message
+            this.profile.prs_can_view = resp.data.prs_can_view
+            this.profile.notes_can_view = resp.data.notes_can_view
+            this.profile.telework_applications_can_view = resp.data.telework_applications_can_view
+            this.profile.time_off_requests_can_view = resp.data.time_off_requests_can_view
+            this.profile.next_to_sign_prs = resp.data.next_to_sign_prs
+            this.profile.workflow_roles = resp.data.workflow_roles
+            this.profile.can_view_mow_routes = resp.data.can_view_mow_routes
+            this.profile.can_manage_mow_stops = resp.data.can_manage_mow_stops
             cookies.set('is_manager', resp.data.is_manager.toString())
             cookies.set('has_manager', resp.data.has_manager.toString())
             cookies.set('is_eligible_for_telework_application', resp.data.is_eligible_for_telework_application.toString())
@@ -119,9 +116,9 @@ export const useUserStore = defineStore('user', {
           });
       })
     },
-    authLogout: () => {
+    authLogout() {
       return new Promise((resolve) => {
-        commit('authLogout')
+        this.$reset()
         resolve('Successfully triggered logout')
       })
     }

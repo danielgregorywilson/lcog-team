@@ -1,11 +1,10 @@
 import { defineStore } from 'pinia';
-import { Stop, AxiosAuthResponse, UserRetrieve } from 'src/types';
+import { AxiosAuthResponse } from 'src/types';
 import axios from 'axios';
 import { useUserStore } from './user';
 
-// TODO
-// const apiURL = process.env.API_URL ? process.env.API_URL : 'https://api.team.lcog.org/'
-const apiURL = 'http://localhost:8000/'
+const apiURL = process.env.API_URL ? 
+  process.env.API_URL : 'https://api.team.lcog.org/'
 const userStore = useUserStore()
 
 export const useAuthStore = defineStore('auth', {
@@ -20,38 +19,26 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-    // Old way of logging in via /auth/login
-    authRequest: (user: UserRetrieve) => {
-      return new Promise((resolve, reject) => { // The Promise used for router redirect in login
-        debugger
-        commit('authRequest')
-        axios({url: `${ process.env.API_URL }api/api-token-auth-password/`, data: user, method: 'POST' }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
-          .then((resp: AxiosAuthResponse) => {
-            const token = resp.data.token
-            localStorage.setItem('user-token', token) // store the token in localstorage
-            axios.defaults.headers.common['Authorization'] = `Token ${token}` // eslint-disable-line @typescript-eslint/no-unsafe-member-access
-            commit('authSuccess', token)
-            // you have your token, now log in your user :)
-            dispatch('userModule/userRequest', null, { root: true })
-              .catch(err => console.log(err))
-            resolve(resp)
-          })
-        .catch(err => {
-          commit('authError', err) // TODO: Mutation doesn't need err
-          localStorage.removeItem('user-token') // if the request fails, remove any possible user token if possible
-          reject(err)
-        })
-      })
+    // Log in with username and password
+    usernameAuthRequest(user: {username: string, password: string}) {
+      return this.authenticate(user, `${ apiURL }api/api-token-auth-password/`)
     },
     // Log in with Microsoft Azure SSO
     setAuth(user: { username: string, firstName: string, lastName: string }) {
-      return new Promise((resolve, reject) => { // The Promise used for router redirect in login
+      return this.authenticate(user, `${ apiURL }api/api-token-auth/`)
+    },
+    authenticate(
+      user: { username: string, password: string } | 
+        { username: string, firstName: string, lastName: string },
+      url: string
+    ) {
+      return new Promise((resolve, reject) => {
         this.status = 'loading'
-        axios({url: `${ process.env.API_URL }api/api-token-auth/`, data: user, method: 'POST' }) // eslint-disable-line @typescript-eslint/restrict-template-expressions
+        axios({url: url, data: user, method: 'POST'})
           .then((resp: AxiosAuthResponse) => {
             const token = resp.data.token
-            localStorage.setItem('user-token', token) // store the token in localstorage
-            axios.defaults.headers.common['Authorization'] = `Token ${token}` // eslint-disable-line @typescript-eslint/no-unsafe-member-access
+            localStorage.setItem('user-token', token)
+            axios.defaults.headers.common['Authorization'] = `Token ${token}`
             this.status = 'success'
             this.token = token
             // you have your token, now log in your user :)
@@ -61,7 +48,8 @@ export const useAuthStore = defineStore('auth', {
           })
         .catch(err => {
           this.status = 'error'
-          localStorage.removeItem('user-token') // if the request fails, remove any possible user token if possible
+          // if the request fails, remove any possible user token
+          localStorage.removeItem('user-token')
           reject(err)
         })
       })
@@ -70,7 +58,7 @@ export const useAuthStore = defineStore('auth', {
       return new Promise((resolve) => {
         this.$reset()
         localStorage.removeItem('user-token') // clear your user's token from localstorage
-        
+        // TODO
         // dispatch('mealsModule/authLogout', null, { root: true })
         //   .catch(err => console.log(err))
         // dispatch('peopleModule/authLogout', null, { root: true })

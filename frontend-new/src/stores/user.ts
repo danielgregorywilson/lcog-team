@@ -1,12 +1,10 @@
 import { defineStore } from 'pinia';
-import { AxiosAuthResponse, UserRetrieve, EmployeeRetrieve } from 'src/types';
+import { EmployeeRetrieve } from 'src/types';
 import axios from 'axios';
-import { useCookies } from "vue3-cookies"
+import { useCookies } from 'vue3-cookies'
 
-// TODO
-// const apiURL = process.env.API_URL ? process.env.API_URL : 'https://api.team.lcog.org/'
-const apiURL = 'http://localhost:8000/'
-const { cookies } = useCookies()
+const apiURL = process.env.API_URL ?
+  process.env.API_URL : 'https://api.team.lcog.org/'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -50,7 +48,7 @@ export const useUserStore = defineStore('user', {
     userRequest() {
       return new Promise((resolve, reject) => {
         this.status = 'loading'
-        axios({ url: `${ process.env.API_URL }api/v1/current-user/` })
+        axios({ url: `${ apiURL }api/v1/current-user/` })
           .then((resp: {data: EmployeeRetrieve}) => {
             this.status = 'success'
             const { cookies } = useCookies()
@@ -107,13 +105,9 @@ export const useUserStore = defineStore('user', {
     // For getting just the user on specific pages
     simpleUserRequest: () => {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ process.env.API_URL }api/v1/current-user/` })
-          .then((resp: {data: {pk: number}}) => {
-            resolve(resp)
-          })
-          .catch(e => {
-            reject(e)
-          });
+        axios({ url: `${ apiURL }api/v1/current-user/` })
+          .then((resp: {data: {pk: number}}) => resolve(resp))
+          .catch(e => reject(e));
       })
     },
     authLogout() {

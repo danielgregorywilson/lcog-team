@@ -67,55 +67,54 @@
   </q-page>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
+import { useRouter } from 'vue-router';
 import { readableDate } from 'src/filters'
 import { PerformanceReviewRetrieve } from 'src/types'
+import { useAuthStore } from 'src/stores/auth';
+import { useUserStore } from 'src/stores/user';
 
+const router = useRouter()
+const authStore = useAuthStore()
+const userStore = useUserStore()
 
 function isAuthenticated(): boolean {
-  // TODO
-  return true
-  // return this.$store.getters['authModule/isAuthenticated'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+  return authStore.isAuthenticated
 }
 
 function isProfileLoaded(): boolean {
-  return true
-  // return this.$store.getters['userModule/isProfileLoaded'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+  return userStore.isProfileLoaded
 }
 
 function isManager(): boolean {
-  return true
-  // return this.$store.getters['userModule/getEmployeeProfile'].is_manager // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+  return userStore.getEmployeeProfile.is_manager
 }
 
 function isUpperManager(): boolean {
-  return true
-  // return this.$store.getters['userModule/getEmployeeProfile'].is_upper_manager // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+  return userStore.getEmployeeProfile.is_upper_manager
 }
 
 function isTheHRManager(): boolean {
-  return true
-  // return this.$store.getters['userModule/getEmployeeProfile'].is_hr_manager // eslint-disable-line
+  return userStore.getEmployeeProfile.is_hr_manager
 }
 
 function isTheExecutiveDirector(): boolean {
-  return true
-  // return this.$store.getters['userModule/getEmployeeProfile'].is_executive_director // eslint-disable-line
+  return userStore.getEmployeeProfile.is_executive_director
 }
 
 function getNextReview(): PerformanceReviewRetrieve {
-  return true
+  return {} as PerformanceReviewRetrieve
+  // TODO
   // return this.$store.getters['performanceReviewModule/nextPerformanceReview'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
 }
 
 function nextReviewNeedsEvaluation(): boolean {
-  return true
-  // return this.getNextReview().status == 'Needs evaluation'
+  return getNextReview().status == 'Needs evaluation'
 }
 
 function userSignedNextEvaluation(): boolean {
   return false
+  // TODO
   // Return if there is a date for the employee's signature on the review
   // if (this.getNextReview().all_required_signatures) {
   //   return !!this.getNextReview().all_required_signatures[0][2]
@@ -124,35 +123,12 @@ function userSignedNextEvaluation(): boolean {
   // }
 }
 
-
-export default defineComponent({
-  // name: 'PageName'
-
-  methods: {
-    userSignedNextEvaluation(): boolean {
-      return false
-      // Return if there is a date for the employee's signature on the review
-      // if (this.getNextReview().all_required_signatures) {
-      //   return !!this.getNextReview().all_required_signatures[0][2]
-      // } else {
-      //   return false
-      // }
-    },
     
-    viewReview(pk: number): void {
-      this.$router.push(`pr/${ pk }`)
-        .catch(e => {
-          console.error('Error navigating to PR detail', e)
-        })
-    }
-  },
+function viewReview(pk: number): void {
+  router.push(`pr/${ pk }`)
+    .catch(e => {
+      console.error('Error navigating to PR detail', e)
+    })
+}
 
-  setup () {
-    return {
-      getNextReview, isAuthenticated, isManager, isProfileLoaded,
-      isTheExecutiveDirector, isTheHRManager, isUpperManager,
-      nextReviewNeedsEvaluation, readableDate
-    };
-  },
-})
 </script>

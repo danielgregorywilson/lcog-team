@@ -90,13 +90,20 @@
   </q-layout>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { UserAgentApplication } from 'msal'
-import { defineComponent, ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useAuthStore } from 'src/stores/auth'
 import { useUserStore } from 'src/stores/user'
 import { Configuration } from 'electron-builder'
 import NavLink from 'components/NavLink.vue'
+import { useRouter } from 'vue-router'
+
+const authStore = useAuthStore()
+const userStore = useUserStore()
+const router = useRouter()
+
+let leftDrawerOpen = ref(false)
 
 interface LinkData {
   title: string;
@@ -109,7 +116,7 @@ interface LinkData {
   canViewMOWRoutes?: boolean
 }
 
-const linksData: Array<LinkData> = [
+const navLinks: Array<LinkData> = [
   {
     title: 'Time Off',
     icon: 'schedule',
@@ -186,116 +193,59 @@ const loginRequest = {
   scopes: ['openid', 'profile', 'User.Read']
 }
 
-export default defineComponent({
-  name: 'MainLayout',
+function toggleLeftDrawer () {
+  leftDrawerOpen.value = !leftDrawerOpen.value
+}
 
-  components: {
-    NavLink
-  },
+function appVersionTag() {
+  return process.env.APP_VERSION_TAG
+}
 
-  methods: {
-    toggleLeftDrawer () {
-      this.leftDrawerOpen = !this.leftDrawerOpen
-    },
+function isAuthenticated(): boolean {
+  return authStore['isAuthenticated']
+}
 
-    appVersionTag() {
-      return process.env.APP_VERSION_TAG
-    },
+function emplayeeName(): string {
+  return userStore['getEmployeeProfile'].name
+}
 
-    isAuthenticated(): boolean {
-      return this.authStore['isAuthenticated']
-    },
-    
-    emplayeeName(): string {
-      return this.userStore['getEmployeeProfile'].name
-    },
-
-    getCurrentUser(): void {
-      if (this.authStore.isAuthenticated && !this.userStore.isProfileLoaded) {
-        this.userStore.userRequest()
-          .catch(e => {
-            console.error('Error getting user from store', e)
-          })
-      }
-    },
-
-    loginWithMicrosoft(): void {
-      myMSALObj.loginPopup(loginRequest)
-        .then(() => {
-          if (myMSALObj.getAccount()) {
-            let account = myMSALObj.getAccount()
-            let firstName = account.name.split(' ')[1][0].toUpperCase() + account.name.split(' ')[1].substring(1).toLowerCase()
-            let lastName = account.name.split(' ')[0][0].toUpperCase() + account.name.split(' ')[0].substring(1).toLowerCase()
-            this.authStore.setAuth({ username: account.userName, firstName, lastName })
-              .then(() => this.$router.push('/'))
-              .catch((err) => console.log(err))
-          }      
-        }).catch(function (error) {
-            console.log(error);
-        });
-    },
-
-    loginDev(): void {
-      this.$router.push('/auth/login')
-        .catch(e => {
-          console.error('Error navigating to login page', e)
-        })
-    },
-
-    logout() {
-      // TODO: Old logout
-      // if (process.env.DEV) {
-      //   this.logoutDev()
-      // } else {
-      //   this.logoutWithMicrosoft()
-      // }
-      this.logoutWithMicrosoft()
-    },
-
-    logoutWithMicrosoft() {
-      this.authStore.authLogout()
-        .then(() => {
-          this.myMSALObj.logout();
-        })
-        .catch(e => {
-          console.error('Error logging out', e);
-        })
-    },
-
-    // TODO: Old logout
-    logoutDev(): void {
-      this.authStore.authLogout()
-        .then(() => {
-          this.$router.push('/auth/login')
-            .catch(e => {
-              console.error('Error navigating to login page after logout', e)
-            })
-        })
-        .catch(e => {
-          console.error('Error logging out', e);
-        })
-    }
-  },
-
-  setup () {
-    const authStore = useAuthStore()
-    const userStore = useUserStore()
-
-    const leftDrawerOpen = ref(false)
-
-    return {
-      navLinks: linksData,
-      authStore,
-      userStore,
-      leftDrawerOpen,
-      msalConfig,
-      myMSALObj,
-      loginRequest
-    }
-  },
-
-  mounted() {
-    this.getCurrentUser();
+function getCurrentUser(): void {
+  if (authStore.isAuthenticated && !userStore.isProfileLoaded) {
+    userStore.userRequest()
+      .catch(e => {
+        console.error('Error getting user from store', e)
+      })
   }
-});
+}
+
+function loginWithMicrosoft(): void {
+  myMSALObj.loginPopup(loginRequest)
+    .then(() => {
+      if (myMSALObj.getAccount()) {
+        let account = myMSALObj.getAccount()
+        let firstName = account.name.split(' ')[1][0].toUpperCase() + account.name.split(' ')[1].substring(1).toLowerCase()
+        let lastName = account.name.split(' ')[0][0].toUpperCase() + account.name.split(' ')[0].substring(1).toLowerCase()
+        authStore.authWithMicrosoft({ username: account.userName, firstName, lastName })
+          .then(() => router.push('/'))
+          .catch((err) => console.log(err))
+      }      
+    }).catch(function (error) {
+        console.log(error);
+    });
+}
+
+function logout() {
+  authStore.authLogout()
+    .then(() => {
+      myMSALObj.logout()
+    })
+    .catch(e => {
+      console.error('Error logging out', e)
+    })
+}
+
+onMounted(() => {
+  getCurrentUser();
+})
+
 </script>

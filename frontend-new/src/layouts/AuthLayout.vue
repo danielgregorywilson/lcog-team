@@ -3,7 +3,7 @@
     <q-header elevated>
       <q-toolbar>
         <q-toolbar-title>
-          LCOG Team App
+          <q-btn flat no-caps :to="{ name: 'dashboard'}">LCOG Team App</q-btn>
         </q-toolbar-title>
 
         <div>Quasar v{{ $q.version }}</div>
@@ -16,9 +16,5 @@
   </q-layout>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue'
-export default defineComponent({
-  name: 'AuthLayout'
-})
+<script setup lang="ts">
 </script>

@@ -20,11 +20,11 @@ export const useAuthStore = defineStore('auth', {
 
   actions: {
     // Log in with username and password
-    usernameAuthRequest(user: {username: string, password: string}) {
+    authWithUsername(user: {username: string, password: string}) {
       return this.authenticate(user, `${ apiURL }api/api-token-auth-password/`)
     },
     // Log in with Microsoft Azure SSO
-    setAuth(user: { username: string, firstName: string, lastName: string }) {
+    authWithMicrosoft(user: { username: string, firstName: string, lastName: string }) {
       return this.authenticate(user, `${ apiURL }api/api-token-auth/`)
     },
     authenticate(

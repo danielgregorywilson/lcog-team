@@ -105,7 +105,7 @@ function isTheExecutiveDirector(): boolean {
 function getNextReview(): PerformanceReviewRetrieve {
   return {} as PerformanceReviewRetrieve
   // TODO
-  // return this.$store.getters['performanceReviewModule/nextPerformanceReview'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+  // return this.$store.getters['performanceReviewModule/nextPerformanceReview']
 }
 
 function nextReviewNeedsEvaluation(): boolean {

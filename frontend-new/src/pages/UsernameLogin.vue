@@ -41,7 +41,7 @@ const username = ref('')
 const password = ref('')
   
 function login(): void {
-  authStore.usernameAuthRequest(
+  authStore.authWithUsername(
     { username: username.value, password: password.value }
   )
     .then(() => router.push('/'))

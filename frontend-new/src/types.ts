@@ -964,6 +964,13 @@ export interface Stop {
   new?: boolean
 }
 
+export interface AxiosCheckAddressServerResponse {
+  data: {
+    lat: number
+    long: number
+  }
+}
+
 /////////////
 // Getters //
 /////////////

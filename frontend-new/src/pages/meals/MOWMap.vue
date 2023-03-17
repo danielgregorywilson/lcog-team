@@ -162,7 +162,13 @@ import { Feature, GeoJsonProperties, Geometry } from 'GeoJSON'
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useMealsStore } from '../../stores/meals'
-import { Stop } from '../../types'
+import { AxiosCheckAddressServerResponse, Stop } from '../../types'
+import { useAuthStore } from 'src/stores/auth'
+import { useUserStore } from 'src/stores/user'
+
+const authStore = useAuthStore()
+const userStore = useUserStore()
+const mealsStore = useMealsStore()
 
 type RouteLabel = 'Gateway' | 'Marcola' | 'MC' | 'Short' | 'Long' | 'North' | 'Will' | 'Tu 1' | 'Tu 2' | 'Tu 3' | 'Thur 1' | 'Thur 2' | 'Thur 3' | 'PU'
 type RouteValue = 'Gateway' | 'Marcola' | 'MC' | 'Short' | 'Long' | 'North' | 'Will' | 'hotPU' | 'Tu 1' | 'Tu 2' | 'Tu 3' | 'Thur 1' | 'Thur 2' | 'Thur 3' | 'coldPU'
@@ -198,8 +204,6 @@ interface RoutesStats {
 }
 
 type WaitlistOption = 'current' | 'waitlisted'
-
-const store = useMealsStore()
 
 let allHot = ref(false)
 let allCold = ref(false)
@@ -281,7 +285,7 @@ let zoom = 10
 
 function getMealStops() {
   return new Promise((resolve, reject) => {
-    store.getMealStops()
+    mealsStore.getMealStops()
       .then(() => {
         resolve('Got meal stops')
       })
@@ -333,9 +337,9 @@ function compileRouteAndAddToMap(
   let stops
   let routeNameInfix = ''
   if (waitlistOption == 'current') {
-    stops = store[route.getter]
+    stops = mealsStore[route.getter]
   } else {
-    stops = store[route.waitlistGetter]
+    stops = mealsStore[route.waitlistGetter]
     routeNameInfix = 'Waitlist'
   }
 
@@ -386,9 +390,9 @@ function compileRouteAndAddToMap(
 function calculateRouteStats() {
   for (let route of allRouteOptions) {
     // Calculate the number of stops on the route.
-    let waitlistedStops = store[route.waitlistGetter]
+    let waitlistedStops = mealsStore[route.waitlistGetter]
     routeStats[route.value].waitlisted = waitlistedStops.length
-    let stops = store[route.getter]
+    let stops = mealsStore[route.getter]
     routeStats[route.value].current = stops.length
       
     // Calculate the center of the route.
@@ -494,9 +498,9 @@ function fitMapToStops() {
       if ([...selectedHotRoutes.value, ...selectedColdRoutes.value].includes(route.value) && waitlistOptionMatchesShowWaitlisted) {
         let stops
         if (waitlistOption == 'current') {
-          stops = store[route.getter]
+          stops = mealsStore[route.getter]
         } else {
-          stops = store[route.waitlistGetter]
+          stops = mealsStore[route.waitlistGetter]
         }
         for (let stop of stops) {
           bounds.extend([stop.longitude, stop.latitude])
@@ -512,22 +516,24 @@ function printPage() {
 }
 
 function canManageMOWStops() {
-  return true
-  // return this.getters['userModule/canManageMOWStops']
+  return userStore.canManageMOWStops
 }
 
 function checkAddress() {
-  store.getAddressLatLong(newStopAddress.value, newStopCity.value, newStopState.value, newStopZip.value)
+  mealsStore.getAddressLatLong(newStopAddress.value, newStopCity.value, newStopState.value, newStopZip.value)
     .then((response) => {
-      newStopLatitude.value = response.data.lat
-      newStopLongitude.value = response.data.long
+      const axiosResponse = response as AxiosCheckAddressServerResponse // TODO: This is a hack. Fix it.
+      newStopLatitude.value = axiosResponse.data.lat
+      newStopLongitude.value = axiosResponse.data.long
       chooseStopRoute()
     })
 }
 
 function chooseStopRoute() {
-  // TODO: Super simple. Consider things like the number of stops on a route and the distance from the center relative to other stops on the route.
-  // Find the route with the center with the shortest distance from the new stop. About 18-20 addresses should be on each route
+  // TODO: Super simple. Consider things like the number of stops on a route and
+  // the distance from the center relative to other stops on the route. Find the
+  // route with the center with the shortest distance from the new stop. About
+  // 18-20 addresses should be on each route.
   let shortestDistance
   let shortestDistanceRoute
   const routeOptions = newStopMealType.value == 'Hot' ? hotRouteOptions : coldRouteOptions
@@ -608,7 +614,7 @@ function addNewStopMarkerToMap(newStop: Stop, route: RouteOption) {
 }
 
 function addStopToRoute() {
-  store.addMealStop({
+  mealsStore.addMealStop({
     first_name: newStopFirstName.value, last_name: newStopLastName.value, address: newStopAddress.value,
     city: newStopCity.value, zip_code: newStopZip.value, meal_type: newStopMealType.value,
     waitlist: newStopWaitlist.value, phone: newStopPhone.value, phone_notes: newStopPhoneNotes.value,
@@ -641,9 +647,8 @@ function initializeComponent() {
 }
 
 function getCurrentUser(): void {
-  return //TODO
-  if (store.getters['authModule/isAuthenticated'] && !store.getters['userModule/isProfileLoaded']) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access
-    store.dispatch('userModule/userRequest')
+  if (authStore.isAuthenticated && !userStore.isProfileLoaded) {
+    userStore.userRequest()
       .catch(e => {
         console.error('Error getting user from store', e)
       })

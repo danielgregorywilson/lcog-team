@@ -5,6 +5,11 @@ import { Url } from 'url'
 // Auth Users Structure from Django Rest Framework //
 /////////////////////////////////////////////////////
 
+export interface AuthStateInterface {
+  token: string;
+  status: string;
+}
+
 export interface AxiosAuthResponse extends AxiosResponse {
   data: {
     token: string
@@ -722,6 +727,23 @@ export interface DeskReservationStateInterface {
 // TimeOffRequest Structure from Django Rest Framework //
 /////////////////////////////////////////////////////////
 
+export interface TimeOffRequestInterface {
+  pk: number
+  employee_pk: number
+  employee_name: string
+  manager_pk: number
+  date_start: Date
+  date_end: Date
+  approved: boolean
+}
+
+export interface TimeOffRequestStateInterface {
+  myTimeOffRequests: Array<TimeOffRequestInterface>
+  teamTimeOffRequests: Array<TimeOffRequestInterface>
+  managedTimeOffRequests: Array<TimeOffRequestInterface>
+  conflictingTimeOffRequests: Array<TimeOffRequestInterface>
+}
+
 export type TimeOffRequestDates = {from: string; to: string} | string
 
 export interface TimeOffRequestCreate {
@@ -944,6 +966,10 @@ export interface AxiosWorkflowCreateServerResponse {
 ////////////////////////////////////////////////
 // Meals Structure from Django Rest Framework //
 ////////////////////////////////////////////////
+
+export interface MealStateInterface {
+  stops: Array<Stop>
+}
 
 export interface Stop {
   first_name: string

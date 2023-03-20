@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia';
-import { Stop } from 'src/types';
+import { MealStateInterface, Stop } from 'src/types';
 import axios from 'axios';
 
 const apiURL = process.env.API_URL ?
   process.env.API_URL : 'https://api.team.lcog.org/'
 
 export const useMealsStore = defineStore('meals', {
-  state: () => ({
+  state: (): MealStateInterface => ({
     stops: [] as Stop[],
   }),
 
@@ -83,5 +83,11 @@ export const useMealsStore = defineStore('meals', {
         });
       })
     },
+    authLogout() {
+      return new Promise((resolve) => {
+        this.$reset()
+        resolve('Successfully triggered logout')
+      })
+    }
   }
 });

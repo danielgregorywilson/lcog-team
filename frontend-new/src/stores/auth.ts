@@ -1,21 +1,28 @@
 import { defineStore } from 'pinia';
-import { AxiosAuthResponse } from 'src/types';
+import { AuthStateInterface, AxiosAuthResponse } from 'src/types';
 import axios from 'axios';
+import { useMealsStore } from './meals';
+import { usePeopleStore } from './people';
+import { useTimeOffStore } from './timeoff';
 import { useUserStore } from './user';
+
 
 const apiURL = process.env.API_URL ? 
   process.env.API_URL : 'https://api.team.lcog.org/'
+const mealsStore = useMealsStore()
+const peopleStore = usePeopleStore()
+const timeOffStore = useTimeOffStore()
 const userStore = useUserStore()
 
+
 export const useAuthStore = defineStore('auth', {
-  state: () => ({
+  state: (): AuthStateInterface => ({
     token: localStorage.getItem('user-token') || '',
     status: '',
   }),
 
   getters: {
-    isAuthenticated: state => !!state.token,
-    authStatus: state => state.status
+    isAuthenticated: state => !!state.token
   },
 
   actions: {
@@ -58,11 +65,11 @@ export const useAuthStore = defineStore('auth', {
       return new Promise((resolve) => {
         this.$reset()
         localStorage.removeItem('user-token') // clear your user's token from localstorage
-        // TODO
-        // dispatch('mealsModule/authLogout', null, { root: true })
-        //   .catch(err => console.log(err))
-        // dispatch('peopleModule/authLogout', null, { root: true })
-        //   .catch(err => console.log(err))
+        mealsStore.authLogout()
+          .catch(err => console.log(err))
+        peopleStore.authLogout()
+          .catch(err => console.log(err))
+        // TODO: Uncomment these when the modules are ready
         // dispatch('performanceReviewModule/authLogout', null, { root: true })
         //   .catch(err => console.log(err))
         // dispatch('responsibilityModule/authLogout', null, { root: true })
@@ -71,8 +78,8 @@ export const useAuthStore = defineStore('auth', {
         //   .catch(err => console.log(err))
         // dispatch('teleworkModule/authLogout', null, { root: true })
         //   .catch(err => console.log(err))
-        // dispatch('timeOffModule/authLogout', null, { root: true })
-        //   .catch(err => console.log(err))
+        timeOffStore.authLogout()
+          .catch(err => console.log(err))
         userStore.authLogout()
           .catch(err => console.log(err))
         // dispatch('workflowModule/authLogout', null, { root: true })

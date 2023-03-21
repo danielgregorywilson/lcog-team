@@ -727,37 +727,6 @@ export interface DeskReservationStateInterface {
 // TimeOffRequest Structure from Django Rest Framework //
 /////////////////////////////////////////////////////////
 
-export interface TimeOffRequestInterface {
-  pk: number
-  employee_pk: number
-  employee_name: string
-  manager_pk: number
-  date_start: Date
-  date_end: Date
-  approved: boolean
-}
-
-export interface TimeOffRequestStateInterface {
-  myTimeOffRequests: Array<TimeOffRequestInterface>
-  teamTimeOffRequests: Array<TimeOffRequestInterface>
-  managedTimeOffRequests: Array<TimeOffRequestInterface>
-  conflictingTimeOffRequests: Array<TimeOffRequestInterface>
-}
-
-export type TimeOffRequestDates = {from: string; to: string} | string
-
-export interface TimeOffRequestCreate {
-  employee_pk: number
-  dates: TimeOffRequestDates
-  note: string
-  privateNote: string
-}
-
-export interface TimeOffRequestAcknowledge {
-  pk: number
-  acknowledge: boolean
-}
-
 export interface TimeOffRequestRetrieve {
   url: Url
   pk: number
@@ -772,7 +741,29 @@ export interface TimeOffRequestRetrieve {
   conflicts?: JSON
 }
 
+export interface TimeOffRequestStateInterface {
+  myTimeOffRequests: Array<TimeOffRequestRetrieve>
+  currentTimeOffRequest: TimeOffRequestRetrieve
+  teamTimeOffRequests: Array<TimeOffRequestRetrieve>
+  managedTimeOffRequests: Array<TimeOffRequestRetrieve>
+  conflictingTimeOffRequests: Array<TimeOffRequestRetrieve>
+}
+
+export type TimeOffRequestDates = {from: string; to: string} | string
+
+export interface TimeOffRequestCreate {
+  dates: TimeOffRequestDates
+  note: string
+  privateNote: string
+}
+
+export interface TimeOffRequestAcknowledge {
+  pk: number
+  acknowledged: boolean
+}
+
 export interface TimeOffRequestUpdate {
+  pk: string
   dates: TimeOffRequestDates
   note: string
   privateNote: string

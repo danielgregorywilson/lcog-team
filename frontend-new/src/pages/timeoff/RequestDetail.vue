@@ -33,6 +33,7 @@
 import { onMounted, ref, Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import { getRoutePk } from 'src/utils'
 import { TimeOffRequestDates, TimeOffRequestRetrieve } from 'src/types'
 import { useTimeOffStore } from 'src/stores/timeoff'
 
@@ -40,7 +41,7 @@ const route = useRoute()
 const router = useRouter()
 const timeOffStore = useTimeOffStore()
 
-let pk = typeof route.params.pk == 'string' ? ref(route.params.pk) : ref(route.params.pk[0])
+const pk = getRoutePk(route)
 let dates: Ref<TimeOffRequestDates> = ref({'from': '', 'to': ''})
 let note = ref('')
 let privateNote = ref('')
@@ -70,12 +71,15 @@ function dateChanged(): void {
 }
 
 function retrieveRequest(): void {
-  timeOffStore.getCurrentTimeOffRequest(pk.value)
+  if (!pk) {
+    console.error('No pk provided to retrieve time off request')
+    return
+  }
+  timeOffStore.getCurrentTimeOffRequest(pk)
     .then(() => {
       const tor = timeOffStore.currentTimeOffRequest
       const startDate: string = tor.start_date.toString().split('-').join('/')
       const endDate: string = tor.end_date.toString().split('-').join('/')
-      pk.value = tor.pk.toString()
       if (startDate == endDate) {
         dates.value = startDate
       } else {
@@ -90,8 +94,12 @@ function retrieveRequest(): void {
 }
 
 function updateTimeOffRequest(): void {
+  if (!pk) {
+    console.error('No pk provided to update time off request')
+    return
+  }
   timeOffStore.updateTimeOffRequest({
-    pk: pk.value,
+    pk: pk,
     dates: dates.value,
     note: note.value,
     privateNote: privateNote.value

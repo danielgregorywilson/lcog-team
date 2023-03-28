@@ -611,19 +611,17 @@ export interface AxiosResponsibilityUpdateServerResponse {
 }
 
 export interface ResponsibilityStateInterface {
-  allResponsibilities: { results: Array<Responsibility> }
+  allResponsibilities: Array<Responsibility>
   orphanedResponsibilities: Array<Responsibility>
   employeePrimaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
   employeeSecondaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
-  tagWithResponsibilities: Array<EmployeeResponsibilitiesInterface>
+  tagWithResponsibilities: ResponsibilityTag
   allTags: { results: Array<ResponsibilityTag> }
-  simpleEmployeeList: Array<SimpleEmployeeRetrieve>
-  simpleEmployeeDetail: SimpleEmployeeRetrieve
   simpleTagList: Array<SimpleResponsibilityTagRetrieve>
 }
 
 export interface EmployeeResponsibilitiesInterface {
-  pk: number
+  pk: string
   responsibilities: Array<Responsibility>
 }
 
@@ -635,7 +633,7 @@ export interface SimpleResponsibilityTagRetrieve {
 export interface ResponsibilityTag {
   pk?: number
   name: string
-  responsibilities?: Array<string>
+  responsibilities: Array<Responsibility>
 }
 
 export interface ResponsibilityTagCreate {

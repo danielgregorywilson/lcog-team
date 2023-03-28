@@ -65,19 +65,19 @@ const routes: RouteRecordRaw[] = [
             component: () => import('src/pages/responsibilities/OrphanedResponsibilities.vue'),
           },
           {
-            path: 'tags',
-            name: 'tags',
-            component: () => import('src/pages/responsibilities/Tags.vue'),
-          },
-          {
             path: 'tag',
             name: 'tag',
-            component: () => import('src/pages/responsibilities/TaggedResponsibilities.vue'),
+            component: () => import('src/pages/responsibilities/Tags.vue'),
             children: [
+              {
+                path: 'all',
+                name: 'all-tags',
+                component: () => import ('src/pages/responsibilities/AllTags.vue')
+              },
               {
                 path: ':pk',
                 name: 'tagged-responsibilities',
-                component: () => import ('src/pages/responsibilities/TaggedResponsibility.vue')
+                component: () => import ('src/pages/responsibilities/TaggedResponsibilities.vue')
               }
             ]
           },
@@ -89,6 +89,7 @@ const routes: RouteRecordRaw[] = [
               {
                 path: 'secondary',
                 name: 'employee-secondary-responsibilities',
+                component: () => import('src/pages/responsibilities/EmployeeResponsibilities.vue'),
                 props: { secondary: true }
               }
             ]

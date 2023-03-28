@@ -1,11 +1,11 @@
-import axios from 'axios';
-import { defineStore } from 'pinia';
+import axios from 'axios'
+import { defineStore } from 'pinia'
 import { 
   TimeOffRequestAcknowledge, TimeOffRequestCreate, TimeOffRequestDates,
   TimeOffRequestRetrieve, TimeOffRequestStateInterface,
   TimeOffRequestUpdate
-} from 'src/types';
-import { useUserStore } from './user';
+} from 'src/types'
+import { useUserStore } from './user'
 
 const userStore = useUserStore()
 
@@ -21,7 +21,7 @@ export const useTimeOffStore = defineStore('timeoff', {
     conflictingTimeOffRequests: [] as Array<TimeOffRequestRetrieve>
   }),
 
-  getters: { },
+  getters: {},
 
   actions: {
     getMyTimeOffRequests() {

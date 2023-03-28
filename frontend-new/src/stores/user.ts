@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { EmployeeRetrieve } from 'src/types';
+import { EmployeeRetrieve, SimpleEmployeeRetrieve } from 'src/types';
 import axios from 'axios';
 import { useCookies } from 'vue3-cookies'
 
@@ -31,7 +31,9 @@ export const useUserStore = defineStore('user', {
       workflow_roles: [] as Array<number>,
       can_view_mow_routes: false,
       can_manage_mow_stops: false
-    }
+    },
+    simpleEmployeeList: [] as Array<SimpleEmployeeRetrieve>,
+    simpleEmployeeDetail: { pk: -1, name: '' } as SimpleEmployeeRetrieve,
   }),
 
   getters: {
@@ -102,12 +104,40 @@ export const useUserStore = defineStore('user', {
           });
       })
     },
-    // For getting just the user on specific pages
+    // For getting just the current user on specific pages
     simpleUserRequest: () => {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/current-user/` })
           .then((resp: {data: {pk: number}}) => resolve(resp))
           .catch(e => reject(e));
+      })
+    },
+    // Simple list of all employees
+    getSimpleEmployeeList() {
+      return new Promise((resolve, reject) => {
+        axios({ url: `${ apiURL }api/v1/employee/simple_list`})
+          .then(resp => {
+            this.simpleEmployeeList = resp.data
+            resolve('Got simple employee list')
+          })
+          .catch(e => {
+            console.error('Error getting simple employee list:', e)
+            reject(`Error getting simple employee list: ${ e }`)
+          })
+      })
+    },
+    // Simple detail of one employee
+    getSimpleEmployeeDetail(data: {pk: number}) {
+      return new Promise((resolve, reject) => {
+        axios({ url: `${ apiURL }api/v1/employee/${ data.pk }/simple_detail`})
+          .then(resp => {
+            this.simpleEmployeeDetail = resp.data
+            resolve('Got simple employee detail')
+          })
+          .catch(e => {
+            console.error('Error getting simple employee detail:', e)
+            reject(`Error getting simple employee detail: ${ e }`)
+          })
       })
     },
     authLogout() {

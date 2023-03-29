@@ -106,7 +106,7 @@ const bus = useEventBus()
 defineProps<{
   tableTitle: string
   tableRows: Responsibility[]
-  tableColumns: QTableProps["columns"]
+  tableColumns: QTableProps['columns']
 }>()
 
 const initialTablePagination = {

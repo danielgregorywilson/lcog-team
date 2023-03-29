@@ -16,7 +16,7 @@ const userStore = useUserStore()
 
 
 export const useAuthStore = defineStore('auth', {
-  state: (): AuthStateInterface => ({
+  state: () => ({
     token: localStorage.getItem('user-token') || '',
     status: '',
   }),

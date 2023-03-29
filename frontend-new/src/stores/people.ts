@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { defineStore } from 'pinia';
-import { EmployeeUpdatePartial, PeopleStateInterface } from 'src/types';
+import { EmployeeUpdatePartial, SimpleEmployeeRetrieve, Unit } from 'src/types';
 
 import { handlePromiseError } from './index'
 
@@ -8,10 +8,10 @@ const apiURL = process.env.API_URL ?
   process.env.API_URL : 'https://api.team.lcog.org/'
 
 export const usePeopleStore = defineStore('people', {
-  state: (): PeopleStateInterface => ({
-    simpleEmployeeList: [],
-    simpleEmployeeDetail: { pk: -1, name: '' },
-    unitList: [],
+  state: () => ({
+    simpleEmployeeList: [] as Array<SimpleEmployeeRetrieve>,
+    simpleEmployeeDetail: { pk: -1, name: '' } as SimpleEmployeeRetrieve,
+    unitList: [] as Array<Unit>
   }),
 
   getters: {},
@@ -49,7 +49,7 @@ export const usePeopleStore = defineStore('people', {
           method: 'PATCH',
           data: data
         })
-        .then(resp => {
+        .then(() => {
           resolve('Successfully updated employee')
         })
         .catch(e => {

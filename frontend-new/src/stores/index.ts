@@ -31,7 +31,7 @@ export default store((/* { ssrContext } */) => {
   return pinia
 })
 
-export function handlePromiseError(reject: (reason?: any) => void, message: string, error: string) {
+export function handlePromiseError(reject: (reason?: any) => void, message: string, error: string) { // eslint-disable-line @typescript-eslint/no-explicit-any
   const errorMessage = `${ message }: ${ error }`
   console.error(errorMessage)
   reject(errorMessage)

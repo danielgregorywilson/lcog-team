@@ -2,8 +2,7 @@ import axios from 'axios'
 import { defineStore } from 'pinia'
 import { 
   TimeOffRequestAcknowledge, TimeOffRequestCreate, TimeOffRequestDates,
-  TimeOffRequestRetrieve, TimeOffRequestStateInterface,
-  TimeOffRequestUpdate
+  TimeOffRequestRetrieve, TimeOffRequestUpdate
 } from 'src/types'
 import { useUserStore } from './user'
 
@@ -13,11 +12,11 @@ const apiURL = process.env.API_URL ?
   process.env.API_URL : 'https://api.team.lcog.org/'
 
 export const useTimeOffStore = defineStore('timeoff', {
-  state: (): TimeOffRequestStateInterface => ({
-    myTimeOffRequests: [],
+  state: () => ({
+    myTimeOffRequests: [] as Array<TimeOffRequestRetrieve>,
     currentTimeOffRequest: {} as TimeOffRequestRetrieve,
-    teamTimeOffRequests: [],
-    managedTimeOffRequests: [],
+    teamTimeOffRequests: [] as Array<TimeOffRequestRetrieve>,
+    managedTimeOffRequests: [] as Array<TimeOffRequestRetrieve>,
     conflictingTimeOffRequests: [] as Array<TimeOffRequestRetrieve>
   }),
 

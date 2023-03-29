@@ -5,11 +5,6 @@ import { Url } from 'url'
 // Auth Users Structure from Django Rest Framework //
 /////////////////////////////////////////////////////
 
-export interface AuthStateInterface {
-  token: string;
-  status: string;
-}
-
 export interface AxiosAuthResponse extends AxiosResponse {
   data: {
     token: string
@@ -100,12 +95,6 @@ export interface AxiosEmployeeRetrieveManyServerResponse {
 export interface Unit {
   pk: number
   name: string
-}
-
-export interface PeopleStateInterface {
-  simpleEmployeeList: Array<SimpleEmployeeRetrieve>
-  simpleEmployeeDetail: SimpleEmployeeRetrieve
-  unitList: Array<Unit>
 }
 
 
@@ -576,7 +565,7 @@ export interface Responsibility {
   name: string
   description: string
   link: string
-  tags: Array<ResponsibilityTag>
+  tags: Array<ResponsibilityTagRetrieve>
   primary_employee_pk?: number
   primary_employee_name?: string
   secondary_employee_pk?: number
@@ -587,7 +576,7 @@ export interface ResponsibilityCreate {
   name: string
   description?: string
   link?: string
-  tags?: Array<ResponsibilityTag>
+  tags?: Array<ResponsibilityTagRetrieve>
   primary_employee?: number
   secondary_employee?: number
 }
@@ -597,7 +586,7 @@ export interface ResponsibilityUpdate {
   name?: string
   description?: string
   link?: string
-  tags?: Array<ResponsibilityTag>
+  tags?: Array<ResponsibilityTagRetrieve>
   primary_employee?: number
   secondary_employee?: number
 }
@@ -610,16 +599,6 @@ export interface AxiosResponsibilityUpdateServerResponse {
   data: Responsibility
 }
 
-export interface ResponsibilityStateInterface {
-  allResponsibilities: Array<Responsibility>
-  orphanedResponsibilities: Array<Responsibility>
-  employeePrimaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
-  employeeSecondaryResponsibilities: Array<EmployeeResponsibilitiesInterface>
-  tagWithResponsibilities: ResponsibilityTag
-  allTags: { results: Array<ResponsibilityTag> }
-  simpleTagList: Array<SimpleResponsibilityTagRetrieve>
-}
-
 export interface EmployeeResponsibilitiesInterface {
   pk: string
   responsibilities: Array<Responsibility>
@@ -630,7 +609,7 @@ export interface SimpleResponsibilityTagRetrieve {
   name: string
 }
 
-export interface ResponsibilityTag {
+export interface ResponsibilityTagRetrieve {
   pk?: number
   name: string
   responsibilities: Array<Responsibility>
@@ -715,11 +694,6 @@ export interface GetEmployeeDeskReservationDataInterface {
   }
 }
 
-export interface DeskReservationStateInterface {
-  allDesks: { results: Array<Desk> }
-  allDeskReservations: { results: Array<DeskReservation> }
-}
-
 
 /////////////////////////////////////////////////////////
 // TimeOffRequest Structure from Django Rest Framework //
@@ -737,14 +711,6 @@ export interface TimeOffRequestRetrieve {
   private_note: string
   acknowledged: boolean
   conflicts?: JSON
-}
-
-export interface TimeOffRequestStateInterface {
-  myTimeOffRequests: Array<TimeOffRequestRetrieve>
-  currentTimeOffRequest: TimeOffRequestRetrieve
-  teamTimeOffRequests: Array<TimeOffRequestRetrieve>
-  managedTimeOffRequests: Array<TimeOffRequestRetrieve>
-  conflictingTimeOffRequests: Array<TimeOffRequestRetrieve>
 }
 
 export type TimeOffRequestDates = {from: string; to: string} | string
@@ -984,100 +950,4 @@ export interface AxiosCheckAddressServerResponse {
     lat: number
     long: number
   }
-}
-
-/////////////
-// Getters //
-/////////////
-
-export interface VuexStoreGetters {
-  'authModule/isAuthenticated': boolean,
-  'userModule/getEmployeeProfile': EmployeeRetrieve,
-  'userModule/hasWorkflowRoles': boolean,
-  'userModule/isManager': boolean,
-  'userModule/canViewMOWRoutes': boolean,
-  'userModule/canManageMOWStops': boolean,
-
-  // Desk Reservation
-  'deskReservationModule/allDesks': {
-    results: Array<Desk>
-  },
-  'deskReservationModule/allDeskReservations': {
-    results: Array<DeskReservation>
-  },
-
-  // Meals
-  'mealsModule/gatewayStops': Array<Stop>,
-  'mealsModule/marcolaStops': Array<Stop>,
-  'mealsModule/MCStops': Array<Stop>,
-  'mealsModule/shortStops': Array<Stop>,
-  'mealsModule/longStops': Array<Stop>,
-  'mealsModule/northStops': Array<Stop>,
-  'mealsModule/willStops': Array<Stop>,
-  'mealsModule/hotPUStops': Array<Stop>,
-  'mealsModule/tu1Stops': Array<Stop>,
-  'mealsModule/tu2Stops': Array<Stop>,
-  'mealsModule/tu3Stops': Array<Stop>,
-  'mealsModule/thur1Stops': Array<Stop>,
-  'mealsModule/thur2Stops': Array<Stop>,
-  'mealsModule/thur3Stops': Array<Stop>,
-  'mealsModule/coldPUStops': Array<Stop>,
-  'mealsModule/gatewayWaitlistStops': Array<Stop>,
-  'mealsModule/marcolaWaitlistStops': Array<Stop>,
-  'mealsModule/MCWaitlistStops': Array<Stop>,
-  'mealsModule/shortWaitlistStops': Array<Stop>,
-  'mealsModule/longWaitlistStops': Array<Stop>,
-  'mealsModule/northWaitlistStops': Array<Stop>,
-  'mealsModule/willWaitlistStops': Array<Stop>,
-  'mealsModule/hotPUWaitlistStops': Array<Stop>,
-  'mealsModule/tu1WaitlistStops': Array<Stop>,
-  'mealsModule/tu2WaitlistStops': Array<Stop>,
-  'mealsModule/tu3WaitlistStops': Array<Stop>,
-  'mealsModule/thur1WaitlistStops': Array<Stop>,
-  'mealsModule/thur2WaitlistStops': Array<Stop>,
-  'mealsModule/thur3WaitlistStops': Array<Stop>,
-  'mealsModule/coldPUWaitlistStops': Array<Stop>,
-
-  // People
-  'peopleModule/simpleEmployeeList': Array<SimpleEmployeeRetrieve>,
-  'peopleModule/simpleEmployeeDetail': SimpleEmployeeRetrieve,
-  'peopleModule/unitList': {
-    results: Array<Unit>
-  },
-
-  // Time Off
-  'timeOffModule/teamTimeOffRequests': {
-    results: Array<TimeOffRequestRetrieve>
-  },
-  'timeOffModule/myTimeOffRequests': {
-    results: Array<TimeOffRequestRetrieve>
-  },
-  'timeOffModule/managedTimeOffRequests': {
-    results: Array<TimeOffRequestRetrieve>
-  },
-  'timeOffModule/conflictingTimeOffRequests': Array<TimeOffRequestRetrieve>,
-
-  // Responsibilities
-  'responsibilityModule/allResponsibilities': {
-    results: Array<Responsibility>
-  },
-  'responsibilityModule/orphanedResponsibilities': {
-    results: Array<Responsibility>
-  },
-  'responsibilityModule/employeePrimaryResponsibilities': Array<EmployeeResponsibilitiesInterface>,
-  'responsibilityModule/employeeSecondaryResponsibilities': Array<EmployeeResponsibilitiesInterface>
-  'responsibilityModule/tagWithResponsibilities': ResponsibilityTag
-  'responsibilityModule/allTags': {
-    results: Array<SimpleResponsibilityTagRetrieve>
-  },
-  'responsibilityModule/simpleTagList': Array<SimpleResponsibilityTagRetrieve>,
-
-  // TODO: Remove
-  'responsibilityModule/simpleEmployeeList': Array<SimpleEmployeeRetrieve>,
-  'responsibilityModule/simpleEmployeeDetail': SimpleEmployeeRetrieve,
-
-  // Workflows
-  'workflowModule/currentWorkflowInstance': WorkflowInstance,
-  'workflowModule/currentEmployeeTransition': EmployeeTransition,
-  'workflowModule/processInstanceCurrentStepPks': Array<number>
 }

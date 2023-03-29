@@ -3,8 +3,8 @@ import { defineStore } from 'pinia'
 
 import {
   EmployeeResponsibilitiesInterface, Responsibility, ResponsibilityCreate,
-  ResponsibilityNameUpdate, ResponsibilityStateInterface,
-  ResponsibilityTagCreate, ResponsibilityTagUpdate, ResponsibilityUpdate
+  ResponsibilityNameUpdate, ResponsibilityTagRetrieve, ResponsibilityTagCreate,
+  ResponsibilityTagUpdate, ResponsibilityUpdate, SimpleResponsibilityTagRetrieve
 } from 'src/types'
 
 import { handlePromiseError } from './index'
@@ -13,16 +13,14 @@ const apiURL = process.env.API_URL ?
   process.env.API_URL : 'https://api.team.lcog.org/'
 
 export const useResponsibilityStore = defineStore('responsibility', {
-  state: (): ResponsibilityStateInterface => ({
-    allResponsibilities: [],
-    orphanedResponsibilities: [],
-    employeePrimaryResponsibilities: [],
-    employeeSecondaryResponsibilities: [],
-    tagWithResponsibilities: [],
-    allTags: { results: [] },
-    // simpleEmployeeList: [],
-    // simpleEmployeeDetail: { pk: -1, name: '' },
-    simpleTagList: []
+  state: () => ({
+    allResponsibilities: [] as Array<Responsibility>,
+    orphanedResponsibilities: [] as Array<Responsibility>,
+    employeePrimaryResponsibilities: [] as Array<EmployeeResponsibilitiesInterface>,
+    employeeSecondaryResponsibilities: [] as Array<EmployeeResponsibilitiesInterface>,
+    tagWithResponsibilities: {} as ResponsibilityTagRetrieve,
+    allTags: [] as Array<ResponsibilityTagRetrieve>,
+    simpleTagList: [] as Array<SimpleResponsibilityTagRetrieve>,
   }),
 
   getters: {},

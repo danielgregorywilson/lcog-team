@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
 
+import { apiURL } from 'src/stores/index'
 import {
   EmployeeResponsibilitiesInterface, Responsibility, ResponsibilityCreate,
   ResponsibilityNameUpdate, ResponsibilityTagRetrieve, ResponsibilityTagCreate,
@@ -8,9 +9,6 @@ import {
 } from 'src/types'
 
 import { handlePromiseError } from './index'
-
-const apiURL = process.env.API_URL ?
-  process.env.API_URL : 'https://api.team.lcog.org/'
 
 export const useResponsibilityStore = defineStore('responsibility', {
   state: () => ({
@@ -119,7 +117,7 @@ export const useResponsibilityStore = defineStore('responsibility', {
       })
     },
     updateResponsibilityName(data: ResponsibilityNameUpdate) {
-      this.allResponsibilities.results.filter(r => r.pk == data.pk)[0].name = data.name
+      this.allResponsibilities.filter(r => r.pk == data.pk)[0].name = data.name
     },
     deleteResponsibility(pk: string) {
       return new Promise((resolve, reject) => {

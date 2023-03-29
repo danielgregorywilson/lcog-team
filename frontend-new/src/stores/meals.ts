@@ -1,9 +1,8 @@
-import { defineStore } from 'pinia';
-import { MealStateInterface, Stop } from 'src/types';
-import axios from 'axios';
+import { defineStore } from 'pinia'
+import axios from 'axios'
 
-const apiURL = process.env.API_URL ?
-  process.env.API_URL : 'https://api.team.lcog.org/'
+import { apiURL } from 'src/stores/index'
+import { MealStateInterface, Stop } from 'src/types'
 
 export const useMealsStore = defineStore('meals', {
   state: (): MealStateInterface => ({

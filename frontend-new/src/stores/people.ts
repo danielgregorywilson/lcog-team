@@ -1,11 +1,8 @@
 import axios from 'axios';
 import { defineStore } from 'pinia';
+
+import { apiURL, handlePromiseError } from 'src/stores/index'
 import { EmployeeUpdatePartial, SimpleEmployeeRetrieve, Unit } from 'src/types';
-
-import { handlePromiseError } from './index'
-
-const apiURL = process.env.API_URL ?
-  process.env.API_URL : 'https://api.team.lcog.org/'
 
 export const usePeopleStore = defineStore('people', {
   state: () => ({

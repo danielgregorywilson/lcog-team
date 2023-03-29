@@ -1,13 +1,12 @@
-import { defineStore } from 'pinia';
+import axios from 'axios'
+import { defineStore } from 'pinia'
+import { useCookies } from 'vue3-cookies'
+
+import { apiURL } from 'src/stores/index'
 import {
   AxiosEmployeeRetrieveOneServerResponse, EmployeeRetrieve,
   SimpleEmployeeRetrieve
-} from 'src/types';
-import axios from 'axios';
-import { useCookies } from 'vue3-cookies'
-
-const apiURL = process.env.API_URL ?
-  process.env.API_URL : 'https://api.team.lcog.org/'
+} from 'src/types'
 
 export const useUserStore = defineStore('user', {
   state: () => ({

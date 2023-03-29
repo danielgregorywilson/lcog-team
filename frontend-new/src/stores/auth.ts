@@ -1,19 +1,17 @@
-import { defineStore } from 'pinia';
-import { AuthStateInterface, AxiosAuthResponse } from 'src/types';
-import axios from 'axios';
-import { useMealsStore } from './meals';
-import { usePeopleStore } from './people';
-import { useTimeOffStore } from './timeoff';
-import { useUserStore } from './user';
+import { defineStore } from 'pinia'
+import axios from 'axios'
 
+import { apiURL } from 'src/stores/index'
+import { useMealsStore } from 'src/stores/meals'
+import { usePeopleStore } from 'src/stores/people'
+import { useTimeOffStore } from 'src/stores/timeoff'
+import { useUserStore } from 'src/stores/user'
+import { AxiosAuthResponse } from 'src/types'
 
-const apiURL = process.env.API_URL ? 
-  process.env.API_URL : 'https://api.team.lcog.org/'
 const mealsStore = useMealsStore()
 const peopleStore = usePeopleStore()
 const timeOffStore = useTimeOffStore()
 const userStore = useUserStore()
-
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({

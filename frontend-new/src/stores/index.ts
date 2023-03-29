@@ -36,3 +36,6 @@ export function handlePromiseError(reject: (reason?: any) => void, message: stri
   console.error(errorMessage)
   reject(errorMessage)
 }
+
+export const apiURL = process.env.API_URL ?
+  process.env.API_URL : 'https://api.team.lcog.org/'

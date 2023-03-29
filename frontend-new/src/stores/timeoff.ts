@@ -1,15 +1,14 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
+
+import { apiURL } from 'src/stores/index'
+import { useUserStore } from 'src/stores/user'
 import { 
   TimeOffRequestAcknowledge, TimeOffRequestCreate, TimeOffRequestDates,
   TimeOffRequestRetrieve, TimeOffRequestUpdate
 } from 'src/types'
-import { useUserStore } from './user'
 
 const userStore = useUserStore()
-
-const apiURL = process.env.API_URL ?
-  process.env.API_URL : 'https://api.team.lcog.org/'
 
 export const useTimeOffStore = defineStore('timeoff', {
   state: () => ({

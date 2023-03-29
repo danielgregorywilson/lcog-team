@@ -1,5 +1,8 @@
 import { defineStore } from 'pinia';
-import { EmployeeRetrieve, SimpleEmployeeRetrieve } from 'src/types';
+import {
+  AxiosEmployeeRetrieveOneServerResponse, EmployeeRetrieve,
+  SimpleEmployeeRetrieve
+} from 'src/types';
 import axios from 'axios';
 import { useCookies } from 'vue3-cookies'
 
@@ -105,10 +108,10 @@ export const useUserStore = defineStore('user', {
       })
     },
     // For getting just the current user on specific pages
-    simpleUserRequest: () => {
+    simpleUserRequest: (): Promise<AxiosEmployeeRetrieveOneServerResponse> => {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/current-user/` })
-          .then((resp: {data: {pk: number}}) => resolve(resp))
+          .then(resp => resolve(resp))
           .catch(e => reject(e));
       })
     },

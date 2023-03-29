@@ -45,6 +45,12 @@ const routes: RouteRecordRaw[] = [
         name: 'release-notes',
         component: () => import('src/pages/ReleaseNotes.vue')
       },
+      {
+        path: '/profile',
+        name: 'profile',
+        component: () => import('src/pages/Profile.vue'),
+        // beforeEnter: ifAuthenticated
+      },
       //////////////////////
       // RESPONSIBILITIES //
       //////////////////////

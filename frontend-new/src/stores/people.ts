@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { defineStore } from 'pinia';
-import { PeopleStateInterface } from 'src/types';
+import { EmployeeUpdatePartial, PeopleStateInterface } from 'src/types';
 
 import { handlePromiseError } from './index'
 
@@ -40,6 +40,21 @@ export const usePeopleStore = defineStore('people', {
           .catch(e => {
             handlePromiseError(reject, 'Error getting simple employee detail', e)
           })
+      })
+    },
+    updatePartialEmployee(pk: string, data: EmployeeUpdatePartial) {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/employee/${ pk }`,
+          method: 'PATCH',
+          data: data
+        })
+        .then(resp => {
+          resolve('Successfully updated employee')
+        })
+        .catch(e => {
+          handlePromiseError(reject, 'Error updating employee', e)
+        })
       })
     },
     getUnitList() {

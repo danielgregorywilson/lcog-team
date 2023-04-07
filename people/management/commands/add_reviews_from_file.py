@@ -57,7 +57,7 @@ class Command(BaseCommand):
 
     def check_review_rows(self, rows, employee):
         # Get the most recent review
-        filtered_rows = filter(lambda row: row[9] != '', rows) # Remove rows without a date
+        filtered_rows = filter(lambda row: row[4] != '' and row[9] != '', rows) # Remove rows without a date
         sorted_rows = sorted(filtered_rows, key=lambda row: datetime.datetime.strptime(row[9], '%m/%d/%Y'))
         most_recent_row = sorted_rows[-1]
         

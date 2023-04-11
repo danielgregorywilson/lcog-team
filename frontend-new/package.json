@@ -11,13 +11,14 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
-    "@quasar/extras": "^1.0.0",
+    "@quasar/extras": "^1.16.2",
     "axios": "^1.2.1",
     "git-describe": "^4.1.1",
     "mapbox-gl": "^2.13.0",
     "msal": "^1.4.17",
     "pinia": "^2.0.11",
-    "quasar": "^2.11.8",
+    "quasar": "^2.11.10",
+    "vite-svg-loader": "^4.0.0",
     "vue": "^3.0.0",
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.0.0",

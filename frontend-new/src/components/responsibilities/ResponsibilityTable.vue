@@ -96,7 +96,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { QTableProps } from 'quasar'
 
-import useEventBus from 'src/eventBus';
+import useEventBus from 'src/eventBus'
 import shared from 'src/pages/responsibilities/shared'
 import { Responsibility } from 'src/types'
 

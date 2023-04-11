@@ -1,14 +1,12 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
 
-import { apiURL } from 'src/stores/index'
+import { apiURL, handlePromiseError } from 'src/stores/index'
 import {
   EmployeeResponsibilitiesInterface, Responsibility, ResponsibilityCreate,
   ResponsibilityNameUpdate, ResponsibilityTagRetrieve, ResponsibilityTagCreate,
   ResponsibilityTagUpdate, ResponsibilityUpdate, SimpleResponsibilityTagRetrieve
 } from 'src/types'
-
-import { handlePromiseError } from './index'
 
 export const useResponsibilityStore = defineStore('responsibility', {
   state: () => ({

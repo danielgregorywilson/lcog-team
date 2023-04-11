@@ -41,7 +41,7 @@ import { QTableProps } from 'quasar'
 import useEventBus from 'src/eventBus';
 import shared from 'src/pages/responsibilities/shared'
 import { useResponsibilityStore } from 'src/stores/responsibility'
-import { Responsibility, ResponsibilityTag } from 'src/types'
+import { Responsibility, ResponsibilityTagRetrieve } from 'src/types'
 
 const router = useRouter()
 const responsibilityStore = useResponsibilityStore()
@@ -58,7 +58,7 @@ const initialTablePagination = {
   rowsPerPage: 50
 }
 
-function allTags(): Array<ResponsibilityTag> {
+function allTags(): Array<ResponsibilityTagRetrieve> {
   const allTags = responsibilityStore.allTags
   return allTags.results
 }

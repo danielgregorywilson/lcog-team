@@ -11,6 +11,7 @@
 
 const { configure } = require('quasar/wrappers');
 const { gitDescribeSync } = require('git-describe');
+const svgLoader = require('vite-svg-loader');
 const path = require('path');
 
 module.exports = configure(function (ctx) {
@@ -97,7 +98,7 @@ module.exports = configure(function (ctx) {
 
           // you need to set i18n resource including paths !
           include: path.resolve(__dirname, './src/i18n/**')
-        }]
+        }], svgLoader()
       ]
     },
 

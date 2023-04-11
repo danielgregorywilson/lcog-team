@@ -221,7 +221,7 @@ import { useQuasar, QSelect } from 'quasar'
 
 import { getRoutePk } from 'src/utils'
 import { 
-  Responsibility, ResponsibilityTag, SimpleEmployeeRetrieve,
+  Responsibility, ResponsibilityTagRetrieve, SimpleEmployeeRetrieve,
   SimpleResponsibilityTagRetrieve 
 } from 'src/types'
 
@@ -251,7 +251,7 @@ let pkToEdit = ref(-1)
 let editFormName = ref('')
 let editFormDescription = ref('')
 let editFormLink = ref('')
-let editFormTags: Ref<Array<ResponsibilityTag>> = ref([])
+let editFormTags: Ref<Array<ResponsibilityTagRetrieve>> = ref([])
 let editFormNewTag = ref('')
 let editFormPrimaryEmployee = ref(emptyEmployee)
 let editFormSecondaryEmployee = ref(emptyEmployee)
@@ -480,7 +480,7 @@ function deleteRow(): void {
 // EDIT TAG FORM //
 ///////////////////
 
-function openTagEditDialog(tag: ResponsibilityTag) {
+function openTagEditDialog(tag: ResponsibilityTagRetrieve) {
   if (tag.pk) {
     tagPkToEdit.value = tag.pk
     editTagFormName.value = tag.name
@@ -525,7 +525,7 @@ function editTag() {
 // DELETE TAG FORM //
 /////////////////////
 
-function openDeleteTagDialog(row: ResponsibilityTag) {
+function openDeleteTagDialog(row: ResponsibilityTagRetrieve) {
   if (row.pk) {
     tagPkToDelete.value = row.pk.toString()
     deleteTagDialogName.value = row.name
@@ -613,10 +613,10 @@ watch(() => bus.value.get('emitOpenEditDialog'), (row: Responsibility) => {
 watch(() => bus.value.get('emitOpenDeleteDialog'), (row: Responsibility) => {
   openDeleteDialog(row)
 })
-watch(() => bus.value.get('emitOpenEditTagDialog'), (row: ResponsibilityTag) => {
+watch(() => bus.value.get('emitOpenEditTagDialog'), (row: ResponsibilityTagRetrieve) => {
   openTagEditDialog(row)
 })
-watch(() => bus.value.get('emitOpenDeleteTagDialog'), (row: ResponsibilityTag) => {
+watch(() => bus.value.get('emitOpenDeleteTagDialog'), (row: ResponsibilityTagRetrieve) => {
   openDeleteTagDialog(row)
 })
 

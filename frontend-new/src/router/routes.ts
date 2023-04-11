@@ -143,6 +143,96 @@ const routes: RouteRecordRaw[] = [
     ],
   },
 
+  //////////////////////
+  // DESK RESERVATION //
+  //////////////////////
+  {
+    path: '/desk-reservation',
+    component: () => import('src/pages/deskReservation/DeskReservation.vue'),
+    children: [
+      {
+        path: 'schaefers',
+        name: 'schaefers',
+        component: () => import('src/pages/deskReservation/Schaefers.vue'),
+        children: [
+          {
+            path: '1',
+            name: 'schaefers-1',
+            component: () => import('src/pages/deskReservation/Schaefers1.vue'),
+            children: [
+              {
+                path: 'desk/:deskNumber',
+                name: 'schaefers-1-desk',
+                component: () => import('src/pages/deskReservation/Schaefers1.vue')
+              }
+            ]
+          },
+          {
+            path: '2',
+            name: 'schaefers-2',
+            component: () => import('src/pages/deskReservation/Schaefers2.vue'),
+            children: [
+              {
+                path: 'desk/:deskNumber',
+                name: 'schaefers-2-desk',
+                component: () => import('src/pages/deskReservation/Schaefers2.vue')
+              }
+            ]
+          },
+          {
+            path: '3',
+            name: 'schaefers-3',
+            component: () => import('src/pages/deskReservation/Schaefers3.vue'),
+            children: [
+              {
+                path: 'desk/:deskNumber',
+                name: 'schaefers-3-desk',
+                component: () => import('src/pages/deskReservation/Schaefers3.vue')
+              }
+            ]
+          }
+        ]
+      },
+      {
+        path: 'park-place',
+        name: 'park-place',
+        component: () => import('src/pages/deskReservation/ParkPlace.vue'),
+        children: [
+          {
+            path: '4',
+            name: 'park-place-4',
+            component: () => import('src/pages/deskReservation/ParkPlace4.vue'),
+          },
+          {
+            path: '5',
+            name: 'park-place-5',
+            component: () => import('src/pages/deskReservation/ParkPlace5.vue'),
+          }
+        ]
+      },
+      {
+        path: 'reports',
+        name: 'reports',
+        component: () => import('src/pages/deskReservation/Report.vue'),
+        // beforeEnter: ifCanViewDeskReservationReports
+      }
+    ]
+  },
+  {
+    // Shortcut path for CIAO to direct to a specific highlighted desk on the
+    // desk reservation map.
+    path: '/desk/:deskNumber',
+    redirect: to => {
+      let name = 'schaefers-1-desk'
+      if (to.params.deskNumber[0] == '2') {
+        name = 'schaefers-2-desk'
+      } else if (to.params.deskNumber[0] == '3') {
+        name = 'schaefers-3-desk'
+      }
+      return { name }
+    }
+  },
+
   /////////////////////////
   // MEALS ON WHEELS MAP //
   /////////////////////////

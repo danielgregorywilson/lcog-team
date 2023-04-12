@@ -194,23 +194,6 @@ const routes: RouteRecordRaw[] = [
         ]
       },
       {
-        path: 'park-place',
-        name: 'park-place',
-        component: () => import('src/pages/deskReservation/ParkPlace.vue'),
-        children: [
-          {
-            path: '4',
-            name: 'park-place-4',
-            component: () => import('src/pages/deskReservation/ParkPlace4.vue'),
-          },
-          {
-            path: '5',
-            name: 'park-place-5',
-            component: () => import('src/pages/deskReservation/ParkPlace5.vue'),
-          }
-        ]
-      },
-      {
         path: 'reports',
         name: 'reports',
         component: () => import('src/pages/deskReservation/Report.vue'),

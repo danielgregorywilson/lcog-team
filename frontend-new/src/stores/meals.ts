@@ -1,5 +1,5 @@
-import { defineStore } from 'pinia'
 import axios from 'axios'
+import { defineStore } from 'pinia'
 
 import { apiURL } from 'src/stores/index'
 import { MealStateInterface, Stop } from 'src/types'

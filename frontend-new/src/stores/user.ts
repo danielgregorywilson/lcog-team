@@ -31,6 +31,7 @@ export const useUserStore = defineStore('user', {
       time_off_requests_can_view: [] as Array<number>,
       next_to_sign_prs: '',
       workflow_roles: [] as Array<number>,
+      is_all_workflows_admin: false,
       can_view_mow_routes: false,
       can_manage_mow_stops: false
     },

@@ -76,6 +76,7 @@ export const useUserStore = defineStore('user', {
             this.profile.time_off_requests_can_view = resp.data.time_off_requests_can_view
             this.profile.next_to_sign_prs = resp.data.next_to_sign_prs
             this.profile.workflow_roles = resp.data.workflow_roles
+            this.profile.is_all_workflows_admin = resp.data.is_all_workflows_admin
             this.profile.can_view_mow_routes = resp.data.can_view_mow_routes
             this.profile.can_manage_mow_stops = resp.data.can_manage_mow_stops
             cookies.set('is_manager', resp.data.is_manager.toString())

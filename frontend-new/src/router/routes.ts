@@ -3,14 +3,14 @@ import { NavigationGuardNext, RouteLocation, RouteRecordRaw } from 'vue-router'
 
 // TODO: Route guards don't work with Pinia
 // https://pinia.vuejs.org/core-concepts/outside-component-usage.html
-const ifAuthenticated = (to: RouteLocation, from: RouteLocation, next: NavigationGuardNext) => {
+// const ifAuthenticated = (to: RouteLocation, from: RouteLocation, next: NavigationGuardNext) => {
   // const authStore = useAuthStore()
   // if (authStore.isAuthenticated) { // TODO: This should use the isAuthenticated getter
   //   next()
   //   return
   // }
   // next('dashboard')
-}
+// }
 
 const ifCanViewTimeOffRequest = (to: RouteLocation, from: RouteLocation, next: NavigationGuardNext) => {
   next()

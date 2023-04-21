@@ -2,12 +2,11 @@ import axios from 'axios'
 import { defineStore } from 'pinia';
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
-import { EmployeeTransition, WorkflowInstance } from 'src/types'
+import { EmployeeTransition, EmployeeTransitionUpdate, WorkflowInstance } from 'src/types'
 
 export const useWorkflowsStore = defineStore('workflows', {
   state: () => ({
     currentWorkflowInstance: {} as WorkflowInstance,
-    currentEmployeeTransition: {} as EmployeeTransition,
     workflowsActionRequired: [] as Array<WorkflowInstance>,
     workflowsComplete: [] as Array<WorkflowInstance>,
     workflowsIncomplete: [] as Array<WorkflowInstance>,
@@ -15,12 +14,14 @@ export const useWorkflowsStore = defineStore('workflows', {
   }),
 
   getters: {
+    currentEmployeeTransition(state): EmployeeTransition {
+      return state.currentWorkflowInstance.transition || {} as EmployeeTransition
+    },
     processInstanceCurrentStepPks: state => {
       const d: {[pk: number]: number} = {}
       if (!state.currentWorkflowInstance.pk) {
         return d
       }
-      debugger
       state.currentWorkflowInstance.process_instances.forEach(pi => {
         if (pi.current_step_instance) {
           d[pi.pk] = pi.current_step_instance.pk  
@@ -44,12 +45,11 @@ export const useWorkflowsStore = defineStore('workflows', {
           });  
       })
     },
-    getCurrentWorkflowInstance(data: {pk: number}) {
+    getCurrentWorkflowInstance(pk: string) {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/workflowinstance/${ data.pk }` })
+        axios({ url: `${ apiURL }api/v1/workflowinstance/${ pk }` })
           .then(resp => {
-            debugger
-            this.currentWorkflowInstance = resp.data.results
+            this.currentWorkflowInstance = resp.data
             resolve(resp)
           })
           .catch(e => {
@@ -91,14 +91,25 @@ export const useWorkflowsStore = defineStore('workflows', {
         });
       })
     },
-    completeStepInstance(data: {stepInstancePk: number, nextStepPk: number}) {
+    completeStepInstance(stepInstancePk: number, nextStepPk?: number) {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/stepinstance/${ data.stepInstancePk }`, data, method: 'PATCH' })
+        axios({ url: `${ apiURL }api/v1/stepinstance/${ stepInstancePk }`, data: {stepInstancePk, nextStepPk}, method: 'PATCH' })
           .then(resp => {
             resolve(resp)
           })  
           .catch(e => {
             handlePromiseError(reject, 'Error completing current step instance', e)
+          });
+      })
+    },
+    updateEmployeeTransition(pk: string, data: EmployeeTransitionUpdate): Promise<EmployeeTransition> {
+      return new Promise((resolve, reject) => {
+        axios({ url: `${ apiURL }api/v1/employeetransition/${ pk }`, data, method: 'PUT' })
+          .then(resp => {
+            resolve(resp.data)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error updating employee transition', e)
           });
       })
     },

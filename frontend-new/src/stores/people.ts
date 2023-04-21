@@ -58,7 +58,7 @@ export const usePeopleStore = defineStore('people', {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/unit`})
         .then(resp => {
-          this.unitList = resp.data
+          this.unitList = resp.data.results
           resolve('Successfully got unit list')
         })
         .catch(e => {

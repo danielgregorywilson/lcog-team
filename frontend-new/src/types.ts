@@ -852,7 +852,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   manager_name: string
   unit_pk: number
   unit_name: string
-  transition_date: Date
+  transition_date: string
   preliminary_hire: boolean
   delete_profile: boolean
   office_location: string

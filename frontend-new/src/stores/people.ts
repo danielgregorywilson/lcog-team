@@ -1,8 +1,8 @@
-import axios from 'axios';
-import { defineStore } from 'pinia';
+import axios from 'axios'
+import { defineStore } from 'pinia'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
-import { EmployeeUpdatePartial, SimpleEmployeeRetrieve, Unit } from 'src/types';
+import { EmployeeUpdatePartial, SimpleEmployeeRetrieve, Unit } from 'src/types'
 
 export const usePeopleStore = defineStore('people', {
   state: () => ({
@@ -73,4 +73,4 @@ export const usePeopleStore = defineStore('people', {
       })
     }
   }
-});
+})

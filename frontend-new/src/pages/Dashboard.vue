@@ -68,11 +68,11 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'
 import { readableDate } from 'src/filters'
 import { PerformanceReviewRetrieve } from 'src/types'
-import { useAuthStore } from 'src/stores/auth';
-import { useUserStore } from 'src/stores/user';
+import { useAuthStore } from 'src/stores/auth'
+import { useUserStore } from 'src/stores/user'
 
 const router = useRouter()
 const authStore = useAuthStore()

@@ -48,22 +48,22 @@ export const useMealsStore = defineStore('meals', {
     async getMealStops() {
       await axios({ url: `${ apiURL }api/v1/mealstop`, method: 'GET' })
         .then(resp => {
-          this.stops = resp.data.results;
+          this.stops = resp.data.results
         })
         .catch(e => {
           console.error('Error getting meal stops', e)
-        });
+        })
     },
     getAddressLatLong: (address: string, city: string, state: string, zip: string) => {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/address-lat-long/?address=${ address }&city=${ city }&state=${ state }&zip=${ zip }`, method: 'GET' })
         .then(resp => {
-          resolve(resp);
+          resolve(resp)
         })
         .catch(e => {
           console.error('Error getting lat/long', e)
           reject(e)
-        });
+        })
       })
     },
     addMealStop: (data: {
@@ -74,12 +74,12 @@ export const useMealsStore = defineStore('meals', {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/mealstop`, method: 'POST', data: data })
         .then(resp => {
-          resolve(resp);
+          resolve(resp)
         })
         .catch(e => {
           console.error('Error adding meal stop', e)
           reject(e)
-        });
+        })
       })
     },
     authLogout() {
@@ -89,4 +89,4 @@ export const useMealsStore = defineStore('meals', {
       })
     }
   }
-});
+})

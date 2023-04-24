@@ -225,7 +225,7 @@ import {
   SimpleResponsibilityTagRetrieve 
 } from 'src/types'
 
-import useEventBus from 'src/eventBus';
+import useEventBus from 'src/eventBus'
 import { useResponsibilityStore } from 'src/stores/responsibility'
 import { useUserStore } from 'src/stores/user'
 
@@ -462,7 +462,7 @@ function editResponsibility() {
 function openDeleteDialog(row: Responsibility) {
   rowPkToDelete.value = row.pk.toString()
   deleteDialogResponsibilityName.value = row.name
-  deleteDialogVisible.value = true;
+  deleteDialogVisible.value = true
 }
 
 function deleteRow(): void {

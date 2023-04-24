@@ -159,8 +159,8 @@
 import { ref, onMounted } from 'vue'
 import type { Ref } from 'vue'
 import { Feature, GeoJsonProperties, Geometry } from 'GeoJSON'
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import mapboxgl from 'mapbox-gl'
+import 'mapbox-gl/dist/mapbox-gl.css'
 import { useMealsStore } from '../../stores/meals'
 import { AxiosCheckAddressServerResponse, Stop } from '../../types'
 import { useAuthStore } from 'src/stores/auth'
@@ -305,8 +305,8 @@ function createMap() {
       zoom: zoom
     })
 
-    map.addControl(new mapboxgl.NavigationControl());
-    map.addControl(new mapboxgl.FullscreenControl());
+    map.addControl(new mapboxgl.NavigationControl())
+    map.addControl(new mapboxgl.FullscreenControl())
 
     map.on('load', () => {
       for(let route of allRouteOptions) {
@@ -315,13 +315,13 @@ function createMap() {
         }
       }
       updateMapVisibility()
-    });
+    })
 
     // When panning the map, update the center coordinates
     map.on('dragend', () => {
       const mapCenter = map.getCenter()
       center = [mapCenter.lng, mapCenter.lat]
-    });
+    })
     
   } catch (err) {
     console.log('Error rendering map:', err)
@@ -372,7 +372,7 @@ function compileRouteAndAddToMap(
       'type': 'FeatureCollection',
       'features': addresses,
     }
-  });
+  })
   
   // Add the addresses as a layer on the map.
   map.addLayer({
@@ -384,7 +384,7 @@ function compileRouteAndAddToMap(
       'circle-color': route.color
     },
     'filter': ['==', '$type', 'Point']
-  });
+  })
 }
 
 function calculateRouteStats() {
@@ -429,18 +429,18 @@ function calculateRouteStats() {
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
   // Haversine formula
-  const R = 6371e3; // metres
-  const φ1 = lat1 * Math.PI/180; // φ, λ in radians
-  const φ2 = lat2 * Math.PI/180;
-  const Δφ = (lat2-lat1) * Math.PI/180;
-  const Δλ = (lon2-lon1) * Math.PI/180;
+  const R = 6371e3 // metres
+  const φ1 = lat1 * Math.PI/180 // φ, λ in radians
+  const φ2 = lat2 * Math.PI/180
+  const Δφ = (lat2-lat1) * Math.PI/180
+  const Δλ = (lon2-lon1) * Math.PI/180
 
   const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
             Math.cos(φ1) * Math.cos(φ2) *
-            Math.sin(Δλ/2) * Math.sin(Δλ/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            Math.sin(Δλ/2) * Math.sin(Δλ/2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
 
-  const d = R * c; // in metres
+  const d = R * c // in metres
   return d
 }
 
@@ -605,12 +605,12 @@ function addNewStopMarkerToMap(newStop: Stop, route: RouteOption) {
         }
       }
     ]
-  };
+  }
   // Add marker to map with an HTML element.
-  const el = document.createElement('div');
-  el.className = 'star-marker';
-  el.style.backgroundColor = route.color;
-  new mapboxgl.Marker(el).setLngLat(geojson.features[0].geometry.coordinates).addTo(map);
+  const el = document.createElement('div')
+  el.className = 'star-marker'
+  el.style.backgroundColor = route.color
+  new mapboxgl.Marker(el).setLngLat(geojson.features[0].geometry.coordinates).addTo(map)
 }
 
 function addStopToRoute() {

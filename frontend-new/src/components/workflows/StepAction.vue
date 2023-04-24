@@ -21,7 +21,7 @@ defineProps<{
 }>()
 
 function navigateToURL(url: string) {
-  window.open(url, '_blank');
+  window.open(url, '_blank')
 }
 
 </script>

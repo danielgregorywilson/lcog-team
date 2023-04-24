@@ -379,7 +379,11 @@ function retrieveEmployeeTransition() {
   managerCurrentVal.value = manager.value
   unit.value = {pk: t.unit_pk, name: t.unit_name}
   unitCurrentVal.value = unit.value
-  transitionDate.value = t.transition_date.replace('T', ' ')
+  if (t.transition_date === null) {
+    transitionDate.value = ''
+  } else {
+    transitionDate.value = t.transition_date.replace('T', ' ')
+  }
   transitionDateCurrentVal.value = transitionDate.value
   preliminaryHire.value = t.preliminary_hire
   preliminaryHireCurrentVal.value = preliminaryHire.value

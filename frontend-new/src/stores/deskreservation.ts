@@ -92,4 +92,4 @@ export const useDeskReservationStore = defineStore('deskreservation', {
       })
     }
   }
-});
+})

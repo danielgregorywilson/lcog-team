@@ -32,7 +32,7 @@ export const useTimeOffStore = defineStore('timeoff', {
           .catch(e => {
             console.log(e)
             reject('Error getting my time off requests')
-          });
+          })
       })
     },
     getTeamTimeOffRequests() {
@@ -45,7 +45,7 @@ export const useTimeOffStore = defineStore('timeoff', {
           .catch(e => {
             console.log(e)
             reject('Error getting team time off requests')
-          });
+          })
       })
     },
     getManagedTimeOffRequests() {
@@ -58,7 +58,7 @@ export const useTimeOffStore = defineStore('timeoff', {
           .catch(e => {
             console.log(e)
             reject('Error getting managed time off requests')
-          });
+          })
       })
     },
     getConflictingTimeOffRequests(data: { dates: TimeOffRequestDates}) {
@@ -71,7 +71,7 @@ export const useTimeOffStore = defineStore('timeoff', {
           .catch(e => {
             console.log(e)
             reject('Error getting conflicting responsibilities')
-          });
+          })
       })
     },
     getCurrentTimeOffRequest(pk: string) {
@@ -84,7 +84,7 @@ export const useTimeOffStore = defineStore('timeoff', {
           .catch(e => {
             console.log(e)
             reject('Error getting current time off request')
-          });
+          })
       })
     },
     createTimeOffRequest(timeOffRequest: TimeOffRequestCreate) {
@@ -99,7 +99,7 @@ export const useTimeOffStore = defineStore('timeoff', {
           .catch(e => {
             console.log(e)
             reject('Error creating time off request')
-          });
+          })
       })
     },
     updateTimeOffRequest(data: TimeOffRequestUpdate) {
@@ -114,7 +114,7 @@ export const useTimeOffStore = defineStore('timeoff', {
           .catch(e => {
             console.log(e)
             reject('Error updating time off request')
-          });
+          })
       })
     },
     acknowledgeTimeOffRequest(data: TimeOffRequestAcknowledge) {
@@ -127,7 +127,7 @@ export const useTimeOffStore = defineStore('timeoff', {
           .catch(e => {
             console.log(e)
             reject('Error acknowledging time off request')
-          });
+          })
       })
     },
     deleteTimeOffRequest(pk: string) {
@@ -140,7 +140,7 @@ export const useTimeOffStore = defineStore('timeoff', {
           .catch(e => {
             console.log(e)
             reject('Error deleting time off request')
-          });
+          })
       })
     },
     authLogout() {
@@ -150,4 +150,4 @@ export const useTimeOffStore = defineStore('timeoff', {
       })
     }
   }
-});
+})

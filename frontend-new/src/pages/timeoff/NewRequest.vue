@@ -78,7 +78,7 @@ function dateChanged(): void {
 }
 
 function randomChoice(array: Array<string>) {
-  return array[Math.floor(Math.random() * array.length)];
+  return array[Math.floor(Math.random() * array.length)]
 }
 
 function createTimeOffRequest(): void {

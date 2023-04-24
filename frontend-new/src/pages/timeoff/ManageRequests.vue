@@ -111,7 +111,7 @@
 
 <script setup lang="ts">
 
-import { QTableProps } from 'quasar';
+import { QTableProps } from 'quasar'
 import { useTimeOffStore } from 'src/stores/timeoff'
 
 const timeOffStore = useTimeOffStore()

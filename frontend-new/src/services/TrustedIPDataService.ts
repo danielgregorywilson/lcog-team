@@ -1,9 +1,9 @@
-import http from '../http-common';
+import http from '../http-common'
 
 class TrustedIPDataService {
   getTrustedIPs() {
-    return http.get('api/v1/trustedip');
+    return http.get('api/v1/trustedip')
   }
 }
 
-export default new TrustedIPDataService();
+export default new TrustedIPDataService()

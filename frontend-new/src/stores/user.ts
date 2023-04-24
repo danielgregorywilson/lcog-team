@@ -100,12 +100,12 @@ export const useUserStore = defineStore('user', {
             resolve(resp)
           })
           .catch(e => {
-            this.status = 'error';
+            this.status = 'error'
             // if resp is unauthorized, logout, to
             this.authLogout()
               .catch(err => console.log(err))
             reject(e)
-          });
+          })
       })
     },
     // For getting just the current user on specific pages
@@ -113,7 +113,7 @@ export const useUserStore = defineStore('user', {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/current-user/` })
           .then(resp => resolve(resp))
-          .catch(e => reject(e));
+          .catch(e => reject(e))
       })
     },
     // Simple list of all employees
@@ -151,4 +151,4 @@ export const useUserStore = defineStore('user', {
       })
     }
   }
-});
+})

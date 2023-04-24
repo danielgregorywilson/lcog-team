@@ -172,7 +172,7 @@ const navLinks: Array<LinkData> = [
     link: '/profile',
     id: 'nav-profile'
   },
-];
+]
 
 // For msal.js Azure/AD SSO 
 const msalConfig: Configuration = {
@@ -230,8 +230,8 @@ function loginWithMicrosoft(): void {
           .catch((err) => console.log(err))
       }      
     }).catch(function (error) {
-        console.log(error);
-    });
+        console.log(error)
+    })
 }
 
 function logout() {
@@ -245,7 +245,7 @@ function logout() {
 }
 
 onMounted(() => {
-  getCurrentUser();
+  getCurrentUser()
 })
 
 </script>

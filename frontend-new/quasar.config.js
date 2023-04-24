@@ -9,10 +9,10 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js
 
 
-const { configure } = require('quasar/wrappers');
-const { gitDescribeSync } = require('git-describe');
-const svgLoader = require('vite-svg-loader');
-const path = require('path');
+const { configure } = require('quasar/wrappers')
+const { gitDescribeSync } = require('git-describe')
+const svgLoader = require('vite-svg-loader')
+const path = require('path')
 
 module.exports = configure(function (ctx) {
   return {
@@ -228,4 +228,4 @@ module.exports = configure(function (ctx) {
       // extendBexManifestJson (json) {}
     }
   }
-});
+})

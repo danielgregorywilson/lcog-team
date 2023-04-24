@@ -133,7 +133,7 @@ const router = useRouter()
 const timeOffStore = useTimeOffStore()
 
 interface QuasarTimeOffRequestTableRowClickActionProps {
-  row: TimeOffRequestRetrieve;
+  row: TimeOffRequestRetrieve
 }
 
 const columns: QTableProps['columns'] = [
@@ -177,7 +177,7 @@ function showDeleteDialog(props: QuasarTimeOffRequestTableRowClickActionProps): 
   rowPkToDelete.value = props.row.pk.toString()
   deleteDialogDatesText.value = `${props.row.start_date.toString()} - ${props.row.end_date.toString()}`
   deleteDialogNoteText.value = props.row.note
-  deleteDialogVisible.value = true;
+  deleteDialogVisible.value = true
 }
 
 function deleteRow(): void {

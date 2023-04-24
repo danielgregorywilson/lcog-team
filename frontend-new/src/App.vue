@@ -13,5 +13,5 @@ if (token) {
 
 export default defineComponent({
   name: 'App'
-});
+})
 </script>

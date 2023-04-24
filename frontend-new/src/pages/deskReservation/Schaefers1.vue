@@ -293,7 +293,7 @@ function deleteReservation(pk: number) {
       //   JSON.stringify({
       //     'message': `Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`
       //   })
-      // );
+      // )
     })
     .catch(e => {
       console.error('Error cancelling desk reservation:' ,e)
@@ -356,7 +356,7 @@ function reserveDesk() {
       //   JSON.stringify({
       //     'message': `Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`
       //   })
-      // );
+      // )
     })
     .catch(e => {
       console.error('Error creating desk reservation:' ,e)
@@ -595,8 +595,8 @@ onMounted(() => {
 
   // We do not expect the socket to ever close
   // this.deskReservationSocket.onclose = () => {
-  //   console.error('Desk Reservation socket closed unexpectedly');
-  // };
+  //   console.error('Desk Reservation socket closed unexpectedly')
+  // }
 
   // Boot session to dashboard if not authenticated or IP not in trusted IP lists
   if (!authStore.isAuthenticated) {

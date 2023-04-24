@@ -211,4 +211,4 @@ export const useResponsibilityStore = defineStore('responsibility', {
       })
     }
   }
-});
+})

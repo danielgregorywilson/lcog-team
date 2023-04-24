@@ -148,14 +148,14 @@ const props = defineProps<{
 }>()
 
 interface WorkflowColumn {
-  name: string;
-  required?: boolean;
-  label: string;
-  align?: string;
-  field?: string;
-  sortable?: boolean;
-  style?: string;
-  headerStyle?: string;
+  name: string
+  required?: boolean
+  label: string
+  align?: string
+  field?: string
+  sortable?: boolean
+  style?: string
+  headerStyle?: string
 }
 
 const columns: QTableProps['columns'] = [
@@ -261,7 +261,7 @@ function showDeleteDialog(row: WorkflowInstance): void {
   rowPkToDelete.value = row.pk.toString()
   deleteDialogPositionName.value = row.title
   deleteDialogPercentComplete.value = row.percent_complete
-  deleteDialogVisible.value = true;
+  deleteDialogVisible.value = true
 }
 
 function deleteRow(): void {
@@ -297,8 +297,8 @@ function clickAddWorkflow(type: 'newEmployeeOnboarding' | 'newEmployeeOffboardin
   switch (type) {
     case 'newEmployeeOnboarding':
       workflowsStore.createNewEmployeeOnboarding()
-        .then((response) => {
-          router.push({name: 'workflow-transition-form', params: {pk: response.pk.toString()}})
+        .then((wfi) => {
+          router.push({name: 'workflow-transition-form', params: {pk: wfi.pk.toString()}})
             .catch(e => {
               console.error('Error navigating to new employee page', e)
             })

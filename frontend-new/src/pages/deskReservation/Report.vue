@@ -142,7 +142,7 @@ function download_desk_usage_report(data: GetDeskReservationDataInterface) {
     var row = [key, data[key]['total_hours'], data[key]['days_utilized'], data[key]['most_frequent_employee']].join(',')
     csv += row
     csv += '\n'
-  });
+  })
 
   var hiddenElement = document.createElement('a')
   hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv)
@@ -164,7 +164,7 @@ function download_employee_desk_usage_report(data: GetEmployeeDeskReservationDat
     var row = [key, data[key]['total_hours'], data[key]['days_utilized'], data[key]['most_frequent_desk']].join(',')
     csv += row
     csv += '\n'
-  });
+  })
 
   var hiddenElement = document.createElement('a')
   hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv)

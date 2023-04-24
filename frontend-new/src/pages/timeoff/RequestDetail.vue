@@ -89,8 +89,8 @@ function retrieveRequest(): void {
       privateNote.value = tor.private_note
     })
     .catch(e => {
-      console.error('Error getting time off request:', e);
-    });
+      console.error('Error getting time off request:', e)
+    })
 }
 
 function updateTimeOffRequest(): void {
@@ -116,7 +116,7 @@ function updateTimeOffRequest(): void {
 }
 
 onMounted(() => {
-  retrieveRequest();
+  retrieveRequest()
 })
 
 </script>

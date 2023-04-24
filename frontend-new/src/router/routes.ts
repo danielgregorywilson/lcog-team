@@ -246,6 +246,15 @@ const routes: RouteRecordRaw[] = [
     }
   },
 
+  /////////////////////
+  // SCHAEFERS KIOSK //
+  /////////////////////
+  {
+    path: '/kiosk',
+    name: 'schaefers-kiosk',
+    component: () => import('src/pages/SchaefersKiosk.vue'),
+  },
+
   /////////////////////////
   // MEALS ON WHEELS MAP //
   /////////////////////////

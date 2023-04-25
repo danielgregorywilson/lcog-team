@@ -3,10 +3,13 @@ import { defineStore } from 'pinia'
 import { useCookies } from 'vue3-cookies'
 
 import { apiURL } from 'src/stores/index'
+import { useSecurityMessageStore } from 'src/stores/securitymessage'
 import {
   AxiosEmployeeRetrieveOneServerResponse, EmployeeRetrieve,
   SimpleEmployeeRetrieve
 } from 'src/types'
+
+const securityMessageStore = useSecurityMessageStore()
 
 export const useUserStore = defineStore('user', {
   state: () => ({
@@ -95,8 +98,8 @@ export const useUserStore = defineStore('user', {
             // TODO: Convert this
             // dispatch('performanceReviewModule/getNextPerformanceReview', {pk: resp.data.pk}, { root: true })
             //   .catch(err => console.log(err))
-            // dispatch('securityMessageModule/getViewedLatestSecurityMessage', {}, { root: true })
-            //   .catch(err => console.log(err))
+            securityMessageStore.getViewedLatestSecurityMessage()
+              .catch(err => console.log(err))
             resolve(resp)
           })
           .catch(e => {

@@ -4,14 +4,20 @@ import axios from 'axios'
 import { apiURL } from 'src/stores/index'
 import { useMealsStore } from 'src/stores/meals'
 import { usePeopleStore } from 'src/stores/people'
+import { useResponsibilityStore } from 'src/stores/responsibility'
+import { useSecurityMessageStore } from 'src/stores/securitymessage'
 import { useTimeOffStore } from 'src/stores/timeoff'
 import { useUserStore } from 'src/stores/user'
+import { useWorkflowsStore } from 'src/stores/workflows'
 import { AxiosAuthResponse } from 'src/types'
 
 const mealsStore = useMealsStore()
 const peopleStore = usePeopleStore()
+const responsibilityStore = useResponsibilityStore()
+const securityMessageStore = useSecurityMessageStore()
 const timeOffStore = useTimeOffStore()
 const userStore = useUserStore()
+const workflowsStore = useWorkflowsStore()
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -70,18 +76,18 @@ export const useAuthStore = defineStore('auth', {
         // TODO: Uncomment these when the modules are ready
         // dispatch('performanceReviewModule/authLogout', null, { root: true })
         //   .catch(err => console.log(err))
-        // dispatch('responsibilityModule/authLogout', null, { root: true })
-        //   .catch(err => console.log(err))
-        // dispatch('securityMessageModule/authLogout', null, { root: true })
-        //   .catch(err => console.log(err))
+        responsibilityStore.authLogout()
+          .catch(err => console.log(err))
+        securityMessageStore.authLogout()
+          .catch(err => console.log(err))
         // dispatch('teleworkModule/authLogout', null, { root: true })
         //   .catch(err => console.log(err))
         timeOffStore.authLogout()
           .catch(err => console.log(err))
         userStore.authLogout()
           .catch(err => console.log(err))
-        // dispatch('workflowModule/authLogout', null, { root: true })
-        //   .catch(err => console.log(err))
+        workflowsStore.authLogout()
+          .catch(err => console.log(err))
         
         resolve('Successfully logged user out')
       })

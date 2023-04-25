@@ -45,12 +45,27 @@ const routes: RouteRecordRaw[] = [
         name: 'release-notes',
         component: () => import('src/pages/ReleaseNotes.vue')
       },
+
+      //////////////////////
+      // SECURITY MESSAGE //
+      //////////////////////
+      {
+        path: '/security-message',
+        name: 'security-message',
+        component: () => import('pages/SecurityMessage.vue'),
+        // beforeEnter: ifAuthenticated
+      },
+
+      /////////////
+      // PROFILE //
+      /////////////
       {
         path: '/profile',
         name: 'profile',
         component: () => import('src/pages/Profile.vue'),
         // beforeEnter: ifAuthenticated
       },
+
       //////////////////////
       // RESPONSIBILITIES //
       //////////////////////

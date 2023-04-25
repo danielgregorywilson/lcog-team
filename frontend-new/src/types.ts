@@ -318,8 +318,13 @@ export interface AxiosReviewNoteUpdateServerResponse {
 // ViewedSecurityMessage Structure from Django Rest Framework //
 ////////////////////////////////////////////////////////////////
 
+export interface SecurityMessage {
+  content: string
+}
+
 export interface ViewedSecurityMessageCreate {
   employee_pk: number
+  security_message_pk: number
 }
 
 export interface ViewedSecurityMessageRetrieve {

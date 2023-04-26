@@ -59,26 +59,26 @@
             <q-item v-for="col in props.cols" :key="col.name">
               <div class="q-table__grid-item-row">
                 <div class="q-table__grid-item-title">{{ col.label }}</div>
-                <div class="q-table__grid-item-value" v-if="['name', 'description'].includes(col.name)">
+                <div v-if="['name', 'description'].includes(col.name)" class="q-table__grid-item-value">
                   {{ col.value }}
                 </div>
-                <div class="q-table__grid-item-value" v-else-if="col.name == 'link'">
+                <div v-else-if="col.name == 'link'" class="q-table__grid-item-value responsibility-link">
                   <a :href="col.value">{{ col.value }}</a>
                 </div>
-                <div class="q-table__grid-item-value" v-else-if="col.name == 'tags'">
+                <div v-else-if="col.name == 'tags'" class="q-table__grid-item-value">
                   <q-chip v-for="tag of col.value" :key="tag.name" clickable @click="navigateToTag(tag.pk)" color="secondary" text-color="white">{{ tag.name }}</q-chip>
                 </div>
-                <div class="q-table__grid-item-value" v-else-if="col.name == 'primary_employee_name'">
+                <div v-else-if="col.name == 'primary_employee_name'" class="q-table__grid-item-value">
                   <router-link v-if="props.row.primary_employee_pk" :to="{ name: 'employee-responsibilities', params: { pk: props.row.primary_employee_pk} }">
                     {{ props.row.primary_employee_name }}
                   </router-link>
                 </div>
-                <div class="q-table__grid-item-value" v-else-if="col.name == 'secondary_employee_name'">
+                <div v-else-if="col.name == 'secondary_employee_name'" class="q-table__grid-item-value">
                   <router-link v-if="props.row.secondary_employee_pk" :to="{ name: 'employee-secondary-responsibilities', params: { pk: props.row.secondary_employee_pk} }">
                     {{ props.row.secondary_employee_name }}
                   </router-link>
                 </div>
-                <div class="q-table__grid-item-value row q-gutter-sm" v-else>
+                <div v-else class="q-table__grid-item-value row q-gutter-sm">
                   <q-btn class="col edit-button" dense round flat color="grey" @click="showEditDialog(props.row)" icon="edit"></q-btn>
                   <q-btn class="col delete-button" dense round flat color="grey" @click="showDeleteDialog(props.row)" icon="delete"></q-btn>
                 </div>
@@ -90,6 +90,12 @@
     </template>
   </q-table>
 </template>
+
+<style scoped lang="scss">
+  .responsibility-link {
+    word-break: break-all;
+  }
+</style>
 
 <script setup lang="ts">
 import { ref } from 'vue'

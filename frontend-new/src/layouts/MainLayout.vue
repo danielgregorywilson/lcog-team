@@ -53,7 +53,7 @@
           <q-item-section avatar>
             <q-img
               id="ms-logo"
-              src="../assets/microsoft-logo.svg"
+              src="../assets/microsoft-logo.png"
               style="width: 24px;"
             />
           </q-item-section>

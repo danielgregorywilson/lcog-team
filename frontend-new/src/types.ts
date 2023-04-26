@@ -1,15 +1,8 @@
-import { AxiosResponse } from 'axios'
 import { Url } from 'url'
 
 /////////////////////////////////////////////////////
 // Auth Users Structure from Django Rest Framework //
 /////////////////////////////////////////////////////
-
-export interface AxiosAuthResponse extends AxiosResponse {
-  data: {
-    token: string
-  }
-}
 
 export interface UserRetrieve {
   url: Url
@@ -22,10 +15,6 @@ export interface UserRetrieve {
   is_manager: boolean
   is_upper_manager: boolean
   can_view_desk_reservation_reports: boolean
-}
-
-export interface AxiosUserRetrieveOneServerResponse {
-  data: UserRetrieve
 }
 
 ///////////////////////////////////////////////////
@@ -80,17 +69,6 @@ export interface EmployeeUpdatePartial {
   email_opt_out_timeoff_daily: boolean
 }
 
-export interface AxiosEmployeeRetrieveOneServerResponse {
-  data: EmployeeRetrieve
-}
-
-export interface AxiosEmployeeRetrieveManyServerResponse {
-  data: {
-    results: Array<EmployeeRetrieve>
-  }
-}
-
-
 /////////////////////////////////////////////////
 // People Structure from Django Rest Framework //
 /////////////////////////////////////////////////
@@ -99,7 +77,6 @@ export interface Unit {
   pk: number
   name: string
 }
-
 
 ////////////////////////////////////////////////////////////
 // PerformanceReview Structure from Django Rest Framework //
@@ -147,16 +124,6 @@ export interface PerformanceReviewRetrieve {
   description_reviewed_employee: boolean
   signed_position_description: string
   all_required_signatures: Array<[string, string, string]>
-}
-
-export interface AxiosPerformanceReviewRetrieveOneServerResponse {
-  data: PerformanceReviewRetrieve
-}
-
-export interface AxiosPerformanceReviewRetrieveManyServerResponse {
-  data: {
-    results: Array<PerformanceReviewRetrieve>
-  }
 }
 
 export interface PerformanceReviewCreate {
@@ -217,16 +184,6 @@ export interface PerformanceReviewUpdatePartial {
   description_reviewed_employee?: boolean
 }
 
-export interface AxiosPerformanceReviewUpdateServerResponse {
-  data: PerformanceReviewRetrieve
-}
-
-export interface AxiosPerformanceReviewSignServerResponse {
-  data: {
-    signatures: Array<[string, string, string]>
-  }
-}
-
 export interface SignedPositionDescriptionUpload {
   pk: string
   file: File
@@ -237,7 +194,6 @@ export interface FileUploadDescriptionUploadServerResponse {
   status: number
   statusText: string
 }
-
 
 /////////////////////////////////////////////////////
 // Signature Structure from Django Rest Framework //
@@ -255,25 +211,6 @@ export interface SignatureRetrieve {
   employee: Url
   date: Date
 }
-
-// export interface AxiosReviewNoteRetrieveOneServerResponse {
-//   data: ReviewNoteRetrieve
-// }
-
-// export interface AxiosManagerReviewNotesForEmployeeServerResponse {
-//   data: Array<ReviewNoteRetrieve>
-// }
-
-// export interface AxiosReviewNoteRetrieveManyServerResponse {
-//   data: {
-//     results: Array<ReviewNoteRetrieve>
-//   }
-// }
-
-// export interface AxiosReviewNoteUpdateServerResponse {
-//   data: ReviewNoteRetrieve
-// }
-
 
 /////////////////////////////////////////////////////
 // ReviewNote Structure from Django Rest Framework //
@@ -298,25 +235,6 @@ export interface ReviewNoteUpdate {
   note?: string
 }
 
-export interface AxiosReviewNoteRetrieveOneServerResponse {
-  data: ReviewNoteRetrieve
-}
-
-export interface AxiosManagerReviewNotesForEmployeeServerResponse {
-  data: Array<ReviewNoteRetrieve>
-}
-
-export interface AxiosReviewNoteRetrieveManyServerResponse {
-  data: {
-    results: Array<ReviewNoteRetrieve>
-  }
-}
-
-export interface AxiosReviewNoteUpdateServerResponse {
-  data: ReviewNoteRetrieve
-}
-
-
 ////////////////////////////////////////////////////////////////
 // ViewedSecurityMessage Structure from Django Rest Framework //
 ////////////////////////////////////////////////////////////////
@@ -337,7 +255,6 @@ export interface ViewedSecurityMessageRetrieve {
   security_message_pk: number
   datetime: string
 }
-
 
 //////////////////////////////////////////////////////////////
 // TeleworkApplication Structure from Django Rest Framework //
@@ -401,49 +318,6 @@ export interface TeleworkApplicationRetrieve {
   manager_signature: [number, string, string, string, number, boolean]
   program_manager_signature_1: [number, string, string, string, number, boolean]
   division_director_signature: [number, string, string, string, number, boolean]
-
-  
-  // employee_division: string
-  // employee_unit_or_program: string
-  // employee_job_title: string
-  // manager_pk: number
-  
-  // days_until_review: number
-  // status: string
-  // period_start_date: Date
-  // period_end_date: Date
-  // effective_date: Date
-  // evaluation_type: string
-  // probationary_evaluation_type: string
-  // step_increase: string
-  // top_step_bonus: string
-  // action_other: string
-
-  // factor_job_knowledge: string
-  // factor_work_quality: string
-  // factor_work_quantity: string
-  // factor_work_habits: string
-  // factor_analysis: string
-  // factor_initiative: string
-  // factor_interpersonal: string
-  // factor_communication: string
-  // factor_dependability: string
-  // factor_professionalism: string
-  // factor_management: string
-  // factor_supervision: string
-  // evaluation_successes: string
-  // evaluation_opportunities: string
-  // evaluation_goals_manager: string
-  // evaluation_comments_employee: string
-  
-  // position_description_link: string
-  // description_reviewed_employee: boolean
-  // signed_position_description: string
-  // all_required_signatures: Array<[string, string, string]>
-}
-
-export interface AxiosTeleworkApplicationRetrieveOneServerResponse {
-  data: TeleworkApplicationRetrieve
 }
 
 export interface TeleworkApplicationCreate {
@@ -522,28 +396,6 @@ export interface TeleworkApplicationUpdatePartial {
   description_reviewed_employee?: boolean
 }
 
-export interface AxiosTeleworkApplicationUpdateServerResponse {
-  data: TeleworkApplicationRetrieve
-}
-
-// export interface AxiosPerformanceReviewSignServerResponse {
-//   data: {
-//     signatures: Array<[string, string, string]>
-//   }
-// }
-
-// export interface SignedPositionDescriptionUpload {
-//   pk: string
-//   file: File
-// }
-
-// export interface SignedPositionDescriptionUploadServerResponse {
-//   data: string
-//   status: number
-//   statusText: string
-// }
-
-
 ////////////////////////////////////////////////////////////
 // TeleworkSignature Structure from Django Rest Framework //
 ////////////////////////////////////////////////////////////
@@ -562,7 +414,6 @@ export interface TeleworkSignatureRetrieve {
   index: number
   date: Date
 }
-
 
 /////////////////////////////////////////////////////////
 // Responsibility Structure from Django Rest Framework //
@@ -603,10 +454,6 @@ export interface ResponsibilityNameUpdate extends ResponsibilityUpdate {
   name: string
 }
 
-export interface AxiosResponsibilityUpdateServerResponse {
-  data: Responsibility
-}
-
 export interface EmployeeResponsibilitiesInterface {
   pk: string
   responsibilities: Array<Responsibility>
@@ -631,7 +478,6 @@ export interface ResponsibilityTagUpdate {
   pk?: number
   name?: string
 }
-
 
 //////////////////////////////////////////////////////////
 // DeskReservation Structure from Django Rest Framework //
@@ -669,17 +515,9 @@ export interface DeskReservationCreate {
   desk_number: string
 }
 
-export interface AxiosDeskReservationCreateServerResponse {
-  data: DeskReservation
-}
-
 export interface GetReservationReportData {
   startDateTime: string
   endDateTime: string
-}
-
-export interface AxiosGetDeskReservationReportDataServerResponse {
-  data: GetDeskReservationDataInterface
 }
 
 export interface GetDeskReservationDataInterface {
@@ -690,10 +528,6 @@ export interface GetDeskReservationDataInterface {
   }
 }
 
-export interface AxiosGetEmployeeDeskReservationReportDataServerResponse {
-  data: GetEmployeeDeskReservationDataInterface
-}
-
 export interface GetEmployeeDeskReservationDataInterface {
   [key: string]: {
     'total_hours': string,
@@ -701,7 +535,6 @@ export interface GetEmployeeDeskReservationDataInterface {
     'most_frequent_desk': string
   }
 }
-
 
 /////////////////////////////////////////////////////////
 // TimeOffRequest Structure from Django Rest Framework //
@@ -744,11 +577,6 @@ export interface TimeOffRequestUpdate {
 export interface TimeOffRequestUpdatePartial {
   acknowledged: boolean
 }
-
-export interface AxiosTimeOffRequestRetrieveOneServerResponse {
-  data: TimeOffRequestRetrieve
-}
-
 
 ///////////////////////////////////////////////////
 // Workflow Structure from Django Rest Framework //
@@ -917,18 +745,14 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   special_instructions?: string
 }
 
-export interface AxiosEmployeeTransitionUpdateServerResponse {
-  data: EmployeeTransition
-}
-
-export interface AxiosWorkflowCreateServerResponse {
-  data: WorkflowInstance
-}
-
-
 ////////////////////////////////////////////////
 // Meals Structure from Django Rest Framework //
 ////////////////////////////////////////////////
+
+export interface LatLong {
+  lat: number
+  long: number
+}
 
 export interface MealStateInterface {
   stops: Array<Stop>
@@ -951,11 +775,4 @@ export interface Stop {
   created_at?: Date
   updated_at?: Date
   new?: boolean
-}
-
-export interface AxiosCheckAddressServerResponse {
-  data: {
-    lat: number
-    long: number
-  }
 }

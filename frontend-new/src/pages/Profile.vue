@@ -78,7 +78,7 @@ import { onMounted, ref } from 'vue'
 
 import { useUserStore } from 'src/stores/user'
 import { usePeopleStore } from 'src/stores/people'
-import { AxiosEmployeeRetrieveOneServerResponse } from 'src/types'
+import { EmployeeRetrieve } from 'src/types'
 
 const peopleStore = usePeopleStore()
 const userStore = useUserStore()
@@ -99,22 +99,22 @@ let emailOptOutTimeOffDaily = ref(false)
 
 let submitted = ref(false)
 
-function retrieveProfile(): Promise<AxiosEmployeeRetrieveOneServerResponse> {
+function retrieveProfile(): Promise<EmployeeRetrieve> {
   return new Promise((resolve, reject) => {
     // We cannot guarantee the user has arrived in vuex state immediately, so request it again here
     userStore.simpleUserRequest()
-      .then((simpleUserresponse: AxiosEmployeeRetrieveOneServerResponse) => {
-        employeePk.value = simpleUserresponse.data.pk.toString()
+      .then((employee) => {
+        employeePk.value = employee.pk.toString()
         // Now that we have the user's pk, get or create a Telework Application for that user
-        displayName.value = simpleUserresponse.data.name
+        displayName.value = employee.name
         displayNameCurrentVal.value = displayName.value
-        emailOptOutAll.value = simpleUserresponse.data.email_opt_out_all
+        emailOptOutAll.value = employee.email_opt_out_all
         emailOptOutAllCurrentVal.value = emailOptOutAll.value
-        emailOptOutTimeOffAll.value = simpleUserresponse.data.email_opt_out_timeoff_all
+        emailOptOutTimeOffAll.value = employee.email_opt_out_timeoff_all
         emailOptOutTimeOffAllCurrentVal.value = emailOptOutTimeOffAll.value
-        emailOptOutTimeOffWeekly.value = simpleUserresponse.data.email_opt_out_timeoff_weekly
+        emailOptOutTimeOffWeekly.value = employee.email_opt_out_timeoff_weekly
         emailOptOutTimeOffWeeklyCurrentVal.value = emailOptOutTimeOffWeekly.value
-        emailOptOutTimeOffDaily.value = simpleUserresponse.data.email_opt_out_timeoff_daily
+        emailOptOutTimeOffDaily.value = employee.email_opt_out_timeoff_daily
         emailOptOutTimeOffDailyCurrentVal.value = emailOptOutTimeOffDaily.value
       })
       .catch(e => {

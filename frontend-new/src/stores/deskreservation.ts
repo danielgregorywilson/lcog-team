@@ -3,8 +3,7 @@ import { defineStore } from 'pinia'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
 import {
-  AxiosDeskReservationCreateServerResponse, Desk, DeskReservation,
-  DeskReservationCreate, GetDeskReservationDataInterface,
+  Desk, DeskReservation, DeskReservationCreate, GetDeskReservationDataInterface,
   GetEmployeeDeskReservationDataInterface, GetReservationReportData
 } from 'src/types'
 
@@ -17,11 +16,11 @@ export const useDeskReservationStore = defineStore('deskreservation', {
   getters: {},
 
   actions: {
-    createReservation(data: DeskReservationCreate): Promise<AxiosDeskReservationCreateServerResponse> {
+    createReservation(data: DeskReservationCreate): Promise<DeskReservation> {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/deskreservation`, method: 'POST', data })
           .then((resp) => {
-            resolve(resp)
+            resolve(resp.data)
           })
           .catch(e => {
             handlePromiseError(reject, 'Error creating desk reservation', e)

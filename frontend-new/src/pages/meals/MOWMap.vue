@@ -522,9 +522,8 @@ function canManageMOWStops() {
 function checkAddress() {
   mealsStore.getAddressLatLong(newStopAddress.value, newStopCity.value, newStopState.value, newStopZip.value)
     .then((response) => {
-      const axiosResponse = response as AxiosCheckAddressServerResponse // TODO: This is a hack. Fix it.
-      newStopLatitude.value = axiosResponse.data.lat
-      newStopLongitude.value = axiosResponse.data.long
+      newStopLatitude.value = response.lat
+      newStopLongitude.value = response.long
       chooseStopRoute()
     })
 }

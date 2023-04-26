@@ -2,7 +2,7 @@ import axios from 'axios'
 import { defineStore } from 'pinia'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
-import { MealStateInterface, Stop } from 'src/types'
+import { LatLong, MealStateInterface, Stop } from 'src/types'
 
 export const useMealsStore = defineStore('meals', {
   state: (): MealStateInterface => ({
@@ -57,11 +57,11 @@ export const useMealsStore = defineStore('meals', {
           })
       })
     },
-    getAddressLatLong: (address: string, city: string, state: string, zip: string) => {
+    getAddressLatLong: (address: string, city: string, state: string, zip: string): Promise<LatLong> => {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/address-lat-long/?address=${ address }&city=${ city }&state=${ state }&zip=${ zip }`, method: 'GET' })
         .then(resp => {
-          resolve(resp)
+          resolve(resp.data)
         })
         .catch(e => {
           handlePromiseError(reject, 'Error getting lat/long', e)

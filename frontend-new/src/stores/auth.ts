@@ -9,7 +9,6 @@ import { useSecurityMessageStore } from 'src/stores/securitymessage'
 import { useTimeOffStore } from 'src/stores/timeoff'
 import { useUserStore } from 'src/stores/user'
 import { useWorkflowsStore } from 'src/stores/workflows'
-import { AxiosAuthResponse } from 'src/types'
 
 const mealsStore = useMealsStore()
 const peopleStore = usePeopleStore()
@@ -42,11 +41,11 @@ export const useAuthStore = defineStore('auth', {
       user: { username: string, password: string } | 
         { username: string, firstName: string, lastName: string },
       url: string
-    ) {
+    ): Promise<string> {
       return new Promise((resolve, reject) => {
         this.status = 'loading'
         axios({url: url, data: user, method: 'POST'})
-          .then((resp: AxiosAuthResponse) => {
+          .then((resp) => {
             const token = resp.data.token
             localStorage.setItem('user-token', token)
             axios.defaults.headers.common['Authorization'] = `Token ${token}`
@@ -55,7 +54,7 @@ export const useAuthStore = defineStore('auth', {
             // you have your token, now log in your user :)
             userStore.userRequest()
               .catch(err => console.log(err))
-            resolve(resp)
+            resolve(token)
           })
         .catch(err => {
           this.status = 'error'

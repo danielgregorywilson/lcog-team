@@ -4,10 +4,7 @@ import { useCookies } from 'vue3-cookies'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
 import { useSecurityMessageStore } from 'src/stores/securitymessage'
-import {
-  AxiosEmployeeRetrieveOneServerResponse, EmployeeRetrieve,
-  SimpleEmployeeRetrieve
-} from 'src/types'
+import { EmployeeRetrieve, SimpleEmployeeRetrieve } from 'src/types'
 
 const securityMessageStore = useSecurityMessageStore()
 
@@ -112,10 +109,10 @@ export const useUserStore = defineStore('user', {
       })
     },
     // For getting just the current user on specific pages
-    simpleUserRequest: (): Promise<AxiosEmployeeRetrieveOneServerResponse> => {
+    simpleUserRequest: (): Promise<EmployeeRetrieve> => {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/current-user/` })
-          .then(resp => resolve(resp))
+          .then(resp => resolve(resp.data))
           .catch(e => handlePromiseError(
             reject, 'Error getting current user', e
           ))

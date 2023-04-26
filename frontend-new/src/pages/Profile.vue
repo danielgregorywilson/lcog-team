@@ -56,7 +56,7 @@
         />
       </div>
       <div class="row items-center q-gutter-sm q-mt-sm">
-        <q-btn :disabled="submitted" @click="submitProfileForm()">Submit</q-btn>
+        <q-btn :disabled="!valuesAreChanged()" @click="submitProfileForm()">Submit</q-btn>
         <span class="success q-ml-sm q-mt-sm" :hidden="!submitted"><strong>Profile Updated.</strong></span>
       </div>
     </form>
@@ -84,11 +84,17 @@ const peopleStore = usePeopleStore()
 const userStore = useUserStore()
 
 let employeePk = ref('')
+
+let displayNameCurrentVal = ref('')
 let displayName = ref('')
 
+let emailOptOutAllCurrentVal = ref(false)
 let emailOptOutAll = ref(false)
+let emailOptOutTimeOffAllCurrentVal = ref(false)
 let emailOptOutTimeOffAll = ref(false)
+let emailOptOutTimeOffWeeklyCurrentVal = ref(false)
 let emailOptOutTimeOffWeekly = ref(false)
+let emailOptOutTimeOffDailyCurrentVal = ref(false)
 let emailOptOutTimeOffDaily = ref(false)
 
 let submitted = ref(false)
@@ -98,19 +104,38 @@ function retrieveProfile(): Promise<AxiosEmployeeRetrieveOneServerResponse> {
     // We cannot guarantee the user has arrived in vuex state immediately, so request it again here
     userStore.simpleUserRequest()
       .then((simpleUserresponse: AxiosEmployeeRetrieveOneServerResponse) => {
+        employeePk.value = simpleUserresponse.data.pk.toString()
         // Now that we have the user's pk, get or create a Telework Application for that user
         displayName.value = simpleUserresponse.data.name
-        employeePk.value = simpleUserresponse.data.pk.toString()
+        displayNameCurrentVal.value = displayName.value
         emailOptOutAll.value = simpleUserresponse.data.email_opt_out_all
+        emailOptOutAllCurrentVal.value = emailOptOutAll.value
         emailOptOutTimeOffAll.value = simpleUserresponse.data.email_opt_out_timeoff_all
+        emailOptOutTimeOffAllCurrentVal.value = emailOptOutTimeOffAll.value
         emailOptOutTimeOffWeekly.value = simpleUserresponse.data.email_opt_out_timeoff_weekly
+        emailOptOutTimeOffWeeklyCurrentVal.value = emailOptOutTimeOffWeekly.value
         emailOptOutTimeOffDaily.value = simpleUserresponse.data.email_opt_out_timeoff_daily
+        emailOptOutTimeOffDailyCurrentVal.value = emailOptOutTimeOffDaily.value
       })
       .catch(e => {
         console.error('Error getting user from API:', e)
         reject(e)
       })
   })
+}
+
+function valuesAreChanged(): boolean { 
+  if (
+    displayName.value == displayNameCurrentVal.value &&
+    emailOptOutAll.value == emailOptOutAllCurrentVal.value &&
+    emailOptOutTimeOffAll.value == emailOptOutTimeOffAllCurrentVal.value &&
+    emailOptOutTimeOffWeekly.value == emailOptOutTimeOffWeeklyCurrentVal.value &&
+    emailOptOutTimeOffDaily.value == emailOptOutTimeOffDailyCurrentVal.value
+  ) {
+    return false
+  } else {
+    return true
+  }
 }
 
 function submitProfileForm(): void {
@@ -121,11 +146,16 @@ function submitProfileForm(): void {
     email_opt_out_timeoff_weekly: emailOptOutTimeOffWeekly.value,
     email_opt_out_timeoff_daily: emailOptOutTimeOffDaily.value
   })
-    .then(() => {
+    .then((p) => {
+      displayNameCurrentVal.value = p.name
+      emailOptOutAllCurrentVal.value = p.email_opt_out_all
+      emailOptOutTimeOffAllCurrentVal.value = p.email_opt_out_timeoff_all
+      emailOptOutTimeOffWeeklyCurrentVal.value = p.email_opt_out_timeoff_weekly
+      emailOptOutTimeOffDailyCurrentVal.value = p.email_opt_out_timeoff_daily
       userStore.userRequest()
-      .catch(e => {
-        console.error('Error getting user from store', e)
-      })
+        .catch(e => {
+          console.error('Error getting user from store', e)
+        })
       submitted.value = true
       setTimeout(() => submitted.value = false, 3000)
     })

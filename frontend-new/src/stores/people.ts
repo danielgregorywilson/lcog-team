@@ -2,7 +2,7 @@ import axios from 'axios'
 import { defineStore } from 'pinia'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
-import { EmployeeUpdatePartial, SimpleEmployeeRetrieve, Unit } from 'src/types'
+import { EmployeeRetrieve, EmployeeUpdatePartial, SimpleEmployeeRetrieve, Unit } from 'src/types'
 
 export const usePeopleStore = defineStore('people', {
   state: () => ({
@@ -38,15 +38,15 @@ export const usePeopleStore = defineStore('people', {
           })
       })
     },
-    updatePartialEmployee(pk: string, data: EmployeeUpdatePartial) {
+    updatePartialEmployee(pk: string, data: EmployeeUpdatePartial): Promise<EmployeeRetrieve> {
       return new Promise((resolve, reject) => {
         axios({
           url: `${ apiURL }api/v1/employee/${ pk }`,
           method: 'PATCH',
           data: data
         })
-        .then(() => {
-          resolve('Successfully updated employee')
+        .then(resp => {
+          resolve(resp.data)
         })
         .catch(e => {
           handlePromiseError(reject, 'Error updating employee', e)

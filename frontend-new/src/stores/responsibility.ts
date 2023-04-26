@@ -41,8 +41,7 @@ export const useResponsibilityStore = defineStore('responsibility', {
             resolve(resp)
           })
           .catch(e => {
-            console.error('Error getting all responsibilities:', e)
-            reject(e)
+            handlePromiseError(reject, 'Error getting all responsibilities', e)
           })
       })
     },
@@ -54,8 +53,9 @@ export const useResponsibilityStore = defineStore('responsibility', {
             resolve(resp)
           })
           .catch(e => {
-            console.error('Error getting orphaned responsibilities:', e)
-            reject(e)
+            handlePromiseError(
+              reject, 'Error getting orphaned responsibilities', e
+            )
           })
       })
     },
@@ -76,8 +76,9 @@ export const useResponsibilityStore = defineStore('responsibility', {
             resolve(resp)
           })
           .catch(e => {
-            console.error('Error getting employee primary responsibilities:', e)
-            reject(e)
+            handlePromiseError(
+              reject, 'Error getting employee primary responsibilities', e
+            )
           })
       })
     },
@@ -98,8 +99,9 @@ export const useResponsibilityStore = defineStore('responsibility', {
             resolve(resp)
           })
           .catch(e => {
-            console.error('Error getting employee secondary responsibilities:', e)
-            reject(e)
+            handlePromiseError(
+              reject, 'Error getting employee secondary responsibilities', e
+            )
           })
       })
     },
@@ -176,8 +178,7 @@ export const useResponsibilityStore = defineStore('responsibility', {
             resolve('Successfully got simple tag list')
           })
           .catch(e => {
-            console.error('Error getting simple tag list:', e)
-            reject(`Error getting simple tag list: ${ e }`)
+            handlePromiseError(reject, 'Error getting simple tag list', e)
           })
       })
     },

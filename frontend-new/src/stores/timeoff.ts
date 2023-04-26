@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
 
-import { apiURL } from 'src/stores/index'
+import { apiURL, handlePromiseError } from 'src/stores/index'
 import { useUserStore } from 'src/stores/user'
 import { 
   TimeOffRequestAcknowledge, TimeOffRequestCreate, TimeOffRequestDates,
@@ -30,8 +30,7 @@ export const useTimeOffStore = defineStore('timeoff', {
             resolve('Successfully got my time off requests')
           })
           .catch(e => {
-            console.log(e)
-            reject('Error getting my time off requests')
+            handlePromiseError(reject, 'Error getting my time off requests', e)
           })
       })
     },
@@ -43,8 +42,9 @@ export const useTimeOffStore = defineStore('timeoff', {
             resolve('Successfully got team time off requests')
           })
           .catch(e => {
-            console.log(e)
-            reject('Error getting team time off requests')
+            handlePromiseError(
+              reject, 'Error getting team time off requests', e
+            )
           })
       })
     },
@@ -56,8 +56,9 @@ export const useTimeOffStore = defineStore('timeoff', {
             resolve('Successfully got managed time off requests')
           })
           .catch(e => {
-            console.log(e)
-            reject('Error getting managed time off requests')
+            handlePromiseError(
+              reject, 'Error getting managed time off requests', e
+            )
           })
       })
     },
@@ -69,8 +70,9 @@ export const useTimeOffStore = defineStore('timeoff', {
             resolve('Successfully got conflicting responsibilities')
           })
           .catch(e => {
-            console.log(e)
-            reject('Error getting conflicting responsibilities')
+            handlePromiseError(
+              reject, 'Error getting conflicting responsibilities', e
+            )
           })
       })
     },
@@ -82,8 +84,9 @@ export const useTimeOffStore = defineStore('timeoff', {
             resolve('Successfully got current time off request')
           })
           .catch(e => {
-            console.log(e)
-            reject('Error getting current time off request')
+            handlePromiseError(
+              reject, 'Error getting current time off request', e
+            )
           })
       })
     },
@@ -97,8 +100,7 @@ export const useTimeOffStore = defineStore('timeoff', {
             resolve('Successfully created time off request')
           })
           .catch(e => {
-            console.log(e)
-            reject('Error creating time off request')
+            handlePromiseError(reject, 'Error creating time off request', e)
           })
       })
     },
@@ -112,8 +114,7 @@ export const useTimeOffStore = defineStore('timeoff', {
             resolve('Successfully updated time off request')
           })
           .catch(e => {
-            console.log(e)
-            reject('Error updating time off request')
+            handlePromiseError(reject, 'Error updating time off request', e)
           })
       })
     },
@@ -125,8 +126,9 @@ export const useTimeOffStore = defineStore('timeoff', {
             resolve('Successfully acknowledged time off request')
           })
           .catch(e => {
-            console.log(e)
-            reject('Error acknowledging time off request')
+            handlePromiseError(
+              reject, 'Error acknowledging time off request', e
+            )
           })
       })
     },
@@ -138,8 +140,7 @@ export const useTimeOffStore = defineStore('timeoff', {
             resolve('Successfully deleted time off request')
           })
           .catch(e => {
-            console.log(e)
-            reject('Error deleting time off request')
+            handlePromiseError(reject, 'Error deleting time off request', e)
           })
       })
     },

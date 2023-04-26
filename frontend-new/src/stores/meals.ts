@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
 
-import { apiURL } from 'src/stores/index'
+import { apiURL, handlePromiseError } from 'src/stores/index'
 import { MealStateInterface, Stop } from 'src/types'
 
 export const useMealsStore = defineStore('meals', {
@@ -45,14 +45,17 @@ export const useMealsStore = defineStore('meals', {
   },
 
   actions: {
-    async getMealStops() {
-      await axios({ url: `${ apiURL }api/v1/mealstop`, method: 'GET' })
-        .then(resp => {
-          this.stops = resp.data.results
-        })
-        .catch(e => {
-          console.error('Error getting meal stops', e)
-        })
+    getMealStops() {
+      return new Promise((resolve, reject) => {
+        axios({ url: `${ apiURL }api/v1/mealstop`, method: 'GET' })
+          .then(resp => {
+            this.stops = resp.data.results
+            resolve(resp)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error getting meal stops', e)
+          })
+      })
     },
     getAddressLatLong: (address: string, city: string, state: string, zip: string) => {
       return new Promise((resolve, reject) => {
@@ -61,8 +64,7 @@ export const useMealsStore = defineStore('meals', {
           resolve(resp)
         })
         .catch(e => {
-          console.error('Error getting lat/long', e)
-          reject(e)
+          handlePromiseError(reject, 'Error getting lat/long', e)
         })
       })
     },
@@ -77,8 +79,7 @@ export const useMealsStore = defineStore('meals', {
           resolve(resp)
         })
         .catch(e => {
-          console.error('Error adding meal stop', e)
-          reject(e)
+          handlePromiseError(reject, 'Error adding meal stop', e)
         })
       })
     },

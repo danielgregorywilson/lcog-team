@@ -2,7 +2,7 @@ import axios from 'axios'
 import { defineStore } from 'pinia'
 import { useCookies } from 'vue3-cookies'
 
-import { apiURL } from 'src/stores/index'
+import { apiURL, handlePromiseError } from 'src/stores/index'
 import { useSecurityMessageStore } from 'src/stores/securitymessage'
 import {
   AxiosEmployeeRetrieveOneServerResponse, EmployeeRetrieve,
@@ -116,7 +116,9 @@ export const useUserStore = defineStore('user', {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/current-user/` })
           .then(resp => resolve(resp))
-          .catch(e => reject(e))
+          .catch(e => handlePromiseError(
+            reject, 'Error getting current user', e
+          ))
       })
     },
     // Simple list of all employees
@@ -128,8 +130,7 @@ export const useUserStore = defineStore('user', {
             resolve('Got simple employee list')
           })
           .catch(e => {
-            console.error('Error getting simple employee list:', e)
-            reject(`Error getting simple employee list: ${ e }`)
+            handlePromiseError(reject, 'Error getting simple employee list', e)
           })
       })
     },
@@ -142,8 +143,7 @@ export const useUserStore = defineStore('user', {
             resolve('Got simple employee detail')
           })
           .catch(e => {
-            console.error('Error getting simple employee detail:', e)
-            reject(`Error getting simple employee detail: ${ e }`)
+            handlePromiseError(reject, 'Error getting simple employee detail', e)
           })
       })
     },

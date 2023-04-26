@@ -121,7 +121,6 @@ export const useWorkflowsStore = defineStore('workflows', {
           })
           .catch(e => {
             handlePromiseError(reject, 'Error deleting workflow instance', e)
-            reject(e)
           })
       })
     },

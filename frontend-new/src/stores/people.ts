@@ -22,7 +22,6 @@ export const usePeopleStore = defineStore('people', {
             resolve('Successfully got simple employee list')
           })
           .catch(e => {
-            console.error('Error getting simple employee list:', e)
             handlePromiseError(reject, 'Error getting simple employee list', e)
           })
       })

@@ -58,6 +58,9 @@ export interface EmployeeRetrieve {
   email_opt_out_timeoff_all: boolean
   email_opt_out_timeoff_weekly: boolean
   email_opt_out_timeoff_daily: boolean
+  is_all_workflows_admin: boolean
+  admin_of_workflows: Array<number>
+  admin_of_processes: Array<number>
   workflow_roles: Array<number>
   can_view_mow_routes: boolean
   can_manage_mow_stops: boolean

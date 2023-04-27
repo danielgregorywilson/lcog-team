@@ -6,6 +6,8 @@ import { apiURL, handlePromiseError } from 'src/stores/index'
 import { useSecurityMessageStore } from 'src/stores/securitymessage'
 import { EmployeeRetrieve, SimpleEmployeeRetrieve } from 'src/types'
 
+const { cookies } = useCookies()
+
 export const useUserStore = defineStore('user', {
   state: () => ({
     status: '',
@@ -54,7 +56,6 @@ export const useUserStore = defineStore('user', {
         axios({ url: `${ apiURL }api/v1/current-user/` })
           .then((resp: {data: EmployeeRetrieve}) => {
             this.status = 'success'
-            const { cookies } = useCookies()
             this.profile.employee_pk = resp.data.pk
             this.profile.username = resp.data.username
             this.profile.email = resp.data.email
@@ -146,6 +147,18 @@ export const useUserStore = defineStore('user', {
     authLogout() {
       return new Promise((resolve) => {
         this.$reset()
+        cookies.remove('is_manager')
+        cookies.remove('has_manager')
+        cookies.remove('is_eligible_for_telework_application')
+        cookies.remove('can_view_seating_charts')
+        cookies.remove('can_edit_seating_charts')
+        cookies.remove('prs_can_view')
+        cookies.remove('notes_can_view')
+        cookies.remove('telework_applications_can_view')
+        cookies.remove('time_off_requests_can_view')
+        cookies.remove('workflow_roles')
+        cookies.remove('can_view_mow_routes')
+        cookies.remove('can_manage_mow_stops')
         resolve('Successfully triggered logout')
       })
     }

@@ -7,7 +7,11 @@ import {
 } from 'vue-router'
 
 import routes from 'src/router/routes'
-import { useAuthStore } from 'src/stores/auth'
+
+import {
+  canViewDeskReservationReports, canViewMealsOnWheelsRoutes,
+  canViewTimeOffRequest, isAuthenticated
+} from './guards'
 
 /*
  * If not building with SSR mode, you can
@@ -33,10 +37,21 @@ export default route(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE),
   })
 
-  Router.beforeEach((to) => {
-    const authStore = useAuthStore()
-    if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+  Router.beforeEach(async (to) => {
+    if (to.meta.requiresAuth && !isAuthenticated()) {
       return '/dashboard'
+    }
+    if (to.meta.requiresDeskReservationReportsPermission) {
+      const canViewReports = await canViewDeskReservationReports()
+      if (!canViewReports) {
+        return '/dashboard'
+      }
+    }
+    if (to.meta.requiresMealsOnWheelsPermission && !canViewMealsOnWheelsRoutes()) {
+      return '/dashboard'
+    }
+    if (to.meta.requiresCanViewTimeOffRequest && !canViewTimeOffRequest(to)) {
+      return '/timeoff'
     }
     
   })

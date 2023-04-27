@@ -1,6 +1,6 @@
 <template>
   <q-page class="q-pa-md">
-    <div class="q-py-md" v-if="hasWorkflowRoles()">
+    <div class="q-py-md" v-if="userHasWorkflowRoles()">
       <div class="row items-center q-mb-md">
         <q-avatar icon="person_add" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
         <div class="text-h4">Employees Onboarding</div>
@@ -38,18 +38,19 @@ import { getCurrentUser } from 'src/utils'
 const router = useRouter()
 const userStore = useUserStore()
 
-function hasWorkflowRoles() {
+function userHasWorkflowRoles() {
   return userStore.getEmployeeProfile.workflow_roles.length > 0
 }
 
 onMounted(() => {
   getCurrentUser()
     .then(() => {
-      if (!hasWorkflowRoles()) {
+      if (!userHasWorkflowRoles()) {
         router.push({ name: 'dashboard' })
       }
     })
     .catch(e => {
+      // User not authenticated or an error occurred fetching the user
       router.push({ name: 'dashboard' })
     })
 })

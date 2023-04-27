@@ -38,6 +38,7 @@ export interface EmployeeRetrieve {
   is_eligible_for_telework_application: boolean
   can_view_seating_charts: boolean
   can_edit_seating_charts: boolean
+  can_view_desk_reservation_reports: boolean
   prs_can_view: Array<number>
   notes_can_view: Array<number>
   time_off_requests_can_view: Array<number>

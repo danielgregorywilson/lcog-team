@@ -138,22 +138,18 @@
 <script setup lang="ts">
 import { Notify, QSelect } from 'quasar'
 import { onMounted, onUnmounted, ref, Ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 
 import FloorPlan from 'src/assets/floorPlans/schaefers1.svg'
 import useEventBus from 'src/eventBus'
-import TrustedIPDataService from 'src/services/TrustedIPDataService'
-import { useAuthStore } from 'src/stores/auth'
 import { useDeskReservationStore } from 'src/stores/deskreservation'
 import { useUserStore } from 'src/stores/user'
 import { Desk, DeskReservation, SimpleEmployeeRetrieve } from 'src/types'
 import { getRouteParam } from 'src/utils'
 
-const authStore = useAuthStore()
 const deskReservationStore = useDeskReservationStore()
 const userStore = useUserStore()
 const route = useRoute()
-const router = useRouter()
 const bus = useEventBus()
 
 let needle = ref('') // For filtering employee list
@@ -597,23 +593,6 @@ onMounted(() => {
   // this.deskReservationSocket.onclose = () => {
   //   console.error('Desk Reservation socket closed unexpectedly')
   // }
-
-  // Boot session to dashboard if not authenticated or IP not in trusted IP lists
-  if (!authStore.isAuthenticated) {
-    TrustedIPDataService.getTrustedIPs()
-      .then((response: {data: boolean}) => {
-        const addressIsSafe = response.data
-        if (!addressIsSafe) {
-          router.push('/')
-            .catch((e) => {
-              console.error('Error navigating to dashboard upon rejecting connection to desk reservations:', e)
-            })
-        }
-      })
-      .catch(e => {
-        console.error('Error getting safe IP address status from API:', e)
-      })
-  }
   
   initDesksAndReservations()
     .then(() => {

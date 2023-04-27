@@ -15,12 +15,14 @@ import { onMounted, watch } from 'vue'
 
 import useEventBus from 'src/eventBus'
 import { handlePromiseError } from 'src/stores'
+import { useUserStore } from 'src/stores/user'
 import { useWorkflowsStore } from 'src/stores/workflows'
 import { WorkflowInstance } from 'src/types'
-import { getRoutePk } from 'src/utils'
+import { getCurrentUser, getRoutePk } from 'src/utils'
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
 const workflowsStore = useWorkflowsStore()
 const bus = useEventBus()
 
@@ -76,12 +78,26 @@ function retrieveWorkflowInstance() {
   })
 }
 
+function userHasWorkflowRoles() {
+  return userStore.getEmployeeProfile.workflow_roles.length > 0
+}
 
 onMounted(() => {
-  retrieveWorkflowInstance()
-    .then(() => bus.emit('workflowInstanceRetrieved', Math.random()))
+  getCurrentUser()
+    .then(() => {
+      if (!userHasWorkflowRoles()) {
+        router.push({ name: 'dashboard' })
+      } else {
+        retrieveWorkflowInstance()
+          .then(() => bus.emit('workflowInstanceRetrieved', Math.random()))
+          .catch(e => {
+            console.error('Error retrieving workflow instance:', e)
+          })
+      }
+    })
     .catch(e => {
-      console.error('Error retrieving workflow instance:', e)
+      // User not authenticated or an error occurred fetching the user
+      router.push({ name: 'dashboard' })
     })
 })
 

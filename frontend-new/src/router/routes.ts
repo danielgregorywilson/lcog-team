@@ -1,21 +1,4 @@
-import { NavigationGuardNext, RouteLocation, RouteRecordRaw } from 'vue-router'
-
-const ifCanViewTimeOffRequest = (to: RouteLocation, from: RouteLocation, next: NavigationGuardNext) => {
-  next()
-  // const toPk = typeof to.params.pk == 'string' ? to.params.pk : to.params.pk[0]
-  // if (
-  //   authStore.isAuthenticated && cookies.get('time_off_requests_can_view') &&
-  //   cookies.get('time_off_requests_can_view').indexOf(toPk) != -1
-  // ) {
-  //   next()
-  //   return
-  // } else {
-  //   next('/timeoff')
-  // }
-}
-
-
-
+import { RouteRecordRaw } from 'vue-router'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -135,7 +118,7 @@ const routes: RouteRecordRaw[] = [
             path: 'request-detail/:pk',
             name: 'timeoff-request-detail',
             component: () => import('src/pages/timeoff/RequestDetail.vue'),
-            beforeEnter: ifCanViewTimeOffRequest,
+            meta: { requiresCanViewTimeOffRequest: true }
           },
           {
             path: 'manage-requests',
@@ -164,13 +147,11 @@ const routes: RouteRecordRaw[] = [
             path: 'processes',
             name: 'workflow-processes',
             component: () => import('src/pages/workflows/WorkflowProcesses.vue')
-            // TODO: beforeEnter: TODO
           },
           {
             path: 'transition',
             name: 'workflow-transition-form',
             component: () => import('src/pages/workflows/EmployeeTransitionDetail.vue')
-            // TODO: beforeEnter: TODO
           }
         ]
       },
@@ -231,7 +212,7 @@ const routes: RouteRecordRaw[] = [
         path: 'reports',
         name: 'reports',
         component: () => import('src/pages/deskReservation/Report.vue'),
-        // beforeEnter: ifCanViewDeskReservationReports
+        meta: { requiresDeskReservationReportsPermission: true }
       }
     ]
   },
@@ -266,7 +247,7 @@ const routes: RouteRecordRaw[] = [
     path: '/mow-map',
     name: 'mow-map',
     component: () => import('src/pages/meals/MOWMap.vue'),
-    // beforeEnter: ifCanViewMealsOnWheelsRoutes
+    meta: { requiresMealsOnWheelsPermission: true }
   },
 
   /////////////////////////

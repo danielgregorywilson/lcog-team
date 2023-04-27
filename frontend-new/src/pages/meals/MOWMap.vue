@@ -162,7 +162,7 @@ import { Feature, GeoJsonProperties, Geometry } from 'GeoJSON'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { useMealsStore } from '../../stores/meals'
-import { AxiosCheckAddressServerResponse, Stop } from '../../types'
+import { Stop } from '../../types'
 import { useAuthStore } from 'src/stores/auth'
 import { useUserStore } from 'src/stores/user'
 
@@ -276,9 +276,7 @@ let routeStats: RoutesStats = {
 }
 
 // Mapbox
-// console.log(process.env)
-// const accessToken = process.env.VUE_APP_MAP_ACCESS_TOKEN
-const accessToken = 'pk.eyJ1IjoiZHdpbHNvbjExMjMiLCJhIjoiY2xlZzFhczhiMGRuczNybXFxNjE1Z3BraiJ9.M5nEPBjHW4AS_nCnrr5ZPA'
+const accessToken = import.meta.env.VITE_MAP_ACCESS_TOKEN
 let map = {} as mapboxgl.Map
 let center: mapboxgl.LngLatLike = [-122.94329319107005, 44.08711374902461]
 let zoom = 10

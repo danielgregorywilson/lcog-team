@@ -1,17 +1,5 @@
 import { NavigationGuardNext, RouteLocation, RouteRecordRaw } from 'vue-router'
 
-
-// TODO: Route guards don't work with Pinia
-// https://pinia.vuejs.org/core-concepts/outside-component-usage.html
-// const ifAuthenticated = (to: RouteLocation, from: RouteLocation, next: NavigationGuardNext) => {
-  // const authStore = useAuthStore()
-  // if (authStore.isAuthenticated) { // TODO: This should use the isAuthenticated getter
-  //   next()
-  //   return
-  // }
-  // next('dashboard')
-// }
-
 const ifCanViewTimeOffRequest = (to: RouteLocation, from: RouteLocation, next: NavigationGuardNext) => {
   next()
   // const toPk = typeof to.params.pk == 'string' ? to.params.pk : to.params.pk[0]
@@ -53,7 +41,7 @@ const routes: RouteRecordRaw[] = [
         path: '/security-message',
         name: 'security-message',
         component: () => import('pages/SecurityMessage.vue'),
-        // beforeEnter: ifAuthenticated
+        meta: { requiresAuth: true }
       },
 
       /////////////
@@ -63,7 +51,7 @@ const routes: RouteRecordRaw[] = [
         path: '/profile',
         name: 'profile',
         component: () => import('src/pages/Profile.vue'),
-        // beforeEnter: ifAuthenticated
+        meta: { requiresAuth: true }
       },
 
       //////////////////////
@@ -74,6 +62,7 @@ const routes: RouteRecordRaw[] = [
         name: 'responsibilities',
         component: () => import('src/pages/responsibilities/Responsibilities.vue'),
         redirect: {name: 'all-responsibilities'},
+        meta: { requiresAuth: true },
         children: [
           {
             path: 'all',
@@ -163,13 +152,13 @@ const routes: RouteRecordRaw[] = [
         path: '/workflows',
         name: 'workflow-dashboard',
         component: () => import('pages/workflows/Workflows.vue'),
-        // beforeEnter: ifManager
+        meta: { requiresAuth: true }
       },
       {
         path: '/wf/:pk',
         name: 'workflow-instance-detail',
         component: () => import('src/pages/workflows/WorkflowInstanceDetail.vue'),
-        // beforeEnter: ifCanViewTimeOffRequest,
+        meta: { requiresAuth: true },
         children: [
           {
             path: 'processes',

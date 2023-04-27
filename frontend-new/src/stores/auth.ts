@@ -10,14 +10,6 @@ import { useTimeOffStore } from 'src/stores/timeoff'
 import { useUserStore } from 'src/stores/user'
 import { useWorkflowsStore } from 'src/stores/workflows'
 
-const mealsStore = useMealsStore()
-const peopleStore = usePeopleStore()
-const responsibilityStore = useResponsibilityStore()
-const securityMessageStore = useSecurityMessageStore()
-const timeOffStore = useTimeOffStore()
-const userStore = useUserStore()
-const workflowsStore = useWorkflowsStore()
-
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: localStorage.getItem('user-token') || '',
@@ -52,6 +44,7 @@ export const useAuthStore = defineStore('auth', {
             this.status = 'success'
             this.token = token
             // you have your token, now log in your user :)
+            const userStore = useUserStore()
             userStore.userRequest()
               .catch(err => console.log(err))
             resolve(token)
@@ -68,6 +61,13 @@ export const useAuthStore = defineStore('auth', {
       return new Promise((resolve) => {
         this.$reset()
         localStorage.removeItem('user-token') // clear your user's token from localstorage
+        const mealsStore = useMealsStore()
+        const peopleStore = usePeopleStore()
+        const responsibilityStore = useResponsibilityStore()
+        const securityMessageStore = useSecurityMessageStore()
+        const timeOffStore = useTimeOffStore()
+        const userStore = useUserStore()
+        const workflowsStore = useWorkflowsStore()
         mealsStore.authLogout()
           .catch(err => console.log(err))
         peopleStore.authLogout()

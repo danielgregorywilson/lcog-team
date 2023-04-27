@@ -6,8 +6,6 @@ import { apiURL, handlePromiseError } from 'src/stores/index'
 import { useSecurityMessageStore } from 'src/stores/securitymessage'
 import { EmployeeRetrieve, SimpleEmployeeRetrieve } from 'src/types'
 
-const securityMessageStore = useSecurityMessageStore()
-
 export const useUserStore = defineStore('user', {
   state: () => ({
     status: '',
@@ -95,6 +93,7 @@ export const useUserStore = defineStore('user', {
             // TODO: Convert this
             // dispatch('performanceReviewModule/getNextPerformanceReview', {pk: resp.data.pk}, { root: true })
             //   .catch(err => console.log(err))
+            const securityMessageStore = useSecurityMessageStore()
             securityMessageStore.getViewedLatestSecurityMessage()
               .catch(err => console.log(err))
             resolve(resp)

@@ -8,8 +8,6 @@ import {
   TimeOffRequestRetrieve, TimeOffRequestUpdate
 } from 'src/types'
 
-const userStore = useUserStore()
-
 export const useTimeOffStore = defineStore('timeoff', {
   state: () => ({
     myTimeOffRequests: [] as Array<TimeOffRequestRetrieve>,
@@ -95,6 +93,7 @@ export const useTimeOffStore = defineStore('timeoff', {
         axios({ url: `${ apiURL }api/v1/timeoffrequest`, data: timeOffRequest, method: 'POST' })
           .then(() => {
             this.getMyTimeOffRequests()
+            const userStore = useUserStore()
             userStore.userRequest()
               .catch(err => console.log(err))
             resolve('Successfully created time off request')
@@ -109,6 +108,7 @@ export const useTimeOffStore = defineStore('timeoff', {
         axios({ url: `${ apiURL }api/v1/timeoffrequest/${ data.pk }`, data, method: 'PUT' })
           .then(() => {
             this.getMyTimeOffRequests()
+            const userStore = useUserStore()
             userStore.userRequest()
               .catch(err => console.log(err))
             resolve('Successfully updated time off request')

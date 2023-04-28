@@ -49,7 +49,7 @@ const bus = useEventBus()
 
 let tableFilter = ref('')
 
-const tableColumns: QTableProps["columns"] = [
+const tableColumns: QTableProps['columns'] = [
   { name: 'name', required: true, label: 'Name', field: 'name', sortable: true, align: 'left' },
   { name: 'actions', label: 'Actions', field: null }
 ]

@@ -116,7 +116,7 @@ import { useTimeOffStore } from 'src/stores/timeoff'
 
 const timeOffStore = useTimeOffStore()
 
-const columns: QTableProps["columns"] = [
+const columns: QTableProps['columns'] = [
   { name: 'employee', label: 'Employee', field: 'employee_name', sortable: true, align: 'center' },
   { name: 'dates', label: 'Dates', field: 'start_date', sortable: true, align: 'center' },
   { name: 'notes', label: 'Notes', field: 'notes', align: 'center' },

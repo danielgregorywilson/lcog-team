@@ -8,7 +8,7 @@ export default {
       rows: Array<Responsibility>,
       term: string,
       filterOn: Array<'name'|'description'|'tags'|'primaryEmployee'|'secondaryEmployee'>
-    ): QTableProps["filterMethod"] {
+    ): QTableProps['filterMethod'] {
         // rows contain the entire data
         // terms contains whatever you have as filter
     

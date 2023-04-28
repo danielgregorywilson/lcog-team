@@ -54,17 +54,18 @@ export const useSecurityMessageStore = defineStore('securitymessage', {
       return new Promise((resolve, reject) => {
         axios({ url: `${ process.env.API_URL }api/v1/viewedsecuritymessage`, data: viewedSecurityMessage, method: 'POST' })
           .then(() => {
-            this.getViewedLatestSecurityMessage()
-              .catch(e => {
-                console.error('Error getting all viewed security messages ater marking one as viewed:', e)
-              })
-            this.getViewedSecurityMessages()
-              .catch(e => {
-                console.error('Error getting all viewed security messages ater marking one as viewed:', e)
-              })
+            Promise.all([
+              this.getViewedLatestSecurityMessage(),  this.getViewedSecurityMessages()
+            ])
+            .then(() => {
+              resolve('Successfully marked a security message as viewed')
+            })
+            .catch(e => {
+              handlePromiseError(reject, 'Error getting viewed latest security message ater marking one as viewed', e)
+            })
           })
           .catch(e => {
-            console.error('Error marking a security message as viewed:', e)
+            handlePromiseError(reject, 'Error marking a security message as viewed', e)
           });
       })
     },

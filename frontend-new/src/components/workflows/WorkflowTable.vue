@@ -147,17 +147,6 @@ const props = defineProps<{
   actionRequired?: boolean,
 }>()
 
-interface WorkflowColumn {
-  name: string
-  required?: boolean
-  label: string
-  align?: string
-  field?: string
-  sortable?: boolean
-  style?: string
-  headerStyle?: string
-}
-
 const columns: QTableProps['columns'] = [
   { name: 'position', label: 'Position', align: 'center', field: 'title' },
   { name: 'name', label: 'Name', align: 'center', field: 'employee_name' },

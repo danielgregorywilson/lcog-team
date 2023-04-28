@@ -19,7 +19,7 @@ const route = useRoute()
 const responsibilityStore = useResponsibilityStore()
 
 
-const tableColumns: QTableProps["columns"] = [
+const tableColumns: QTableProps['columns'] = [
   { name: 'name', required: true, label: 'Name', field: 'name', sortable: true, align: 'left' },
   { name: 'description', required: false, label: 'Description', field: 'description', sortable: false, align: 'left' },
   { name: 'link', required: false, label: 'Link', field: 'link', sortable: false, align: 'left' },

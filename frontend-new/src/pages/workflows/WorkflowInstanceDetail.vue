@@ -71,7 +71,6 @@ function retrieveWorkflowInstance() {
       resolve('Got Workflow Instance')
     })
     .catch(e => {
-      debugger
       console.error('Error retrieving workflow instance', e)
       reject(e)
     })
@@ -97,6 +96,7 @@ onMounted(() => {
     })
     .catch(e => {
       // User not authenticated or an error occurred fetching the user
+      console.error(e)
       router.push({ name: 'dashboard' })
     })
 })

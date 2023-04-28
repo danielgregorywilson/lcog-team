@@ -156,8 +156,8 @@ let needle = ref('') // For filtering employee list
 
 const ignoreList = ['UP', 'DOWN', 'DN', 'DF', 'FE']
 
-const standardDeskImg = '/src/assets/floorPlans/desk-standard.png'
-const ergoDeskImg = '/src/assets/floorPlans/desk-ergo.png'
+const standardDeskImg = '../assets/floorPlans/desk-standard.png'
+const ergoDeskImg = '../assets/floorPlans/desk-ergo.png'
 
 const BUILDING = 'S'
 const FLOOR = '1'

@@ -38,7 +38,7 @@
             </div>
             <div class="row items-center q-gutter-sm">
               <div>Ergonomic Work Station</div>
-              <q-img :src=ergoDeskImg width=35px />
+              <q-img :src=ErgoDeskImg width=35px />
             </div>
             <div class="row items-center q-gutter-sm">
               <div>Held</div>
@@ -140,6 +140,8 @@ import { Notify, QSelect } from 'quasar'
 import { onMounted, onUnmounted, ref, Ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+import ErgoDeskImg from 'src/assets/floorPlans/desk-ergo.png'
+import StandardDeskImg from 'src/assets/floorPlans/desk-standard.png'
 import FloorPlan from 'src/assets/floorPlans/schaefers3.svg'
 import useEventBus from 'src/eventBus'
 import { useDeskReservationStore } from 'src/stores/deskreservation'
@@ -155,9 +157,6 @@ const bus = useEventBus()
 let needle = ref('') // For filtering employee list
 
 const ignoreList = ['UP', 'DOWN', 'DN', 'DF', 'FE']
-
-const standardDeskImg = '/src/assets/floorPlans/desk-standard.png'
-const ergoDeskImg = '/src/assets/floorPlans/desk-ergo.png'
 
 const BUILDING = 'S'
 const FLOOR = '3'
@@ -463,7 +462,7 @@ function handleSVG() {
 
         // Determine if the desk is ergo and/or lead
         // Use correct icon based on ergonomic or not
-        const deskLogo = desk.ergonomic ? ergoDeskImg : standardDeskImg
+        const deskLogo = desk.ergonomic ? ErgoDeskImg : StandardDeskImg
         const deskLead = desk.lead
 
         // Determine if the desk has a hold on it today

@@ -8,9 +8,14 @@ from meals.models import Route, Stop
 class Command(BaseCommand):
     help = 'Imports hot meal delivery addresses from a CSV file.'
 
+    def add_arguments(self, parser):
+        parser.add_argument('--path', type=str)
+
     def handle(self, *args, **options): 
         # Import from file
-        path = 'meals/management/hot-meals.csv'
+        path = options['path']
+        if not path:
+            path = 'meals/management/hot-meals.csv'
 
         dataReader = csv.reader(open(path), delimiter=',', quotechar='"')
         for row in dataReader:

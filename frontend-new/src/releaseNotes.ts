@@ -4,6 +4,16 @@
 
 export const releases = [
   {
+    version: '0.12.0',
+    date: new Date(2023, 4, 1),
+    changes: [
+      {
+        type: 'new',
+        description: 'Rebuild the Team App in Vue 3 for better performance and maintainability'
+      },
+    ]
+  },
+  {
     version: '0.11.0',
     date: new Date(2023, 2, 7),
     changes: [

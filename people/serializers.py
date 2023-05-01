@@ -47,6 +47,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 
 class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     name = serializers.CharField()
+    username = serializers.EmailField(source='user.username')
     email = serializers.EmailField(source='user.email')
     is_manager = serializers.SerializerMethodField()
     has_manager = serializers.SerializerMethodField()
@@ -66,11 +67,11 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Employee
         fields = [
-            'url', 'pk', 'name', 'user', 'email', 'manager', 'is_manager',
-            'has_manager', 'is_eligible_for_telework_application',
-            'can_view_seating_charts', 'can_edit_seating_charts',
-            'can_view_desk_reservation_reports', 'is_upper_manager',
-            'is_hr_manager', 'is_executive_director',
+            'url', 'pk', 'name', 'user', 'username', 'email', 'manager',
+            'is_manager', 'has_manager',
+            'is_eligible_for_telework_application', 'can_view_seating_charts',
+            'can_edit_seating_charts', 'can_view_desk_reservation_reports',
+            'is_upper_manager', 'is_hr_manager', 'is_executive_director',
             'viewed_security_message', 'prs_can_view', 'notes_can_view',
             'telework_applications_can_view', 'time_off_requests_can_view',
             'next_to_sign_prs', 'email_opt_out_all',

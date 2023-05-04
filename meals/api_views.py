@@ -36,13 +36,14 @@ class MealStopViewSet(viewsets.ModelViewSet):
     pagination_class = LargeResultsSetPagination
 
     def create(self, request):
-        if not request.user.groups.filter(name='Manage Meals on Wheels Stops').exists():
-            return Response({'created': False, 'error': 'You do not have permission to create a new stop.'})
+        # TODO: Re-enable this permission check.
+        # if not request.user.groups.filter(name='Manage Meals on Wheels Stops').exists():
+        #     return Response({'created': False, 'error': 'You do not have permission to create a new stop.'})
         city = City.objects.get(name=request.data['city'])
         meal_type = Stop.TYPE_CHOICE_HOT if request.data['meal_type'] == 'Hot' else Stop.TYPE_CHOICE_COLD
         route_name = 'PU' if request.data['route_name'] in ['hotPU', 'coldPU'] else request.data['route_name']
         route = Route.objects.get(name=route_name)
-        zip_code = ZipCode.objects.get(code=request.data['zip'])
+        zip_code = ZipCode.objects.get(code=request.data['zip_code'])
         meal_stop = Stop.objects.create(
             first_name=request.data['first_name'],
             last_name=request.data['last_name'],

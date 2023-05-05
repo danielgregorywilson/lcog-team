@@ -4,6 +4,24 @@
 
 export const releases = [
   {
+    version: '0.12.1',
+    date: new Date(2023, 4, 5),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Employee Transitions: Support middle initials of up to 5 characters'
+      },
+      {
+        type: 'improved',
+        description: 'Employee Transitions: Suggest email based on entered first and last name'
+      },
+      {
+        type: 'improved',
+        description: 'Employee Transitions: Titles/Position is now a drop down with limited choices; Submit button returns user to list view'
+      },
+    ]
+  },
+  {
     version: '0.12.0',
     date: new Date(2023, 4, 1),
     changes: [

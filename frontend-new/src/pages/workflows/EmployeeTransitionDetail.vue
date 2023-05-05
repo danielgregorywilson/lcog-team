@@ -108,7 +108,7 @@
     </div>
     <div class="row q-my-sm">
       <q-checkbox v-model="preliminaryHire" v-if="employeeID == 'CLSD'" label="Preliminary Hire" />
-      <q-checkbox v-model="deleteProfile" label="Delete Profile" />
+      <q-checkbox v-if="type=='E'" v-model="deleteProfile" label="Delete Profile" />
     </div>
     <div class="row">
       <q-select
@@ -166,10 +166,10 @@
         label="Load Code"
       />
     </div>
-    <div class="row">
+    <div v-if="type=='E'" class="row">
       <q-checkbox v-model="shouldDelete" label="Delete?" />
     </div>
-    <div class="row">
+    <div v-if="type=='E'" class="row">
       <q-input
         v-model="reassignTo"
         label="Reassign to"
@@ -180,29 +180,31 @@
     </div>
     <div class="text-h6 transition-form-section-heading">Proxy Card/Photo ID</div>
     <div class="row">
-      <q-checkbox v-model="proxCardNeeded" label="Needed" />
-      <q-checkbox v-model="proxCardReturned" label="Turned In" />
+      <q-checkbox v-if="type!='E'" v-model="proxCardNeeded" label="Needed" />
+      <q-checkbox v-if="type=='E'" v-model="proxCardReturned" label="Turned In" />
     </div>
-    <div class="text-h6 transition-form-section-heading">Computer Profile</div>
-    <div class="row">
-      <div>
-        Email account will be disabled (no incoming or outgoing emails) on End Date
-        <span class="text-underline">unless otherwise specified in special instructions</span>.
+    <div v-if="type=='E'">
+      <div class="text-h6 transition-form-section-heading">Computer Profile</div>
+      <div class="row">
+        <div>
+          Email account will be disabled (no incoming or outgoing emails) on End Date
+          <span class="text-underline">unless otherwise specified in special instructions</span>.
+        </div>
       </div>
-    </div>
-    <div class="row">
-      <q-checkbox
-        v-model="showAccessEmails"
-        label="Does someone need to access current emails?"
-        class="q-mr-md" />
-      <EmployeeSelect
-        v-if="showAccessEmails"
-        label="Who?"
-        :employee="accessEmails"
-        v-on:input="accessEmails=$event"
-        v-on:clear="accessEmails=emptyEmployee"
-        class="q-mr-md"
-      />
+      <div class="row">
+        <q-checkbox
+          v-model="showAccessEmails"
+          label="Does someone need to access current emails?"
+          class="q-mr-md" />
+        <EmployeeSelect
+          v-if="showAccessEmails"
+          label="Who?"
+          :employee="accessEmails"
+          v-on:input="accessEmails=$event"
+          v-on:clear="accessEmails=emptyEmployee"
+          class="q-mr-md"
+        />
+      </div>
     </div>
     <div class="text-h6 transition-form-section-heading">Special Instructions</div>
     <div class="row">

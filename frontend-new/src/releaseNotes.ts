@@ -9,15 +9,7 @@ export const releases = [
     changes: [
       {
         type: 'improved',
-        description: 'Employee Transitions: Support middle initials of up to 5 characters'
-      },
-      {
-        type: 'improved',
-        description: 'Employee Transitions: Suggest email based on entered first and last name'
-      },
-      {
-        type: 'improved',
-        description: 'Employee Transitions: Titles/Position is now a drop down with limited choices; Submit button returns user to list view'
+        description: 'Employee transition form improvements'
       },
     ]
   },

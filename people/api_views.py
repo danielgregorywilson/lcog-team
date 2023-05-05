@@ -16,16 +16,17 @@ from mainsite.helpers import (
     send_signature_email_to_hr_manager, send_signature_email_to_manager
 )
 from people.models import (
-    Employee, PerformanceReview, ReviewNote, Signature, TeleworkApplication,
-    TeleworkSignature, UnitOrProgram, ViewedSecurityMessage
+    Employee, JobTitle, PerformanceReview, ReviewNote, Signature,
+    TeleworkApplication, TeleworkSignature, UnitOrProgram,
+    ViewedSecurityMessage
 )
 from people.serializers import (
     EmployeeSerializer, FileUploadSerializer, GroupSerializer,
-    PerformanceReviewFileUploadSerializer, PerformanceReviewSerializer,
-    ReviewNoteSerializer, SignatureSerializer, SimpleEmployeeSerializer,
-    TeleworkApplicationFileUploadSerializer, TeleworkApplicationSerializer,
-    TeleworkSignatureSerializer, UnitSerializer, UserSerializer,
-    ViewedSecurityMessageSerializer
+    JobTitleSerializer, PerformanceReviewFileUploadSerializer,
+    PerformanceReviewSerializer, ReviewNoteSerializer, SignatureSerializer,
+    SimpleEmployeeSerializer, TeleworkApplicationFileUploadSerializer,
+    TeleworkApplicationSerializer, TeleworkSignatureSerializer, UnitSerializer,
+    UserSerializer, ViewedSecurityMessageSerializer
 )
 
 
@@ -53,6 +54,14 @@ class IsAdmin(BasePermission):
             request.user and
             request.user.is_staff
         )
+
+
+class JobTitleViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows users to be viewed or edited.
+    """
+    queryset = JobTitle.objects.all()
+    serializer_class = JobTitleSerializer
 
 
 class UnitViewSet(viewsets.ModelViewSet):

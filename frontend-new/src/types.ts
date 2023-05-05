@@ -74,6 +74,11 @@ export interface EmployeeUpdatePartial {
 // People Structure from Django Rest Framework //
 /////////////////////////////////////////////////
 
+export interface Title {
+  pk: number
+  name: string
+}
+
 export interface Unit {
   pk: number
   name: string
@@ -682,7 +687,8 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   employee_number: string
   employee_id: string // TODO This should be EmployeeID
   employee_email: string
-  title: string
+  title_pk: number
+  title_name: string
   fte: string
   bilingual: boolean
   manager_pk: number
@@ -721,7 +727,7 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   employee_number?: string
   employee_id?: string // TODO This should be EmployeeID
   employee_email?: string
-  title?: string
+  title_pk?: number
   fte?: string
   bilingual?: boolean
   manager_pk?: number

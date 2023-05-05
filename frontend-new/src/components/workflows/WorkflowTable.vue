@@ -148,7 +148,7 @@ const props = defineProps<{
 }>()
 
 const columns: QTableProps['columns'] = [
-  { name: 'position', label: 'Position', align: 'center', field: 'title' },
+  { name: 'position', label: 'Position', align: 'center', field: 'title_name' },
   { name: 'name', label: 'Name', align: 'center', field: 'employee_name' },
   { name: 'startedAt', align: 'center', label: 'Workflow Start Date', field: 'started_at', sortable: true },
   { name: 'transitionDate', align: 'center', label: 'Transition Date', field: 'transition_date', sortable: true },

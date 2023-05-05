@@ -635,6 +635,11 @@ function updateTransitionAndClose() {
     })
     .catch(e => {
       console.error('Error updating Employee Transition', e)
+      quasar.notify({
+        message: 'Error updating Employee Transition',
+        color: 'negative',
+        icon: 'report_problem'
+      })
       reject(e)
     })
   })

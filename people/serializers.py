@@ -5,9 +5,17 @@ from django.contrib.auth.models import Group, User
 from rest_framework import serializers
 
 from people.models import (
-    Employee, PerformanceReview, ReviewNote, Signature, TeleworkApplication,
-    TeleworkSignature, UnitOrProgram, ViewedSecurityMessage
+    Employee, JobTitle, PerformanceReview, ReviewNote, Signature,
+    TeleworkApplication, TeleworkSignature, UnitOrProgram,
+    ViewedSecurityMessage
 )
+
+
+class JobTitleSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = JobTitle
+        fields = ['pk', 'name']
 
 
 class UnitSerializer(serializers.HyperlinkedModelSerializer):

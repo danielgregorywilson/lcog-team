@@ -18,9 +18,9 @@
     </div>
     <div class="text-h6 transition-form-section-heading">Employee</div>
     <div class="row">
-      <q-input v-model="employeeFirstName" label="First" class="q-mr-md" />
-      <q-input v-model="employeeMiddleInitial" mask="A" label="M" class="q-mr-md" style="width: 1em" />
-      <q-input v-model="employeeLastName" label="Last" class="q-mr-md" />
+      <q-input v-model="employeeFirstName" label="First" class="q-mr-md" @blur="suggestEmail()" />
+      <q-input v-model="employeeMiddleInitial" maxlength=5 label="M" class="q-mr-md" style="width: 4em" />
+      <q-input v-model="employeeLastName" label="Last" class="q-mr-md" @blur="suggestEmail()" />
       <q-input v-model="employeePreferredName" label="Preferred Name, if different" style="width: 25em" />
     </div>
     <div class="row">
@@ -40,7 +40,13 @@
     </div>
     <div class="text-h6 transition-form-section-heading">Position</div>
     <div class="row">
-      <q-input v-model="title" label="Title" class="q-mr-md" />
+      <JobTitleSelect
+        label="Title"
+        :title="title"
+        v-on:input="title=$event"
+        v-on:clear="title=emptyTitle"
+        class="q-mr-md"
+      />
       <q-input v-model="fte" label="FTE" mask="#.##" class="q-mr-md" />
       <q-checkbox v-model="bilingual" label="Bilingual" />
     </div>
@@ -89,6 +95,7 @@
     </div>
     <div class="text-h6 transition-form-section-heading">Work Details</div>
     <div class="row q-mt-md"><div v-if="type=='E'">End Date/Time</div><div v-else>Start Date/Time</div></div>
+    {{ transitionDate }}
     <div class="row q-my-sm">
       <q-date
         v-model="transitionDate"
@@ -207,7 +214,7 @@
     <div style="height: 80px;"></div>
 
     <div id="sticky-footer" class="row justify-between" v-if="true">
-      <q-btn id="update-button" class="col-1" color="white" text-color="black" label="Submit" :disabled="!valuesAreChanged()" @click="updateTransition()" />
+      <q-btn id="update-button" class="col-1" color="white" text-color="black" label="Submit" :disabled="!valuesAreChanged()" @click="updateTransitionAndClose()" />
       <!-- <q-btn v-if="this.showErrorButton && this.formErrorItems().length > 0" label="Show missing fields" icon="check" color="warning" @click="openErrorDialog('right')" /> -->
       <!-- <div class="col-3 self-center status">Current Status: {{ status }}</div> -->
     </div>
@@ -243,23 +250,28 @@
 </style>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
+import { useQuasar } from 'quasar'
+import { useRoute, useRouter } from 'vue-router'
 import { onMounted, ref, Ref, watch } from 'vue'
 
 import useEventBus from 'src/eventBus'
 import { EmployeeTransition } from 'src/types'
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
+import JobTitleSelect from 'src/components/JobTitleSelect.vue'
 import UnitSelect from 'src/components/UnitSelect.vue'
 import { useUserStore } from 'src/stores/user'
 import { useWorkflowsStore } from 'src/stores/workflows'
 import { getRoutePk } from 'src/utils'
 
+const quasar = useQuasar()
 const route = useRoute()
+const router = useRouter()
 const { bus } = useEventBus()
 const userStore = useUserStore()
 const workflowsStore = useWorkflowsStore()
 
 const emptyEmployee = {name: '', pk: -1}
+const emptyTitle = {name: '', pk: -1}
 const emptyUnit = {name: '', pk: -1}
 
 function currentEmployeeTransition(): EmployeeTransition {
@@ -286,8 +298,8 @@ let employeeIDCurrentVal = ref('') // TODO This should be EmployeeID
 let employeeID = ref('') // TODO This should be EmployeeID
 let employeeEmailCurrentVal = ref('')
 let employeeEmail = ref('')
-let titleCurrentVal = ref('')
-let title = ref('')
+let titleCurrentVal = ref(emptyTitle)
+let title = ref(emptyTitle)
 let fteCurrentVal = ref('')
 let fte = ref('')
 let salaryRangeCurrentVal = ref(null) as Ref<number | null>
@@ -300,8 +312,8 @@ let managerCurrentVal = ref(emptyEmployee)
 let manager = ref(emptyEmployee)
 let unitCurrentVal = ref(emptyUnit)
 let unit = ref(emptyUnit)
-let transitionDateCurrentVal = ref('')
-let transitionDate = ref('')
+let transitionDateCurrentVal = ref(null) as Ref<string | null>
+let transitionDate = ref(null) as Ref<string | null>
 let preliminaryHireCurrentVal = ref(false)
 let preliminaryHire = ref(false)
 let deleteProfileCurrentVal = ref(false)
@@ -365,7 +377,7 @@ function retrieveEmployeeTransition() {
   employeeIDCurrentVal.value = employeeID.value
   employeeEmail.value = t.employee_email
   employeeEmailCurrentVal.value = employeeEmail.value
-  title.value = t.title
+  title.value = {pk: t.title_pk, name: t.title_name}
   titleCurrentVal.value = title.value
   fte.value = t.fte
   fteCurrentVal.value = fte.value
@@ -380,7 +392,7 @@ function retrieveEmployeeTransition() {
   unit.value = {pk: t.unit_pk, name: t.unit_name}
   unitCurrentVal.value = unit.value
   if (t.transition_date === null) {
-    transitionDate.value = ''
+    transitionDate.value = null
   } else {
     transitionDate.value = t.transition_date.replace('T', ' ')
   }
@@ -458,6 +470,12 @@ function retrieveEmployeeTransition() {
   // })
 }
 
+function suggestEmail(): void {
+  if (employeeFirstName.value && employeeLastName.value && !employeeEmail.value) {
+    employeeEmail.value = `${employeeFirstName.value.charAt(0).toLowerCase()}${employeeLastName.value.toLowerCase()}@lcog.org`
+  }
+}
+
 function valuesAreChanged(): boolean { 
   if (
     type.value == typeCurrentVal.value &&
@@ -468,7 +486,7 @@ function valuesAreChanged(): boolean {
     employeeID.value == employeeIDCurrentVal.value &&
     employeeNumber.value == employeeNumberCurrentVal.value &&
     employeeEmail.value == employeeEmailCurrentVal.value &&
-    title.value == titleCurrentVal.value &&
+    title.value.pk == titleCurrentVal.value.pk &&
     fte.value == fteCurrentVal.value &&
     salaryRange.value == salaryRangeCurrentVal.value &&
     salaryStep.value == salaryStepCurrentVal.value &&
@@ -502,7 +520,7 @@ function valuesAreChanged(): boolean {
   }
 }
 
-function updateTransition() {
+function updateTransitionAndClose() {
   return new Promise((resolve, reject) => {
     const currentPhoneVal = currentPhone.value == '(___) ___-____' ? '' : currentPhone.value
     if (['Reassign to:', 'Change name display to:'].indexOf(phoneRequest.value) == -1) {
@@ -510,6 +528,10 @@ function updateTransition() {
     }
     if (!showAccessEmails.value) {
       accessEmails.value = emptyEmployee
+    }
+    let transitionDateSubmission = new Date()
+    if (transitionDate.value) {
+      transitionDateSubmission = new Date(transitionDate.value)
     }
     workflowsStore.updateEmployeeTransition(transitionPk.value, {
       type: type.value,
@@ -521,14 +543,14 @@ function updateTransition() {
       employee_id: employeeID.value,
       employee_number: employeeNumber.value,
       employee_email: employeeEmail.value,
-      title: title.value,
+      title_pk: title.value.pk,
       fte: fte.value,
       salary_range: salaryRange.value,
       salary_step: salaryStep.value,
       bilingual: bilingual.value,
       manager_pk: manager.value.pk,
       unit_pk: unit.value.pk,
-      transition_date: transitionDate.value,
+      transition_date: transitionDateSubmission,
       preliminary_hire: preliminaryHire.value,
       delete_profile: deleteProfile.value,
       office_location: officeLocation.value,
@@ -561,7 +583,7 @@ function updateTransition() {
       employeeIDCurrentVal.value = t.employee_id
       employeeNumberCurrentVal.value = t.employee_number
       employeeEmailCurrentVal.value = t.employee_email
-      titleCurrentVal.value = t.title
+      titleCurrentVal.value = {pk: t.title_pk, name: t.title_name}
       fteCurrentVal.value = t.fte
       salaryRangeCurrentVal.value = t.salary_range
       salaryStepCurrentVal.value = t.salary_step
@@ -602,6 +624,13 @@ function updateTransition() {
           })
       }
 
+      router.push({ name: 'workflow-dashboard' })
+
+      if (!!t.title_name) {
+        quasar.notify(`Updated Employee Transition for ${t.title_name} Position`)
+      } else {
+        quasar.notify('Updated Employee Transition')
+      }
       resolve('Updated')
     })
     .catch(e => {

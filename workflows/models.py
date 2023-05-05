@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext as _
 
-from people.models import Employee, UnitOrProgram
+from people.models import Employee, JobTitle, UnitOrProgram
 
 
 class Role(models.Model):
@@ -96,19 +96,21 @@ class EmployeeTransition(models.Model):
         blank=True, null=True
     )
     # TODO: What does this mean now?
-    date_submitted = models.DateTimeField(blank=True, null=True) 
+    date_submitted = models.DateTimeField(blank=True, null=True)
     submitter = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name="submitter_of_transitions"
     )
     employee_first_name = models.CharField(blank=True, max_length=50)
-    employee_middle_initial = models.CharField(blank=True, max_length=1)
+    employee_middle_initial = models.CharField(blank=True, max_length=5)
     employee_last_name = models.CharField(blank=True, max_length=50)
     employee_preferred_name = models.CharField(blank=True, max_length=100)
     employee_number = models.PositiveSmallIntegerField(blank=True, null=True)
     employee_id = models.CharField(blank=True, max_length=4, choices=EMPLOYEE_ID_CHOICES)
     employee_email = models.EmailField(blank=True)
-    title = models.CharField(blank=True, max_length=100)
+    title = models.ForeignKey(
+        JobTitle, blank=True, null=True, on_delete=models.SET_NULL
+    )
     fte = models.FloatField(blank=True, default=1.0)
     salary_range = models.PositiveSmallIntegerField(blank=True, null=True)
     salary_step = models.PositiveSmallIntegerField(blank=True, null=True)

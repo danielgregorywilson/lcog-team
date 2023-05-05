@@ -110,6 +110,8 @@ class ProcessInstanceSerializer(serializers.ModelSerializer):
 
 class EmployeeTransitionSerializer(serializers.ModelSerializer):
     submitter_name = serializers.CharField(source='submitter.name', required=False)
+    title_pk = serializers.SerializerMethodField()
+    title_name = serializers.SerializerMethodField()
     manager_pk = serializers.SerializerMethodField()
     manager_name = serializers.SerializerMethodField()
     unit_pk = serializers.SerializerMethodField()
@@ -123,15 +125,15 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
             'url', 'pk', 'type', 'date_submitted', 'submitter_name',
             'employee_first_name', 'employee_middle_initial',
             'employee_last_name', 'employee_preferred_name', 'employee_number',
-            'employee_id', 'employee_email', 'title', 'fte', 'salary_range',
-            'salary_step', 'bilingual', 'manager_pk', 'manager_name',
-            'unit_pk', 'unit_name', 'transition_date', 'preliminary_hire',
-            'delete_profile', 'office_location', 'cubicle_number',
-            'union_affiliation', 'teleworking', 'current_phone', 'desk_phone', 
-            'phone_request', 'phone_request_data', 'load_code',
-            'should_delete', 'reassign_to', 'business_cards',
-            'prox_card_needed', 'prox_card_returned', 'access_emails_pk',
-            'access_emails_name', 'special_instructions'
+            'employee_id', 'employee_email', 'title_pk', 'title_name', 'fte',
+            'salary_range', 'salary_step', 'bilingual', 'manager_pk',
+            'manager_name', 'unit_pk', 'unit_name', 'transition_date',
+            'preliminary_hire', 'delete_profile', 'office_location',
+            'cubicle_number', 'union_affiliation', 'teleworking',
+            'current_phone', 'desk_phone', 'phone_request',
+            'phone_request_data', 'load_code', 'should_delete', 'reassign_to',
+            'business_cards', 'prox_card_needed', 'prox_card_returned',
+            'access_emails_pk', 'access_emails_name', 'special_instructions'
         ]
     
     @staticmethod
@@ -148,6 +150,21 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
         else:
             return ''
     
+    @staticmethod
+    def get_title_pk(transition):
+        if transition.title:
+            return transition.title.pk
+        else:
+            return -1
+
+    @staticmethod
+    def get_title_name(transition):
+        if transition.title:
+            if transition.title.name:
+                return transition.title.name
+            else:
+                return ''
+
     @staticmethod
     def get_unit_pk(transition):
         if transition.unit:
@@ -186,7 +203,8 @@ class WorkflowInstanceSerializer(serializers.ModelSerializer):
     transition = EmployeeTransitionSerializer()
     percent_complete = serializers.SerializerMethodField()
     employee_name = serializers.SerializerMethodField()
-    title = serializers.SerializerMethodField()
+    title_pk = serializers.SerializerMethodField()
+    title_name = serializers.SerializerMethodField()
     transition_date = serializers.SerializerMethodField()
 
     class Meta:
@@ -194,7 +212,7 @@ class WorkflowInstanceSerializer(serializers.ModelSerializer):
         fields = [
             'url', 'pk', 'workflow', 'started_at', 'completed_at',
             'process_instances', 'transition', 'percent_complete',
-            'employee_name', 'title', 'transition_date'
+            'employee_name', 'title_pk', 'title_name', 'transition_date'
         ]
         depth = 1
 
@@ -205,10 +223,21 @@ class WorkflowInstanceSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_employee_name(wfi):
         return wfi.employee_name
-    
+
     @staticmethod
-    def get_title(wfi):
-        return wfi.title
+    def get_title_pk(wfi):
+        if wfi.title:
+            return wfi.title.pk
+        else:
+            return -1
+
+    @staticmethod
+    def get_title_name(wfi):
+        if wfi.title:
+            if wfi.title.name:
+                return wfi.title.name
+            else:
+                return ''
 
     @staticmethod
     def get_transition_date(wfi):

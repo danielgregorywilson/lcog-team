@@ -95,7 +95,6 @@
     </div>
     <div class="text-h6 transition-form-section-heading">Work Details</div>
     <div class="row q-mt-md"><div v-if="type=='E'">End Date/Time</div><div v-else>Start Date/Time</div></div>
-    {{ transitionDate }}
     <div class="row q-my-sm">
       <q-date
         v-model="transitionDate"

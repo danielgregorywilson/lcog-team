@@ -9,10 +9,10 @@ from mainsite.views import obtain_auth_token_without_password
 from meals.api_views import AddressLatLong, MealStopViewSet
 from people.api_views import (
     CurrentUserView, EmployeeViewSet, FileUploadViewSet, GroupViewSet,
-    PerformanceReviewViewSet, ReviewNoteViewSet, SignatureViewSet,
-    TeleworkApplicationFileUploadViewSet, TeleworkApplicationViewSet,
-    TeleworkSignatureViewSet, UnitViewSet, UserViewSet,
-    ViewedSecurityMessageViewSet
+    JobTitleViewSet, PerformanceReviewViewSet, ReviewNoteViewSet,
+    SignatureViewSet, TeleworkApplicationFileUploadViewSet,
+    TeleworkApplicationViewSet, TeleworkSignatureViewSet, UnitViewSet,
+    UserViewSet, ViewedSecurityMessageViewSet
 )
 from responsibilities.api_views import (
     ResponsibilityViewSet, TagViewSet as ResponsibilityTagViewSet
@@ -63,6 +63,7 @@ router.register('v1/role', RoleViewSet)
 router.register('v1/step', StepViewSet)
 router.register('v1/stepchoice', StepChoiceViewSet)
 router.register('v1/stepinstance', StepInstanceViewSet)
+router.register('v1/jobtitle', JobTitleViewSet)
 router.register('v1/unit', UnitViewSet)
 router.register('v1/workflow', WorkflowViewSet)
 router.register('v1/workflowinstance', WorkflowInstanceViewSet)

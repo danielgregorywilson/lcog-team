@@ -2,12 +2,13 @@ import axios from 'axios'
 import { defineStore } from 'pinia'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
-import { EmployeeRetrieve, EmployeeUpdatePartial, SimpleEmployeeRetrieve, Unit } from 'src/types'
+import { EmployeeRetrieve, EmployeeUpdatePartial, SimpleEmployeeRetrieve, Title, Unit } from 'src/types'
 
 export const usePeopleStore = defineStore('people', {
   state: () => ({
     simpleEmployeeList: [] as Array<SimpleEmployeeRetrieve>,
     simpleEmployeeDetail: { pk: -1, name: '' } as SimpleEmployeeRetrieve,
+    titleList: [] as Array<Title>,
     unitList: [] as Array<Unit>
   }),
 
@@ -50,6 +51,18 @@ export const usePeopleStore = defineStore('people', {
         })
         .catch(e => {
           handlePromiseError(reject, 'Error updating employee', e)
+        })
+      })
+    },
+    getTitleList() {
+      return new Promise((resolve, reject) => {
+        axios({ url: `${ apiURL }api/v1/jobtitle`})
+        .then(resp => {
+          this.titleList = resp.data.results
+          resolve('Successfully got title list')
+        })
+        .catch(e => {
+          handlePromiseError(reject, 'Error getting title list', e)
         })
       })
     },

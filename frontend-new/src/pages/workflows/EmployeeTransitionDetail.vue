@@ -2,13 +2,13 @@
   <div class="q-pt-md">
     <div class="text-h6 transition-form-section-heading">Type</div>
     <div class="row items-center">
-      <q-radio v-model="type" val="N" disable />
+      <q-radio v-model="type" val="New" disable />
       <div>New</div>
-      <q-radio v-model="type" val="R" disable />
+      <q-radio v-model="type" val="Return" disable />
       <div>Return</div>
-      <q-radio v-model="type" val="M" disable />
+      <q-radio v-model="type" val="Change/Modify" disable />
       <div>Change/Modify</div>
-      <q-radio v-model="type" val="E" disable />
+      <q-radio v-model="type" val="Exit" disable />
       <div>Exit</div>
     </div>
     <div class="text-h6 transition-form-section-heading">Submission Info</div>
@@ -94,7 +94,7 @@
       />
     </div>
     <div class="text-h6 transition-form-section-heading">Work Details</div>
-    <div class="row q-mt-md"><div v-if="type=='E'">End Date/Time</div><div v-else>Start Date/Time</div></div>
+    <div class="row q-mt-md"><div v-if="type=='Exit'">End Date/Time</div><div v-else>Start Date/Time</div></div>
     <div class="row q-my-sm">
       <q-date
         v-model="transitionDate"
@@ -108,7 +108,7 @@
     </div>
     <div class="row q-my-sm">
       <q-checkbox v-model="preliminaryHire" v-if="employeeID == 'CLSD'" label="Preliminary Hire" />
-      <q-checkbox v-if="type=='E'" v-model="deleteProfile" label="Delete Profile" />
+      <q-checkbox v-if="type=='Exit'" v-model="deleteProfile" label="Delete Profile" />
     </div>
     <div class="row">
       <q-select
@@ -127,6 +127,18 @@
       </q-select>
       <q-input v-model="cubicleNumber" type="number" label="Cubicle Number" mask="###" class="q-mr-md" />
       <q-checkbox v-model="teleworking" label="Teleworking" />
+    </div>
+    <div v-if="['New', 'Return'].indexOf(type) != -1">
+      <div class="text-h6 transition-form-section-heading">Computer</div>
+      <div class="row items-center" id="computer-type">
+        <div class="q-gutter-sm q-mr-md">
+          <q-radio v-model="computerType" val="New" label="New" />
+          <q-radio v-model="computerType" val="Repurposed" label="Repurposed" />
+        </div>
+        <q-input v-if="computerType == 'New'" v-model="computerGL" label="GL Code" style="width: 250px;" />
+        <q-input v-else v-model="computerDescription" label="Description of existing computer" style="width: 350px;" />
+      </div>
+      <div v-if="computerType == 'New'" class="row q-mt-sm" style="color: red">Note that new PCs take 2-4 weeks to order.</div>
     </div>
     <div class="text-h6 transition-form-section-heading">Phone</div>
     <div class="row">
@@ -166,10 +178,10 @@
         label="Load Code"
       />
     </div>
-    <div v-if="type=='E'" class="row">
+    <div v-if="type=='Exit'" class="row">
       <q-checkbox v-model="shouldDelete" label="Delete?" />
     </div>
-    <div v-if="type=='E'" class="row">
+    <div v-if="type=='Exit'" class="row">
       <q-input
         v-model="reassignTo"
         label="Reassign to"
@@ -180,10 +192,10 @@
     </div>
     <div class="text-h6 transition-form-section-heading">Proxy Card/Photo ID</div>
     <div class="row">
-      <q-checkbox v-if="type!='E'" v-model="proxCardNeeded" label="Needed" />
-      <q-checkbox v-if="type=='E'" v-model="proxCardReturned" label="Turned In" />
+      <q-checkbox v-if="type!='Exit'" v-model="proxCardNeeded" label="Needed" />
+      <q-checkbox v-if="type=='Exit'" v-model="proxCardReturned" label="Turned In" />
     </div>
-    <div v-if="type=='E'">
+    <div v-if="type=='Exit'">
       <div class="text-h6 transition-form-section-heading">Computer Profile</div>
       <div class="row">
         <div>
@@ -211,12 +223,23 @@
       <q-input v-model="specialInstructions" autogrow style="width:100%" />
     </div>
 
+    <!-- Dialog of all error items -->
+    <q-dialog v-model="showErrorDialog" :position="errorDialogPosition">
+      <q-card style="width: 350px">
+        <q-list bordered separator>
+          <q-item v-for="(item, index) in formErrorItems()" :key="index" clickable @click="clickedErrorItem(item)">
+            <q-item-label>{{item[1]}}</q-item-label>
+          </q-item>
+        </q-list>
+      </q-card>
+    </q-dialog>
+
     <!-- Spacing for footer -->
     <div style="height: 80px;"></div>
 
     <div id="sticky-footer" class="row justify-between" v-if="true">
       <q-btn id="update-button" class="col-1" color="white" text-color="black" label="Submit" :disabled="!valuesAreChanged()" @click="updateTransitionAndClose()" />
-      <!-- <q-btn v-if="this.showErrorButton && this.formErrorItems().length > 0" label="Show missing fields" icon="check" color="warning" @click="openErrorDialog('right')" /> -->
+      <q-btn v-if="showErrorButton && formErrorItems().length > 0" label="Show errors" icon="check" color="warning" @click="openErrorDialog('right')" />
       <!-- <div class="col-3 self-center status">Current Status: {{ status }}</div> -->
     </div>
   </div>
@@ -251,7 +274,7 @@
 </style>
 
 <script setup lang="ts">
-import { useQuasar } from 'quasar'
+import { QDialogProps, scroll, useQuasar } from 'quasar'
 import { useRoute, useRouter } from 'vue-router'
 import { onMounted, ref, Ref, watch } from 'vue'
 
@@ -265,6 +288,7 @@ import { useWorkflowsStore } from 'src/stores/workflows'
 import { getRoutePk } from 'src/utils'
 
 const quasar = useQuasar()
+const { getScrollTarget, setVerticalScrollPosition  } = scroll
 const route = useRoute()
 const router = useRouter()
 const { bus } = useEventBus()
@@ -327,6 +351,12 @@ let unionAffiliationCurrentVal = ref('')
 let unionAffiliation = ref('')
 let teleworkingCurrentVal = ref(false)
 let teleworking = ref(false)
+let computerTypeCurrentVal = ref('')
+let computerType = ref('')
+let computerGLCurrentVal = ref('')
+let computerGL = ref('')
+let computerDescriptionCurrentVal = ref('')
+let computerDescription = ref('')
 let currentPhoneCurrentVal = ref('')
 let currentPhone = ref('')
 let deskPhoneCurrentVal = ref(false)
@@ -353,6 +383,10 @@ let accessEmailsCurrentVal = ref(emptyEmployee)
 let accessEmails = ref(emptyEmployee)
 let specialInstructionsCurrentVal = ref('')
 let specialInstructions = ref('')
+
+let showErrorButton = ref(false)
+let showErrorDialog = ref(false)
+let errorDialogPosition = ref('top') as Ref<QDialogProps['position']>
 
 function retrieveEmployeeTransition() {
   const t = currentEmployeeTransition()
@@ -410,6 +444,12 @@ function retrieveEmployeeTransition() {
   unionAffiliationCurrentVal.value = unionAffiliation.value
   teleworking.value = t.teleworking
   teleworkingCurrentVal.value = teleworking.value
+  computerType.value = t.computer_type
+  computerTypeCurrentVal.value = computerType.value
+  computerGL.value = t.computer_gl
+  computerGLCurrentVal.value = computerGL.value
+  computerDescription.value = t.computer_description
+  computerDescriptionCurrentVal.value = computerDescription.value
   currentPhone.value = t.current_phone
   currentPhoneCurrentVal.value = currentPhone.value
   deskPhone.value = t.desk_phone
@@ -439,7 +479,9 @@ function retrieveEmployeeTransition() {
   specialInstructions.value = t.special_instructions
   specialInstructionsCurrentVal.value = specialInstructions.value
   
-
+  if (formErrorItems().length > 0) {
+    showErrorButton.value = true
+  }
 
   
   // return new Promise((resolve, reject) => {
@@ -501,6 +543,9 @@ function valuesAreChanged(): boolean {
     cubicleNumber.value == cubicleNumberCurrentVal.value &&
     unionAffiliation.value == unionAffiliationCurrentVal.value &&
     teleworking.value == teleworkingCurrentVal.value &&
+    computerType.value == computerTypeCurrentVal.value &&
+    computerGL.value == computerGLCurrentVal.value &&
+    computerDescription.value == computerDescriptionCurrentVal.value &&
     currentPhone.value == currentPhoneCurrentVal.value &&
     deskPhone.value == deskPhoneCurrentVal.value &&
     phoneRequest.value == phoneRequestCurrentVal.value &&
@@ -519,6 +564,24 @@ function valuesAreChanged(): boolean {
   } else {
     return true
   }
+}
+
+function formErrorItems(): Array<[string, string]> {
+  let errorItems: Array<[string, string]> = []
+  if (computerTypeCurrentVal.value == 'New' && !computerGLCurrentVal.value) {
+    errorItems.push(['computer-type', 'Provide a valid GL code for computer purchase'])
+  }
+  if (computerTypeCurrentVal.value == 'Repurposed' && !computerDescriptionCurrentVal.value) {
+    errorItems.push(['computer-type', 'Provide a description of existing computer'])
+  }
+  
+  // if (!this.stepIncreaseCurrentVal) {
+  //   errorItems.push(['step-increase', 'Select Step Increase'])
+  // }
+  // if (this.descriptionReviewedEmployeeCurrentVal && !this.uploadedPositionDescriptionUrl) {
+  //   errorItems.push(['position-description-review', 'Upload Signed Position Description'])
+  // }
+  return errorItems
 }
 
 function updateTransitionAndClose() {
@@ -558,6 +621,9 @@ function updateTransitionAndClose() {
       cubicle_number: cubicleNumber.value,
       union_affiliation: unionAffiliation.value,
       teleworking: teleworking.value,
+      computer_type: computerType.value,
+      computer_gl: computerGL.value,
+      computer_description: computerDescription.value,
       current_phone: currentPhoneVal,
       desk_phone: deskPhone.value,
       phone_request: phoneRequest.value,
@@ -598,6 +664,9 @@ function updateTransitionAndClose() {
       cubicleNumberCurrentVal.value = t.cubicle_number
       unionAffiliationCurrentVal.value = t.union_affiliation
       teleworkingCurrentVal.value = t.teleworking
+      computerTypeCurrentVal.value = t.computer_type
+      computerGLCurrentVal.value = t.computer_gl
+      computerDescriptionCurrentVal.value = t.computer_description
       currentPhoneCurrentVal.value = t.current_phone
       deskPhoneCurrentVal.value = t.desk_phone
       phoneRequestCurrentVal.value = t.phone_request
@@ -612,10 +681,6 @@ function updateTransitionAndClose() {
       accessEmailsCurrentVal.value = {pk: t.access_emails_pk, name: t.access_emails_name}
       specialInstructionsCurrentVal.value = t.special_instructions
 
-      // if (this.formErrorItems().length > 0) {
-      //   this.showErrorButton = true
-      // }
-
       const routePk = getRoutePk(route)
       if (routePk) {
         workflowsStore.getCurrentWorkflowInstance(routePk)
@@ -625,7 +690,13 @@ function updateTransitionAndClose() {
           })
       }
 
-      router.push({ name: 'workflow-dashboard' })
+      if (formErrorItems().length > 0) {
+        showErrorButton.value = true
+      } else {
+        router.push({ name: 'workflow-dashboard' })
+      }
+
+      // TODO: If a new computer is required, send an email to the IT department
 
       if (!!t.title_name) {
         quasar.notify(`Updated Employee Transition for ${t.title_name} Position`)
@@ -644,6 +715,22 @@ function updateTransitionAndClose() {
       reject(e)
     })
   })
+}
+
+function openErrorDialog(position: QDialogProps['position']) {
+  errorDialogPosition.value = position
+  showErrorDialog.value = true
+}
+
+function clickedErrorItem(item: [string, string]) {
+  showErrorDialog.value = false
+  const element = document.getElementById(item[0])
+  if (!!element) {
+    const target = getScrollTarget(element)
+    const offset = element.offsetTop - 50
+    const duration = 500
+    setVerticalScrollPosition(target, offset, duration)
+  }
 }
 
 watch(() => bus.value.get('workflowInstanceRetrieved'), () => {

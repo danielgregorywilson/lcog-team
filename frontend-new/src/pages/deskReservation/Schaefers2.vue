@@ -298,14 +298,20 @@ function deleteReservation(pk: number) {
 function clickReserve() {
   // Before we reserve the desk, ensure the user does not have any active
   // reservations. If so, offer to move them.
-  const currentReservations = deskReservations.value
-    .filter(desk => desk.employee_pk == selectedEmployee.value.pk)
-  if (currentReservations.length) {
-    activeUserReservations.value = currentReservations
-    moveReservationDialogVisible.value = true
-  } else {
-    reserveDesk()
-  }
+  initDeskReservations() // Get latest desk reservations in case they changed since page load
+    .then(() => {
+      const currentReservations = deskReservations.value
+        .filter(desk => desk.employee_pk == selectedEmployee.value.pk)
+      if (currentReservations.length) {
+        activeUserReservations.value = currentReservations
+        moveReservationDialogVisible.value = true
+      } else {
+        reserveDesk()
+      }
+    })
+    .catch(e => {
+      console.error('Error initializing desk reservations:', e)
+    })
 }
 
 function moveReservation() {
@@ -323,17 +329,17 @@ function reserveDesk() {
     floor: FLOOR,
     desk_number: selectedDeskNumber.value
   })
-    .then((response) => {
+    .then((reservation) => {
       selectedEmployee.value = emptyEmployee
       selectedDeskNumber.value = ''
       deselectAllRoomButtons()
-      if (response.data.created) {
-        Notify.create(`Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`)  
+      if (reservation.created) {
+        Notify.create(`Reserved desk ${reservation.desk_number} for ${reservation.employee_name}`)  
       } else {
-        if (response.data.desk_held) {
-          Notify.create({message: `Sorry! Desk ${response.data.desk_number} is held today. Please choose another`, type: 'negative'})
+        if (reservation.desk_held) {
+          Notify.create({message: `Sorry! Desk ${reservation.desk_number} is held today. Please choose another`, type: 'negative'})
         } else {
-          Notify.create({message: `Sorry! Desk ${response.data.desk_number} is already reserved for ${response.data.employee_name}. Please choose another`, type: 'negative'})
+          Notify.create({message: `Sorry! Desk ${reservation.desk_number} is already reserved for ${reservation.employee_name}. Please choose another`, type: 'negative'})
         }
       }
       

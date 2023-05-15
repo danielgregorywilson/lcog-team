@@ -298,14 +298,20 @@ function deleteReservation(pk: number) {
 function clickReserve() {
   // Before we reserve the desk, ensure the user does not have any active
   // reservations. If so, offer to move them.
-  const currentReservations = deskReservations.value
-    .filter(desk => desk.employee_pk == selectedEmployee.value.pk)
-  if (currentReservations.length) {
-    activeUserReservations.value = currentReservations
-    moveReservationDialogVisible.value = true
-  } else {
-    reserveDesk()
-  }
+  initDeskReservations() // Get latest desk reservations in case they changed since page load
+    .then(() => {
+      const currentReservations = deskReservations.value
+        .filter(desk => desk.employee_pk == selectedEmployee.value.pk)
+      if (currentReservations.length) {
+        activeUserReservations.value = currentReservations
+        moveReservationDialogVisible.value = true
+      } else {
+        reserveDesk()
+      }
+    })
+    .catch(e => {
+      console.error('Error initializing desk reservations:', e)
+    })
 }
 
 function moveReservation() {

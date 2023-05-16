@@ -17,75 +17,82 @@ class Role(models.Model):
 
 
 class EmployeeTransition(models.Model):
-    TRANSITION_TYPE_NEW = 'N'
-    TRANSITION_TYPE_RETURN = 'R'
-    TRANSITION_TYPE_CHANGE = 'C'
-    TRANSITION_TYPE_EXIT = 'E'
+    TRANSITION_TYPE_NEW = 'New'
+    TRANSITION_TYPE_RETURN = 'Return'
+    TRANSITION_TYPE_CHANGE = 'Change/Modify'
+    TRANSITION_TYPE_EXIT = 'Exit'
     TRANSITION_TYPE_CHOICES = [
-        (TRANSITION_TYPE_NEW, 'New'),
-        (TRANSITION_TYPE_RETURN, 'Return'),
-        (TRANSITION_TYPE_CHANGE, 'Change/Modify'),
-        (TRANSITION_TYPE_EXIT, 'Exit')
+        (TRANSITION_TYPE_NEW, TRANSITION_TYPE_NEW),
+        (TRANSITION_TYPE_RETURN, TRANSITION_TYPE_RETURN),
+        (TRANSITION_TYPE_CHANGE, TRANSITION_TYPE_CHANGE),
+        (TRANSITION_TYPE_EXIT, TRANSITION_TYPE_EXIT)
     ]
 
     EMPLOYEE_ID_CLSD = 'CLSD'
     EMPLOYEE_ID_CLID = 'CLID'
     EMPLOYEE_ID_CHOICES = [
-        (EMPLOYEE_ID_CLSD, 'CLSD'),
-        (EMPLOYEE_ID_CLID, 'CLID')
+        (EMPLOYEE_ID_CLSD, EMPLOYEE_ID_CLSD),
+        (EMPLOYEE_ID_CLID, EMPLOYEE_ID_CLID)
     ]
 
-    LOCATION_COTTAGE_GROVE = 'CG'
-    LOCATION_FLORENCE = 'FL'
-    LOCATION_JUNCTION_CITY = 'JC'
-    LOCATION_OAKRIDGE = 'OA'
-    LOCATION_PP4 = 'P4'
-    LOCATION_PP5 = 'P5'
-    LOCATION_SB = 'SB'
-    LOCATION_S1 = 'S1'
-    LOCATION_S2 = 'S2'
-    LOCATION_S3 = 'S3'
-    LOCATION_SENIOR_MEALS = 'SM'
-    LOCATION_VENETA = 'VE'
+    LOCATION_COTTAGE_GROVE = 'Cottage Grove'
+    LOCATION_FLORENCE = 'Florence'
+    LOCATION_JUNCTION_CITY = 'Junction City'
+    LOCATION_OAKRIDGE = 'Oakridge'
+    LOCATION_PP4 = 'PPB - 4th Floor'
+    LOCATION_PP5 = 'PPB - 5th Floor'
+    LOCATION_SB = 'Schaefers - Basement'
+    LOCATION_S1 = 'Schaefers - 1st Floor'
+    LOCATION_S2 = 'Schaefers - 2nd Floor'
+    LOCATION_S3 = 'Schaefers - 3rd Floor'
+    LOCATION_SENIOR_MEALS = 'Senior Meals Site'
+    LOCATION_VENETA = 'Veneta'
     LOCATION_CHOICES = [
-        (LOCATION_COTTAGE_GROVE, 'Cottage Grove'),
-        (LOCATION_FLORENCE, 'Florence'),
-        (LOCATION_JUNCTION_CITY, 'Junction City'),
-        (LOCATION_OAKRIDGE, 'Oakridge'),
-        (LOCATION_PP4, 'PPB - 4th Floor'),
-        (LOCATION_PP5, 'PPB - 5th Floor'),
-        (LOCATION_SB, 'Schaefers - Basement'),
-        (LOCATION_S1, 'Schaefers - 1st Floor'),
-        (LOCATION_S2, 'Schaefers - 2nd Floor'),
-        (LOCATION_S3, 'Schaefers - 3rd Floor'),
-        (LOCATION_SENIOR_MEALS, 'Senior Meals Site'),
-        (LOCATION_VENETA, 'Veneta'),   
+        (LOCATION_COTTAGE_GROVE, LOCATION_COTTAGE_GROVE),
+        (LOCATION_FLORENCE, LOCATION_FLORENCE),
+        (LOCATION_JUNCTION_CITY, LOCATION_JUNCTION_CITY),
+        (LOCATION_OAKRIDGE, LOCATION_OAKRIDGE),
+        (LOCATION_PP4, LOCATION_PP4),
+        (LOCATION_PP5, LOCATION_PP5),
+        (LOCATION_SB, LOCATION_SB),
+        (LOCATION_S1, LOCATION_S1),
+        (LOCATION_S2, LOCATION_S2),
+        (LOCATION_S3, LOCATION_S3),
+        (LOCATION_SENIOR_MEALS, LOCATION_SENIOR_MEALS),
+        (LOCATION_VENETA, LOCATION_VENETA),   
     ]
 
-    UNION_NON_REPRESENTED = 'N'
-    UNION_EA = 'E'
-    UNION_SEIU = 'S'
-    UNION_MANAGEMENT = 'M'
+    UNION_NON_REPRESENTED = 'Non-Represented'
+    UNION_EA = 'EA'
+    UNION_SEIU = 'SEIU'
+    UNION_MANAGEMENT = 'Management'
     UNION_CHOICES = [
-        (UNION_NON_REPRESENTED, 'Non-Represented'),
-        (UNION_EA, 'EA'),
-        (UNION_SEIU, 'SEIU'),
-        (UNION_MANAGEMENT, 'Management')
+        (UNION_NON_REPRESENTED, UNION_NON_REPRESENTED),
+        (UNION_EA, UNION_EA),
+        (UNION_SEIU, UNION_SEIU),
+        (UNION_MANAGEMENT, UNION_MANAGEMENT)
     ]
 
-    PHONE_REQUEST_NEW = 'NN'
-    PHONE_REQUEST_REMOVE = 'RP'
-    PHONE_REQUEST_DELETE_NUM = 'DN'
-    PHONE_REQUEST_REASSIGN = 'RT'
-    PHONE_REQIUEST_CHANGE = 'CN'
-    PHONE_REQUEST_DELETE_VM = 'DV'
+    COMPUTER_TYPE_NEW = 'New'
+    COMPUTER_TYPE_REPURPOSED = 'Repurposed'
+    COMPUTER_TYPE_CHOICES = [
+        (COMPUTER_TYPE_NEW, COMPUTER_TYPE_NEW),
+        (COMPUTER_TYPE_REPURPOSED, COMPUTER_TYPE_REPURPOSED),
+    ]
+
+    PHONE_REQUEST_NEW = 'New number needed'
+    PHONE_REQUEST_REMOVE = 'Remove phone'
+    PHONE_REQUEST_DELETE_NUM = 'Delete number'
+    PHONE_REQUEST_REASSIGN = 'Reassign to:'
+    PHONE_REQUEST_CHANGE = 'Change name display to:'
+    PHONE_REQUEST_DELETE_VM = 'Delete voicemail box'
     PHONE_REQUEST_CHOICES = [
-        (PHONE_REQUEST_NEW, 'New number needed'),
-        (PHONE_REQUEST_REMOVE, 'Remove phone'),
-        (PHONE_REQUEST_DELETE_NUM, 'Delete number'),
-        (PHONE_REQUEST_REASSIGN, 'Reassign to:'),
-        (PHONE_REQIUEST_CHANGE, 'Change name display to:'),
-        (PHONE_REQUEST_DELETE_VM, 'Delete voicemail box')
+        (PHONE_REQUEST_NEW, PHONE_REQUEST_NEW),
+        (PHONE_REQUEST_REMOVE, PHONE_REQUEST_REMOVE),
+        (PHONE_REQUEST_DELETE_NUM, PHONE_REQUEST_DELETE_NUM),
+        (PHONE_REQUEST_REASSIGN, PHONE_REQUEST_REASSIGN),
+        (PHONE_REQUEST_CHANGE, PHONE_REQUEST_CHANGE),
+        (PHONE_REQUEST_DELETE_VM, PHONE_REQUEST_DELETE_VM)
     ]
 
     class Meta:
@@ -125,10 +132,13 @@ class EmployeeTransition(models.Model):
     transition_date = models.DateTimeField(blank=True, null=True)
     preliminary_hire = models.BooleanField(default=False)
     delete_profile = models.BooleanField(default=False)
-    office_location = models.CharField(max_length=30, choices=LOCATION_CHOICES)
+    office_location = models.CharField(max_length=30, choices=LOCATION_CHOICES, blank=True)
     cubicle_number = models.PositiveSmallIntegerField(blank=True, null=True)
-    union_affiliation = models.CharField(max_length=20, choices=UNION_CHOICES)
+    union_affiliation = models.CharField(max_length=20, choices=UNION_CHOICES, blank=True)
     teleworking = models.BooleanField(default=False)
+    computer_type = models.CharField(max_length=10, choices=COMPUTER_TYPE_CHOICES, blank=True)
+    computer_gl = models.CharField(max_length=30, blank=True)
+    computer_description = models.CharField(max_length=200, blank=True)
     current_phone = models.CharField(max_length=10, blank=True)
     desk_phone = models.BooleanField(default=False)
     phone_request = models.CharField(max_length=30, choices=PHONE_REQUEST_CHOICES, blank=True)

@@ -7,7 +7,13 @@
       <q-btn color="secondary" icon="east" @click="weekForward()"/>
     </q-btn-group>
   </div>
-  <div class="q-mt-lg">
+  <q-spinner-grid
+    v-if="!calendarLoaded"
+    class="spinner q-mt-lg"
+    color="primary"
+    size="xl"
+  />
+  <div v-else class="q-mt-lg">
     <div v-for="day of teamTimeOff()" :key="day.date">
       <div class="text-h5"><span>{{day.date}}</span><span v-if="day.isToday"> (Today)</span></div>
       <ul>
@@ -43,6 +49,8 @@ import { useTimeOffStore } from 'src/stores/timeoff'
 type TimeOffCalendarData = Array<{date: string, isToday: boolean, requests: Array<TimeOffRequestRetrieve>}>
 
 const timeOffStore = useTimeOffStore()
+
+let calendarLoaded = ref(false)
 
 let today = ref(new Date())
 let thisWeekMonday = ref(new Date())
@@ -84,6 +92,9 @@ function teamTimeOff(): TimeOffCalendarData {
 // TODO: This currently gets all time off; should probably just get for a period
 function retrieveTeamTimeOff(): void {
   timeOffStore.getTeamTimeOffRequests()
+    .then(() => {
+      calendarLoaded.value = true
+    })
     .catch(e => {
       console.error('Error retrieving team time off', e)
     })

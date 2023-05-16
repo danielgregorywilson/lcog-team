@@ -130,6 +130,7 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
             'manager_name', 'unit_pk', 'unit_name', 'transition_date',
             'preliminary_hire', 'delete_profile', 'office_location',
             'cubicle_number', 'union_affiliation', 'teleworking',
+            'computer_type', 'computer_gl', 'computer_description',
             'current_phone', 'desk_phone', 'phone_request',
             'phone_request_data', 'load_code', 'should_delete', 'reassign_to',
             'business_cards', 'prox_card_needed', 'prox_card_returned',

@@ -702,6 +702,9 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   cubicle_number: number | null
   union_affiliation: string
   teleworking: boolean
+  computer_type: string
+  computer_gl: string
+  computer_description: string
   current_phone: string
   desk_phone: boolean
   phone_request: string
@@ -738,6 +741,9 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   office_location?: string
   union_affiliation?: string
   teleworking?: boolean
+  computer_type?: string
+  computer_gl?: string
+  computer_description?: string
   current_phone?: string
   desk_phone?: boolean
   phone_request?: string

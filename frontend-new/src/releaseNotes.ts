@@ -4,6 +4,24 @@
 
 export const releases = [
   {
+    version: '0.12.2',
+    date: new Date(2023, 4, 15),
+    changes: [
+      {
+        type: 'fix',
+        description: 'Fix a bug where an employee could reserve multiple desks for the same day'
+      },
+      {
+        type: 'improved',
+        description: 'Employee transition form improvements, inlcuding new computer fields'
+      },
+      {
+        type: 'improved',
+        description: 'Team calendar loading spinner'
+      },
+    ]
+  },
+  {
     version: '0.12.1',
     date: new Date(2023, 4, 5),
     changes: [

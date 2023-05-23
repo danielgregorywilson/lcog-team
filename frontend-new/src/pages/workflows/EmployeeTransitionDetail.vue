@@ -125,7 +125,7 @@
           <q-icon name="cancel" @click.stop="officeLocation=''" class="cursor-pointer" />
         </template>
       </q-select>
-      <q-input v-model="cubicleNumber" type="number" label="Cubicle Number" mask="###" class="q-mr-md" />
+      <q-input v-model="cubicleNumber" mask="NNNNNNNNNN" label="Cubicle Number" class="q-mr-md" />
       <q-checkbox v-model="teleworking" label="Teleworking" />
     </div>
     <div v-if="['New', 'Return'].indexOf(type) != -1">

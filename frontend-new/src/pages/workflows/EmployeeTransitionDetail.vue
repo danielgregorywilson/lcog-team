@@ -150,7 +150,6 @@
         fill-mask
         class="q-mr-md"
       />
-      <q-checkbox v-model="deskPhone" label="Desk Phone Needed" class="q-mr-md" />
       <q-select
         v-model="phoneRequest"
         :options="[
@@ -172,11 +171,17 @@
       />
     </div>
     <div class="row">
+      <q-checkbox v-model="deskPhone" label="Desk Phone Needed" class="q-mr-md" />
+    </div>
+    <div class="row">
       <q-input
         v-model="loadCode"
         v-if="employeeID == 'CLSD'"
         label="Load Code"
       />
+    </div>
+    <div>
+      <q-checkbox v-model="cellPhone" label="Cell Phone Needed" class="q-mr-md" />
     </div>
     <div v-if="type=='Exit'" class="row">
       <q-checkbox v-model="shouldDelete" label="Delete?" />
@@ -187,6 +192,7 @@
         label="Reassign to"
       />
     </div>
+    <div class="text-h6 transition-form-section-heading">Business Cards</div>
     <div class="row">
       <q-checkbox v-model="businessCards" label="Order Business Cards" />
     </div>
@@ -367,6 +373,8 @@ let phoneRequestDataCurrentVal = ref('')
 let phoneRequestData = ref('')
 let loadCodeCurrentVal = ref('')
 let loadCode = ref('')
+let cellPhoneCurrentVal = ref(false)
+let cellPhone = ref(false)
 let shouldDeleteCurrentVal = ref(false)
 let shouldDelete = ref(false)
 let reassignToCurrentVal = ref('')
@@ -460,6 +468,8 @@ function retrieveEmployeeTransition() {
   phoneRequestDataCurrentVal.value = phoneRequestData.value
   loadCode.value = t.load_code
   loadCodeCurrentVal.value = loadCode.value
+  cellPhone.value = t.cell_phone
+  cellPhoneCurrentVal.value = cellPhone.value
   shouldDelete.value = t.should_delete
   shouldDeleteCurrentVal.value = shouldDelete.value
   reassignTo.value = t.reassign_to
@@ -551,6 +561,7 @@ function valuesAreChanged(): boolean {
     phoneRequest.value == phoneRequestCurrentVal.value &&
     phoneRequestData.value == phoneRequestDataCurrentVal.value &&
     loadCode.value == loadCodeCurrentVal.value &&
+    cellPhone.value == cellPhoneCurrentVal.value &&
     shouldDelete.value == shouldDeleteCurrentVal.value &&
     reassignTo.value == reassignToCurrentVal.value &&
     businessCards.value == businessCardsCurrentVal.value &&
@@ -629,6 +640,7 @@ function updateTransitionAndClose() {
       phone_request: phoneRequest.value,
       phone_request_data: phoneRequestData.value,
       load_code: loadCode.value,
+      cell_phone: cellPhone.value,
       should_delete: shouldDelete.value,
       reassign_to: reassignTo.value,
       business_cards: businessCards.value,
@@ -672,6 +684,7 @@ function updateTransitionAndClose() {
       phoneRequestCurrentVal.value = t.phone_request
       phoneRequestDataCurrentVal.value = t.phone_request_data
       loadCodeCurrentVal.value = t.load_code
+      cellPhoneCurrentVal.value = t.cell_phone
       shouldDeleteCurrentVal.value = t.should_delete
       reassignToCurrentVal.value = t.reassign_to
       businessCardsCurrentVal.value = t.business_cards

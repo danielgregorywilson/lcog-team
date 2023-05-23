@@ -144,6 +144,7 @@ class EmployeeTransition(models.Model):
     phone_request = models.CharField(max_length=30, choices=PHONE_REQUEST_CHOICES, blank=True)
     phone_request_data = models.CharField(max_length=50, blank=True)
     load_code = models.CharField(max_length=50, blank=True)
+    cell_phone = models.BooleanField(default=False)
     should_delete = models.BooleanField(default=False)
     reassign_to = models.CharField(max_length=50, blank=True)
     business_cards = models.BooleanField(default=False)

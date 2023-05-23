@@ -710,6 +710,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   phone_request: string
   phone_request_data: string
   load_code: string
+  cell_phone: boolean
   should_delete: boolean
   reassign_to: string
   business_cards: boolean
@@ -749,6 +750,7 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   phone_request?: string
   phone_request_data?: string
   load_code?: string
+  cell_phone?: boolean
   should_delete?: boolean
   reassign_to?: string
   business_cards?: boolean

@@ -132,9 +132,10 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
             'cubicle_number', 'union_affiliation', 'teleworking',
             'computer_type', 'computer_gl', 'computer_description',
             'phone_number', 'desk_phone', 'phone_request',
-            'phone_request_data', 'load_code', 'should_delete', 'reassign_to',
-            'business_cards', 'prox_card_needed', 'prox_card_returned',
-            'access_emails_pk', 'access_emails_name', 'special_instructions'
+            'phone_request_data', 'load_code', 'cell_phone', 'should_delete',
+            'reassign_to', 'business_cards', 'prox_card_needed',
+            'prox_card_returned', 'access_emails_pk', 'access_emails_name',
+            'special_instructions'
         ]
     
     @staticmethod

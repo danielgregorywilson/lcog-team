@@ -58,7 +58,11 @@ export const usePeopleStore = defineStore('people', {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/jobtitle`})
         .then(resp => {
-          this.titleList = resp.data.results
+          this.titleList = resp.data.results.sort((a: Title, b: Title) => {
+            if (a.name < b.name) { return -1 }
+            if (a.name > b.name) { return 1 }
+            return 0
+          })
           resolve('Successfully got title list')
         })
         .catch(e => {

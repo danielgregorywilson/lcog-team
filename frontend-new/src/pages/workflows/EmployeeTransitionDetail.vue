@@ -143,7 +143,7 @@
     <div class="text-h6 transition-form-section-heading">Phone</div>
     <div class="row">
       <q-input
-        v-model="currentPhone"
+        v-model="phoneNumber"
         type="tel"
         label="Phone Number"
         mask="(###) ###-####"
@@ -357,8 +357,8 @@ let computerGLCurrentVal = ref('')
 let computerGL = ref('')
 let computerDescriptionCurrentVal = ref('')
 let computerDescription = ref('')
-let currentPhoneCurrentVal = ref('')
-let currentPhone = ref('')
+let phoneNumberCurrentVal = ref('')
+let phoneNumber = ref('')
 let deskPhoneCurrentVal = ref(false)
 let deskPhone = ref(false)
 let phoneRequestCurrentVal = ref('')
@@ -450,8 +450,8 @@ function retrieveEmployeeTransition() {
   computerGLCurrentVal.value = computerGL.value
   computerDescription.value = t.computer_description
   computerDescriptionCurrentVal.value = computerDescription.value
-  currentPhone.value = t.current_phone
-  currentPhoneCurrentVal.value = currentPhone.value
+  phoneNumber.value = t.phone_number
+  phoneNumberCurrentVal.value = phoneNumber.value
   deskPhone.value = t.desk_phone
   deskPhoneCurrentVal.value = deskPhone.value
   phoneRequest.value = t.phone_request
@@ -546,7 +546,7 @@ function valuesAreChanged(): boolean {
     computerType.value == computerTypeCurrentVal.value &&
     computerGL.value == computerGLCurrentVal.value &&
     computerDescription.value == computerDescriptionCurrentVal.value &&
-    currentPhone.value == currentPhoneCurrentVal.value &&
+    phoneNumber.value == phoneNumberCurrentVal.value &&
     deskPhone.value == deskPhoneCurrentVal.value &&
     phoneRequest.value == phoneRequestCurrentVal.value &&
     phoneRequestData.value == phoneRequestDataCurrentVal.value &&
@@ -586,7 +586,7 @@ function formErrorItems(): Array<[string, string]> {
 
 function updateTransitionAndClose() {
   return new Promise((resolve, reject) => {
-    const currentPhoneVal = currentPhone.value == '(___) ___-____' ? '' : currentPhone.value
+    const phoneNumberVal = phoneNumber.value == '(___) ___-____' ? '' : phoneNumber.value
     if (['Reassign to:', 'Change name display to:'].indexOf(phoneRequest.value) == -1) {
       phoneRequestData.value = ''
     }
@@ -624,7 +624,7 @@ function updateTransitionAndClose() {
       computer_type: computerType.value,
       computer_gl: computerGL.value,
       computer_description: computerDescription.value,
-      current_phone: currentPhoneVal,
+      phone_number: phoneNumberVal,
       desk_phone: deskPhone.value,
       phone_request: phoneRequest.value,
       phone_request_data: phoneRequestData.value,
@@ -667,7 +667,7 @@ function updateTransitionAndClose() {
       computerTypeCurrentVal.value = t.computer_type
       computerGLCurrentVal.value = t.computer_gl
       computerDescriptionCurrentVal.value = t.computer_description
-      currentPhoneCurrentVal.value = t.current_phone
+      phoneNumberCurrentVal.value = t.phone_number
       deskPhoneCurrentVal.value = t.desk_phone
       phoneRequestCurrentVal.value = t.phone_request
       phoneRequestDataCurrentVal.value = t.phone_request_data

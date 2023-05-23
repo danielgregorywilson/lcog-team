@@ -139,7 +139,7 @@ class EmployeeTransition(models.Model):
     computer_type = models.CharField(max_length=10, choices=COMPUTER_TYPE_CHOICES, blank=True)
     computer_gl = models.CharField(max_length=30, blank=True)
     computer_description = models.CharField(max_length=200, blank=True)
-    current_phone = models.CharField(max_length=10, blank=True)
+    phone_number = models.CharField(max_length=20, blank=True)
     desk_phone = models.BooleanField(default=False)
     phone_request = models.CharField(max_length=30, choices=PHONE_REQUEST_CHOICES, blank=True)
     phone_request_data = models.CharField(max_length=50, blank=True)

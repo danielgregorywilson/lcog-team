@@ -145,12 +145,12 @@ import StandardDeskImg from 'src/assets/floorPlans/desk-standard.png'
 import FloorPlan from 'src/assets/floorPlans/schaefers1.svg'
 import useEventBus from 'src/eventBus'
 import { useDeskReservationStore } from 'src/stores/deskreservation'
-import { useUserStore } from 'src/stores/user'
+import { usePeopleStore } from 'src/stores/people'
 import { Desk, DeskReservation, SimpleEmployeeRetrieve } from 'src/types'
 import { getRouteParam } from 'src/utils'
 
 const deskReservationStore = useDeskReservationStore()
-const userStore = useUserStore()
+const peopleStore = usePeopleStore()
 const route = useRoute()
 const bus = useEventBus()
 
@@ -197,14 +197,14 @@ const orangeColor = 'orange'
 // EMPLOYEES //
 ///////////////
 function employees(): Array<SimpleEmployeeRetrieve> {    
-  const employees = userStore.simpleEmployeeList
+  const employees = peopleStore.simpleEmployeeList
   return employees.filter((employee) => {
     return employee.name.toLowerCase().indexOf(needle.value) != -1
   })
 }
 
 function retrieveSimpleEmployeeList(): void {
-  userStore.getSimpleEmployeeList()
+  peopleStore.getSimpleEmployeeList()
     .catch(e => {
       console.error('Error retrieving simple employee list', e)
     })

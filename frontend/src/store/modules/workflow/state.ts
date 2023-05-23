@@ -26,7 +26,7 @@ const blankEmployeeTransition: EmployeeTransition = {
   unit_name: '', transition_date: new Date(), preliminary_hire: false,
   delete_profile: false, office_location: '', cubicle_number: null,
   union_affiliation: '', teleworking: false, desk_phone: false,
-  current_phone: '', phone_request: '', phone_request_data: '', load_code: '',
+  phone_number: '', phone_request: '', phone_request_data: '', load_code: '',
   should_delete: false, reassign_to: '', business_cards: false,
   prox_card_needed: false, prox_card_returned: false, access_emails_pk: -1,
   access_emails_name: '', special_instructions: ''

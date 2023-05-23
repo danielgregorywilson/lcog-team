@@ -880,7 +880,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   cubicle_number: number | null
   union_affiliation: string
   teleworking: boolean
-  current_phone: string
+  phone_number: string
   desk_phone: boolean
   phone_request: string
   phone_request_data: string
@@ -916,7 +916,7 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   office_location?: string
   union_affiliation?: string
   teleworking?: boolean
-  current_phone?: string
+  phone_number?: string
   desk_phone?: boolean
   phone_request?: string
   phone_request_data?: string

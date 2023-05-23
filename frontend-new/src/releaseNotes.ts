@@ -4,6 +4,24 @@
 
 export const releases = [
   {
+    version: '0.13.0',
+    date: new Date(2023, 4, 23),
+    changes: [
+      {
+        type: 'fix',
+        description: 'Fix a bug where employee transition form could not be submitted'
+      },
+      {
+        type: 'improved',
+        description: 'Employee transition form improvements, including new cell phone fields'
+      },
+      {
+        type: 'improved',
+        description: 'Loading spinners in more places'
+      },
+    ]
+  },
+  {
     version: '0.12.2',
     date: new Date(2023, 4, 15),
     changes: [
@@ -13,7 +31,7 @@ export const releases = [
       },
       {
         type: 'improved',
-        description: 'Employee transition form improvements, inlcuding new computer fields'
+        description: 'Employee transition form improvements, including new computer fields'
       },
       {
         type: 'improved',

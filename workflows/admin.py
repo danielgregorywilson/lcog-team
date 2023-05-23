@@ -96,14 +96,15 @@ class StepChoiceInline(admin.TabularInline):
     formset = GetParentFormSet
     form = StepChoiceForm
     fk_name = "step"
-    ordering = ('order',)
+    ordering = ("order",)
     extra = 0
 
 
 @admin.register(Step)
 class StepAdmin(admin.ModelAdmin):
-    list_display = ("name",)
+    list_display = ("order", "name",)
     list_filter = ("process",)
+    ordering = ("order",)
     form = StepForm
     inlines = (StepChoiceInline,)
 

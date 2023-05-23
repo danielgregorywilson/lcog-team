@@ -1,6 +1,13 @@
 <template>
   <div class="q-py-sm">
+    <q-spinner-grid
+        v-if="!workflowsLoaded"
+        class="spinner q-mt-lg"
+        color="primary"
+        size="xl"
+      />
     <q-table
+      v-else
       :rows="workflows()"
       :columns="columns"
       :grid="$q.screen.lt.md"
@@ -137,6 +144,8 @@ const router = useRouter()
 const userStore = useUserStore()
 const workflowsStore = useWorkflowsStore()
 
+let workflowsLoaded = ref(false)
+
 let deleteDialogVisible = ref(false)
 let deleteDialogPositionName = ref('Not Set')
 let deleteDialogPercentComplete = ref('0')
@@ -181,22 +190,34 @@ function noDataLabel(): string {
 function retrieveWorkflows(): void {
   if (props.actionRequired) {
     workflowsStore.getWorkflows({actionRequired: true})
+      .then(() => {
+        workflowsLoaded.value = true
+      })
       .catch(e => {
         console.error('Error retrieving workflows with action required:', e)
       })
   } else if (props.complete == undefined) {
     workflowsStore.getWorkflows({})
+      .then(() => {
+        workflowsLoaded.value = true
+      })  
       .catch(e => {
         console.error('Error retrieving all workflows:', e)
       })
   } else {
     if (props.complete) {
       workflowsStore.getWorkflows({complete: true})
+        .then(() => {
+          workflowsLoaded.value = true
+        })
         .catch(e => {
           console.error('Error retrieving complete workflows:', e)
         })
     } else {
       workflowsStore.getWorkflows({complete: false})
+        .then(() => {
+          workflowsLoaded.value = true
+        })  
         .catch(e => {
           console.error('Error retrieving incomplete workflows:', e)
         })

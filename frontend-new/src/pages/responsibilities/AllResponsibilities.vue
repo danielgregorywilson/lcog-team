@@ -1,5 +1,12 @@
 <template>
+  <q-spinner-grid
+    v-if="!responsibilitiesLoaded"
+    class="spinner q-mt-lg"
+    color="primary"
+    size="xl"
+  />
   <ResponsibilityTable
+    v-else
     tableTitle="All Responsibilities"
     :tableRows="allResponsibilities()"
     :tableColumns="tableColumns"
@@ -27,7 +34,7 @@
 </style>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { QTableProps } from 'quasar'
 
 import ResponsibilityTable from 'src/components/responsibilities/ResponsibilityTable.vue'
@@ -35,6 +42,8 @@ import { useResponsibilityStore } from 'src/stores/responsibility'
 import { Responsibility } from 'src/types'
 
 const responsibilityStore = useResponsibilityStore()
+
+let responsibilitiesLoaded = ref(false)
 
 const tableColumns: QTableProps['columns'] = [
   { name: 'name', required: true, label: 'Name', field: 'name', sortable: true, align: 'left' },
@@ -52,6 +61,9 @@ function allResponsibilities(): Array<Responsibility> {
 
 function retrieveAllResponsibilites(): void {
   responsibilityStore.getAllResponsibilities()
+    .then(() => {
+      responsibilitiesLoaded.value = true
+    })
     .catch(e => {
       console.error('Error retrieving responsibilities', e)
     })

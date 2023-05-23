@@ -125,7 +125,7 @@
     <div class="text-h6 transition-form-section-heading">Phone</div>
     <div class="row">
       <q-input
-        v-model="currentPhone"
+        v-model="phoneNumber"
         type="tel"
         label="Phone Number"
         mask="(###) ###-####"
@@ -312,8 +312,8 @@ export default class EmployeeTransitionDetail extends Vue {
   public unionAffiliation = ''
   public teleworkingCurrentVal = false
   public teleworking = false
-  public currentPhoneCurrentVal = ''
-  public currentPhone = ''
+  public phoneNumberCurrentVal = ''
+  public phoneNumber = ''
   public deskPhoneCurrentVal = false
   public deskPhone = false
   public phoneRequestCurrentVal = ''
@@ -392,8 +392,8 @@ export default class EmployeeTransitionDetail extends Vue {
     this.unionAffiliationCurrentVal = this.unionAffiliation
     this.teleworking = t.teleworking
     this.teleworkingCurrentVal = this.teleworking
-    this.currentPhone = t.current_phone
-    this.currentPhoneCurrentVal = this.currentPhone
+    this.phoneNumber = t.phone_number
+    this.phoneNumberCurrentVal = this.phoneNumber
     this.deskPhone = t.desk_phone
     this.deskPhoneCurrentVal = this.deskPhone
     this.phoneRequest = t.phone_request
@@ -477,7 +477,7 @@ export default class EmployeeTransitionDetail extends Vue {
       this.cubicleNumber == this.cubicleNumberCurrentVal &&
       this.unionAffiliation == this.unionAffiliationCurrentVal &&
       this.teleworking == this.teleworkingCurrentVal &&
-      this.currentPhone == this.currentPhoneCurrentVal &&
+      this.phoneNumber == this.phoneNumberCurrentVal &&
       this.deskPhone == this.deskPhoneCurrentVal &&
       this.phoneRequest == this.phoneRequestCurrentVal &&
       this.phoneRequestData == this.phoneRequestDataCurrentVal &&
@@ -499,7 +499,7 @@ export default class EmployeeTransitionDetail extends Vue {
 
   public updateTransition() {
     return new Promise((resolve, reject) => {
-      const currentPhoneVal = this.currentPhone == '(___) ___-____' ? '' : this.currentPhone
+      const phoneNumberVal = this.phoneNumber == '(___) ___-____' ? '' : this.phoneNumber
       if (['Reassign to:', 'Change name display to:'].indexOf(this.phoneRequest) == -1) {
         this.phoneRequestData = ''
       }
@@ -531,7 +531,7 @@ export default class EmployeeTransitionDetail extends Vue {
         cubicle_number: this.cubicleNumber,
         union_affiliation: this.unionAffiliation,
         teleworking: this.teleworking,
-        current_phone: currentPhoneVal,
+        phone_number: phoneNumberVal,
         desk_phone: this.deskPhone,
         phone_request: this.phoneRequest,
         phone_request_data: this.phoneRequestData,
@@ -571,7 +571,7 @@ export default class EmployeeTransitionDetail extends Vue {
         this.cubicleNumberCurrentVal = response.data.cubicle_number
         this.unionAffiliationCurrentVal = response.data.union_affiliation
         this.teleworkingCurrentVal = response.data.teleworking
-        this.currentPhoneCurrentVal = response.data.current_phone
+        this.phoneNumberCurrentVal = response.data.phone_number
         this.deskPhoneCurrentVal = response.data.desk_phone
         this.phoneRequestCurrentVal = response.data.phone_request
         this.phoneRequestDataCurrentVal = response.data.phone_request_data

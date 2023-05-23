@@ -15,11 +15,16 @@ export const usePeopleStore = defineStore('people', {
   getters: {},
 
   actions: {
+    // Simple list of all employees
     getSimpleEmployeeList() {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/employee/simple_list`})
           .then(resp => {
-            this.simpleEmployeeList = resp.data
+            this.simpleEmployeeList = resp.data.sort((a: SimpleEmployeeRetrieve, b: SimpleEmployeeRetrieve) => {
+              if (a.name < b.name) return -1
+              if (a.name > b.name) return 1
+              return 0
+            })
             resolve('Successfully got simple employee list')
           })
           .catch(e => {
@@ -27,12 +32,13 @@ export const usePeopleStore = defineStore('people', {
           })
       })
     },
-    getSimpleEmployeeDetail(data: {pk: string}) {
+    // Simple detail of one employee
+    getSimpleEmployeeDetail(data: {pk: number}) {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/employee/${ data.pk }/simple_detail`})
           .then(resp => {
             this.simpleEmployeeDetail = resp.data
-            resolve('Successfully got simple employee detail')
+            resolve('Got simple employee detail')
           })
           .catch(e => {
             handlePromiseError(reject, 'Error getting simple employee detail', e)
@@ -58,7 +64,11 @@ export const usePeopleStore = defineStore('people', {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/jobtitle`})
         .then(resp => {
-          this.titleList = resp.data.results
+          this.titleList = resp.data.results.sort((a: Title, b: Title) => {
+            if (a.name < b.name) { return -1 }
+            if (a.name > b.name) { return 1 }
+            return 0
+          })
           resolve('Successfully got title list')
         })
         .catch(e => {

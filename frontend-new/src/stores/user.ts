@@ -118,36 +118,6 @@ export const useUserStore = defineStore('user', {
           ))
       })
     },
-    // Simple list of all employees
-    getSimpleEmployeeList() {
-      return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/employee/simple_list`})
-          .then(resp => {
-            this.simpleEmployeeList = resp.data.sort((a: SimpleEmployeeRetrieve, b: SimpleEmployeeRetrieve) => {
-              if (a.name < b.name) return -1
-              if (a.name > b.name) return 1
-              return 0
-            })
-            resolve('Got simple employee list')
-          })
-          .catch(e => {
-            handlePromiseError(reject, 'Error getting simple employee list', e)
-          })
-      })
-    },
-    // Simple detail of one employee
-    getSimpleEmployeeDetail(data: {pk: number}) {
-      return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/employee/${ data.pk }/simple_detail`})
-          .then(resp => {
-            this.simpleEmployeeDetail = resp.data
-            resolve('Got simple employee detail')
-          })
-          .catch(e => {
-            handlePromiseError(reject, 'Error getting simple employee detail', e)
-          })
-      })
-    },
     authLogout() {
       return new Promise((resolve) => {
         this.$reset()

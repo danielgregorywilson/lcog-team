@@ -28,9 +28,9 @@
 <script setup lang="ts">
 import { onMounted, onUpdated, ref } from 'vue'
 
-import { useUserStore } from 'src/stores/user'
+import { usePeopleStore } from 'src/stores/people'
 
-const userStore = useUserStore()
+const peopleStore = usePeopleStore()
 
 const emptyEmployee = {name: '', pk: -1}
 
@@ -48,14 +48,14 @@ let needle = ref('') // For filtering employee list
 let selectedEmployee = ref(emptyEmployee)
 
 function retrieveSimpleEmployeeList(): void {
-  userStore.getSimpleEmployeeList()
+  peopleStore.getSimpleEmployeeList()
     .catch(e => {
       console.error('Error retrieving simple employee list', e)
     })
 }
 
 function employees() {    
-  const employees = userStore.simpleEmployeeList
+  const employees = peopleStore.simpleEmployeeList
   return employees.filter((employee) => {
     return employee.name.toLowerCase().indexOf(needle.value) != -1
   })

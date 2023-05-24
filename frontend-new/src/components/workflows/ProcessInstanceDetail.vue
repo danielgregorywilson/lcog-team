@@ -23,7 +23,7 @@
         <q-stepper-navigation v-if="!stepInstanceIsComplete(si)">
           <div v-if="si.step.next_step">
             <q-btn
-              :disable="!canCompleteStepInstance(si)"
+              :disable="!canCompleteStepInstance(si) || disableCompletions"
               @click="completeStep(si.pk)"
               color="primary"
               label="Mark as Complete"
@@ -38,7 +38,7 @@
               @click="completeStep(si.pk, choice.next_step_pk)"
               color="primary"
               :label="choice.choice_text"
-              :disable="!canCompleteStepInstance(si)"
+              :disable="!canCompleteStepInstance(si) || disableCompletions"
             />
           </div>
         </q-stepper-navigation>
@@ -68,6 +68,7 @@ const props = defineProps<{
 const formatDate = date.formatDate
 
 let currentStepInstance = ref(-1)
+let disableCompletions = ref(false) // Prevent completing a step instance twice
 
 function setCurrentStepInstance() {
   currentStepInstance.value = workflowsStore.processInstanceCurrentStepPks[props.pi.pk]
@@ -105,10 +106,12 @@ function canCompleteStepInstance(stepInstance: StepInstance): boolean {
 }
 
 function completeStep(stepInstancePk: number, nextStepPk?: number): void {
+  disableCompletions.value = true
   workflowsStore.completeStepInstance(stepInstancePk, nextStepPk)
     .then(() => {
       setCurrentStepInstance()
       bus.emit('completedStep', Math.random())
+      disableCompletions.value = false
     })
     .catch(e => {
       console.error('Error completing step instance', e)

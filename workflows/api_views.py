@@ -407,6 +407,11 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
         """
         # Complete the current step instance
         stepinstance = StepInstance.objects.get(pk=pk)
+        
+        # Prevent completing a step instance twice
+        if stepinstance.completed_at:
+            return Response({'error': 'This step instance has already been completed.'}, status=status.HTTP_400_BAD_REQUEST)
+        
         stepinstance.completed_at = timezone.now()
         stepinstance.completed_by = request.user.employee
         stepinstance.save()

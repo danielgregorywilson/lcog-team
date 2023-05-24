@@ -227,13 +227,13 @@ import {
 
 import useEventBus from 'src/eventBus'
 import { useResponsibilityStore } from 'src/stores/responsibility'
-import { useUserStore } from 'src/stores/user'
+import { usePeopleStore } from 'src/stores/people'
 
 const quasar = useQuasar()
 const route = useRoute()
 const { bus } = useEventBus()
 const responsibilityStore = useResponsibilityStore()
-const userStore = useUserStore()
+const peopleStore = usePeopleStore()
 
 const emptyEmployee = {name: '', pk: -1}
 
@@ -275,14 +275,14 @@ let tagNeedle = ref('') // For filtering tag list
 // EMPLOYEES //
 ///////////////
 function employees(): Array<SimpleEmployeeRetrieve> {    
-  const employees = userStore.simpleEmployeeList
+  const employees = peopleStore.simpleEmployeeList
   return employees.filter((employee) => {
     return employee.name.toLowerCase().indexOf(needle.value) != -1
   })
 }
 
 function retrieveSimpleEmployeeList(): void {
-  userStore.getSimpleEmployeeList()
+  peopleStore.getSimpleEmployeeList()
     .catch(e => {
       console.error('Error retrieving simple employee list', e)
     })

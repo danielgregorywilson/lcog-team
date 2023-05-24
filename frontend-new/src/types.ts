@@ -705,11 +705,12 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   computer_type: string
   computer_gl: string
   computer_description: string
-  current_phone: string
+  phone_number: string
   desk_phone: boolean
   phone_request: string
   phone_request_data: string
   load_code: string
+  cell_phone: boolean
   should_delete: boolean
   reassign_to: string
   business_cards: boolean
@@ -744,11 +745,12 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   computer_type?: string
   computer_gl?: string
   computer_description?: string
-  current_phone?: string
+  phone_number?: string
   desk_phone?: boolean
   phone_request?: string
   phone_request_data?: string
   load_code?: string
+  cell_phone?: boolean
   should_delete?: boolean
   reassign_to?: string
   business_cards?: boolean

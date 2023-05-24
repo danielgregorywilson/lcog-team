@@ -125,7 +125,7 @@
           <q-icon name="cancel" @click.stop="officeLocation=''" class="cursor-pointer" />
         </template>
       </q-select>
-      <q-input v-model="cubicleNumber" type="number" label="Cubicle Number" mask="###" class="q-mr-md" />
+      <q-input v-model="cubicleNumber" mask="NNNNNNNNNN" label="Cubicle Number" class="q-mr-md" />
       <q-checkbox v-model="teleworking" label="Teleworking" />
     </div>
     <div v-if="['New', 'Return'].indexOf(type) != -1">
@@ -143,14 +143,13 @@
     <div class="text-h6 transition-form-section-heading">Phone</div>
     <div class="row">
       <q-input
-        v-model="currentPhone"
+        v-model="phoneNumber"
         type="tel"
         label="Phone Number"
         mask="(###) ###-####"
         fill-mask
         class="q-mr-md"
       />
-      <q-checkbox v-model="deskPhone" label="Desk Phone Needed" class="q-mr-md" />
       <q-select
         v-model="phoneRequest"
         :options="[
@@ -172,11 +171,17 @@
       />
     </div>
     <div class="row">
+      <q-checkbox v-model="deskPhone" label="Desk Phone Needed" class="q-mr-md" />
+    </div>
+    <div class="row">
       <q-input
         v-model="loadCode"
         v-if="employeeID == 'CLSD'"
         label="Load Code"
       />
+    </div>
+    <div>
+      <q-checkbox v-model="cellPhone" label="Cell Phone Needed" class="q-mr-md" />
     </div>
     <div v-if="type=='Exit'" class="row">
       <q-checkbox v-model="shouldDelete" label="Delete?" />
@@ -187,6 +192,7 @@
         label="Reassign to"
       />
     </div>
+    <div class="text-h6 transition-form-section-heading">Business Cards</div>
     <div class="row">
       <q-checkbox v-model="businessCards" label="Order Business Cards" />
     </div>
@@ -357,8 +363,8 @@ let computerGLCurrentVal = ref('')
 let computerGL = ref('')
 let computerDescriptionCurrentVal = ref('')
 let computerDescription = ref('')
-let currentPhoneCurrentVal = ref('')
-let currentPhone = ref('')
+let phoneNumberCurrentVal = ref('')
+let phoneNumber = ref('')
 let deskPhoneCurrentVal = ref(false)
 let deskPhone = ref(false)
 let phoneRequestCurrentVal = ref('')
@@ -367,6 +373,8 @@ let phoneRequestDataCurrentVal = ref('')
 let phoneRequestData = ref('')
 let loadCodeCurrentVal = ref('')
 let loadCode = ref('')
+let cellPhoneCurrentVal = ref(false)
+let cellPhone = ref(false)
 let shouldDeleteCurrentVal = ref(false)
 let shouldDelete = ref(false)
 let reassignToCurrentVal = ref('')
@@ -450,8 +458,8 @@ function retrieveEmployeeTransition() {
   computerGLCurrentVal.value = computerGL.value
   computerDescription.value = t.computer_description
   computerDescriptionCurrentVal.value = computerDescription.value
-  currentPhone.value = t.current_phone
-  currentPhoneCurrentVal.value = currentPhone.value
+  phoneNumber.value = t.phone_number
+  phoneNumberCurrentVal.value = phoneNumber.value
   deskPhone.value = t.desk_phone
   deskPhoneCurrentVal.value = deskPhone.value
   phoneRequest.value = t.phone_request
@@ -460,6 +468,8 @@ function retrieveEmployeeTransition() {
   phoneRequestDataCurrentVal.value = phoneRequestData.value
   loadCode.value = t.load_code
   loadCodeCurrentVal.value = loadCode.value
+  cellPhone.value = t.cell_phone
+  cellPhoneCurrentVal.value = cellPhone.value
   shouldDelete.value = t.should_delete
   shouldDeleteCurrentVal.value = shouldDelete.value
   reassignTo.value = t.reassign_to
@@ -546,11 +556,12 @@ function valuesAreChanged(): boolean {
     computerType.value == computerTypeCurrentVal.value &&
     computerGL.value == computerGLCurrentVal.value &&
     computerDescription.value == computerDescriptionCurrentVal.value &&
-    currentPhone.value == currentPhoneCurrentVal.value &&
+    phoneNumber.value == phoneNumberCurrentVal.value &&
     deskPhone.value == deskPhoneCurrentVal.value &&
     phoneRequest.value == phoneRequestCurrentVal.value &&
     phoneRequestData.value == phoneRequestDataCurrentVal.value &&
     loadCode.value == loadCodeCurrentVal.value &&
+    cellPhone.value == cellPhoneCurrentVal.value &&
     shouldDelete.value == shouldDeleteCurrentVal.value &&
     reassignTo.value == reassignToCurrentVal.value &&
     businessCards.value == businessCardsCurrentVal.value &&
@@ -586,7 +597,7 @@ function formErrorItems(): Array<[string, string]> {
 
 function updateTransitionAndClose() {
   return new Promise((resolve, reject) => {
-    const currentPhoneVal = currentPhone.value == '(___) ___-____' ? '' : currentPhone.value
+    const phoneNumberVal = phoneNumber.value == '(___) ___-____' ? '' : phoneNumber.value
     if (['Reassign to:', 'Change name display to:'].indexOf(phoneRequest.value) == -1) {
       phoneRequestData.value = ''
     }
@@ -624,11 +635,12 @@ function updateTransitionAndClose() {
       computer_type: computerType.value,
       computer_gl: computerGL.value,
       computer_description: computerDescription.value,
-      current_phone: currentPhoneVal,
+      phone_number: phoneNumberVal,
       desk_phone: deskPhone.value,
       phone_request: phoneRequest.value,
       phone_request_data: phoneRequestData.value,
       load_code: loadCode.value,
+      cell_phone: cellPhone.value,
       should_delete: shouldDelete.value,
       reassign_to: reassignTo.value,
       business_cards: businessCards.value,
@@ -667,11 +679,12 @@ function updateTransitionAndClose() {
       computerTypeCurrentVal.value = t.computer_type
       computerGLCurrentVal.value = t.computer_gl
       computerDescriptionCurrentVal.value = t.computer_description
-      currentPhoneCurrentVal.value = t.current_phone
+      phoneNumberCurrentVal.value = t.phone_number
       deskPhoneCurrentVal.value = t.desk_phone
       phoneRequestCurrentVal.value = t.phone_request
       phoneRequestDataCurrentVal.value = t.phone_request_data
       loadCodeCurrentVal.value = t.load_code
+      cellPhoneCurrentVal.value = t.cell_phone
       shouldDeleteCurrentVal.value = t.should_delete
       reassignToCurrentVal.value = t.reassign_to
       businessCardsCurrentVal.value = t.business_cards

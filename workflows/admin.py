@@ -121,12 +121,13 @@ class WorkflowInstanceAdmin(admin.ModelAdmin):
 
 @admin.register(ProcessInstance)
 class ProcessInstanceAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("pk", "process", "workflow_instance", "current_step_instance")
 
 
 @admin.register(StepInstance)
 class StepInstanceAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("pk", "step", "process_instance")
+    ordering = ("process_instance", "step__order")
 
 
 @admin.register(EmployeeTransition)

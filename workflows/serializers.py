@@ -83,7 +83,7 @@ class StepInstanceSerializer(serializers.ModelSerializer):
         model = StepInstance
         fields = [
             'url', 'pk', 'started_at', 'completed_at', 'step', 'completed_by',
-            'completed_by_name'
+            'completed_by_name', 'undo_completion_possible'
         ]
     
     @staticmethod

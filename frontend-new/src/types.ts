@@ -645,6 +645,7 @@ export type StepInstance = {
   completed_at: Date
   completed_by: number
   completed_by_name: string
+  undo_completion_possible: boolean
 }
 
 export type ProcessInstance = {

@@ -403,46 +403,69 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
     
     def partial_update(self, request, pk=None):
         """
-        Complete a step instance
+        Complete or undo completion of a step instance
         """
-        # Complete the current step instance
         stepinstance = StepInstance.objects.get(pk=pk)
-        
-        # Prevent completing a step instance twice
-        if stepinstance.completed_at:
-            return Response({'error': 'This step instance has already been completed.'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        stepinstance.completed_at = timezone.now()
-        stepinstance.completed_by = request.user.employee
-        stepinstance.save()
-        
-        # TODO: Do anything that needs to be done to prep the next step like email people
 
-        processinstance = stepinstance.process_instance
-
-        # Update the process instance
-        if stepinstance.step.end:
-            # If this is the last step instance in a process, complete the process
-            processinstance.completed_at = timezone.now()
-            processinstance.current_step_instance = None
-        else:
-            # Make the next StepInstance
-            if 'nextStepPk' in request.data:
-                next_step = Step.objects.get(pk=request.data['nextStepPk'])
+        if (request.data['action'] == 'complete'):
+            # Complete the current step instance  
+            if stepinstance.completed_at:
+                # Prevent completing a step instance twice
+                return Response({'error': 'This step instance has already been completed.'}, status=status.HTTP_400_BAD_REQUEST)
+      
+            stepinstance.completed_at = timezone.now()
+            stepinstance.completed_by = request.user.employee
+            stepinstance.save()
+            
+            # TODO: Do anything that needs to be done to prep the next step like email people
+            
+            # Update the process instance
+            processinstance = stepinstance.process_instance
+            if stepinstance.step.end:
+                # If this is the last step instance in a process, complete the process
+                processinstance.completed_at = timezone.now()
+                processinstance.current_step_instance = None
             else:
-                next_step=stepinstance.step.next_step
-            new_stepinstance = StepInstance.objects.create(
-                step=next_step,
-                process_instance=processinstance
-            )
-            processinstance.current_step_instance = new_stepinstance
-        processinstance.save()
+                # Make the next StepInstance
+                if 'nextStepPk' in request.data:
+                    next_step = Step.objects.get(pk=request.data['nextStepPk'])
+                else:
+                    next_step=stepinstance.step.next_step
+                new_stepinstance = StepInstance.objects.create(
+                    step=next_step,
+                    process_instance=processinstance
+                )
+                processinstance.current_step_instance = new_stepinstance
+            processinstance.save()
 
-        # If step instance completion triggers a new process, start it
-        workflow_instance = stepinstance.process_instance.workflow_instance
-        if stepinstance.step.trigger_processes.count():
-            for process in stepinstance.step.trigger_processes.all():
-                process.create_process_instance(workflow_instance)
+            # If step instance completion triggers a new process, start it
+            workflow_instance = stepinstance.process_instance.workflow_instance
+            if stepinstance.step.trigger_processes.count():
+                for process in stepinstance.step.trigger_processes.all():
+                    process.create_process_instance(workflow_instance)
+        
+        else:
+            # Undo completion of the current step instance
+            if not stepinstance.completed_at:
+                # Prevent undoing completion of a step instance that hasn't been completed
+                return Response({'error': 'This step instance has not been completed.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Undo completion of current SI (user and date)
+            stepinstance.completed_at = None
+            stepinstance.completed_by = None
+            stepinstance.save()
+
+            # Update PI
+            processinstance = stepinstance.process_instance
+            nextStepInstance = StepInstance.objects.get(pk=request.data['nextStepInstancePk'])
+            if nextStepInstance.step.end:
+                # If the next step is the last step instance in a process, un-complete the process
+                processinstance.completed_at = None
+            processinstance.current_step_instance = stepinstance
+            processinstance.save()
+
+            # Delete next SI
+            nextStepInstance.delete()
 
         serialized_stepinstance = StepInstanceSerializer(stepinstance,
             context={'request': request})

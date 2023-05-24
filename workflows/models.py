@@ -491,4 +491,15 @@ class StepInstance(HasTimeStampsMixin):
     def is_complete(self):
         return bool(self.completed_by)
 
+    @property
+    def undo_completion_possible(self):
+        if self.step.next_step:
+            # If there is a next step, we can undo if it is incomplete
+            return self.step.next_step.stepinstance_set.filter(
+                process_instance=self.process_instance, completed_at__isnull=True
+            ).exists()
+        else:
+            # If there is no next step, we can undo
+            return True
+
     #TODO: Complete method fills completed_at, completed_by, and current_step_instance and completed_at on Workflow instance

@@ -37,10 +37,10 @@
           <div v-if="props.row.conflicts.length != 0" class="q-ml-sm">
             <q-icon color="orange" name="warning" size="md">
               <q-tooltip content-style="font-size: 16px">
-                <div>One or more team members with shared responsibilities will be also be unavailable:</div>
+                <div>One or more team members with shared responsibilities will also be unavailable:</div>
                 <ul>
                   <li v-for="employee of props.row.conflicts" :key="employee.pk">
-                    {{ employee.name }}: {{ employee.responsibility_names[0] }}<span v-if="employee.responsibility_names.length > 1"> and {{ employee.responsibility_names.length - 1 }} more</span>
+                    {{ employee.name }}: <span v-for="(name, idx) of employee.responsibility_names" :key="idx"><span v-if="idx==0">{{ name }}</span><span v-else>, {{ name }}</span></span>
                   </li>
                 </ul>
               </q-tooltip>
@@ -81,10 +81,10 @@
                     <div v-if="props.row.conflicts.length != 0" class="q-ml-sm">
                       <q-icon color="orange" name="warning" size="md">
                         <q-tooltip content-style="font-size: 16px">
-                          <div>One or more team members with shared responsibilities will be also be unavailable:</div>
+                          <div>One or more team members with shared responsibilities will also be unavailable:</div>
                           <ul>
                             <li v-for="employee of props.row.conflicts" :key="employee.pk">
-                              {{ employee.name }}: {{ employee.responsibility_names[0] }}<span v-if="employee.responsibility_names.length > 1"> and {{ employee.responsibility_names.length - 1 }} more</span>
+                              {{ employee.name }}: <span v-for="(name, idx) of employee.responsibility_names" :key="idx"><span v-if="idx==0">{{ name }}</span><span v-else>, {{ name }}</span></span>
                             </li>
                           </ul>
                         </q-tooltip>

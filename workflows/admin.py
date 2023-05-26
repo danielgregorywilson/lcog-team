@@ -59,6 +59,21 @@ class StepChoiceForm(ModelForm):
         self.fields['next_step'].queryset = Step.objects.filter(process=parent_object.process).exclude(pk=parent_object.pk).order_by('order')         
 
 
+class ProcessInstanceForm(ModelForm):
+    """Used in ProcessInstance Admin for current_step_instance and workflow_instance"""
+    def __init__(self, *args, **kwargs):
+        super(ProcessInstanceForm, self).__init__(*args, **kwargs)
+        self.fields['current_step_instance'].queryset = StepInstance.objects.filter(process_instance=self.instance)
+        self.fields['workflow_instance'].queryset = WorkflowInstance.objects.filter(workflow=self.instance.process.workflow)
+
+
+class StepInstanceForm(ModelForm):
+    """Used in StepInstance Admin for process_instance"""
+    def __init__(self, *args, **kwargs):
+        super(StepInstanceForm, self).__init__(*args, **kwargs)
+        self.fields['process_instance'].queryset = ProcessInstance.objects.filter(process=self.instance.step.process)
+
+
 class StepInline(admin.TabularInline):
     model = Step
     formset = GetParentFormSet
@@ -122,12 +137,14 @@ class WorkflowInstanceAdmin(admin.ModelAdmin):
 @admin.register(ProcessInstance)
 class ProcessInstanceAdmin(admin.ModelAdmin):
     list_display = ("pk", "process", "workflow_instance", "current_step_instance")
+    form = ProcessInstanceForm
 
 
 @admin.register(StepInstance)
 class StepInstanceAdmin(admin.ModelAdmin):
     list_display = ("pk", "step", "process_instance")
     ordering = ("process_instance", "step__order")
+    form = StepInstanceForm
 
 
 class TransitionChangeInline(admin.TabularInline):

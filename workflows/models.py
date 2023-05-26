@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 
 from django.core.exceptions import ValidationError
@@ -99,6 +100,13 @@ class EmployeeTransition(models.Model):
 
     class Meta:
         ordering = ["pk"]
+
+    def __str__(self):
+        if self.transition_date:
+            date = datetime.strftime(self.transition_date, '%m/%d/%Y')
+        else:
+            date = "No date"
+        return "EmployeeTransition ({}): {} - {}".format(self.pk, self.title, date)
 
     type = models.CharField(
         _("transition type"), max_length=20, choices=TRANSITION_TYPE_CHOICES,
@@ -458,6 +466,9 @@ class WorkflowInstance(HasTimeStampsMixin):
     class Meta:
         ordering = ["pk"]
 
+    def __str__(self):
+        return "WorkflowInstance ({}): {}".format(self.pk, self.workflow)
+
     workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE)
     transition = models.OneToOneField(
         EmployeeTransition, blank=True, null=True, on_delete=models.SET_NULL
@@ -495,6 +506,9 @@ class WorkflowInstance(HasTimeStampsMixin):
 class ProcessInstance(HasTimeStampsMixin):
     class Meta:
         ordering = ["pk"]
+
+    def __str__(self):
+        return "ProcessInstance ({}): {}".format(self.pk, self.process)
     
     process = models.ForeignKey("workflows.Process", on_delete=models.CASCADE)
     workflow_instance = models.ForeignKey(
@@ -531,6 +545,9 @@ class ProcessInstance(HasTimeStampsMixin):
 class StepInstance(HasTimeStampsMixin):
     class Meta:
         ordering = ["pk"]
+
+    def __str__(self):
+        return "StepInstance ({}): {}".format(self.pk, self.step)
     
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
     process_instance = models.ForeignKey(

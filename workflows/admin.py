@@ -5,7 +5,7 @@ from django.urls import reverse
 
 from workflows.models import (
     Action, EmployeeTransition, Process, ProcessInstance, Role, Step,
-    StepChoice, StepInstance, Workflow, WorkflowInstance
+    StepChoice, StepInstance, TransitionChange, Workflow, WorkflowInstance
 )
 
 
@@ -130,6 +130,12 @@ class StepInstanceAdmin(admin.ModelAdmin):
     ordering = ("process_instance", "step__order")
 
 
+class TransitionChangeInline(admin.TabularInline):
+    model = TransitionChange
+    readonly_fields = ("date", "created_by", "changes")
+    extra = 0
+
+
 @admin.register(EmployeeTransition)
 class EmployeeTransitionAdmin(admin.ModelAdmin):
-    pass
+    inlines = (TransitionChangeInline,)

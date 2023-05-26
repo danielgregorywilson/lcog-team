@@ -676,6 +676,16 @@ interface EmployeeTransitionBase {
   cubicle_number: number | null
 }
 
+export interface TransitionChange {
+  pk: number
+  transition: number
+  created_by: number
+  created_by_name: string
+  created_by_initials: string
+  date: string
+  changes: JSON
+}
+
 export interface EmployeeTransition extends EmployeeTransitionBase {
   pk: number
   type: string
@@ -720,6 +730,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   access_emails_pk: number
   access_emails_name: string
   special_instructions: string
+  changes: Array<TransitionChange>
 }
 
 export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {

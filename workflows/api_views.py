@@ -23,13 +23,14 @@ from timeoff.helpers import (
 )
 from workflows.models import (
     EmployeeTransition, Process, ProcessInstance, Role, Step, StepChoice,
-    StepInstance, Workflow, WorkflowInstance
+    StepInstance, TransitionChange, Workflow, WorkflowInstance
 )
 
 from workflows.serializers import (
     EmployeeTransitionSerializer, ProcessInstanceSerializer, ProcessSerializer,
     RoleSerializer, StepChoiceSerializer, StepInstanceSerializer,
-    StepSerializer, WorkflowInstanceSerializer, WorkflowSerializer
+    StepSerializer, TransitionChangeSerializer, WorkflowInstanceSerializer,
+    WorkflowSerializer
 )
 
 
@@ -295,6 +296,14 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
     #     serialized_tor = TimeOffRequestSerializer(tor,
     #         context={'request': request})
     #     return Response(serialized_tor.data)
+
+
+class TransitionChangeViewSet(viewsets.ModelViewSet):
+    queryset = TransitionChange.objects.all()
+    serializer_class = TransitionChangeSerializer
+    # permission_classes = [
+    #     IsAuthenticatedOrReadOnly
+    # ]
 
 
 class ProcessViewSet(viewsets.ModelViewSet):

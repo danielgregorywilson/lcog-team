@@ -4,6 +4,28 @@
 
 export const releases = [
   {
+    version: '0.13.1',
+    date: new Date(2023, 4, 30),
+    changes: [
+      {
+        type: 'new',
+        description: 'Allow undoing a workflow step'
+      },
+      {
+        type: 'new',
+        description: 'Keep change records for the transition form'
+      },
+      {
+        type: 'improved',
+        description: 'Various improvements to workflows pages'
+      },
+      {
+        type: 'improved',
+        description: 'When showing responsibility conflicts in the calendar, show all conflicts, not just the first one'
+      },
+    ]
+  },
+  {
     version: '0.13.0',
     date: new Date(2023, 4, 23),
     changes: [

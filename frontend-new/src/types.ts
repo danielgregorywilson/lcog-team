@@ -645,6 +645,7 @@ export type StepInstance = {
   completed_at: Date
   completed_by: number
   completed_by_name: string
+  undo_completion_possible: boolean
 }
 
 export type ProcessInstance = {
@@ -673,6 +674,16 @@ interface EmployeeTransitionBase {
   salary_range: number | null
   salary_step: number | null
   cubicle_number: number | null
+}
+
+export interface TransitionChange {
+  pk: number
+  transition: number
+  created_by: number
+  created_by_name: string
+  created_by_initials: string
+  date: string
+  changes: JSON
 }
 
 export interface EmployeeTransition extends EmployeeTransitionBase {
@@ -719,6 +730,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   access_emails_pk: number
   access_emails_name: string
   special_instructions: string
+  changes: Array<TransitionChange>
 }
 
 export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {

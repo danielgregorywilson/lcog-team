@@ -17,3 +17,11 @@ export function readableDate(d: Date): string {
   const offsetMsecs = offsetMins*60000 // Number of milliseconds
   return new Date(readableDate.getTime() + offsetMsecs).toLocaleDateString()
 }
+
+export function readableDateTime(d: Date): string {
+  if (!d) {
+    return 'Date not set'
+  }
+  const readableDate = new Date(d) // Date from server (adjusted to our timezone)
+  return new Date(readableDate.getTime()).toLocaleString()
+}

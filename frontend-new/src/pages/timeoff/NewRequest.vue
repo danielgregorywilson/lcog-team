@@ -5,10 +5,10 @@
       <div v-if="touchedCalendar && conflictingTimeOffRequests().length != 0">
         <q-icon color="orange" name="warning" size="xl" class="q-ml-sm" />
         <div>
-          <div>One or more team members with shared responsibilities will be also be unavailable:</div>
+          <div>One or more team members with shared responsibilities will also be unavailable:</div>
           <ul>
             <li v-for="tor of conflictingTimeOffRequests()" :key="tor.pk">
-              <router-link :to="{ name: 'employee-responsibilities', params: { pk: tor.employee_pk } }">{{ tor.employee_name }}</router-link>: {{ employee.responsibility_names[0] }}<span v-if="employee.responsibility_names.length > 1"> and {{ employee.responsibility_names.length - 1 }} more</span>
+              <router-link :to="{ name: 'employee-responsibilities', params: { pk: tor.employee_pk } }">{{ tor.employee_name }}</router-link>: {{ employee.responsibility_names[0] }}<span v-for="(name, idx) of employee.responsibility_names" :key="idx"><span v-if="idx==0">{{ name }}</span><span v-else>, {{ name }}</span></span>
             </li>
           </ul>
         </div>

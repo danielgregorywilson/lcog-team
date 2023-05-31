@@ -1,3 +1,6 @@
+from datetime import datetime
+import json
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext as _
@@ -98,6 +101,13 @@ class EmployeeTransition(models.Model):
     class Meta:
         ordering = ["pk"]
 
+    def __str__(self):
+        if self.transition_date:
+            date = datetime.strftime(self.transition_date, '%m/%d/%Y')
+        else:
+            date = "No date"
+        return "EmployeeTransition ({}): {} - {}".format(self.pk, self.title, date)
+
     type = models.CharField(
         _("transition type"), max_length=20, choices=TRANSITION_TYPE_CHOICES,
         blank=True, null=True
@@ -155,6 +165,57 @@ class EmployeeTransition(models.Model):
         related_name="access_emails_after_transitions"
     )
     special_instructions = models.TextField(blank=True)
+
+    __original_values = {}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__original_values = self.__dict__.copy()
+        # self.__original_values["date_submitted"] = json.dumps(self.date_submitted)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        original = self.__original_values
+        new = self.__dict__.copy()
+        # Creata a change record
+        changes = {}
+        for field in self._meta.fields:
+            if field.name in ["id", "date_submitted", "submitter"]:
+                continue
+            if field.name == 'transition_date' and new[field.name]:
+                original_value = str(original[field.column])[:23]
+                new_value = new[field.column][:23].replace('T', ' ')
+            else:
+                original_value = original[field.column]
+                new_value = new[field.column]
+            if original_value != new_value:
+                changes[field.name] = {
+                    "original": original_value,
+                    "new": new_value,
+                }
+        if len(changes):
+            json_changes = json.dumps(changes, sort_keys=True, default=str)
+            TransitionChange.objects.create(
+                transition=self, created_by=self.submitter, changes=json_changes
+            )
+
+
+class TransitionChange(models.Model):
+    """
+    A change record for a transition.
+    """
+    class Meta:
+        ordering = ["pk"]
+
+    transition = models.ForeignKey(
+        EmployeeTransition, blank=True, null=True, on_delete=models.CASCADE,
+        related_name="changes"
+    )
+    date = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(
+        Employee, blank=True, null=True, on_delete=models.SET_NULL,
+    )
+    changes = models.JSONField()
 
 
 class Workflow(models.Model):
@@ -405,6 +466,9 @@ class WorkflowInstance(HasTimeStampsMixin):
     class Meta:
         ordering = ["pk"]
 
+    def __str__(self):
+        return "WorkflowInstance ({}): {}".format(self.pk, self.workflow)
+
     workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE)
     transition = models.OneToOneField(
         EmployeeTransition, blank=True, null=True, on_delete=models.SET_NULL
@@ -442,6 +506,9 @@ class WorkflowInstance(HasTimeStampsMixin):
 class ProcessInstance(HasTimeStampsMixin):
     class Meta:
         ordering = ["pk"]
+
+    def __str__(self):
+        return "ProcessInstance ({}): {}".format(self.pk, self.process)
     
     process = models.ForeignKey("workflows.Process", on_delete=models.CASCADE)
     workflow_instance = models.ForeignKey(
@@ -478,6 +545,9 @@ class ProcessInstance(HasTimeStampsMixin):
 class StepInstance(HasTimeStampsMixin):
     class Meta:
         ordering = ["pk"]
+
+    def __str__(self):
+        return "StepInstance ({}): {}".format(self.pk, self.step)
     
     step = models.ForeignKey(Step, on_delete=models.CASCADE)
     process_instance = models.ForeignKey(
@@ -490,5 +560,16 @@ class StepInstance(HasTimeStampsMixin):
     @property
     def is_complete(self):
         return bool(self.completed_by)
+
+    @property
+    def undo_completion_possible(self):
+        if self.step.next_step:
+            # If there is a next step, we can undo if it is incomplete
+            return self.step.next_step.stepinstance_set.filter(
+                process_instance=self.process_instance, completed_at__isnull=True
+            ).exists()
+        else:
+            # If there is no next step, we can undo
+            return True
 
     #TODO: Complete method fills completed_at, completed_by, and current_step_instance and completed_at on Workflow instance

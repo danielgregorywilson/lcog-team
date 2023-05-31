@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from workflows.models import (
     Action, EmployeeTransition, Process, ProcessInstance, Role, Step,
-    StepChoice, StepInstance, Workflow, WorkflowInstance
+    StepChoice, StepInstance, TransitionChange, Workflow, WorkflowInstance
 )
 
 
@@ -83,7 +83,7 @@ class StepInstanceSerializer(serializers.ModelSerializer):
         model = StepInstance
         fields = [
             'url', 'pk', 'started_at', 'completed_at', 'step', 'completed_by',
-            'completed_by_name'
+            'completed_by_name', 'undo_completion_possible'
         ]
     
     @staticmethod
@@ -108,6 +108,32 @@ class ProcessInstanceSerializer(serializers.ModelSerializer):
         depth = 1
 
 
+class TransitionChangeSerializer(serializers.ModelSerializer):
+    created_by_name = serializers.SerializerMethodField()
+    created_by_initials = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TransitionChange
+        fields = [
+            'url', 'pk', 'transition', 'date', 'created_by',
+            'created_by_name', 'created_by_initials', 'changes'
+        ]
+    
+    @staticmethod
+    def get_created_by_name(transitionchange):
+        if transitionchange.created_by:
+            return transitionchange.created_by.name
+        else:
+            return None
+
+    @staticmethod
+    def get_created_by_initials(transitionchange):
+        if transitionchange.created_by:
+            return transitionchange.created_by.initials
+        else:
+            return None
+
+
 class EmployeeTransitionSerializer(serializers.ModelSerializer):
     submitter_name = serializers.CharField(source='submitter.name', required=False)
     title_pk = serializers.SerializerMethodField()
@@ -118,6 +144,7 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
     unit_name = serializers.SerializerMethodField()
     access_emails_pk = serializers.SerializerMethodField()
     access_emails_name = serializers.SerializerMethodField()
+    changes = TransitionChangeSerializer(many=True)
 
     class Meta:
         model = EmployeeTransition
@@ -135,7 +162,7 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
             'phone_request_data', 'load_code', 'cell_phone', 'should_delete',
             'reassign_to', 'business_cards', 'prox_card_needed',
             'prox_card_returned', 'access_emails_pk', 'access_emails_name',
-            'special_instructions'
+            'special_instructions', 'changes'
         ]
     
     @staticmethod

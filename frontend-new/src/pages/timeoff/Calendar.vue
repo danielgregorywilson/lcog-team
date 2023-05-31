@@ -24,10 +24,10 @@
           <router-link :to="{ name: 'employee-responsibilities', params: { pk: request.employee_pk } }">{{ request.employee_name }}</router-link>
           <q-icon v-if="request.conflicts.length != 0" color="orange" name="warning" size="sm" class="q-ml-sm">
             <q-tooltip  content-style="font-size: 16px">
-              <div>One or more team members with shared responsibilities will be also be unavailable:</div>
+              <div>One or more team members with shared responsibilities will also be unavailable:</div>
               <ul>
                 <li v-for="employee of request.conflicts" :key="employee.pk">
-                  {{ employee.name }}: {{ employee.responsibility_names[0] }}<span v-if="employee.responsibility_names.length > 1"> and {{ employee.responsibility_names.length - 1 }} more</span>
+                  {{ employee.name }}: <span v-for="(name, idx) of employee.responsibility_names" :key="idx"><span v-if="idx==0">{{ name }}</span><span v-else>, {{ name }}</span></span>
                 </li>
               </ul>
             </q-tooltip>

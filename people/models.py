@@ -106,6 +106,13 @@ class Employee(models.Model):
             return self.user.get_full_name()
 
     @property
+    def initials(self):
+        if self.display_name:
+            return "".join(map(lambda x: x[0], self.display_name.split(' '))).upper()
+        else:
+            return "".join(map(lambda x: x[0], self.user.get_full_name().split(' '))).upper()
+
+    @property
     def is_program_manager(self):
         return self.manager and self.manager.is_division_director
 

@@ -47,7 +47,7 @@
         v-on:clear="title=emptyTitle"
         class="q-mr-md"
       />
-      <q-input v-model="fte" label="FTE" mask="#.##" class="q-mr-md" />
+      <q-input v-model="fte" label="FTE" class="q-mr-md" />
       <q-checkbox v-model="bilingual" label="Bilingual" />
     </div>
     <div class="row">
@@ -240,12 +240,39 @@
       </q-card>
     </q-dialog>
 
+    <!-- Dialog of changes -->
+    <q-dialog v-model="showChangesDialog">
+      <q-card class="q-pa-md">
+        <q-list bordered separator>
+          <q-item v-for="(changeRecord, index) in changes" :key="index">
+            <q-item-section top avatar>
+              <Avatar :initials="changeRecord.created_by_initials" :name="changeRecord.created_by_name"/>
+            </q-item-section>
+
+            <q-item-section>
+              <q-item-label v-for="(value, key, index) in JSON.parse(changeRecord.changes)" :key="index">
+                <div v-if="value.original && value.original != 'None'">{{ key }}: {{ value.original }} -> <span class="text-bold">{{ value.new }}</span></div>
+                <div v-else>{{ key }}: <span class="text-bold">{{ value.new }}</span></div>
+              </q-item-label>
+            </q-item-section>
+
+            <q-item-section side top>
+              <q-item-label caption>{{ readableDateTime(changeRecord.date) }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-card>
+    </q-dialog>
+
     <!-- Spacing for footer -->
     <div style="height: 80px;"></div>
 
     <div id="sticky-footer" class="row justify-between" v-if="true">
-      <q-btn id="update-button" class="col-1" color="white" text-color="black" label="Submit" :disabled="!valuesAreChanged()" @click="updateTransitionAndClose()" />
-      <q-btn v-if="showErrorButton && formErrorItems().length > 0" label="Show errors" icon="check" color="warning" @click="openErrorDialog('right')" />
+      <q-btn class="col-1" color="white" text-color="black" label="Submit" :disabled="!valuesAreChanged()" @click="updateTransitionAndClose()" />
+      <div>
+        <q-btn v-if="changes && changes.length" class="col-1" color="white" text-color="black" label="Change Records" @click="showChangesDialog = true" />
+        <q-btn v-if="showErrorButton && formErrorItems().length > 0" label="Show errors" icon="check" color="warning" class="q-ml-sm" @click="openErrorDialog('right')" />
+      </div>
       <!-- <div class="col-3 self-center status">Current Status: {{ status }}</div> -->
     </div>
   </div>
@@ -285,7 +312,9 @@ import { useRoute, useRouter } from 'vue-router'
 import { onMounted, ref, Ref, watch } from 'vue'
 
 import useEventBus from 'src/eventBus'
-import { EmployeeTransition } from 'src/types'
+import { readableDateTime } from 'src/filters'
+import { EmployeeTransition, TransitionChange } from 'src/types'
+import Avatar from 'src/components/Avatar.vue'
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import JobTitleSelect from 'src/components/JobTitleSelect.vue'
 import UnitSelect from 'src/components/UnitSelect.vue'
@@ -392,9 +421,13 @@ let accessEmails = ref(emptyEmployee)
 let specialInstructionsCurrentVal = ref('')
 let specialInstructions = ref('')
 
+let changes = ref(null) as Ref<TransitionChange[] | null>
+
 let showErrorButton = ref(false)
 let showErrorDialog = ref(false)
 let errorDialogPosition = ref('top') as Ref<QDialogProps['position']>
+
+let showChangesDialog = ref(false)
 
 function retrieveEmployeeTransition() {
   const t = currentEmployeeTransition()
@@ -488,6 +521,8 @@ function retrieveEmployeeTransition() {
   accessEmailsCurrentVal.value = accessEmails.value
   specialInstructions.value = t.special_instructions
   specialInstructionsCurrentVal.value = specialInstructions.value
+
+  changes.value = t.changes
   
   if (formErrorItems().length > 0) {
     showErrorButton.value = true
@@ -595,6 +630,17 @@ function formErrorItems(): Array<[string, string]> {
   return errorItems
 }
 
+function transitionChangeItems() {
+  if (!changes.value) {
+    return null
+  } else {
+    return changes.value
+    return changes.value.map((tc: TransitionChange) => {
+      return tc.changes
+    })
+  }
+}
+
 function updateTransitionAndClose() {
   return new Promise((resolve, reject) => {
     const phoneNumberVal = phoneNumber.value == '(___) ___-____' ? '' : phoneNumber.value
@@ -693,6 +739,8 @@ function updateTransitionAndClose() {
       showAccessEmailsCurrentVal.value = showAccessEmails.value
       accessEmailsCurrentVal.value = {pk: t.access_emails_pk, name: t.access_emails_name}
       specialInstructionsCurrentVal.value = t.special_instructions
+
+      changes.value = t.changes
 
       const routePk = getRoutePk(route)
       if (routePk) {

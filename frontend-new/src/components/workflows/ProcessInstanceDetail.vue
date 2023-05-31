@@ -20,10 +20,20 @@
         <div>{{ si.step.description }}</div>
         <StepAction v-for="action of si.step.optional_actions" :action="action" :key="action.pk" />
         <div v-if="si.completed_at" class="text-secondary">Completed by {{ si.completed_by_name }} on {{ formatDate(si.completed_at, 'dddd, M/D/YY [at] HH:MM') }}</div>
-        <q-stepper-navigation v-if="!stepInstanceIsComplete(si)">
+        <q-stepper-navigation v-if="stepInstanceIsComplete(si)">
+          <div v-if="si.undo_completion_possible">
+            <q-btn
+              :disable="!canUndoStepCompletion(si) || disableCompletions"
+              @click="undoStepCompletion(si.pk)"
+              color="warning"
+              label="Undo Completion"
+            />
+          </div>
+        </q-stepper-navigation>
+        <q-stepper-navigation v-else>
           <div v-if="si.step.next_step">
             <q-btn
-              :disable="!canCompleteStepInstance(si)"
+              :disable="!canCompleteStepInstance(si) || disableCompletions"
               @click="completeStep(si.pk)"
               color="primary"
               label="Mark as Complete"
@@ -38,7 +48,7 @@
               @click="completeStep(si.pk, choice.next_step_pk)"
               color="primary"
               :label="choice.choice_text"
-              :disable="!canCompleteStepInstance(si)"
+              :disable="!canCompleteStepInstance(si) || disableCompletions"
             />
           </div>
         </q-stepper-navigation>
@@ -68,6 +78,11 @@ const props = defineProps<{
 const formatDate = date.formatDate
 
 let currentStepInstance = ref(-1)
+let disableCompletions = ref(false) // Prevent completing a step instance twice
+
+function latestStepInstance() {
+  return props.pi.step_instances[props.pi.step_instances.length - 1]
+}
 
 function setCurrentStepInstance() {
   currentStepInstance.value = workflowsStore.processInstanceCurrentStepPks[props.pi.pk]
@@ -81,10 +96,7 @@ function stepInstanceIsComplete(stepInstance: StepInstance): boolean {
   }
 }
 
-function canCompleteStepInstance(stepInstance: StepInstance): boolean {
-  if (stepInstance.completed_at) {
-    return false
-  }
+function userAllowedToCompleteStepInstance(stepInstance: StepInstance): boolean {
   const step = stepInstance.step
   if (userStore.getEmployeeProfile.is_all_workflows_admin) {
     // If they are an All-Workflows-Admin, allow completion
@@ -104,14 +116,45 @@ function canCompleteStepInstance(stepInstance: StepInstance): boolean {
   }
 }
 
+function canCompleteStepInstance(stepInstance: StepInstance): boolean {
+  if (stepInstance.completed_at) {
+    return false
+  }
+  return userAllowedToCompleteStepInstance(stepInstance)
+}
+
+function canUndoStepCompletion(stepInstance: StepInstance): boolean {
+  if (!stepInstance.completed_at) {
+    return false
+  }
+  return userAllowedToCompleteStepInstance(stepInstance)
+}
+
 function completeStep(stepInstancePk: number, nextStepPk?: number): void {
+  disableCompletions.value = true
   workflowsStore.completeStepInstance(stepInstancePk, nextStepPk)
     .then(() => {
       setCurrentStepInstance()
       bus.emit('completedStep', Math.random())
+      disableCompletions.value = false
     })
     .catch(e => {
       console.error('Error completing step instance', e)
+    })
+}
+
+function undoStepCompletion(stepInstancePk: number): void {
+  disableCompletions.value = true
+  // The next step will always be the process instance's current step
+  const nextStepPk = latestStepInstance().pk
+  workflowsStore.undoStepInstanceCompletion(stepInstancePk, nextStepPk)
+    .then(() => {
+      setCurrentStepInstance()
+      bus.emit('completedStep', Math.random())
+      disableCompletions.value = false
+    })
+    .catch(e => {
+      console.error('Error undoing step instance completion', e)
     })
 }
 

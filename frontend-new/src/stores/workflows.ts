@@ -93,12 +93,23 @@ export const useWorkflowsStore = defineStore('workflows', {
     },
     completeStepInstance(stepInstancePk: number, nextStepPk?: number) {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/stepinstance/${ stepInstancePk }`, data: {stepInstancePk, nextStepPk}, method: 'PATCH' })
+        axios({ url: `${ apiURL }api/v1/stepinstance/${ stepInstancePk }`, data: {action: 'complete', stepInstancePk, nextStepPk}, method: 'PATCH' })
           .then(resp => {
             resolve(resp)
           })  
           .catch(e => {
             handlePromiseError(reject, 'Error completing current step instance', e)
+          })
+      })
+    },
+    undoStepInstanceCompletion(stepInstancePk: number, nextStepInstancePk?: number) {
+      return new Promise((resolve, reject) => {
+        axios({ url: `${ apiURL }api/v1/stepinstance/${ stepInstancePk }`, data: {action: 'undo', stepInstancePk, nextStepInstancePk}, method: 'PATCH' })
+          .then(resp => {
+            resolve(resp)
+          })  
+          .catch(e => {
+            handlePromiseError(reject, 'Error undoing current step instance completion', e)
           })
       })
     },

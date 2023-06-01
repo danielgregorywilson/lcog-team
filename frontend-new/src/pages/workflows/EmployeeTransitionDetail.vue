@@ -18,9 +18,9 @@
     </div>
     <div class="text-h6 transition-form-section-heading">Employee</div>
     <div class="row">
-      <q-input v-model="employeeFirstName" label="First" class="q-mr-md" @blur="suggestEmail()" />
+      <q-input v-model="employeeFirstName" label="First" class="q-mr-md" />
       <q-input v-model="employeeMiddleInitial" maxlength=5 label="M" class="q-mr-md" style="width: 4em" />
-      <q-input v-model="employeeLastName" label="Last" class="q-mr-md" @blur="suggestEmail()" />
+      <q-input v-model="employeeLastName" label="Last" class="q-mr-md" />
       <q-input v-model="employeePreferredName" label="Preferred Name, if different" style="width: 25em" />
     </div>
     <div class="row">
@@ -36,7 +36,7 @@
         </template>
       </q-select>
       <q-input v-model="employeeNumber" type="number" label="Employee Number" mask="####" class="q-mr-md" />
-      <q-input v-model="employeeEmail" type="email" label="Email" />
+      <q-input v-model="employeeEmail" type="email" label="Email" @focus="suggestEmail()" />
     </div>
     <div class="text-h6 transition-form-section-heading">Position</div>
     <div class="row">
@@ -313,11 +313,14 @@ import { onMounted, ref, Ref, watch } from 'vue'
 
 import useEventBus from 'src/eventBus'
 import { readableDateTime } from 'src/filters'
-import { EmployeeTransition, TransitionChange } from 'src/types'
+import {
+  EmployeeEmailRetrieve, EmployeeTransition, TransitionChange
+} from 'src/types'
 import Avatar from 'src/components/Avatar.vue'
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import JobTitleSelect from 'src/components/JobTitleSelect.vue'
 import UnitSelect from 'src/components/UnitSelect.vue'
+import { usePeopleStore } from 'src/stores/people'
 import { useUserStore } from 'src/stores/user'
 import { useWorkflowsStore } from 'src/stores/workflows'
 import { getRoutePk } from 'src/utils'
@@ -327,6 +330,7 @@ const { getScrollTarget, setVerticalScrollPosition  } = scroll
 const route = useRoute()
 const router = useRouter()
 const { bus } = useEventBus()
+const peopleStore = usePeopleStore()
 const userStore = useUserStore()
 const workflowsStore = useWorkflowsStore()
 
@@ -558,9 +562,53 @@ function retrieveEmployeeTransition() {
   // })
 }
 
+function emailInUse(email: string): boolean {
+  const emailList = peopleStore.employeeEmailList
+  if (emailList.indexOf(email) > -1) {
+    return true
+  } else {
+    return false 
+  }
+}
+
 function suggestEmail(): void {
-  if (employeeFirstName.value && employeeLastName.value && !employeeEmail.value) {
-    employeeEmail.value = `${employeeFirstName.value.charAt(0).toLowerCase()}${employeeLastName.value.toLowerCase()}@lcog.org`
+  // Create first pass at suggestion
+  let suggestedEmail = ''
+  let firstChar = ''
+  if (employeePreferredName.value) {
+    firstChar = employeePreferredName.value.charAt(0).toLowerCase()
+  } else if (employeeFirstName.value) {
+    firstChar = employeeFirstName.value.charAt(0).toLowerCase()
+  } else {
+    return
+  }
+  if (employeeLastName.value) {
+    suggestedEmail = `${firstChar}${employeeLastName.value.toLowerCase()}@lcog.org`
+  } else {
+    return
+  }
+  
+  // Check if email is already in use
+  if (emailInUse(suggestedEmail)) {
+    // If so, add middle initial and check again
+    if (employeeMiddleInitial.value) {
+      suggestedEmail = `${firstChar}${employeeMiddleInitial.value.toLowerCase()}${employeeLastName.value.toLowerCase()}@lcog.org`
+    } else {
+      return
+    }
+    if (emailInUse(suggestedEmail)) {
+      // If so, add a number to the end and check again
+      let i = 1
+      while (emailInUse(`${suggestedEmail}${i}`)) {
+        i++
+      }
+      suggestedEmail = `${suggestedEmail}${i}`
+    }
+  }
+  
+  // Set the value
+  if (!employeeEmail.value) {
+    employeeEmail.value = suggestedEmail
   }
 }
 
@@ -801,5 +849,12 @@ watch(() => bus.value.get('workflowInstanceRetrieved'), () => {
 
 onMounted(() => {
   retrieveEmployeeTransition()
+
+  if (!peopleStore.employeeEmailList.length) {
+    peopleStore.getEmployeeEmailList()
+      .catch(e => {
+        console.error('Error retrieving simple employee list', e)
+      })
+  }
 })
 </script>

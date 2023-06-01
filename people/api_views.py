@@ -21,8 +21,8 @@ from people.models import (
     ViewedSecurityMessage
 )
 from people.serializers import (
-    EmployeeSerializer, FileUploadSerializer, GroupSerializer,
-    JobTitleSerializer, PerformanceReviewFileUploadSerializer,
+    EmployeeSerializer, EmployeeEmailSerializer, FileUploadSerializer,
+    GroupSerializer, JobTitleSerializer, PerformanceReviewFileUploadSerializer,
     PerformanceReviewSerializer, ReviewNoteSerializer, SignatureSerializer,
     SimpleEmployeeSerializer, TeleworkApplicationFileUploadSerializer,
     TeleworkApplicationSerializer, TeleworkSignatureSerializer, UnitSerializer,
@@ -152,6 +152,13 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     def simple_list(self, request):
         employees = Employee.active_objects.all()
         serializer = SimpleEmployeeSerializer(employees, many=True)
+        return Response(serializer.data)
+
+    # A simple list of employee emails for populating dropdowns
+    @action(detail=False, methods=['get'])
+    def email_list(self, request):
+        employees = Employee.active_objects.all()
+        serializer = EmployeeEmailSerializer(employees, many=True)
         return Response(serializer.data)
     
     # Retrieve the name of an employee from pk

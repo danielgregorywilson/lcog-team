@@ -191,6 +191,18 @@ class SimpleEmployeeSerializer(serializers.ModelSerializer):
         fields = ['pk', 'name']
 
 
+class EmployeeEmailSerializer(serializers.ModelSerializer):
+    email = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Employee
+        fields = ['email']
+    
+    @staticmethod
+    def get_email(employee):
+        return employee.user.email
+
+
 class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     employee_pk = serializers.CharField(source='employee.pk') #TODO: Make IntegerField
     employee_name = serializers.CharField(source='employee.name')

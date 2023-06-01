@@ -61,6 +61,10 @@ export interface SimpleEmployeeRetrieve {
   name: string
 }
 
+export interface EmployeeEmailRetrieve {
+  email: string
+}
+
 // For updating employee profile
 export interface EmployeeUpdatePartial {
   display_name?: string

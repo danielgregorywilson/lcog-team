@@ -175,7 +175,7 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_manager_name(transition):
         if transition.manager:
-            return transition.manager.name
+            return transition.manager.legal_name
         else:
             return ''
     

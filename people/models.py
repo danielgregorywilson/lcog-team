@@ -104,6 +104,10 @@ class Employee(models.Model):
             return self.display_name
         else:
             return self.user.get_full_name()
+    
+    @property
+    def legal_name(self):
+        return self.user.get_full_name()
 
     @property
     def initials(self):

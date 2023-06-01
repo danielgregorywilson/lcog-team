@@ -82,6 +82,7 @@
       <EmployeeSelect
         label="Manager"
         :employee="manager"
+        :useLegalName="true"
         v-on:input="manager=$event"
         v-on:clear="manager=emptyEmployee"
         class="q-mr-md"
@@ -218,6 +219,7 @@
           v-if="showAccessEmails"
           label="Who?"
           :employee="accessEmails"
+          :useLegalName="true"
           v-on:input="accessEmails=$event"
           v-on:clear="accessEmails=emptyEmployee"
           class="q-mr-md"
@@ -334,7 +336,7 @@ const peopleStore = usePeopleStore()
 const userStore = useUserStore()
 const workflowsStore = useWorkflowsStore()
 
-const emptyEmployee = {name: '', pk: -1}
+const emptyEmployee = {legal_name: '', pk: -1}
 const emptyTitle = {name: '', pk: -1}
 const emptyUnit = {name: '', pk: -1}
 
@@ -467,7 +469,7 @@ function retrieveEmployeeTransition() {
   salaryStepCurrentVal.value = salaryStep.value
   bilingual.value = t.bilingual
   bilingualCurrentVal.value = bilingual.value
-  manager.value = {pk: t.manager_pk, name: t.manager_name}
+  manager.value = {pk: t.manager_pk, legal_name: t.manager_name}
   managerCurrentVal.value = manager.value
   unit.value = {pk: t.unit_pk, name: t.unit_name}
   unitCurrentVal.value = unit.value
@@ -521,7 +523,7 @@ function retrieveEmployeeTransition() {
     showAccessEmails.value = true
     showAccessEmailsCurrentVal.value = true
   } 
-  accessEmails.value = {pk: t.access_emails_pk, name: t.access_emails_name}
+  accessEmails.value = {pk: t.access_emails_pk, legal_name: t.access_emails_name}
   accessEmailsCurrentVal.value = accessEmails.value
   specialInstructions.value = t.special_instructions
   specialInstructionsCurrentVal.value = specialInstructions.value
@@ -683,9 +685,6 @@ function transitionChangeItems() {
     return null
   } else {
     return changes.value
-    return changes.value.map((tc: TransitionChange) => {
-      return tc.changes
-    })
   }
 }
 
@@ -761,7 +760,7 @@ function updateTransitionAndClose() {
       salaryRangeCurrentVal.value = t.salary_range
       salaryStepCurrentVal.value = t.salary_step
       bilingualCurrentVal.value = t.bilingual
-      managerCurrentVal.value = {pk: t.manager_pk, name: t.manager_name}
+      managerCurrentVal.value = {pk: t.manager_pk, legal_name: t.manager_name}
       unitCurrentVal.value = {pk: t.unit_pk, name: t.unit_name}
       transitionDateCurrentVal.value = t.transition_date
       preliminaryHireCurrentVal.value = t.preliminary_hire
@@ -785,7 +784,7 @@ function updateTransitionAndClose() {
       proxCardNeededCurrentVal.value = t.prox_card_needed
       proxCardReturnedCurrentVal.value = t.prox_card_returned
       showAccessEmailsCurrentVal.value = showAccessEmails.value
-      accessEmailsCurrentVal.value = {pk: t.access_emails_pk, name: t.access_emails_name}
+      accessEmailsCurrentVal.value = {pk: t.access_emails_pk, legal_name: t.access_emails_name}
       specialInstructionsCurrentVal.value = t.special_instructions
 
       changes.value = t.changes

@@ -59,6 +59,7 @@ export interface EmployeeRetrieve {
 export interface SimpleEmployeeRetrieve {
   pk: number
   name: string
+  legal_name: string
 }
 
 export interface EmployeeEmailRetrieve {

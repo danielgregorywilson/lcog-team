@@ -188,7 +188,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
 class SimpleEmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        fields = ['pk', 'name']
+        fields = ['pk', 'name', 'legal_name']
 
 
 class EmployeeEmailSerializer(serializers.ModelSerializer):

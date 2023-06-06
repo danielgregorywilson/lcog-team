@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from time import time
 
-from rest_framework import viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
@@ -243,10 +243,22 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         t.salary_step = request.data['salary_step']
         t.bilingual = request.data['bilingual']
         
-        if 'manager_pk' in request.data and request.data['manager_pk'] != -1:
-            t.manager = Employee.objects.get(pk=request.data['manager_pk'])    
-        else:
-            t.manager = None        
+        # Only the original submitter can edit manager field
+        user_is_submitter = request.user.employee == t.submitter
+        if 'manager_pk' in request.data and not user_is_submitter:
+            return Response(
+                {
+                    'error':
+                    'Only the original submitter can edit the manager field.'
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+        if user_is_submitter:
+            if 'manager_pk' in request.data and request.data['manager_pk'] != -1:
+                t.manager = Employee.objects.get(pk=request.data['manager_pk'])
+            else:
+                t.manager = None
+              
         
         if 'unit_pk' in request.data and request.data['unit_pk'] != -1:
             t.unit = UnitOrProgram.objects.get(pk=request.data['unit_pk'])

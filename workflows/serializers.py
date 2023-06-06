@@ -135,6 +135,7 @@ class TransitionChangeSerializer(serializers.ModelSerializer):
 
 
 class EmployeeTransitionSerializer(serializers.ModelSerializer):
+    submitter_pk = serializers.CharField(source='submitter.pk', required=False)
     submitter_name = serializers.CharField(source='submitter.name', required=False)
     title_pk = serializers.SerializerMethodField()
     title_name = serializers.SerializerMethodField()
@@ -149,8 +150,8 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeeTransition
         fields = [
-            'url', 'pk', 'type', 'date_submitted', 'submitter_name',
-            'employee_first_name', 'employee_middle_initial',
+            'url', 'pk', 'type', 'date_submitted', 'submitter_pk',
+            'submitter_name', 'employee_first_name', 'employee_middle_initial',
             'employee_last_name', 'employee_preferred_name', 'employee_number',
             'employee_id', 'employee_email', 'title_pk', 'title_name', 'fte',
             'salary_range', 'salary_step', 'bilingual', 'manager_pk',

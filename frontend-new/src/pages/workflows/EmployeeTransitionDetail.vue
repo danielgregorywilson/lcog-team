@@ -12,9 +12,9 @@
       <div>Exit</div>
     </div>
     <div class="text-h6 transition-form-section-heading">Submission Info</div>
-    <div class="row">
-      <q-input v-model="dateSubmitted" label="Date Submitted" class="q-mr-md" disable />
-      <q-input v-model="submitterName" label="Submitter" disable />
+    <div class="row items-center">
+      <div class="q-mr-md"><span class="text-bold">Date Submitted:</span> {{ readableDateTime(dateSubmitted) }}</div>
+      <div><span class="text-bold">Submitter:</span> {{ submitterName }}</div>
     </div>
     <div class="text-h6 transition-form-section-heading">Employee</div>
     <div class="row">
@@ -78,8 +78,9 @@
         </template>
       </q-select>
     </div>
-    <div class="row">
+    <div class="row items-center">
       <EmployeeSelect
+        v-if="employeeIsSubmitter()"
         label="Manager"
         :employee="manager"
         :useLegalName="true"
@@ -87,6 +88,7 @@
         v-on:clear="manager=emptyEmployee"
         class="q-mr-md"
       />
+      <div v-else class="q-mr-md">Manager: {{ manager.legal_name }}</div>
       <UnitSelect
         label="Unit"
         :unit="unit"
@@ -349,6 +351,7 @@ let transitionPk = ref('')
 let typeCurrentVal = ref('')
 let type = ref('')
 let dateSubmitted = ref(new Date())
+let submitterPk = ref(-1)
 let submitterName = ref('')
 let employeeFirstNameCurrentVal = ref('')
 let employeeFirstName = ref('')
@@ -443,6 +446,7 @@ function retrieveEmployeeTransition() {
   typeCurrentVal.value = type.value
 
   dateSubmitted.value = t.date_submitted
+  submitterPk.value = t.submitter_pk
   submitterName.value = t.submitter_name
 
   employeeFirstName.value = t.employee_first_name
@@ -680,6 +684,10 @@ function formErrorItems(): Array<[string, string]> {
   return errorItems
 }
 
+function employeeIsSubmitter() {
+  return userStore.getEmployeeProfile.employee_pk == submitterPk.value
+}
+
 function transitionChangeItems() {
   if (!changes.value) {
     return null
@@ -746,6 +754,7 @@ function updateTransitionAndClose() {
       typeCurrentVal.value = t.type
       
       dateSubmitted.value = t.date_submitted
+      submitterPk.value = t.submitter_pk
       submitterName.value = t.submitter_name
 
       employeeFirstNameCurrentVal.value = t.employee_first_name

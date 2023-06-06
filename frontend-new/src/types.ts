@@ -695,6 +695,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   pk: number
   type: string
   date_submitted: Date
+  submitter_pk: number
   submitter_name: string
   employee_first_name: string
   employee_middle_initial: string

@@ -239,13 +239,44 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             t.title = None
 
         t.fte = request.data['fte']
-        t.salary_range = request.data['salary_range']
-        t.salary_step = request.data['salary_step']
+
+        # Only the hiring manager, fiscal, or HR can edit salary fields
+        user_is_hiring_manager = request.user.employee == t.manager
+        user_is_hr = request.user.employee.is_hr_employee
+        user_is_fiscal = request.user.employee.is_fiscal_employee
+        user_can_edit_salary = any([
+            user_is_hiring_manager, user_is_hr, user_is_fiscal
+        ])
+        editing_salary_range = all([
+            'salary_range' in request.data,
+            request.data['salary_range'] != t.salary_range
+        ])
+        editing_salary_step = all([
+            'salary_step' in request.data,
+            request.data['salary_step'] != t.salary_step
+        ])
+        editing_salary = editing_salary_range or editing_salary_step
+        if editing_salary and not user_can_edit_salary:
+            return Response(
+                {
+                    'error':
+                    'Only the hiring manager, fiscal, or HR can edit salary fields.'
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+        if editing_salary and user_can_edit_salary:
+            t.salary_range = request.data['salary_range']
+            t.salary_step = request.data['salary_step']
+        
         t.bilingual = request.data['bilingual']
         
         # Only the original submitter can edit manager field
         user_is_submitter = request.user.employee == t.submitter
-        if 'manager_pk' in request.data and not user_is_submitter:
+        editing_manager = all([
+            'manager_pk' in request.data,
+            request.data['manager_pk'] != t.manager.pk
+        ])
+        if editing_manager and not user_is_submitter:
             return Response(
                 {
                     'error':
@@ -254,7 +285,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN
             )
         if user_is_submitter:
-            if 'manager_pk' in request.data and request.data['manager_pk'] != -1:
+            if editing_manager and request.data['manager_pk'] != -1:
                 t.manager = Employee.objects.get(pk=request.data['manager_pk'])
             else:
                 t.manager = None

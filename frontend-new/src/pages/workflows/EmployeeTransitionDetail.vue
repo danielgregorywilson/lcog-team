@@ -52,6 +52,7 @@
     </div>
     <div class="row">
       <q-select
+        v-if="canViewSalaryFields()"
         v-model="salaryRange"
         :options="Array.from({length: 50}, (x, i) => i+1)"
         label="Salary Range"
@@ -60,6 +61,7 @@
         clearable
       />
       <q-select
+        v-if="canViewSalaryFields()"
         v-model="salaryStep"
         :options="Array.from({length:10}, (x, i) => i+1)"
         label="Salary Step"
@@ -314,6 +316,7 @@
 import { QDialogProps, scroll, useQuasar } from 'quasar'
 import { useRoute, useRouter } from 'vue-router'
 import { onMounted, ref, Ref, watch } from 'vue'
+import { useCookies } from 'vue3-cookies'
 
 import useEventBus from 'src/eventBus'
 import { readableDateTime } from 'src/filters'
@@ -334,6 +337,7 @@ const { getScrollTarget, setVerticalScrollPosition  } = scroll
 const route = useRoute()
 const router = useRouter()
 const { bus } = useEventBus()
+const { cookies } = useCookies()
 const peopleStore = usePeopleStore()
 const userStore = useUserStore()
 const workflowsStore = useWorkflowsStore()
@@ -686,6 +690,12 @@ function formErrorItems(): Array<[string, string]> {
 
 function employeeIsSubmitter() {
   return userStore.getEmployeeProfile.employee_pk == submitterPk.value
+}
+
+function canViewSalaryFields() {
+  return userStore.getEmployeeProfile.employee_pk == manager.value.pk ||
+    cookies.get('is_hr_employee') == 'true' ||
+    cookies.get('is_fiscal_employee') == 'true'
 }
 
 function transitionChangeItems() {

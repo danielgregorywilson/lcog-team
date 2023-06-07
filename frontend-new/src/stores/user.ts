@@ -18,6 +18,8 @@ export const useUserStore = defineStore('user', {
       name: '',
       is_manager: false,
       has_manager: false,
+      is_hr_employee: false,
+      is_fiscal_employee: false,
       is_eligible_for_telework_application: false,
       can_view_seating_charts: false,
       can_edit_seating_charts: false,
@@ -62,6 +64,8 @@ export const useUserStore = defineStore('user', {
             this.profile.name = resp.data.name
             this.profile.is_manager = resp.data.is_manager
             this.profile.has_manager = resp.data.has_manager
+            this.profile.is_hr_employee = resp.data.is_hr_employee
+            this.profile.is_fiscal_employee = resp.data.is_fiscal_employee
             this.profile.is_eligible_for_telework_application = resp.data.is_eligible_for_telework_application
             this.profile.can_view_seating_charts = resp.data.can_view_seating_charts
             this.profile.can_edit_seating_charts = resp.data.can_edit_seating_charts
@@ -80,6 +84,8 @@ export const useUserStore = defineStore('user', {
             this.profile.can_manage_mow_stops = resp.data.can_manage_mow_stops
             cookies.set('is_manager', resp.data.is_manager.toString())
             cookies.set('has_manager', resp.data.has_manager.toString())
+            cookies.set('is_hr_employee', resp.data.is_hr_employee.toString())
+            cookies.set('is_fiscal_employee', resp.data.is_fiscal_employee.toString())
             cookies.set('is_eligible_for_telework_application', resp.data.is_eligible_for_telework_application.toString())
             cookies.set('can_view_seating_charts', resp.data.can_view_seating_charts.toString())
             cookies.set('can_edit_seating_charts', resp.data.can_edit_seating_charts.toString())
@@ -123,6 +129,8 @@ export const useUserStore = defineStore('user', {
         this.$reset()
         cookies.remove('is_manager')
         cookies.remove('has_manager')
+        cookies.remove('is_hr_employee')
+        cookies.remove('is_fiscal_employee')
         cookies.remove('is_eligible_for_telework_application')
         cookies.remove('can_view_seating_charts')
         cookies.remove('can_edit_seating_charts')

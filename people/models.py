@@ -117,6 +117,14 @@ class Employee(models.Model):
             return "".join(map(lambda x: x[0], self.user.get_full_name().split(' '))).upper()
 
     @property
+    def is_hr_employee(self):
+        return self.user.groups.filter(name='HR Employee').exists()
+
+    @property
+    def is_fiscal_employee(self):
+        return self.user.groups.filter(name='Fiscal Employee').exists()
+
+    @property
     def is_program_manager(self):
         return self.manager and self.manager.is_division_director
 

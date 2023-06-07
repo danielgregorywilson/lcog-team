@@ -31,6 +31,8 @@ export interface EmployeeRetrieve {
   manager: Url
   is_manager: boolean
   has_manager: boolean
+  is_hr_employee: boolean
+  is_fiscal_employee: boolean
   is_upper_manager: boolean
   is_hr_manager: boolean
   is_executive_director: boolean

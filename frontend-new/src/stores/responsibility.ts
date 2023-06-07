@@ -150,7 +150,7 @@ export const useResponsibilityStore = defineStore('responsibility', {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/responsibilitytags` })
           .then(resp => {
-            this.allTags = resp.data
+            this.allTags = resp.data.results
             resolve(resp)
           })
           .catch(e => {

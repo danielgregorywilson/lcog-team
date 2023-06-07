@@ -60,7 +60,7 @@
       <template v-slot:body-cell-actions="props">
         <q-td key="actions" :props="props">
           <q-btn class="col" dense round flat color="grey" @click="editWorkflowInstance(props.row)" icon="play_arrow"></q-btn>
-          <q-btn v-if="workflowHasTransition(props.row) && canViewTransition(props.row)" class="col" dense round flat color="grey" @click="editTransitionForm(props.row)" icon="assignment"></q-btn>
+          <q-btn v-if="workflowHasTransition() && canViewTransition()" class="col" dense round flat color="grey" @click="editTransitionForm(props.row)" icon="assignment"></q-btn>
           <q-btn v-if="canDeleteWorkflowInstance(props.row)" class="col" dense round flat color="grey" @click="showDeleteDialog(props.row)" icon="delete"></q-btn>
         </q-td>
       </template>
@@ -93,7 +93,7 @@
                   </div>
                   <div class="q-table__grid-item-value row q-gutter-sm" v-else>
                     <q-btn class="col" dense round flat color="grey" @click="editWorkflowInstance(props.row)" icon="play_arrow"></q-btn>
-                    <q-btn v-if="workflowHasTransition(props.row) && canViewTransition(props.row)" class="col" dense round flat color="grey" @click="editTransitionForm(props.row)" icon="assignment"></q-btn>
+                    <q-btn v-if="workflowHasTransition() && canViewTransition()" class="col" dense round flat color="grey" @click="editTransitionForm(props.row)" icon="assignment"></q-btn>
                     <q-btn v-if="canDeleteWorkflowInstance(props.row)" class="col" dense round flat color="grey" @click="showDeleteDialog(props.row)" icon="delete"></q-btn>
                   </div>
                 </div>
@@ -177,10 +177,10 @@ const columns: QTableProps['columns'] = [
   { name: 'startedAt', align: 'center', label: 'Workflow Start Date', field: 'started_at', sortable: true },
   { name: 'transitionDate', align: 'center', label: 'Transition Date', field: 'transition_date', sortable: true },
   { name: 'percentComplete', align: 'center', label: '% Complete', field: 'percent_complete', sortable: true },
-  { name: 'actions', label: 'Actions', align: 'center', field: null },
+  { name: 'actions', label: 'Actions', align: 'center', field: '' },
 ]
 
-function pagination(): string {
+function pagination(): readonly any[] {
   if (props.noPagination) {
     return [0]
   } else {
@@ -190,9 +190,10 @@ function pagination(): string {
 
 let tableFilter = ref('')
 
-function tableFilterMethod(rows: Array<WorkflowInstance>, term: string) {
+function tableFilterMethod(rows: readonly any[], term: string) {
+  const tableRows = rows as WorkflowInstance[]
   const searchTerm = term ? term.toLowerCase() : ''
-  const filteredRows = rows.filter(
+  const filteredRows = tableRows.filter(
     (row) => {
       if (searchTerm == '') {
           // If no search term, return all rows

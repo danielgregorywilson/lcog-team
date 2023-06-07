@@ -161,7 +161,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/workflows/Workflows.vue'),
         meta: { requiresAuth: true },
         children: [
-          { path: '', redirect: { name: 'workflow-dashboard' } },
+          { 
+            path: '',
+            name: 'workflow-dashboard-redirect',
+            redirect: { name: 'workflow-dashboard' }
+          },
           {
             path: 'dashboard',
             name: 'workflow-dashboard',
@@ -172,7 +176,11 @@ const routes: RouteRecordRaw[] = [
             name: 'workflow-archive',
             component: () => import('src/pages/workflows/WorkflowArchive.vue'),
             children: [
-              { path: '', redirect: { name: 'workflow-archive-onboarding' } },
+              {
+                path: '',
+                name: 'workflow-arrchive-onboarding-redirect',
+                redirect: { name: 'workflow-archive-onboarding' }
+              },
               {
                 path: 'onboarding',
                 name: 'workflow-archive-onboarding',
@@ -183,7 +191,7 @@ const routes: RouteRecordRaw[] = [
                 }
               }
             ]
-          },
+          }
         ]
       },
       {
@@ -207,7 +215,7 @@ const routes: RouteRecordRaw[] = [
             }
           }
         ]
-      },
+      }
     ],
   },
 

@@ -121,8 +121,9 @@ const initialTablePagination = {
 
 let tableFilter = ref('')
 
-function tableFilterMethod(rows: Array<Responsibility>, term: string) {
-  return shared.tableFilterMethod(rows, term, ['name', 'description', 'tags', 'primaryEmployee', 'secondaryEmployee'])
+function tableFilterMethod(rows: readonly any[], term: string) {
+  const tableRows = rows as Responsibility[]
+  return shared.tableFilterMethod(tableRows, term, ['name', 'description', 'tags', 'primaryEmployee', 'secondaryEmployee'])
 }
 
 function navigateToTag(tagPk: string): void {

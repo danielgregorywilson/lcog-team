@@ -598,7 +598,7 @@ export interface TimeOffRequestUpdatePartial {
 export type Workflow = {
   pk: number
   name: string
-  role: Role
+  role: number
   version: number
 }
 

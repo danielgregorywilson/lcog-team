@@ -10,10 +10,24 @@
       v-else
       :rows="workflows()"
       :columns="columns"
+      :filter=tableFilter
+      :filter-method=tableFilterMethod
       :grid="$q.screen.lt.md"
       :no-data-label="noDataLabel()"
       row-key="name"
+      :rows-per-page-options="pagination()"
     >
+      <template v-slot:top-right>
+        <q-input borderless dense clearable debounce="300" v-model="tableFilter" placeholder="Search">
+          <template v-slot:prepend>
+            <q-icon name="search">
+              <q-tooltip>
+                Type to search on Name, Description, Tag name, or Employee Name
+              </q-tooltip>
+            </q-icon>
+          </template>
+        </q-input>
+      </template>
       <!-- Slots for header cells: Shrink the width when the screen is too small to see the whole table width -->
       <!-- <template v-slot:header-cell-employeeName="props">
         <th v-if="$q.screen.lt.lg" style="white-space: normal;">{{props.col.label}}</th>
@@ -154,6 +168,7 @@ let rowPkToDelete = ref('')
 const props = defineProps<{
   complete?: boolean,
   actionRequired?: boolean,
+  noPagination?: boolean,
 }>()
 
 const columns: QTableProps['columns'] = [
@@ -164,6 +179,45 @@ const columns: QTableProps['columns'] = [
   { name: 'percentComplete', align: 'center', label: '% Complete', field: 'percent_complete', sortable: true },
   { name: 'actions', label: 'Actions', align: 'center', field: null },
 ]
+
+function pagination(): string {
+  if (props.noPagination) {
+    return [0]
+  } else {
+    return [ 10, 30, 50, 0 ]
+  }
+}
+
+let tableFilter = ref('')
+
+function tableFilterMethod(rows: Array<WorkflowInstance>, term: string) {
+  const searchTerm = term ? term.toLowerCase() : ''
+  const filteredRows = rows.filter(
+    (row) => {
+      if (searchTerm == '') {
+          // If no search term, return all rows
+          return true
+      } else {
+          const matchCriteria: Array<boolean> = []
+          // Filter by name
+          if (row.employee_name) {
+            const nameMatches = row.employee_name.toLowerCase().includes(searchTerm)
+            matchCriteria.push(nameMatches)
+          }
+          // Filter by position
+          if (row.title_name) {
+            const positionMatches = row.title_name.toLowerCase().includes(searchTerm)
+            matchCriteria.push(positionMatches)
+          }
+          if (matchCriteria.some(c => !!c)) {
+              return true
+          }
+          // Assume row doesn't match
+          return false
+      }
+    })
+  return filteredRows
+}
 
 function workflows(): Array<WorkflowInstance> {
   if (props.actionRequired !== undefined && props.actionRequired) {

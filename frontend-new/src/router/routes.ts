@@ -157,9 +157,34 @@ const routes: RouteRecordRaw[] = [
       ///////////////
       {
         path: '/workflows',
-        name: 'workflow-dashboard',
+        name: 'workflows',
         component: () => import('pages/workflows/Workflows.vue'),
-        meta: { requiresAuth: true }
+        meta: { requiresAuth: true },
+        children: [
+          { path: '', redirect: { name: 'workflow-dashboard' } },
+          {
+            path: 'dashboard',
+            name: 'workflow-dashboard',
+            component: () => import('pages/workflows/WorkflowDashboard.vue')
+          },
+          {
+            path: 'archive',
+            name: 'workflow-archive',
+            component: () => import('src/pages/workflows/WorkflowArchive.vue'),
+            children: [
+              { path: '', redirect: { name: 'workflow-archive-onboarding' } },
+              {
+                path: 'onboarding',
+                name: 'workflow-archive-onboarding',
+                component: () => {
+                  return import(
+                    'src/pages/workflows/WorkflowArchiveOnboarding.vue'
+                  )
+                }
+              }
+            ]
+          },
+        ]
       },
       {
         path: '/wf/:pk',

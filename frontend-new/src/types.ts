@@ -673,6 +673,10 @@ export interface WorkflowInstance {
   transition?: EmployeeTransition
   title: string
   percent_complete: string
+  employee_name?: string
+  title_pk?: number
+  title_name?: string
+  transition_date?: string
 }
 
 export type EmployeeID = 'CLSD' | 'CLID' | ''

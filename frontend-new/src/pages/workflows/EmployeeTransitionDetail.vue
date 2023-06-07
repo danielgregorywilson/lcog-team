@@ -320,9 +320,7 @@ import { useCookies } from 'vue3-cookies'
 
 import useEventBus from 'src/eventBus'
 import { readableDateTime } from 'src/filters'
-import {
-  EmployeeEmailRetrieve, EmployeeTransition, TransitionChange
-} from 'src/types'
+import { EmployeeTransition, TransitionChange } from 'src/types'
 import Avatar from 'src/components/Avatar.vue'
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import JobTitleSelect from 'src/components/JobTitleSelect.vue'
@@ -696,14 +694,6 @@ function canViewSalaryFields() {
   return userStore.getEmployeeProfile.employee_pk == manager.value.pk ||
     cookies.get('is_hr_employee') == 'true' ||
     cookies.get('is_fiscal_employee') == 'true'
-}
-
-function transitionChangeItems() {
-  if (!changes.value) {
-    return null
-  } else {
-    return changes.value
-  }
 }
 
 function updateTransitionAndClose() {

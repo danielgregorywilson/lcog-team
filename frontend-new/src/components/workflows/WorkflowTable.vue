@@ -130,7 +130,7 @@
 
 <script setup lang="ts">
 import { QTableProps, useQuasar } from 'quasar'
-import { defineProps, ref, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { WorkflowInstance } from 'src/types'

@@ -317,6 +317,27 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresMealsOnWheelsPermission: true }
   },
 
+  //////////////////
+  // PRINT LAYOUT //
+  //////////////////
+  {
+    path: '/print',
+    component: () => import('layouts/PrintLayout.vue'),
+    children: [
+      {
+        path: 'wf/:pk/transition',
+        name: 'workflow-print',
+        component: () => {
+          return import('src/pages/workflows/EmployeeTransitionDetail.vue')
+        },
+        meta: { requiresAuth: true },
+        props: {
+          print: true
+        }
+      }
+    ]
+  },
+
   /////////////////////////
   // USERNAME LOGIN PAGE //
   /////////////////////////

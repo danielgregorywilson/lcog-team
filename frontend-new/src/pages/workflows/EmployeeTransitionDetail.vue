@@ -276,8 +276,9 @@
     <div id="sticky-footer" class="row justify-between" v-if="true">
       <q-btn class="col-1" color="white" text-color="black" label="Submit" :disabled="!valuesAreChanged()" @click="updateTransitionAndClose()" />
       <div>
-        <q-btn v-if="changes && changes.length" class="col-1" color="white" text-color="black" label="Change Records" @click="showChangesDialog = true" />
+        <q-btn v-if="changes && changes.length" color="white" text-color="black" label="Change Records" @click="showChangesDialog = true" />
         <q-btn v-if="showErrorButton && formErrorItems().length > 0" label="Show errors" icon="check" color="warning" class="q-ml-sm" @click="openErrorDialog('right')" />
+        <q-btn class="q-ml-sm" color="white" text-color="black" label="Print" @click="router.push({ name: 'workflow-print' })" />
       </div>
       <!-- <div class="col-3 self-center status">Current Status: {{ status }}</div> -->
     </div>
@@ -308,6 +309,12 @@
 @media only screen and (min-width: 1024px) {
   #sticky-footer {
     left: 209px;
+  }
+}
+
+@media print {
+  #sticky-footer {
+    display: none;
   }
 }
 </style>
@@ -343,6 +350,10 @@ const workflowsStore = useWorkflowsStore()
 const emptyEmployee = {legal_name: '', pk: -1}
 const emptyTitle = {name: '', pk: -1}
 const emptyUnit = {name: '', pk: -1}
+
+const props = defineProps<{
+  print?: boolean
+}>()
 
 function currentEmployeeTransition(): EmployeeTransition {
   return workflowsStore.currentEmployeeTransition
@@ -857,6 +868,9 @@ watch(() => bus.value.get('workflowInstanceRetrieved'), () => {
 
 onMounted(() => {
   retrieveEmployeeTransition()
+  // if (props.print) {
+  //   window.print()
+  // }
 
   if (!peopleStore.employeeEmailList.length) {
     peopleStore.getEmployeeEmailList()

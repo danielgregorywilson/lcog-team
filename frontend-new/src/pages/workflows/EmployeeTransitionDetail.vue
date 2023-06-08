@@ -100,7 +100,8 @@
     </div>
     <div class="text-h6 transition-form-section-heading">Work Details</div>
     <div class="row q-mt-md"><div v-if="type=='Exit'">End Date/Time</div><div v-else>Start Date/Time</div></div>
-    <div class="row q-my-sm">
+    <div v-if="props.print" class="row q-my-sm">{{ transitionDate }}</div>
+    <div v-else class="row q-my-sm">
       <q-date
         v-model="transitionDate"
         mask="YYYY-MM-DD HH:mm"
@@ -327,7 +328,10 @@ import { useCookies } from 'vue3-cookies'
 
 import useEventBus from 'src/eventBus'
 import { readableDateTime } from 'src/filters'
-import { EmployeeTransition, TransitionChange } from 'src/types'
+import { handlePromiseError } from 'src/stores'
+import {
+  EmployeeTransition, TransitionChange, WorkflowInstance
+} from 'src/types'
 import Avatar from 'src/components/Avatar.vue'
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import JobTitleSelect from 'src/components/JobTitleSelect.vue'
@@ -452,133 +456,107 @@ let errorDialogPosition = ref('top') as Ref<QDialogProps['position']>
 let showChangesDialog = ref(false)
 
 function retrieveEmployeeTransition() {
-  const t = currentEmployeeTransition()
-  transitionPk.value = t.pk.toString()
-  
-  type.value = t.type
-  typeCurrentVal.value = type.value
+  return new Promise((resolve) => {
+    const t = currentEmployeeTransition()
+    transitionPk.value = t.pk.toString()
+    
+    type.value = t.type
+    typeCurrentVal.value = type.value
 
-  dateSubmitted.value = t.date_submitted
-  submitterPk.value = t.submitter_pk
-  submitterName.value = t.submitter_name
+    dateSubmitted.value = t.date_submitted
+    submitterPk.value = t.submitter_pk
+    submitterName.value = t.submitter_name
 
-  employeeFirstName.value = t.employee_first_name
-  employeeFirstNameCurrentVal.value = employeeFirstName.value
-  employeeMiddleInitial.value = t.employee_middle_initial
-  employeeMiddleInitialCurrentVal.value = employeeMiddleInitial.value
-  employeeLastName.value = t.employee_last_name
-  employeeLastNameCurrentVal.value = employeeLastName.value
-  employeePreferredName.value = t.employee_preferred_name
-  employeePreferredNameCurrentVal.value = employeePreferredName.value
-  employeeNumber.value = t.employee_number
-  employeeID.value = t.employee_id
-  employeeNumberCurrentVal.value = employeeNumber.value
-  employeeIDCurrentVal.value = employeeID.value
-  employeeEmail.value = t.employee_email
-  employeeEmailCurrentVal.value = employeeEmail.value
-  title.value = {pk: t.title_pk, name: t.title_name}
-  titleCurrentVal.value = title.value
-  fte.value = t.fte
-  fteCurrentVal.value = fte.value
-  salaryRange.value = t.salary_range
-  salaryRangeCurrentVal.value = salaryRange.value
-  salaryStep.value = t.salary_step
-  salaryStepCurrentVal.value = salaryStep.value
-  bilingual.value = t.bilingual
-  bilingualCurrentVal.value = bilingual.value
-  manager.value = {pk: t.manager_pk, legal_name: t.manager_name}
-  managerCurrentVal.value = manager.value
-  unit.value = {pk: t.unit_pk, name: t.unit_name}
-  unitCurrentVal.value = unit.value
-  if (t.transition_date === null) {
-    transitionDate.value = null
-  } else {
-    transitionDate.value = t.transition_date.replace('T', ' ')
-  }
-  transitionDateCurrentVal.value = transitionDate.value
-  preliminaryHire.value = t.preliminary_hire
-  preliminaryHireCurrentVal.value = preliminaryHire.value
-  deleteProfile.value = t.delete_profile
-  deleteProfileCurrentVal.value = deleteProfile.value
-  officeLocation.value = t.office_location
-  officeLocationCurrentVal.value = officeLocation.value
-  cubicleNumber.value = t.cubicle_number
-  cubicleNumberCurrentVal.value = cubicleNumber.value
-  unionAffiliation.value = t.union_affiliation
-  unionAffiliationCurrentVal.value = unionAffiliation.value
-  teleworking.value = t.teleworking
-  teleworkingCurrentVal.value = teleworking.value
-  computerType.value = t.computer_type
-  computerTypeCurrentVal.value = computerType.value
-  computerGL.value = t.computer_gl
-  computerGLCurrentVal.value = computerGL.value
-  computerDescription.value = t.computer_description
-  computerDescriptionCurrentVal.value = computerDescription.value
-  phoneNumber.value = t.phone_number
-  phoneNumberCurrentVal.value = phoneNumber.value
-  deskPhone.value = t.desk_phone
-  deskPhoneCurrentVal.value = deskPhone.value
-  phoneRequest.value = t.phone_request
-  phoneRequestCurrentVal.value = phoneRequest.value
-  phoneRequestData.value = t.phone_request_data
-  phoneRequestDataCurrentVal.value = phoneRequestData.value
-  loadCode.value = t.load_code
-  loadCodeCurrentVal.value = loadCode.value
-  cellPhone.value = t.cell_phone
-  cellPhoneCurrentVal.value = cellPhone.value
-  shouldDelete.value = t.should_delete
-  shouldDeleteCurrentVal.value = shouldDelete.value
-  reassignTo.value = t.reassign_to
-  reassignToCurrentVal.value = reassignTo.value
-  businessCards.value = t.business_cards
-  businessCardsCurrentVal.value = businessCards.value
-  proxCardNeeded.value = t.prox_card_needed
-  proxCardNeededCurrentVal.value = proxCardNeeded.value
-  proxCardReturned.value = t.prox_card_returned
-  proxCardReturnedCurrentVal.value = proxCardReturned.value
-  if (t.access_emails_pk != -1) {
-    showAccessEmails.value = true
-    showAccessEmailsCurrentVal.value = true
-  } 
-  accessEmails.value = {pk: t.access_emails_pk, legal_name: t.access_emails_name}
-  accessEmailsCurrentVal.value = accessEmails.value
-  specialInstructions.value = t.special_instructions
-  specialInstructionsCurrentVal.value = specialInstructions.value
+    employeeFirstName.value = t.employee_first_name
+    employeeFirstNameCurrentVal.value = employeeFirstName.value
+    employeeMiddleInitial.value = t.employee_middle_initial
+    employeeMiddleInitialCurrentVal.value = employeeMiddleInitial.value
+    employeeLastName.value = t.employee_last_name
+    employeeLastNameCurrentVal.value = employeeLastName.value
+    employeePreferredName.value = t.employee_preferred_name
+    employeePreferredNameCurrentVal.value = employeePreferredName.value
+    employeeNumber.value = t.employee_number
+    employeeID.value = t.employee_id
+    employeeNumberCurrentVal.value = employeeNumber.value
+    employeeIDCurrentVal.value = employeeID.value
+    employeeEmail.value = t.employee_email
+    employeeEmailCurrentVal.value = employeeEmail.value
+    title.value = {pk: t.title_pk, name: t.title_name}
+    titleCurrentVal.value = title.value
+    fte.value = t.fte
+    fteCurrentVal.value = fte.value
+    salaryRange.value = t.salary_range
+    salaryRangeCurrentVal.value = salaryRange.value
+    salaryStep.value = t.salary_step
+    salaryStepCurrentVal.value = salaryStep.value
+    bilingual.value = t.bilingual
+    bilingualCurrentVal.value = bilingual.value
+    manager.value = {pk: t.manager_pk, legal_name: t.manager_name}
+    managerCurrentVal.value = manager.value
+    unit.value = {pk: t.unit_pk, name: t.unit_name}
+    unitCurrentVal.value = unit.value
+    if (t.transition_date === null) {
+      transitionDate.value = null
+    } else {
+      transitionDate.value = t.transition_date.replace('T', ' ')
+    }
+    transitionDateCurrentVal.value = transitionDate.value
+    preliminaryHire.value = t.preliminary_hire
+    preliminaryHireCurrentVal.value = preliminaryHire.value
+    deleteProfile.value = t.delete_profile
+    deleteProfileCurrentVal.value = deleteProfile.value
+    officeLocation.value = t.office_location
+    officeLocationCurrentVal.value = officeLocation.value
+    cubicleNumber.value = t.cubicle_number
+    cubicleNumberCurrentVal.value = cubicleNumber.value
+    unionAffiliation.value = t.union_affiliation
+    unionAffiliationCurrentVal.value = unionAffiliation.value
+    teleworking.value = t.teleworking
+    teleworkingCurrentVal.value = teleworking.value
+    computerType.value = t.computer_type
+    computerTypeCurrentVal.value = computerType.value
+    computerGL.value = t.computer_gl
+    computerGLCurrentVal.value = computerGL.value
+    computerDescription.value = t.computer_description
+    computerDescriptionCurrentVal.value = computerDescription.value
+    phoneNumber.value = t.phone_number
+    phoneNumberCurrentVal.value = phoneNumber.value
+    deskPhone.value = t.desk_phone
+    deskPhoneCurrentVal.value = deskPhone.value
+    phoneRequest.value = t.phone_request
+    phoneRequestCurrentVal.value = phoneRequest.value
+    phoneRequestData.value = t.phone_request_data
+    phoneRequestDataCurrentVal.value = phoneRequestData.value
+    loadCode.value = t.load_code
+    loadCodeCurrentVal.value = loadCode.value
+    cellPhone.value = t.cell_phone
+    cellPhoneCurrentVal.value = cellPhone.value
+    shouldDelete.value = t.should_delete
+    shouldDeleteCurrentVal.value = shouldDelete.value
+    reassignTo.value = t.reassign_to
+    reassignToCurrentVal.value = reassignTo.value
+    businessCards.value = t.business_cards
+    businessCardsCurrentVal.value = businessCards.value
+    proxCardNeeded.value = t.prox_card_needed
+    proxCardNeededCurrentVal.value = proxCardNeeded.value
+    proxCardReturned.value = t.prox_card_returned
+    proxCardReturnedCurrentVal.value = proxCardReturned.value
+    if (t.access_emails_pk != -1) {
+      showAccessEmails.value = true
+      showAccessEmailsCurrentVal.value = true
+    } 
+    accessEmails.value = {pk: t.access_emails_pk, legal_name: t.access_emails_name}
+    accessEmailsCurrentVal.value = accessEmails.value
+    specialInstructions.value = t.special_instructions
+    specialInstructionsCurrentVal.value = specialInstructions.value
 
-  changes.value = t.changes
-  
-  if (formErrorItems().length > 0) {
-    showErrorButton.value = true
-  }
-
-  
-  // return new Promise((resolve, reject) => {
-  //   this.$store.dispatch('workflowModule/getCurrentEmployeeTransition', {pk: this.$route.params.pk})
-  //     .then(() => {
-  //       const wfInstance: WorkflowInstance = this.getters['workflowModule/currentWorkflowInstance'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access
-  //       if (!wfInstance) {
-  //           console.log('Workflow instance does not seem to exist. Redirecting...')
-  //           this.$router.push('/')
-  //             .catch(e => {
-  //               console.error('Error navigating to dashboard upon not finding a matching Workflow Instance:', e)
-  //               reject(e)
-  //             })
-  //           return
-  //         }
-  //       if (!wfInstance.process_instances[0].completed_at) {
-  //         this.currentStepInstance = wfInstance.process_instances[0].current_step_instance.pk
-  //       } else {
-  //         // Process Instance is complete
-  //         this.currentStepInstance = -1
-  //       }
-  //       bus.$emit('updateProcessInstances') // Trigger ProcessInstanceDetail to get a new current step
-  //       resolve('Got Workflow Instance')
-  //     })
-  //   .catch(e => {
-  //     console.error('Error retrieving workflow instance', e)
-  //     reject(e)
-  //   })
-  // })
+    changes.value = t.changes
+    
+    if (formErrorItems().length > 0) {
+      showErrorButton.value = true
+    }
+    resolve('Retrieved employee transition')
+  })
 }
 
 function emailInUse(email: string): boolean {
@@ -861,16 +839,51 @@ function clickedErrorItem(item: [string, string]) {
   }
 }
 
+function handlePrint() {
+  const pk = getRoutePk(route)
+  if (!pk) {
+    router.push('/')
+  } else {
+    workflowsStore.getCurrentWorkflowInstance(pk)
+      .then(() => {
+        const wfInstance: WorkflowInstance = workflowsStore.currentWorkflowInstance
+        if (!wfInstance) {
+          console.log('Workflow instance does not seem to exist. Redirecting...')
+          router.push({ name: 'workflow-dashboard' })
+            .catch(e => {
+              console.error('Error navigating to workflow dashboard upon not finding a matching Workflow Instance:', e)
+            })
+          return
+        }
+        retrieveEmployeeTransition().then(() => {
+          // Print the screen
+          window.print()
+        })
+      })
+      .catch(e => {
+        console.error('Error retrieving workflow instance', e)
+        router.push({ name: 'workflow-transition-form', params: { pk: pk } })
+          .catch(e => {
+            console.error(
+              'Error navigating to transition form upon not finding a matching Workflow Instance:',
+              e
+            )
+          })
+      })
+  }
+}
+
 watch(() => bus.value.get('workflowInstanceRetrieved'), () => {
   // TODO: We should only set state once, but when yoyu load /transition this runs twice
   retrieveEmployeeTransition()
 })
 
 onMounted(() => {
-  retrieveEmployeeTransition()
-  // if (props.print) {
-  //   window.print()
-  // }
+  if (props.print) {
+    handlePrint()
+  } else {
+    retrieveEmployeeTransition()
+  }
 
   if (!peopleStore.employeeEmailList.length) {
     peopleStore.getEmployeeEmailList()

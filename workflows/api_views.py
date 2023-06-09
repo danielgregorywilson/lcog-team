@@ -353,7 +353,9 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         send_staff_transition_email(
             transition,
             update=request.data['update'],
-            extra_message=request.data['extraMessage']
+            extra_message=request.data['extraMessage'],
+            sender_name=request.data['senderName'],
+            url=request.data['transition_url']
         )
         return Response("Sent email to staff.")
 

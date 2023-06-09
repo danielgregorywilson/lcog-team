@@ -876,6 +876,8 @@ function onSubmitSendDialog() {
   workflowsStore.sendTransitionToEmailList(transitionPk.value, {
     update: sendDialogUpdate.value,
     extraMessage: sendDialogMessage.value,
+    senderName: userStore.getEmployeeProfile.name,
+    transition_url: route.fullPath
   })
     .then(() => {
       quasar.notify({
@@ -884,6 +886,8 @@ function onSubmitSendDialog() {
         icon: 'send'
       })
       showSendDialog.value = false
+      sendDialogUpdate.value = false
+      sendDialogMessage.value = ''
     })
     .catch(e => {
       console.error('Error sending email', e)

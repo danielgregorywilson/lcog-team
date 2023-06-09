@@ -1,8 +1,34 @@
-// ////////////////////////////////
-// WATCH THOSE MONTH CODES, NOOB //
-///////////////////////////////////
+// //////////////////////////
+// WATCH THOSE MONTH CODES //
+/////////////////////////////
 
 export const releases = [
+  {
+    version: '0.13.2',
+    date: new Date(2023, 5, 9),
+    changes: [
+      {
+        type: 'new',
+        description: 'Workflows archive page'
+      },
+      {
+        type: 'new',
+        description: 'Transition form print view'
+      },
+      {
+        type: 'new',
+        description: 'Transition form function to send form to staff transition news'
+      },
+      {
+        type: 'improved',
+        description: 'Add security for view and edit of transition form fields'
+      },
+      {
+        type: 'improved',
+        description: 'Various improvements to workflows pages'
+      }
+    ]
+  },
   {
     version: '0.13.1',
     date: new Date(2023, 4, 30),

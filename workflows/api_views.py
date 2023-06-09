@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from time import time
 
-from rest_framework import viewsets
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
@@ -21,6 +21,7 @@ from timeoff.helpers import (
     send_employee_manager_acknowledged_timeoff_request_notification,
     send_manager_new_timeoff_request_notification
 )
+from workflows.helpers import send_staff_transition_email
 from workflows.models import (
     EmployeeTransition, Process, ProcessInstance, Role, Step, StepChoice,
     StepInstance, TransitionChange, Workflow, WorkflowInstance
@@ -216,10 +217,13 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk=None):
         t = EmployeeTransition.objects.get(pk=pk)
-        submitter = Employee.objects.get(pk=request.data['submitter_pk']) if \
-            'submitter_pk' in request.data else None
-        t.submitter = submitter
-        t.date_submitted = datetime.now(tz=get_current_timezone())
+
+        # Set submitter only the first time the transition is updated
+        if not t.submitter:
+            submitter = Employee.objects.get(pk=request.data['submitter_pk']) if \
+                'submitter_pk' in request.data else None
+            t.submitter = submitter
+            t.date_submitted = datetime.now(tz=get_current_timezone())
 
         t.type = request.data['type']
         t.employee_first_name = request.data['employee_first_name']
@@ -236,14 +240,60 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             t.title = None
 
         t.fte = request.data['fte']
-        t.salary_range = request.data['salary_range']
-        t.salary_step = request.data['salary_step']
+
+        # Only the hiring manager, fiscal, or HR can edit salary fields
+        user_is_hiring_manager = request.user.employee == t.manager
+        user_is_hr = request.user.employee.is_hr_employee
+        user_is_fiscal = request.user.employee.is_fiscal_employee
+        user_can_edit_salary = any([
+            user_is_hiring_manager, user_is_hr, user_is_fiscal
+        ])
+        editing_salary_range = all([
+            'salary_range' in request.data,
+            request.data['salary_range'] != t.salary_range
+        ])
+        editing_salary_step = all([
+            'salary_step' in request.data,
+            request.data['salary_step'] != t.salary_step
+        ])
+        editing_salary = editing_salary_range or editing_salary_step
+        if editing_salary and not user_can_edit_salary:
+            return Response(
+                {
+                    'error':
+                    'Only the hiring manager, fiscal, or HR can edit salary fields.'
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+        if editing_salary and user_can_edit_salary:
+            t.salary_range = request.data['salary_range']
+            t.salary_step = request.data['salary_step']
+        
         t.bilingual = request.data['bilingual']
         
-        if 'manager_pk' in request.data and request.data['manager_pk'] != -1:
-            t.manager = Employee.objects.get(pk=request.data['manager_pk'])    
-        else:
-            t.manager = None        
+        # Only the original submitter can edit manager field
+        user_is_submitter = request.user.employee == t.submitter
+        current_manager = t.manager.pk if t.manager else -1
+        editing_manager = all([
+            # Manager field is being edited
+            'manager_pk' in request.data,
+            # Manager field is being changed
+            request.data['manager_pk'] != current_manager
+        ])
+        if editing_manager and not user_is_submitter:
+            return Response(
+                {
+                    'error':
+                    'Only the original submitter can edit the manager field.'
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+        if user_is_submitter:
+            if editing_manager and request.data['manager_pk'] != -1:
+                t.manager = Employee.objects.get(pk=request.data['manager_pk'])
+            else:
+                t.manager = None
+              
         
         if 'unit_pk' in request.data and request.data['unit_pk'] != -1:
             t.unit = UnitOrProgram.objects.get(pk=request.data['unit_pk'])
@@ -296,6 +346,18 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
     #     serialized_tor = TimeOffRequestSerializer(tor,
     #         context={'request': request})
     #     return Response(serialized_tor.data)
+
+    @action(detail=True, methods=['post'])
+    def send_transition_to_email_list(self, request, pk):
+        transition = EmployeeTransition.objects.get(pk=pk)
+        send_staff_transition_email(
+            transition,
+            update=request.data['update'],
+            extra_message=request.data['extraMessage'],
+            sender_name=request.data['senderName'],
+            url=request.data['transition_url']
+        )
+        return Response("Sent email to staff.")
 
 
 class TransitionChangeViewSet(viewsets.ModelViewSet):

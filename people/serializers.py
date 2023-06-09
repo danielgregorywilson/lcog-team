@@ -76,10 +76,11 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
         model = Employee
         fields = [
             'url', 'pk', 'name', 'user', 'username', 'email', 'manager',
-            'is_manager', 'has_manager',
-            'is_eligible_for_telework_application', 'can_view_seating_charts',
-            'can_edit_seating_charts', 'can_view_desk_reservation_reports',
-            'is_upper_manager', 'is_hr_manager', 'is_executive_director',
+            'is_manager', 'has_manager', 'is_hr_employee',
+            'is_fiscal_employee', 'is_eligible_for_telework_application',
+            'can_view_seating_charts', 'can_edit_seating_charts',
+            'can_view_desk_reservation_reports', 'is_upper_manager',
+            'is_hr_manager', 'is_executive_director',
             'viewed_security_message', 'prs_can_view', 'notes_can_view',
             'telework_applications_can_view', 'time_off_requests_can_view',
             'next_to_sign_prs', 'email_opt_out_all',
@@ -188,7 +189,19 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
 class SimpleEmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        fields = ['pk', 'name']
+        fields = ['pk', 'name', 'legal_name']
+
+
+class EmployeeEmailSerializer(serializers.ModelSerializer):
+    email = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Employee
+        fields = ['email']
+    
+    @staticmethod
+    def get_email(employee):
+        return employee.user.email
 
 
 class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):

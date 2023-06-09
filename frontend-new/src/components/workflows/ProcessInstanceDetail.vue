@@ -140,6 +140,7 @@ function completeStep(stepInstancePk: number, nextStepPk?: number): void {
     })
     .catch(e => {
       console.error('Error completing step instance', e)
+      disableCompletions.value = false
     })
 }
 

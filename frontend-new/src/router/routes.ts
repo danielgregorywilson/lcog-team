@@ -43,19 +43,29 @@ const routes: RouteRecordRaw[] = [
       {
         path: '/responsibilities',
         name: 'responsibilities',
-        component: () => import('src/pages/responsibilities/Responsibilities.vue'),
+        component: () => {
+          return import('src/pages/responsibilities/Responsibilities.vue')
+        },
         redirect: {name: 'all-responsibilities'},
         meta: { requiresAuth: true },
         children: [
           {
             path: 'all',
             name: 'all-responsibilities',
-            component: () => import('src/pages/responsibilities/AllResponsibilities.vue'),
+            component: () => {
+              return import(
+                'src/pages/responsibilities/AllResponsibilities.vue'
+              )
+            }
           },
           {
             path: 'orphaned',
             name: 'orphaned-responsibilities',
-            component: () => import('src/pages/responsibilities/OrphanedResponsibilities.vue'),
+            component: () => {
+              return import(
+                'src/pages/responsibilities/OrphanedResponsibilities.vue'
+              )
+            }
           },
           {
             path: 'tag',
@@ -65,24 +75,38 @@ const routes: RouteRecordRaw[] = [
               {
                 path: 'all',
                 name: 'all-tags',
-                component: () => import ('src/pages/responsibilities/AllTags.vue')
+                component: () => {
+                  return import('src/pages/responsibilities/AllTags.vue')
+                }
               },
               {
                 path: ':pk',
                 name: 'tagged-responsibilities',
-                component: () => import ('src/pages/responsibilities/TaggedResponsibilities.vue')
+                component: () => {
+                  return import (
+                    'src/pages/responsibilities/TaggedResponsibilities.vue'
+                  )
+                }
               }
             ]
           },
           {
             path: ':pk',
             name: 'employee-responsibilities',
-            component: () => import('src/pages/responsibilities/EmployeeResponsibilities.vue'),
+            component: () => {
+              return import(
+                'src/pages/responsibilities/EmployeeResponsibilities.vue'
+              )
+            },
             children: [
               {
                 path: 'secondary',
                 name: 'employee-secondary-responsibilities',
-                component: () => import('src/pages/responsibilities/EmployeeResponsibilities.vue'),
+                component: () => {
+                  return import(
+                    'src/pages/responsibilities/EmployeeResponsibilities.vue'
+                  )
+                },
                 props: { secondary: true }
               }
             ]
@@ -133,14 +157,49 @@ const routes: RouteRecordRaw[] = [
       ///////////////
       {
         path: '/workflows',
-        name: 'workflow-dashboard',
+        name: 'workflows',
         component: () => import('pages/workflows/Workflows.vue'),
-        meta: { requiresAuth: true }
+        meta: { requiresAuth: true },
+        children: [
+          { 
+            path: '',
+            name: 'workflow-dashboard-redirect',
+            redirect: { name: 'workflow-dashboard' }
+          },
+          {
+            path: 'dashboard',
+            name: 'workflow-dashboard',
+            component: () => import('pages/workflows/WorkflowDashboard.vue')
+          },
+          {
+            path: 'archive',
+            name: 'workflow-archive',
+            component: () => import('src/pages/workflows/WorkflowArchive.vue'),
+            children: [
+              {
+                path: '',
+                name: 'workflow-arrchive-onboarding-redirect',
+                redirect: { name: 'workflow-archive-onboarding' }
+              },
+              {
+                path: 'onboarding',
+                name: 'workflow-archive-onboarding',
+                component: () => {
+                  return import(
+                    'src/pages/workflows/WorkflowArchiveOnboarding.vue'
+                  )
+                }
+              }
+            ]
+          }
+        ]
       },
       {
         path: '/wf/:pk',
         name: 'workflow-instance-detail',
-        component: () => import('src/pages/workflows/WorkflowInstanceDetail.vue'),
+        component: () => {
+          return import('src/pages/workflows/WorkflowInstanceDetail.vue')
+        },
         meta: { requiresAuth: true },
         children: [
           {
@@ -151,10 +210,12 @@ const routes: RouteRecordRaw[] = [
           {
             path: 'transition',
             name: 'workflow-transition-form',
-            component: () => import('src/pages/workflows/EmployeeTransitionDetail.vue')
+            component: () => {
+              return import('src/pages/workflows/EmployeeTransitionDetail.vue')
+            }
           }
         ]
-      },
+      }
     ],
   },
 
@@ -178,7 +239,9 @@ const routes: RouteRecordRaw[] = [
               {
                 path: 'desk/:deskNumber',
                 name: 'schaefers-1-desk',
-                component: () => import('src/pages/deskReservation/Schaefers1.vue')
+                component: () => {
+                  return import('src/pages/deskReservation/Schaefers1.vue')
+                }
               }
             ]
           },
@@ -190,7 +253,9 @@ const routes: RouteRecordRaw[] = [
               {
                 path: 'desk/:deskNumber',
                 name: 'schaefers-2-desk',
-                component: () => import('src/pages/deskReservation/Schaefers2.vue')
+                component: () => {
+                  return import('src/pages/deskReservation/Schaefers2.vue')
+                }
               }
             ]
           },
@@ -202,7 +267,9 @@ const routes: RouteRecordRaw[] = [
               {
                 path: 'desk/:deskNumber',
                 name: 'schaefers-3-desk',
-                component: () => import('src/pages/deskReservation/Schaefers3.vue')
+                component: () => {
+                  return import('src/pages/deskReservation/Schaefers3.vue')
+                }
               }
             ]
           }
@@ -248,6 +315,27 @@ const routes: RouteRecordRaw[] = [
     name: 'mow-map',
     component: () => import('src/pages/meals/MOWMap.vue'),
     meta: { requiresMealsOnWheelsPermission: true }
+  },
+
+  //////////////////
+  // PRINT LAYOUT //
+  //////////////////
+  {
+    path: '/print',
+    component: () => import('layouts/PrintLayout.vue'),
+    children: [
+      {
+        path: 'wf/:pk/transition',
+        name: 'workflow-print',
+        component: () => {
+          return import('src/pages/workflows/EmployeeTransitionDetail.vue')
+        },
+        meta: { requiresAuth: true },
+        props: {
+          print: true
+        }
+      }
+    ]
   },
 
   /////////////////////////

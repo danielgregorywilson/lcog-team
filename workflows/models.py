@@ -112,7 +112,8 @@ class EmployeeTransition(models.Model):
         _("transition type"), max_length=20, choices=TRANSITION_TYPE_CHOICES,
         blank=True, null=True
     )
-    # TODO: What does this mean now?
+    # TODO: What does this mean now? Currently submitter and date are set only
+    # the first time the transition is saved.
     date_submitted = models.DateTimeField(blank=True, null=True)
     submitter = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,

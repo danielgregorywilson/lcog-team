@@ -271,6 +271,29 @@
       </q-card>
     </q-dialog>
 
+    <!-- Dialog of changes -->
+    <q-dialog v-model="showSendDialog">
+      <q-card class="q-pa-md">
+        <div class="text-h6">Send message to staff transition news?</div>
+        <q-form
+          @submit='onSubmitSendDialog()'
+          class="q-gutter-md"
+        >
+          <q-checkbox v-model="sendDialogUpdate" label="Update" />
+          <q-input
+            v-model="sendDialogMessage"
+            filled
+            type="textarea"
+            label="Extra message to include"	
+          />
+
+          <div>
+            <q-btn label="Send" icon-right="send" type="submit" color="primary"/>
+          </div>
+        </q-form>
+      </q-card>
+    </q-dialog>
+
     <!-- Spacing for footer -->
     <div style="height: 80px;"></div>
 
@@ -279,7 +302,15 @@
       <div>
         <q-btn v-if="changes && changes.length" color="white" text-color="black" label="Change Records" @click="showChangesDialog = true" />
         <q-btn v-if="showErrorButton && formErrorItems().length > 0" label="Show errors" icon="check" color="warning" class="q-ml-sm" @click="openErrorDialog('right')" />
-        <q-btn class="q-ml-sm" color="white" text-color="black" label="Print" @click="router.push({ name: 'workflow-print' })" />
+        <q-btn class="q-ml-sm" color="white" text-color="black" icon="print" label="Print" @click="router.push({ name: 'workflow-print' })" />
+        <q-btn
+          class="q-ml-sm"
+          color="white"
+          text-color="black"
+          icon="send"
+          label="Send"
+          @click="showSendDialog = true"
+        />
       </div>
       <!-- <div class="col-3 self-center status">Current Status: {{ status }}</div> -->
     </div>
@@ -328,7 +359,6 @@ import { useCookies } from 'vue3-cookies'
 
 import useEventBus from 'src/eventBus'
 import { readableDateTime } from 'src/filters'
-import { handlePromiseError } from 'src/stores'
 import {
   EmployeeTransition, TransitionChange, WorkflowInstance
 } from 'src/types'
@@ -454,6 +484,9 @@ let showErrorDialog = ref(false)
 let errorDialogPosition = ref('top') as Ref<QDialogProps['position']>
 
 let showChangesDialog = ref(false)
+let showSendDialog = ref(false)
+let sendDialogUpdate = ref(false)
+let sendDialogMessage = ref('')
 
 function retrieveEmployeeTransition() {
   return new Promise((resolve) => {
@@ -837,6 +870,29 @@ function clickedErrorItem(item: [string, string]) {
     const duration = 500
     setVerticalScrollPosition(target, offset, duration)
   }
+}
+
+function onSubmitSendDialog() {
+  workflowsStore.sendTransitionToEmailList(transitionPk.value, {
+    update: sendDialogUpdate.value,
+    extraMessage: sendDialogMessage.value,
+  })
+    .then(() => {
+      quasar.notify({
+        message: 'Sent',
+        color: 'positive',
+        icon: 'send'
+      })
+      showSendDialog.value = false
+    })
+    .catch(e => {
+      console.error('Error sending email', e)
+      quasar.notify({
+        message: 'Error sending email',
+        color: 'negative',
+        icon: 'report_problem'
+      })
+    })
 }
 
 function handlePrint() {

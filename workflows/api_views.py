@@ -21,6 +21,7 @@ from timeoff.helpers import (
     send_employee_manager_acknowledged_timeoff_request_notification,
     send_manager_new_timeoff_request_notification
 )
+from workflows.helpers import send_staff_transition_email
 from workflows.models import (
     EmployeeTransition, Process, ProcessInstance, Role, Step, StepChoice,
     StepInstance, TransitionChange, Workflow, WorkflowInstance
@@ -272,9 +273,12 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         
         # Only the original submitter can edit manager field
         user_is_submitter = request.user.employee == t.submitter
+        current_manager = t.manager.pk if t.manager else -1
         editing_manager = all([
+            # Manager field is being edited
             'manager_pk' in request.data,
-            request.data['manager_pk'] != t.manager.pk
+            # Manager field is being changed
+            request.data['manager_pk'] != current_manager
         ])
         if editing_manager and not user_is_submitter:
             return Response(
@@ -342,6 +346,16 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
     #     serialized_tor = TimeOffRequestSerializer(tor,
     #         context={'request': request})
     #     return Response(serialized_tor.data)
+
+    @action(detail=True, methods=['post'])
+    def send_transition_to_email_list(self, request, pk):
+        transition = EmployeeTransition.objects.get(pk=pk)
+        send_staff_transition_email(
+            transition,
+            update=request.data['update'],
+            extra_message=request.data['extraMessage']
+        )
+        return Response("Sent email to staff.")
 
 
 class TransitionChangeViewSet(viewsets.ModelViewSet):

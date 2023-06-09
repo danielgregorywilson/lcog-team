@@ -4,7 +4,7 @@ import { useCookies } from 'vue3-cookies'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
 import { useSecurityMessageStore } from 'src/stores/securitymessage'
-import { EmployeeRetrieve, Role, SimpleEmployeeRetrieve } from 'src/types'
+import { EmployeeRetrieve, SimpleEmployeeRetrieve } from 'src/types'
 
 const { cookies } = useCookies()
 

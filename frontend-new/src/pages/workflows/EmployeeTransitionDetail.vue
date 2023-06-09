@@ -2,13 +2,13 @@
   <div class="q-pt-md">
     <div class="text-h6 transition-form-section-heading">Type</div>
     <div class="row items-center">
-      <q-radio v-model="type" val="New" disable />
+      <q-radio v-model="type" val="New" />
       <div>New</div>
-      <q-radio v-model="type" val="Return" disable />
+      <q-radio v-model="type" val="Return" />
       <div>Return</div>
-      <q-radio v-model="type" val="Change/Modify" disable />
+      <q-radio v-model="type" val="Change/Modify" />
       <div>Change/Modify</div>
-      <q-radio v-model="type" val="Exit" disable />
+      <q-radio v-model="type" val="Exit" />
       <div>Exit</div>
     </div>
     <div class="text-h6 transition-form-section-heading">Submission Info</div>

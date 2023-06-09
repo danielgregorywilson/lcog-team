@@ -304,6 +304,7 @@
         <q-btn v-if="showErrorButton && formErrorItems().length > 0" label="Show errors" icon="check" color="warning" class="q-ml-sm" @click="openErrorDialog('right')" />
         <q-btn class="q-ml-sm" color="white" text-color="black" icon="print" label="Print" @click="router.push({ name: 'workflow-print' })" />
         <q-btn
+          v-if="canSendToTransitionNews()"
           class="q-ml-sm"
           color="white"
           text-color="black"
@@ -716,6 +717,10 @@ function canViewSalaryFields() {
   return userStore.getEmployeeProfile.employee_pk == manager.value.pk ||
     cookies.get('is_hr_employee') == 'true' ||
     cookies.get('is_fiscal_employee') == 'true'
+}
+
+function canSendToTransitionNews() {
+  return cookies.get('is_hr_employee') == 'true'
 }
 
 function updateTransitionAndClose() {

@@ -104,6 +104,10 @@ class Employee(models.Model):
             return self.display_name
         else:
             return self.user.get_full_name()
+    
+    @property
+    def legal_name(self):
+        return self.user.get_full_name()
 
     @property
     def initials(self):
@@ -111,6 +115,14 @@ class Employee(models.Model):
             return "".join(map(lambda x: x[0], self.display_name.split(' '))).upper()
         else:
             return "".join(map(lambda x: x[0], self.user.get_full_name().split(' '))).upper()
+
+    @property
+    def is_hr_employee(self):
+        return self.user.groups.filter(name='HR Employee').exists()
+
+    @property
+    def is_fiscal_employee(self):
+        return self.user.groups.filter(name='Fiscal Employee').exists()
 
     @property
     def is_program_manager(self):

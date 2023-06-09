@@ -51,7 +51,7 @@ let tableFilter = ref('')
 
 const tableColumns: QTableProps['columns'] = [
   { name: 'name', required: true, label: 'Name', field: 'name', sortable: true, align: 'left' },
-  { name: 'actions', label: 'Actions', field: null }
+  { name: 'actions', label: 'Actions', field: '' }
 ]
 
 const initialTablePagination = {
@@ -60,7 +60,7 @@ const initialTablePagination = {
 
 function allTags(): Array<ResponsibilityTagRetrieve> {
   const allTags = responsibilityStore.allTags
-  return allTags.results
+  return allTags
 }
 
 function retrieveTags(): void {
@@ -70,8 +70,9 @@ function retrieveTags(): void {
     })
 }
 
-function tableFilterMethod(rows: Array<Responsibility>, term: string) {
-  return shared.tableFilterMethod(rows, term, ['name',])
+function tableFilterMethod(rows: readonly any[], term: string) {
+  const tableRows = rows as Responsibility[]
+  return shared.tableFilterMethod(tableRows, term, ['name',])
 }
 
 function navigateToTag(tagPk: string): void {

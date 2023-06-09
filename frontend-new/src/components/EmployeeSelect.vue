@@ -3,7 +3,7 @@
   v-model="selectedEmployee"
   :options="employees()"
   option-value="pk"
-  option-label="name"
+  :option-label="selectOptionLabel()"
   :label="label"
   use-input
   hide-selected
@@ -19,7 +19,7 @@
       </q-item-section>
     </q-item>
   </template>
-  <template v-if="selectedEmployee.name" v-slot:append>
+  <template v-if="selectedEmployeeName" v-slot:append>
     <q-icon name="cancel" @click.stop="clearEmployee()" class="cursor-pointer" />
   </template>
 </q-select>
@@ -29,23 +29,41 @@
 import { onMounted, onUpdated, ref } from 'vue'
 
 import { usePeopleStore } from 'src/stores/people'
+import { SimpleEmployeeRetrieve } from 'src/types'
 
 const peopleStore = usePeopleStore()
 
-const emptyEmployee = {name: '', pk: -1}
+const emptyEmployee = {pk: -1, name: '', legal_name: ''}
 
 const props = defineProps<{
   label: string,
-  employee: {name: string, pk: number},
+  employee: SimpleEmployeeRetrieve,
+  useLegalName: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'clear'): void
-  (e: 'input', arg: {name: string, pk: number}): void
+  (e: 'input', arg: SimpleEmployeeRetrieve): void
 }>()
 
 let needle = ref('') // For filtering employee list
 let selectedEmployee = ref(emptyEmployee)
+
+function selectOptionLabel(): string {
+  if (props.useLegalName) {
+    return 'legal_name'
+  } else {
+    return 'name'
+  }
+}
+
+function selectedEmployeeName(): string {
+  if (props.useLegalName) {
+    return selectedEmployee.value.legal_name
+  } else {
+    return selectedEmployee.value.name
+  }
+}
 
 function retrieveSimpleEmployeeList(): void {
   peopleStore.getSimpleEmployeeList()
@@ -55,9 +73,13 @@ function retrieveSimpleEmployeeList(): void {
 }
 
 function employees() {    
-  const employees = peopleStore.simpleEmployeeList
-  return employees.filter((employee) => {
-    return employee.name.toLowerCase().indexOf(needle.value) != -1
+  const employeesList = peopleStore.simpleEmployeeList
+  return employeesList.filter((employee) => {
+    if (props.useLegalName) {
+      return employee.legal_name.toLowerCase().indexOf(needle.value) != -1
+    } else {
+      return employee.name.toLowerCase().indexOf(needle.value) != -1
+    }
   })
 }
 

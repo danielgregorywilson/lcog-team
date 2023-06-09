@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     'deskreservation',
     'meals',
     'people',
+    'purchases',
     'responsibilities',
     'timeoff',
     'workflows',

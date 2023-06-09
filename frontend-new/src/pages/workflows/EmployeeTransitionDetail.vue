@@ -12,15 +12,15 @@
       <div>Exit</div>
     </div>
     <div class="text-h6 transition-form-section-heading">Submission Info</div>
-    <div class="row">
-      <q-input v-model="dateSubmitted" label="Date Submitted" class="q-mr-md" disable />
-      <q-input v-model="submitterName" label="Submitter" disable />
+    <div class="row items-center">
+      <div class="q-mr-md"><span class="text-bold">Date Submitted:</span> {{ readableDateTime(dateSubmitted) }}</div>
+      <div><span class="text-bold">Submitter:</span> {{ submitterName }}</div>
     </div>
     <div class="text-h6 transition-form-section-heading">Employee</div>
     <div class="row">
-      <q-input v-model="employeeFirstName" label="First" class="q-mr-md" @blur="suggestEmail()" />
+      <q-input v-model="employeeFirstName" label="First" class="q-mr-md" />
       <q-input v-model="employeeMiddleInitial" maxlength=5 label="M" class="q-mr-md" style="width: 4em" />
-      <q-input v-model="employeeLastName" label="Last" class="q-mr-md" @blur="suggestEmail()" />
+      <q-input v-model="employeeLastName" label="Last" class="q-mr-md" />
       <q-input v-model="employeePreferredName" label="Preferred Name, if different" style="width: 25em" />
     </div>
     <div class="row">
@@ -36,7 +36,7 @@
         </template>
       </q-select>
       <q-input v-model="employeeNumber" type="number" label="Employee Number" mask="####" class="q-mr-md" />
-      <q-input v-model="employeeEmail" type="email" label="Email" />
+      <q-input v-model="employeeEmail" type="email" label="Email" @focus="suggestEmail()" />
     </div>
     <div class="text-h6 transition-form-section-heading">Position</div>
     <div class="row">
@@ -52,6 +52,7 @@
     </div>
     <div class="row">
       <q-select
+        v-if="canViewSalaryFields()"
         v-model="salaryRange"
         :options="Array.from({length: 50}, (x, i) => i+1)"
         label="Salary Range"
@@ -60,6 +61,7 @@
         clearable
       />
       <q-select
+        v-if="canViewSalaryFields()"
         v-model="salaryStep"
         :options="Array.from({length:10}, (x, i) => i+1)"
         label="Salary Step"
@@ -78,14 +80,17 @@
         </template>
       </q-select>
     </div>
-    <div class="row">
+    <div class="row items-center">
       <EmployeeSelect
+        v-if="employeeIsSubmitter()"
         label="Manager"
         :employee="manager"
+        :useLegalName="true"
         v-on:input="manager=$event"
         v-on:clear="manager=emptyEmployee"
         class="q-mr-md"
       />
+      <div v-else class="q-mr-md">Manager: {{ manager.legal_name }}</div>
       <UnitSelect
         label="Unit"
         :unit="unit"
@@ -95,7 +100,8 @@
     </div>
     <div class="text-h6 transition-form-section-heading">Work Details</div>
     <div class="row q-mt-md"><div v-if="type=='Exit'">End Date/Time</div><div v-else>Start Date/Time</div></div>
-    <div class="row q-my-sm">
+    <div v-if="props.print" class="row q-my-sm">{{ transitionDate }}</div>
+    <div v-else class="row q-my-sm">
       <q-date
         v-model="transitionDate"
         mask="YYYY-MM-DD HH:mm"
@@ -218,6 +224,7 @@
           v-if="showAccessEmails"
           label="Who?"
           :employee="accessEmails"
+          :useLegalName="true"
           v-on:input="accessEmails=$event"
           v-on:clear="accessEmails=emptyEmployee"
           class="q-mr-md"
@@ -264,14 +271,46 @@
       </q-card>
     </q-dialog>
 
+    <!-- Dialog of changes -->
+    <q-dialog v-model="showSendDialog">
+      <q-card class="q-pa-md">
+        <div class="text-h6">Send message to staff transition news?</div>
+        <q-form
+          @submit='onSubmitSendDialog()'
+          class="q-gutter-md"
+        >
+          <q-checkbox v-model="sendDialogUpdate" label="Update" />
+          <q-input
+            v-model="sendDialogMessage"
+            filled
+            type="textarea"
+            label="Extra message to include"	
+          />
+
+          <div>
+            <q-btn label="Send" icon-right="send" type="submit" color="primary"/>
+          </div>
+        </q-form>
+      </q-card>
+    </q-dialog>
+
     <!-- Spacing for footer -->
     <div style="height: 80px;"></div>
 
     <div id="sticky-footer" class="row justify-between" v-if="true">
       <q-btn class="col-1" color="white" text-color="black" label="Submit" :disabled="!valuesAreChanged()" @click="updateTransitionAndClose()" />
       <div>
-        <q-btn v-if="changes && changes.length" class="col-1" color="white" text-color="black" label="Change Records" @click="showChangesDialog = true" />
+        <q-btn v-if="changes && changes.length" color="white" text-color="black" label="Change Records" @click="showChangesDialog = true" />
         <q-btn v-if="showErrorButton && formErrorItems().length > 0" label="Show errors" icon="check" color="warning" class="q-ml-sm" @click="openErrorDialog('right')" />
+        <q-btn class="q-ml-sm" color="white" text-color="black" icon="print" label="Print" @click="router.push({ name: 'workflow-print' })" />
+        <q-btn
+          class="q-ml-sm"
+          color="white"
+          text-color="black"
+          icon="send"
+          label="Send"
+          @click="showSendDialog = true"
+        />
       </div>
       <!-- <div class="col-3 self-center status">Current Status: {{ status }}</div> -->
     </div>
@@ -304,20 +343,30 @@
     left: 209px;
   }
 }
+
+@media print {
+  #sticky-footer {
+    display: none;
+  }
+}
 </style>
 
 <script setup lang="ts">
 import { QDialogProps, scroll, useQuasar } from 'quasar'
 import { useRoute, useRouter } from 'vue-router'
 import { onMounted, ref, Ref, watch } from 'vue'
+import { useCookies } from 'vue3-cookies'
 
 import useEventBus from 'src/eventBus'
 import { readableDateTime } from 'src/filters'
-import { EmployeeTransition, TransitionChange } from 'src/types'
+import {
+  EmployeeTransition, TransitionChange, WorkflowInstance
+} from 'src/types'
 import Avatar from 'src/components/Avatar.vue'
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import JobTitleSelect from 'src/components/JobTitleSelect.vue'
 import UnitSelect from 'src/components/UnitSelect.vue'
+import { usePeopleStore } from 'src/stores/people'
 import { useUserStore } from 'src/stores/user'
 import { useWorkflowsStore } from 'src/stores/workflows'
 import { getRoutePk } from 'src/utils'
@@ -327,12 +376,18 @@ const { getScrollTarget, setVerticalScrollPosition  } = scroll
 const route = useRoute()
 const router = useRouter()
 const { bus } = useEventBus()
+const { cookies } = useCookies()
+const peopleStore = usePeopleStore()
 const userStore = useUserStore()
 const workflowsStore = useWorkflowsStore()
 
-const emptyEmployee = {name: '', pk: -1}
+const emptyEmployee = {legal_name: '', pk: -1}
 const emptyTitle = {name: '', pk: -1}
 const emptyUnit = {name: '', pk: -1}
+
+const props = defineProps<{
+  print?: boolean
+}>()
 
 function currentEmployeeTransition(): EmployeeTransition {
   return workflowsStore.currentEmployeeTransition
@@ -343,6 +398,7 @@ let transitionPk = ref('')
 let typeCurrentVal = ref('')
 let type = ref('')
 let dateSubmitted = ref(new Date())
+let submitterPk = ref(-1)
 let submitterName = ref('')
 let employeeFirstNameCurrentVal = ref('')
 let employeeFirstName = ref('')
@@ -428,139 +484,161 @@ let showErrorDialog = ref(false)
 let errorDialogPosition = ref('top') as Ref<QDialogProps['position']>
 
 let showChangesDialog = ref(false)
+let showSendDialog = ref(false)
+let sendDialogUpdate = ref(false)
+let sendDialogMessage = ref('')
 
 function retrieveEmployeeTransition() {
-  const t = currentEmployeeTransition()
-  transitionPk.value = t.pk.toString()
-  
-  type.value = t.type
-  typeCurrentVal.value = type.value
+  return new Promise((resolve) => {
+    const t = currentEmployeeTransition()
+    transitionPk.value = t.pk.toString()
+    
+    type.value = t.type
+    typeCurrentVal.value = type.value
 
-  dateSubmitted.value = t.date_submitted
-  submitterName.value = t.submitter_name
+    dateSubmitted.value = t.date_submitted
+    submitterPk.value = t.submitter_pk
+    submitterName.value = t.submitter_name
 
-  employeeFirstName.value = t.employee_first_name
-  employeeFirstNameCurrentVal.value = employeeFirstName.value
-  employeeMiddleInitial.value = t.employee_middle_initial
-  employeeMiddleInitialCurrentVal.value = employeeMiddleInitial.value
-  employeeLastName.value = t.employee_last_name
-  employeeLastNameCurrentVal.value = employeeLastName.value
-  employeePreferredName.value = t.employee_preferred_name
-  employeePreferredNameCurrentVal.value = employeePreferredName.value
-  employeeNumber.value = t.employee_number
-  employeeID.value = t.employee_id
-  employeeNumberCurrentVal.value = employeeNumber.value
-  employeeIDCurrentVal.value = employeeID.value
-  employeeEmail.value = t.employee_email
-  employeeEmailCurrentVal.value = employeeEmail.value
-  title.value = {pk: t.title_pk, name: t.title_name}
-  titleCurrentVal.value = title.value
-  fte.value = t.fte
-  fteCurrentVal.value = fte.value
-  salaryRange.value = t.salary_range
-  salaryRangeCurrentVal.value = salaryRange.value
-  salaryStep.value = t.salary_step
-  salaryStepCurrentVal.value = salaryStep.value
-  bilingual.value = t.bilingual
-  bilingualCurrentVal.value = bilingual.value
-  manager.value = {pk: t.manager_pk, name: t.manager_name}
-  managerCurrentVal.value = manager.value
-  unit.value = {pk: t.unit_pk, name: t.unit_name}
-  unitCurrentVal.value = unit.value
-  if (t.transition_date === null) {
-    transitionDate.value = null
+    employeeFirstName.value = t.employee_first_name
+    employeeFirstNameCurrentVal.value = employeeFirstName.value
+    employeeMiddleInitial.value = t.employee_middle_initial
+    employeeMiddleInitialCurrentVal.value = employeeMiddleInitial.value
+    employeeLastName.value = t.employee_last_name
+    employeeLastNameCurrentVal.value = employeeLastName.value
+    employeePreferredName.value = t.employee_preferred_name
+    employeePreferredNameCurrentVal.value = employeePreferredName.value
+    employeeNumber.value = t.employee_number
+    employeeID.value = t.employee_id
+    employeeNumberCurrentVal.value = employeeNumber.value
+    employeeIDCurrentVal.value = employeeID.value
+    employeeEmail.value = t.employee_email
+    employeeEmailCurrentVal.value = employeeEmail.value
+    title.value = {pk: t.title_pk, name: t.title_name}
+    titleCurrentVal.value = title.value
+    fte.value = t.fte
+    fteCurrentVal.value = fte.value
+    salaryRange.value = t.salary_range
+    salaryRangeCurrentVal.value = salaryRange.value
+    salaryStep.value = t.salary_step
+    salaryStepCurrentVal.value = salaryStep.value
+    bilingual.value = t.bilingual
+    bilingualCurrentVal.value = bilingual.value
+    manager.value = {pk: t.manager_pk, legal_name: t.manager_name}
+    managerCurrentVal.value = manager.value
+    unit.value = {pk: t.unit_pk, name: t.unit_name}
+    unitCurrentVal.value = unit.value
+    if (t.transition_date === null) {
+      transitionDate.value = null
+    } else {
+      transitionDate.value = t.transition_date.replace('T', ' ')
+    }
+    transitionDateCurrentVal.value = transitionDate.value
+    preliminaryHire.value = t.preliminary_hire
+    preliminaryHireCurrentVal.value = preliminaryHire.value
+    deleteProfile.value = t.delete_profile
+    deleteProfileCurrentVal.value = deleteProfile.value
+    officeLocation.value = t.office_location
+    officeLocationCurrentVal.value = officeLocation.value
+    cubicleNumber.value = t.cubicle_number
+    cubicleNumberCurrentVal.value = cubicleNumber.value
+    unionAffiliation.value = t.union_affiliation
+    unionAffiliationCurrentVal.value = unionAffiliation.value
+    teleworking.value = t.teleworking
+    teleworkingCurrentVal.value = teleworking.value
+    computerType.value = t.computer_type
+    computerTypeCurrentVal.value = computerType.value
+    computerGL.value = t.computer_gl
+    computerGLCurrentVal.value = computerGL.value
+    computerDescription.value = t.computer_description
+    computerDescriptionCurrentVal.value = computerDescription.value
+    phoneNumber.value = t.phone_number
+    phoneNumberCurrentVal.value = phoneNumber.value
+    deskPhone.value = t.desk_phone
+    deskPhoneCurrentVal.value = deskPhone.value
+    phoneRequest.value = t.phone_request
+    phoneRequestCurrentVal.value = phoneRequest.value
+    phoneRequestData.value = t.phone_request_data
+    phoneRequestDataCurrentVal.value = phoneRequestData.value
+    loadCode.value = t.load_code
+    loadCodeCurrentVal.value = loadCode.value
+    cellPhone.value = t.cell_phone
+    cellPhoneCurrentVal.value = cellPhone.value
+    shouldDelete.value = t.should_delete
+    shouldDeleteCurrentVal.value = shouldDelete.value
+    reassignTo.value = t.reassign_to
+    reassignToCurrentVal.value = reassignTo.value
+    businessCards.value = t.business_cards
+    businessCardsCurrentVal.value = businessCards.value
+    proxCardNeeded.value = t.prox_card_needed
+    proxCardNeededCurrentVal.value = proxCardNeeded.value
+    proxCardReturned.value = t.prox_card_returned
+    proxCardReturnedCurrentVal.value = proxCardReturned.value
+    if (t.access_emails_pk != -1) {
+      showAccessEmails.value = true
+      showAccessEmailsCurrentVal.value = true
+    } 
+    accessEmails.value = {pk: t.access_emails_pk, legal_name: t.access_emails_name}
+    accessEmailsCurrentVal.value = accessEmails.value
+    specialInstructions.value = t.special_instructions
+    specialInstructionsCurrentVal.value = specialInstructions.value
+
+    changes.value = t.changes
+    
+    if (formErrorItems().length > 0) {
+      showErrorButton.value = true
+    }
+    resolve('Retrieved employee transition')
+  })
+}
+
+function emailInUse(email: string): boolean {
+  const emailList = peopleStore.employeeEmailList
+  if (emailList.indexOf(email) > -1) {
+    return true
   } else {
-    transitionDate.value = t.transition_date.replace('T', ' ')
+    return false 
   }
-  transitionDateCurrentVal.value = transitionDate.value
-  preliminaryHire.value = t.preliminary_hire
-  preliminaryHireCurrentVal.value = preliminaryHire.value
-  deleteProfile.value = t.delete_profile
-  deleteProfileCurrentVal.value = deleteProfile.value
-  officeLocation.value = t.office_location
-  officeLocationCurrentVal.value = officeLocation.value
-  cubicleNumber.value = t.cubicle_number
-  cubicleNumberCurrentVal.value = cubicleNumber.value
-  unionAffiliation.value = t.union_affiliation
-  unionAffiliationCurrentVal.value = unionAffiliation.value
-  teleworking.value = t.teleworking
-  teleworkingCurrentVal.value = teleworking.value
-  computerType.value = t.computer_type
-  computerTypeCurrentVal.value = computerType.value
-  computerGL.value = t.computer_gl
-  computerGLCurrentVal.value = computerGL.value
-  computerDescription.value = t.computer_description
-  computerDescriptionCurrentVal.value = computerDescription.value
-  phoneNumber.value = t.phone_number
-  phoneNumberCurrentVal.value = phoneNumber.value
-  deskPhone.value = t.desk_phone
-  deskPhoneCurrentVal.value = deskPhone.value
-  phoneRequest.value = t.phone_request
-  phoneRequestCurrentVal.value = phoneRequest.value
-  phoneRequestData.value = t.phone_request_data
-  phoneRequestDataCurrentVal.value = phoneRequestData.value
-  loadCode.value = t.load_code
-  loadCodeCurrentVal.value = loadCode.value
-  cellPhone.value = t.cell_phone
-  cellPhoneCurrentVal.value = cellPhone.value
-  shouldDelete.value = t.should_delete
-  shouldDeleteCurrentVal.value = shouldDelete.value
-  reassignTo.value = t.reassign_to
-  reassignToCurrentVal.value = reassignTo.value
-  businessCards.value = t.business_cards
-  businessCardsCurrentVal.value = businessCards.value
-  proxCardNeeded.value = t.prox_card_needed
-  proxCardNeededCurrentVal.value = proxCardNeeded.value
-  proxCardReturned.value = t.prox_card_returned
-  proxCardReturnedCurrentVal.value = proxCardReturned.value
-  if (t.access_emails_pk != -1) {
-    showAccessEmails.value = true
-    showAccessEmailsCurrentVal.value = true
-  } 
-  accessEmails.value = {pk: t.access_emails_pk, name: t.access_emails_name}
-  accessEmailsCurrentVal.value = accessEmails.value
-  specialInstructions.value = t.special_instructions
-  specialInstructionsCurrentVal.value = specialInstructions.value
-
-  changes.value = t.changes
-  
-  if (formErrorItems().length > 0) {
-    showErrorButton.value = true
-  }
-
-  
-  // return new Promise((resolve, reject) => {
-  //   this.$store.dispatch('workflowModule/getCurrentEmployeeTransition', {pk: this.$route.params.pk})
-  //     .then(() => {
-  //       const wfInstance: WorkflowInstance = this.getters['workflowModule/currentWorkflowInstance'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access
-  //       if (!wfInstance) {
-  //           console.log('Workflow instance does not seem to exist. Redirecting...')
-  //           this.$router.push('/')
-  //             .catch(e => {
-  //               console.error('Error navigating to dashboard upon not finding a matching Workflow Instance:', e)
-  //               reject(e)
-  //             })
-  //           return
-  //         }
-  //       if (!wfInstance.process_instances[0].completed_at) {
-  //         this.currentStepInstance = wfInstance.process_instances[0].current_step_instance.pk
-  //       } else {
-  //         // Process Instance is complete
-  //         this.currentStepInstance = -1
-  //       }
-  //       bus.$emit('updateProcessInstances') // Trigger ProcessInstanceDetail to get a new current step
-  //       resolve('Got Workflow Instance')
-  //     })
-  //   .catch(e => {
-  //     console.error('Error retrieving workflow instance', e)
-  //     reject(e)
-  //   })
-  // })
 }
 
 function suggestEmail(): void {
-  if (employeeFirstName.value && employeeLastName.value && !employeeEmail.value) {
-    employeeEmail.value = `${employeeFirstName.value.charAt(0).toLowerCase()}${employeeLastName.value.toLowerCase()}@lcog.org`
+  // Create first pass at suggestion
+  let suggestedEmail = ''
+  let firstChar = ''
+  if (employeePreferredName.value) {
+    firstChar = employeePreferredName.value.charAt(0).toLowerCase()
+  } else if (employeeFirstName.value) {
+    firstChar = employeeFirstName.value.charAt(0).toLowerCase()
+  } else {
+    return
+  }
+  if (employeeLastName.value) {
+    suggestedEmail = `${firstChar}${employeeLastName.value.toLowerCase()}@lcog.org`
+  } else {
+    return
+  }
+  
+  // Check if email is already in use
+  if (emailInUse(suggestedEmail)) {
+    // If so, add middle initial and check again
+    if (employeeMiddleInitial.value) {
+      suggestedEmail = `${firstChar}${employeeMiddleInitial.value.toLowerCase()}${employeeLastName.value.toLowerCase()}@lcog.org`
+    } else {
+      return
+    }
+    if (emailInUse(suggestedEmail)) {
+      // If so, add a number to the end and check again
+      let i = 1
+      while (emailInUse(`${suggestedEmail}${i}`)) {
+        i++
+      }
+      suggestedEmail = `${suggestedEmail}${i}`
+    }
+  }
+  
+  // Set the value
+  if (!employeeEmail.value) {
+    employeeEmail.value = suggestedEmail
   }
 }
 
@@ -630,15 +708,14 @@ function formErrorItems(): Array<[string, string]> {
   return errorItems
 }
 
-function transitionChangeItems() {
-  if (!changes.value) {
-    return null
-  } else {
-    return changes.value
-    return changes.value.map((tc: TransitionChange) => {
-      return tc.changes
-    })
-  }
+function employeeIsSubmitter() {
+  return userStore.getEmployeeProfile.employee_pk == submitterPk.value
+}
+
+function canViewSalaryFields() {
+  return userStore.getEmployeeProfile.employee_pk == manager.value.pk ||
+    cookies.get('is_hr_employee') == 'true' ||
+    cookies.get('is_fiscal_employee') == 'true'
 }
 
 function updateTransitionAndClose() {
@@ -699,6 +776,7 @@ function updateTransitionAndClose() {
       typeCurrentVal.value = t.type
       
       dateSubmitted.value = t.date_submitted
+      submitterPk.value = t.submitter_pk
       submitterName.value = t.submitter_name
 
       employeeFirstNameCurrentVal.value = t.employee_first_name
@@ -713,7 +791,7 @@ function updateTransitionAndClose() {
       salaryRangeCurrentVal.value = t.salary_range
       salaryStepCurrentVal.value = t.salary_step
       bilingualCurrentVal.value = t.bilingual
-      managerCurrentVal.value = {pk: t.manager_pk, name: t.manager_name}
+      managerCurrentVal.value = {pk: t.manager_pk, legal_name: t.manager_name}
       unitCurrentVal.value = {pk: t.unit_pk, name: t.unit_name}
       transitionDateCurrentVal.value = t.transition_date
       preliminaryHireCurrentVal.value = t.preliminary_hire
@@ -737,7 +815,7 @@ function updateTransitionAndClose() {
       proxCardNeededCurrentVal.value = t.prox_card_needed
       proxCardReturnedCurrentVal.value = t.prox_card_returned
       showAccessEmailsCurrentVal.value = showAccessEmails.value
-      accessEmailsCurrentVal.value = {pk: t.access_emails_pk, name: t.access_emails_name}
+      accessEmailsCurrentVal.value = {pk: t.access_emails_pk, legal_name: t.access_emails_name}
       specialInstructionsCurrentVal.value = t.special_instructions
 
       changes.value = t.changes
@@ -794,12 +872,84 @@ function clickedErrorItem(item: [string, string]) {
   }
 }
 
+function onSubmitSendDialog() {
+  workflowsStore.sendTransitionToEmailList(transitionPk.value, {
+    update: sendDialogUpdate.value,
+    extraMessage: sendDialogMessage.value,
+    senderName: userStore.getEmployeeProfile.name,
+    transition_url: route.fullPath
+  })
+    .then(() => {
+      quasar.notify({
+        message: 'Sent',
+        color: 'positive',
+        icon: 'send'
+      })
+      showSendDialog.value = false
+      sendDialogUpdate.value = false
+      sendDialogMessage.value = ''
+    })
+    .catch(e => {
+      console.error('Error sending email', e)
+      quasar.notify({
+        message: 'Error sending email',
+        color: 'negative',
+        icon: 'report_problem'
+      })
+    })
+}
+
+function handlePrint() {
+  const pk = getRoutePk(route)
+  if (!pk) {
+    router.push('/')
+  } else {
+    workflowsStore.getCurrentWorkflowInstance(pk)
+      .then(() => {
+        const wfInstance: WorkflowInstance = workflowsStore.currentWorkflowInstance
+        if (!wfInstance) {
+          console.log('Workflow instance does not seem to exist. Redirecting...')
+          router.push({ name: 'workflow-dashboard' })
+            .catch(e => {
+              console.error('Error navigating to workflow dashboard upon not finding a matching Workflow Instance:', e)
+            })
+          return
+        }
+        retrieveEmployeeTransition().then(() => {
+          // Print the screen
+          window.print()
+        })
+      })
+      .catch(e => {
+        console.error('Error retrieving workflow instance', e)
+        router.push({ name: 'workflow-transition-form', params: { pk: pk } })
+          .catch(e => {
+            console.error(
+              'Error navigating to transition form upon not finding a matching Workflow Instance:',
+              e
+            )
+          })
+      })
+  }
+}
+
 watch(() => bus.value.get('workflowInstanceRetrieved'), () => {
   // TODO: We should only set state once, but when yoyu load /transition this runs twice
   retrieveEmployeeTransition()
 })
 
 onMounted(() => {
-  retrieveEmployeeTransition()
+  if (props.print) {
+    handlePrint()
+  } else {
+    retrieveEmployeeTransition()
+  }
+
+  if (!peopleStore.employeeEmailList.length) {
+    peopleStore.getEmployeeEmailList()
+      .catch(e => {
+        console.error('Error retrieving simple employee list', e)
+      })
+  }
 })
 </script>

@@ -31,6 +31,8 @@ export interface EmployeeRetrieve {
   manager: Url
   is_manager: boolean
   has_manager: boolean
+  is_hr_employee: boolean
+  is_fiscal_employee: boolean
   is_upper_manager: boolean
   is_hr_manager: boolean
   is_executive_director: boolean
@@ -59,6 +61,11 @@ export interface EmployeeRetrieve {
 export interface SimpleEmployeeRetrieve {
   pk: number
   name: string
+  legal_name: string
+}
+
+export interface EmployeeEmailRetrieve {
+  email: string
 }
 
 // For updating employee profile
@@ -591,7 +598,7 @@ export interface TimeOffRequestUpdatePartial {
 export type Workflow = {
   pk: number
   name: string
-  role: Role
+  role: number
   version: number
 }
 
@@ -666,6 +673,10 @@ export interface WorkflowInstance {
   transition?: EmployeeTransition
   title: string
   percent_complete: string
+  employee_name?: string
+  title_pk?: number
+  title_name?: string
+  transition_date?: string
 }
 
 export type EmployeeID = 'CLSD' | 'CLID' | ''
@@ -690,6 +701,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   pk: number
   type: string
   date_submitted: Date
+  submitter_pk: number
   submitter_name: string
   employee_first_name: string
   employee_middle_initial: string

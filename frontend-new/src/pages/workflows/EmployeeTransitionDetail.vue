@@ -30,13 +30,14 @@
         label="Employee ID"
         class="q-mr-sm"
         style="width: 130px;"
+        :disable="!canEditEmployeeNumberFields()"
       >
         <template v-if="employeeID" v-slot:append>
           <q-icon name="cancel" @click.stop="employeeID=''" class="cursor-pointer" />
         </template>
       </q-select>
-      <q-input v-model="employeeNumber" type="number" label="Employee Number" mask="####" class="q-mr-md" />
-      <q-input v-model="employeeEmail" type="email" label="Email" @focus="suggestEmail()" />
+      <q-input v-model="employeeNumber" type="number" label="Employee Number" mask="####" class="q-mr-md" :disable="!canEditEmployeeNumberFields()" />
+      <q-input v-model="employeeEmail" type="email" label="Email" @focus="suggestEmail()" :disable="!canEditEmployeeNumberFields()" />
     </div>
     <div class="text-h6 transition-form-section-heading">Position</div>
     <div class="row">
@@ -711,6 +712,10 @@ function formErrorItems(): Array<[string, string]> {
 
 function employeeIsSubmitter() {
   return userStore.getEmployeeProfile.employee_pk == submitterPk.value
+}
+
+function canEditEmployeeNumberFields() {
+  return cookies.get('is_hr_employee') == 'true'
 }
 
 function canViewSalaryFields() {

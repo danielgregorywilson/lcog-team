@@ -13,15 +13,28 @@
     </div>
     <div class="text-h6 transition-form-section-heading">Submission Info</div>
     <div class="row items-center">
-      <div class="q-mr-md"><span class="text-bold">Date Submitted:</span> {{ readableDateTime(dateSubmitted) }}</div>
+      <div class="q-mr-md">
+        <span class="text-bold">Date Submitted:</span>
+        {{ readableDateTime(dateSubmitted) }}
+      </div>
       <div><span class="text-bold">Submitter:</span> {{ submitterName }}</div>
     </div>
     <div class="text-h6 transition-form-section-heading">Employee</div>
     <div class="row">
       <q-input v-model="employeeFirstName" label="First" class="q-mr-md" />
-      <q-input v-model="employeeMiddleInitial" maxlength=5 label="M" class="q-mr-md" style="width: 4em" />
+      <q-input
+        v-model="employeeMiddleInitial"
+        maxlength=5
+        label="M"
+        class="q-mr-md"
+        style="width: 4em"
+      />
       <q-input v-model="employeeLastName" label="Last" class="q-mr-md" />
-      <q-input v-model="employeePreferredName" label="Preferred Name, if different" style="width: 25em" />
+      <q-input
+        v-model="employeePreferredName"
+        label="Preferred Name, if different"
+        style="width: 25em"
+      />
     </div>
     <div class="row">
       <q-select
@@ -33,11 +46,28 @@
         :disable="!canEditEmployeeNumberFields()"
       >
         <template v-if="employeeID" v-slot:append>
-          <q-icon name="cancel" @click.stop="employeeID=''" class="cursor-pointer" />
+          <q-icon
+            name="cancel"
+            @click.stop="employeeID=''"
+            class="cursor-pointer"
+          />
         </template>
       </q-select>
-      <q-input v-model="employeeNumber" type="number" label="Employee Number" mask="####" class="q-mr-md" :disable="!canEditEmployeeNumberFields()" />
-      <q-input v-model="employeeEmail" type="email" label="Email" @focus="suggestEmail()" :disable="!canEditEmployeeNumberFields()" />
+      <q-input
+        v-model="employeeNumber"
+        type="number"
+        label="Employee Number"
+        mask="####"
+        class="q-mr-md"
+        :disable="!canEditEmployeeNumberFields()"
+      />
+      <q-input
+        v-model="employeeEmail"
+        type="email"
+        label="Email"
+        @focus="suggestEmail()"
+        :disable="!canEditEmployeeNumberFields()"
+      />
     </div>
     <div class="text-h6 transition-form-section-heading">Position</div>
     <div class="row">
@@ -77,7 +107,11 @@
         style="width: 172px;"
       >
         <template v-if="unionAffiliation" v-slot:append>
-          <q-icon name="cancel" @click.stop="unionAffiliation=''" class="cursor-pointer" />
+          <q-icon
+            name="cancel"
+            @click.stop="unionAffiliation=''"
+            class="cursor-pointer"
+          />
         </template>
       </q-select>
     </div>
@@ -100,7 +134,10 @@
       />
     </div>
     <div class="text-h6 transition-form-section-heading">Work Details</div>
-    <div class="row q-mt-md"><div v-if="type=='Exit'">End Date/Time</div><div v-else>Start Date/Time</div></div>
+    <div class="row q-mt-md">
+      <div v-if="type=='Exit'">End Date/Time</div>
+      <div v-else>Start Date/Time</div>
+    </div>
     <div v-if="props.print" class="row q-my-sm">{{ transitionDate }}</div>
     <div v-else class="row q-my-sm">
       <q-date
@@ -114,25 +151,44 @@
       />
     </div>
     <div class="row q-my-sm">
-      <q-checkbox v-model="preliminaryHire" v-if="employeeID == 'CLSD'" label="Preliminary Hire" />
-      <q-checkbox v-if="type=='Exit'" v-model="deleteProfile" label="Delete Profile" />
+      <q-checkbox
+        v-model="preliminaryHire"
+        v-if="employeeID == 'CLSD'"
+        label="Preliminary Hire"
+      />
+      <q-checkbox
+        v-if="type=='Exit'"
+        v-model="deleteProfile"
+        label="Delete Profile"
+      />
     </div>
     <div class="row">
       <q-select
         v-model="officeLocation"
         :options="[
-          'Cottage Grove', 'Florence', 'Junction City', 'Oakridge', 'PPB - 4th Floor', 'PPB - 5th Floor',
-          'Schaefers - Basement', 'Schaefers - 1st Floor', 'Schaefers - 2nd Floor', 'Schaefers - 3rd Floor',
-          'Senior Meals Site', 'Veneta']"
+          'Cottage Grove', 'Florence', 'Junction City', 'Oakridge',
+          'PPB - 4th Floor', 'PPB - 5th Floor', 'Schaefers - Basement',
+          'Schaefers - 1st Floor', 'Schaefers - 2nd Floor',
+          'Schaefers - 3rd Floor', 'Senior Meals Site', 'Veneta'
+        ]"
         label="Office Location"
         class="q-mr-md"
         style="width: 193px;"
       >
         <template v-if="officeLocation" v-slot:append>
-          <q-icon name="cancel" @click.stop="officeLocation=''" class="cursor-pointer" />
+          <q-icon
+            name="cancel"
+            @click.stop="officeLocation=''"
+            class="cursor-pointer"
+          />
         </template>
       </q-select>
-      <q-input v-model="cubicleNumber" mask="NNNNNNNNNN" label="Cubicle Number" class="q-mr-md" />
+      <q-input
+        v-model="cubicleNumber"
+        mask="NNNNNNNNNN"
+        label="Cubicle Number"
+        class="q-mr-md"
+      />
       <q-checkbox v-model="teleworking" label="Teleworking" />
     </div>
     <div v-if="['New', 'Return'].indexOf(type) != -1">
@@ -142,10 +198,26 @@
           <q-radio v-model="computerType" val="New" label="New" />
           <q-radio v-model="computerType" val="Repurposed" label="Repurposed" />
         </div>
-        <q-input v-if="computerType == 'New'" v-model="computerGL" label="GL Code" style="width: 250px;" />
-        <q-input v-else v-model="computerDescription" label="Description of existing computer" style="width: 350px;" />
+        <q-input
+          v-if="computerType == 'New'"
+          v-model="computerGL"
+          label="GL Code"
+          style="width: 250px;"
+        />
+        <q-input
+          v-else
+          v-model="computerDescription"
+          label="Description of existing computer"
+          style="width: 350px;"
+        />
       </div>
-      <div v-if="computerType == 'New'" class="row q-mt-sm" style="color: red">Note that new PCs take 2-4 weeks to order.</div>
+      <div
+        v-if="computerType == 'New'"
+        class="row q-mt-sm"
+        style="color: red"
+      >
+        Note that new PCs take 2-4 weeks to order.
+      </div>
     </div>
     <div class="text-h6 transition-form-section-heading">Phone</div>
     <div class="row">
@@ -168,17 +240,27 @@
         class="q-mr-md"
       >
         <template v-if="phoneRequest" v-slot:append>
-          <q-icon name="cancel" @click.stop="phoneRequest=''" class="cursor-pointer" />
+          <q-icon
+            name="cancel"
+            @click.stop="phoneRequest=''"
+            class="cursor-pointer"
+          />
         </template>
       </q-select>
       <q-input
         v-model="phoneRequestData"
-        v-if="['Reassign to:', 'Change name display to:'].indexOf(phoneRequest) != -1"
+        v-if="[
+          'Reassign to:', 'Change name display to:'
+        ].indexOf(phoneRequest) != -1"
         label="To whom?"
       />
     </div>
     <div class="row">
-      <q-checkbox v-model="deskPhone" label="Desk Phone Needed" class="q-mr-md" />
+      <q-checkbox
+        v-model="deskPhone"
+        label="Desk Phone Needed"
+        class="q-mr-md"
+      />
     </div>
     <div class="row">
       <q-input
@@ -188,7 +270,11 @@
       />
     </div>
     <div>
-      <q-checkbox v-model="cellPhone" label="Cell Phone Needed" class="q-mr-md" />
+      <q-checkbox
+        v-model="cellPhone"
+        label="Cell Phone Needed"
+        class="q-mr-md"
+      />
     </div>
     <div v-if="type=='Exit'" class="row">
       <q-checkbox v-model="shouldDelete" label="Delete?" />
@@ -203,17 +289,28 @@
     <div class="row">
       <q-checkbox v-model="businessCards" label="Order Business Cards" />
     </div>
-    <div class="text-h6 transition-form-section-heading">Proxy Card/Photo ID</div>
+    <div class="text-h6 transition-form-section-heading">
+      Proxy Card/Photo ID
+    </div>
     <div class="row">
       <q-checkbox v-if="type!='Exit'" v-model="proxCardNeeded" label="Needed" />
-      <q-checkbox v-if="type=='Exit'" v-model="proxCardReturned" label="Turned In" />
+      <q-checkbox
+        v-if="type=='Exit'"
+        v-model="proxCardReturned"
+        label="Turned In"
+      />
     </div>
     <div v-if="type=='Exit'">
-      <div class="text-h6 transition-form-section-heading">Computer Profile</div>
+      <div class="text-h6 transition-form-section-heading">
+        Computer Profile
+      </div>
       <div class="row">
         <div>
-          Email account will be disabled (no incoming or outgoing emails) on End Date
-          <span class="text-underline">unless otherwise specified in special instructions</span>.
+          Email account will be disabled (no incoming or outgoing emails) on End
+          Date
+          <span class="text-underline">
+            unless otherwise specified in special instructions
+          </span>.
         </div>
       </div>
       <div class="row">
@@ -232,7 +329,9 @@
         />
       </div>
     </div>
-    <div class="text-h6 transition-form-section-heading">Special Instructions</div>
+    <div class="text-h6 transition-form-section-heading">
+      Special Instructions
+    </div>
     <div class="row">
       <q-input v-model="specialInstructions" autogrow style="width:100%" />
     </div>
@@ -241,7 +340,12 @@
     <q-dialog v-model="showErrorDialog" :position="errorDialogPosition">
       <q-card style="width: 350px">
         <q-list bordered separator>
-          <q-item v-for="(item, index) in formErrorItems()" :key="index" clickable @click="clickedErrorItem(item)">
+          <q-item
+            v-for="(item, index) in formErrorItems()"
+            :key="index"
+            clickable
+            @click="clickedErrorItem(item)"
+          >
             <q-item-label>{{item[1]}}</q-item-label>
           </q-item>
         </q-list>
@@ -254,18 +358,31 @@
         <q-list bordered separator>
           <q-item v-for="(changeRecord, index) in changes" :key="index">
             <q-item-section top avatar>
-              <Avatar :initials="changeRecord.created_by_initials" :name="changeRecord.created_by_name"/>
+              <Avatar
+                :initials="changeRecord.created_by_initials"
+                :name="changeRecord.created_by_name"
+              />
             </q-item-section>
 
             <q-item-section>
-              <q-item-label v-for="(value, key, index) in JSON.parse(changeRecord.changes)" :key="index">
-                <div v-if="value.original && value.original != 'None'">{{ key }}: {{ value.original }} -> <span class="text-bold">{{ value.new }}</span></div>
-                <div v-else>{{ key }}: <span class="text-bold">{{ value.new }}</span></div>
+              <q-item-label
+                v-for="(value, key, index) in JSON.parse(changeRecord.changes)"
+                :key="index"
+              >
+                <div v-if="value.original && value.original != 'None'">
+                  {{ key }}: {{ value.original }} ->
+                  <span class="text-bold">{{ value.new }}</span>
+                </div>
+                <div v-else>
+                  {{ key }}: <span class="text-bold">{{ value.new }}</span>
+                </div>
               </q-item-label>
             </q-item-section>
 
             <q-item-section side top>
-              <q-item-label caption>{{ readableDateTime(changeRecord.date) }}</q-item-label>
+              <q-item-label caption>
+                {{ readableDateTime(changeRecord.date) }}
+              </q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
@@ -289,7 +406,12 @@
           />
 
           <div>
-            <q-btn label="Send" icon-right="send" type="submit" color="primary"/>
+            <q-btn
+              label="Send"
+              icon-right="send"
+              type="submit"
+              color="primary"
+            />
           </div>
         </q-form>
       </q-card>
@@ -299,11 +421,38 @@
     <div style="height: 80px;"></div>
 
     <div id="sticky-footer" class="row justify-between" v-if="true">
-      <q-btn class="col-1" color="white" text-color="black" label="Submit" :disabled="!valuesAreChanged()" @click="updateTransitionAndClose()" />
+      <q-btn
+        class="col-1"
+        color="white"
+        text-color="black"
+        label="Submit"
+        :disabled="!valuesAreChanged()"
+        @click="updateTransitionAndClose()"
+      />
       <div>
-        <q-btn v-if="changes && changes.length" color="white" text-color="black" label="Change Records" @click="showChangesDialog = true" />
-        <q-btn v-if="showErrorButton && formErrorItems().length > 0" label="Show errors" icon="check" color="warning" class="q-ml-sm" @click="openErrorDialog('right')" />
-        <q-btn class="q-ml-sm" color="white" text-color="black" icon="print" label="Print" @click="router.push({ name: 'workflow-print' })" />
+        <q-btn
+          v-if="changes && changes.length"
+          color="white"
+          text-color="black"
+          label="Change Records"
+          @click="showChangesDialog = true"
+        />
+        <q-btn
+          v-if="showErrorButton && formErrorItems().length > 0"
+          label="Show errors"
+          icon="check"
+          color="warning"
+          class="q-ml-sm"
+          @click="openErrorDialog('right')"
+        />
+        <q-btn
+          class="q-ml-sm"
+          color="white"
+          text-color="black"
+          icon="print"
+          label="Print"
+          @click="router.push({ name: 'workflow-print' })"
+        />
         <q-btn
           v-if="canSendToTransitionNews()"
           class="q-ml-sm"
@@ -314,7 +463,9 @@
           @click="showSendDialog = true"
         />
       </div>
-      <!-- <div class="col-3 self-center status">Current Status: {{ status }}</div> -->
+      <!-- <div class="col-3 self-center status">
+        Current Status: {{ status }}
+      </div> -->
     </div>
   </div>
 </template>
@@ -383,7 +534,7 @@ const peopleStore = usePeopleStore()
 const userStore = useUserStore()
 const workflowsStore = useWorkflowsStore()
 
-const emptyEmployee = {legal_name: '', pk: -1}
+const emptyEmployee = {name: '', legal_name: '', pk: -1}
 const emptyTitle = {name: '', pk: -1}
 const emptyUnit = {name: '', pk: -1}
 
@@ -526,7 +677,7 @@ function retrieveEmployeeTransition() {
     salaryStepCurrentVal.value = salaryStep.value
     bilingual.value = t.bilingual
     bilingualCurrentVal.value = bilingual.value
-    manager.value = {pk: t.manager_pk, legal_name: t.manager_name}
+    manager.value = {pk: t.manager_pk, name: '', legal_name: t.manager_name}
     managerCurrentVal.value = manager.value
     unit.value = {pk: t.unit_pk, name: t.unit_name}
     unitCurrentVal.value = unit.value
@@ -580,7 +731,9 @@ function retrieveEmployeeTransition() {
       showAccessEmails.value = true
       showAccessEmailsCurrentVal.value = true
     } 
-    accessEmails.value = {pk: t.access_emails_pk, legal_name: t.access_emails_name}
+    accessEmails.value = {
+      pk: t.access_emails_pk, name: '', legal_name: t.access_emails_name
+    }
     accessEmailsCurrentVal.value = accessEmails.value
     specialInstructions.value = t.special_instructions
     specialInstructionsCurrentVal.value = specialInstructions.value
@@ -615,7 +768,8 @@ function suggestEmail(): void {
     return
   }
   if (employeeLastName.value) {
-    suggestedEmail = `${firstChar}${employeeLastName.value.toLowerCase()}@lcog.org`
+    suggestedEmail =
+    `${firstChar}${employeeLastName.value.toLowerCase()}@lcog.org`
   } else {
     return
   }
@@ -624,7 +778,9 @@ function suggestEmail(): void {
   if (emailInUse(suggestedEmail)) {
     // If so, add middle initial and check again
     if (employeeMiddleInitial.value) {
-      suggestedEmail = `${firstChar}${employeeMiddleInitial.value.toLowerCase()}${employeeLastName.value.toLowerCase()}@lcog.org`
+      const mi = employeeMiddleInitial.value.toLowerCase()
+      const ln = employeeLastName.value.toLowerCase()
+      suggestedEmail = `${firstChar}${mi}${ln}@lcog.org`
     } else {
       return
     }
@@ -695,18 +851,18 @@ function valuesAreChanged(): boolean {
 function formErrorItems(): Array<[string, string]> {
   let errorItems: Array<[string, string]> = []
   if (computerTypeCurrentVal.value == 'New' && !computerGLCurrentVal.value) {
-    errorItems.push(['computer-type', 'Provide a valid GL code for computer purchase'])
+    errorItems.push(
+      ['computer-type', 'Provide a valid GL code for computer purchase']
+    )
   }
-  if (computerTypeCurrentVal.value == 'Repurposed' && !computerDescriptionCurrentVal.value) {
-    errorItems.push(['computer-type', 'Provide a description of existing computer'])
+  if (
+    computerTypeCurrentVal.value == 'Repurposed' &&
+    !computerDescriptionCurrentVal.value
+  ) {
+    errorItems.push(
+      ['computer-type', 'Provide a description of existing computer']
+    )
   }
-  
-  // if (!this.stepIncreaseCurrentVal) {
-  //   errorItems.push(['step-increase', 'Select Step Increase'])
-  // }
-  // if (this.descriptionReviewedEmployeeCurrentVal && !this.uploadedPositionDescriptionUrl) {
-  //   errorItems.push(['position-description-review', 'Upload Signed Position Description'])
-  // }
   return errorItems
 }
 
@@ -730,8 +886,13 @@ function canSendToTransitionNews() {
 
 function updateTransitionAndClose() {
   return new Promise((resolve, reject) => {
-    const phoneNumberVal = phoneNumber.value == '(___) ___-____' ? '' : phoneNumber.value
-    if (['Reassign to:', 'Change name display to:'].indexOf(phoneRequest.value) == -1) {
+    const phoneNumberVal = phoneNumber.value == '(___) ___-____' ? '' :
+      phoneNumber.value
+    if (
+      [
+        'Reassign to:', 'Change name display to:'
+      ].indexOf(phoneRequest.value) == -1
+    ) {
       phoneRequestData.value = ''
     }
     if (!showAccessEmails.value) {
@@ -801,7 +962,9 @@ function updateTransitionAndClose() {
       salaryRangeCurrentVal.value = t.salary_range
       salaryStepCurrentVal.value = t.salary_step
       bilingualCurrentVal.value = t.bilingual
-      managerCurrentVal.value = {pk: t.manager_pk, legal_name: t.manager_name}
+      managerCurrentVal.value = {
+        pk: t.manager_pk, name: '', legal_name: t.manager_name
+      }
       unitCurrentVal.value = {pk: t.unit_pk, name: t.unit_name}
       transitionDateCurrentVal.value = t.transition_date
       preliminaryHireCurrentVal.value = t.preliminary_hire
@@ -825,7 +988,9 @@ function updateTransitionAndClose() {
       proxCardNeededCurrentVal.value = t.prox_card_needed
       proxCardReturnedCurrentVal.value = t.prox_card_returned
       showAccessEmailsCurrentVal.value = showAccessEmails.value
-      accessEmailsCurrentVal.value = {pk: t.access_emails_pk, legal_name: t.access_emails_name}
+      accessEmailsCurrentVal.value = {
+        pk: t.access_emails_pk, name: '', legal_name: t.access_emails_name
+      }
       specialInstructionsCurrentVal.value = t.special_instructions
 
       changes.value = t.changes
@@ -834,7 +999,10 @@ function updateTransitionAndClose() {
       if (routePk) {
         workflowsStore.getCurrentWorkflowInstance(routePk)
           .catch(e => {
-            console.error('Error getting getCurrentWorkflowInstance after updaing EmployeeTransition:', e)
+            console.error(
+              'Error getting getCurrentWorkflowInstance after updaing EmployeeTransition:',
+              e
+            )
             reject(e)
           })
       }
@@ -848,7 +1016,9 @@ function updateTransitionAndClose() {
       // TODO: If a new computer is required, send an email to the IT department
 
       if (!!t.title_name) {
-        quasar.notify(`Updated Employee Transition for ${t.title_name} Position`)
+        quasar.notify(
+          `Updated Employee Transition for ${t.title_name} Position`
+        )
       } else {
         quasar.notify('Updated Employee Transition')
       }
@@ -916,12 +1086,18 @@ function handlePrint() {
   } else {
     workflowsStore.getCurrentWorkflowInstance(pk)
       .then(() => {
-        const wfInstance: WorkflowInstance = workflowsStore.currentWorkflowInstance
+        const wfInstance: WorkflowInstance = 
+          workflowsStore.currentWorkflowInstance
         if (!wfInstance) {
-          console.log('Workflow instance does not seem to exist. Redirecting...')
+          console.error(
+            'Workflow instance does not seem to exist. Redirecting...'
+          )
           router.push({ name: 'workflow-dashboard' })
             .catch(e => {
-              console.error('Error navigating to workflow dashboard upon not finding a matching Workflow Instance:', e)
+              console.error(
+                'Error navigating to workflow dashboard upon not finding a matching Workflow Instance:',
+                e
+              )
             })
           return
         }
@@ -944,7 +1120,8 @@ function handlePrint() {
 }
 
 watch(() => bus.value.get('workflowInstanceRetrieved'), () => {
-  // TODO: We should only set state once, but when yoyu load /transition this runs twice
+  // TODO: We should only set state once, but when you load /transition
+  // this runs twice
   retrieveEmployeeTransition()
 })
 

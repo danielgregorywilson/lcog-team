@@ -18,7 +18,7 @@ export function readableDate(d: Date): string {
   return new Date(readableDate.getTime() + offsetMsecs).toLocaleDateString()
 }
 
-export function readableDateTime(d: Date): string {
+export function readableDateTime(d: Date | string): string {
   if (!d) {
     return 'Date not set'
   }

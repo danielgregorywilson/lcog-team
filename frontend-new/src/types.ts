@@ -694,7 +694,7 @@ export interface TransitionChange {
   created_by_name: string
   created_by_initials: string
   date: string
-  changes: JSON
+  changes: string
 }
 
 export interface EmployeeTransition extends EmployeeTransitionBase {

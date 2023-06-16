@@ -285,6 +285,10 @@
         label="Reassign to"
       />
     </div>
+    <div class="text-h6 transition-form-section-heading">Gas PIN</div>
+    <div class="row">
+      <q-checkbox v-model="gasPINNeeded" label="Gas PIN Needed" />
+    </div>
     <div class="text-h6 transition-form-section-heading">Business Cards</div>
     <div class="row">
       <q-checkbox v-model="businessCards" label="Order Business Cards" />
@@ -653,6 +657,8 @@ let shouldDeleteCurrentVal = ref(false)
 let shouldDelete = ref(false)
 let reassignToCurrentVal = ref('')
 let reassignTo = ref('')
+let gasPINNeededCurrentVal = ref(false)
+let gasPINNeeded = ref(false)
 let businessCardsCurrentVal = ref(false)
 let businessCards = ref(false)
 let proxCardNeededCurrentVal = ref(false)
@@ -759,6 +765,8 @@ function retrieveEmployeeTransition() {
     shouldDeleteCurrentVal.value = shouldDelete.value
     reassignTo.value = t.reassign_to
     reassignToCurrentVal.value = reassignTo.value
+    gasPINNeeded.value = t.gas_pin_needed
+    gasPINNeededCurrentVal.value = gasPINNeeded.value
     businessCards.value = t.business_cards
     businessCardsCurrentVal.value = businessCards.value
     proxCardNeeded.value = t.prox_card_needed
@@ -873,6 +881,7 @@ function valuesAreChanged(): boolean {
     cellPhone.value == cellPhoneCurrentVal.value &&
     shouldDelete.value == shouldDeleteCurrentVal.value &&
     reassignTo.value == reassignToCurrentVal.value &&
+    gasPINNeeded.value == gasPINNeededCurrentVal.value &&
     businessCards.value == businessCardsCurrentVal.value &&
     proxCardNeeded.value == proxCardNeededCurrentVal.value &&
     proxCardReturned.value == proxCardReturnedCurrentVal.value &&
@@ -979,6 +988,7 @@ function updateTransitionAndClose() {
       cell_phone: cellPhone.value,
       should_delete: shouldDelete.value,
       reassign_to: reassignTo.value,
+      gas_pin_needed: gasPINNeeded.value,
       business_cards: businessCards.value,
       prox_card_needed: proxCardNeeded.value,
       prox_card_returned: proxCardReturned.value,
@@ -1026,6 +1036,7 @@ function updateTransitionAndClose() {
       cellPhoneCurrentVal.value = t.cell_phone
       shouldDeleteCurrentVal.value = t.should_delete
       reassignToCurrentVal.value = t.reassign_to
+      gasPINNeededCurrentVal.value = t.gas_pin_needed
       businessCardsCurrentVal.value = t.business_cards
       proxCardNeededCurrentVal.value = t.prox_card_needed
       proxCardReturnedCurrentVal.value = t.prox_card_returned

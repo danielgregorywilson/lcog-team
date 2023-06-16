@@ -320,6 +320,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         t.cell_phone = request.data['cell_phone']
         t.should_delete = request.data['should_delete']
         t.reassign_to = request.data['reassign_to']
+        t.gas_pin_needed = request.data['gas_pin_needed']
         t.business_cards = request.data['business_cards']
         t.prox_card_needed = request.data['prox_card_needed']
         t.prox_card_returned = request.data['prox_card_returned']

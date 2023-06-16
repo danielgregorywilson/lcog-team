@@ -737,6 +737,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   cell_phone: boolean
   should_delete: boolean
   reassign_to: string
+  gas_pin_needed: boolean
   business_cards: boolean
   prox_card_needed: boolean
   prox_card_returned: boolean
@@ -778,6 +779,7 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   cell_phone?: boolean
   should_delete?: boolean
   reassign_to?: string
+  gas_pin_needed?: boolean
   business_cards?: boolean
   prox_card_needed?: boolean
   prox_card_returned?: boolean

@@ -389,12 +389,39 @@
       </q-card>
     </q-dialog>
 
-    <!-- Dialog of changes -->
-    <q-dialog v-model="showSendDialog">
+    <!-- Send to HR Dialog -->
+    <q-dialog v-model="showSendToHRDialog">
+      <q-card class="q-pa-md" style="width: 400px">
+        <div class="text-h6">Send transition to HR?</div>
+        <q-form
+          @submit='onSubmitSendDialog("HR")'
+          class="q-gutter-md"
+        >
+          <q-input
+            v-model="sendDialogMessage"
+            filled
+            type="textarea"
+            label="Extra message to include"	
+          />
+
+          <div>
+            <q-btn
+              label="Send"
+              icon-right="send"
+              type="submit"
+              color="primary"
+            />
+          </div>
+        </q-form>
+      </q-card>
+    </q-dialog>
+
+    <!-- Send to staff transition news Dialog -->
+    <q-dialog v-model="showSendToSTNDialog">
       <q-card class="q-pa-md">
         <div class="text-h6">Send message to staff transition news?</div>
         <q-form
-          @submit='onSubmitSendDialog()'
+          @submit='onSubmitSendDialog("STN")'
           class="q-gutter-md"
         >
           <q-checkbox v-model="sendDialogUpdate" label="Update" />
@@ -407,7 +434,7 @@
 
           <div>
             <q-btn
-              label="Send"
+              label="Send to STN"
               icon-right="send"
               type="submit"
               color="primary"
@@ -454,13 +481,22 @@
           @click="router.push({ name: 'workflow-print' })"
         />
         <q-btn
+          v-if="canSendToHR()"
+          class="q-ml-sm"
+          color="white"
+          text-color="black"
+          icon="send"
+          label="Send to HR"
+          @click="showSendToHRDialog = true"
+        />
+        <q-btn
           v-if="canSendToTransitionNews()"
           class="q-ml-sm"
           color="white"
           text-color="black"
           icon="send"
-          label="Send"
-          @click="showSendDialog = true"
+          label="Send to STN"
+          @click="showSendToSTNDialog = true"
         />
       </div>
       <!-- <div class="col-3 self-center status">
@@ -637,9 +673,11 @@ let showErrorDialog = ref(false)
 let errorDialogPosition = ref('top') as Ref<QDialogProps['position']>
 
 let showChangesDialog = ref(false)
-let showSendDialog = ref(false)
-let sendDialogUpdate = ref(false)
+
+let showSendToHRDialog = ref(false)
+let showSendToSTNDialog = ref(false)
 let sendDialogMessage = ref('')
+let sendDialogUpdate = ref(false)
 
 function retrieveEmployeeTransition() {
   return new Promise((resolve) => {
@@ -880,6 +918,10 @@ function canViewSalaryFields() {
     cookies.get('is_fiscal_employee') == 'true'
 }
 
+function canSendToHR() {
+  return cookies.get('is_sds_hiring_lead') == 'true'
+}
+
 function canSendToTransitionNews() {
   return cookies.get('is_hr_employee') == 'true'
 }
@@ -1052,11 +1094,13 @@ function clickedErrorItem(item: [string, string]) {
   }
 }
 
-function onSubmitSendDialog() {
+function onSubmitSendDialog(type: 'HR'|'STN') {
   workflowsStore.sendTransitionToEmailList(transitionPk.value, {
+    type: type,
     update: sendDialogUpdate.value,
     extraMessage: sendDialogMessage.value,
     senderName: userStore.getEmployeeProfile.name,
+    senderEmail: userStore.getEmployeeProfile.email,
     transition_url: route.fullPath
   })
     .then(() => {
@@ -1065,7 +1109,8 @@ function onSubmitSendDialog() {
         color: 'positive',
         icon: 'send'
       })
-      showSendDialog.value = false
+      showSendToHRDialog.value = false
+      showSendToSTNDialog.value = false
       sendDialogUpdate.value = false
       sendDialogMessage.value = ''
     })

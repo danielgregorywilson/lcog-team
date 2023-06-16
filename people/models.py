@@ -119,6 +119,10 @@ class Employee(models.Model):
     @property
     def is_hr_employee(self):
         return self.user.groups.filter(name='HR Employee').exists()
+    
+    @property
+    def is_sds_hiring_lead(self):
+        return self.user.groups.filter(name='SDS Hiring Lead').exists()
 
     @property
     def is_fiscal_employee(self):

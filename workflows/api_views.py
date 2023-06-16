@@ -21,7 +21,9 @@ from timeoff.helpers import (
     send_employee_manager_acknowledged_timeoff_request_notification,
     send_manager_new_timeoff_request_notification
 )
-from workflows.helpers import send_staff_transition_email
+from workflows.helpers import (
+    send_transition_hr_email, send_transition_stn_email
+)
 from workflows.models import (
     EmployeeTransition, Process, ProcessInstance, Role, Step, StepChoice,
     StepInstance, TransitionChange, Workflow, WorkflowInstance
@@ -350,13 +352,24 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def send_transition_to_email_list(self, request, pk):
         transition = EmployeeTransition.objects.get(pk=pk)
-        send_staff_transition_email(
-            transition,
-            update=request.data['update'],
-            extra_message=request.data['extraMessage'],
-            sender_name=request.data['senderName'],
-            url=request.data['transition_url']
-        )
+        if request.data['type'] == 'HR':
+            send_transition_hr_email(
+                transition,
+                extra_message=request.data['extraMessage'],
+                sender_name=request.data['senderName'],
+                sender_email=request.data['senderEmail'],
+                url=request.data['transition_url']
+            )
+        elif request.data['type'] == 'STN':
+            send_transition_stn_email(
+                transition,
+                update=request.data['update'],
+                extra_message=request.data['extraMessage'],
+                sender_name=request.data['senderName'],
+                url=request.data['transition_url']
+            )
+        else:
+            return Response("Invalid type.", status=status.HTTP_400_BAD_REQUEST)
         return Response("Sent email to staff.")
 
 

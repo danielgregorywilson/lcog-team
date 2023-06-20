@@ -32,6 +32,7 @@ export interface EmployeeRetrieve {
   is_manager: boolean
   has_manager: boolean
   is_hr_employee: boolean
+  is_sds_hiring_lead: boolean
   is_fiscal_employee: boolean
   is_upper_manager: boolean
   is_hr_manager: boolean
@@ -694,7 +695,7 @@ export interface TransitionChange {
   created_by_name: string
   created_by_initials: string
   date: string
-  changes: JSON
+  changes: string
 }
 
 export interface EmployeeTransition extends EmployeeTransitionBase {
@@ -736,6 +737,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   cell_phone: boolean
   should_delete: boolean
   reassign_to: string
+  gas_pin_needed: boolean
   business_cards: boolean
   prox_card_needed: boolean
   prox_card_returned: boolean
@@ -777,6 +779,7 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   cell_phone?: boolean
   should_delete?: boolean
   reassign_to?: string
+  gas_pin_needed?: boolean
   business_cards?: boolean
   prox_card_needed?: boolean
   prox_card_returned?: boolean

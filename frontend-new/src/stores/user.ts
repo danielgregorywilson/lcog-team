@@ -19,6 +19,7 @@ export const useUserStore = defineStore('user', {
       is_manager: false,
       has_manager: false,
       is_hr_employee: false,
+      is_sds_hiring_lead: false,
       is_fiscal_employee: false,
       is_eligible_for_telework_application: false,
       can_view_seating_charts: false,
@@ -65,6 +66,7 @@ export const useUserStore = defineStore('user', {
             this.profile.is_manager = resp.data.is_manager
             this.profile.has_manager = resp.data.has_manager
             this.profile.is_hr_employee = resp.data.is_hr_employee
+            this.profile.is_sds_hiring_lead = resp.data.is_sds_hiring_lead
             this.profile.is_fiscal_employee = resp.data.is_fiscal_employee
             this.profile.is_eligible_for_telework_application = resp.data.is_eligible_for_telework_application
             this.profile.can_view_seating_charts = resp.data.can_view_seating_charts
@@ -85,6 +87,7 @@ export const useUserStore = defineStore('user', {
             cookies.set('is_manager', resp.data.is_manager.toString())
             cookies.set('has_manager', resp.data.has_manager.toString())
             cookies.set('is_hr_employee', resp.data.is_hr_employee.toString())
+            cookies.set('is_sds_hiring_lead', resp.data.is_sds_hiring_lead.toString())
             cookies.set('is_fiscal_employee', resp.data.is_fiscal_employee.toString())
             cookies.set('is_eligible_for_telework_application', resp.data.is_eligible_for_telework_application.toString())
             cookies.set('can_view_seating_charts', resp.data.can_view_seating_charts.toString())
@@ -130,6 +133,7 @@ export const useUserStore = defineStore('user', {
         cookies.remove('is_manager')
         cookies.remove('has_manager')
         cookies.remove('is_hr_employee')
+        cookies.remove('is_sds_hiring_lead')
         cookies.remove('is_fiscal_employee')
         cookies.remove('is_eligible_for_telework_application')
         cookies.remove('can_view_seating_charts')

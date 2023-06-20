@@ -3,7 +3,7 @@ import os
 
 from django.apps import apps
 from django.contrib.sites.models import Site
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage, EmailMultiAlternatives, send_mail
 from django.urls import reverse
 
 import requests
@@ -36,6 +36,14 @@ def get_host_url(request):
 def send_email(to_address, subject, body, html_body):
     return send_mail(subject, body, os.environ.get('FROM_EMAIL'), [to_address], html_message=html_body)
 
+def send_email_multiple(to_addresses=[], cc_addresses=[], subject='', text_body='', html_body=''):
+    email = EmailMultiAlternatives(
+        subject=subject, body=text_body,
+        from_email=os.environ.get('FROM_EMAIL'), to=to_addresses,
+        cc=cc_addresses
+    )
+    email.attach_alternative(html_body, "text/html")
+    return email.send()
 
 def send_evaluation_written_email_to_employee(employee, review):
     # Notification #5

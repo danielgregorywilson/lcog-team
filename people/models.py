@@ -47,6 +47,7 @@ class JobTitle(models.Model):
     class Meta:
         verbose_name = _("Job Title")
         verbose_name_plural = _("Job Titles")
+        ordering = ["name"]
 
     name = models.CharField(_("name"), max_length=100)
     position_description_link = models.URLField(_("position description link"), blank=True, null=True)

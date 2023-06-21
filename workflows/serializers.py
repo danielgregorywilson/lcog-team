@@ -227,39 +227,20 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
             return ''
 
 
-class WorkflowInstanceSerializer(serializers.ModelSerializer):
-    process_instances = ProcessInstanceSerializer(source='processinstance_set',
-        many=True)
-    transition = EmployeeTransitionSerializer()
-    percent_complete = serializers.SerializerMethodField()
-    employee_name = serializers.SerializerMethodField()
-    title_pk = serializers.SerializerMethodField()
+class WorkflowInstanceSimpleSerializer(serializers.ModelSerializer):
+    """
+    Used for WorkflowTable component
+    """
     title_name = serializers.SerializerMethodField()
-    transition_date = serializers.SerializerMethodField()
 
     class Meta:
         model = WorkflowInstance
         fields = [
-            'url', 'pk', 'workflow', 'started_at', 'completed_at',
-            'process_instances', 'transition', 'percent_complete',
-            'employee_name', 'title_pk', 'title_name', 'transition_date'
+            'url', 'pk', 'started_at', 'percent_complete', 'employee_name',
+            'title_name', 'transition_date'
         ]
         depth = 1
 
-    @staticmethod
-    def get_percent_complete(wfi):
-        return wfi.percent_complete
-
-    @staticmethod
-    def get_employee_name(wfi):
-        return wfi.employee_name
-
-    @staticmethod
-    def get_title_pk(wfi):
-        if wfi.title:
-            return wfi.title.pk
-        else:
-            return -1
 
     @staticmethod
     def get_title_name(wfi):
@@ -269,6 +250,15 @@ class WorkflowInstanceSerializer(serializers.ModelSerializer):
             else:
                 return ''
 
-    @staticmethod
-    def get_transition_date(wfi):
-        return wfi.transition_date
+
+class WorkflowInstanceSerializer(serializers.ModelSerializer):
+    process_instances = ProcessInstanceSerializer(source='processinstance_set',
+        many=True)
+    transition = EmployeeTransitionSerializer()
+
+    class Meta:
+        model = WorkflowInstance
+        fields = [
+            'url', 'pk', 'workflow', 'process_instances', 'transition'
+        ]
+        depth = 1

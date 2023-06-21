@@ -57,23 +57,23 @@ export const useWorkflowsStore = defineStore('workflows', {
           })
         })
     },
-    // All workflows, optionally filtered to ongoing/completed
+    // All workflow instances, optionally filtered to ongoing/completed
     getWorkflows(data: {complete?: boolean, actionRequired?: boolean}) {
       let targetUrl: string
       let workflowType: 'allWorkflows' | 'workflowsActionRequired' | 'workflowsComplete' | 'workflowsIncomplete'
       if (data == undefined) {
-        targetUrl = `${ apiURL }api/v1/workflowinstance`
+        targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true`
         workflowType = 'allWorkflows'	
       } else if (data.actionRequired !== undefined && data.actionRequired) {
-        targetUrl = `${ apiURL }api/v1/workflowinstance?action_required=true`
+        targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true&action_required=true`
         workflowType = 'workflowsActionRequired'
       } else {
         if (data.complete !== undefined) {
           if (data.complete) {
-            targetUrl = `${ apiURL }api/v1/workflowinstance?complete=true`
+            targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true&complete=true`
             workflowType = 'workflowsComplete'
           } else {
-            targetUrl = `${ apiURL }api/v1/workflowinstance?complete=false`
+            targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true&complete=false`
             workflowType = 'workflowsIncomplete'
           }
         } else {

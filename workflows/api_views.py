@@ -33,7 +33,7 @@ from workflows.serializers import (
     EmployeeTransitionSerializer, ProcessInstanceSerializer, ProcessSerializer,
     RoleSerializer, StepChoiceSerializer, StepInstanceSerializer,
     StepSerializer, TransitionChangeSerializer, WorkflowInstanceSerializer,
-    WorkflowSerializer
+    WorkflowInstanceSimpleSerializer, WorkflowSerializer
 )
 
 
@@ -108,6 +108,12 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
     # permission_classes = [
     #     IsAuthenticatedOrReadOnly
     # ]
+
+    def get_serializer_class(self):
+        simple = self.request.query_params.get('simple', None)
+        if simple is not None and is_true_string(simple):
+            return WorkflowInstanceSimpleSerializer
+        return super().get_serializer_class()
 
     # def get_queryset(self):
     #     """

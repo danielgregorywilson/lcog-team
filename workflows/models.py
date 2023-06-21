@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import json
 
 from django.core.exceptions import ValidationError
@@ -158,6 +158,7 @@ class EmployeeTransition(models.Model):
     cell_phone = models.BooleanField(default=False)
     should_delete = models.BooleanField(default=False)
     reassign_to = models.CharField(max_length=50, blank=True)
+    gas_pin_needed = models.BooleanField(_("Gas PIN needed"), default=False)
     business_cards = models.BooleanField(default=False)
     prox_card_needed = models.BooleanField(default=False)
     prox_card_returned = models.BooleanField(default=False)
@@ -184,8 +185,20 @@ class EmployeeTransition(models.Model):
             if field.name in ["id", "date_submitted", "submitter"]:
                 continue
             if field.name == 'transition_date' and new[field.name]:
-                original_value = str(original[field.column])[:23]
-                new_value = new[field.column][:23].replace('T', ' ')
+                original_date = original[field.name]
+                new_date = new[field.name]
+                # When coming from the form, the date is a string
+                if type(new_date) == str:
+                    new_date = datetime.strptime(new_date, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
+                # Strip microseconds from timestamps
+                new_date -= timedelta(microseconds=new_date.microsecond)
+                original_date -= timedelta(microseconds=original_date.microsecond)
+                # Do not create a change record if the date has not changed
+                if original_date == new_date:
+                    continue
+                # String representation of the date
+                original_value = str(original_date)
+                new_value = str(new_date)
             else:
                 original_value = original[field.column]
                 new_value = new[field.column]

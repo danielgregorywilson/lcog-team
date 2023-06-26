@@ -192,7 +192,8 @@ class EmployeeTransition(models.Model):
                     new_date = datetime.strptime(new_date, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
                 # Strip microseconds from timestamps
                 new_date -= timedelta(microseconds=new_date.microsecond)
-                original_date -= timedelta(microseconds=original_date.microsecond)
+                if original_date:
+                  original_date -= timedelta(microseconds=original_date.microsecond)
                 # Do not create a change record if the date has not changed
                 if original_date == new_date:
                     continue

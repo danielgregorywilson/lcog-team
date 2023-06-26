@@ -103,7 +103,7 @@ class ProcessInstanceSerializer(serializers.ModelSerializer):
         model = ProcessInstance
         fields = [
             'url', 'pk', 'process', 'step_instances', 'current_step_instance',
-            'completed_at'
+            'completed_at', 'percent_complete'
         ]
         depth = 1
 
@@ -259,6 +259,7 @@ class WorkflowInstanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkflowInstance
         fields = [
-            'url', 'pk', 'workflow', 'process_instances', 'transition'
+            'url', 'pk', 'workflow', 'process_instances', 'transition',
+            'percent_complete'
         ]
         depth = 1

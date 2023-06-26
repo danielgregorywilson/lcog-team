@@ -1,9 +1,18 @@
 <template>
   <q-page class="q-pa-md" v-if="workflowInstanceLoaded()">
-    <div class="text-h4 q-mb-sm">{{ currentWorkflowInstance().workflow.name }}</div>
+    <div class="row items-center q-mb-sm">
+      <div class="text-h4 q-mr-md">{{ wfi().workflow.name }}</div>
+      <div style="width: 100px;">
+        <q-linear-progress rounded size="25px" :value="wfi().percent_complete/100" color="primary">
+          <div class="absolute-full flex flex-center">
+            <q-badge color="white" text-color="primary" :label="`${wfi().percent_complete}%`" />
+          </div>
+        </q-linear-progress>
+      </div>
+    </div>
     <q-btn-group push v-if="hasEmployeeTransition()">
-      <q-btn push :color="isSelected('workflow-processes')" glossy label="Processes" :to="{name: 'workflow-processes', params: {pk: currentWorkflowInstance().pk}}" />
-      <q-btn push :color="isSelected('workflow-transition-form')" glossy label="Employee Transition Form" :to="{name: 'workflow-transition-form', params: {pk: currentWorkflowInstance().pk}}" />
+      <q-btn push :color="isSelected('workflow-processes')" glossy label="Processes" :to="{name: 'workflow-processes', params: {pk: wfi().pk}}" />
+      <q-btn push :color="isSelected('workflow-transition-form')" glossy label="Employee Transition Form" :to="{name: 'workflow-transition-form', params: {pk: wfi().pk}}" />
     </q-btn-group>
     <router-view :key="$route.path" />
   </q-page>
@@ -30,7 +39,7 @@ function workflowInstanceLoaded() {
   return workflowsStore.currentWorkflowInstance.pk != null
 }
 
-function currentWorkflowInstance(): WorkflowInstance {
+function wfi(): WorkflowInstance {
   return workflowsStore.currentWorkflowInstance
 }
 

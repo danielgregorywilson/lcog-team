@@ -716,6 +716,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   title_name: string
   fte: string
   bilingual: boolean
+  second_language: string
   manager_pk: number
   manager_name: string
   unit_pk: number
@@ -761,6 +762,7 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   title_pk?: number
   fte?: string
   bilingual?: boolean
+  second_language?: string
   manager_pk?: number
   unit_pk?: number
   transition_date?: Date

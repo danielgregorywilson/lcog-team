@@ -80,6 +80,12 @@
       />
       <q-input v-model="fte" label="FTE" class="q-mr-md" />
       <q-checkbox v-model="bilingual" label="Bilingual" />
+      <LanguageSelect
+        label="Second Language"
+        :language="secondLanguage"
+        v-on:input="unit=$event"
+        v-on:clear="unit=emptyUnit"
+      />
     </div>
     <div class="row">
       <q-select
@@ -558,6 +564,7 @@ import {
 import Avatar from 'src/components/Avatar.vue'
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import JobTitleSelect from 'src/components/JobTitleSelect.vue'
+import LanguageSelect from 'src/components/LanguageSelect.vue'
 import UnitSelect from 'src/components/UnitSelect.vue'
 import { usePeopleStore } from 'src/stores/people'
 import { useUserStore } from 'src/stores/user'
@@ -617,6 +624,8 @@ let salaryStepCurrentVal = ref(null) as Ref<number | null>
 let salaryStep = ref(null) as Ref<number | null>
 let bilingualCurrentVal = ref(false)
 let bilingual = ref(false)
+let secondLanguageCurrentVal = ref('')
+let secondLanguage = ref('')
 let managerCurrentVal = ref(emptyEmployee)
 let manager = ref(emptyEmployee)
 let unitCurrentVal = ref(emptyUnit)
@@ -721,6 +730,8 @@ function retrieveEmployeeTransition() {
     salaryStepCurrentVal.value = salaryStep.value
     bilingual.value = t.bilingual
     bilingualCurrentVal.value = bilingual.value
+    secondLanguage.value = t.second_language
+    secondLanguageCurrentVal.value = secondLanguage.value
     manager.value = {pk: t.manager_pk, name: '', legal_name: t.manager_name}
     managerCurrentVal.value = manager.value
     unit.value = {pk: t.unit_pk, name: t.unit_name}
@@ -861,6 +872,7 @@ function valuesAreChanged(): boolean {
     salaryRange.value == salaryRangeCurrentVal.value &&
     salaryStep.value == salaryStepCurrentVal.value &&
     bilingual.value == bilingualCurrentVal.value &&
+    secondLanguage.value == secondLanguageCurrentVal.value &&
     manager.value.pk == managerCurrentVal.value.pk &&
     unit.value.pk == unitCurrentVal.value.pk &&
     transitionDate.value == transitionDateCurrentVal.value &&
@@ -968,6 +980,7 @@ function updateTransitionAndClose() {
       salary_range: salaryRange.value,
       salary_step: salaryStep.value,
       bilingual: bilingual.value,
+      second_language: secondLanguage.value,
       manager_pk: manager.value.pk,
       unit_pk: unit.value.pk,
       transition_date: transitionDateSubmission,
@@ -1014,6 +1027,7 @@ function updateTransitionAndClose() {
       salaryRangeCurrentVal.value = t.salary_range
       salaryStepCurrentVal.value = t.salary_step
       bilingualCurrentVal.value = t.bilingual
+      secondLanguageCurrentVal.value = t.second_language
       managerCurrentVal.value = {
         pk: t.manager_pk, name: '', legal_name: t.manager_name
       }

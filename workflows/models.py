@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext as _
 
+from mainsite.models import LANGUAGE_CHOICES
 from people.models import Employee, JobTitle, UnitOrProgram
 
 
@@ -133,6 +134,7 @@ class EmployeeTransition(models.Model):
     salary_range = models.PositiveSmallIntegerField(blank=True, null=True)
     salary_step = models.PositiveSmallIntegerField(blank=True, null=True)
     bilingual = models.BooleanField(default=False)
+    second_language = models.CharField(max_length=20, choices=LANGUAGE_CHOICES, blank=True)
     manager = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name="manager_of_transitions"

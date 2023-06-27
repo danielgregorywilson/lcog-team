@@ -50,7 +50,7 @@
       </template>
       <template v-slot:body-cell-percentComplete="props">
         <q-td key="percentComplete" :props="props">
-          <q-linear-progress size="25px" :value="props.row.percent_complete/100" color="primary">
+          <q-linear-progress rounded size="25px" :value="props.row.percent_complete/100" color="primary">
             <div class="absolute-full flex flex-center">
               <q-badge color="white" text-color="primary" :label="`${props.row.percent_complete}%`" />
             </div>

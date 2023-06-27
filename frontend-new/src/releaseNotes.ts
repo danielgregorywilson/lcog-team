@@ -4,6 +4,24 @@
 
 export const releases = [
   {
+    version: '0.13.5',
+    date: new Date(2023, 5, 27),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Added a second language select dropdown to transition form'
+      },
+      {
+        type: 'improved',
+        description: 'Show percent complete in process instance views'
+      },
+      {
+        type: 'fix',
+        description: 'Fix a bug where the transition form would not submit initially'
+      }
+    ]
+  },
+  {
     version: '0.13.4',
     date: new Date(2023, 5, 21),
     changes: [

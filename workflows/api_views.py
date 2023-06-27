@@ -278,6 +278,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             t.salary_step = request.data['salary_step']
         
         t.bilingual = request.data['bilingual']
+        t.second_language = request.data['second_language']
         
         # Only the original submitter can edit manager field
         user_is_submitter = request.user.employee == t.submitter

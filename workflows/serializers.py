@@ -103,7 +103,7 @@ class ProcessInstanceSerializer(serializers.ModelSerializer):
         model = ProcessInstance
         fields = [
             'url', 'pk', 'process', 'step_instances', 'current_step_instance',
-            'completed_at'
+            'completed_at', 'percent_complete'
         ]
         depth = 1
 
@@ -154,14 +154,14 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
             'submitter_name', 'employee_first_name', 'employee_middle_initial',
             'employee_last_name', 'employee_preferred_name', 'employee_number',
             'employee_id', 'employee_email', 'title_pk', 'title_name', 'fte',
-            'salary_range', 'salary_step', 'bilingual', 'manager_pk',
-            'manager_name', 'unit_pk', 'unit_name', 'transition_date',
-            'preliminary_hire', 'delete_profile', 'office_location',
-            'cubicle_number', 'union_affiliation', 'teleworking',
-            'computer_type', 'computer_gl', 'computer_description',
-            'phone_number', 'desk_phone', 'phone_request',
-            'phone_request_data', 'load_code', 'cell_phone', 'should_delete',
-            'reassign_to', 'gas_pin_needed', 'business_cards',
+            'salary_range', 'salary_step', 'bilingual', 'second_language',
+            'manager_pk', 'manager_name', 'unit_pk', 'unit_name',
+            'transition_date', 'preliminary_hire', 'delete_profile',
+            'office_location', 'cubicle_number', 'union_affiliation',
+            'teleworking', 'computer_type', 'computer_gl',
+            'computer_description', 'phone_number', 'desk_phone',
+            'phone_request', 'phone_request_data', 'load_code', 'cell_phone',
+            'should_delete', 'reassign_to', 'gas_pin_needed', 'business_cards',
             'prox_card_needed', 'prox_card_returned', 'access_emails_pk',
             'access_emails_name', 'special_instructions', 'changes'
         ]
@@ -259,6 +259,7 @@ class WorkflowInstanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkflowInstance
         fields = [
-            'url', 'pk', 'workflow', 'process_instances', 'transition'
+            'url', 'pk', 'workflow', 'process_instances', 'transition',
+            'percent_complete'
         ]
         depth = 1

@@ -91,6 +91,7 @@
       /> -->
       <q-select
         v-if="bilingual"
+        label="Second Language"
         v-model="secondLanguage"
         :options="languageOptions"
         class="language-select"

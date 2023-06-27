@@ -2,18 +2,21 @@
   <q-select
     v-model="selectedLanguage"
     :options="languageOptions"
-    label="Language"
-    name="language"
-    id="language"
-    input-debounce="500"
-    @filter="filterFn"
-    @update:model-value="emit('input', selectedUnit)"
+    @update:model-value="emit('input', selectedLanguage)"
+    class="language-select"
   >
     <template v-if="selectedLanguage" v-slot:append>
       <q-icon name="cancel" @click.stop="clearLanguage()" class="cursor-pointer" />
     </template>
   </q-select>
-  </template>
+  {{ selectedLanguage }}
+</template>
+
+<style scoped lang="scss">
+  .language-select {
+    width: 221px
+  }
+</style>
 
   
   <script setup lang="ts">
@@ -33,20 +36,13 @@
   
   const props = defineProps<{
     language: string,
+    foo: string,
   }>()
   
   const emit = defineEmits<{
     (e: 'clear'): void
-    (e: 'input', arg: {name: string, pk: number}): void
+    (e: 'input', arg: string): void
   }>()
-  
-  let needle = ref('') // For filtering language list
-  
-  function filterFn (val: string, update: Function) { // eslint-disable-line @typescript-eslint/ban-types
-    update(() => {
-      needle.value = val.toLowerCase()
-    })
-  }
   
   function clearLanguage() {
     selectedLanguage.value = ''
@@ -54,7 +50,7 @@
   }
   
   onUpdated(() => {
-    selectedLanguage.value = props.language
+    // selectedLanguage.value = props.language
   })
   </script>
   

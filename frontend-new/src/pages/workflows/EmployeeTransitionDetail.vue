@@ -79,13 +79,26 @@
         class="q-mr-md"
       />
       <q-input v-model="fte" label="FTE" class="q-mr-md" />
-      <q-checkbox v-model="bilingual" label="Bilingual" />
-      <LanguageSelect
+      <q-checkbox v-model="bilingual" label="Bilingual" class="q-mr-md" />
+      <!-- TODO: For some reason this component won't initialize with secondLanguage -->
+      <!-- <LanguageSelect
+        v-if="bilingual"
         label="Second Language"
         :language="secondLanguage"
-        v-on:input="unit=$event"
-        v-on:clear="unit=emptyUnit"
-      />
+        foo="bar"
+        v-on:input="secondLanguage=$event"
+        v-on:clear="secondLanguage=''"
+      /> -->
+      <q-select
+        v-if="bilingual"
+        v-model="secondLanguage"
+        :options="languageOptions"
+        class="language-select"
+      >
+        <template v-if="secondLanguage" v-slot:append>
+          <q-icon name="cancel" @click.stop="secondLanguage=''" class="cursor-pointer" />
+        </template>
+      </q-select>
     </div>
     <div class="row">
       <q-select
@@ -524,6 +537,9 @@
   border-bottom: 2px solid black;
   margin: 10px 0;
 }
+.language-select {
+  width: 221px
+}
 #sticky-footer {
   padding: 10px;
   background-color: rgb(25, 118, 210);
@@ -564,7 +580,7 @@ import {
 import Avatar from 'src/components/Avatar.vue'
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import JobTitleSelect from 'src/components/JobTitleSelect.vue'
-import LanguageSelect from 'src/components/LanguageSelect.vue'
+// import LanguageSelect from 'src/components/LanguageSelect.vue'
 import UnitSelect from 'src/components/UnitSelect.vue'
 import { usePeopleStore } from 'src/stores/people'
 import { useUserStore } from 'src/stores/user'
@@ -584,6 +600,16 @@ const workflowsStore = useWorkflowsStore()
 const emptyEmployee = {name: '', legal_name: '', pk: -1}
 const emptyTitle = {name: '', pk: -1}
 const emptyUnit = {name: '', pk: -1}
+
+const languageOptions = [
+  'American Sign Language', 'Arabic', 'Bengali', 'Chinese', 'Croatian',
+  'Czech', 'Danish', 'Dutch', 'Finnish', 'French', 'German', 'Greek',
+  'Gujarati', 'Haitian Creole', 'Hebrew', 'Hindi', 'Hungarian', 'Indonesian',
+  'Italian', 'Japanese', 'Korean', 'Latvian', 'Lithuanian', 'Norwegian',
+  'Persian', 'Polish', 'Portuguese', 'Romanian', 'Russian', 'Serbian',
+  'Slovak', 'Slovenian', 'Spanish', 'Swahili', 'Swedish', 'Tagalog', 'Tamil',
+  'Thai', 'Turkish', 'Urdu', 'Vietnamese', 'Welsh', 'Xhosa', 'Zulu',
+]
 
 const props = defineProps<{
   print?: boolean
@@ -949,6 +975,9 @@ function canSendToTransitionNews() {
 
 function updateTransitionAndClose() {
   return new Promise((resolve, reject) => {
+    if (!bilingual.value) {
+      secondLanguage.value = ''
+    } 
     const phoneNumberVal = phoneNumber.value == '(___) ___-____' ? '' :
       phoneNumber.value
     if (

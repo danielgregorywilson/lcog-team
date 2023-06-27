@@ -79,7 +79,26 @@
         class="q-mr-md"
       />
       <q-input v-model="fte" label="FTE" class="q-mr-md" />
-      <q-checkbox v-model="bilingual" label="Bilingual" />
+      <q-checkbox v-model="bilingual" label="Bilingual" class="q-mr-md" />
+      <!-- TODO: For some reason this component won't initialize with secondLanguage -->
+      <!-- <LanguageSelect
+        v-if="bilingual"
+        label="Second Language"
+        :language="secondLanguage"
+        foo="bar"
+        v-on:input="secondLanguage=$event"
+        v-on:clear="secondLanguage=''"
+      /> -->
+      <q-select
+        v-if="bilingual"
+        v-model="secondLanguage"
+        :options="languageOptions"
+        class="language-select"
+      >
+        <template v-if="secondLanguage" v-slot:append>
+          <q-icon name="cancel" @click.stop="secondLanguage=''" class="cursor-pointer" />
+        </template>
+      </q-select>
     </div>
     <div class="row">
       <q-select
@@ -518,6 +537,9 @@
   border-bottom: 2px solid black;
   margin: 10px 0;
 }
+.language-select {
+  width: 221px
+}
 #sticky-footer {
   padding: 10px;
   background-color: rgb(25, 118, 210);
@@ -558,6 +580,7 @@ import {
 import Avatar from 'src/components/Avatar.vue'
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import JobTitleSelect from 'src/components/JobTitleSelect.vue'
+// import LanguageSelect from 'src/components/LanguageSelect.vue'
 import UnitSelect from 'src/components/UnitSelect.vue'
 import { usePeopleStore } from 'src/stores/people'
 import { useUserStore } from 'src/stores/user'
@@ -577,6 +600,16 @@ const workflowsStore = useWorkflowsStore()
 const emptyEmployee = {name: '', legal_name: '', pk: -1}
 const emptyTitle = {name: '', pk: -1}
 const emptyUnit = {name: '', pk: -1}
+
+const languageOptions = [
+  'American Sign Language', 'Arabic', 'Bengali', 'Chinese', 'Croatian',
+  'Czech', 'Danish', 'Dutch', 'Finnish', 'French', 'German', 'Greek',
+  'Gujarati', 'Haitian Creole', 'Hebrew', 'Hindi', 'Hungarian', 'Indonesian',
+  'Italian', 'Japanese', 'Korean', 'Latvian', 'Lithuanian', 'Norwegian',
+  'Persian', 'Polish', 'Portuguese', 'Romanian', 'Russian', 'Serbian',
+  'Slovak', 'Slovenian', 'Spanish', 'Swahili', 'Swedish', 'Tagalog', 'Tamil',
+  'Thai', 'Turkish', 'Urdu', 'Vietnamese', 'Welsh', 'Xhosa', 'Zulu',
+]
 
 const props = defineProps<{
   print?: boolean
@@ -617,6 +650,8 @@ let salaryStepCurrentVal = ref(null) as Ref<number | null>
 let salaryStep = ref(null) as Ref<number | null>
 let bilingualCurrentVal = ref(false)
 let bilingual = ref(false)
+let secondLanguageCurrentVal = ref('')
+let secondLanguage = ref('')
 let managerCurrentVal = ref(emptyEmployee)
 let manager = ref(emptyEmployee)
 let unitCurrentVal = ref(emptyUnit)
@@ -721,6 +756,8 @@ function retrieveEmployeeTransition() {
     salaryStepCurrentVal.value = salaryStep.value
     bilingual.value = t.bilingual
     bilingualCurrentVal.value = bilingual.value
+    secondLanguage.value = t.second_language
+    secondLanguageCurrentVal.value = secondLanguage.value
     manager.value = {pk: t.manager_pk, name: '', legal_name: t.manager_name}
     managerCurrentVal.value = manager.value
     unit.value = {pk: t.unit_pk, name: t.unit_name}
@@ -861,6 +898,7 @@ function valuesAreChanged(): boolean {
     salaryRange.value == salaryRangeCurrentVal.value &&
     salaryStep.value == salaryStepCurrentVal.value &&
     bilingual.value == bilingualCurrentVal.value &&
+    secondLanguage.value == secondLanguageCurrentVal.value &&
     manager.value.pk == managerCurrentVal.value.pk &&
     unit.value.pk == unitCurrentVal.value.pk &&
     transitionDate.value == transitionDateCurrentVal.value &&
@@ -937,6 +975,9 @@ function canSendToTransitionNews() {
 
 function updateTransitionAndClose() {
   return new Promise((resolve, reject) => {
+    if (!bilingual.value) {
+      secondLanguage.value = ''
+    } 
     const phoneNumberVal = phoneNumber.value == '(___) ___-____' ? '' :
       phoneNumber.value
     if (
@@ -968,6 +1009,7 @@ function updateTransitionAndClose() {
       salary_range: salaryRange.value,
       salary_step: salaryStep.value,
       bilingual: bilingual.value,
+      second_language: secondLanguage.value,
       manager_pk: manager.value.pk,
       unit_pk: unit.value.pk,
       transition_date: transitionDateSubmission,
@@ -1014,6 +1056,7 @@ function updateTransitionAndClose() {
       salaryRangeCurrentVal.value = t.salary_range
       salaryStepCurrentVal.value = t.salary_step
       bilingualCurrentVal.value = t.bilingual
+      secondLanguageCurrentVal.value = t.second_language
       managerCurrentVal.value = {
         pk: t.manager_pk, name: '', legal_name: t.manager_name
       }

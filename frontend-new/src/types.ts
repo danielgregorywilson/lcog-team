@@ -663,6 +663,7 @@ export type ProcessInstance = {
   current_step_instance: StepInstance
   started_at: string
   completed_at: string
+  percent_complete: number
 }
 
 export interface WorkflowInstance {
@@ -673,7 +674,7 @@ export interface WorkflowInstance {
   process_instances: Array<ProcessInstance>
   transition?: EmployeeTransition
   title: string
-  percent_complete: string
+  percent_complete: number
   employee_name?: string
   title_pk?: number
   title_name?: string
@@ -715,6 +716,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   title_name: string
   fte: string
   bilingual: boolean
+  second_language: string
   manager_pk: number
   manager_name: string
   unit_pk: number
@@ -760,6 +762,7 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   title_pk?: number
   fte?: string
   bilingual?: boolean
+  second_language?: string
   manager_pk?: number
   unit_pk?: number
   transition_date?: Date

@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext as _
 
+from mainsite.models import LANGUAGE_CHOICES
 from people.models import Employee, JobTitle, UnitOrProgram
 
 
@@ -133,6 +134,7 @@ class EmployeeTransition(models.Model):
     salary_range = models.PositiveSmallIntegerField(blank=True, null=True)
     salary_step = models.PositiveSmallIntegerField(blank=True, null=True)
     bilingual = models.BooleanField(default=False)
+    second_language = models.CharField(max_length=20, choices=LANGUAGE_CHOICES, blank=True)
     manager = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name="manager_of_transitions"
@@ -192,7 +194,8 @@ class EmployeeTransition(models.Model):
                     new_date = datetime.strptime(new_date, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
                 # Strip microseconds from timestamps
                 new_date -= timedelta(microseconds=new_date.microsecond)
-                original_date -= timedelta(microseconds=original_date.microsecond)
+                if original_date:
+                  original_date -= timedelta(microseconds=original_date.microsecond)
                 # Do not create a change record if the date has not changed
                 if original_date == new_date:
                     continue

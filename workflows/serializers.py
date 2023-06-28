@@ -232,12 +232,13 @@ class WorkflowInstanceSimpleSerializer(serializers.ModelSerializer):
     Used for WorkflowTable component
     """
     title_name = serializers.SerializerMethodField()
+    workflow_role_pk = serializers.IntegerField(source='workflow.role.pk', required=False)
 
     class Meta:
         model = WorkflowInstance
         fields = [
             'url', 'pk', 'started_at', 'percent_complete', 'employee_name',
-            'title_name', 'transition_date'
+            'title_name', 'transition_date', 'workflow_role_pk'
         ]
         depth = 1
 

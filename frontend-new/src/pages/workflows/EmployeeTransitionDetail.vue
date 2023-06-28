@@ -982,6 +982,7 @@ function canSendToTransitionNews() {
 
 function updateTransition() {
   return new Promise((resolve, reject) => {
+    // Clean fields
     if (!bilingual.value) {
       secondLanguage.value = ''
     } 
@@ -1001,6 +1002,14 @@ function updateTransition() {
     if (transitionDate.value) {
       transitionDateSubmission = new Date(transitionDate.value)
     }
+
+    // Mark for sending notifications
+    let gasPINNotificationNeeded = false
+    if (gasPINNeededCurrentVal.value == false && gasPINNeeded.value == true) {
+      gasPINNotificationNeeded = true
+    }
+
+    // Update the DB
     workflowsStore.updateEmployeeTransition(transitionPk.value, {
       type: type.value,
       submitter_pk: userStore.getEmployeeProfile.employee_pk,
@@ -1114,6 +1123,11 @@ function updateTransition() {
         showErrorButton.value = true
       }
 
+      // Send notification emails
+      if (gasPINNotificationNeeded && ['New', 'Return', 'Change/Modify'].indexOf(type.value) != -1) {
+        sendGasPINNotificationEmail()
+      }
+
       // TODO: If a new computer is required, send an email to the IT department
 
       if (!!t.title_name) {
@@ -1151,6 +1165,29 @@ function clickedErrorItem(item: [string, string]) {
     const duration = 500
     setVerticalScrollPosition(target, offset, duration)
   }
+}
+
+function sendGasPINNotificationEmail() {
+  workflowsStore.sendGasPINNotificationEmail(transitionPk.value, {
+    senderName: userStore.getEmployeeProfile.name,
+    senderEmail: userStore.getEmployeeProfile.email,
+    transition_url: route.fullPath
+  })
+    .then(() => {
+      quasar.notify({
+        message: 'Sent Gas PIN Notification Email',
+        color: 'positive',
+        icon: 'send'
+      })
+    })
+    .catch(e => {
+      console.error('Error sending Gas PIN Notification Email', e)
+      quasar.notify({
+        message: 'Error sending Gas PIN Notification Email',
+        color: 'negative',
+        icon: 'report_problem'
+      })
+    })
 }
 
 function onSubmitSendDialog(type: 'HR'|'STN') {

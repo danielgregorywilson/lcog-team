@@ -11,6 +11,42 @@ from workflows.models import EmployeeTransition
 
 STAFF_TRANSITION_NEWS_EMAIL = os.environ.get('STAFF_TRANSITION_NEWS_EMAIL')
 
+def send_gas_pin_notification_email(
+    t, sender_name='', sender_email='', url=''
+):
+    current_site = Site.objects.get_current()
+    transition_url = current_site.domain + url
+
+    first_name = t.employee_first_name if t.employee_first_name else ''
+    last_name = t.employee_last_name if t.employee_last_name else ''
+    name_string = f'{ first_name } { last_name }'
+    if t.type == EmployeeTransition.TRANSITION_TYPE_NEW:
+        type_verb = 'starting'
+    elif t.type == EmployeeTransition.TRANSITION_TYPE_CHANGE:
+        type_verb = 'changing'
+    elif t.type == EmployeeTransition.TRANSITION_TYPE_EXIT:
+        type_verb = 'terminating'
+    else:
+        type_verb = 'changing'
+    date_string = t.transition_date.strftime('%m-%d-%y') if t.transition_date else ''
+
+    subject = f'New Gas PIN needed for { name_string }'
+
+    html_template = '../templates/email/employee-transition-gas-pin.html'
+    html_message = render_to_string(html_template, {
+        'name_string': name_string, 'type_verb': type_verb,
+        'date_string': date_string, 'transition_url': transition_url,
+        'sender_name': sender_name
+    })
+    plaintext_message = strip_tags(html_message)
+
+    # Send to Gas PIN admins
+    to_addresses = Group.objects.get(name='Gas PIN Admins').user_set.all().values_list('email', flat=True)
+
+    send_email_multiple(
+        to_addresses, [], subject, plaintext_message, html_message
+    )
+
 def send_transition_hr_email(
     t, extra_message=None, sender_name='', sender_email='', url=''
 ):

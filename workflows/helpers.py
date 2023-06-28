@@ -47,8 +47,7 @@ def send_transition_hr_email(
         cc_addresses.append(t.manager.user.email)
     sds_hiring_leads = Group.objects.get(name='SDS Hiring Lead').user_set.all().values_list('email', flat=True)
     for email in sds_hiring_leads:
-        if email != sender_email:
-            cc_addresses.append(email)
+        cc_addresses.append(email)
 
     send_email_multiple(
         to_addresses, cc_addresses, subject, plaintext_message, html_message

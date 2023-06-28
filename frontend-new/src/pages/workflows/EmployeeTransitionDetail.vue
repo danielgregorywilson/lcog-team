@@ -417,6 +417,7 @@
     <q-dialog v-model="showSendToHRDialog">
       <q-card class="q-pa-md" style="width: 400px">
         <div class="text-h6">Send transition to HR?</div>
+        <q-chip v-if="valuesAreChanged()" color="warning" text-color="white" icon="warning" label="Unsaved changes" />
         <q-form
           @submit='onSubmitSendDialog("HR")'
           class="q-gutter-md"
@@ -444,6 +445,7 @@
     <q-dialog v-model="showSendToSTNDialog">
       <q-card class="q-pa-md">
         <div class="text-h6">Send message to staff transition news?</div>
+        <q-chip v-if="valuesAreChanged()" color="warning" text-color="white" icon="warning" label="Unsaved changes" />
         <q-form
           @submit='onSubmitSendDialog("STN")'
           class="q-gutter-md"

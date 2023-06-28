@@ -476,10 +476,11 @@
         class="col-1"
         color="white"
         text-color="black"
-        label="Submit"
+        label="Save"
         :disabled="!valuesAreChanged()"
-        @click="updateTransitionAndClose()"
+        @click="updateTransition()"
       />
+      <q-chip v-if="valuesAreChanged()" color="warning" text-color="white" icon="warning" label="Unsaved changes" />
       <div>
         <q-btn
           v-if="changes && changes.length"
@@ -902,7 +903,10 @@ function valuesAreChanged(): boolean {
     secondLanguage.value == secondLanguageCurrentVal.value &&
     manager.value.pk == managerCurrentVal.value.pk &&
     unit.value.pk == unitCurrentVal.value.pk &&
-    transitionDate.value == transitionDateCurrentVal.value &&
+    (
+      transitionDate.value && transitionDateCurrentVal.value &&
+      Date.parse(transitionDate.value) == Date.parse(transitionDateCurrentVal.value)
+    ) &&
     preliminaryHire.value == preliminaryHireCurrentVal.value &&
     deleteProfile.value == deleteProfileCurrentVal.value &&
     officeLocation.value == officeLocationCurrentVal.value &&
@@ -974,7 +978,7 @@ function canSendToTransitionNews() {
   return cookies.get('is_hr_employee') == 'true'
 }
 
-function updateTransitionAndClose() {
+function updateTransition() {
   return new Promise((resolve, reject) => {
     if (!bilingual.value) {
       secondLanguage.value = ''
@@ -1106,8 +1110,6 @@ function updateTransitionAndClose() {
 
       if (formErrorItems().length > 0) {
         showErrorButton.value = true
-      } else {
-        router.push({ name: 'workflow-dashboard' })
       }
 
       // TODO: If a new computer is required, send an email to the IT department

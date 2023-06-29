@@ -906,8 +906,13 @@ function valuesAreChanged(): boolean {
     manager.value.pk == managerCurrentVal.value.pk &&
     unit.value.pk == unitCurrentVal.value.pk &&
     (
-      transitionDate.value && transitionDateCurrentVal.value &&
-      Date.parse(transitionDate.value) == Date.parse(transitionDateCurrentVal.value)
+      // If both dates are null, they are the same
+      (transitionDate.value == null && transitionDateCurrentVal.value == null) ||
+      // If both dates are not null, compare them as dates
+      (
+        !!transitionDate.value && !!transitionDateCurrentVal.value &&
+        Date.parse(transitionDate.value) == Date.parse(transitionDateCurrentVal.value)
+      )
     ) &&
     preliminaryHire.value == preliminaryHireCurrentVal.value &&
     deleteProfile.value == deleteProfileCurrentVal.value &&
@@ -998,9 +1003,10 @@ function updateTransition() {
     if (!showAccessEmails.value) {
       accessEmails.value = emptyEmployee
     }
-    let transitionDateSubmission = new Date()
+    
+    let transitionDateFromForm: Date | undefined = undefined
     if (transitionDate.value) {
-      transitionDateSubmission = new Date(transitionDate.value)
+      transitionDateFromForm = new Date(transitionDate.value)
     }
 
     // Mark for sending notifications
@@ -1028,7 +1034,7 @@ function updateTransition() {
       second_language: secondLanguage.value,
       manager_pk: manager.value.pk,
       unit_pk: unit.value.pk,
-      transition_date: transitionDateSubmission,
+      transition_date: transitionDateFromForm,
       preliminary_hire: preliminaryHire.value,
       delete_profile: deleteProfile.value,
       office_location: officeLocation.value,

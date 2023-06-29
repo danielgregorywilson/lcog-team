@@ -22,7 +22,8 @@ from timeoff.helpers import (
     send_manager_new_timeoff_request_notification
 )
 from workflows.helpers import (
-    send_transition_hr_email, send_transition_stn_email
+    send_gas_pin_notification_email, send_transition_hr_email,
+    send_transition_stn_email
 )
 from workflows.models import (
     EmployeeTransition, Process, ProcessInstance, Role, Step, StepChoice,
@@ -309,7 +310,11 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         else:
             t.unit = None
         
-        t.transition_date = request.data['transition_date']
+        if 'transition_date' in request.data:
+            t.transition_date = request.data['transition_date']
+        else:
+            t.transition_date = None
+
         t.preliminary_hire = request.data['preliminary_hire']
         t.delete_profile = request.data['delete_profile']
         t.office_location = request.data['office_location']
@@ -356,6 +361,16 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
     #     serialized_tor = TimeOffRequestSerializer(tor,
     #         context={'request': request})
     #     return Response(serialized_tor.data)
+
+    @action(detail=True, methods=['post'])
+    def send_gas_pin_notification_email(self, request, pk):
+        transition = EmployeeTransition.objects.get(pk=pk)
+        send_gas_pin_notification_email(
+            transition,
+            sender_name=request.data['senderName'],
+            sender_email=request.data['senderEmail'],
+            url=request.data['transition_url'] )
+        return Response("Gas PIN notification email sent.")
 
     @action(detail=True, methods=['post'])
     def send_transition_to_email_list(self, request, pk):

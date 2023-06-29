@@ -6,8 +6,8 @@
     </head>
     <body style="margin: 15px;">
         <p>Hello,</p>
-        <p>See link for a transition for {{ name_string }} {{ type_verb }} on {{ date_string }}.</p>
-        {% if extra_message %}<p>{{ extra_message }}</p>{% endif %}
+        <p>A new Gas PIN is needed for {{ name_string }} {{ type_verb }} on {{ date_string }}.</p>
+        <p>See link to view the transition:</p>
         <p><a href="{{ transition_url }}">{{ transition_url }}</a></p>
         <p>{{ sender_name }}</p>
     </body>

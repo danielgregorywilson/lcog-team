@@ -417,6 +417,7 @@
     <q-dialog v-model="showSendToHRDialog">
       <q-card class="q-pa-md" style="width: 400px">
         <div class="text-h6">Send transition to HR?</div>
+        <q-chip v-if="valuesAreChanged()" color="warning" text-color="white" icon="warning" label="Unsaved changes" />
         <q-form
           @submit='onSubmitSendDialog("HR")'
           class="q-gutter-md"
@@ -444,6 +445,7 @@
     <q-dialog v-model="showSendToSTNDialog">
       <q-card class="q-pa-md">
         <div class="text-h6">Send message to staff transition news?</div>
+        <q-chip v-if="valuesAreChanged()" color="warning" text-color="white" icon="warning" label="Unsaved changes" />
         <q-form
           @submit='onSubmitSendDialog("STN")'
           class="q-gutter-md"
@@ -476,10 +478,11 @@
         class="col-1"
         color="white"
         text-color="black"
-        label="Submit"
+        label="Save"
         :disabled="!valuesAreChanged()"
-        @click="updateTransitionAndClose()"
+        @click="updateTransition()"
       />
+      <q-chip v-if="valuesAreChanged()" color="warning" text-color="white" icon="warning" label="Unsaved changes" />
       <div>
         <q-btn
           v-if="changes && changes.length"
@@ -902,7 +905,15 @@ function valuesAreChanged(): boolean {
     secondLanguage.value == secondLanguageCurrentVal.value &&
     manager.value.pk == managerCurrentVal.value.pk &&
     unit.value.pk == unitCurrentVal.value.pk &&
-    transitionDate.value == transitionDateCurrentVal.value &&
+    (
+      // If both dates are null, they are the same
+      (transitionDate.value == null && transitionDateCurrentVal.value == null) ||
+      // If both dates are not null, compare them as dates
+      (
+        !!transitionDate.value && !!transitionDateCurrentVal.value &&
+        Date.parse(transitionDate.value) == Date.parse(transitionDateCurrentVal.value)
+      )
+    ) &&
     preliminaryHire.value == preliminaryHireCurrentVal.value &&
     deleteProfile.value == deleteProfileCurrentVal.value &&
     officeLocation.value == officeLocationCurrentVal.value &&
@@ -974,8 +985,9 @@ function canSendToTransitionNews() {
   return cookies.get('is_hr_employee') == 'true'
 }
 
-function updateTransitionAndClose() {
+function updateTransition() {
   return new Promise((resolve, reject) => {
+    // Clean fields
     if (!bilingual.value) {
       secondLanguage.value = ''
     } 
@@ -991,10 +1003,19 @@ function updateTransitionAndClose() {
     if (!showAccessEmails.value) {
       accessEmails.value = emptyEmployee
     }
-    let transitionDateSubmission = new Date()
+    
+    let transitionDateFromForm: Date | undefined = undefined
     if (transitionDate.value) {
-      transitionDateSubmission = new Date(transitionDate.value)
+      transitionDateFromForm = new Date(transitionDate.value)
     }
+
+    // Mark for sending notifications
+    let gasPINNotificationNeeded = false
+    if (gasPINNeededCurrentVal.value == false && gasPINNeeded.value == true) {
+      gasPINNotificationNeeded = true
+    }
+
+    // Update the DB
     workflowsStore.updateEmployeeTransition(transitionPk.value, {
       type: type.value,
       submitter_pk: userStore.getEmployeeProfile.employee_pk,
@@ -1013,7 +1034,7 @@ function updateTransitionAndClose() {
       second_language: secondLanguage.value,
       manager_pk: manager.value.pk,
       unit_pk: unit.value.pk,
-      transition_date: transitionDateSubmission,
+      transition_date: transitionDateFromForm,
       preliminary_hire: preliminaryHire.value,
       delete_profile: deleteProfile.value,
       office_location: officeLocation.value,
@@ -1106,8 +1127,11 @@ function updateTransitionAndClose() {
 
       if (formErrorItems().length > 0) {
         showErrorButton.value = true
-      } else {
-        router.push({ name: 'workflow-dashboard' })
+      }
+
+      // Send notification emails
+      if (gasPINNotificationNeeded && ['New', 'Return', 'Change/Modify'].indexOf(type.value) != -1) {
+        sendGasPINNotificationEmail()
       }
 
       // TODO: If a new computer is required, send an email to the IT department
@@ -1147,6 +1171,29 @@ function clickedErrorItem(item: [string, string]) {
     const duration = 500
     setVerticalScrollPosition(target, offset, duration)
   }
+}
+
+function sendGasPINNotificationEmail() {
+  workflowsStore.sendGasPINNotificationEmail(transitionPk.value, {
+    senderName: userStore.getEmployeeProfile.name,
+    senderEmail: userStore.getEmployeeProfile.email,
+    transition_url: route.fullPath
+  })
+    .then(() => {
+      quasar.notify({
+        message: 'Sent Gas PIN Notification Email',
+        color: 'positive',
+        icon: 'send'
+      })
+    })
+    .catch(e => {
+      console.error('Error sending Gas PIN Notification Email', e)
+      quasar.notify({
+        message: 'Error sending Gas PIN Notification Email',
+        color: 'negative',
+        icon: 'report_problem'
+      })
+    })
 }
 
 function onSubmitSendDialog(type: 'HR'|'STN') {

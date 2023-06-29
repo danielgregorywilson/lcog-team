@@ -679,6 +679,7 @@ export interface WorkflowInstance {
   title_pk?: number
   title_name?: string
   transition_date?: string
+  workflow_role_pk?: number
 }
 
 export type EmployeeID = 'CLSD' | 'CLID' | ''

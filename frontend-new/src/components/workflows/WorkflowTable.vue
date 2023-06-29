@@ -313,9 +313,9 @@ function canDeleteWorkflowInstance(workflowInstance: WorkflowInstance): boolean 
   if (userStore.getEmployeeProfile.is_all_workflows_admin) {
     // If they are an All-Workflows-Admin, allow delete
     return true
-  } else if (workflowInstance.workflow.role) {
+  } else if (workflowInstance.workflow_role_pk) {
     // If they are an admin of the workflow, allow delete
-    return userStore.getEmployeeProfile.workflow_roles.indexOf(workflowInstance.workflow.role) != -1
+    return userStore.getEmployeeProfile.workflow_roles.indexOf(workflowInstance.workflow_role_pk) != -1
   } else {
     // TODO: What should happen if no role assigned? Only admins? Everyone? Require all steps to have roles?
     return false

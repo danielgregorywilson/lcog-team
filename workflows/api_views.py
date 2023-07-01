@@ -136,17 +136,32 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
     #         return instances
 
     def create(self, request):
-        if self.request.data['type'] == 'new_employee_onboarding':
+        import pdb; pdb.set_trace()
+        wf = None
+        if request.data['type'] == 'employee_onboarding':
             et = EmployeeTransition.objects.create(type=EmployeeTransition.TRANSITION_TYPE_NEW)
-            wf = Workflow.objects.get(name="New Employee Onboarding")
-            wfi = WorkflowInstance.objects.create(workflow=wf, transition=et)
-            # Create process instances
-            for process in wf.processes.filter(workflow_start=True):
-                process.create_process_instance(wfi)
-            serialized_wfi = WorkflowInstanceSerializer(wfi,
-                context={'request': request}
-            )
-            return Response(serialized_wfi.data)
+            wf = Workflow.objects.get(name="Employee Onboarding")
+        elif request.data['type'] == 'employee_returning':
+            et = EmployeeTransition.objects.create(type=EmployeeTransition.TRANSITION_TYPE_RETURN)
+            # wf = Workflow.objects.get(name="Employee Returning")
+        elif request.data['type'] == 'employee_changing':
+            et = EmployeeTransition.objects.create(type=EmployeeTransition.TRANSITION_TYPE_CHANGE)
+            # wf = Workflow.objects.get(name="Employee Changing")
+        elif request.data['type'] == 'employee_exiting':
+            et = EmployeeTransition.objects.create(type=EmployeeTransition.TRANSITION_TYPE_EXIT)
+            # wf = Workflow.objects.get(name="Employee Exiting")
+        else:
+            return Response({'error': 'Invalid workflow type'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create workflow instance
+        wfi = WorkflowInstance.objects.create(workflow=wf, transition=et)
+        # Create process instances
+        for process in wf.processes.filter(workflow_start=True):
+            process.create_process_instance(wfi)
+        serialized_wfi = WorkflowInstanceSerializer(wfi,
+            context={'request': request}
+        )
+        return Response(serialized_wfi.data)
 
     # def update(self, request, pk=None):
     #     tor = TimeOffRequest.objects.get(pk=pk)

@@ -7,10 +7,8 @@ import { EmployeeTransition, EmployeeTransitionUpdate, WorkflowInstance } from '
 export const useWorkflowsStore = defineStore('workflows', {
   state: () => ({
     currentWorkflowInstance: {} as WorkflowInstance,
-    workflowsActionRequired: [] as Array<WorkflowInstance>,
-    workflowsComplete: [] as Array<WorkflowInstance>,
     workflowsIncomplete: [] as Array<WorkflowInstance>,
-    allWorkflows: [] as Array<WorkflowInstance>,
+    workflowsComplete: [] as Array<WorkflowInstance>,
   }),
 
   getters: {
@@ -36,12 +34,45 @@ export const useWorkflowsStore = defineStore('workflows', {
   actions: {
     createNewEmployeeOnboarding(): Promise<WorkflowInstance> {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/workflowinstance`, method: 'POST', data: {type: 'new_employee_onboarding'} })
+        axios({ url: `${ apiURL }api/v1/workflowinstance`, method: 'POST', data: {type: 'employee_onboarding'} })
           .then(resp => {
             resolve(resp.data)
           })
           .catch(e => {
             handlePromiseError(reject, 'Error creating new employee onboarding workflow instance', e)
+          })
+      })
+    },
+    createNewEmployeeReturning(): Promise<WorkflowInstance> {
+      return new Promise((resolve, reject) => {
+        axios({ url: `${ apiURL }api/v1/workflowinstance`, method: 'POST', data: {type: 'employee_returning'} })
+          .then(resp => {
+            resolve(resp.data)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error creating new employee returning workflow instance', e)
+          })
+      })
+    },
+    createNewEmployeeChanging(): Promise<WorkflowInstance> {
+      return new Promise((resolve, reject) => {
+        axios({ url: `${ apiURL }api/v1/workflowinstance`, method: 'POST', data: {type: 'employee_changing'} })
+          .then(resp => {
+            resolve(resp.data)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error creating new employee changing workflow instance', e)
+          })
+      })
+    },
+    createNewEmployeeExiting(): Promise<WorkflowInstance> {
+      return new Promise((resolve, reject) => {
+        axios({ url: `${ apiURL }api/v1/workflowinstance`, method: 'POST', data: {type: 'employee_exiting'} })
+          .then(resp => {
+            resolve(resp.data)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error creating new employee exiting workflow instance', e)
           })
       })
     },
@@ -58,27 +89,15 @@ export const useWorkflowsStore = defineStore('workflows', {
         })
     },
     // All workflow instances, optionally filtered to ongoing/completed
-    getWorkflows(data: {complete?: boolean, actionRequired?: boolean}) {
+    getWorkflows(data: {complete: boolean}) {
       let targetUrl: string
-      let workflowType: 'allWorkflows' | 'workflowsActionRequired' | 'workflowsComplete' | 'workflowsIncomplete'
-      if (data == undefined) {
-        targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true`
-        workflowType = 'allWorkflows'	
-      } else if (data.actionRequired !== undefined && data.actionRequired) {
-        targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true&action_required=true`
-        workflowType = 'workflowsActionRequired'
+      let workflowType: 'workflowsComplete' | 'workflowsIncomplete'
+      if (data.complete) {
+        targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true&complete=true`
+        workflowType = 'workflowsComplete'
       } else {
-        if (data.complete !== undefined) {
-          if (data.complete) {
-            targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true&complete=true`
-            workflowType = 'workflowsComplete'
-          } else {
-            targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true&complete=false`
-            workflowType = 'workflowsIncomplete'
-          }
-        } else {
-          // Todo: All? Error?
-        }
+        targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true&complete=false`
+        workflowType = 'workflowsIncomplete'
       }
       return new Promise((resolve, reject) => {
         axios({ url: targetUrl })

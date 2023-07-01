@@ -16,7 +16,7 @@
   <div class="text-h6">All Complete</div>
   <workflow-table :complete="true" /> -->
   <!-- <div class="text-h6">All</div> -->
-  <WorkflowTable :noPagination="true" />
+  <WorkflowTable :complete="true" type="all" :noPagination="true" />
 </template>
 
 <script setup lang="ts">

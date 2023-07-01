@@ -13,9 +13,9 @@
       :filter=tableFilter
       :filter-method=tableFilterMethod
       :grid="$q.screen.lt.md"
-      :no-data-label="noDataLabel()"
+      no-data-label="Nothing to show"
       row-key="name"
-      :rows-per-page-options="pagination()"
+      :rows-per-page-options="[0]"
     >
       <template v-slot:top-right>
         <q-input borderless dense clearable debounce="300" v-model="tableFilter" placeholder="Search">
@@ -103,7 +103,7 @@
         </div>
       </template>
       <template v-slot:bottom-row>
-        <q-tr @click="clickAddWorkflow('newEmployeeOnboarding')" class="cursor-pointer">
+        <q-tr @click="clickAddWorkflow()" class="cursor-pointer">
           <q-td colspan="100%">
             <q-icon name="add" size="md" class="q-pr-sm"/>New Position To Fill
           </q-td>
@@ -131,7 +131,7 @@
   </div>
 </template>
 
-<style scoped>
+<style lang="scss">
 .q-table tbody td.td-status {
     min-width: 135px;
     white-space: normal;
@@ -140,6 +140,9 @@
     min-width: 200px;
     white-space: normal;
 }
+.q-table__bottom {
+  display: none !important;
+}
 </style>
 
 <script setup lang="ts">
@@ -147,7 +150,7 @@ import { QTableProps, useQuasar } from 'quasar'
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { WorkflowInstance } from 'src/types'
+import { WorkflowInstanceSimple } from 'src/types'
 
 import { readableDate } from 'src/filters'
 import { useUserStore } from 'src/stores/user'
@@ -162,13 +165,14 @@ let workflowsLoaded = ref(false)
 
 let deleteDialogVisible = ref(false)
 let deleteDialogPositionName = ref('Not Set')
-let deleteDialogPercentComplete = ref('0')
+let deleteDialogPercentComplete = ref(0)
 let rowPkToDelete = ref('')
 
 const props = defineProps<{
-  complete?: boolean,
-  actionRequired?: boolean,
-  noPagination?: boolean,
+  complete: boolean,
+  type: 'all' | 'new' | 'return' | 'change' | 'exit'
+  // TODO: Move action required into the table as a column
+  // actionRequired?: boolean,
 }>()
 
 const columns: QTableProps['columns'] = [
@@ -180,18 +184,10 @@ const columns: QTableProps['columns'] = [
   { name: 'actions', label: 'Actions', align: 'center', field: '' },
 ]
 
-function pagination(): readonly any[] {
-  if (props.noPagination) {
-    return [0]
-  } else {
-    return [ 10, 30, 50, 0 ]
-  }
-}
-
 let tableFilter = ref('')
 
 function tableFilterMethod(rows: readonly any[], term: string) {
-  const tableRows = rows as WorkflowInstance[]
+  const tableRows = rows as WorkflowInstanceSimple[]
   const searchTerm = term ? term.toLowerCase() : ''
   const filteredRows = tableRows.filter(
     (row) => {
@@ -220,67 +216,64 @@ function tableFilterMethod(rows: readonly any[], term: string) {
   return filteredRows
 }
 
-function workflows(): Array<WorkflowInstance> {
-  if (props.actionRequired !== undefined && props.actionRequired) {
-    return workflowsStore.workflowsActionRequired
-  } else if (props.complete !== undefined) {
-    if (props.complete) {
-      return workflowsStore.workflowsComplete
-    } else {
-      return workflowsStore.workflowsIncomplete
+function workflows(): Array<WorkflowInstanceSimple> {
+  let workflows: Array<WorkflowInstanceSimple> = []
+  if (props.complete) {
+    workflows = workflowsStore.workflowsComplete
+  } else {
+    workflows = workflowsStore.workflowsIncomplete
+  }
+  return workflows.filter(
+    (row) => {
+      if (props.type == 'all') {
+        return true
+      } else {
+        const matchCriteria: Array<boolean> = []
+        // Filter by workflow type
+        if (props.type == 'new') {
+          const typeMatches = row.transition_type == 'New'
+          matchCriteria.push(typeMatches)
+        } else if (props.type == 'return') {
+          const typeMatches = row.transition_type == 'Return'
+          matchCriteria.push(typeMatches)
+        } else if (props.type == 'change') {
+          const typeMatches = row.transition_type == 'Change/Modify'
+          matchCriteria.push(typeMatches)
+        } else if (props.type == 'exit') {
+          const typeMatches = row.transition_type == 'Exit'
+          matchCriteria.push(typeMatches)
+        }
+        if (matchCriteria.some(c => !!c)) {
+          return true
+        }
+        // Assume row doesn't match
+        return false
+      }
     }
-  } else {
-    return workflowsStore.allWorkflows
-  }
-}
-
-function noDataLabel(): string {
-  if (props.actionRequired) {
-    return 'Great work! All done here.'
-  } else {
-    return 'Nothing to show.'
-  }
+  )
 }
 
 function retrieveWorkflows(): void {
-  if (props.actionRequired) {
-    workflowsStore.getWorkflows({actionRequired: true})
+  if (props.complete) {
+    workflowsStore.getWorkflows({complete: true})
       .then(() => {
         workflowsLoaded.value = true
       })
       .catch(e => {
-        console.error('Error retrieving workflows with action required:', e)
+        console.error('Error retrieving complete workflows:', e)
       })
-  } else if (props.complete == undefined) {
-    workflowsStore.getWorkflows({})
+  } else {
+    workflowsStore.getWorkflows({complete: false})
       .then(() => {
         workflowsLoaded.value = true
       })  
       .catch(e => {
-        console.error('Error retrieving all workflows:', e)
+        console.error('Error retrieving incomplete workflows:', e)
       })
-  } else {
-    if (props.complete) {
-      workflowsStore.getWorkflows({complete: true})
-        .then(() => {
-          workflowsLoaded.value = true
-        })
-        .catch(e => {
-          console.error('Error retrieving complete workflows:', e)
-        })
-    } else {
-      workflowsStore.getWorkflows({complete: false})
-        .then(() => {
-          workflowsLoaded.value = true
-        })  
-        .catch(e => {
-          console.error('Error retrieving incomplete workflows:', e)
-        })
-    }
   }
 }
 
-function editWorkflowInstance(workflowInstance: WorkflowInstance): void {
+function editWorkflowInstance(workflowInstance: WorkflowInstanceSimple): void {
   const rowPk = workflowInstance.pk.toString()
   router.push({name: 'workflow-processes', params: {pk: rowPk}})
     .catch(e => {
@@ -298,7 +291,7 @@ function canViewTransition(): boolean {
   return true
 }
 
-function editTransitionForm(workflowInstance: WorkflowInstance) {
+function editTransitionForm(workflowInstance: WorkflowInstanceSimple) {
   const rowPk = workflowInstance.pk.toString()
   router.push({name: 'workflow-transition-form', params: {pk: rowPk}} )
     .catch(e => {
@@ -306,7 +299,7 @@ function editTransitionForm(workflowInstance: WorkflowInstance) {
     })
 }
 
-function canDeleteWorkflowInstance(workflowInstance: WorkflowInstance): boolean {
+function canDeleteWorkflowInstance(workflowInstance: WorkflowInstanceSimple): boolean {
   if (workflowInstance.completed_at) {
     return false
   }
@@ -322,9 +315,9 @@ function canDeleteWorkflowInstance(workflowInstance: WorkflowInstance): boolean 
   }
 }
 
-function showDeleteDialog(row: WorkflowInstance): void {
+function showDeleteDialog(row: WorkflowInstanceSimple): void {
   rowPkToDelete.value = row.pk.toString()
-  deleteDialogPositionName.value = row.title
+  deleteDialogPositionName.value = row.title_name
   deleteDialogPercentComplete.value = row.percent_complete
   deleteDialogVisible.value = true
 }
@@ -340,47 +333,59 @@ function deleteRow(): void {
     })
 }
 
-// private editEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {
-//   // this.$router.push(`pr/${ props.row.pk }`)
-//   //   .catch(e => {
-//   //     console.error('Error navigating to PR detail:', e)
-//   //   })
-// }
-
-// private printEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {
-//   // this.$router.push(`print/pr/${ props.row.pk }`)
-//   //   .catch(e => {
-//   //     console.error('Error printing PR:', e)
-//   //   })
-// }
-
-// private printEvaluationPositionDescription(props: QuasarPerformanceReviewTableRowClickActionProps): void {
-//   // window.location.href = props.row.signed_position_description
-// }
-
-function clickAddWorkflow(type: 'newEmployeeOnboarding' | 'newEmployeeOffboarding'): void {
-  switch (type) {
-    case 'newEmployeeOnboarding':
+function clickAddWorkflow(): void {
+  switch (props.type) {
+    case 'all':
+    case 'new':
       workflowsStore.createNewEmployeeOnboarding()
         .then((wfi) => {
-          router.push({name: 'workflow-transition-form', params: {pk: wfi.pk.toString()}})
-            .catch(e => {
-              console.error('Error navigating to new employee page', e)
-            })
+          navigateToWorkflowTransitionForm(wfi.pk)
         })
         .catch(e => {
           console.error('Error creating a new employee onboarding workflow instance', e)
         })
       break
-    case 'newEmployeeOffboarding':
-      // TODO
+    case 'return':
+      workflowsStore.createNewEmployeeReturning()
+        .then((wfi) => {
+          navigateToWorkflowTransitionForm(wfi.pk)
+        })
+        .catch(e => {
+          console.error('Error creating a new employee onboarding workflow instance', e)
+        })
+      break
+    case 'change':
+      workflowsStore.createNewEmployeeChanging()
+        .then((wfi) => {
+          navigateToWorkflowTransitionForm(wfi.pk)
+        })
+        .catch(e => {
+          console.error('Error creating a new employee onboarding workflow instance', e)
+        })
+      break
+    case 'exit':
+      workflowsStore.createNewEmployeeExiting()
+        .then((wfi) => {
+          navigateToWorkflowTransitionForm(wfi.pk)
+        })
+        .catch(e => {
+          console.error('Error creating a new employee onboarding workflow instance', e)
+        })
       break
     default:
       break
   }
+
+  function navigateToWorkflowTransitionForm(pk: number): void {
+    router.push({name: 'workflow-transition-form', params: {pk: pk.toString()}})
+      .catch(e => {
+        console.error('Error navigating to workflow transition form:', e)
+      })
+  }
 }
 
 onMounted(() => {
+  // TODO: Check if already loaded in Pinia
   retrieveWorkflows()
 })
 </script>

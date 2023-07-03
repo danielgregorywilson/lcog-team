@@ -102,7 +102,7 @@
           </q-card>
         </div>
       </template>
-      <template v-slot:bottom-row>
+      <template v-slot:bottom-row v-if="props.allowAddDelete">
         <q-tr @click="clickAddWorkflow()" class="cursor-pointer">
           <q-td colspan="100%">
             <q-icon name="add" size="md" class="q-pr-sm"/>New Position To Fill
@@ -147,7 +147,7 @@
 
 <script setup lang="ts">
 import { QTableProps, useQuasar } from 'quasar'
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { WorkflowInstanceSimple } from 'src/types'
@@ -161,7 +161,7 @@ const router = useRouter()
 const userStore = useUserStore()
 const workflowsStore = useWorkflowsStore()
 
-let workflowsLoaded = ref(false)
+let workflowsLoaded = ref(true)
 
 let deleteDialogVisible = ref(false)
 let deleteDialogPositionName = ref('Not Set')
@@ -171,8 +171,13 @@ let rowPkToDelete = ref('')
 const props = defineProps<{
   complete: boolean,
   type: 'all' | 'new' | 'return' | 'change' | 'exit'
+  allowAddDelete: boolean,
   // TODO: Move action required into the table as a column
   // actionRequired?: boolean,
+}>()
+
+const emit = defineEmits<{
+  (e: 'retrieve'): void
 }>()
 
 const columns: QTableProps['columns'] = [
@@ -253,26 +258,6 @@ function workflows(): Array<WorkflowInstanceSimple> {
   )
 }
 
-function retrieveWorkflows(): void {
-  if (props.complete) {
-    workflowsStore.getWorkflows({complete: true})
-      .then(() => {
-        workflowsLoaded.value = true
-      })
-      .catch(e => {
-        console.error('Error retrieving complete workflows:', e)
-      })
-  } else {
-    workflowsStore.getWorkflows({complete: false})
-      .then(() => {
-        workflowsLoaded.value = true
-      })  
-      .catch(e => {
-        console.error('Error retrieving incomplete workflows:', e)
-      })
-  }
-}
-
 function editWorkflowInstance(workflowInstance: WorkflowInstanceSimple): void {
   const rowPk = workflowInstance.pk.toString()
   router.push({name: 'workflow-processes', params: {pk: rowPk}})
@@ -326,7 +311,7 @@ function deleteRow(): void {
   workflowsStore.deleteWorkflowInstance(rowPkToDelete.value)
     .then(() => {
       quasar.notify('Deleted a workflow.')
-      retrieveWorkflows()
+      emit('retrieve')
     })
     .catch(e => {
       console.error('Error deleting workflow', e)
@@ -383,9 +368,4 @@ function clickAddWorkflow(): void {
       })
   }
 }
-
-onMounted(() => {
-  // TODO: Check if already loaded in Pinia
-  retrieveWorkflows()
-})
 </script>

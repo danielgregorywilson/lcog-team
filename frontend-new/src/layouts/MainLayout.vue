@@ -95,6 +95,7 @@ import { UserAgentApplication } from 'msal'
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from 'src/stores/auth'
 import { useUserStore } from 'src/stores/user'
+import { getCurrentUser } from 'src/utils'
 import { Configuration } from 'electron-builder'
 import NavLink from 'components/NavLink.vue'
 import { useRouter } from 'vue-router'
@@ -207,15 +208,6 @@ function isAuthenticated(): boolean {
 
 function emplayeeName(): string {
   return userStore['getEmployeeProfile'].name
-}
-
-function getCurrentUser(): void {
-  if (authStore.isAuthenticated && !userStore.isProfileLoaded) {
-    userStore.userRequest()
-      .catch(e => {
-        console.error('Error getting user from store', e)
-      })
-  }
 }
 
 function loginWithMicrosoft(): void {

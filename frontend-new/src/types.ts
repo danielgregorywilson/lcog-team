@@ -666,20 +666,24 @@ export type ProcessInstance = {
   percent_complete: number
 }
 
+export interface WorkflowInstanceSimple {
+  pk: number
+  started_at: string
+  completed_at: string
+  percent_complete: number
+  employee_name: string
+  title_name: string
+  transition_type: string
+  transition_date: string
+  workflow_role_pk: number
+}
+
 export interface WorkflowInstance {
   pk: number
   workflow: Workflow
-  started_at: string
-  completed_at: string
   process_instances: Array<ProcessInstance>
-  transition?: EmployeeTransition
-  title: string
+  transition: EmployeeTransition
   percent_complete: number
-  employee_name?: string
-  title_pk?: number
-  title_name?: string
-  transition_date?: string
-  workflow_role_pk?: number
 }
 
 export type EmployeeID = 'CLSD' | 'CLID' | ''

@@ -88,13 +88,16 @@
               <q-item v-for="col in props.cols" :key="col.name">
                 <div class="q-table__grid-item-row">
                   <div class="q-table__grid-item-title">{{ col.label }}</div>
-                  <div class="q-table__grid-item-value" v-if="col.label != 'Actions'">
-                    {{ col.value }}
-                  </div>
-                  <div class="q-table__grid-item-value row q-gutter-sm" v-else>
+                  <div class="q-table__grid-item-value row q-gutter-sm" v-if="col.label == 'Actions'">
                     <q-btn class="col" dense round flat color="grey" @click="editWorkflowInstance(props.row)" icon="play_arrow"></q-btn>
                     <q-btn v-if="workflowHasTransition() && canViewTransition()" class="col" dense round flat color="grey" @click="editTransitionForm(props.row)" icon="assignment"></q-btn>
                     <q-btn v-if="canDeleteWorkflowInstance(props.row)" class="col" dense round flat color="grey" @click="showDeleteDialog(props.row)" icon="delete"></q-btn>
+                  </div>
+                  <div class="q-table__grid-item-value" v-else-if="col.label.indexOf('Date') != -1">
+                    {{ readableDate(col.value) }}
+                  </div>
+                  <div class="q-table__grid-item-value" v-else>
+                    {{ col.value }}
                   </div>
                 </div>
               </q-item>

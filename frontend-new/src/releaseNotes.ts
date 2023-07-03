@@ -4,6 +4,16 @@
 
 export const releases = [
   {
+    version: '0.13.7',
+    date: new Date(2023, 6, 3),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Split out workflows by type in dashboard: onboarding, returning, changing, exiting'
+      }
+    ]
+  },
+  {
     version: '0.13.6',
     date: new Date(2023, 5, 29),
     changes: [

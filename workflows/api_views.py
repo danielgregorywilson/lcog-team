@@ -136,20 +136,19 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
     #         return instances
 
     def create(self, request):
-        import pdb; pdb.set_trace()
         wf = None
         if request.data['type'] == 'employee_onboarding':
             et = EmployeeTransition.objects.create(type=EmployeeTransition.TRANSITION_TYPE_NEW)
             wf = Workflow.objects.get(name="Employee Onboarding")
         elif request.data['type'] == 'employee_returning':
             et = EmployeeTransition.objects.create(type=EmployeeTransition.TRANSITION_TYPE_RETURN)
-            # wf = Workflow.objects.get(name="Employee Returning")
+            wf = Workflow.objects.get(name="Employee Returning")
         elif request.data['type'] == 'employee_changing':
             et = EmployeeTransition.objects.create(type=EmployeeTransition.TRANSITION_TYPE_CHANGE)
-            # wf = Workflow.objects.get(name="Employee Changing")
+            wf = Workflow.objects.get(name="Employee Changing")
         elif request.data['type'] == 'employee_exiting':
             et = EmployeeTransition.objects.create(type=EmployeeTransition.TRANSITION_TYPE_EXIT)
-            # wf = Workflow.objects.get(name="Employee Exiting")
+            wf = Workflow.objects.get(name="Employee Exiting")
         else:
             return Response({'error': 'Invalid workflow type'}, status=status.HTTP_400_BAD_REQUEST)
         

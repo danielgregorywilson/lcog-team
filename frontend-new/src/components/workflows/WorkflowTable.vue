@@ -108,7 +108,7 @@
       <template v-slot:bottom-row v-if="props.allowAddDelete">
         <q-tr @click="clickAddWorkflow()" class="cursor-pointer">
           <q-td colspan="100%">
-            <q-icon name="add" size="md" class="q-pr-sm"/>New Position To Fill
+            <q-icon name="add" size="md" class="q-pr-sm"/>New Workflow
           </q-td>
         </q-tr>
       </template>

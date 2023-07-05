@@ -287,7 +287,9 @@ class Process(models.Model):
 
     @property
     def total_steps(self):
-        return self.step_set.filter(end=True).first().num_steps_before + 1
+        # Count the number of steps before the final one. Don't count the final
+        # step because it is the "complete" step and cannot be completed.
+        return self.step_set.filter(end=True).first().num_steps_before
 
     def create_process_instance(self, wfi):
         pi = ProcessInstance.objects.create(
@@ -430,21 +432,33 @@ class Step(models.Model):
 
     @property
     def num_steps_after(self):
+        """
+        Count the number of steps after the current step. Since there are
+        multiple possible paths to the end of a process, just get one route
+        forward and call that sufficient.
+        TODO: Rewrite to calculate the best-case (quickest) path forward (or
+        worst case, or average of all cases)
+        """
         num_steps = 0
         current_step = self
         while True:
             if current_step.end == True:
+                # We have reached the end of the process.
                 break
             else:
+                # Look for the next step
                 if current_step.next_step:
                     current_step = current_step.next_step
                 else:
+                    # In the case of a choice, there is no next step, so find
+                    # the first choice that leads to a step.
                     step_choice = StepChoice.objects.filter(
                         step=current_step
                     ).first()
                     if not step_choice:
                         raise Exception("Couldn't find a next step.")
                     current_step = step_choice.next_step
+                num_steps += 1
         return num_steps
 
     #TODO: On save, error if no next and not end
@@ -542,9 +556,13 @@ class ProcessInstance(HasTimeStampsMixin):
             return 100
         else:
             num_steps_before = self.current_step_instance.step.num_steps_before
-            print("PI STEPS", self.pk, num_steps_before)
             num_steps_after = self.current_step_instance.step.num_steps_after
-            total_steps = num_steps_before + 1 + num_steps_after
+            # Add the steps before, the current step, and the steps after, but
+            # subtract one because the final step is the "complete" step and
+            # cannot be completed.
+            total_steps = num_steps_before + 1 + num_steps_after - 1
+            if total_steps == 0:
+                return 0
             return int((num_steps_before / total_steps) * 100)
 
     @property

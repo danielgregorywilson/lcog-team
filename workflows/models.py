@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext as _
 
-from mainsite.models import LANGUAGE_CHOICES
+from mainsite.models import ActiveManager, InactiveManager, LANGUAGE_CHOICES
 from people.models import Employee, JobTitle, UnitOrProgram
 
 
@@ -500,10 +500,15 @@ class WorkflowInstance(HasTimeStampsMixin):
     def __str__(self):
         return "WorkflowInstance ({}): {}".format(self.pk, self.workflow)
 
+    objects = models.Manager()
+    active_objects = ActiveManager()
+    inactive_objects = InactiveManager()
+
     workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE)
     transition = models.OneToOneField(
         EmployeeTransition, blank=True, null=True, on_delete=models.SET_NULL
     )
+    active = models.BooleanField(default=True)
 
     # @property
     # def current_step_instance(self):

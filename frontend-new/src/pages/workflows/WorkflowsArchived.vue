@@ -1,15 +1,21 @@
 <template>
-  <div class="row items-center q-mb-md">
-    <q-avatar
-      icon="person"
-      color="primary"
-      text-color="white"
-      font-size="32px"
-      class="q-mr-sm"
-    />
-    <div class="text-h4">Archive</div>
+  <div class="row q-mb-md">
+    <q-btn-group push>
+      <q-btn push color="primary" glossy label="Active" :to="{ name: 'workflow-dashboard' }" />
+      <q-btn push color="primary" glossy label="Complete" :to="{ name: 'workflows-complete-onboarding' }" />
+      <q-btn push color="secondary" glossy label="Deleted" :to="{ name: 'workflows-archived' }"  />
+    </q-btn-group>
   </div>
-  <WorkflowTable :complete="true" type="all" :allowAddDelete="false" />
+  <div class="row items-center q-mb-md">
+    <div class="text-h5">Deleted</div>
+  </div>
+  <WorkflowTable
+    :archived="true"
+    :complete="false"
+    type="all"
+    :allowAddDelete="false"
+    v-on:retrieve="retrieveWorkflows"
+  />
 </template>
 
 <script setup lang="ts">
@@ -32,7 +38,7 @@ function userHasWorkflowRoles() {
 }
 
 function retrieveWorkflows(): void {
-  workflowsStore.getWorkflows({complete: false})
+  workflowsStore.getWorkflows({archived: true, complete: false})
     .then(() => {
       workflowsLoaded.value = true
     })  

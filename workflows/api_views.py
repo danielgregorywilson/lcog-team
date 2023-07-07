@@ -116,24 +116,21 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
             return WorkflowInstanceSimpleSerializer
         return super().get_serializer_class()
 
-    # def get_queryset(self):
-    #     """
+    def get_queryset(self):
+        """
 
-    #     """
-    #     user = self.request.user
-    #     if user.is_authenticated:
-    #         action_required = self.request.query_params.get('action_required',
-    #             None)
-    #         complete = self.request.query_params.get('complete', None)
-    #         if action_required is not None and is_true_string(action_required):
-    #             queryset = WorkflowInstance.action_required.get_queryset(user)
-            
-            
-    #         if user.is_superuser:
-    #             instances = WorkflowInstance.objects.all()
-    #         else:
-    #             instances = WorkflowInstance.objects.none()
-    #         return instances
+        """
+        user = self.request.user
+        if user.is_authenticated:
+            archived = self.request.query_params.get('archived', None)
+            if archived is not None and is_true_string(archived):
+                return WorkflowInstance.inactive_objects.all()
+            elif archived is not None and not is_true_string(archived):
+                return WorkflowInstance.active_objects.all()
+            return WorkflowInstance.objects.all()
+        else:
+            return Employee.objects.none()
+
 
     def create(self, request):
         wf = None
@@ -180,17 +177,21 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
     #         context={'request': request})
     #     return Response(serialized_tor.data)
     
-    # def partial_update(self, request, pk=None):
-    #     """
-    #     Acknowledge a time off request.
-    #     """
-    #     tor = TimeOffRequest.objects.get(pk=pk)
-    #     tor.acknowledged = request.data['acknowledged']
-    #     tor.save()
-    #     send_employee_manager_acknowledged_timeoff_request_notification(tor)
-    #     serialized_tor = TimeOffRequestSerializer(tor,
-    #         context={'request': request})
-    #     return Response(serialized_tor.data)
+    def partial_update(self, request, pk=None):
+        """
+        Archive or restore a workflow instance.
+        """
+        wfi = WorkflowInstance.objects.get(pk=pk)
+        if request.data['action'] == 'archive':
+            wfi.active = False
+        elif request.data['action'] == 'restore':
+            wfi.active = True
+        else:
+            return Response({'error': 'Invalid action'}, status=status.HTTP_400_BAD_REQUEST)
+        wfi.save()
+        serialized_wfi = WorkflowInstanceSerializer(wfi,
+            context={'request': request})
+        return Response(serialized_wfi.data)
 
     def destroy(self, request, pk=None):
         instance = self.get_object()
@@ -427,8 +428,7 @@ class ProcessViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        This view should return a list of all time off requests for which
-        the currently authenticated user is the manager.
+
         """
         user = self.request.user
         if user.is_authenticated:

@@ -61,7 +61,8 @@
         <q-td key="actions" :props="props">
           <q-btn class="col" dense round flat color="grey" @click="editWorkflowInstance(props.row)" icon="play_arrow"></q-btn>
           <q-btn v-if="workflowHasTransition() && canViewTransition()" class="col" dense round flat color="grey" @click="editTransitionForm(props.row)" icon="assignment"></q-btn>
-          <q-btn v-if="canDeleteWorkflowInstance(props.row)" class="col" dense round flat color="grey" @click="showDeleteDialog(props.row)" icon="delete"></q-btn>
+          <q-btn v-if="!archived && canDeleteWorkflowInstance(props.row)" class="col" dense round flat color="grey" @click="showArchiveDialog(props.row)" icon="delete"></q-btn>
+          <q-btn v-if="archived && canDeleteWorkflowInstance(props.row)" class="col" dense round flat color="grey" @click="showArchiveDialog(props.row)" icon="restore_from_trash"></q-btn>
         </q-td>
       </template>
       <!-- <template v-slot:body-cell-status="props">
@@ -91,7 +92,8 @@
                   <div class="q-table__grid-item-value row q-gutter-sm" v-if="col.label == 'Actions'">
                     <q-btn class="col" dense round flat color="grey" @click="editWorkflowInstance(props.row)" icon="play_arrow"></q-btn>
                     <q-btn v-if="workflowHasTransition() && canViewTransition()" class="col" dense round flat color="grey" @click="editTransitionForm(props.row)" icon="assignment"></q-btn>
-                    <q-btn v-if="canDeleteWorkflowInstance(props.row)" class="col" dense round flat color="grey" @click="showDeleteDialog(props.row)" icon="delete"></q-btn>
+                    <q-btn v-if="!archived && canDeleteWorkflowInstance(props.row)" class="col" dense round flat color="grey" @click="showArchiveDialog(props.row)" icon="delete"></q-btn>
+                    <q-btn v-if="archived && canDeleteWorkflowInstance(props.row)" class="col" dense round flat color="grey" @click="showArchiveDialog(props.row)" icon="restore_from_trash"></q-btn>
                   </div>
                   <div class="q-table__grid-item-value" v-else-if="col.label.indexOf('Date') != -1">
                     {{ readableDate(col.value) }}
@@ -119,7 +121,7 @@
         <q-card-section>
           <div class="row items-center">
             <q-avatar icon="insert_chart_outlined" color="primary" text-color="white" />
-            <span class="q-ml-sm">Are you sure you want to delete this workflow?</span>
+            <span class="q-ml-sm">Are you sure you want to <span v-if="!archived">delete</span><span v-else>restore</span> this workflow?</span>
           </div>
           <div class="row justify-center text-center">Position: {{ deleteDialogPositionName }}</div>
           <div class="row justify-center text-center">{{ deleteDialogPercentComplete }}% Complete</div>
@@ -127,7 +129,8 @@
 
         <q-card-actions class="row justify-around">
           <q-btn flat label="Cancel" color="primary" v-close-popup />
-          <q-btn flat label="Yes, delete it" color="primary" @click="deleteRow()" v-close-popup />
+          <q-btn v-if="!archived" flat label="Yes, delete it" color="primary" @click="deleteRow()" v-close-popup />
+          <q-btn v-else flat label="Yes, restore it" color="primary" @click="restoreRow()" v-close-popup />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -169,9 +172,10 @@ let workflowsLoaded = ref(true)
 let deleteDialogVisible = ref(false)
 let deleteDialogPositionName = ref('Not Set')
 let deleteDialogPercentComplete = ref(0)
-let rowPkToDelete = ref('')
+let rowPkToArchive = ref('')
 
 const props = defineProps<{
+  archived: boolean,
   complete: boolean,
   type: 'all' | 'new' | 'return' | 'change' | 'exit'
   allowAddDelete: boolean,
@@ -226,7 +230,9 @@ function tableFilterMethod(rows: readonly any[], term: string) {
 
 function workflows(): Array<WorkflowInstanceSimple> {
   let workflows: Array<WorkflowInstanceSimple> = []
-  if (props.complete) {
+  if (props.archived) {
+    workflows = workflowsStore.workflowsArchived
+  } else if (props.complete) {
     workflows = workflowsStore.workflowsComplete
   } else {
     workflows = workflowsStore.workflowsIncomplete
@@ -303,21 +309,32 @@ function canDeleteWorkflowInstance(workflowInstance: WorkflowInstanceSimple): bo
   }
 }
 
-function showDeleteDialog(row: WorkflowInstanceSimple): void {
-  rowPkToDelete.value = row.pk.toString()
+function showArchiveDialog(row: WorkflowInstanceSimple): void {
+  rowPkToArchive.value = row.pk.toString()
   deleteDialogPositionName.value = row.title_name
   deleteDialogPercentComplete.value = row.percent_complete
   deleteDialogVisible.value = true
 }
 
 function deleteRow(): void {
-  workflowsStore.deleteWorkflowInstance(rowPkToDelete.value)
+  workflowsStore.archiveWorkflowInstance(rowPkToArchive.value)
     .then(() => {
       quasar.notify('Deleted a workflow.')
       emit('retrieve')
     })
     .catch(e => {
       console.error('Error deleting workflow', e)
+    })
+}
+
+function restoreRow(): void {
+  workflowsStore.restoreWorkflowInstance(rowPkToArchive.value)
+    .then(() => {
+      quasar.notify('Restored a workflow.')
+      emit('retrieve')
+    })
+    .catch(e => {
+      console.error('Error restoring workflow', e)
     })
 }
 

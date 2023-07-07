@@ -9,6 +9,7 @@ export const useWorkflowsStore = defineStore('workflows', {
     currentWorkflowInstance: {} as WorkflowInstance,
     workflowsIncomplete: [] as Array<WorkflowInstance>,
     workflowsComplete: [] as Array<WorkflowInstance>,
+    workflowsArchived: [] as Array<WorkflowInstance>,
   }),
 
   getters: {
@@ -89,14 +90,17 @@ export const useWorkflowsStore = defineStore('workflows', {
         })
     },
     // All workflow instances, optionally filtered to ongoing/completed
-    getWorkflows(data: {complete: boolean}) {
+    getWorkflows(data: {archived: boolean, complete: boolean}) {
       let targetUrl: string
-      let workflowType: 'workflowsComplete' | 'workflowsIncomplete'
-      if (data.complete) {
-        targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true&complete=true`
+      let workflowType: 'workflowsComplete' | 'workflowsIncomplete' | 'workflowsArchived'
+      if (data.archived) {
+        targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true&archived=true`
+        workflowType = 'workflowsArchived'
+      } else if (data.complete) {
+        targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true&archived=false&complete=true`
         workflowType = 'workflowsComplete'
       } else {
-        targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true&complete=false`
+        targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true&archived=false&complete=false`
         workflowType = 'workflowsIncomplete'
       }
       return new Promise((resolve, reject) => {
@@ -170,14 +174,25 @@ export const useWorkflowsStore = defineStore('workflows', {
           })
       })
     },
-    deleteWorkflowInstance(workflowInstancePk: string) {
+    archiveWorkflowInstance(workflowInstancePk: string) {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/workflowinstance/${ workflowInstancePk }`, method: 'DELETE' })
+        axios({ url: `${ apiURL }api/v1/workflowinstance/${ workflowInstancePk }`, data: {action: 'archive'}, method: 'PATCH' })
           .then(resp => {
             resolve(resp)
           })
           .catch(e => {
-            handlePromiseError(reject, 'Error deleting workflow instance', e)
+            handlePromiseError(reject, 'Error archiving workflow instance', e)
+          })
+      })
+    },
+    restoreWorkflowInstance(workflowInstancePk: string) {
+      return new Promise((resolve, reject) => {
+        axios({ url: `${ apiURL }api/v1/workflowinstance/${ workflowInstancePk }`, data: {action: 'restore'}, method: 'PATCH' })
+          .then(resp => {
+            resolve(resp)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error restoring workflow instance', e)
           })
       })
     },

@@ -537,6 +537,13 @@ class WorkflowInstance(HasTimeStampsMixin):
     def transition_date(self):
         if self.transition:
             return self.transition.transition_date
+        
+    def employee_action_required(self, employee):
+        # Return True if the employee is responsible for completing the current step of any of the process instances
+        for pi in self.processinstance_set.all():
+            if pi.employee_action_required(employee):
+                return True
+        return False
 
 
 class ProcessInstance(HasTimeStampsMixin):
@@ -581,6 +588,10 @@ class ProcessInstance(HasTimeStampsMixin):
         else:
             return self.current_step_instance.step.num_steps_before
 
+    def employee_action_required(self, employee):
+        # Return True if the employee is responsible for completing the current step
+        return employee.workflow_roles.indexOf(self.current_step_instance.step.role) > -1
+
 
 class StepInstance(HasTimeStampsMixin):
     class Meta:
@@ -612,4 +623,8 @@ class StepInstance(HasTimeStampsMixin):
             # If there is no next step, we can undo
             return True
 
-    #TODO: Complete method fills completed_at, completed_by, and current_step_instance and completed_at on Workflow instance
+    #TODO: Complete method fills completed_at, completed_by, and current_step_instance and completed_at on Workflow instance. This is currently done in the view, but maybe it should be here?
+
+    def employee_action_required(self, employee):
+        # Return True if the employee is responsible for completing this step
+        return employee.workflow_roles.indexOf(self.step.role) > -1

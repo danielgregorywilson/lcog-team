@@ -590,7 +590,10 @@ class ProcessInstance(HasTimeStampsMixin):
 
     def employee_action_required(self, employee):
         # Return True if the employee is responsible for completing the current step
-        return employee.workflow_roles.indexOf(self.current_step_instance.step.role) > -1
+        current_step = self.current_step_instance.step
+        if current_step.role:
+            return employee.workflow_roles.filter(pk=self.current_step_instance.step.role.pk).count() > 0
+        return False
 
 
 class StepInstance(HasTimeStampsMixin):
@@ -627,4 +630,6 @@ class StepInstance(HasTimeStampsMixin):
 
     def employee_action_required(self, employee):
         # Return True if the employee is responsible for completing this step
-        return employee.workflow_roles.indexOf(self.step.role) > -1
+        if self.step.role:
+            return employee.workflow_roles.filter(pk=self.step.role.pk).count() > 0
+        return False

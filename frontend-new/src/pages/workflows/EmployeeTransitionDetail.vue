@@ -595,7 +595,7 @@ const quasar = useQuasar()
 const { getScrollTarget, setVerticalScrollPosition  } = scroll
 const route = useRoute()
 const router = useRouter()
-const { bus } = useEventBus()
+const bus = useEventBus()
 const { cookies } = useCookies()
 const peopleStore = usePeopleStore()
 const userStore = useUserStore()
@@ -1215,6 +1215,10 @@ function onSubmitSendDialog(type: 'HR'|'STN') {
       showSendToSTNDialog.value = false
       sendDialogUpdate.value = false
       sendDialogMessage.value = ''
+      if (type == 'STN') {
+        // Signal to WorkflowInstanceDetail that process instances were created.
+        bus.emit('processInstancesCreated', Math.random())
+      }
     })
     .catch(e => {
       console.error('Error sending email', e)
@@ -1266,7 +1270,7 @@ function handlePrint() {
   }
 }
 
-watch(() => bus.value.get('workflowInstanceRetrieved'), () => {
+watch(() => bus.bus.value.get('workflowInstanceRetrieved'), () => {
   // TODO: We should only set state once, but when you load /transition
   // this runs twice
   retrieveEmployeeTransition()

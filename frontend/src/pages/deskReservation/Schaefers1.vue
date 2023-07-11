@@ -2,12 +2,12 @@
   <q-page class="q-mt-xs" id="schaefers-1-page">
     <div class="row justify-between items-center">
       <div class="row items-center q-ml-sm">
-          <q-btn-group push class="">
-            <q-btn push color="secondary" glossy label="1F" :to="{ name: 'schaefers-1' }" />
-            <q-btn push color="primary" glossy label="2F" :to="{ name: 'schaefers-2' }" />
-            <q-btn push color="primary" glossy label="3F" :to="{ name: 'schaefers-3' }"  />
-          </q-btn-group>
-        </div>
+        <q-btn-group push>
+          <q-btn push color="secondary" glossy label="1F" :to="{ name: 'schaefers-1' }" />
+          <q-btn push color="primary" glossy label="2F" :to="{ name: 'schaefers-2' }" />
+          <q-btn push color="primary" glossy label="3F" :to="{ name: 'schaefers-3' }"  />
+        </q-btn-group>
+      </div>
       <div class="row items-center q-gutter-md">
         <q-icon name="help" color="primary" size=48px class="cursor-pointer" @click="showHelp()" />
         <q-select class="" v-model="selectedEmployee" :options="employees()" option-value="pk" option-label="name" label="Select your name" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">

@@ -119,4 +119,12 @@ watch(() => bus.bus.value.get('completedStep'), () => {
       console.error('Error retrieving workflow instance:', e)
     })
 })
+
+watch(() => bus.bus.value.get('processInstancesCreated'), () => {
+  // When transition form is sent, process instances are created, so get them.
+  retrieveWorkflowInstance()
+    .catch(e => {
+      console.error('Error retrieving workflow instance:', e)
+    })
+})
 </script>

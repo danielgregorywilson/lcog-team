@@ -10,6 +10,11 @@ class ActiveManager(models.Manager):
         return super().get_queryset().filter(active=True)
 
 
+class InactiveManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(active=False)
+
+
 class ImageUpload(models.Model):
     description = models.CharField(_("description"), max_length=255)
     image = models.ImageField(upload_to="uploads/image-upload")

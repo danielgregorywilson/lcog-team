@@ -7,7 +7,7 @@ from django.utils.html import strip_tags
 
 from mainsite.helpers import send_email, send_email_multiple
 from people.models import JobTitle
-from workflows.models import EmployeeTransition
+from workflows.models import EmployeeTransition, ProcessInstance
 
 STAFF_TRANSITION_NEWS_EMAIL = os.environ.get('STAFF_TRANSITION_NEWS_EMAIL')
 
@@ -123,3 +123,17 @@ def send_transition_stn_email(t, update=False, extra_message=None, sender_name='
     send_email(
         STAFF_TRANSITION_NEWS_EMAIL, subject, plaintext_message, html_message
     )
+
+def create_process_instances(transition):
+    # Create process instances for staff transition workflows. Triggered when
+    # a transition form is sent to Staff Transition News.
+    onboarding_processes_start = [
+        'HR Onboarding', 'IS Onboarding', 'IS Telecom Onboarding',
+        'SDS Facilities Onboarding', 'SDS Onboarding', 'SDS Phone Onboarding'
+    ]
+    wfi = transition.workflowinstance
+    if (transition.type == EmployeeTransition.TRANSITION_TYPE_NEW):
+        for process in wfi.workflow.processes.filter(name__in=onboarding_processes_start):
+            existing_pis = ProcessInstance.objects.filter(process=process, workflow_instance=wfi)
+            if existing_pis.count() == 0:
+                process.create_process_instance(wfi)

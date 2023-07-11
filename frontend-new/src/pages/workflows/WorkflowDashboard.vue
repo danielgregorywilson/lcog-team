@@ -1,4 +1,11 @@
 <template>
+  <div class="row q-mb-md">
+    <q-btn-group push>
+      <q-btn push color="secondary" glossy label="Active" :to="{ name: 'workflow-dashboard' }" />
+      <q-btn push color="primary" glossy label="Complete" :to="{ name: 'workflows-complete-onboarding' }" />
+      <q-btn push color="primary" glossy label="Deleted" :to="{ name: 'workflows-archived' }"  />
+    </q-btn-group>
+  </div>
   <div class="row items-center q-mb-sm">
     <q-avatar
       icon="person_add"
@@ -11,6 +18,7 @@
     <div class="text-h5">Employees Onboarding</div>
   </div>
   <WorkflowTable
+    :archived="false"
     :complete="false"
     type="new"
     :allowAddDelete="true"
@@ -28,6 +36,7 @@
     <div class="text-h5">Employees Returning</div>
   </div>
   <WorkflowTable
+    :archived="false"
     :complete="false"
     type="return"
     :allowAddDelete="true"
@@ -45,6 +54,7 @@
     <div class="text-h5">Employees Changing</div>
   </div>
   <WorkflowTable
+    :archived="false"
     :complete="false"
     type="change"
     :allowAddDelete="true"
@@ -62,6 +72,7 @@
     <div class="text-h5">Employees Exiting</div>
   </div>
   <WorkflowTable
+    :archived="false"
     :complete="false"
     type="exit"
     :allowAddDelete="true"
@@ -89,7 +100,7 @@ function userHasWorkflowRoles() {
 }
 
 function retrieveWorkflows(): void {
-  workflowsStore.getWorkflows({complete: false})
+  workflowsStore.getWorkflows({archived: false, complete: false})
     .then(() => {
       workflowsLoaded.value = true
     })  

@@ -225,9 +225,21 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
             return transition.access_emails.name
         else:
             return ''
+        
+
+class WorkflowInstanceBaseSerializer(serializers.ModelSerializer):
+    
+    def get_employee_action_required(self, wfi):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        if user and hasattr(user, "employee"):
+            return wfi.employee_action_required(user.employee)
+        return False
 
 
-class WorkflowInstanceSimpleSerializer(serializers.ModelSerializer):
+class WorkflowInstanceSimpleSerializer(WorkflowInstanceBaseSerializer):
     """
     Used for WorkflowTable component
     """
@@ -238,13 +250,14 @@ class WorkflowInstanceSimpleSerializer(serializers.ModelSerializer):
     workflow_role_pk = serializers.IntegerField(
         source='workflow.role.pk', required=False
     )
+    employee_action_required = serializers.SerializerMethodField()
 
     class Meta:
         model = WorkflowInstance
         fields = [
             'url', 'pk', 'started_at', 'completed_at', 'percent_complete',
             'employee_name', 'title_name', 'transition_type',
-            'transition_date', 'workflow_role_pk'
+            'transition_date', 'workflow_role_pk', 'employee_action_required'
         ]
         depth = 1
 
@@ -258,15 +271,16 @@ class WorkflowInstanceSimpleSerializer(serializers.ModelSerializer):
                 return ''
 
 
-class WorkflowInstanceSerializer(serializers.ModelSerializer):
+class WorkflowInstanceSerializer(WorkflowInstanceBaseSerializer):
     process_instances = ProcessInstanceSerializer(source='processinstance_set',
         many=True)
     transition = EmployeeTransitionSerializer()
+    employee_action_required = serializers.SerializerMethodField()
 
     class Meta:
         model = WorkflowInstance
         fields = [
             'url', 'pk', 'workflow', 'process_instances', 'transition',
-            'percent_complete'
+            'percent_complete', 'employee_action_required'
         ]
         depth = 1

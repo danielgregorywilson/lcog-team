@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext as _
 
-from mainsite.models import LANGUAGE_CHOICES
+from mainsite.models import ActiveManager, InactiveManager, LANGUAGE_CHOICES
 from people.models import Employee, JobTitle, UnitOrProgram
 
 
@@ -287,7 +287,9 @@ class Process(models.Model):
 
     @property
     def total_steps(self):
-        return self.step_set.filter(end=True).first().num_steps_before + 1
+        # Count the number of steps before the final one. Don't count the final
+        # step because it is the "complete" step and cannot be completed.
+        return self.step_set.filter(end=True).first().num_steps_before
 
     def create_process_instance(self, wfi):
         pi = ProcessInstance.objects.create(
@@ -430,21 +432,33 @@ class Step(models.Model):
 
     @property
     def num_steps_after(self):
+        """
+        Count the number of steps after the current step. Since there are
+        multiple possible paths to the end of a process, just get one route
+        forward and call that sufficient.
+        TODO: Rewrite to calculate the best-case (quickest) path forward (or
+        worst case, or average of all cases)
+        """
         num_steps = 0
         current_step = self
         while True:
             if current_step.end == True:
+                # We have reached the end of the process.
                 break
             else:
+                # Look for the next step
                 if current_step.next_step:
                     current_step = current_step.next_step
                 else:
+                    # In the case of a choice, there is no next step, so find
+                    # the first choice that leads to a step.
                     step_choice = StepChoice.objects.filter(
                         step=current_step
                     ).first()
                     if not step_choice:
                         raise Exception("Couldn't find a next step.")
                     current_step = step_choice.next_step
+                num_steps += 1
         return num_steps
 
     #TODO: On save, error if no next and not end
@@ -486,10 +500,15 @@ class WorkflowInstance(HasTimeStampsMixin):
     def __str__(self):
         return "WorkflowInstance ({}): {}".format(self.pk, self.workflow)
 
+    objects = models.Manager()
+    active_objects = ActiveManager()
+    inactive_objects = InactiveManager()
+
     workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE)
     transition = models.OneToOneField(
         EmployeeTransition, blank=True, null=True, on_delete=models.SET_NULL
     )
+    active = models.BooleanField(default=True)
 
     # @property
     # def current_step_instance(self):
@@ -518,6 +537,13 @@ class WorkflowInstance(HasTimeStampsMixin):
     def transition_date(self):
         if self.transition:
             return self.transition.transition_date
+        
+    def employee_action_required(self, employee):
+        # Return True if the employee is responsible for completing the current step of any of the process instances
+        for pi in self.processinstance_set.all():
+            if pi.employee_action_required(employee):
+                return True
+        return False
 
 
 class ProcessInstance(HasTimeStampsMixin):
@@ -542,9 +568,13 @@ class ProcessInstance(HasTimeStampsMixin):
             return 100
         else:
             num_steps_before = self.current_step_instance.step.num_steps_before
-            print("PI STEPS", self.pk, num_steps_before)
             num_steps_after = self.current_step_instance.step.num_steps_after
-            total_steps = num_steps_before + 1 + num_steps_after
+            # Add the steps before, the current step, and the steps after, but
+            # subtract one because the final step is the "complete" step and
+            # cannot be completed.
+            total_steps = num_steps_before + 1 + num_steps_after - 1
+            if total_steps == 0:
+                return 0
             return int((num_steps_before / total_steps) * 100)
 
     @property
@@ -557,6 +587,13 @@ class ProcessInstance(HasTimeStampsMixin):
             return self.total_steps
         else:
             return self.current_step_instance.step.num_steps_before
+
+    def employee_action_required(self, employee):
+        # Return True if the employee is responsible for completing the current step
+        current_step = self.current_step_instance.step
+        if current_step.role:
+            return employee.workflow_roles.filter(pk=self.current_step_instance.step.role.pk).count() > 0
+        return False
 
 
 class StepInstance(HasTimeStampsMixin):
@@ -589,4 +626,10 @@ class StepInstance(HasTimeStampsMixin):
             # If there is no next step, we can undo
             return True
 
-    #TODO: Complete method fills completed_at, completed_by, and current_step_instance and completed_at on Workflow instance
+    #TODO: Complete method fills completed_at, completed_by, and current_step_instance and completed_at on Workflow instance. This is currently done in the view, but maybe it should be here?
+
+    def employee_action_required(self, employee):
+        # Return True if the employee is responsible for completing this step
+        if self.step.role:
+            return employee.workflow_roles.filter(pk=self.step.role.pk).count() > 0
+        return False

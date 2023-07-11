@@ -172,25 +172,30 @@ const routes: RouteRecordRaw[] = [
             component: () => import('pages/workflows/WorkflowDashboard.vue')
           },
           {
-            path: 'archive',
-            name: 'workflow-archive',
-            component: () => import('src/pages/workflows/WorkflowArchive.vue'),
+            path: 'complete',
+            name: 'workflows-complete',
+            component: () => import('src/pages/workflows/WorkflowsComplete.vue'),
             children: [
               {
                 path: '',
-                name: 'workflow-arrchive-onboarding-redirect',
-                redirect: { name: 'workflow-archive-onboarding' }
+                name: 'workflows-complete-onboarding-redirect',
+                redirect: { name: 'workflows-complete-onboarding' }
               },
               {
                 path: 'onboarding',
-                name: 'workflow-archive-onboarding',
+                name: 'workflows-complete-onboarding',
                 component: () => {
                   return import(
-                    'src/pages/workflows/WorkflowArchiveOnboarding.vue'
+                    'src/pages/workflows/WorkflowsCompleteOnboarding.vue'
                   )
                 }
               }
             ]
+          },
+          {
+            path: 'deleted',
+            name: 'workflows-archived',
+            component: () => import('src/pages/workflows/WorkflowsArchived.vue')
           }
         ]
       },

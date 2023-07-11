@@ -4,12 +4,42 @@
 
 export const releases = [
   {
+    version: '0.14.0',
+    date: new Date(2023, 6, 11),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Mark if action is required for the current user to complete a workflow step.'
+      },
+      {
+        type: 'improved',
+        description: 'Workflows are now archived rather than deleted. They can be restored from the archive.'
+      },
+      {
+        type: 'improved',
+        description: 'We no longer create process instances until the transition form is sent to Staff Transition News.'
+      },
+      {
+        type: 'improved',
+        description: 'Minor improvements to workflows app.'
+      },
+      {
+        type: 'fix',
+        description: 'Fix the way we calculate workflow percent complete.'
+      },
+      {
+        type: 'fix',
+        description: 'Display all job titles in the transition form dropdown.'
+      }
+    ]
+  },
+  {
     version: '0.13.7',
     date: new Date(2023, 6, 3),
     changes: [
       {
         type: 'improved',
-        description: 'Split out workflows by type in dashboard: onboarding, returning, changing, exiting'
+        description: 'Split out workflows by type in dashboard: onboarding, returning, changing, exiting.'
       }
     ]
   },
@@ -19,11 +49,11 @@ export const releases = [
     changes: [
       {
         type: 'improved',
-        description: 'Many improvements to transition form'
+        description: 'Many improvements to transition form.'
       },
       {
         type: 'improved',
-        description: 'Send notification about Gas PIN for new employees'
+        description: 'Send notification about Gas PIN for new employees.'
       }
     ]
   },
@@ -33,15 +63,15 @@ export const releases = [
     changes: [
       {
         type: 'improved',
-        description: 'Added a second language select dropdown to transition form'
+        description: 'Added a second language select dropdown to transition form.'
       },
       {
         type: 'improved',
-        description: 'Show percent complete in process instance views'
+        description: 'Show percent complete in process instance views.'
       },
       {
         type: 'fix',
-        description: 'Fix a bug where the transition form would not submit initially'
+        description: 'Fix a bug where the transition form would not submit initially.'
       }
     ]
   },
@@ -51,7 +81,7 @@ export const releases = [
     changes: [
       {
         type: 'improved',
-        description: 'Optimize workflow dashboards'
+        description: 'Optimize workflow dashboards.'
       }
     ]
   },
@@ -61,7 +91,7 @@ export const releases = [
     changes: [
       {
         type: 'improved',
-        description: 'Improvements to employee transition form'
+        description: 'Improvements to employee transition form.'
       }
     ]
   },

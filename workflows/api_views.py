@@ -22,8 +22,8 @@ from timeoff.helpers import (
     send_manager_new_timeoff_request_notification
 )
 from workflows.helpers import (
-    send_gas_pin_notification_email, send_transition_hr_email,
-    send_transition_stn_email
+    create_process_instances, send_gas_pin_notification_email,
+    send_transition_hr_email, send_transition_stn_email
 )
 from workflows.models import (
     EmployeeTransition, Process, ProcessInstance, Role, Step, StepChoice,
@@ -406,6 +406,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
                 sender_name=request.data['senderName'],
                 url=request.data['transition_url']
             )
+            create_process_instances(transition)
         else:
             return Response("Invalid type.", status=status.HTTP_400_BAD_REQUEST)
         return Response("Sent email to staff.")

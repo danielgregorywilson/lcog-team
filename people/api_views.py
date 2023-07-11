@@ -8,6 +8,7 @@ from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 from rest_framework.response import Response
 
+from mainsite.api_views import LargeResultsSetPagination
 from mainsite.models import SecurityMessage
 from mainsite.helpers import (
     is_true_string, send_completed_email_to_hr_manager,
@@ -57,17 +58,12 @@ class IsAdmin(BasePermission):
 
 
 class JobTitleViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
     queryset = JobTitle.objects.all()
     serializer_class = JobTitleSerializer
+    pagination_class = LargeResultsSetPagination
 
 
 class UnitViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
     queryset = UnitOrProgram.objects.all()
     serializer_class = UnitSerializer
 

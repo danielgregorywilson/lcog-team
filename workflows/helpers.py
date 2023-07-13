@@ -128,8 +128,9 @@ def create_process_instances(transition):
     # Create process instances for staff transition workflows. Triggered when
     # a transition form is sent to Staff Transition News.
     onboarding_processes_start = [
-        'HR Onboarding', 'IS Onboarding', 'IS Telecom Onboarding',
-        'SDS Facilities Onboarding', 'SDS Onboarding', 'SDS Phone Onboarding'
+        'HR Onboarding', 'HR Onboarding Backgorund Check', 'IS Onboarding',
+        'IS Telecom Onboarding', 'SDS Facilities Onboarding', 'SDS Onboarding',
+        'SDS Phone Onboarding'
     ]
     returning_processes_start = []
     changing_processes_start = [

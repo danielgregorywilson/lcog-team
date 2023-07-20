@@ -590,6 +590,9 @@ class ProcessInstance(HasTimeStampsMixin):
 
     def employee_action_required(self, employee):
         # Return True if the employee is responsible for completing the current step
+        if not self.current_step_instance:
+            # TODO: This should not happen; maybe log an error
+            return False
         current_step = self.current_step_instance.step
         if current_step.role:
             return employee.workflow_roles.filter(pk=self.current_step_instance.step.role.pk).count() > 0

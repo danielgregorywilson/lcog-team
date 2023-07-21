@@ -208,36 +208,40 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
     #     IsAuthenticatedOrReadOnly
     # ]
 
-
     def get_queryset(self):
         """
-        Block anonymous users from seeing any data. Superusers can see all.
-        TODO: Other users can see all but shouldn't be able to.
+        Block anonymous users and users without access from seeing any
+        transitions. Superusers can see all.
         """
+        queryset = EmployeeTransition.objects.none()
         user = self.request.user
         if not user.is_anonymous and user.is_authenticated:
             if user.is_superuser:
-                return EmployeeTransition.objects.all()
-            else:
-                # TODO
-                return EmployeeTransition.objects.all()
-        else:
-            return EmployeeTransition.objects.none()
+                queryset = EmployeeTransition.objects.all()
+            elif user.employee:
+                employee = user.employee
+                if employee.can_view_employee_transitions():
+                    # Users who can view employee transitions can see all
+                    queryset = EmployeeTransition.objects.all()
+        return queryset
 
     def get_serializer_class(self):
         """
-        Superusers and HR/Fiscal employees should see all fields. All others should see only a subset.
+        Superusers and HR/Fiscal employees should see all fields. All others
+        should see only a subset.
         """
+        serializer = EmployeeTransitionRedactedSerializer
         user = self.request.user
         if not user.is_anonymous and user.is_authenticated:
             if user.is_superuser:
+                # Superusers can see all fields
                 return EmployeeTransitionSerializer
-            elif user.employee and (user.employee.is_hr_employee or user.employee.is_fiscal_employee):
-                return EmployeeTransitionSerializer
-            else:
-                return EmployeeTransitionRedactedSerializer
-        else:
-            return super().get_serializer_class()
+            if user.employee:
+                employee = user.employee
+                if employee.is_hr_employee or employee.is_fiscal_employee:
+                    # HR and Fiscal employees can see all fields
+                    serializer = EmployeeTransitionSerializer
+        return serializer
 
     # def create(self, request):
     #     if self.request.data['type'] == 'new_employee_onboarding':

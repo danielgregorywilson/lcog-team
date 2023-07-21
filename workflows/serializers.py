@@ -270,6 +270,8 @@ class WorkflowInstanceSimpleSerializer(WorkflowInstanceBaseSerializer):
     transition_type = serializers.CharField(
         source='transition.type', required=False
     )
+    transition_submitter = serializers.SerializerMethodField()
+    transition_date_submitted = serializers.SerializerMethodField()
     title_name = serializers.SerializerMethodField()
     workflow_role_pk = serializers.IntegerField(
         source='workflow.role.pk', required=False
@@ -281,6 +283,7 @@ class WorkflowInstanceSimpleSerializer(WorkflowInstanceBaseSerializer):
         fields = [
             'url', 'pk', 'started_at', 'completed_at', 'percent_complete',
             'employee_name', 'title_name', 'transition_type',
+            'transition_submitter', 'transition_date_submitted',
             'transition_date', 'workflow_role_pk', 'employee_action_required'
         ]
         depth = 1
@@ -291,6 +294,22 @@ class WorkflowInstanceSimpleSerializer(WorkflowInstanceBaseSerializer):
         if wfi.title:
             if wfi.title.name:
                 return wfi.title.name
+            else:
+                return ''
+    
+    @staticmethod
+    def get_transition_submitter(wfi):
+        if wfi.transition:
+            if wfi.transition.submitter:
+                return wfi.transition.submitter.name
+            else:
+                return ''
+    
+    @staticmethod
+    def get_transition_date_submitted(wfi):
+        if wfi.transition:
+            if wfi.transition.date_submitted:
+                return wfi.transition.date_submitted
             else:
                 return ''
 

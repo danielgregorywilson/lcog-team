@@ -38,9 +38,10 @@
         <th v-else>{{props.col.label}}</th>
       </template> -->
       <!-- Slots for body cells: Show dates in a familiar format; make sure status can wrap, and display action buttons -->
-      <template v-slot:body-cell-startedAt="props">
-        <q-td key="startedAt" :props="props">
-          {{ readableDate(props.row.started_at) }}
+      <template v-slot:body-cell-created="props">
+        <q-td key="created" :props="props">
+          {{ readableDate(props.row.transition_date_submitted) }} -
+          {{ props.row.transition_submitter }}
         </q-td>
       </template>
       <template v-slot:body-cell-transitionDate="props">
@@ -200,7 +201,7 @@ const emit = defineEmits<{
 const columns: QTableProps['columns'] = [
   { name: 'position', label: 'Position', align: 'center', field: 'title_name' },
   { name: 'name', label: 'Name', align: 'center', field: 'employee_name' },
-  { name: 'startedAt', align: 'center', label: 'Workflow Start Date', field: 'started_at', sortable: true },
+  { name: 'created', align: 'center', label: 'Created', field: 'created', sortable: true },
   { name: 'transitionDate', align: 'center', label: 'Transition Date', field: 'transition_date', sortable: true },
   { name: 'percentComplete', align: 'center', label: '% Complete', field: 'percent_complete', sortable: true },
   { name: 'actions', label: 'Actions', align: 'center', field: '' },

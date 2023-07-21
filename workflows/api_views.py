@@ -31,9 +31,10 @@ from workflows.models import (
 )
 
 from workflows.serializers import (
-    EmployeeTransitionSerializer, ProcessInstanceSerializer, ProcessSerializer,
-    RoleSerializer, StepChoiceSerializer, StepInstanceSerializer,
-    StepSerializer, TransitionChangeSerializer, WorkflowInstanceSerializer,
+    EmployeeTransitionRedactedSerializer, EmployeeTransitionSerializer,
+    ProcessInstanceSerializer, ProcessSerializer, RoleSerializer,
+    StepChoiceSerializer, StepInstanceSerializer, StepSerializer,
+    TransitionChangeSerializer, WorkflowInstanceSerializer,
     WorkflowInstanceSimpleSerializer, WorkflowSerializer
 )
 
@@ -129,7 +130,7 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
                 return WorkflowInstance.active_objects.all()
             return WorkflowInstance.objects.all()
         else:
-            return Employee.objects.none()
+            return WorkflowInstance.objects.none()
 
 
     def create(self, request):
@@ -207,24 +208,36 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
     #     IsAuthenticatedOrReadOnly
     # ]
 
-    # def get_queryset(self):
-    #     """
 
-    #     """
-    #     user = self.request.user
-    #     if user.is_authenticated:
-    #         action_required = self.request.query_params.get('action_required',
-    #             None)
-    #         complete = self.request.query_params.get('complete', None)
-    #         if action_required is not None and is_true_string(action_required):
-    #             queryset = WorkflowInstance.action_required.get_queryset(user)
-            
-            
-    #         if user.is_superuser:
-    #             instances = WorkflowInstance.objects.all()
-    #         else:
-    #             instances = WorkflowInstance.objects.none()
-    #         return instances
+    def get_queryset(self):
+        """
+        Block anonymous users from seeing any data. Superusers can see all.
+        TODO: Other users can see all but shouldn't be able to.
+        """
+        user = self.request.user
+        if not user.is_anonymous and user.is_authenticated:
+            if user.is_superuser:
+                return EmployeeTransition.objects.all()
+            else:
+                # TODO
+                return EmployeeTransition.objects.all()
+        else:
+            return EmployeeTransition.objects.none()
+
+    def get_serializer_class(self):
+        """
+        Superusers and HR/Fiscal employees should see all fields. All others should see only a subset.
+        """
+        user = self.request.user
+        if not user.is_anonymous and user.is_authenticated:
+            if user.is_superuser:
+                return EmployeeTransitionSerializer
+            elif user.employee and (user.employee.is_hr_employee or user.employee.is_fiscal_employee):
+                return EmployeeTransitionSerializer
+            else:
+                return EmployeeTransitionRedactedSerializer
+        else:
+            return super().get_serializer_class()
 
     # def create(self, request):
     #     if self.request.data['type'] == 'new_employee_onboarding':

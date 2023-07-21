@@ -225,7 +225,31 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
             return transition.access_emails.name
         else:
             return ''
-        
+
+
+class EmployeeTransitionRedactedSerializer(EmployeeTransitionSerializer):
+    """
+    Same as the regular serializer but leave out sensitive fields: salary_range
+    and salary_step.
+    """
+    class Meta:
+        model = EmployeeTransition
+        fields = [
+            'url', 'pk', 'type', 'date_submitted', 'submitter_pk',
+            'submitter_name', 'employee_first_name', 'employee_middle_initial',
+            'employee_last_name', 'employee_preferred_name', 'employee_number',
+            'employee_id', 'employee_email', 'title_pk', 'title_name', 'fte',
+            'bilingual', 'second_language',
+            'manager_pk', 'manager_name', 'unit_pk', 'unit_name',
+            'transition_date', 'preliminary_hire', 'delete_profile',
+            'office_location', 'cubicle_number', 'union_affiliation',
+            'teleworking', 'computer_type', 'computer_gl',
+            'computer_description', 'phone_number', 'desk_phone',
+            'phone_request', 'phone_request_data', 'load_code', 'cell_phone',
+            'should_delete', 'reassign_to', 'gas_pin_needed', 'business_cards',
+            'prox_card_needed', 'prox_card_returned', 'access_emails_pk',
+            'access_emails_name', 'special_instructions', 'changes'
+        ]
 
 class WorkflowInstanceBaseSerializer(serializers.ModelSerializer):
     

@@ -143,6 +143,8 @@ class EmployeeTransition(models.Model):
         UnitOrProgram, blank=True, null=True, on_delete=models.SET_NULL
     )
     transition_date = models.DateTimeField(blank=True, null=True)
+    lwop = models.BooleanField(default=False)
+    lwop_details = models.TextField(blank=True, null=True)
     preliminary_hire = models.BooleanField(default=False)
     delete_profile = models.BooleanField(default=False)
     office_location = models.CharField(max_length=30, choices=LOCATION_CHOICES, blank=True)

@@ -359,6 +359,8 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         else:
             t.transition_date = None
 
+        t.lwop = request.data['lwop']
+        t.lwop_details = request.data['lwop_details']
         t.preliminary_hire = request.data['preliminary_hire']
         t.delete_profile = request.data['delete_profile']
         t.office_location = request.data['office_location']

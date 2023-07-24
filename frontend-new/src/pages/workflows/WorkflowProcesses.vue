@@ -1,5 +1,8 @@
 <template>
   <div class="q-pt-md">
+    <div v-if="currentWorkflowInstance().process_instances.length === 0" class="text-h6 text-center q-pa-md">
+      No processes have been started yet.	
+    </div>
     <div v-for="pi of currentWorkflowInstance().process_instances" :key="pi.pk" class="q-mb-md">
       <div class="row items-center q-mb-sm">
         <div class="text-h5 q-mr-md">{{pi.process.name}}</div>

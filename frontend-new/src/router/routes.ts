@@ -175,22 +175,23 @@ const routes: RouteRecordRaw[] = [
             path: 'complete',
             name: 'workflows-complete',
             component: () => import('src/pages/workflows/WorkflowsComplete.vue'),
-            children: [
-              {
-                path: '',
-                name: 'workflows-complete-onboarding-redirect',
-                redirect: { name: 'workflows-complete-onboarding' }
-              },
-              {
-                path: 'onboarding',
-                name: 'workflows-complete-onboarding',
-                component: () => {
-                  return import(
-                    'src/pages/workflows/WorkflowsCompleteOnboarding.vue'
-                  )
-                }
-              }
-            ]
+            // TODO: For now we just have one complete page/table
+            // children: [
+            //   {
+            //     path: '',
+            //     name: 'workflows-complete-onboarding-redirect',
+            //     redirect: { name: 'workflows-complete-onboarding' }
+            //   },
+            //   {
+            //     path: 'onboarding',
+            //     name: 'workflows-complete-onboarding',
+            //     component: () => {
+            //       return import(
+            //         'src/pages/workflows/WorkflowsCompleteOnboarding.vue'
+            //       )
+            //     }
+            //   }
+            // ]
           },
           {
             path: 'deleted',

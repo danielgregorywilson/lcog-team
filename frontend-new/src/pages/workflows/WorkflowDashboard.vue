@@ -2,7 +2,7 @@
   <div class="row q-mb-md">
     <q-btn-group push>
       <q-btn push color="secondary" glossy label="Active" :to="{ name: 'workflow-dashboard' }" />
-      <q-btn push color="primary" glossy label="Complete" :to="{ name: 'workflows-complete-onboarding' }" />
+      <q-btn push color="primary" glossy label="Complete" :to="{ name: 'workflows-complete' }" />
       <q-btn push color="primary" glossy label="Deleted" :to="{ name: 'workflows-archived' }"  />
     </q-btn-group>
   </div>

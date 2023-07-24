@@ -143,6 +143,8 @@ class EmployeeTransition(models.Model):
         UnitOrProgram, blank=True, null=True, on_delete=models.SET_NULL
     )
     transition_date = models.DateTimeField(blank=True, null=True)
+    lwop = models.BooleanField(default=False)
+    lwop_details = models.TextField(blank=True, null=True)
     preliminary_hire = models.BooleanField(default=False)
     delete_profile = models.BooleanField(default=False)
     office_location = models.CharField(max_length=30, choices=LOCATION_CHOICES, blank=True)
@@ -509,6 +511,7 @@ class WorkflowInstance(HasTimeStampsMixin):
         EmployeeTransition, blank=True, null=True, on_delete=models.SET_NULL
     )
     active = models.BooleanField(default=True)
+    complete = models.BooleanField(default=False)
 
     # @property
     # def current_step_instance(self):
@@ -590,6 +593,9 @@ class ProcessInstance(HasTimeStampsMixin):
 
     def employee_action_required(self, employee):
         # Return True if the employee is responsible for completing the current step
+        if not self.current_step_instance:
+            # TODO: This should not happen; maybe log an error
+            return False
         current_step = self.current_step_instance.step
         if current_step.role:
             return employee.workflow_roles.filter(pk=self.current_step_instance.step.role.pk).count() > 0

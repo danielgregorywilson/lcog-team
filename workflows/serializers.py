@@ -156,9 +156,9 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
             'employee_id', 'employee_email', 'title_pk', 'title_name', 'fte',
             'salary_range', 'salary_step', 'bilingual', 'second_language',
             'manager_pk', 'manager_name', 'unit_pk', 'unit_name',
-            'transition_date', 'preliminary_hire', 'delete_profile',
-            'office_location', 'cubicle_number', 'union_affiliation',
-            'teleworking', 'computer_type', 'computer_gl',
+            'transition_date', 'lwop', 'lwop_details', 'preliminary_hire',
+            'delete_profile', 'office_location', 'cubicle_number',
+            'union_affiliation', 'teleworking', 'computer_type', 'computer_gl',
             'computer_description', 'phone_number', 'desk_phone',
             'phone_request', 'phone_request_data', 'load_code', 'cell_phone',
             'should_delete', 'reassign_to', 'gas_pin_needed', 'business_cards',
@@ -225,10 +225,47 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
             return transition.access_emails.name
         else:
             return ''
-        
+
+
+class EmployeeTransitionRedactedSerializer(EmployeeTransitionSerializer):
+    """
+    Same as the regular serializer but leave out sensitive fields: salary_range
+    and salary_step.
+    """
+    class Meta:
+        model = EmployeeTransition
+        fields = [
+            'url', 'pk', 'type', 'date_submitted', 'submitter_pk',
+            'submitter_name', 'employee_first_name', 'employee_middle_initial',
+            'employee_last_name', 'employee_preferred_name', 'employee_number',
+            'employee_id', 'employee_email', 'title_pk', 'title_name', 'fte',
+            'bilingual', 'second_language', 'manager_pk', 'manager_name',
+            'unit_pk', 'unit_name', 'transition_date', 'lwop', 'lwop_details',
+            'preliminary_hire', 'delete_profile', 'office_location',
+            'cubicle_number', 'union_affiliation', 'teleworking',
+            'computer_type', 'computer_gl', 'computer_description',
+            'phone_number', 'desk_phone', 'phone_request',
+            'phone_request_data', 'load_code', 'cell_phone', 'should_delete',
+            'reassign_to', 'gas_pin_needed', 'business_cards',
+            'prox_card_needed', 'prox_card_returned', 'access_emails_pk',
+            'access_emails_name', 'special_instructions', 'changes'
+        ]
 
 class WorkflowInstanceBaseSerializer(serializers.ModelSerializer):
-    
+    title_name = serializers.SerializerMethodField()
+    employee_action_required = serializers.SerializerMethodField()
+    workflow_role_pk = serializers.IntegerField(
+        source='workflow.role.pk', required=False
+    )
+
+    @staticmethod
+    def get_title_name(wfi):
+        if wfi.title:
+            if wfi.title.name:
+                return wfi.title.name
+            else:
+                return ''
+
     def get_employee_action_required(self, wfi):
         user = None
         request = self.context.get("request")
@@ -246,27 +283,33 @@ class WorkflowInstanceSimpleSerializer(WorkflowInstanceBaseSerializer):
     transition_type = serializers.CharField(
         source='transition.type', required=False
     )
-    title_name = serializers.SerializerMethodField()
-    workflow_role_pk = serializers.IntegerField(
-        source='workflow.role.pk', required=False
-    )
-    employee_action_required = serializers.SerializerMethodField()
+    transition_submitter = serializers.SerializerMethodField()
+    transition_date_submitted = serializers.SerializerMethodField()
 
     class Meta:
         model = WorkflowInstance
         fields = [
-            'url', 'pk', 'started_at', 'completed_at', 'percent_complete',
-            'employee_name', 'title_name', 'transition_type',
-            'transition_date', 'workflow_role_pk', 'employee_action_required'
+            'url', 'pk', 'started_at', 'complete', 'completed_at',
+            'percent_complete', 'employee_name', 'title_name',
+            'transition_type', 'transition_submitter',
+            'transition_date_submitted', 'transition_date', 'workflow_role_pk',
+            'employee_action_required'
         ]
         depth = 1
-
-
+    
     @staticmethod
-    def get_title_name(wfi):
-        if wfi.title:
-            if wfi.title.name:
-                return wfi.title.name
+    def get_transition_submitter(wfi):
+        if wfi.transition:
+            if wfi.transition.submitter:
+                return wfi.transition.submitter.name
+            else:
+                return ''
+    
+    @staticmethod
+    def get_transition_date_submitted(wfi):
+        if wfi.transition:
+            if wfi.transition.date_submitted:
+                return wfi.transition.date_submitted
             else:
                 return ''
 
@@ -275,12 +318,12 @@ class WorkflowInstanceSerializer(WorkflowInstanceBaseSerializer):
     process_instances = ProcessInstanceSerializer(source='processinstance_set',
         many=True)
     transition = EmployeeTransitionSerializer()
-    employee_action_required = serializers.SerializerMethodField()
 
     class Meta:
         model = WorkflowInstance
         fields = [
             'url', 'pk', 'workflow', 'process_instances', 'transition',
-            'percent_complete', 'employee_action_required'
+            'active', 'complete', 'percent_complete', 'title_name',
+            'employee_action_required', 'workflow_role_pk'
         ]
         depth = 1

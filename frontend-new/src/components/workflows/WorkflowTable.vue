@@ -9,7 +9,7 @@
     <q-table
       v-else
       :rows="workflows()"
-      :columns="columns"
+      :columns="columns()"
       :filter=tableFilter
       :filter-method=tableFilterMethod
       :grid="$q.screen.lt.md"
@@ -18,7 +18,14 @@
       :rows-per-page-options="[0]"
     >
       <template v-slot:top-right>
-        <q-input borderless dense clearable debounce="300" v-model="tableFilter" placeholder="Search">
+        <q-input
+          borderless
+          dense
+          clearable
+          debounce="300"
+          v-model="tableFilter"
+          placeholder="Search"
+        >
           <template v-slot:prepend>
             <q-icon name="search">
               <q-tooltip>
@@ -38,9 +45,10 @@
         <th v-else>{{props.col.label}}</th>
       </template> -->
       <!-- Slots for body cells: Show dates in a familiar format; make sure status can wrap, and display action buttons -->
-      <template v-slot:body-cell-startedAt="props">
-        <q-td key="startedAt" :props="props">
-          {{ readableDate(props.row.started_at) }}
+      <template v-slot:body-cell-created="props">
+        <q-td key="created" :props="props">
+          {{ readableDate(props.row.transition_date_submitted) }} -
+          {{ props.row.transition_submitter }}
         </q-td>
       </template>
       <template v-slot:body-cell-transitionDate="props">
@@ -48,22 +56,75 @@
           {{ readableDate(props.row.transition_date) }}
         </q-td>
       </template>
+      <template v-slot:body-cell-completed="props">
+        <q-td key="completed" :props="props">
+          {{ readableDate(props.row.completed_at) }}
+        </q-td>
+      </template>
       <template v-slot:body-cell-percentComplete="props">
         <q-td key="percentComplete" :props="props">
-          <q-linear-progress rounded size="25px" :value="props.row.percent_complete/100" color="primary">
+          <q-linear-progress
+            rounded size="25px"
+            :value="props.row.percent_complete/100"
+            color="primary"
+          >
             <div class="absolute-full flex flex-center">
-              <q-badge color="white" text-color="primary" :label="`${props.row.percent_complete}%`" />
+              <q-badge
+                color="white"
+                text-color="primary"
+                :label="`${props.row.percent_complete}%`"
+              />
             </div>
           </q-linear-progress>
       </q-td>
       </template>
       <template v-slot:body-cell-actions="props">
         <q-td key="actions" :props="props">
-          <q-btn class="col" dense round flat color="grey" @click="editWorkflowInstance(props.row)" icon="play_arrow"></q-btn>
-          <q-btn v-if="workflowHasTransition() && canViewTransition()" class="col" dense round flat color="grey" @click="editTransitionForm(props.row)" icon="assignment"></q-btn>
-          <q-btn v-if="!archived && canDeleteWorkflowInstance(props.row)" class="col" dense round flat color="grey" @click="showArchiveDialog(props.row)" icon="delete"></q-btn>
-          <q-btn v-if="archived && canDeleteWorkflowInstance(props.row)" class="col" dense round flat color="grey" @click="showArchiveDialog(props.row)" icon="restore_from_trash"></q-btn>
-          <q-icon v-if="props.row.employee_action_required" color="orange" name="warning" size="md">
+          <q-btn
+            class="col"
+            dense
+            round
+            flat
+            color="grey"
+            @click="editWorkflowInstance(props.row)"
+            icon="play_arrow"
+          />
+          <q-btn
+            v-if="workflowHasTransition() && canViewTransition()"
+            class="col"
+            dense
+            round
+            flat
+            color="grey"
+            @click="editTransitionForm(props.row)"
+            icon="assignment"
+          />
+          <q-btn
+            v-if="!archived && canDeleteWorkflowInstance(props.row)"
+            class="col"
+            dense
+            round
+            flat
+            color="grey"
+            @click="showArchiveDialog(props.row)"
+            icon="delete"
+          />
+          <q-btn
+            v-if="archived && canDeleteWorkflowInstance(props.row)"
+            class="col"
+            dense
+            round
+            flat
+            color="grey"
+            @click="showArchiveDialog(props.row)"
+            icon="restore_from_trash"
+          />
+          <q-icon
+            v-if="!archived && !complete && props.row.employee_action_required"
+            color="orange"
+            name="warning"
+            size="md"
+          >
               <q-tooltip content-style="font-size: 16px">
                 <div>Your action is required</div>
               </q-tooltip>
@@ -94,12 +155,55 @@
               <q-item v-for="col in props.cols" :key="col.name">
                 <div class="q-table__grid-item-row">
                   <div class="q-table__grid-item-title">{{ col.label }}</div>
-                  <div class="q-table__grid-item-value row q-gutter-sm" v-if="col.label == 'Actions'">
-                    <q-btn class="col" dense round flat color="grey" @click="editWorkflowInstance(props.row)" icon="play_arrow"></q-btn>
-                    <q-btn v-if="workflowHasTransition() && canViewTransition()" class="col" dense round flat color="grey" @click="editTransitionForm(props.row)" icon="assignment"></q-btn>
-                    <q-btn v-if="!archived && canDeleteWorkflowInstance(props.row)" class="col" dense round flat color="grey" @click="showArchiveDialog(props.row)" icon="delete"></q-btn>
-                    <q-btn v-if="archived && canDeleteWorkflowInstance(props.row)" class="col" dense round flat color="grey" @click="showArchiveDialog(props.row)" icon="restore_from_trash"></q-btn>
-                    <q-icon v-if="props.row.employee_action_required" color="orange" name="warning" size="md">
+                  <div
+                    class="q-table__grid-item-value row q-gutter-sm"
+                    v-if="col.label == 'Actions'"
+                  >
+                    <q-btn
+                      class="col"
+                      dense
+                      round
+                      flat
+                      color="grey"
+                      @click="editWorkflowInstance(props.row)"
+                      icon="play_arrow"
+                    />
+                    <q-btn
+                      v-if="workflowHasTransition() && canViewTransition()"
+                      class="col"
+                      dense
+                      round
+                      flat
+                      color="grey"
+                      @click="editTransitionForm(props.row)"
+                      icon="assignment"
+                    />
+                    <q-btn
+                      v-if="!archived && canDeleteWorkflowInstance(props.row)"
+                      class="col"
+                      dense
+                      round
+                      flat
+                      color="grey"
+                      @click="showArchiveDialog(props.row)"
+                      icon="delete"
+                    />
+                    <q-btn
+                      v-if="archived && canDeleteWorkflowInstance(props.row)"
+                      class="col"
+                      dense
+                      round
+                      flat
+                      color="grey"
+                      @click="showArchiveDialog(props.row)"
+                      icon="restore_from_trash"
+                    />
+                    <q-icon
+                      v-if="!archived && !complete && props.row.employee_action_required"
+                      color="orange"
+                      name="warning"
+                      size="md"
+                    >
                       <q-tooltip content-style="font-size: 16px">
                         <div>Your action is required</div>
                       </q-tooltip>
@@ -130,17 +234,39 @@
       <q-card>
         <q-card-section>
           <div class="row items-center">
-            <q-avatar icon="insert_chart_outlined" color="primary" text-color="white" />
+            <q-avatar
+              icon="insert_chart_outlined"
+              color="primary"
+              text-color="white"
+            />
             <span class="q-ml-sm">Are you sure you want to <span v-if="!archived">delete</span><span v-else>restore</span> this workflow?</span>
           </div>
-          <div class="row justify-center text-center">Position: {{ deleteDialogPositionName }}</div>
-          <div class="row justify-center text-center">{{ deleteDialogPercentComplete }}% Complete</div>
+          <div class="row justify-center text-center">
+            Position: {{ deleteDialogPositionName }}
+          </div>
+          <div class="row justify-center text-center">
+            {{ deleteDialogPercentComplete }}% Complete
+          </div>
         </q-card-section>
 
         <q-card-actions class="row justify-around">
           <q-btn flat label="Cancel" color="primary" v-close-popup />
-          <q-btn v-if="!archived" flat label="Yes, delete it" color="primary" @click="deleteRow()" v-close-popup />
-          <q-btn v-else flat label="Yes, restore it" color="primary" @click="restoreRow()" v-close-popup />
+          <q-btn
+            v-if="!archived"
+            flat
+            label="Yes, delete it"
+            color="primary"
+            @click="deleteRow()"
+            v-close-popup
+          />
+          <q-btn
+            v-else
+            flat
+            label="Yes, restore it"
+            color="primary"
+            @click="restoreRow()"
+            v-close-popup
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -197,14 +323,38 @@ const emit = defineEmits<{
   (e: 'retrieve'): void
 }>()
 
-const columns: QTableProps['columns'] = [
+const activeColumns: QTableProps['columns'] = [
   { name: 'position', label: 'Position', align: 'center', field: 'title_name' },
   { name: 'name', label: 'Name', align: 'center', field: 'employee_name' },
-  { name: 'startedAt', align: 'center', label: 'Workflow Start Date', field: 'started_at', sortable: true },
+  { name: 'created', align: 'center', label: 'Created', field: 'created', sortable: true },
   { name: 'transitionDate', align: 'center', label: 'Transition Date', field: 'transition_date', sortable: true },
   { name: 'percentComplete', align: 'center', label: '% Complete', field: 'percent_complete', sortable: true },
   { name: 'actions', label: 'Actions', align: 'center', field: '' },
 ]
+
+const archivedColumns: QTableProps['columns'] = [
+  { name: 'type', label: 'Type', align: 'center', field: 'transition_type'},
+  { name: 'created', align: 'center', label: 'Created', field: 'created', sortable: true },
+  { name: 'percentComplete', align: 'center', label: '% Complete', field: 'percent_complete', sortable: true },
+  { name: 'actions', label: 'Actions', align: 'center', field: '' },
+]
+
+const completedColumns: QTableProps['columns'] = [
+  { name: 'type', label: 'Type', align: 'center', field: 'transition_type'},
+  { name: 'created', align: 'center', label: 'Created', field: 'created', sortable: true },
+  { name: 'completed', align: 'center', label: 'Completed', field: 'completed_at', sortable: true},
+  { name: 'percentComplete', align: 'center', label: '% Complete', field: 'percent_complete', sortable: true },
+  { name: 'actions', label: 'Actions', align: 'center', field: '' },
+]
+
+function columns() {
+  if (props.archived) {
+    return archivedColumns
+  } else if (props.complete) {
+    return completedColumns
+  }
+  return activeColumns
+}
 
 let tableFilter = ref('')
 
@@ -304,7 +454,7 @@ function editTransitionForm(workflowInstance: WorkflowInstanceSimple) {
 }
 
 function canDeleteWorkflowInstance(workflowInstance: WorkflowInstanceSimple): boolean {
-  if (workflowInstance.completed_at) {
+  if (workflowInstance.complete || workflowInstance.completed_at) {
     return false
   }
   if (userStore.getEmployeeProfile.is_all_workflows_admin) {

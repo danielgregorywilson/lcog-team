@@ -669,6 +669,7 @@ export type ProcessInstance = {
 export interface WorkflowInstanceSimple {
   pk: number
   started_at: string
+  complete: boolean
   completed_at: string
   percent_complete: number
   employee_name: string

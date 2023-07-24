@@ -305,7 +305,7 @@ function editTransitionForm(workflowInstance: WorkflowInstanceSimple) {
 }
 
 function canDeleteWorkflowInstance(workflowInstance: WorkflowInstanceSimple): boolean {
-  if (workflowInstance.completed_at) {
+  if (workflowInstance.complete || workflowInstance.completed_at) {
     return false
   }
   if (userStore.getEmployeeProfile.is_all_workflows_admin) {

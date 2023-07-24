@@ -64,7 +64,7 @@
           <q-btn v-if="workflowHasTransition() && canViewTransition()" class="col" dense round flat color="grey" @click="editTransitionForm(props.row)" icon="assignment"></q-btn>
           <q-btn v-if="!archived && canDeleteWorkflowInstance(props.row)" class="col" dense round flat color="grey" @click="showArchiveDialog(props.row)" icon="delete"></q-btn>
           <q-btn v-if="archived && canDeleteWorkflowInstance(props.row)" class="col" dense round flat color="grey" @click="showArchiveDialog(props.row)" icon="restore_from_trash"></q-btn>
-          <q-icon v-if="props.row.employee_action_required" color="orange" name="warning" size="md">
+          <q-icon v-if="!archived && !complete && props.row.employee_action_required" color="orange" name="warning" size="md">
               <q-tooltip content-style="font-size: 16px">
                 <div>Your action is required</div>
               </q-tooltip>
@@ -100,7 +100,7 @@
                     <q-btn v-if="workflowHasTransition() && canViewTransition()" class="col" dense round flat color="grey" @click="editTransitionForm(props.row)" icon="assignment"></q-btn>
                     <q-btn v-if="!archived && canDeleteWorkflowInstance(props.row)" class="col" dense round flat color="grey" @click="showArchiveDialog(props.row)" icon="delete"></q-btn>
                     <q-btn v-if="archived && canDeleteWorkflowInstance(props.row)" class="col" dense round flat color="grey" @click="showArchiveDialog(props.row)" icon="restore_from_trash"></q-btn>
-                    <q-icon v-if="props.row.employee_action_required" color="orange" name="warning" size="md">
+                    <q-icon v-if="!archived && !complete && props.row.employee_action_required" color="orange" name="warning" size="md">
                       <q-tooltip content-style="font-size: 16px">
                         <div>Your action is required</div>
                       </q-tooltip>

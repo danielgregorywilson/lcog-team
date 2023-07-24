@@ -9,7 +9,7 @@
     <q-table
       v-else
       :rows="workflows()"
-      :columns="columns"
+      :columns="columns()"
       :filter=tableFilter
       :filter-method=tableFilterMethod
       :grid="$q.screen.lt.md"
@@ -318,7 +318,7 @@ const emit = defineEmits<{
   (e: 'retrieve'): void
 }>()
 
-const columns: QTableProps['columns'] = [
+const activeColumns: QTableProps['columns'] = [
   { name: 'position', label: 'Position', align: 'center', field: 'title_name' },
   { name: 'name', label: 'Name', align: 'center', field: 'employee_name' },
   { name: 'created', align: 'center', label: 'Created', field: 'created', sortable: true },
@@ -326,6 +326,20 @@ const columns: QTableProps['columns'] = [
   { name: 'percentComplete', align: 'center', label: '% Complete', field: 'percent_complete', sortable: true },
   { name: 'actions', label: 'Actions', align: 'center', field: '' },
 ]
+
+const archivedColumns: QTableProps['columns'] = [
+  { name: 'type', label: 'Type', align: 'center', field: 'transition_type'},
+  { name: 'created', align: 'center', label: 'Created', field: 'created', sortable: true },
+  { name: 'percentComplete', align: 'center', label: '% Complete', field: 'percent_complete', sortable: true },
+  { name: 'actions', label: 'Actions', align: 'center', field: '' },
+]
+
+function columns() {
+  if (props.archived || props.complete) {
+    return archivedColumns
+  }
+  return activeColumns
+}
 
 let tableFilter = ref('')
 

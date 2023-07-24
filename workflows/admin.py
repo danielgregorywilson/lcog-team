@@ -104,6 +104,7 @@ class StepInline(admin.TabularInline):
 class ProcessAdmin(admin.ModelAdmin):
     list_display = ("name", "workflow", "version")
     list_filter = ("workflow",)
+    ordering = ("workflow", "name")
     inlines = (StepInline,)
 
 

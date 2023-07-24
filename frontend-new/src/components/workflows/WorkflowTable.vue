@@ -56,6 +56,11 @@
           {{ readableDate(props.row.transition_date) }}
         </q-td>
       </template>
+      <template v-slot:body-cell-completed="props">
+        <q-td key="completed" :props="props">
+          {{ readableDate(props.row.completed_at) }}
+        </q-td>
+      </template>
       <template v-slot:body-cell-percentComplete="props">
         <q-td key="percentComplete" :props="props">
           <q-linear-progress
@@ -334,9 +339,19 @@ const archivedColumns: QTableProps['columns'] = [
   { name: 'actions', label: 'Actions', align: 'center', field: '' },
 ]
 
+const completedColumns: QTableProps['columns'] = [
+  { name: 'type', label: 'Type', align: 'center', field: 'transition_type'},
+  { name: 'created', align: 'center', label: 'Created', field: 'created', sortable: true },
+  { name: 'completed', align: 'center', label: 'Completed', field: 'completed_at', sortable: true},
+  { name: 'percentComplete', align: 'center', label: '% Complete', field: 'percent_complete', sortable: true },
+  { name: 'actions', label: 'Actions', align: 'center', field: '' },
+]
+
 function columns() {
-  if (props.archived || props.complete) {
+  if (props.archived) {
     return archivedColumns
+  } else if (props.complete) {
+    return completedColumns
   }
   return activeColumns
 }

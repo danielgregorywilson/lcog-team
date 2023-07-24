@@ -464,6 +464,13 @@ class Employee(models.Model):
         role = apps.get_model('workflows', 'Role').objects.get(name="All Workflows Admins")
         return self in role.members.all()
 
+    def is_employee_transition_admin(self):
+        role = apps.get_model('workflows', 'Role').objects.get(name="Employee Transition Admins")
+        return self in role.members.all()
+    
+    def can_view_employee_transitions(self):
+        return self.is_employee_transition_admin() or self.is_all_workflows_admin()
+
     def admin_of_workflows(self):
         all_workflows = apps.get_model('workflows', 'Workflow').objects.all().select_related('role')
         return [workflow.id for workflow in list(all_workflows) if workflow.role and self in workflow.role.members.all()]

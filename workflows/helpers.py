@@ -128,12 +128,26 @@ def create_process_instances(transition):
     # Create process instances for staff transition workflows. Triggered when
     # a transition form is sent to Staff Transition News.
     onboarding_processes_start = [
-        'HR Onboarding', 'IS Onboarding', 'IS Telecom Onboarding',
-        'SDS Facilities Onboarding', 'SDS Onboarding', 'SDS Phone Onboarding'
+        'HR Onboarding', 'HR Onboarding Backgorund Check', 'IS Onboarding',
+        'IS Telecom Onboarding', 'SDS Facilities Onboarding', 'SDS Onboarding',
+        'SDS Phone Onboarding'
     ]
+    returning_processes_start = []
+    changing_processes_start = [
+        'SDS Phone Changing'
+    ]
+    exiting_processes_start = []
     wfi = transition.workflowinstance
-    if (transition.type == EmployeeTransition.TRANSITION_TYPE_NEW):
-        for process in wfi.workflow.processes.filter(name__in=onboarding_processes_start):
-            existing_pis = ProcessInstance.objects.filter(process=process, workflow_instance=wfi)
-            if existing_pis.count() == 0:
-                process.create_process_instance(wfi)
+    # Set the process names based on the transition type
+    transition_process_names = onboarding_processes_start
+    if (transition.type == EmployeeTransition.TRANSITION_TYPE_RETURN):
+        transition_process_names = returning_processes_start
+    elif (transition.type == EmployeeTransition.TRANSITION_TYPE_CHANGE):
+        transition_process_names = changing_processes_start
+    elif (transition.type == EmployeeTransition.TRANSITION_TYPE_EXIT):
+        transition_process_names = exiting_processes_start
+    # Create process instances for each process in the list
+    for process in wfi.workflow.processes.filter(name__in=transition_process_names):
+        existing_pis = ProcessInstance.objects.filter(process=process, workflow_instance=wfi)
+        if existing_pis.count() == 0:
+            process.create_process_instance(wfi)

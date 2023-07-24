@@ -4,6 +4,32 @@
 
 export const releases = [
   {
+    version: '0.15.0',
+    date: new Date(2023, 6, 24),
+    changes: [
+      {
+        type: 'new',
+        description: 'Add pre-approved leave without pay to transition form'
+      },
+      {
+        type: 'improved',
+        description: 'Start transition workflow processes once a STN email is sent.'
+      },
+      {
+        type: 'improved',
+        description: 'Improve API access guards.'
+      },
+      {
+        type: 'improved',
+        description: 'Workflows can now be manually marked as complete.'
+      },
+      {
+        type: 'improved',
+        description: 'Minor improvements to workflows app.'
+      }
+    ]
+  },
+  {
     version: '0.14.0',
     date: new Date(2023, 6, 11),
     changes: [

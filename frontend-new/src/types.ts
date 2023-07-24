@@ -669,6 +669,7 @@ export type ProcessInstance = {
 export interface WorkflowInstanceSimple {
   pk: number
   started_at: string
+  complete: boolean
   completed_at: string
   percent_complete: number
   employee_name: string
@@ -683,7 +684,11 @@ export interface WorkflowInstance {
   workflow: Workflow
   process_instances: Array<ProcessInstance>
   transition: EmployeeTransition
+  active: boolean
+  complete: boolean
   percent_complete: number
+  title_name: string
+  workflow_role_pk: number
 }
 
 export type EmployeeID = 'CLSD' | 'CLID' | ''
@@ -727,6 +732,8 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   unit_pk: number
   unit_name: string
   transition_date: string
+  lwop: boolean
+  lwop_details: string
   preliminary_hire: boolean
   delete_profile: boolean
   office_location: string
@@ -771,6 +778,8 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   manager_pk?: number
   unit_pk?: number
   transition_date?: Date
+  lwop?: boolean
+  lwop_details?: string
   preliminary_hire?: boolean
   delete_profile?: boolean
   office_location?: string

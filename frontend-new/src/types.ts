@@ -683,7 +683,11 @@ export interface WorkflowInstance {
   workflow: Workflow
   process_instances: Array<ProcessInstance>
   transition: EmployeeTransition
+  active: boolean
+  complete: boolean
   percent_complete: number
+  title_name: string
+  workflow_role_pk: number
 }
 
 export type EmployeeID = 'CLSD' | 'CLID' | ''

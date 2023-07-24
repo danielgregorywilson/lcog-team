@@ -252,7 +252,20 @@ class EmployeeTransitionRedactedSerializer(EmployeeTransitionSerializer):
         ]
 
 class WorkflowInstanceBaseSerializer(serializers.ModelSerializer):
-    
+    title_name = serializers.SerializerMethodField()
+    employee_action_required = serializers.SerializerMethodField()
+    workflow_role_pk = serializers.IntegerField(
+        source='workflow.role.pk', required=False
+    )
+
+    @staticmethod
+    def get_title_name(wfi):
+        if wfi.title:
+            if wfi.title.name:
+                return wfi.title.name
+            else:
+                return ''
+
     def get_employee_action_required(self, wfi):
         user = None
         request = self.context.get("request")
@@ -272,11 +285,6 @@ class WorkflowInstanceSimpleSerializer(WorkflowInstanceBaseSerializer):
     )
     transition_submitter = serializers.SerializerMethodField()
     transition_date_submitted = serializers.SerializerMethodField()
-    title_name = serializers.SerializerMethodField()
-    workflow_role_pk = serializers.IntegerField(
-        source='workflow.role.pk', required=False
-    )
-    employee_action_required = serializers.SerializerMethodField()
 
     class Meta:
         model = WorkflowInstance
@@ -287,15 +295,6 @@ class WorkflowInstanceSimpleSerializer(WorkflowInstanceBaseSerializer):
             'transition_date', 'workflow_role_pk', 'employee_action_required'
         ]
         depth = 1
-
-
-    @staticmethod
-    def get_title_name(wfi):
-        if wfi.title:
-            if wfi.title.name:
-                return wfi.title.name
-            else:
-                return ''
     
     @staticmethod
     def get_transition_submitter(wfi):
@@ -318,12 +317,12 @@ class WorkflowInstanceSerializer(WorkflowInstanceBaseSerializer):
     process_instances = ProcessInstanceSerializer(source='processinstance_set',
         many=True)
     transition = EmployeeTransitionSerializer()
-    employee_action_required = serializers.SerializerMethodField()
 
     class Meta:
         model = WorkflowInstance
         fields = [
             'url', 'pk', 'workflow', 'process_instances', 'transition',
-            'percent_complete', 'employee_action_required'
+            'active', 'complete', 'percent_complete', 'title_name',
+            'employee_action_required', 'workflow_role_pk'
         ]
         depth = 1

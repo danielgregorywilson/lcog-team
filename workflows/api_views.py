@@ -127,7 +127,11 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
             if archived is not None and is_true_string(archived):
                 return WorkflowInstance.inactive_objects.all()
             elif archived is not None and not is_true_string(archived):
-                return WorkflowInstance.active_objects.all()
+                complete = self.request.query_params.get('complete', None)
+                if complete is not None and is_true_string(complete):
+                    return WorkflowInstance.active_objects.filter(complete=True)
+                elif complete is not None and not is_true_string(complete):
+                    return WorkflowInstance.active_objects.filter(complete=False)
             return WorkflowInstance.objects.all()
         else:
             return WorkflowInstance.objects.none()
@@ -180,13 +184,21 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
     
     def partial_update(self, request, pk=None):
         """
-        Archive or restore a workflow instance.
+        Archive/restore or complete/reopen a workflow instance.
         """
         wfi = WorkflowInstance.objects.get(pk=pk)
         if request.data['action'] == 'archive':
             wfi.active = False
         elif request.data['action'] == 'restore':
             wfi.active = True
+        # TODO: Add logic to prevent completing an archived workflow instance
+        # TODO: For now, complete is a manual process, but it should intersect somehow with the process instances being complete.
+        elif request.data['action'] == 'complete':
+            wfi.complete = True
+            wfi.completed_at = timezone.now()
+        elif request.data['action'] == 'reopen':
+            wfi.complete = False
+            wfi.completed_at = None
         else:
             return Response({'error': 'Invalid action'}, status=status.HTTP_400_BAD_REQUEST)
         wfi.save()

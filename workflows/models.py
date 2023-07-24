@@ -509,6 +509,7 @@ class WorkflowInstance(HasTimeStampsMixin):
         EmployeeTransition, blank=True, null=True, on_delete=models.SET_NULL
     )
     active = models.BooleanField(default=True)
+    complete = models.BooleanField(default=False)
 
     # @property
     # def current_step_instance(self):

@@ -71,6 +71,7 @@ class StepInstanceForm(ModelForm):
     """Used in StepInstance Admin for process_instance"""
     def __init__(self, *args, **kwargs):
         super(StepInstanceForm, self).__init__(*args, **kwargs)
+        # TODO: This is broken when creating a new StepInstance in the admin
         self.fields['process_instance'].queryset = ProcessInstance.objects.filter(process=self.instance.step.process)
 
 
@@ -95,7 +96,7 @@ class StepInline(admin.TabularInline):
         for idx, choice in enumerate(instance.next_step_choices.all()):
             if idx != 0:
                 choices_text += " / "
-            choices_text += choice.choice_text + ": " + choice.next_step.name
+            choices_text += choice.choice_text + ": " + str(choice.next_step.order) + ' - ' + choice.next_step.name
         return choices_text
 
 
@@ -103,6 +104,7 @@ class StepInline(admin.TabularInline):
 class ProcessAdmin(admin.ModelAdmin):
     list_display = ("name", "workflow", "version")
     list_filter = ("workflow",)
+    ordering = ("workflow", "name")
     inlines = (StepInline,)
 
 

@@ -196,6 +196,28 @@ export const useWorkflowsStore = defineStore('workflows', {
           })
       })
     },
+    completeWorkflowInstance(workflowInstancePk: string) {
+      return new Promise((resolve, reject) => {
+        axios({ url: `${ apiURL }api/v1/workflowinstance/${ workflowInstancePk }`, data: {action: 'complete'}, method: 'PATCH' })
+          .then(resp => {
+            resolve(resp)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error completing workflow instance', e)
+          })
+      })
+    },
+    reopenWorkflowInstance(workflowInstancePk: string) {
+      return new Promise((resolve, reject) => {
+        axios({ url: `${ apiURL }api/v1/workflowinstance/${ workflowInstancePk }`, data: {action: 'reopen'}, method: 'PATCH' })
+          .then(resp => {
+            resolve(resp)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error reopening workflow instance', e)
+          })
+      })
+    },
     authLogout() {
       return new Promise((resolve) => {
         this.$reset()

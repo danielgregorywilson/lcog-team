@@ -31,9 +31,10 @@ from workflows.models import (
 )
 
 from workflows.serializers import (
-    EmployeeTransitionSerializer, ProcessInstanceSerializer, ProcessSerializer,
-    RoleSerializer, StepChoiceSerializer, StepInstanceSerializer,
-    StepSerializer, TransitionChangeSerializer, WorkflowInstanceSerializer,
+    EmployeeTransitionRedactedSerializer, EmployeeTransitionSerializer,
+    ProcessInstanceSerializer, ProcessSerializer, RoleSerializer,
+    StepChoiceSerializer, StepInstanceSerializer, StepSerializer,
+    TransitionChangeSerializer, WorkflowInstanceSerializer,
     WorkflowInstanceSimpleSerializer, WorkflowSerializer
 )
 
@@ -126,10 +127,14 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
             if archived is not None and is_true_string(archived):
                 return WorkflowInstance.inactive_objects.all()
             elif archived is not None and not is_true_string(archived):
-                return WorkflowInstance.active_objects.all()
+                complete = self.request.query_params.get('complete', None)
+                if complete is not None and is_true_string(complete):
+                    return WorkflowInstance.active_objects.filter(complete=True)
+                elif complete is not None and not is_true_string(complete):
+                    return WorkflowInstance.active_objects.filter(complete=False)
             return WorkflowInstance.objects.all()
         else:
-            return Employee.objects.none()
+            return WorkflowInstance.objects.none()
 
 
     def create(self, request):
@@ -179,13 +184,21 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
     
     def partial_update(self, request, pk=None):
         """
-        Archive or restore a workflow instance.
+        Archive/restore or complete/reopen a workflow instance.
         """
         wfi = WorkflowInstance.objects.get(pk=pk)
         if request.data['action'] == 'archive':
             wfi.active = False
         elif request.data['action'] == 'restore':
             wfi.active = True
+        # TODO: Add logic to prevent completing an archived workflow instance
+        # TODO: For now, complete is a manual process, but it should intersect somehow with the process instances being complete.
+        elif request.data['action'] == 'complete':
+            wfi.complete = True
+            wfi.completed_at = timezone.now()
+        elif request.data['action'] == 'reopen':
+            wfi.complete = False
+            wfi.completed_at = None
         else:
             return Response({'error': 'Invalid action'}, status=status.HTTP_400_BAD_REQUEST)
         wfi.save()
@@ -207,24 +220,40 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
     #     IsAuthenticatedOrReadOnly
     # ]
 
-    # def get_queryset(self):
-    #     """
+    def get_queryset(self):
+        """
+        Block anonymous users and users without access from seeing any
+        transitions. Superusers can see all.
+        """
+        queryset = EmployeeTransition.objects.none()
+        user = self.request.user
+        if not user.is_anonymous and user.is_authenticated:
+            if user.is_superuser:
+                queryset = EmployeeTransition.objects.all()
+            elif user.employee:
+                employee = user.employee
+                if employee.can_view_employee_transitions():
+                    # Users who can view employee transitions can see all
+                    queryset = EmployeeTransition.objects.all()
+        return queryset
 
-    #     """
-    #     user = self.request.user
-    #     if user.is_authenticated:
-    #         action_required = self.request.query_params.get('action_required',
-    #             None)
-    #         complete = self.request.query_params.get('complete', None)
-    #         if action_required is not None and is_true_string(action_required):
-    #             queryset = WorkflowInstance.action_required.get_queryset(user)
-            
-            
-    #         if user.is_superuser:
-    #             instances = WorkflowInstance.objects.all()
-    #         else:
-    #             instances = WorkflowInstance.objects.none()
-    #         return instances
+    def get_serializer_class(self):
+        """
+        Superusers and HR/Fiscal employees should see all fields. All others
+        should see only a subset.
+        """
+        serializer = EmployeeTransitionRedactedSerializer
+        user = self.request.user
+        if not user.is_anonymous and user.is_authenticated:
+            if user.is_superuser:
+                # Superusers can see all fields
+                return EmployeeTransitionSerializer
+            if user.employee:
+                employee = user.employee
+                if employee.is_hr_employee or employee.is_fiscal_employee:
+                    # HR and Fiscal employees can see all fields
+                    serializer = EmployeeTransitionSerializer
+        return serializer
 
     # def create(self, request):
     #     if self.request.data['type'] == 'new_employee_onboarding':
@@ -330,6 +359,8 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         else:
             t.transition_date = None
 
+        t.lwop = request.data['lwop']
+        t.lwop_details = request.data['lwop_details']
         t.preliminary_hire = request.data['preliminary_hire']
         t.delete_profile = request.data['delete_profile']
         t.office_location = request.data['office_location']

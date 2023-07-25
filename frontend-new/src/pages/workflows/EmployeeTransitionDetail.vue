@@ -170,6 +170,15 @@
         mask="YYYY-MM-DD HH:mm"
       />
     </div>
+    <div class="row q-my-sm" v-if="['New', 'Return'].indexOf(type) != -1">
+      <q-checkbox v-model="lwop" label="Pre Approved LWOP at time of hire" class="q-mr-md" />
+      <q-input
+        v-model="lwopDetails"
+        v-if="lwop"
+        label="Dates and hours approved"
+        style="width: 350px;"
+      />
+    </div>
     <div class="row q-my-sm">
       <q-checkbox
         v-model="preliminaryHire"
@@ -662,6 +671,10 @@ let unitCurrentVal = ref(emptyUnit)
 let unit = ref(emptyUnit)
 let transitionDateCurrentVal = ref(null) as Ref<string | null>
 let transitionDate = ref(null) as Ref<string | null>
+let lwopCurrentVal = ref(false)
+let lwop = ref(false)
+let lwopDetailsCurrentVal = ref('')
+let lwopDetails = ref('')
 let preliminaryHireCurrentVal = ref(false)
 let preliminaryHire = ref(false)
 let deleteProfileCurrentVal = ref(false)
@@ -772,6 +785,10 @@ function retrieveEmployeeTransition() {
       transitionDate.value = t.transition_date.replace('T', ' ')
     }
     transitionDateCurrentVal.value = transitionDate.value
+    lwop.value = t.lwop
+    lwopCurrentVal.value = lwop.value
+    lwopDetails.value = t.lwop_details
+    lwopDetailsCurrentVal.value = lwopDetails.value
     preliminaryHire.value = t.preliminary_hire
     preliminaryHireCurrentVal.value = preliminaryHire.value
     deleteProfile.value = t.delete_profile
@@ -914,6 +931,8 @@ function valuesAreChanged(): boolean {
         Date.parse(transitionDate.value) == Date.parse(transitionDateCurrentVal.value)
       )
     ) &&
+    lwop.value == lwopCurrentVal.value &&
+    lwopDetails.value == lwopDetailsCurrentVal.value &&
     preliminaryHire.value == preliminaryHireCurrentVal.value &&
     deleteProfile.value == deleteProfileCurrentVal.value &&
     officeLocation.value == officeLocationCurrentVal.value &&
@@ -1035,6 +1054,8 @@ function updateTransition() {
       manager_pk: manager.value.pk,
       unit_pk: unit.value.pk,
       transition_date: transitionDateFromForm,
+      lwop: lwop.value,
+      lwop_details: lwopDetails.value,
       preliminary_hire: preliminaryHire.value,
       delete_profile: deleteProfile.value,
       office_location: officeLocation.value,
@@ -1084,6 +1105,8 @@ function updateTransition() {
       }
       unitCurrentVal.value = {pk: t.unit_pk, name: t.unit_name}
       transitionDateCurrentVal.value = t.transition_date
+      lwopCurrentVal.value = t.lwop
+      lwopDetailsCurrentVal.value = t.lwop_details
       preliminaryHireCurrentVal.value = t.preliminary_hire
       deleteProfileCurrentVal.value = t.delete_profile
       officeLocationCurrentVal.value = t.office_location

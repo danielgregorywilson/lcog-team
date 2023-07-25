@@ -117,7 +117,7 @@
   }
 }
 
-tr:has(> td[data-past="false"]) {
+tr:has(> td[data-past="true"]) {
   background-color: lightgray;
 }
 

@@ -5,7 +5,7 @@ export default {
   tableFilterMethod(
     rows: Array<Responsibility>,
     term: string,
-    filterOn: Array<'name'|'description'|'tags'|'primaryEmployee'|'secondaryEmployee'>
+    filterOn: Array<'name'|'description'|'link'|'tags'|'primaryEmployee'|'secondaryEmployee'>
   ): Array<Responsibility> {
       // rows contain the entire data
       // terms contains whatever you have as filter
@@ -27,6 +27,10 @@ export default {
               if (filterOn.includes('description')) {
                   const descriptionMatches = row.description.toLowerCase().includes(searchTerm)
                   matchCriteria.push(descriptionMatches)
+              }
+              if (filterOn.includes('link')) {
+                  const linkMatches = row.link.toLowerCase().includes(searchTerm)
+                  matchCriteria.push(linkMatches)
               }
               if (filterOn.includes('tags')) {
                   let tagsMatch = false

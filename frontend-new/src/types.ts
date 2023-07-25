@@ -562,6 +562,7 @@ export interface TimeOffRequestRetrieve {
   manager_pk: number
   start_date: Date
   end_date: Date
+  past: boolean
   note: string
   private_note: string
   acknowledged: boolean

@@ -293,6 +293,29 @@ class Process(models.Model):
         # step because it is the "complete" step and cannot be completed.
         return self.step_set.filter(end=True).first().num_steps_before
 
+    # def save(self, *args, **kwargs):
+    #     super().save(*args, **kwargs)
+    #     # If a Process has any Steps, it must have exactly one start Step and
+    #     # one end Step.
+    #     if self.step_set.count():
+    #         if self.step_set.filter(start=True).count() != 1:
+    #             raise ValidationError("A process must have exactly one start step.")
+    #         if self.step_set.filter(end=True).count() != 1:
+    #             raise ValidationError("A process must have exactly one end step.")
+
+    # TODO: Get this working either here or on the Step class
+    # def clean(self):
+    #     # If a Process has any Steps, it must have exactly one start Step and
+    #     # one end Step.
+    #     if (self.pk):
+    #         if self.step_set.count():
+    #             if self.step_set.filter(start=True).count() == 0:
+    #                 self.step_set.first().start = True
+    #                 self.save()
+    #             if self.step_set.filter(end=True).count() == 0:
+    #                 self.step_set.last().end = True
+                    self.save()
+
     def create_process_instance(self, wfi):
         pi = ProcessInstance.objects.create(
             process=self, workflow_instance=wfi

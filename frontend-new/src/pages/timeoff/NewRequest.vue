@@ -1,14 +1,21 @@
 <template>
   <div>
     <div class="q-gutter-md row">
-      <q-date v-model="dates" range @input="dateChanged()"/>
-      <div v-if="touchedCalendar && conflictingTimeOffRequests().length != 0">
+      <q-date v-model="dates" range @update:model-value="dateChanged()"/>
+      <div v-if="touchedCalendar && conflictingResponsibilities().length != 0">
         <q-icon color="orange" name="warning" size="xl" class="q-ml-sm" />
         <div>
           <div>One or more team members with shared responsibilities will also be unavailable:</div>
           <ul>
-            <li v-for="tor of conflictingTimeOffRequests()" :key="tor.pk">
-              <router-link :to="{ name: 'employee-responsibilities', params: { pk: tor.employee_pk } }">{{ tor.employee_name }}</router-link>: {{ employee.responsibility_names[0] }}<span v-for="(name, idx) of employee.responsibility_names" :key="idx"><span v-if="idx==0">{{ name }}</span><span v-else>, {{ name }}</span></span>
+            <li v-for="tor of conflictingResponsibilities()" :key="tor.pk">
+              <router-link :to="{ name: 'employee-responsibilities', params: { pk: tor.pk } }">
+                {{ tor.name }}
+              </router-link>
+              : 
+              <span v-for="(name, idx) of tor.responsibility_names" :key="idx">
+                <span v-if="idx==0">{{ name }}</span>
+                <span v-else>, {{ name }}</span>
+              </span>
             </li>
           </ul>
         </div>
@@ -34,7 +41,9 @@ import { ref, Ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { useQuasar } from 'quasar'
-import { TimeOffRequestDates, TimeOffRequestRetrieve } from 'src/types'
+import {
+  EmployeeConflictingResponsibilities, TimeOffRequestDates
+} from 'src/types'
 import { useTimeOffStore } from 'src/stores/timeoff'
 
 const quasar = useQuasar()
@@ -62,15 +71,15 @@ function formIsFilled(): boolean {
   }
 }
 
-function conflictingTimeOffRequests(): Array<TimeOffRequestRetrieve> {
-  return timeOffStore.conflictingTimeOffRequests
+function conflictingResponsibilities(): Array<EmployeeConflictingResponsibilities> {
+  return timeOffStore.conflictingResponsibilities
 }
 
 function dateChanged(): void {
   // Check if there are any coworkers out with shared responsibilities
   touchedCalendar.value = true
   if (dates.value) {
-    timeOffStore.getConflictingTimeOffRequests({ dates: dates.value })
+    timeOffStore.getConflictingResponsibilites({ dates: dates.value })
       .catch(e => {
         console.error('Error getting conflicting responsibilities:', e)
       })

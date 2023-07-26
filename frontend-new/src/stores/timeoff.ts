@@ -4,8 +4,9 @@ import { defineStore } from 'pinia'
 import { apiURL, handlePromiseError } from 'src/stores/index'
 import { useUserStore } from 'src/stores/user'
 import { 
-  TimeOffRequestAcknowledge, TimeOffRequestCreate, TimeOffRequestDates,
-  TimeOffRequestRetrieve, TimeOffRequestUpdate
+  EmployeeConflictingResponsibilities, TimeOffRequestAcknowledge,
+  TimeOffRequestCreate, TimeOffRequestDates, TimeOffRequestRetrieve,
+  TimeOffRequestUpdate
 } from 'src/types'
 
 export const useTimeOffStore = defineStore('timeoff', {
@@ -14,7 +15,7 @@ export const useTimeOffStore = defineStore('timeoff', {
     currentTimeOffRequest: {} as TimeOffRequestRetrieve,
     teamTimeOffRequests: [] as Array<TimeOffRequestRetrieve>,
     managedTimeOffRequests: [] as Array<TimeOffRequestRetrieve>,
-    conflictingTimeOffRequests: [] as Array<TimeOffRequestRetrieve>
+    conflictingResponsibilities: [] as Array<EmployeeConflictingResponsibilities>
   }),
 
   getters: {},
@@ -60,11 +61,11 @@ export const useTimeOffStore = defineStore('timeoff', {
           })
       })
     },
-    getConflictingTimeOffRequests(data: { dates: TimeOffRequestDates}) {
+    getConflictingResponsibilites(data: { dates: TimeOffRequestDates}) {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/timeoffrequest/conflicting_responsibilities`, data: data, method: 'POST' })
           .then(resp => {
-            this.conflictingTimeOffRequests = resp.data.results
+            this.conflictingResponsibilities = resp.data
             resolve('Successfully got conflicting responsibilities')
           })
           .catch(e => {

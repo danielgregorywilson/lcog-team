@@ -593,6 +593,12 @@ export interface TimeOffRequestUpdatePartial {
   acknowledged: boolean
 }
 
+export interface EmployeeConflictingResponsibilities {
+  pk: number
+  name: string
+  responsibility_names: Array<string>
+}
+
 ///////////////////////////////////////////////////
 // Workflow Structure from Django Rest Framework //
 ///////////////////////////////////////////////////

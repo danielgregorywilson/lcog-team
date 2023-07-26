@@ -314,7 +314,7 @@ class Process(models.Model):
     #                 self.save()
     #             if self.step_set.filter(end=True).count() == 0:
     #                 self.step_set.last().end = True
-                    self.save()
+    #                 self.save()
 
     def create_process_instance(self, wfi):
         pi = ProcessInstance.objects.create(

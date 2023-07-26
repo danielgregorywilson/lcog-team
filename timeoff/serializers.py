@@ -24,7 +24,10 @@ class TimeOffRequestSerializerBase(serializers.HyperlinkedModelSerializer):
     @staticmethod
     def get_past(tor):
         # Return true if the request is in the past
-        return tor.end_date < date.today()
+        ed = tor.end_date
+        if type(ed) == str:
+            ed = date.fromisoformat(ed)
+        return ed < date.today()
 
 
 class TimeOffRequestPublicSerializer(TimeOffRequestSerializerBase):

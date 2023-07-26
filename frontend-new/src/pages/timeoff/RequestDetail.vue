@@ -5,10 +5,16 @@
       <div v-if="conflictingResponsibilities().length != 0">
         <q-icon color="orange" name="warning" size="xl" class="q-ml-sm" />
         <div>
-          <div>One or more team members with shared responsibilities will also be unavailable:</div>
+          <div>
+            One or more team members with shared responsibilities will also be
+            unavailable:
+          </div>
           <ul>
             <li v-for="tor of conflictingResponsibilities()" :key="tor.pk">
-              <router-link :to="{ name: 'employee-responsibilities', params: { pk: tor.pk } }">
+              <router-link
+                :to="{ name: 'employee-responsibilities',
+                params: { pk: tor.pk } }"
+              >
                 {{ tor.name }}
               </router-link>
               : 
@@ -31,7 +37,13 @@
       label="Private Note (visible to manager only)"
       class="q-pb-md"
     />
-    <q-btn color="white" text-color="black" label="Update" :disabled="!formIsFilled()" @click="updateTimeOffRequest()" />
+    <q-btn
+      color="white"
+      text-color="black"
+      label="Update"
+      :disabled="!formIsFilled()"
+      @click="updateTimeOffRequest()"
+    />
   </div>
 </template>
 
@@ -41,7 +53,9 @@ import { onMounted, ref, Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { getRoutePk } from 'src/utils'
-import { EmployeeConflictingResponsibilities, TimeOffRequestDates } from 'src/types'
+import {
+  EmployeeConflictingResponsibilities, TimeOffRequestDates
+} from 'src/types'
 import { useTimeOffStore } from 'src/stores/timeoff'
 
 const route = useRoute()
@@ -61,9 +75,12 @@ function formIsFilled(): boolean {
   }
 }
 
-// TODO: Do a valuesAreChanged thing like with ReviewNoteDetail so we aren't always resetting acknowledgements unnecessarily
+// TODO: Do a valuesAreChanged thing like with ReviewNoteDetail so we aren't
+// always resetting acknowledgements unnecessarily
 
-function conflictingResponsibilities(): Array<EmployeeConflictingResponsibilities> {
+function conflictingResponsibilities():
+  Array<EmployeeConflictingResponsibilities>
+{
   return timeOffStore.conflictingResponsibilities
 }
 
@@ -115,7 +132,10 @@ function updateTimeOffRequest(): void {
     .then(() => {
       router.push({ name: 'timeoff-my-requests'})
         .catch(e => {
-          console.error('Error navigating to My Requests page after creating time off request:', e)
+          console.error(
+            'Error navigating to My Requests page after creating TOR:',
+            e
+          )
         })
     })
     .catch(e => {

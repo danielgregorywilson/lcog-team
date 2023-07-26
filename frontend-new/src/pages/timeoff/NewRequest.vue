@@ -5,10 +5,16 @@
       <div v-if="touchedCalendar && conflictingResponsibilities().length != 0">
         <q-icon color="orange" name="warning" size="xl" class="q-ml-sm" />
         <div>
-          <div>One or more team members with shared responsibilities will also be unavailable:</div>
+          <div>
+            One or more team members with shared responsibilities will also be
+            unavailable:
+          </div>
           <ul>
             <li v-for="tor of conflictingResponsibilities()" :key="tor.pk">
-              <router-link :to="{ name: 'employee-responsibilities', params: { pk: tor.pk } }">
+              <router-link
+                :to="{ name: 'employee-responsibilities',
+                params: { pk: tor.pk } }"
+              >
                 {{ tor.name }}
               </router-link>
               : 
@@ -31,7 +37,13 @@
       label="Private Note (visible to manager only)"
       class="q-pb-md"
     />
-    <q-btn color="white" text-color="black" label="Create" :disabled="!formIsFilled()" @click="createTimeOffRequest()" />
+    <q-btn
+      color="white"
+      text-color="black"
+      label="Create"
+      :disabled="!formIsFilled()"
+      @click="createTimeOffRequest()"
+    />
   </div>
 </template>
 
@@ -64,14 +76,20 @@ let note = ref('')
 let privateNote = ref('')
 
 function formIsFilled(): boolean {
-  if (dates.value && (typeof dates.value != 'string' && dates.value.from != '') || (typeof dates.value == 'string' && dates.value != '')) {
+  if (
+    dates.value &&
+    (typeof dates.value != 'string' && dates.value.from != '') ||
+    (typeof dates.value == 'string' && dates.value != '')
+  ) {
     return true
   } else {
     return false
   }
 }
 
-function conflictingResponsibilities(): Array<EmployeeConflictingResponsibilities> {
+function conflictingResponsibilities():
+  Array<EmployeeConflictingResponsibilities>
+{
   return timeOffStore.conflictingResponsibilities
 }
 
@@ -94,12 +112,20 @@ function createTimeOffRequest(): void {
   if (typeof dates.value != 'string' && dates.value.from == '') {
     return
   }    
-  timeOffStore.createTimeOffRequest({ dates: dates.value, note: note.value, privateNote: privateNote.value })
+  timeOffStore.createTimeOffRequest(
+    { dates: dates.value, note: note.value, privateNote: privateNote.value }
+  )
     .then(() => {
-      quasar.notify(`Time off successfully recorded. ${randomChoice(newRequestMessages)}`)
+      quasar.notify(
+        `Time off successfully recorded. ${randomChoice(newRequestMessages)}`
+      )
       router.push({ name: 'timeoff-my-requests'})
         .catch(e => {
-          console.error('Error navigating to My Requests page after creating time off request:', e)
+          console.error(
+            'Error navigating to My Requests page after creating time off',
+            'request:',
+            e
+          )
         })
     })
     .catch(e => {

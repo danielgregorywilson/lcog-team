@@ -314,9 +314,11 @@
         label="Reassign to"
       />
     </div>
-    <div class="text-h6 transition-form-section-heading">Gas PIN</div>
-    <div class="row">
-      <q-checkbox v-model="gasPINNeeded" label="Gas PIN Needed" />
+    <div v-if="['New', 'Return', 'Change/Modify'].indexOf(type) != -1">
+      <div class="text-h6 transition-form-section-heading">Gas PIN</div>
+      <div class="row">
+        <q-checkbox v-model="gasPINNeeded" label="Gas PIN Needed" />
+      </div>
     </div>
     <div class="text-h6 transition-form-section-heading">Business Cards</div>
     <div class="row">

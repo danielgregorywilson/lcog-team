@@ -14,7 +14,7 @@
         </q-th>
       </template>
       <template v-slot:body-cell-dates="props">
-        <q-td key="dates" :props="props">
+        <q-td key="dates" :props="props" :data-past="props.row.past">
           <div v-if="$q.screen.gt.xs">{{ props.row.start_date }} - {{ props.row.end_date }}</div>
           <div v-if="$q.screen.xs">
             <div>{{ props.row.start_date }}</div>
@@ -115,6 +115,10 @@
   .table-note {
     white-space: normal;
   }
+}
+
+tr:has(> td[data-past="true"]) {
+  background-color: lightgray;
 }
 
 </style>

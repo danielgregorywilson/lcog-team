@@ -299,5 +299,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(populate_employee_numbers)
+        # migrations.RunPython(populate_employee_numbers)
     ]

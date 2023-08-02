@@ -562,6 +562,7 @@ export interface TimeOffRequestRetrieve {
   manager_pk: number
   start_date: Date
   end_date: Date
+  past: boolean
   note: string
   private_note: string
   acknowledged: boolean
@@ -590,6 +591,12 @@ export interface TimeOffRequestUpdate {
 
 export interface TimeOffRequestUpdatePartial {
   acknowledged: boolean
+}
+
+export interface EmployeeConflictingResponsibilities {
+  pk: number
+  name: string
+  responsibility_names: Array<string>
 }
 
 ///////////////////////////////////////////////////

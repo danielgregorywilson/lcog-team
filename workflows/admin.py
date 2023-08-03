@@ -46,10 +46,12 @@ class StepForm(ModelForm):
 
 
 class StepInlineForm(ModelForm):
-    """Used in Process Admin for child Steps' next_steps"""
+    """Used in Process Admin for child Steps' next_steps and trigger_processes"""
     def __init__(self, *args, parent_object, **kwargs):
         super(StepInlineForm, self).__init__(*args, **kwargs)
         self.fields['next_step'].queryset = Step.objects.filter(process=parent_object).exclude(pk=self.instance.pk).order_by('order')
+        if (parent_object.pk):
+            self.fields['trigger_processes'].queryset = Process.objects.filter(workflow=parent_object.workflow).exclude(pk=parent_object.pk).order_by('name')
 
 
 class StepChoiceForm(ModelForm):

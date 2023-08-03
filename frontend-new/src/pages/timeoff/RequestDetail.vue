@@ -1,14 +1,27 @@
 <template>
   <div>
     <div class="q-gutter-md row">
-      <q-date v-model="dates" range @input="dateChanged()"/>
-      <div v-if="conflictingTimeOffRequests().length != 0">
+      <q-date v-model="dates" range @update:model-value="dateChanged()"/>
+      <div v-if="conflictingResponsibilities().length != 0">
         <q-icon color="orange" name="warning" size="xl" class="q-ml-sm" />
         <div>
-          <div>One or more team members with shared responsibilities will also be unavailable:</div>
+          <div>
+            One or more team members with shared responsibilities will also be
+            unavailable:
+          </div>
           <ul>
-            <li v-for="tor of conflictingTimeOffRequests()" :key="tor.pk">
-              <router-link :to="{ name: 'employee-responsibilities', params: { pk: tor.employee_pk } }">{{ tor.employee_name }}</router-link>: {{ employee.responsibility_names[0] }}<span v-for="(name, idx) of employee.responsibility_names" :key="idx"><span v-if="idx==0">{{ name }}</span><span v-else>, {{ name }}</span></span>
+            <li v-for="tor of conflictingResponsibilities()" :key="tor.pk">
+              <router-link
+                :to="{ name: 'employee-responsibilities',
+                params: { pk: tor.pk } }"
+              >
+                {{ tor.name }}
+              </router-link>
+              : 
+              <span v-for="(name, idx) of tor.responsibility_names" :key="idx">
+                <span v-if="idx==0">{{ name }}</span>
+                <span v-else>, {{ name }}</span>
+              </span>
             </li>
           </ul>
         </div>
@@ -24,7 +37,13 @@
       label="Private Note (visible to manager only)"
       class="q-pb-md"
     />
-    <q-btn color="white" text-color="black" label="Update" :disabled="!formIsFilled()" @click="updateTimeOffRequest()" />
+    <q-btn
+      color="white"
+      text-color="black"
+      label="Update"
+      :disabled="!formIsFilled()"
+      @click="updateTimeOffRequest()"
+    />
   </div>
 </template>
 
@@ -34,7 +53,9 @@ import { onMounted, ref, Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { getRoutePk } from 'src/utils'
-import { TimeOffRequestDates, TimeOffRequestRetrieve } from 'src/types'
+import {
+  EmployeeConflictingResponsibilities, TimeOffRequestDates
+} from 'src/types'
 import { useTimeOffStore } from 'src/stores/timeoff'
 
 const route = useRoute()
@@ -54,16 +75,19 @@ function formIsFilled(): boolean {
   }
 }
 
-// TODO: Do a valuesAreChanged thing like with ReviewNoteDetail so we aren't always resetting acknowledgements unnecessarily
+// TODO: Do a valuesAreChanged thing like with ReviewNoteDetail so we aren't
+// always resetting acknowledgements unnecessarily
 
-function conflictingTimeOffRequests(): Array<TimeOffRequestRetrieve> {
-  return timeOffStore.conflictingTimeOffRequests
+function conflictingResponsibilities():
+  Array<EmployeeConflictingResponsibilities>
+{
+  return timeOffStore.conflictingResponsibilities
 }
 
 function dateChanged(): void {
   // Check if there are any coworkers out with shared responsibilities
   if (dates.value) {
-    timeOffStore.getConflictingTimeOffRequests({ dates: dates.value })
+    timeOffStore.getConflictingResponsibilites({ dates: dates.value })
       .catch(e => {
         console.error('Error getting conflicting responsibilities:', e)
       })
@@ -87,6 +111,7 @@ function retrieveRequest(): void {
       }
       note.value = tor.note
       privateNote.value = tor.private_note
+      dateChanged()
     })
     .catch(e => {
       console.error('Error getting time off request:', e)
@@ -107,7 +132,10 @@ function updateTimeOffRequest(): void {
     .then(() => {
       router.push({ name: 'timeoff-my-requests'})
         .catch(e => {
-          console.error('Error navigating to My Requests page after creating time off request:', e)
+          console.error(
+            'Error navigating to My Requests page after creating TOR:',
+            e
+          )
         })
     })
     .catch(e => {

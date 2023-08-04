@@ -137,7 +137,7 @@
     </div>
     <div class="row items-center">
       <EmployeeSelect
-        v-if="employeeIsSubmitter()"
+        v-if="!formSubmitted() || employeeIsSubmitter()"
         label="Manager"
         :employee="manager"
         :useLegalName="true"
@@ -982,6 +982,10 @@ function formErrorItems(): Array<[string, string]> {
     )
   }
   return errorItems
+}
+
+function formSubmitted() {
+  return !!dateSubmitted.value
 }
 
 function employeeIsSubmitter() {

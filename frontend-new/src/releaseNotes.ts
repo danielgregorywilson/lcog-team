@@ -4,16 +4,26 @@
 
 export const releases = [
   {
+    version: '0.15.2',
+    date: new Date(2023, 7, 4),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Minor improvements to the transition form.'
+      }
+    ]
+  },
+  {
     version: '0.15.1',
     date: new Date(2023, 7, 2),
     changes: [
       {
         type: 'improved',
-        description: 'Minor improvements to transition form.'
+        description: 'Minor improvements to the transition form.'
       },
       {
         type: 'improved',
-        description: 'Minor improvements to responsibilities table.'
+        description: 'Minor improvements to the responsibilities table.'
       },
       {
         type: 'improved',

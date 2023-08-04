@@ -19,7 +19,7 @@
       </q-item-section>
     </q-item>
   </template>
-  <template v-if="selectedEmployeeName" v-slot:append>
+  <template v-if="selectedEmployeeName()" v-slot:append>
     <q-icon name="cancel" @click.stop="clearEmployee()" class="cursor-pointer" />
   </template>
 </q-select>

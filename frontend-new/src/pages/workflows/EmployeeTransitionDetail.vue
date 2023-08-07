@@ -424,6 +424,34 @@
       </q-card>
     </q-dialog>
 
+    <!-- Send to SDS Hiring Leads Dialog -->
+    <q-dialog v-model="showSendToSDSHiringLeadsDialog">
+      <q-card class="q-pa-md" style="width: 400px">
+        <div class="text-h6">Send transition to S&DS hiring admins?</div>
+        <q-chip v-if="valuesAreChanged()" color="warning" text-color="white" icon="warning" label="Unsaved changes" />
+        <q-form
+          @submit='onSubmitSendDialog("SDS")'
+          class="q-gutter-md"
+        >
+          <q-input
+            v-model="sendDialogMessage"
+            filled
+            type="textarea"
+            label="Extra message to include"
+          />
+
+          <div>
+            <q-btn
+              label="Send"
+              icon-right="send"
+              type="submit"
+              color="primary"
+            />
+          </div>
+        </q-form>
+      </q-card>
+    </q-dialog>
+
     <!-- Send to HR Dialog -->
     <q-dialog v-model="showSendToHRDialog">
       <q-card class="q-pa-md" style="width: 400px">
@@ -437,7 +465,7 @@
             v-model="sendDialogMessage"
             filled
             type="textarea"
-            label="Extra message to include"	
+            label="Extra message to include"
           />
 
           <div>
@@ -466,7 +494,7 @@
             v-model="sendDialogMessage"
             filled
             type="textarea"
-            label="Extra message to include"	
+            label="Extra message to include"
           />
 
           <div>
@@ -519,7 +547,16 @@
           @click="router.push({ name: 'workflow-print' })"
         />
         <q-btn
-          v-if="canSendToHR()"
+          v-if="canSendToTransitionNews()"
+          class="q-ml-sm"
+          color="white"
+          text-color="black"
+          icon="send"
+          label="Send to STN"
+          @click="showSendToSTNDialog = true"
+        />
+        <q-btn
+          v-else-if="canSendToHR()"
           class="q-ml-sm"
           color="white"
           text-color="black"
@@ -528,13 +565,13 @@
           @click="showSendToHRDialog = true"
         />
         <q-btn
-          v-if="canSendToTransitionNews()"
+          v-else
           class="q-ml-sm"
           color="white"
           text-color="black"
           icon="send"
-          label="Send to STN"
-          @click="showSendToSTNDialog = true"
+          label="Submit"
+          @click="showSendToSDSHiringLeadsDialog = true"
         />
       </div>
       <!-- <div class="col-3 self-center status">
@@ -734,6 +771,7 @@ let errorDialogPosition = ref('top') as Ref<QDialogProps['position']>
 
 let showChangesDialog = ref(false)
 
+let showSendToSDSHiringLeadsDialog = ref(false)
 let showSendToHRDialog = ref(false)
 let showSendToSTNDialog = ref(false)
 let sendDialogMessage = ref('')
@@ -743,7 +781,7 @@ function retrieveEmployeeTransition() {
   return new Promise((resolve) => {
     const t = currentEmployeeTransition()
     transitionPk.value = t.pk.toString()
-    
+
     type.value = t.type
     typeCurrentVal.value = type.value
 
@@ -836,7 +874,7 @@ function retrieveEmployeeTransition() {
     if (t.access_emails_pk != -1) {
       showAccessEmails.value = true
       showAccessEmailsCurrentVal.value = true
-    } 
+    }
     accessEmails.value = {
       pk: t.access_emails_pk, name: '', legal_name: t.access_emails_name
     }
@@ -845,7 +883,7 @@ function retrieveEmployeeTransition() {
     specialInstructionsCurrentVal.value = specialInstructions.value
 
     changes.value = t.changes
-    
+
     if (formErrorItems().length > 0) {
       showErrorButton.value = true
     }
@@ -858,7 +896,7 @@ function emailInUse(email: string): boolean {
   if (emailList.indexOf(email) > -1) {
     return true
   } else {
-    return false 
+    return false
   }
 }
 
@@ -879,7 +917,7 @@ function suggestEmail(): void {
   } else {
     return
   }
-  
+
   // Check if email is already in use
   if (emailInUse(suggestedEmail)) {
     // If so, add middle initial and check again
@@ -899,14 +937,14 @@ function suggestEmail(): void {
       suggestedEmail = `${suggestedEmail}${i}`
     }
   }
-  
+
   // Set the value
   if (!employeeEmail.value) {
     employeeEmail.value = suggestedEmail
   }
 }
 
-function valuesAreChanged(): boolean { 
+function valuesAreChanged(): boolean {
   if (
     type.value == typeCurrentVal.value &&
     employeeFirstName.value == employeeFirstNameCurrentVal.value &&
@@ -1015,7 +1053,7 @@ function updateTransition() {
     // Clean fields
     if (!bilingual.value) {
       secondLanguage.value = ''
-    } 
+    }
     const phoneNumberVal = phoneNumber.value == '(___) ___-____' ? '' :
       phoneNumber.value
     if (
@@ -1028,7 +1066,7 @@ function updateTransition() {
     if (!showAccessEmails.value) {
       accessEmails.value = emptyEmployee
     }
-    
+
     let transitionDateFromForm: Date | undefined = undefined
     if (transitionDate.value) {
       transitionDateFromForm = new Date(transitionDate.value)
@@ -1088,7 +1126,7 @@ function updateTransition() {
     })
     .then((t) => {
       typeCurrentVal.value = t.type
-      
+
       dateSubmitted.value = t.date_submitted
       submitterPk.value = t.submitter_pk
       submitterName.value = t.submitter_name
@@ -1225,7 +1263,7 @@ function sendGasPINNotificationEmail() {
     })
 }
 
-function onSubmitSendDialog(type: 'HR'|'STN') {
+function onSubmitSendDialog(type: 'SDS'|'HR'|'STN') {
   workflowsStore.sendTransitionToEmailList(transitionPk.value, {
     type: type,
     update: sendDialogUpdate.value,
@@ -1240,6 +1278,7 @@ function onSubmitSendDialog(type: 'HR'|'STN') {
         color: 'positive',
         icon: 'send'
       })
+      showSendToSDSHiringLeadsDialog.value = false
       showSendToHRDialog.value = false
       showSendToSTNDialog.value = false
       sendDialogUpdate.value = false
@@ -1266,7 +1305,7 @@ function handlePrint() {
   } else {
     workflowsStore.getCurrentWorkflowInstance(pk)
       .then(() => {
-        const wfInstance: WorkflowInstance = 
+        const wfInstance: WorkflowInstance =
           workflowsStore.currentWorkflowInstance
         if (!wfInstance) {
           console.error(

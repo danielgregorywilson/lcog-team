@@ -161,7 +161,7 @@ export const useWorkflowsStore = defineStore('workflows', {
       })
     },
     sendTransitionToEmailList(pk: string, data: {
-      type: 'HR'|'STN', update: boolean, extraMessage: string,
+      type: 'SDS'|'HR'|'STN', update: boolean, extraMessage: string,
       senderName: string, senderEmail: string, transition_url: string
     }): Promise<boolean> {
       return new Promise((resolve, reject) => {

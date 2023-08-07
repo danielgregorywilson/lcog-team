@@ -47,6 +47,45 @@ def send_gas_pin_notification_email(
         to_addresses, [], subject, plaintext_message, html_message
     )
 
+def send_transition_sds_hiring_leads_email(
+    t, extra_message=None, sender_name='', sender_email='', url=''
+):
+    current_site = Site.objects.get_current()
+    transition_url = current_site.domain + url
+    
+    title_string = t.title.name if t.title else ''
+    if t.type == EmployeeTransition.TRANSITION_TYPE_NEW:
+        type_verb = 'starting'
+    elif t.type == EmployeeTransition.TRANSITION_TYPE_CHANGE:
+        type_verb = 'changing'
+    elif t.type == EmployeeTransition.TRANSITION_TYPE_EXIT:
+        type_verb = 'terminating'
+    else:
+        type_verb = 'changing'
+    date_string = t.transition_date.strftime('%m-%d-%y') if t.transition_date else ''
+
+    subject = f'{ title_string } EIS { type_verb } { date_string }'
+
+    html_template = '../templates/email/employee-transition-sds.html'
+    html_message = render_to_string(html_template, {
+        'title_string': title_string, 'type_verb': type_verb,
+        'date_string': date_string, 'extra_message': extra_message,
+        'transition_url': transition_url, 'sender_name': sender_name
+    })
+    plaintext_message = strip_tags(html_message)
+
+    # Send to tammy/lori and copy hiring manager and sender
+    to_addresses = Group.objects.get(name='SDS Hiring Lead').user_set.all().values_list('email', flat=True)
+    cc_addresses = []
+    if t.manager and t.manager.user.email:
+        cc_addresses.append(t.manager.user.email)
+    if sender_email not in cc_addresses:
+        cc_addresses.append(sender_email)
+
+    send_email_multiple(
+        to_addresses, cc_addresses, subject, plaintext_message, html_message
+    )
+
 def send_transition_hr_email(
     t, extra_message=None, sender_name='', sender_email='', url=''
 ):

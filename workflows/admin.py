@@ -135,12 +135,17 @@ class ActionAdmin(admin.ModelAdmin):
 
 @admin.register(WorkflowInstance)
 class WorkflowInstanceAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("pk", "workflow", "started_at", "completed_at", "complete", "active")
+    list_filter = ("workflow", "active", "complete")
+    readonly_fields = ("started_at",)
+    fields = ("started_at", "completed_at", "workflow", "transition", "active", "complete")
 
 
 @admin.register(ProcessInstance)
 class ProcessInstanceAdmin(admin.ModelAdmin):
     list_display = ("pk", "process", "workflow_instance", "current_step_instance")
+    fields = ("started_at", "completed_at", "process", "workflow_instance", "current_step_instance")
+    readonly_fields = ("started_at",)
     form = ProcessInstanceForm
 
 
@@ -148,6 +153,8 @@ class ProcessInstanceAdmin(admin.ModelAdmin):
 class StepInstanceAdmin(admin.ModelAdmin):
     list_display = ("pk", "step", "process_instance")
     ordering = ("process_instance", "step__order")
+    fields = ("started_at", "completed_at", "step", "process_instance", "completed_by")
+    readonly_fields = ("started_at",)
     form = StepInstanceForm
 
 

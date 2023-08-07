@@ -34,7 +34,15 @@ def get_host_url(request):
 
 
 def send_email(to_address, subject, body, html_body):
-    return send_mail(subject, body, os.environ.get('FROM_EMAIL'), [to_address], html_message=html_body)
+    return send_mail(
+        subject,
+        body,
+        from_email=os.environ.get('FROM_EMAIL'),
+        recipient_list=[to_address],
+        auth_user=os.environ.get('FROM_EMAIL_USERNAME'),
+        auth_password=os.environ.get('FROM_EMAIL_PASSWORD'),
+        html_message=html_body
+    )
 
 def send_email_multiple(to_addresses=[], cc_addresses=[], subject='', text_body='', html_body=''):
     email = EmailMultiAlternatives(

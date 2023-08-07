@@ -23,7 +23,8 @@ from timeoff.helpers import (
 )
 from workflows.helpers import (
     create_process_instances, send_gas_pin_notification_email,
-    send_transition_hr_email, send_transition_stn_email
+    send_transition_hr_email, send_transition_sds_hiring_leads_email,
+    send_transition_stn_email
 )
 from workflows.models import (
     EmployeeTransition, Process, ProcessInstance, Role, Step, StepChoice,
@@ -421,7 +422,15 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def send_transition_to_email_list(self, request, pk):
         transition = EmployeeTransition.objects.get(pk=pk)
-        if request.data['type'] == 'HR':
+        if request.data['type'] == 'SDS':
+            send_transition_sds_hiring_leads_email(
+                transition,
+                extra_message=request.data['extraMessage'],
+                sender_name=request.data['senderName'],
+                sender_email=request.data['senderEmail'],
+                url=request.data['transition_url']
+            )
+        elif request.data['type'] == 'HR':
             send_transition_hr_email(
                 transition,
                 extra_message=request.data['extraMessage'],

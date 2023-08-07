@@ -4,6 +4,16 @@
 
 export const releases = [
   {
+    version: '0.15.3',
+    date: new Date(2023, 7, 7),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Add a button for hiring managers to send transition email to SDS hiring admins.'
+      }
+    ]
+  },
+  {
     version: '0.15.2',
     date: new Date(2023, 7, 4),
     changes: [

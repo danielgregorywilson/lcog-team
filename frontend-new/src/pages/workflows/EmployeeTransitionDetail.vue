@@ -1035,7 +1035,9 @@ function canEditEmployeeNumberFields() {
 }
 
 function canViewSalaryFields() {
-  return userStore.getEmployeeProfile.employee_pk == manager.value.pk ||
+  return !formSubmitted() ||
+    employeeIsSubmitter() ||
+    userStore.getEmployeeProfile.employee_pk == manager.value.pk ||
     cookies.get('is_hr_employee') == 'true' ||
     cookies.get('is_fiscal_employee') == 'true'
 }

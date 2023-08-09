@@ -294,7 +294,7 @@
     <div class="row">
       <q-input
         v-model="loadCode"
-        v-if="employeeID == 'CLSD'"
+        v-if="employeeID != 'CLID'"
         label="Load Code"
       />
     </div>

@@ -182,7 +182,7 @@
     <div class="row q-my-sm">
       <q-checkbox
         v-model="preliminaryHire"
-        v-if="employeeID == 'CLSD'"
+        v-if="employeeID != 'CLID'"
         label="Preliminary Hire"
       />
       <q-checkbox
@@ -196,9 +196,10 @@
         v-model="officeLocation"
         :options="[
           'Cottage Grove', 'Florence', 'Junction City', 'Oakridge',
-          'PPB - 4th Floor', 'PPB - 5th Floor', 'Schaefers - Basement',
-          'Schaefers - 1st Floor', 'Schaefers - 2nd Floor',
-          'Schaefers - 3rd Floor', 'Senior Meals Site', 'Veneta'
+          'PPB - 1st Floor', 'PPB - 4th Floor', 'PPB - 5th Floor',
+          'Schaefers - Basement', 'Schaefers - 1st Floor',
+          'Schaefers - 2nd Floor', 'Schaefers - 3rd Floor', 'Senior Meals Site',
+          'Veneta'
         ]"
         label="Office Location"
         class="q-mr-md"
@@ -294,7 +295,7 @@
     <div class="row">
       <q-input
         v-model="loadCode"
-        v-if="employeeID == 'CLSD'"
+        v-if="employeeID != 'CLID'"
         label="Load Code"
       />
     </div>
@@ -1035,7 +1036,9 @@ function canEditEmployeeNumberFields() {
 }
 
 function canViewSalaryFields() {
-  return userStore.getEmployeeProfile.employee_pk == manager.value.pk ||
+  return !formSubmitted() ||
+    employeeIsSubmitter() ||
+    userStore.getEmployeeProfile.employee_pk == manager.value.pk ||
     cookies.get('is_hr_employee') == 'true' ||
     cookies.get('is_fiscal_employee') == 'true'
 }

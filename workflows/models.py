@@ -43,6 +43,7 @@ class EmployeeTransition(models.Model):
     LOCATION_FLORENCE = 'Florence'
     LOCATION_JUNCTION_CITY = 'Junction City'
     LOCATION_OAKRIDGE = 'Oakridge'
+    LOCATION_PP1 = 'PPB - 1st Floor'
     LOCATION_PP4 = 'PPB - 4th Floor'
     LOCATION_PP5 = 'PPB - 5th Floor'
     LOCATION_SB = 'Schaefers - Basement'
@@ -56,6 +57,7 @@ class EmployeeTransition(models.Model):
         (LOCATION_FLORENCE, LOCATION_FLORENCE),
         (LOCATION_JUNCTION_CITY, LOCATION_JUNCTION_CITY),
         (LOCATION_OAKRIDGE, LOCATION_OAKRIDGE),
+        (LOCATION_PP1, LOCATION_PP1),
         (LOCATION_PP4, LOCATION_PP4),
         (LOCATION_PP5, LOCATION_PP5),
         (LOCATION_SB, LOCATION_SB),

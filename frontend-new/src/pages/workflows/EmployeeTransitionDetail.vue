@@ -196,9 +196,10 @@
         v-model="officeLocation"
         :options="[
           'Cottage Grove', 'Florence', 'Junction City', 'Oakridge',
-          'PPB - 4th Floor', 'PPB - 5th Floor', 'Schaefers - Basement',
-          'Schaefers - 1st Floor', 'Schaefers - 2nd Floor',
-          'Schaefers - 3rd Floor', 'Senior Meals Site', 'Veneta'
+          'PPB - 1st Floor', 'PPB - 4th Floor', 'PPB - 5th Floor',
+          'Schaefers - Basement', 'Schaefers - 1st Floor',
+          'Schaefers - 2nd Floor', 'Schaefers - 3rd Floor', 'Senior Meals Site',
+          'Veneta'
         ]"
         label="Office Location"
         class="q-mr-md"

@@ -296,11 +296,13 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         t.fte = request.data['fte']
 
         # Only the hiring manager, fiscal, or HR can edit salary fields
+        user_is_submitter = request.user.employee == t.submitter
         user_is_hiring_manager = request.user.employee == t.manager
         user_is_hr = request.user.employee.is_hr_employee
         user_is_fiscal = request.user.employee.is_fiscal_employee
         user_can_edit_salary = any([
-            user_is_hiring_manager, user_is_hr, user_is_fiscal
+            user_is_submitter, user_is_hiring_manager, user_is_hr,
+            user_is_fiscal
         ])
         editing_salary_range = all([
             'salary_range' in request.data,

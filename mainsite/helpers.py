@@ -39,8 +39,8 @@ def send_email(to_address, subject, body, html_body):
         body,
         from_email=os.environ.get('FROM_EMAIL'),
         recipient_list=[to_address],
-        auth_user=os.environ.get('FROM_EMAIL_USERNAME'),
-        auth_password=os.environ.get('FROM_EMAIL_PASSWORD'),
+        # auth_user=os.environ.get('FROM_EMAIL_USERNAME'),
+        # auth_password=os.environ.get('FROM_EMAIL_PASSWORD'),
         html_message=html_body
     )
 

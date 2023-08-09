@@ -182,7 +182,7 @@
     <div class="row q-my-sm">
       <q-checkbox
         v-model="preliminaryHire"
-        v-if="employeeID == 'CLSD'"
+        v-if="employeeID != 'CLID'"
         label="Preliminary Hire"
       />
       <q-checkbox

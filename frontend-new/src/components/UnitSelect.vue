@@ -28,7 +28,7 @@
 
 <style scoped lang="scss">
   .unit-select {
-    width: 350px
+    width: 742px
   }
 </style>
 

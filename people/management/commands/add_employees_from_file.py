@@ -190,6 +190,8 @@ class Command(BaseCommand):
                         manager = Employee.objects.get(user__last_name='Harris', user__first_name='Karen')
                     elif manager_last_name == 'Thompson':
                         manager = Employee.objects.get(user__last_name='Thompson', user__first_name='Paul')
+                    elif manager_last_name == 'Blair':
+                        manager = Employee.objects.get(user__last_name='Blair', user__first_name='Deborah')
                     else:
                         manager = Employee.objects.get(user__last_name=manager_last_name)
                     if employee.manager != manager:

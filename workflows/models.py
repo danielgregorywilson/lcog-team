@@ -133,7 +133,7 @@ class EmployeeTransition(models.Model):
         JobTitle, blank=True, null=True, on_delete=models.SET_NULL
     )
     fte = models.FloatField(blank=True, default=1.0)
-    salary_range = models.PositiveSmallIntegerField(blank=True, null=True)
+    salary_range = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2)
     salary_step = models.PositiveSmallIntegerField(blank=True, null=True)
     bilingual = models.BooleanField(default=False)
     second_language = models.CharField(max_length=20, choices=LANGUAGE_CHOICES, blank=True)
@@ -173,6 +173,7 @@ class EmployeeTransition(models.Model):
         related_name="access_emails_after_transitions"
     )
     special_instructions = models.TextField(blank=True)
+    fiscal_field = models.TextField(blank=True)
 
     __original_values = {}
 

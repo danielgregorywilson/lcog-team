@@ -1049,7 +1049,8 @@ function canViewSalaryFields() {
     employeeIsSubmitter() ||
     userStore.getEmployeeProfile.employee_pk == manager.value.pk ||
     cookies.get('is_hr_employee') == 'true' ||
-    cookies.get('is_fiscal_employee') == 'true'
+    cookies.get('is_fiscal_employee') == 'true' ||
+    cookies.get('is_sds_hiring_lead') == 'true'
 }
 
 function canSendToHR() {

@@ -392,6 +392,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             t.access_emails = None 
         
         t.special_instructions = request.data['special_instructions']
+        t.fiscal_field = request.data['fiscal_field']
         
         t.save()
         serialized_transition = EmployeeTransitionSerializer(t,

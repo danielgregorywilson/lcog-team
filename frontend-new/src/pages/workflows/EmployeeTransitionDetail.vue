@@ -102,13 +102,11 @@
       </q-select>
     </div>
     <div class="row">
-      <q-select
+      <q-input
         v-if="canViewSalaryFields()"
         v-model="salaryRange"
-        :options="Array.from({length: 50}, (x, i) => i+1)"
         label="Salary Range"
         class="q-mr-md"
-        style="width: 133px;"
         clearable
       />
       <q-select
@@ -370,6 +368,12 @@
     </div>
     <div class="row">
       <q-input v-model="specialInstructions" autogrow style="width:100%" />
+    </div>
+    <div class="text-h6 transition-form-section-heading">
+      Fiscal Use Only
+    </div>
+    <div class="row">
+      <q-input v-model="fiscalField" autogrow style="width:100%" />
     </div>
 
     <!-- Dialog of all error items -->
@@ -763,6 +767,8 @@ let accessEmailsCurrentVal = ref(emptyEmployee)
 let accessEmails = ref(emptyEmployee)
 let specialInstructionsCurrentVal = ref('')
 let specialInstructions = ref('')
+let fiscalFieldCurrentVal = ref('')
+let fiscalField = ref('')
 
 let changes = ref(null) as Ref<TransitionChange[] | null>
 
@@ -882,6 +888,8 @@ function retrieveEmployeeTransition() {
     accessEmailsCurrentVal.value = accessEmails.value
     specialInstructions.value = t.special_instructions
     specialInstructionsCurrentVal.value = specialInstructions.value
+    fiscalField.value = t.fiscal_field
+    fiscalFieldCurrentVal.value = fiscalField.value
 
     changes.value = t.changes
 
@@ -997,7 +1005,8 @@ function valuesAreChanged(): boolean {
     proxCardReturned.value == proxCardReturnedCurrentVal.value &&
     showAccessEmails.value == showAccessEmailsCurrentVal.value &&
     accessEmails.value.pk == accessEmailsCurrentVal.value.pk &&
-    specialInstructions.value == specialInstructionsCurrentVal.value
+    specialInstructions.value == specialInstructionsCurrentVal.value &&
+    fiscalField.value == fiscalFieldCurrentVal.value
   ) {
     return false
   } else {
@@ -1125,7 +1134,8 @@ function updateTransition() {
       prox_card_needed: proxCardNeeded.value,
       prox_card_returned: proxCardReturned.value,
       access_emails_pk: accessEmails.value.pk,
-      special_instructions: specialInstructions.value
+      special_instructions: specialInstructions.value,
+      fiscal_field: fiscalField.value
     })
     .then((t) => {
       typeCurrentVal.value = t.type
@@ -1143,6 +1153,8 @@ function updateTransition() {
       employeeEmailCurrentVal.value = t.employee_email
       titleCurrentVal.value = {pk: t.title_pk, name: t.title_name}
       fteCurrentVal.value = t.fte
+      // We need to set salaryRange because integers are set as decimals
+      salaryRange.value = t.salary_range
       salaryRangeCurrentVal.value = t.salary_range
       salaryStepCurrentVal.value = t.salary_step
       bilingualCurrentVal.value = t.bilingual
@@ -1180,6 +1192,7 @@ function updateTransition() {
         pk: t.access_emails_pk, name: '', legal_name: t.access_emails_name
       }
       specialInstructionsCurrentVal.value = t.special_instructions
+      fiscalFieldCurrentVal.value = t.fiscal_field
 
       changes.value = t.changes
 

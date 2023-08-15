@@ -765,6 +765,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   access_emails_pk: number
   access_emails_name: string
   special_instructions: string
+  fiscal_field: string
   changes: Array<TransitionChange>
 }
 
@@ -809,6 +810,7 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   prox_card_returned?: boolean
   access_emails_pk?: number
   special_instructions?: string
+  fiscal_field?: string
 }
 
 ////////////////////////////////////////////////

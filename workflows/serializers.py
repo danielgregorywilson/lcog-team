@@ -163,7 +163,8 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
             'phone_request', 'phone_request_data', 'load_code', 'cell_phone',
             'should_delete', 'reassign_to', 'gas_pin_needed', 'business_cards',
             'prox_card_needed', 'prox_card_returned', 'access_emails_pk',
-            'access_emails_name', 'special_instructions', 'changes'
+            'access_emails_name', 'special_instructions', 'fiscal_field',
+            'changes'
         ]
     
     @staticmethod

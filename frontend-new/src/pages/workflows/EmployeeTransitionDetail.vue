@@ -434,6 +434,10 @@
     <q-dialog v-model="showSendToSDSHiringLeadsDialog">
       <q-card class="q-pa-md" style="width: 400px">
         <div class="text-h6">Send transition to S&DS hiring admins?</div>
+        <div class="row text-red">
+          <q-icon class="col-1 q-mr-xs" name="warning" size="md"/>
+          <div class="col text-bold text-center">By submitting this information you are providing your electronic signature approving this request.</div>
+        </div>
         <q-chip v-if="valuesAreChanged()" color="warning" text-color="white" icon="warning" label="Unsaved changes" />
         <q-form
           @submit='onSubmitSendDialog("SDS")'

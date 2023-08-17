@@ -374,7 +374,12 @@
       Fiscal Use Only
     </div>
     <div class="row">
-      <q-input v-model="fiscalField" autogrow style="width:100%" />
+      <q-input
+        v-model="fiscalField"
+        autogrow
+        style="width:100%"
+        hint="_ _ _ - _ _ - _ _ _ _ / Allocation %"
+        :readonly="!canEditFiscalField()" />
     </div>
 
     <!-- Dialog of all error items -->
@@ -1050,6 +1055,10 @@ function canViewSalaryFields() {
     cookies.get('is_hr_employee') == 'true' ||
     cookies.get('is_fiscal_employee') == 'true' ||
     cookies.get('is_sds_hiring_lead') == 'true'
+}
+
+function canEditFiscalField() {
+  return cookies.get('is_fiscal_employee') == 'true'
 }
 
 function canSendToHR() {

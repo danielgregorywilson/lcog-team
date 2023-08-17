@@ -193,7 +193,15 @@ class Command(BaseCommand):
                     elif manager_last_name == 'Blair':
                         manager = Employee.objects.get(user__last_name='Blair', user__first_name='Deborah')
                     else:
-                        manager = Employee.objects.get(user__last_name=manager_last_name)
+                        try:
+                            manager = Employee.objects.get(user__last_name=manager_last_name)
+                        except Employee.MultipleObjectsReturned:
+                            self.stdout.write("~~~~~~~~~~~~~EXCEPTION~~~~~~~~~~~~")
+                            self.stdout.write(
+                                'Multiple managers with last name {}'.format(manager_last_name)
+                            )
+                            self.stdout.write("~~~~~~~~~~~~~EXCEPTION~~~~~~~~~~~~")
+                            manager = Employee.objects.get(user__email='dwilson@lcog.org')
                     if employee.manager != manager:
                         employee.manager = manager
                         employee.save()

@@ -108,7 +108,7 @@
         label="Salary Range"
         class="q-mr-md"
         clearable
-        :rules="[ val => Number.isInteger(Math.floor(val)) || 'Only numbers are allowed']"
+        :rules="[ val => Number.isInteger(Math.floor(val)) || 'Please enter a number']"
       />
       <q-select
         v-if="canViewSalaryFields()"

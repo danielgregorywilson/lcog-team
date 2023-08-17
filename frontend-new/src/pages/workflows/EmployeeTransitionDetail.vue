@@ -136,7 +136,7 @@
     </div>
     <div class="row items-center">
       <EmployeeSelect
-        v-if="!formSubmitted() || employeeIsSubmitter()"
+        v-if="canEditManagerField()"
         label="Manager"
         :employee="manager"
         :useLegalName="true"
@@ -788,6 +788,10 @@ let showSendToSTNDialog = ref(false)
 let sendDialogMessage = ref('')
 let sendDialogUpdate = ref(false)
 
+////////////////////////////
+// Retrieve/Modify/Submit //
+////////////////////////////
+
 function retrieveEmployeeTransition() {
   return new Promise((resolve) => {
     const t = currentEmployeeTransition()
@@ -904,59 +908,6 @@ function retrieveEmployeeTransition() {
   })
 }
 
-function emailInUse(email: string): boolean {
-  const emailList = peopleStore.employeeEmailList
-  if (emailList.indexOf(email) > -1) {
-    return true
-  } else {
-    return false
-  }
-}
-
-function suggestEmail(): void {
-  // Create first pass at suggestion
-  let suggestedEmail = ''
-  let firstChar = ''
-  if (employeePreferredName.value) {
-    firstChar = employeePreferredName.value.charAt(0).toLowerCase()
-  } else if (employeeFirstName.value) {
-    firstChar = employeeFirstName.value.charAt(0).toLowerCase()
-  } else {
-    return
-  }
-  if (employeeLastName.value) {
-    suggestedEmail =
-    `${firstChar}${employeeLastName.value.toLowerCase()}@lcog.org`
-  } else {
-    return
-  }
-
-  // Check if email is already in use
-  if (emailInUse(suggestedEmail)) {
-    // If so, add middle initial and check again
-    if (employeeMiddleInitial.value) {
-      const mi = employeeMiddleInitial.value.toLowerCase()
-      const ln = employeeLastName.value.toLowerCase()
-      suggestedEmail = `${firstChar}${mi}${ln}@lcog.org`
-    } else {
-      return
-    }
-    if (emailInUse(suggestedEmail)) {
-      // If so, add a number to the end and check again
-      let i = 1
-      while (emailInUse(`${suggestedEmail}${i}`)) {
-        i++
-      }
-      suggestedEmail = `${suggestedEmail}${i}`
-    }
-  }
-
-  // Set the value
-  if (!employeeEmail.value) {
-    employeeEmail.value = suggestedEmail
-  }
-}
-
 function valuesAreChanged(): boolean {
   if (
     type.value == typeCurrentVal.value &&
@@ -1016,57 +967,6 @@ function valuesAreChanged(): boolean {
   } else {
     return true
   }
-}
-
-function formErrorItems(): Array<[string, string]> {
-  let errorItems: Array<[string, string]> = []
-  if (computerTypeCurrentVal.value == 'New' && !computerGLCurrentVal.value) {
-    errorItems.push(
-      ['computer-type', 'Provide a valid GL code for computer purchase']
-    )
-  }
-  if (
-    computerTypeCurrentVal.value == 'Repurposed' &&
-    !computerDescriptionCurrentVal.value
-  ) {
-    errorItems.push(
-      ['computer-type', 'Provide a description of existing computer']
-    )
-  }
-  return errorItems
-}
-
-function formSubmitted() {
-  return !!dateSubmitted.value
-}
-
-function employeeIsSubmitter() {
-  return userStore.getEmployeeProfile.employee_pk == submitterPk.value
-}
-
-function canEditEmployeeNumberFields() {
-  return cookies.get('is_hr_employee') == 'true'
-}
-
-function canViewSalaryFields() {
-  return !formSubmitted() ||
-    employeeIsSubmitter() ||
-    userStore.getEmployeeProfile.employee_pk == manager.value.pk ||
-    cookies.get('is_hr_employee') == 'true' ||
-    cookies.get('is_fiscal_employee') == 'true' ||
-    cookies.get('is_sds_hiring_lead') == 'true'
-}
-
-function canEditFiscalField() {
-  return cookies.get('is_fiscal_employee') == 'true'
-}
-
-function canSendToHR() {
-  return cookies.get('is_sds_hiring_lead') == 'true'
-}
-
-function canSendToTransitionNews() {
-  return cookies.get('is_hr_employee') == 'true'
 }
 
 function updateTransition() {
@@ -1249,6 +1149,122 @@ function updateTransition() {
   })
 }
 
+function formErrorItems(): Array<[string, string]> {
+  let errorItems: Array<[string, string]> = []
+  if (computerTypeCurrentVal.value == 'New' && !computerGLCurrentVal.value) {
+    errorItems.push(
+      ['computer-type', 'Provide a valid GL code for computer purchase']
+    )
+  }
+  if (
+    computerTypeCurrentVal.value == 'Repurposed' &&
+    !computerDescriptionCurrentVal.value
+  ) {
+    errorItems.push(
+      ['computer-type', 'Provide a description of existing computer']
+    )
+  }
+  return errorItems
+}
+
+/////////////////////////////////
+// Field view/edit permissions //
+/////////////////////////////////
+
+function formSubmitted() {
+  return !!dateSubmitted.value
+}
+
+function employeeIsSubmitter() {
+  return userStore.getEmployeeProfile.employee_pk == submitterPk.value
+}
+
+function canEditManagerField() {
+  return !formSubmitted() || employeeIsSubmitter()
+}
+
+function canEditEmployeeNumberFields() {
+  return cookies.get('is_hr_employee') == 'true'
+}
+
+function canViewSalaryFields() {
+  return !formSubmitted() ||
+    employeeIsSubmitter() ||
+    userStore.getEmployeeProfile.employee_pk == manager.value.pk ||
+    cookies.get('is_hr_employee') == 'true' ||
+    cookies.get('is_fiscal_employee') == 'true' ||
+    cookies.get('is_sds_hiring_lead') == 'true'
+}
+
+function canEditFiscalField() {
+  return cookies.get('is_fiscal_employee') == 'true'
+}
+
+function canSendToHR() {
+  return cookies.get('is_sds_hiring_lead') == 'true'
+}
+
+function canSendToTransitionNews() {
+  return cookies.get('is_hr_employee') == 'true'
+}
+
+////////////////////////
+// Interact with form //
+////////////////////////
+
+function emailInUse(email: string): boolean {
+  const emailList = peopleStore.employeeEmailList
+  if (emailList.indexOf(email) > -1) {
+    return true
+  } else {
+    return false
+  }
+}
+
+function suggestEmail(): void {
+  // Create first pass at suggestion
+  let suggestedEmail = ''
+  let firstChar = ''
+  if (employeePreferredName.value) {
+    firstChar = employeePreferredName.value.charAt(0).toLowerCase()
+  } else if (employeeFirstName.value) {
+    firstChar = employeeFirstName.value.charAt(0).toLowerCase()
+  } else {
+    return
+  }
+  if (employeeLastName.value) {
+    suggestedEmail =
+    `${firstChar}${employeeLastName.value.toLowerCase()}@lcog.org`
+  } else {
+    return
+  }
+
+  // Check if email is already in use
+  if (emailInUse(suggestedEmail)) {
+    // If so, add middle initial and check again
+    if (employeeMiddleInitial.value) {
+      const mi = employeeMiddleInitial.value.toLowerCase()
+      const ln = employeeLastName.value.toLowerCase()
+      suggestedEmail = `${firstChar}${mi}${ln}@lcog.org`
+    } else {
+      return
+    }
+    if (emailInUse(suggestedEmail)) {
+      // If so, add a number to the end and check again
+      let i = 1
+      while (emailInUse(`${suggestedEmail}${i}`)) {
+        i++
+      }
+      suggestedEmail = `${suggestedEmail}${i}`
+    }
+  }
+
+  // Set the value
+  if (!employeeEmail.value) {
+    employeeEmail.value = suggestedEmail
+  }
+}
+
 function openErrorDialog(position: QDialogProps['position']) {
   errorDialogPosition.value = position
   showErrorDialog.value = true
@@ -1264,6 +1280,50 @@ function clickedErrorItem(item: [string, string]) {
     setVerticalScrollPosition(target, offset, duration)
   }
 }
+
+function handlePrint() {
+  const pk = getRoutePk(route)
+  if (!pk) {
+    router.push('/')
+  } else {
+    workflowsStore.getCurrentWorkflowInstance(pk)
+      .then(() => {
+        const wfInstance: WorkflowInstance =
+          workflowsStore.currentWorkflowInstance
+        if (!wfInstance) {
+          console.error(
+            'Workflow instance does not seem to exist. Redirecting...'
+          )
+          router.push({ name: 'workflow-dashboard' })
+            .catch(e => {
+              console.error(
+                'Error navigating to workflow dashboard upon not finding a matching Workflow Instance:',
+                e
+              )
+            })
+          return
+        }
+        retrieveEmployeeTransition().then(() => {
+          // Print the screen
+          window.print()
+        })
+      })
+      .catch(e => {
+        console.error('Error retrieving workflow instance', e)
+        router.push({ name: 'workflow-transition-form', params: { pk: pk } })
+          .catch(e => {
+            console.error(
+              'Error navigating to transition form upon not finding a matching Workflow Instance:',
+              e
+            )
+          })
+      })
+  }
+}
+
+////////////////////////
+// Send notifications //
+////////////////////////
 
 function sendGasPINNotificationEmail() {
   workflowsStore.sendGasPINNotificationEmail(transitionPk.value, {
@@ -1323,45 +1383,9 @@ function onSubmitSendDialog(type: 'SDS'|'HR'|'STN') {
     })
 }
 
-function handlePrint() {
-  const pk = getRoutePk(route)
-  if (!pk) {
-    router.push('/')
-  } else {
-    workflowsStore.getCurrentWorkflowInstance(pk)
-      .then(() => {
-        const wfInstance: WorkflowInstance =
-          workflowsStore.currentWorkflowInstance
-        if (!wfInstance) {
-          console.error(
-            'Workflow instance does not seem to exist. Redirecting...'
-          )
-          router.push({ name: 'workflow-dashboard' })
-            .catch(e => {
-              console.error(
-                'Error navigating to workflow dashboard upon not finding a matching Workflow Instance:',
-                e
-              )
-            })
-          return
-        }
-        retrieveEmployeeTransition().then(() => {
-          // Print the screen
-          window.print()
-        })
-      })
-      .catch(e => {
-        console.error('Error retrieving workflow instance', e)
-        router.push({ name: 'workflow-transition-form', params: { pk: pk } })
-          .catch(e => {
-            console.error(
-              'Error navigating to transition form upon not finding a matching Workflow Instance:',
-              e
-            )
-          })
-      })
-  }
-}
+/////////////////////////
+// Vue Lifecycle Hooks //
+/////////////////////////
 
 watch(() => bus.bus.value.get('workflowInstanceRetrieved'), () => {
   // TODO: We should only set state once, but when you load /transition

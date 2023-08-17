@@ -23,3 +23,7 @@ test_user_data.json
 node_modules
 package-lock.json
 old-dbs
+
+# Caselle import files
+people/management/employees.csv
+people/management/reviews.csv

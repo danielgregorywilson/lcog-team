@@ -517,7 +517,7 @@
     <!-- Spacing for footer -->
     <div style="height: 80px;"></div>
 
-    <div id="sticky-footer" class="row justify-between" v-if="true">
+    <div id="sticky-footer" class="row justify-between" v-if="!props.print">
       <q-btn
         class="col-1"
         color="white"
@@ -613,12 +613,6 @@
 @media only screen and (min-width: 1024px) {
   #sticky-footer {
     left: 209px;
-  }
-}
-
-@media print {
-  #sticky-footer {
-    display: none;
   }
 }
 </style>

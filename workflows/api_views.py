@@ -13,7 +13,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.timezone import get_current_timezone
 
-from mainsite.helpers import is_true_string
+from mainsite.helpers import is_true_string, prop_in_obj
 
 from people.models import Employee, JobTitle, UnitOrProgram
 
@@ -130,9 +130,13 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
             elif archived is not None and not is_true_string(archived):
                 complete = self.request.query_params.get('complete', None)
                 if complete is not None and is_true_string(complete):
-                    return WorkflowInstance.active_objects.filter(complete=True)
+                    return WorkflowInstance.active_objects.filter(
+                        complete=True
+                    )
                 elif complete is not None and not is_true_string(complete):
-                    return WorkflowInstance.active_objects.filter(complete=False)
+                    return WorkflowInstance.active_objects.filter(
+                        complete=False
+                    )
             return WorkflowInstance.objects.all()
         else:
             return WorkflowInstance.objects.none()
@@ -141,19 +145,30 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
     def create(self, request):
         wf = None
         if request.data['type'] == 'employee_onboarding':
-            et = EmployeeTransition.objects.create(type=EmployeeTransition.TRANSITION_TYPE_NEW)
+            et = EmployeeTransition.objects.create(
+                type=EmployeeTransition.TRANSITION_TYPE_NEW
+            )
             wf = Workflow.objects.get(name="Employee Onboarding")
         elif request.data['type'] == 'employee_returning':
-            et = EmployeeTransition.objects.create(type=EmployeeTransition.TRANSITION_TYPE_RETURN)
+            et = EmployeeTransition.objects.create(
+                type=EmployeeTransition.TRANSITION_TYPE_RETURN
+            )
             wf = Workflow.objects.get(name="Employee Returning")
         elif request.data['type'] == 'employee_changing':
-            et = EmployeeTransition.objects.create(type=EmployeeTransition.TRANSITION_TYPE_CHANGE)
+            et = EmployeeTransition.objects.create(
+                type=EmployeeTransition.TRANSITION_TYPE_CHANGE
+            )
             wf = Workflow.objects.get(name="Employee Changing")
         elif request.data['type'] == 'employee_exiting':
-            et = EmployeeTransition.objects.create(type=EmployeeTransition.TRANSITION_TYPE_EXIT)
+            et = EmployeeTransition.objects.create(
+                type=EmployeeTransition.TRANSITION_TYPE_EXIT
+            )
             wf = Workflow.objects.get(name="Employee Exiting")
         else:
-            return Response({'error': 'Invalid workflow type'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'error': 'Invalid workflow type'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
         # Create workflow instance
         wfi = WorkflowInstance.objects.create(workflow=wf, transition=et)
@@ -193,7 +208,8 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
         elif request.data['action'] == 'restore':
             wfi.active = True
         # TODO: Add logic to prevent completing an archived workflow instance
-        # TODO: For now, complete is a manual process, but it should intersect somehow with the process instances being complete.
+        # TODO: For now, complete is a manual process, but it should intersect
+        # somehow with the process instances being complete.
         elif request.data['action'] == 'complete':
             wfi.complete = True
             wfi.completed_at = timezone.now()
@@ -201,7 +217,9 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
             wfi.complete = False
             wfi.completed_at = None
         else:
-            return Response({'error': 'Invalid action'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {'error': 'Invalid action'}, status=status.HTTP_400_BAD_REQUEST
+            )
         wfi.save()
         serialized_wfi = WorkflowInstanceSerializer(wfi,
             context={'request': request})
@@ -288,7 +306,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         t.employee_number = request.data['employee_number']
         t.employee_email = request.data['employee_email']
         
-        if 'title_pk' in request.data and request.data['title_pk'] != -1:
+        if prop_in_obj(request.data, 'title_pk', -1):
             t.title = JobTitle.objects.get(pk=request.data['title_pk'])
         else:
             t.title = None
@@ -351,8 +369,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             else:
                 t.manager = None
               
-        
-        if 'unit_pk' in request.data and request.data['unit_pk'] != -1:
+        if prop_in_obj(request.data, 'unit_pk', -1):
             t.unit = UnitOrProgram.objects.get(pk=request.data['unit_pk'])
         else:
             t.unit = None
@@ -386,8 +403,10 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         t.prox_card_needed = request.data['prox_card_needed']
         t.prox_card_returned = request.data['prox_card_returned']
         
-        if 'access_emails_pk' in request.data and request.data['access_emails_pk'] != -1:
-            t.access_emails = Employee.objects.get(pk=request.data['access_emails_pk'])    
+        if prop_in_obj(request.data, 'access_emails_pk', -1):
+            t.access_emails = Employee.objects.get(
+                pk=request.data['access_emails_pk']
+            )    
         else:
             t.access_emails = None 
         
@@ -451,7 +470,10 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             )
             create_process_instances(transition)
         else:
-            return Response("Invalid type.", status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                "Invalid type.",
+                status=status.HTTP_400_BAD_REQUEST
+            )
         return Response("Sent email to staff.")
 
 
@@ -576,18 +598,26 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
             # Complete the current step instance  
             if stepinstance.completed_at:
                 # Prevent completing a step instance twice
-                return Response({'error': 'This step instance has already been completed.'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    {
+                        'error':
+                        'This step instance has already been completed.'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
       
             stepinstance.completed_at = timezone.now()
             stepinstance.completed_by = request.user.employee
             stepinstance.save()
             
-            # TODO: Do anything that needs to be done to prep the next step like email people
+            # TODO: Do anything that needs to be done to prep the next step
+            # like email people
             
             # Update the process instance
             processinstance = stepinstance.process_instance
             if stepinstance.step.end:
-                # If this is the last step instance in a process, complete the process
+                # If this is the last step instance in a process, complete the
+                # process
                 processinstance.completed_at = timezone.now()
                 processinstance.current_step_instance = None
             else:
@@ -612,8 +642,12 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
         else:
             # Undo completion of the current step instance
             if not stepinstance.completed_at:
-                # Prevent undoing completion of a step instance that hasn't been completed
-                return Response({'error': 'This step instance has not been completed.'}, status=status.HTTP_400_BAD_REQUEST)
+                # Prevent undoing completion of a step instance that hasn't
+                # been completed
+                return Response(
+                    {'error': 'This step instance has not been completed.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
             # Undo completion of current SI (user and date)
             stepinstance.completed_at = None
@@ -622,9 +656,12 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
 
             # Update PI
             processinstance = stepinstance.process_instance
-            nextStepInstance = StepInstance.objects.get(pk=request.data['nextStepInstancePk'])
+            nextStepInstance = StepInstance.objects.get(
+                pk=request.data['nextStepInstancePk']
+            )
             if nextStepInstance.step.end:
-                # If the next step is the last step instance in a process, un-complete the process
+                # If the next step is the last step instance in a process,
+                # un-complete the process
                 processinstance.completed_at = None
             processinstance.current_step_instance = stepinstance
             processinstance.save()

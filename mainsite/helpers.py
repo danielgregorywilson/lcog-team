@@ -376,6 +376,10 @@ def is_true_string(str):
     return False
 
 
+def prop_in_obj(obj, prop, is_not):
+    return prop in obj and obj[prop] != is_not
+
+
 # d = datetime.date(2022, 8, 4)
 # next_monday = next_weekday(d, 0) # 0=Monday, 1=Tuesday, 2=Wednesday...
 def next_weekday(d, weekday):

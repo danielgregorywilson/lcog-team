@@ -97,7 +97,10 @@
         class="language-select"
       >
         <template v-if="secondLanguage" v-slot:append>
-          <q-icon name="cancel" @click.stop="secondLanguage=''" class="cursor-pointer" />
+          <q-icon
+            name="cancel"
+            @click.stop="secondLanguage=''"
+            class="cursor-pointer" />
         </template>
       </q-select>
     </div>
@@ -108,7 +111,9 @@
         label="Salary Range"
         class="q-mr-md"
         clearable
-        :rules="[ val => Number.isInteger(Math.floor(val)) || 'Please enter a number']"
+        :rules="
+          [ val => Number.isInteger(Math.floor(val)) || 'Please enter a number']
+        "
       />
       <q-select
         v-if="canViewSalaryFields()"
@@ -170,7 +175,11 @@
       />
     </div>
     <div class="row q-my-sm" v-if="['New', 'Return'].indexOf(type) != -1">
-      <q-checkbox v-model="lwop" label="Pre Approved LWOP at time of hire" class="q-mr-md" />
+      <q-checkbox
+        v-model="lwop"
+        label="Pre Approved LWOP at time of hire"
+        class="q-mr-md"
+      />
       <q-input
         v-model="lwopDetails"
         v-if="lwop"
@@ -409,7 +418,6 @@
                 :name="changeRecord.created_by_name"
               />
             </q-item-section>
-
             <q-item-section>
               <q-item-label
                 v-for="(value, key, index) in JSON.parse(changeRecord.changes)"
@@ -424,7 +432,6 @@
                 </div>
               </q-item-label>
             </q-item-section>
-
             <q-item-section side top>
               <q-item-label caption>
                 {{ readableDateTime(changeRecord.date) }}
@@ -441,9 +448,18 @@
         <div class="text-h6">Send transition to S&DS hiring admins?</div>
         <div class="row text-red">
           <q-icon class="col-1 q-mr-xs" name="warning" size="md"/>
-          <div class="col text-bold text-center">By submitting this information you are providing your electronic signature approving this request.</div>
+          <div class="col text-bold text-center">
+            By submitting this information you are providing your electronic
+            signature approving this request.
+          </div>
         </div>
-        <q-chip v-if="valuesAreChanged()" color="warning" text-color="white" icon="warning" label="Unsaved changes" />
+        <q-chip
+          v-if="valuesAreChanged()"
+          color="warning"
+          text-color="white"
+          icon="warning"
+          label="Unsaved changes"
+        />
         <q-form
           @submit='onSubmitSendDialog("SDS")'
           class="q-gutter-md"
@@ -454,7 +470,6 @@
             type="textarea"
             label="Extra message to include"
           />
-
           <div>
             <q-btn
               label="Send"
@@ -471,7 +486,13 @@
     <q-dialog v-model="showSendToHRDialog">
       <q-card class="q-pa-md" style="width: 400px">
         <div class="text-h6">Send transition to HR?</div>
-        <q-chip v-if="valuesAreChanged()" color="warning" text-color="white" icon="warning" label="Unsaved changes" />
+        <q-chip
+          v-if="valuesAreChanged()"
+          color="warning"
+          text-color="white"
+          icon="warning"
+          label="Unsaved changes"
+        />
         <q-form
           @submit='onSubmitSendDialog("HR")'
           class="q-gutter-md"
@@ -482,7 +503,6 @@
             type="textarea"
             label="Extra message to include"
           />
-
           <div>
             <q-btn
               label="Send"
@@ -499,7 +519,13 @@
     <q-dialog v-model="showSendToSTNDialog">
       <q-card class="q-pa-md">
         <div class="text-h6">Send message to staff transition news?</div>
-        <q-chip v-if="valuesAreChanged()" color="warning" text-color="white" icon="warning" label="Unsaved changes" />
+        <q-chip
+          v-if="valuesAreChanged()"
+          color="warning"
+          text-color="white"
+          icon="warning"
+          label="Unsaved changes"
+        />
         <q-form
           @submit='onSubmitSendDialog("STN")'
           class="q-gutter-md"
@@ -511,7 +537,6 @@
             type="textarea"
             label="Extra message to include"
           />
-
           <div>
             <q-btn
               label="Send to STN"
@@ -536,7 +561,13 @@
         :disabled="!valuesAreChanged()"
         @click="updateTransition()"
       />
-      <q-chip v-if="valuesAreChanged()" color="warning" text-color="white" icon="warning" label="Unsaved changes" />
+      <q-chip
+        v-if="valuesAreChanged()"
+        color="warning"
+        text-color="white"
+        icon="warning"
+        label="Unsaved changes"
+      />
       <div>
         <q-btn
           v-if="changes && changes.length"
@@ -928,11 +959,14 @@ function valuesAreChanged(): boolean {
     unit.value.pk == unitCurrentVal.value.pk &&
     (
       // If both dates are null, they are the same
-      (transitionDate.value == null && transitionDateCurrentVal.value == null) ||
+      (
+        transitionDate.value == null && transitionDateCurrentVal.value == null
+      ) ||
       // If both dates are not null, compare them as dates
       (
         !!transitionDate.value && !!transitionDateCurrentVal.value &&
-        Date.parse(transitionDate.value) == Date.parse(transitionDateCurrentVal.value)
+        Date.parse(transitionDate.value) ==
+        Date.parse(transitionDateCurrentVal.value)
       )
     ) &&
     lwop.value == lwopCurrentVal.value &&
@@ -1110,7 +1144,8 @@ function updateTransition() {
         workflowsStore.getCurrentWorkflowInstance(routePk)
           .catch(e => {
             console.error(
-              'Error getting getCurrentWorkflowInstance after updaing EmployeeTransition:',
+              'Error getting getCurrentWorkflowInstance after updating',
+              'EmployeeTransition:',
               e
             )
             reject(e)
@@ -1122,7 +1157,10 @@ function updateTransition() {
       }
 
       // Send notification emails
-      if (gasPINNotificationNeeded && ['New', 'Return', 'Change/Modify'].indexOf(type.value) != -1) {
+      if (
+        gasPINNotificationNeeded &&
+        ['New', 'Return', 'Change/Modify'].indexOf(type.value) != -1
+      ) {
         sendGasPINNotificationEmail()
       }
 
@@ -1297,7 +1335,8 @@ function handlePrint() {
           router.push({ name: 'workflow-dashboard' })
             .catch(e => {
               console.error(
-                'Error navigating to workflow dashboard upon not finding a matching Workflow Instance:',
+                'Error navigating to workflow dashboard upon not finding a',
+                'matching Workflow Instance:',
                 e
               )
             })
@@ -1313,7 +1352,8 @@ function handlePrint() {
         router.push({ name: 'workflow-transition-form', params: { pk: pk } })
           .catch(e => {
             console.error(
-              'Error navigating to transition form upon not finding a matching Workflow Instance:',
+              'Error navigating to transition form upon not finding a matching',
+              'Workflow Instance:',
               e
             )
           })

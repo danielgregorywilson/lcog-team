@@ -141,15 +141,14 @@
     </div>
     <div class="row items-center">
       <EmployeeSelect
-        v-if="canEditManagerField()"
         label="Manager"
         :employee="manager"
         :useLegalName="true"
         v-on:input="manager=$event"
         v-on:clear="manager=emptyEmployee"
         class="q-mr-md"
+        :readOnly="!canEditManagerField()"
       />
-      <div v-else class="q-mr-md">Manager: {{ manager.legal_name }}</div>
       <UnitSelect
         label="Unit"
         :unit="unit"

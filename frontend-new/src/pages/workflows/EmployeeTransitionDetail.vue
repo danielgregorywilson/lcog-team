@@ -366,6 +366,7 @@
           label="Who?"
           :employee="accessEmails"
           :useLegalName="true"
+          :readOnly=false
           v-on:input="accessEmails=$event"
           v-on:clear="accessEmails=emptyEmployee"
           class="q-mr-md"

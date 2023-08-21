@@ -302,9 +302,13 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         t.employee_middle_initial = request.data['employee_middle_initial']
         t.employee_last_name = request.data['employee_last_name']
         t.employee_preferred_name = request.data['employee_preferred_name']
-        t.employee_id = request.data['employee_id']
-        t.employee_number = request.data['employee_number']
-        t.employee_email = request.data['employee_email']
+        
+        # Only members of HR can edit employee ID fields
+        user_is_hr = request.user.employee.is_hr_employee
+        if user_is_hr:
+            t.employee_id = request.data['employee_id']
+            t.employee_number = request.data['employee_number']
+            t.employee_email = request.data['employee_email']
         
         if prop_in_obj(request.data, 'title_pk', -1):
             t.title = JobTitle.objects.get(pk=request.data['title_pk'])

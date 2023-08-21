@@ -43,9 +43,12 @@
         label="Employee ID"
         class="q-mr-sm"
         style="width: 130px;"
-        :disable="!canEditEmployeeNumberFields()"
+        :readonly="!canEditEmployeeNumberFields()"
       >
-        <template v-if="employeeID" v-slot:append>
+        <template
+          v-if="canEditEmployeeNumberFields() && employeeID"
+          v-slot:append
+        >
           <q-icon
             name="cancel"
             @click.stop="employeeID=''"
@@ -59,14 +62,14 @@
         label="Employee Number"
         mask="####"
         class="q-mr-md"
-        :disable="!canEditEmployeeNumberFields()"
+        :readonly="!canEditEmployeeNumberFields()"
       />
       <q-input
         v-model="employeeEmail"
         type="email"
         label="Email"
         @focus="suggestEmail()"
-        :disable="!canEditEmployeeNumberFields()"
+        :readonly="!canEditEmployeeNumberFields()"
       />
     </div>
     <div class="text-h6 transition-form-section-heading">Position</div>

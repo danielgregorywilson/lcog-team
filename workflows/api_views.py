@@ -303,7 +303,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         t.employee_last_name = request.data['employee_last_name']
         t.employee_preferred_name = request.data['employee_preferred_name']
         
-        # Only members of HR can edit employee ID fields
+        # Only HR can edit employee number fields
         user_is_hr = request.user.employee.is_hr_employee
         if user_is_hr:
             t.employee_id = request.data['employee_id']
@@ -317,7 +317,8 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
 
         t.fte = request.data['fte']
 
-        # Only the hiring manager, fiscal, or HR can edit salary fields
+        # Only the submitter, hiring manager, HR, fiscal, and SDS hiring leads
+        # can edit salary fields.
         user_is_submitter = request.user.employee == t.submitter
         user_is_hiring_manager = request.user.employee == t.manager
         user_is_hr = request.user.employee.is_hr_employee
@@ -350,7 +351,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         t.bilingual = request.data['bilingual']
         t.second_language = request.data['second_language']
         
-        # Only the original submitter can edit manager field
+        # On an update, only the original submitter can edit manager field
         user_is_submitter = request.user.employee == t.submitter
         current_manager = t.manager.pk if t.manager else -1
         editing_manager = all([
@@ -415,7 +416,11 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             t.access_emails = None 
         
         t.special_instructions = request.data['special_instructions']
-        t.fiscal_field = request.data['fiscal_field']
+        
+        # Only fiscal can edit fiscal field
+        user_is_fiscal = request.user.employee.is_fiscal_employee
+        if user_is_fiscal:
+            t.fiscal_field = request.data['fiscal_field']
         
         t.save()
         serialized_transition = EmployeeTransitionSerializer(t,

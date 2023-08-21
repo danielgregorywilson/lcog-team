@@ -1220,14 +1220,14 @@ function employeeIsSubmitter() {
   return userStore.getEmployeeProfile.employee_pk == submitterPk.value
 }
 
-function canEditManagerField() {
-  return !formSubmitted() || employeeIsSubmitter()
-}
-
+// Only HR can edit employee number fields. Anyone can view them.
 function canEditEmployeeNumberFields() {
   return cookies.get('is_hr_employee') == 'true'
 }
 
+// Original submitter can view/edit salary fields.
+// If the form is submitted, only the submitter, hiring manager, HR, fiscal, and
+// SDS hiring leads can view/edit them.
 function canViewSalaryFields() {
   return !formSubmitted() ||
     employeeIsSubmitter() ||
@@ -1237,6 +1237,13 @@ function canViewSalaryFields() {
     cookies.get('is_sds_hiring_lead') == 'true'
 }
 
+// If the form is submitted, only the original submitter can edit manager field.
+// Anyone can view it.
+function canEditManagerField() {
+  return !formSubmitted() || employeeIsSubmitter()
+}
+
+// Only fiscal can edit the fiscal field. Anyone can view it.
 function canEditFiscalField() {
   return cookies.get('is_fiscal_employee') == 'true'
 }

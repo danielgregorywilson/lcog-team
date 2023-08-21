@@ -1228,6 +1228,7 @@ function canEditEmployeeNumberFields() {
 // Original submitter can view/edit salary fields.
 // If the form is submitted, only the submitter, hiring manager, HR, fiscal, and
 // SDS hiring leads can view/edit them.
+// All others can neither view nor edit them.
 function canViewSalaryFields() {
   return !formSubmitted() ||
     employeeIsSubmitter() ||

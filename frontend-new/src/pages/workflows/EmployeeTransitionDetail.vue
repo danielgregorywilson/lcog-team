@@ -1179,11 +1179,11 @@ function updateTransition() {
       resolve('Updated')
     })
     .catch(e => {
-      console.error('Error updating Employee Transition', e)
       quasar.notify({
-        message: 'Error updating Employee Transition',
+        message: e,
         color: 'negative',
-        icon: 'report_problem'
+        icon: 'report_problem',
+        timeout: 5000
       })
       reject(e)
     })

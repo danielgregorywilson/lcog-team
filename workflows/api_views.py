@@ -166,7 +166,7 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
             wf = Workflow.objects.get(name="Employee Exiting")
         else:
             return Response(
-                {'error': 'Invalid workflow type'},
+                data='Invalid workflow type',
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -218,7 +218,7 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
             wfi.completed_at = None
         else:
             return Response(
-                {'error': 'Invalid action'}, status=status.HTTP_400_BAD_REQUEST
+                data='Invalid action', status=status.HTTP_400_BAD_REQUEST
             )
         wfi.save()
         serialized_wfi = WorkflowInstanceSerializer(wfi,
@@ -338,10 +338,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         editing_salary = editing_salary_range or editing_salary_step
         if editing_salary and not user_can_edit_salary:
             return Response(
-                {
-                    'error':
-                    'Only the hiring manager, fiscal, or HR can edit salary fields.'
-                },
+                data='Only the hiring manager, fiscal, or HR can edit salary fields.',
                 status=status.HTTP_403_FORBIDDEN
             )
         if editing_salary and user_can_edit_salary:
@@ -362,10 +359,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         ])
         if editing_manager and not user_is_submitter:
             return Response(
-                {
-                    'error':
-                    'Only the original submitter can edit the manager field.'
-                },
+                data='Only the original submitter can edit the manager field.',
                 status=status.HTTP_403_FORBIDDEN
             )
         if user_is_submitter:
@@ -421,7 +415,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
         user_is_fiscal = request.user.employee.is_fiscal_employee
         if user_is_fiscal:
             t.fiscal_field = request.data['fiscal_field']
-        
+
         t.save()
         serialized_transition = EmployeeTransitionSerializer(t,
             context={'request': request})
@@ -480,7 +474,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             create_process_instances(transition)
         else:
             return Response(
-                "Invalid type.",
+                data="Invalid type.",
                 status=status.HTTP_400_BAD_REQUEST
             )
         return Response("Sent email to staff.")
@@ -608,10 +602,7 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
             if stepinstance.completed_at:
                 # Prevent completing a step instance twice
                 return Response(
-                    {
-                        'error':
-                        'This step instance has already been completed.'
-                    },
+                    data='This step instance has already been completed.',
                     status=status.HTTP_400_BAD_REQUEST
                 )
       
@@ -654,7 +645,7 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
                 # Prevent undoing completion of a step instance that hasn't
                 # been completed
                 return Response(
-                    {'error': 'This step instance has not been completed.'},
+                    data='This step instance has not been completed.',
                     status=status.HTTP_400_BAD_REQUEST
                 )
 

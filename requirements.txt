@@ -23,3 +23,4 @@ six==1.16.0
 sqlparse==0.4.1
 supervisor==4.2.4            # Process control system for running Daphne on production
 urllib3==1.26.6
+watchtower==3.0.1            # AWS CloudWatch logging

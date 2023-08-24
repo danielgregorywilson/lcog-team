@@ -1,4 +1,5 @@
 import datetime
+import logging
 import os
 
 from django.apps import apps
@@ -9,6 +10,7 @@ from django.urls import reverse
 import requests
 import urllib.parse
 
+logger = logging.getLogger('watchtower-logger')
 
 SEND_MANAGER_FIRST_REMINDER_NEW_PR_DAYS_BEFORE = 60
 SEND_MANAGER_SECOND_REMINDER_NEW_PR_DAYS_BEFORE = 45
@@ -32,6 +34,15 @@ def get_host_url(request):
     else:
         return f'http://{ host }/' 
 
+
+def record_error(message, error, request=None):
+    message += '\n'
+    message += 'User: ' + str(request.user)
+    message += '\n'
+    message += 'Error: ' + str(error)
+    message += '\n'
+    message += str(request.__dict__)
+    logger.error(message)
 
 def send_email(to_address, subject, body, html_body):
     return send_mail(

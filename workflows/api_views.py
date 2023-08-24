@@ -338,8 +338,10 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             ])
             editing_salary = editing_salary_range or editing_salary_step
             if editing_salary and not user_can_edit_salary:
+                message = 'Only the hiring manager, fiscal, or HR can edit salary fields.'
+                record_error(message, e, request)
                 return Response(
-                    data='Only the hiring manager, fiscal, or HR can edit salary fields.',
+                    data=message,
                     status=status.HTTP_403_FORBIDDEN
                 )
             if editing_salary and user_can_edit_salary:

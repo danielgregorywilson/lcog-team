@@ -5,7 +5,7 @@
 export const releases = [
   {
     version: '0.17.1',
-    date: new Date(2023, 7, 14),
+    date: new Date(2023, 7, 25),
     changes: [
       {
         type: 'improved',

@@ -9,7 +9,7 @@ from mainsite.helpers import send_email, send_email_multiple
 from people.models import JobTitle
 from workflows.models import EmployeeTransition, ProcessInstance
 
-STAFF_TRANSITION_NEWS_EMAIL = os.environ.get('STAFF_TRANSITION_NEWS_EMAIL')
+STAFF_TRANSITION_NEWS_RECIPIENTS = os.environ.get('STAFF_TRANSITION_NEWS_RECIPIENTS')
 
 def send_gas_pin_notification_email(
     t, sender_name='', sender_email='', url=''
@@ -159,8 +159,9 @@ def send_transition_stn_email(t, update=False, extra_message=None, sender_name='
     })
     plaintext_message = strip_tags(html_message)
 
-    send_email(
-        STAFF_TRANSITION_NEWS_EMAIL, subject, plaintext_message, html_message
+    recipients = STAFF_TRANSITION_NEWS_RECIPIENTS.split(",")
+    send_email_multiple(
+        recipients, [], subject, plaintext_message, html_message
     )
 
 def create_process_instances(transition):

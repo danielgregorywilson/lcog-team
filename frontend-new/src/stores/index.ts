@@ -1,6 +1,7 @@
 import { store } from 'quasar/wrappers'
 import { createPinia } from 'pinia'
 import { Router } from 'vue-router'
+import { AxiosError } from 'axios'
 
 /*
  * When adding new properties to stores, you should also
@@ -31,8 +32,12 @@ export default store((/* { ssrContext } */) => {
   return pinia
 })
 
-export function handlePromiseError(reject: (reason?: any) => void, message: string, error: string) { // eslint-disable-line @typescript-eslint/no-explicit-any
-  const errorMessage = `${ message }: ${ error }`
+export function handlePromiseError(reject: (reason?: any) => void, message: string, error: AxiosError) { // eslint-disable-line @typescript-eslint/no-explicit-any
+  let reason = error.message
+  if (error.response && error.response.data && error.response.data) {
+    reason = error.response.data as string
+  }
+  const errorMessage = `${ message }: ${ reason }`
   console.error(errorMessage)
   reject(errorMessage)
 }

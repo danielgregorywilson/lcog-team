@@ -13,7 +13,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.timezone import get_current_timezone
 
-from mainsite.helpers import is_true_string
+from mainsite.helpers import is_true_string, prop_in_obj, record_error
 
 from people.models import Employee, JobTitle, UnitOrProgram
 
@@ -130,9 +130,13 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
             elif archived is not None and not is_true_string(archived):
                 complete = self.request.query_params.get('complete', None)
                 if complete is not None and is_true_string(complete):
-                    return WorkflowInstance.active_objects.filter(complete=True)
+                    return WorkflowInstance.active_objects.filter(
+                        complete=True
+                    )
                 elif complete is not None and not is_true_string(complete):
-                    return WorkflowInstance.active_objects.filter(complete=False)
+                    return WorkflowInstance.active_objects.filter(
+                        complete=False
+                    )
             return WorkflowInstance.objects.all()
         else:
             return WorkflowInstance.objects.none()
@@ -141,19 +145,30 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
     def create(self, request):
         wf = None
         if request.data['type'] == 'employee_onboarding':
-            et = EmployeeTransition.objects.create(type=EmployeeTransition.TRANSITION_TYPE_NEW)
+            et = EmployeeTransition.objects.create(
+                type=EmployeeTransition.TRANSITION_TYPE_NEW
+            )
             wf = Workflow.objects.get(name="Employee Onboarding")
         elif request.data['type'] == 'employee_returning':
-            et = EmployeeTransition.objects.create(type=EmployeeTransition.TRANSITION_TYPE_RETURN)
+            et = EmployeeTransition.objects.create(
+                type=EmployeeTransition.TRANSITION_TYPE_RETURN
+            )
             wf = Workflow.objects.get(name="Employee Returning")
         elif request.data['type'] == 'employee_changing':
-            et = EmployeeTransition.objects.create(type=EmployeeTransition.TRANSITION_TYPE_CHANGE)
+            et = EmployeeTransition.objects.create(
+                type=EmployeeTransition.TRANSITION_TYPE_CHANGE
+            )
             wf = Workflow.objects.get(name="Employee Changing")
         elif request.data['type'] == 'employee_exiting':
-            et = EmployeeTransition.objects.create(type=EmployeeTransition.TRANSITION_TYPE_EXIT)
+            et = EmployeeTransition.objects.create(
+                type=EmployeeTransition.TRANSITION_TYPE_EXIT
+            )
             wf = Workflow.objects.get(name="Employee Exiting")
         else:
-            return Response({'error': 'Invalid workflow type'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                data='Invalid workflow type',
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
         # Create workflow instance
         wfi = WorkflowInstance.objects.create(workflow=wf, transition=et)
@@ -193,7 +208,8 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
         elif request.data['action'] == 'restore':
             wfi.active = True
         # TODO: Add logic to prevent completing an archived workflow instance
-        # TODO: For now, complete is a manual process, but it should intersect somehow with the process instances being complete.
+        # TODO: For now, complete is a manual process, but it should intersect
+        # somehow with the process instances being complete.
         elif request.data['action'] == 'complete':
             wfi.complete = True
             wfi.completed_at = timezone.now()
@@ -201,7 +217,9 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
             wfi.complete = False
             wfi.completed_at = None
         else:
-            return Response({'error': 'Invalid action'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                data='Invalid action', status=status.HTTP_400_BAD_REQUEST
+            )
         wfi.save()
         serialized_wfi = WorkflowInstanceSerializer(wfi,
             context={'request': request})
@@ -270,134 +288,152 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
     #         return Response(serialized_wfi.data)
 
     def update(self, request, pk=None):
-        t = EmployeeTransition.objects.get(pk=pk)
+        try:
+            t = EmployeeTransition.objects.get(pk=pk)
 
-        # Set submitter only the first time the transition is updated
-        if not t.submitter:
-            submitter = Employee.objects.get(pk=request.data['submitter_pk']) if \
-                'submitter_pk' in request.data else None
-            t.submitter = submitter
-            t.date_submitted = datetime.now(tz=get_current_timezone())
+            # Set submitter only the first time the transition is updated
+            if not t.submitter:
+                submitter = Employee.objects.get(pk=request.data['submitter_pk']) if \
+                    'submitter_pk' in request.data else None
+                t.submitter = submitter
+                t.date_submitted = datetime.now(tz=get_current_timezone())
 
-        t.type = request.data['type']
-        t.employee_first_name = request.data['employee_first_name']
-        t.employee_middle_initial = request.data['employee_middle_initial']
-        t.employee_last_name = request.data['employee_last_name']
-        t.employee_preferred_name = request.data['employee_preferred_name']
-        t.employee_id = request.data['employee_id']
-        t.employee_number = request.data['employee_number']
-        t.employee_email = request.data['employee_email']
-        
-        if 'title_pk' in request.data and request.data['title_pk'] != -1:
-            t.title = JobTitle.objects.get(pk=request.data['title_pk'])
-        else:
-            t.title = None
-
-        t.fte = request.data['fte']
-
-        # Only the hiring manager, fiscal, or HR can edit salary fields
-        user_is_submitter = request.user.employee == t.submitter
-        user_is_hiring_manager = request.user.employee == t.manager
-        user_is_hr = request.user.employee.is_hr_employee
-        user_is_fiscal = request.user.employee.is_fiscal_employee
-        user_can_edit_salary = any([
-            user_is_submitter, user_is_hiring_manager, user_is_hr,
-            user_is_fiscal
-        ])
-        editing_salary_range = all([
-            'salary_range' in request.data,
-            request.data['salary_range'] != t.salary_range
-        ])
-        editing_salary_step = all([
-            'salary_step' in request.data,
-            request.data['salary_step'] != t.salary_step
-        ])
-        editing_salary = editing_salary_range or editing_salary_step
-        if editing_salary and not user_can_edit_salary:
-            return Response(
-                {
-                    'error':
-                    'Only the hiring manager, fiscal, or HR can edit salary fields.'
-                },
-                status=status.HTTP_403_FORBIDDEN
-            )
-        if editing_salary and user_can_edit_salary:
-            t.salary_range = request.data['salary_range']
-            t.salary_step = request.data['salary_step']
-        
-        t.bilingual = request.data['bilingual']
-        t.second_language = request.data['second_language']
-        
-        # Only the original submitter can edit manager field
-        user_is_submitter = request.user.employee == t.submitter
-        current_manager = t.manager.pk if t.manager else -1
-        editing_manager = all([
-            # Manager field is being edited
-            'manager_pk' in request.data,
-            # Manager field is being changed
-            request.data['manager_pk'] != current_manager
-        ])
-        if editing_manager and not user_is_submitter:
-            return Response(
-                {
-                    'error':
-                    'Only the original submitter can edit the manager field.'
-                },
-                status=status.HTTP_403_FORBIDDEN
-            )
-        if user_is_submitter:
-            if editing_manager and request.data['manager_pk'] != -1:
-                t.manager = Employee.objects.get(pk=request.data['manager_pk'])
+            t.type = request.data['type']
+            t.employee_first_name = request.data['employee_first_name']
+            t.employee_middle_initial = request.data['employee_middle_initial']
+            t.employee_last_name = request.data['employee_last_name']
+            t.employee_preferred_name = request.data['employee_preferred_name']
+            
+            # Only HR can edit employee number fields
+            user_is_hr = request.user.employee.is_hr_employee
+            if user_is_hr:
+                t.employee_id = request.data['employee_id']
+                t.employee_number = request.data['employee_number']
+                t.employee_email = request.data['employee_email']
+            
+            if prop_in_obj(request.data, 'title_pk', -1):
+                t.title = JobTitle.objects.get(pk=request.data['title_pk'])
             else:
-                t.manager = None
-              
-        
-        if 'unit_pk' in request.data and request.data['unit_pk'] != -1:
-            t.unit = UnitOrProgram.objects.get(pk=request.data['unit_pk'])
-        else:
-            t.unit = None
-        
-        if 'transition_date' in request.data:
-            t.transition_date = request.data['transition_date']
-        else:
-            t.transition_date = None
+                t.title = None
 
-        t.lwop = request.data['lwop']
-        t.lwop_details = request.data['lwop_details']
-        t.preliminary_hire = request.data['preliminary_hire']
-        t.delete_profile = request.data['delete_profile']
-        t.office_location = request.data['office_location']
-        t.cubicle_number = request.data['cubicle_number']
-        t.union_affiliation = request.data['union_affiliation']
-        t.teleworking = request.data['teleworking']
-        t.computer_type = request.data['computer_type']
-        t.computer_gl = request.data['computer_gl']
-        t.computer_description = request.data['computer_description']
-        t.phone_number = request.data['phone_number']
-        t.desk_phone = request.data['desk_phone']
-        t.phone_request = request.data['phone_request']
-        t.phone_request_data = request.data['phone_request_data']
-        t.load_code = request.data['load_code']
-        t.cell_phone = request.data['cell_phone']
-        t.should_delete = request.data['should_delete']
-        t.reassign_to = request.data['reassign_to']
-        t.gas_pin_needed = request.data['gas_pin_needed']
-        t.business_cards = request.data['business_cards']
-        t.prox_card_needed = request.data['prox_card_needed']
-        t.prox_card_returned = request.data['prox_card_returned']
-        
-        if 'access_emails_pk' in request.data and request.data['access_emails_pk'] != -1:
-            t.access_emails = Employee.objects.get(pk=request.data['access_emails_pk'])    
-        else:
-            t.access_emails = None 
-        
-        t.special_instructions = request.data['special_instructions']
-        t.fiscal_field = request.data['fiscal_field']
-        
-        t.save()
-        serialized_transition = EmployeeTransitionSerializer(t,
-            context={'request': request})
-        return Response(serialized_transition.data)
+            t.fte = request.data['fte']
+
+            # Only the submitter, hiring manager, HR, fiscal, and SDS hiring leads
+            # can edit salary fields.
+            user_is_submitter = request.user.employee == t.submitter
+            user_is_hiring_manager = request.user.employee == t.manager
+            user_is_hr = request.user.employee.is_hr_employee
+            user_is_fiscal = request.user.employee.is_fiscal_employee
+            user_can_edit_salary = any([
+                user_is_submitter, user_is_hiring_manager, user_is_hr,
+                user_is_fiscal
+            ])
+            editing_salary_range = all([
+                'salary_range' in request.data,
+                request.data['salary_range'] != t.salary_range
+            ])
+            editing_salary_step = all([
+                'salary_step' in request.data,
+                request.data['salary_step'] != t.salary_step
+            ])
+            editing_salary = editing_salary_range or editing_salary_step
+            if editing_salary and not user_can_edit_salary:
+                message = 'Only the hiring manager, fiscal, or HR can edit salary fields.'
+                record_error(message, e, request)
+                return Response(
+                    data=message,
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            if editing_salary and user_can_edit_salary:
+                t.salary_range = request.data['salary_range']
+                t.salary_step = request.data['salary_step']
+            
+            t.bilingual = request.data['bilingual']
+            t.second_language = request.data['second_language']
+            
+            # On an update, only the original submitter can edit manager field
+            user_is_submitter = request.user.employee == t.submitter
+            current_manager = t.manager.pk if t.manager else -1
+            editing_manager = all([
+                # Manager field is being edited
+                'manager_pk' in request.data,
+                # Manager field is being changed
+                request.data['manager_pk'] != current_manager
+            ])
+            if editing_manager and not user_is_submitter:
+                message = 'Only the original submitter can edit the manager field.'
+                record_error(message, e, request)
+                return Response(
+                    data=message,
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            if user_is_submitter:
+                if editing_manager and request.data['manager_pk'] != -1:
+                    t.manager = Employee.objects.get(pk=request.data['manager_pk'])
+                else:
+                    t.manager = None
+                
+            if prop_in_obj(request.data, 'unit_pk', -1):
+                t.unit = UnitOrProgram.objects.get(pk=request.data['unit_pk'])
+            else:
+                t.unit = None
+            
+            if 'transition_date' in request.data:
+                t.transition_date = request.data['transition_date']
+            else:
+                t.transition_date = None
+
+            t.lwop = request.data['lwop']
+            c = 1/0
+            t.lwop_details = request.data['lwop_details']
+            t.preliminary_hire = request.data['preliminary_hire']
+            t.delete_profile = request.data['delete_profile']
+            t.office_location = request.data['office_location']
+            t.cubicle_number = request.data['cubicle_number']
+            t.union_affiliation = request.data['union_affiliation']
+            t.teleworking = request.data['teleworking']
+            t.computer_type = request.data['computer_type']
+            t.computer_gl = request.data['computer_gl']
+            t.computer_description = request.data['computer_description']
+            t.phone_number = request.data['phone_number']
+            t.desk_phone = request.data['desk_phone']
+            t.phone_request = request.data['phone_request']
+            t.phone_request_data = request.data['phone_request_data']
+            t.load_code = request.data['load_code']
+            t.cell_phone = request.data['cell_phone']
+            t.should_delete = request.data['should_delete']
+            t.reassign_to = request.data['reassign_to']
+            t.gas_pin_needed = request.data['gas_pin_needed']
+            t.business_cards = request.data['business_cards']
+            t.prox_card_needed = request.data['prox_card_needed']
+            t.prox_card_returned = request.data['prox_card_returned']
+            
+            if prop_in_obj(request.data, 'access_emails_pk', -1):
+                t.access_emails = Employee.objects.get(
+                    pk=request.data['access_emails_pk']
+                )    
+            else:
+                t.access_emails = None 
+            
+            t.special_instructions = request.data['special_instructions']
+
+            # Only fiscal can edit fiscal field
+            user_is_fiscal = request.user.employee.is_fiscal_employee
+            if user_is_fiscal:
+                t.fiscal_field = request.data['fiscal_field']
+
+            t.save()
+            serialized_transition = EmployeeTransitionSerializer(t,
+                context={'request': request})
+            return Response(serialized_transition.data)
+        except Exception as e:
+            message = 'Error updating employee transition.'
+            record_error(message, e, request)
+            return Response(
+                data=f'{message}: {str(e)}',
+                status=status.HTTP_403_FORBIDDEN
+            )
+
     
     # def partial_update(self, request, pk=None):
     #     """
@@ -451,7 +487,10 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             )
             create_process_instances(transition)
         else:
-            return Response("Invalid type.", status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                data="Invalid type.",
+                status=status.HTTP_400_BAD_REQUEST
+            )
         return Response("Sent email to staff.")
 
 
@@ -576,18 +615,23 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
             # Complete the current step instance  
             if stepinstance.completed_at:
                 # Prevent completing a step instance twice
-                return Response({'error': 'This step instance has already been completed.'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    data='This step instance has already been completed.',
+                    status=status.HTTP_400_BAD_REQUEST
+                )
       
             stepinstance.completed_at = timezone.now()
             stepinstance.completed_by = request.user.employee
             stepinstance.save()
             
-            # TODO: Do anything that needs to be done to prep the next step like email people
+            # TODO: Do anything that needs to be done to prep the next step
+            # like email people
             
             # Update the process instance
             processinstance = stepinstance.process_instance
             if stepinstance.step.end:
-                # If this is the last step instance in a process, complete the process
+                # If this is the last step instance in a process, complete the
+                # process
                 processinstance.completed_at = timezone.now()
                 processinstance.current_step_instance = None
             else:
@@ -612,8 +656,12 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
         else:
             # Undo completion of the current step instance
             if not stepinstance.completed_at:
-                # Prevent undoing completion of a step instance that hasn't been completed
-                return Response({'error': 'This step instance has not been completed.'}, status=status.HTTP_400_BAD_REQUEST)
+                # Prevent undoing completion of a step instance that hasn't
+                # been completed
+                return Response(
+                    data='This step instance has not been completed.',
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
             # Undo completion of current SI (user and date)
             stepinstance.completed_at = None
@@ -622,9 +670,12 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
 
             # Update PI
             processinstance = stepinstance.process_instance
-            nextStepInstance = StepInstance.objects.get(pk=request.data['nextStepInstancePk'])
+            nextStepInstance = StepInstance.objects.get(
+                pk=request.data['nextStepInstancePk']
+            )
             if nextStepInstance.step.end:
-                # If the next step is the last step instance in a process, un-complete the process
+                # If the next step is the last step instance in a process,
+                # un-complete the process
                 processinstance.completed_at = None
             processinstance.current_step_instance = stepinstance
             processinstance.save()

@@ -43,9 +43,12 @@
         label="Employee ID"
         class="q-mr-sm"
         style="width: 130px;"
-        :disable="!canEditEmployeeNumberFields()"
+        :readonly="!canEditEmployeeNumberFields()"
       >
-        <template v-if="employeeID" v-slot:append>
+        <template
+          v-if="canEditEmployeeNumberFields() && employeeID"
+          v-slot:append
+        >
           <q-icon
             name="cancel"
             @click.stop="employeeID=''"
@@ -59,14 +62,14 @@
         label="Employee Number"
         mask="####"
         class="q-mr-md"
-        :disable="!canEditEmployeeNumberFields()"
+        :readonly="!canEditEmployeeNumberFields()"
       />
       <q-input
         v-model="employeeEmail"
         type="email"
         label="Email"
         @focus="suggestEmail()"
-        :disable="!canEditEmployeeNumberFields()"
+        :readonly="!canEditEmployeeNumberFields()"
       />
     </div>
     <div class="text-h6 transition-form-section-heading">Position</div>
@@ -97,7 +100,10 @@
         class="language-select"
       >
         <template v-if="secondLanguage" v-slot:append>
-          <q-icon name="cancel" @click.stop="secondLanguage=''" class="cursor-pointer" />
+          <q-icon
+            name="cancel"
+            @click.stop="secondLanguage=''"
+            class="cursor-pointer" />
         </template>
       </q-select>
     </div>
@@ -108,6 +114,9 @@
         label="Salary Range"
         class="q-mr-md"
         clearable
+        :rules="
+          [ val => Number.isInteger(Math.floor(val)) || 'Please enter a number']
+        "
       />
       <q-select
         v-if="canViewSalaryFields()"
@@ -135,15 +144,14 @@
     </div>
     <div class="row items-center">
       <EmployeeSelect
-        v-if="!formSubmitted() || employeeIsSubmitter()"
         label="Manager"
         :employee="manager"
         :useLegalName="true"
         v-on:input="manager=$event"
         v-on:clear="manager=emptyEmployee"
         class="q-mr-md"
+        :readOnly="!canEditManagerField()"
       />
-      <div v-else class="q-mr-md">Manager: {{ manager.legal_name }}</div>
       <UnitSelect
         label="Unit"
         :unit="unit"
@@ -169,7 +177,11 @@
       />
     </div>
     <div class="row q-my-sm" v-if="['New', 'Return'].indexOf(type) != -1">
-      <q-checkbox v-model="lwop" label="Pre Approved LWOP at time of hire" class="q-mr-md" />
+      <q-checkbox
+        v-model="lwop"
+        label="Pre Approved LWOP at time of hire"
+        class="q-mr-md"
+      />
       <q-input
         v-model="lwopDetails"
         v-if="lwop"
@@ -357,6 +369,7 @@
           label="Who?"
           :employee="accessEmails"
           :useLegalName="true"
+          :readOnly=false
           v-on:input="accessEmails=$event"
           v-on:clear="accessEmails=emptyEmployee"
           class="q-mr-md"
@@ -373,7 +386,12 @@
       Fiscal Use Only
     </div>
     <div class="row">
-      <q-input v-model="fiscalField" autogrow style="width:100%" />
+      <q-input
+        v-model="fiscalField"
+        autogrow
+        style="width:100%"
+        hint="_ _ _ - _ _ - _ _ _ _ / Allocation %"
+        :readonly="!canEditFiscalField()" />
     </div>
 
     <!-- Dialog of all error items -->
@@ -403,7 +421,6 @@
                 :name="changeRecord.created_by_name"
               />
             </q-item-section>
-
             <q-item-section>
               <q-item-label
                 v-for="(value, key, index) in JSON.parse(changeRecord.changes)"
@@ -418,7 +435,6 @@
                 </div>
               </q-item-label>
             </q-item-section>
-
             <q-item-section side top>
               <q-item-label caption>
                 {{ readableDateTime(changeRecord.date) }}
@@ -433,7 +449,20 @@
     <q-dialog v-model="showSendToSDSHiringLeadsDialog">
       <q-card class="q-pa-md" style="width: 400px">
         <div class="text-h6">Send transition to S&DS hiring admins?</div>
-        <q-chip v-if="valuesAreChanged()" color="warning" text-color="white" icon="warning" label="Unsaved changes" />
+        <div class="row text-red">
+          <q-icon class="col-1 q-mr-xs" name="warning" size="md"/>
+          <div class="col text-bold text-center">
+            By submitting this information you are providing your electronic
+            signature approving this request.
+          </div>
+        </div>
+        <q-chip
+          v-if="valuesAreChanged()"
+          color="warning"
+          text-color="white"
+          icon="warning"
+          label="Unsaved changes"
+        />
         <q-form
           @submit='onSubmitSendDialog("SDS")'
           class="q-gutter-md"
@@ -444,7 +473,6 @@
             type="textarea"
             label="Extra message to include"
           />
-
           <div>
             <q-btn
               label="Send"
@@ -461,7 +489,13 @@
     <q-dialog v-model="showSendToHRDialog">
       <q-card class="q-pa-md" style="width: 400px">
         <div class="text-h6">Send transition to HR?</div>
-        <q-chip v-if="valuesAreChanged()" color="warning" text-color="white" icon="warning" label="Unsaved changes" />
+        <q-chip
+          v-if="valuesAreChanged()"
+          color="warning"
+          text-color="white"
+          icon="warning"
+          label="Unsaved changes"
+        />
         <q-form
           @submit='onSubmitSendDialog("HR")'
           class="q-gutter-md"
@@ -472,7 +506,6 @@
             type="textarea"
             label="Extra message to include"
           />
-
           <div>
             <q-btn
               label="Send"
@@ -489,7 +522,13 @@
     <q-dialog v-model="showSendToSTNDialog">
       <q-card class="q-pa-md">
         <div class="text-h6">Send message to staff transition news?</div>
-        <q-chip v-if="valuesAreChanged()" color="warning" text-color="white" icon="warning" label="Unsaved changes" />
+        <q-chip
+          v-if="valuesAreChanged()"
+          color="warning"
+          text-color="white"
+          icon="warning"
+          label="Unsaved changes"
+        />
         <q-form
           @submit='onSubmitSendDialog("STN")'
           class="q-gutter-md"
@@ -501,7 +540,6 @@
             type="textarea"
             label="Extra message to include"
           />
-
           <div>
             <q-btn
               label="Send to STN"
@@ -517,7 +555,7 @@
     <!-- Spacing for footer -->
     <div style="height: 80px;"></div>
 
-    <div id="sticky-footer" class="row justify-between" v-if="true">
+    <div id="sticky-footer" class="row justify-between" v-if="!props.print">
       <q-btn
         class="col-1"
         color="white"
@@ -526,7 +564,13 @@
         :disabled="!valuesAreChanged()"
         @click="updateTransition()"
       />
-      <q-chip v-if="valuesAreChanged()" color="warning" text-color="white" icon="warning" label="Unsaved changes" />
+      <q-chip
+        v-if="valuesAreChanged()"
+        color="warning"
+        text-color="white"
+        icon="warning"
+        label="Unsaved changes"
+      />
       <div>
         <q-btn
           v-if="changes && changes.length"
@@ -613,12 +657,6 @@
 @media only screen and (min-width: 1024px) {
   #sticky-footer {
     left: 209px;
-  }
-}
-
-@media print {
-  #sticky-footer {
-    display: none;
   }
 }
 </style>
@@ -784,6 +822,10 @@ let showSendToSTNDialog = ref(false)
 let sendDialogMessage = ref('')
 let sendDialogUpdate = ref(false)
 
+////////////////////////////
+// Retrieve/Modify/Submit //
+////////////////////////////
+
 function retrieveEmployeeTransition() {
   return new Promise((resolve) => {
     const t = currentEmployeeTransition()
@@ -900,59 +942,6 @@ function retrieveEmployeeTransition() {
   })
 }
 
-function emailInUse(email: string): boolean {
-  const emailList = peopleStore.employeeEmailList
-  if (emailList.indexOf(email) > -1) {
-    return true
-  } else {
-    return false
-  }
-}
-
-function suggestEmail(): void {
-  // Create first pass at suggestion
-  let suggestedEmail = ''
-  let firstChar = ''
-  if (employeePreferredName.value) {
-    firstChar = employeePreferredName.value.charAt(0).toLowerCase()
-  } else if (employeeFirstName.value) {
-    firstChar = employeeFirstName.value.charAt(0).toLowerCase()
-  } else {
-    return
-  }
-  if (employeeLastName.value) {
-    suggestedEmail =
-    `${firstChar}${employeeLastName.value.toLowerCase()}@lcog.org`
-  } else {
-    return
-  }
-
-  // Check if email is already in use
-  if (emailInUse(suggestedEmail)) {
-    // If so, add middle initial and check again
-    if (employeeMiddleInitial.value) {
-      const mi = employeeMiddleInitial.value.toLowerCase()
-      const ln = employeeLastName.value.toLowerCase()
-      suggestedEmail = `${firstChar}${mi}${ln}@lcog.org`
-    } else {
-      return
-    }
-    if (emailInUse(suggestedEmail)) {
-      // If so, add a number to the end and check again
-      let i = 1
-      while (emailInUse(`${suggestedEmail}${i}`)) {
-        i++
-      }
-      suggestedEmail = `${suggestedEmail}${i}`
-    }
-  }
-
-  // Set the value
-  if (!employeeEmail.value) {
-    employeeEmail.value = suggestedEmail
-  }
-}
-
 function valuesAreChanged(): boolean {
   if (
     type.value == typeCurrentVal.value &&
@@ -973,11 +962,14 @@ function valuesAreChanged(): boolean {
     unit.value.pk == unitCurrentVal.value.pk &&
     (
       // If both dates are null, they are the same
-      (transitionDate.value == null && transitionDateCurrentVal.value == null) ||
+      (
+        transitionDate.value == null && transitionDateCurrentVal.value == null
+      ) ||
       // If both dates are not null, compare them as dates
       (
         !!transitionDate.value && !!transitionDateCurrentVal.value &&
-        Date.parse(transitionDate.value) == Date.parse(transitionDateCurrentVal.value)
+        Date.parse(transitionDate.value) ==
+        Date.parse(transitionDateCurrentVal.value)
       )
     ) &&
     lwop.value == lwopCurrentVal.value &&
@@ -1012,53 +1004,6 @@ function valuesAreChanged(): boolean {
   } else {
     return true
   }
-}
-
-function formErrorItems(): Array<[string, string]> {
-  let errorItems: Array<[string, string]> = []
-  if (computerTypeCurrentVal.value == 'New' && !computerGLCurrentVal.value) {
-    errorItems.push(
-      ['computer-type', 'Provide a valid GL code for computer purchase']
-    )
-  }
-  if (
-    computerTypeCurrentVal.value == 'Repurposed' &&
-    !computerDescriptionCurrentVal.value
-  ) {
-    errorItems.push(
-      ['computer-type', 'Provide a description of existing computer']
-    )
-  }
-  return errorItems
-}
-
-function formSubmitted() {
-  return !!dateSubmitted.value
-}
-
-function employeeIsSubmitter() {
-  return userStore.getEmployeeProfile.employee_pk == submitterPk.value
-}
-
-function canEditEmployeeNumberFields() {
-  return cookies.get('is_hr_employee') == 'true'
-}
-
-function canViewSalaryFields() {
-  return !formSubmitted() ||
-    employeeIsSubmitter() ||
-    userStore.getEmployeeProfile.employee_pk == manager.value.pk ||
-    cookies.get('is_hr_employee') == 'true' ||
-    cookies.get('is_fiscal_employee') == 'true' ||
-    cookies.get('is_sds_hiring_lead') == 'true'
-}
-
-function canSendToHR() {
-  return cookies.get('is_sds_hiring_lead') == 'true'
-}
-
-function canSendToTransitionNews() {
-  return cookies.get('is_hr_employee') == 'true'
 }
 
 function updateTransition() {
@@ -1202,7 +1147,8 @@ function updateTransition() {
         workflowsStore.getCurrentWorkflowInstance(routePk)
           .catch(e => {
             console.error(
-              'Error getting getCurrentWorkflowInstance after updaing EmployeeTransition:',
+              'Error getting getCurrentWorkflowInstance after updating',
+              'EmployeeTransition:',
               e
             )
             reject(e)
@@ -1214,7 +1160,10 @@ function updateTransition() {
       }
 
       // Send notification emails
-      if (gasPINNotificationNeeded && ['New', 'Return', 'Change/Modify'].indexOf(type.value) != -1) {
+      if (
+        gasPINNotificationNeeded &&
+        ['New', 'Return', 'Change/Modify'].indexOf(type.value) != -1
+      ) {
         sendGasPINNotificationEmail()
       }
 
@@ -1230,15 +1179,139 @@ function updateTransition() {
       resolve('Updated')
     })
     .catch(e => {
-      console.error('Error updating Employee Transition', e)
       quasar.notify({
-        message: 'Error updating Employee Transition',
+        message: e,
         color: 'negative',
-        icon: 'report_problem'
+        icon: 'report_problem',
+        timeout: 5000
       })
       reject(e)
     })
   })
+}
+
+function formErrorItems(): Array<[string, string]> {
+  let errorItems: Array<[string, string]> = []
+  if (computerTypeCurrentVal.value == 'New' && !computerGLCurrentVal.value) {
+    errorItems.push(
+      ['computer-type', 'Provide a valid GL code for computer purchase']
+    )
+  }
+  if (
+    computerTypeCurrentVal.value == 'Repurposed' &&
+    !computerDescriptionCurrentVal.value
+  ) {
+    errorItems.push(
+      ['computer-type', 'Provide a description of existing computer']
+    )
+  }
+  return errorItems
+}
+
+/////////////////////////////////
+// Field view/edit permissions //
+/////////////////////////////////
+
+function formSubmitted() {
+  return !!dateSubmitted.value
+}
+
+function employeeIsSubmitter() {
+  return userStore.getEmployeeProfile.employee_pk == submitterPk.value
+}
+
+// Only HR can edit employee number fields. Anyone can view them.
+function canEditEmployeeNumberFields() {
+  return cookies.get('is_hr_employee') == 'true'
+}
+
+// Original submitter can view/edit salary fields.
+// If the form is submitted, only the submitter, hiring manager, HR, fiscal, and
+// SDS hiring leads can view/edit them.
+// All others can neither view nor edit them.
+function canViewSalaryFields() {
+  return !formSubmitted() ||
+    employeeIsSubmitter() ||
+    userStore.getEmployeeProfile.employee_pk == manager.value.pk ||
+    cookies.get('is_hr_employee') == 'true' ||
+    cookies.get('is_fiscal_employee') == 'true' ||
+    cookies.get('is_sds_hiring_lead') == 'true'
+}
+
+// If the form is submitted, only the original submitter can edit manager field.
+// Anyone can view it.
+function canEditManagerField() {
+  return !formSubmitted() || employeeIsSubmitter()
+}
+
+// Only fiscal can edit the fiscal field. Anyone can view it.
+function canEditFiscalField() {
+  return cookies.get('is_fiscal_employee') == 'true'
+}
+
+function canSendToHR() {
+  return cookies.get('is_sds_hiring_lead') == 'true'
+}
+
+function canSendToTransitionNews() {
+  return cookies.get('is_hr_employee') == 'true'
+}
+
+////////////////////////
+// Interact with form //
+////////////////////////
+
+function emailInUse(email: string): boolean {
+  const emailList = peopleStore.employeeEmailList
+  if (emailList.indexOf(email) > -1) {
+    return true
+  } else {
+    return false
+  }
+}
+
+function suggestEmail(): void {
+  // Create first pass at suggestion
+  let suggestedEmail = ''
+  let firstChar = ''
+  if (employeePreferredName.value) {
+    firstChar = employeePreferredName.value.charAt(0).toLowerCase()
+  } else if (employeeFirstName.value) {
+    firstChar = employeeFirstName.value.charAt(0).toLowerCase()
+  } else {
+    return
+  }
+  if (employeeLastName.value) {
+    suggestedEmail =
+    `${firstChar}${employeeLastName.value.toLowerCase()}@lcog.org`
+  } else {
+    return
+  }
+
+  // Check if email is already in use
+  if (emailInUse(suggestedEmail)) {
+    // If so, add middle initial and check again
+    if (employeeMiddleInitial.value) {
+      const mi = employeeMiddleInitial.value.toLowerCase()
+      const ln = employeeLastName.value.toLowerCase()
+      suggestedEmail = `${firstChar}${mi}${ln}@lcog.org`
+    } else {
+      return
+    }
+    if (emailInUse(suggestedEmail)) {
+      // If so, add a number to the end and check again
+      let i = 1
+      while (emailInUse(`${suggestedEmail}${i}`)) {
+        i++
+      }
+      suggestedEmail = `${suggestedEmail}${i}`
+    }
+  }
+
+  // Set the value
+  if (!employeeEmail.value) {
+    employeeEmail.value = suggestedEmail
+  }
 }
 
 function openErrorDialog(position: QDialogProps['position']) {
@@ -1256,6 +1329,52 @@ function clickedErrorItem(item: [string, string]) {
     setVerticalScrollPosition(target, offset, duration)
   }
 }
+
+function handlePrint() {
+  const pk = getRoutePk(route)
+  if (!pk) {
+    router.push('/')
+  } else {
+    workflowsStore.getCurrentWorkflowInstance(pk)
+      .then(() => {
+        const wfInstance: WorkflowInstance =
+          workflowsStore.currentWorkflowInstance
+        if (!wfInstance) {
+          console.error(
+            'Workflow instance does not seem to exist. Redirecting...'
+          )
+          router.push({ name: 'workflow-dashboard' })
+            .catch(e => {
+              console.error(
+                'Error navigating to workflow dashboard upon not finding a',
+                'matching Workflow Instance:',
+                e
+              )
+            })
+          return
+        }
+        retrieveEmployeeTransition().then(() => {
+          // Print the screen
+          window.print()
+        })
+      })
+      .catch(e => {
+        console.error('Error retrieving workflow instance', e)
+        router.push({ name: 'workflow-transition-form', params: { pk: pk } })
+          .catch(e => {
+            console.error(
+              'Error navigating to transition form upon not finding a matching',
+              'Workflow Instance:',
+              e
+            )
+          })
+      })
+  }
+}
+
+////////////////////////
+// Send notifications //
+////////////////////////
 
 function sendGasPINNotificationEmail() {
   workflowsStore.sendGasPINNotificationEmail(transitionPk.value, {
@@ -1315,45 +1434,9 @@ function onSubmitSendDialog(type: 'SDS'|'HR'|'STN') {
     })
 }
 
-function handlePrint() {
-  const pk = getRoutePk(route)
-  if (!pk) {
-    router.push('/')
-  } else {
-    workflowsStore.getCurrentWorkflowInstance(pk)
-      .then(() => {
-        const wfInstance: WorkflowInstance =
-          workflowsStore.currentWorkflowInstance
-        if (!wfInstance) {
-          console.error(
-            'Workflow instance does not seem to exist. Redirecting...'
-          )
-          router.push({ name: 'workflow-dashboard' })
-            .catch(e => {
-              console.error(
-                'Error navigating to workflow dashboard upon not finding a matching Workflow Instance:',
-                e
-              )
-            })
-          return
-        }
-        retrieveEmployeeTransition().then(() => {
-          // Print the screen
-          window.print()
-        })
-      })
-      .catch(e => {
-        console.error('Error retrieving workflow instance', e)
-        router.push({ name: 'workflow-transition-form', params: { pk: pk } })
-          .catch(e => {
-            console.error(
-              'Error navigating to transition form upon not finding a matching Workflow Instance:',
-              e
-            )
-          })
-      })
-  }
-}
+/////////////////////////
+// Vue Lifecycle Hooks //
+/////////////////////////
 
 watch(() => bus.bus.value.get('workflowInstanceRetrieved'), () => {
   // TODO: We should only set state once, but when you load /transition

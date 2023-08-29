@@ -14,6 +14,8 @@ import os
 
 from distutils.util import strtobool
 
+import logging
+import boto3
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -140,7 +142,7 @@ WSGI_APPLICATION = 'mainsite.wsgi.application'
 if 'RDS_DB_NAME' in os.environ:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'ENGINE': 'django.db.backends.postgresql',
             'NAME': os.environ['RDS_DB_NAME'],
             'USER': os.environ['RDS_USERNAME'],
             'PASSWORD': os.environ['RDS_PASSWORD'],
@@ -232,7 +234,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # S3 storage bucket information
 AWS_STORAGE_BUCKET_NAME = 'team-app-storage'
-AWS_S3_REGION_NAME = 'us-west-2'
+AWS_REGION_NAME = 'us-west-2'
 
 # Tell django-storages the domain to use to refer to static files.
 AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
@@ -241,10 +243,16 @@ if 'STATICFILES_LOCATION' in os.environ:
     # Tell the staticfiles app to use S3Boto3 storage when writing the collected static files (when
     # you run `collectstatic`).
     STATICFILES_LOCATION = os.environ['STATICFILES_LOCATION']
-    STATICFILES_STORAGE = os.environ['STATICFILES_STORAGE']
-    # Media files location
     MEDIAFILES_LOCATION = os.environ['MEDIAFILES_LOCATION']
-    DEFAULT_FILE_STORAGE = os.environ['DEFAULT_FILE_STORAGE']
+
+    STORAGES = {
+        "default": {
+            "BACKEND": os.environ['DEFAULT_FILE_STORAGE'],
+        },
+        "staticfiles": {
+            "BACKEND": os.environ['STATICFILES_STORAGE'],
+        },
+    }
 
 # Set long timeout for static file browser caching
 AWS_S3_OBJECT_PARAMETERS = {
@@ -279,6 +287,53 @@ DEFAULT_FROM_EMAIL = 'no-reply@lcog.org'
 # AWS_SES_REGION_NAME = 'us-west-2'
 # AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'
 
+###########
+# LOGGING #
+###########
+
+AWS_LOG_GROUP = 'TeamAppLogGroup', # your log group
+AWS_LOG_STREAM = 'TeamAppLogStream', # your stream
+AWS_LOGGER_NAME = 'watchtower-logger' # your logger
+
+
+boto3_logs_client = boto3.client("logs", region_name=AWS_REGION_NAME)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'aws': {
+            # you can add specific format for aws here
+            # if you want to change format, you can read:
+            #    https://stackoverflow.com/questions/533048/how-to-log-source-file-name-and-line-number-in-python/44401529
+            'format': u"%(asctime)s [%(levelname)-8s] %(message)s [%(pathname)s:%(lineno)d]",
+            'datefmt': "%Y-%m-%d %H:%M:%S"
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+        'watchtower': {
+            'class': 'watchtower.CloudWatchLogHandler',
+            'boto3_client': boto3_logs_client,
+            'log_group_name': 'TeamAppLogGroup',
+            'log_stream_name': 'TeamAppLogStream',
+            # Decrease the verbosity level here to send only those logs to watchtower,
+            # but still see more verbose logs in the console. See the watchtower
+            # documentation for other parameters that can be set here.
+            'level': 'DEBUG'
+        }
+    },
+    'loggers': {
+        AWS_LOGGER_NAME: {
+            'level': 'DEBUG',
+            'handlers': ['watchtower'],
+            'propagate': False,
+        },
+        # add your other loggers here...
+    },
+}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 

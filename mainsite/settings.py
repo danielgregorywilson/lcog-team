@@ -242,7 +242,8 @@ AWS_S3_DOMAIN = 'https://%s.s3.%s.amazonaws.com' % (AWS_STORAGE_BUCKET_NAME, AWS
 # Static files (CSS, JavaScript, Images)
 # Stored in AWS S3 bucket unless running locally
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
-STATIC_URL = AWS_S3_DOMAIN
+# STATIC_URL = AWS_S3_DOMAIN
+STATIC_URL = '/static/'
 
 if 'STATICFILES_LOCATION' in os.environ:
     # Tell the staticfiles app to use S3Boto3 storage when writing the collected static files (when

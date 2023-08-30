@@ -225,8 +225,7 @@ USE_TZ = True
 #     os.path.join(BASE_DIR, "static")
 # ]
 
-# Where to build static files
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -242,8 +241,10 @@ AWS_S3_DOMAIN = 'https://%s.s3.%s.amazonaws.com' % (AWS_STORAGE_BUCKET_NAME, AWS
 # Static files (CSS, JavaScript, Images)
 # Stored in AWS S3 bucket unless running locally
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
-# STATIC_URL = AWS_S3_DOMAIN
-STATIC_URL = '/static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, "static") # Where to build static files locally (ignored by EB)
+# STATIC_URL = AWS_S3_DOMAIN + '/static/' # Where to serve static files from
+# STATIC_URL = '/static/'
 
 if 'STATICFILES_LOCATION' in os.environ:
     # Tell the staticfiles app to use S3Boto3 storage when writing the collected static files (when

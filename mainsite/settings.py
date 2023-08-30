@@ -14,10 +14,15 @@ import os
 
 from distutils.util import strtobool
 
-import logging
 import boto3
+from storages.backends.s3boto3 import (S3Boto3Storage, S3StaticStorage) # Needed for staging/production static files
+
+import logging
+
 from dotenv import load_dotenv
 load_dotenv()
+
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

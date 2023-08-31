@@ -16,6 +16,7 @@
       no-data-label="Nothing to show"
       row-key="name"
       :rows-per-page-options="[0]"
+      v-bind:class="'workflowtable-' + props.type"
     >
       <template v-slot:top-right>
         <q-input
@@ -222,7 +223,7 @@
         </div>
       </template>
       <template v-slot:bottom-row v-if="props.allowAddDelete">
-        <q-tr @click="clickAddWorkflow()" class="cursor-pointer">
+        <q-tr @click="clickAddWorkflow()" class="cursor-pointer row-add-new">
           <q-td colspan="100%">
             <q-icon name="add" size="md" class="q-pr-sm"/>New Workflow
           </q-td>

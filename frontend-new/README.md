@@ -22,9 +22,8 @@ quasar dev
 # Cypress e2e tests
 Open Cypress launcher to run individual tests
 `cd frontend-new && npm run cypress:open`
-Run Cypress tests in the background and upload results to https://dashboard.cypress.io/
-`cd frontend-new`
-`npm run cypress:run`
+Run Cypress tests in the background and upload results to https://cloud.cypress.io/
+`cd frontend-new && npm run cypress:run`
 
 ### Lint the files
 ```bash

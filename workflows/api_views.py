@@ -384,7 +384,6 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
                 t.transition_date = None
 
             t.lwop = request.data['lwop']
-            c = 1/0
             t.lwop_details = request.data['lwop_details']
             t.preliminary_hire = request.data['preliminary_hire']
             t.delete_profile = request.data['delete_profile']
@@ -430,7 +429,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             message = 'Error updating employee transition.'
             record_error(message, e, request)
             return Response(
-                data=f'{message}: {str(e)}',
+                data=message,
                 status=status.HTTP_403_FORBIDDEN
             )
 

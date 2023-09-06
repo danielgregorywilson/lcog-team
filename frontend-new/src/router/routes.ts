@@ -161,7 +161,7 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/workflows/Workflows.vue'),
         meta: { requiresAuth: true },
         children: [
-          { 
+          {
             path: '',
             name: 'workflow-dashboard-redirect',
             redirect: { name: 'workflow-dashboard' }
@@ -358,6 +358,15 @@ const routes: RouteRecordRaw[] = [
         // beforeEnter: ifNotAuthenticated,
       },
     ]
+  },
+
+  /////////////////
+  // Outage page //
+  /////////////////
+  {
+    path: '/outage',
+    name: 'outage-notice',
+    component: () => import('src/pages/OutageNotice.vue'),
   },
 
   // Always leave this as last one,

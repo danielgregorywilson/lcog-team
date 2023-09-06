@@ -429,7 +429,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             message = 'Error updating employee transition.'
             record_error(message, e, request)
             return Response(
-                data=f'{message}: {str(e)}',
+                data=message,
                 status=status.HTTP_403_FORBIDDEN
             )
 

@@ -34,10 +34,3 @@ Windows `.\manage.py runserver`
 # Install Elastic Beanstalk CLI
 https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3-install.html
 Manually install the CLI using pip. Modify environment variable PATH from instructions.
-
-# Cypress e2e tests
-Open Cypress launcher to run individual tests
-`cd frontend && npm run cypress:open`
-Run Cypress tests in the background and upload results to https://dashboard.cypress.io/
-`cd frontend`
-`npm run cypress:run`

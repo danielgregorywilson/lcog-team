@@ -21,7 +21,12 @@
     </div>
     <div class="text-h6 transition-form-section-heading">Employee</div>
     <div class="row">
-      <q-input v-model="employeeFirstName" label="First" class="q-mr-md" />
+      <q-input
+        v-model="employeeFirstName"
+        label="First"
+        class="q-mr-md"
+        name="first-name"
+      />
       <q-input
         v-model="employeeMiddleInitial"
         maxlength=5
@@ -29,11 +34,17 @@
         class="q-mr-md"
         style="width: 4em"
       />
-      <q-input v-model="employeeLastName" label="Last" class="q-mr-md" />
+      <q-input
+        v-model="employeeLastName"
+        label="Last"
+        class="q-mr-md"
+        name="last-name"
+      />
       <q-input
         v-model="employeePreferredName"
         label="Preferred Name, if different"
         style="width: 25em"
+        name="preferredName"
       />
     </div>
     <div class="row">
@@ -70,6 +81,7 @@
         label="Email"
         @focus="suggestEmail()"
         :readonly="!canEditEmployeeNumberFields()"
+        name="email"
       />
     </div>
     <div class="text-h6 transition-form-section-heading">Position</div>
@@ -80,6 +92,7 @@
         v-on:input="title=$event"
         v-on:clear="title=emptyTitle"
         class="q-mr-md"
+        name="title"
       />
       <q-input v-model="fte" label="FTE" class="q-mr-md" />
       <q-checkbox v-model="bilingual" label="Bilingual" class="q-mr-md" />
@@ -151,6 +164,7 @@
         v-on:clear="manager=emptyEmployee"
         class="q-mr-md"
         :readOnly="!canEditManagerField()"
+        name="manager"
       />
       <UnitSelect
         label="Unit"
@@ -561,6 +575,7 @@
         color="white"
         text-color="black"
         label="Save"
+        name="save-button"
         :disabled="!valuesAreChanged()"
         @click="updateTransition()"
       />

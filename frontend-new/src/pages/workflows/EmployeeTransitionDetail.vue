@@ -50,6 +50,8 @@
     <div class="row">
       <q-select
         v-model="employeeID"
+        name="employee-id"
+        id="employee-id"
         :options="['CLSD', 'CLID']"
         label="Employee ID"
         class="q-mr-sm"
@@ -71,6 +73,7 @@
         v-model="employeeNumber"
         type="number"
         label="Employee Number"
+        name="employee-number"
         mask="####"
         class="q-mr-md"
         :readonly="!canEditEmployeeNumberFields()"
@@ -124,6 +127,7 @@
       <q-input
         v-if="canViewSalaryFields()"
         v-model="salaryRange"
+        name="salary-range"
         label="Salary Range"
         class="q-mr-md"
         clearable
@@ -134,6 +138,8 @@
       <q-select
         v-if="canViewSalaryFields()"
         v-model="salaryStep"
+        id="salary-step"
+        name="salary-step"
         :options="Array.from({length:10}, (x, i) => i+1)"
         label="Salary Step"
         class="q-mr-md"
@@ -402,6 +408,7 @@
     <div class="row">
       <q-input
         v-model="fiscalField"
+        name="fiscal-field"
         autogrow
         style="width:100%"
         hint="_ _ _ - _ _ - _ _ _ _ / Allocation %"

@@ -1,19 +1,23 @@
 export function visitUrl(path: string) {
-  cy.visit(`${ Cypress.env('base_url') }${ path }`)
+  return new Promise((resolve, reject) => {
+    cy.visit(`${ Cypress.env('base_url') }${ path }`).then(() => {
+      resolve('Successfully visited url')
+    })
+  })
 }
 
 export function loginUser(user: { username: string, password: string }) {
   return new Promise((resolve, reject) => {
-    visitUrl(Cypress.env('login_path'))
-    cy.wait(5000)
-    cy.get('input#username').type(user.username)
-    cy.get('input#password').type(user.password)
-    cy.get('button[type="submit"]').click()
-    cy.location('pathname', {timeout: 60000}) // Wait until the dashboard loads
-      .should('include', '/dashboard')
-      .then(() => {
-        resolve('Successfully logged in user')
-      })
+    visitUrl(Cypress.env('login_path')).then(() => {
+      cy.get('input#username').type(user.username)
+      cy.get('input#password').type(user.password)
+      cy.get('button[type="submit"]').click()
+      cy.location('pathname', {timeout: 60000}) // Wait until the dashboard loads
+        .should('include', '/dashboard')
+        .then(() => {
+          resolve('Successfully logged in user')
+        })
+    })
   })
 }
 

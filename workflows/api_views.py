@@ -1,6 +1,5 @@
-from dataclasses import dataclass
 from datetime import datetime
-from time import time
+import traceback
 
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -339,7 +338,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             editing_salary = editing_salary_range or editing_salary_step
             if editing_salary and not user_can_edit_salary:
                 message = 'Only the hiring manager, fiscal, or HR can edit salary fields.'
-                record_error(message, e, request)
+                record_error(message, e, request, traceback.format_exc())
                 return Response(
                     data=message,
                     status=status.HTTP_403_FORBIDDEN
@@ -362,7 +361,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             ])
             if editing_manager and not user_is_submitter:
                 message = 'Only the original submitter can edit the manager field.'
-                record_error(message, e, request)
+                record_error(message, e, request, traceback.format_exc())
                 return Response(
                     data=message,
                     status=status.HTTP_403_FORBIDDEN
@@ -427,7 +426,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             return Response(serialized_transition.data)
         except Exception as e:
             message = 'Error updating employee transition.'
-            record_error(message, e, request)
+            record_error(message, e, request, traceback.format_exc())
             return Response(
                 data=message,
                 status=status.HTTP_403_FORBIDDEN

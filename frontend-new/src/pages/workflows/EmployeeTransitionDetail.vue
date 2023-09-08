@@ -2,13 +2,33 @@
   <div class="q-pt-md">
     <div class="text-h6 transition-form-section-heading">Type</div>
     <div class="row items-center">
-      <q-radio v-model="type" val="New" />
+      <q-radio
+        v-model="type"
+        val="New"
+        id="type-new"
+        :disable="!canEditOtherFields()"
+      />
       <div>New</div>
-      <q-radio v-model="type" val="Return" />
+      <q-radio
+        v-model="type"
+        val="Return"
+        id="type-return"
+        :disable="!canEditOtherFields()"
+      />
       <div>Return</div>
-      <q-radio v-model="type" val="Change/Modify" />
+      <q-radio
+        v-model="type"
+        val="Change/Modify"
+        id="type-change"
+        :disable="!canEditOtherFields()"
+      />
       <div>Change/Modify</div>
-      <q-radio v-model="type" val="Exit" />
+      <q-radio
+        v-model="type"
+        val="Exit"
+        id="type-exit"
+        :disable="!canEditOtherFields()"
+      />
       <div>Exit</div>
     </div>
     <div class="text-h6 transition-form-section-heading">Submission Info</div>
@@ -26,25 +46,30 @@
         label="First"
         class="q-mr-md"
         name="first-name"
+        :readonly="!canEditOtherFields()"
       />
       <q-input
         v-model="employeeMiddleInitial"
         maxlength=5
         label="M"
         class="q-mr-md"
+        name="middle-initial"
         style="width: 4em"
+        :readonly="!canEditOtherFields()"
       />
       <q-input
         v-model="employeeLastName"
         label="Last"
         class="q-mr-md"
         name="last-name"
+        :readonly="!canEditOtherFields()"
       />
       <q-input
         v-model="employeePreferredName"
         label="Preferred Name, if different"
         style="width: 25em"
-        name="preferredName"
+        name="preferred-name"
+        :readonly="!canEditOtherFields()"
       />
     </div>
     <div class="row">
@@ -96,9 +121,22 @@
         v-on:clear="title=emptyTitle"
         class="q-mr-md"
         name="title"
+        :disable="!canEditOtherFields()"
       />
-      <q-input v-model="fte" label="FTE" class="q-mr-md" />
-      <q-checkbox v-model="bilingual" label="Bilingual" class="q-mr-md" />
+      <q-input
+        v-model="fte"
+        name="fte"
+        label="FTE"
+        class="q-mr-md"
+        :readonly="!canEditOtherFields()"
+      />
+      <q-checkbox
+        v-model="bilingual"
+        label="Bilingual"
+        class="q-mr-md"
+        id="bilingual"
+        :disable="!canEditOtherFields()"
+      />
       <!-- TODO: For some reason this component won't initialize with secondLanguage -->
       <!-- <LanguageSelect
         v-if="bilingual"
@@ -114,6 +152,8 @@
         v-model="secondLanguage"
         :options="languageOptions"
         class="language-select"
+        id="second-language"
+        :disable="!canEditOtherFields()"
       >
         <template v-if="secondLanguage" v-slot:append>
           <q-icon
@@ -150,6 +190,8 @@
         v-model="unionAffiliation"
         :options="['Non-Represented','EA', 'SEIU', 'Management']"
         label="Union Affiliation"
+        id="union-affiliation"
+        :disable="!canEditOtherFields()"
         style="width: 172px;"
       >
         <template v-if="unionAffiliation" v-slot:append>
@@ -1269,6 +1311,17 @@ function canEditManagerField() {
 // Only fiscal can edit the fiscal field. Anyone can view it.
 function canEditFiscalField() {
   return cookies.get('is_fiscal_employee') == 'true'
+}
+
+// If the form is submitted, other fields are editable only by submitter, hiring
+// manager, HR, fiscal, and SDS hiring leads.
+function canEditOtherFields() {
+  return !formSubmitted() ||
+    employeeIsSubmitter() ||
+    userStore.getEmployeeProfile.employee_pk == manager.value.pk ||
+    cookies.get('is_hr_employee') == 'true' ||
+    cookies.get('is_fiscal_employee') == 'true' ||
+    cookies.get('is_sds_hiring_lead') == 'true'
 }
 
 function canSendToHR() {

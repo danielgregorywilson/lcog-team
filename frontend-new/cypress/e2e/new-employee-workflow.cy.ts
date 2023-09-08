@@ -1,4 +1,5 @@
-import { loginSuperuser, loginUser, visitUrl } from '../support/helpers'
+import { title } from 'process'
+import { loginSuperuser, loginUser, randomString, visitUrl } from '../support/helpers'
 
 // Cypress clears localstorage between tests, so use this to store data
 const LOCAL_STORAGE_MEMORY: { [key: string]: string } = {}
@@ -56,6 +57,60 @@ function fiscalViewNotEdit() {
   fiscalField.should('have.attr', 'readonly', 'readonly')
 }
 
+function otherFieldsViewAndEdit() {
+  cy.get('#type-return').click()
+  cy.get('#type-return').should('have.attr', 'aria-checked', 'true')
+  cy.get('#type-change').click()
+  cy.get('#type-change').should('have.attr', 'aria-checked', 'true')
+  cy.get('#type-exit').click()
+  cy.get('#type-exit').should('have.attr', 'aria-checked', 'true')
+  const firstName = randomString(10)
+  cy.get('input[name="first-name"]').clear().type(firstName)
+  cy.get('input[name="first-name"]').should('have.value', firstName)
+  const middleInitial = randomString(1)
+  cy.get('input[name="middle-initial"]').clear().type(middleInitial)
+  cy.get('input[name="middle-initial"]').should('have.value', middleInitial)
+  const lastName = randomString(10)
+  cy.get('input[name="last-name"]').clear().type(lastName)
+  cy.get('input[name="last-name"]').should('have.value', lastName)
+  const preferredName = randomString(20)
+  cy.get('input[name="preferred-name"]').clear().type(preferredName)
+  cy.get('input[name="preferred-name"]').should('have.value', preferredName)
+  const titleInput = cy.get('select[name="title"]').siblings('input')
+  titleInput.type('Dev')
+  cy.wait(500) // Wait for the title to be selected
+  titleInput.type('{downArrow}{enter}')
+  titleInput.should('have.value', 'Senior Web Developer')
+  const fte = 2
+  cy.get('input[name="fte"]').clear().type(fte.toString())
+  cy.get('input[name="fte"]').should('have.value', fte.toString())
+  cy.get('#bilingual').click()
+  cy.get('#bilingual').should('have.attr', 'aria-checked', 'true')
+  cy.get('#second-language').click()
+  cy.get('.q-menu > .q-virtual-scroll__content > .q-item').first().click()
+  cy.get('#union-affiliation').click()
+  cy.get('.q-menu > .q-virtual-scroll__content > .q-item').first().click()
+}
+
+function otherFieldsViewNotEdit() {
+  cy.get('#type-return').click()
+  cy.get('#type-new').should('have.attr', 'aria-checked', 'true')
+  cy.get('#type-change').click()
+  cy.get('#type-new').should('have.attr', 'aria-checked', 'true')
+  cy.get('#type-exit').click()
+  cy.get('#type-new').should('have.attr', 'aria-checked', 'true')
+  cy.get('input[name="first-name"]').should('have.attr', 'readonly')
+  cy.get('input[name="middle-initial"]').should('have.attr', 'readonly')
+  cy.get('input[name="last-name"]').should('have.attr', 'readonly')
+  cy.get('input[name="preferred-name"]').should('have.attr', 'readonly')
+  cy.get('select[name="title"]').should('not.exist')
+  cy.get('input[name="fte"]').should('have.attr', 'readonly')
+  cy.get('#bilingual').click()
+  cy.get('#bilingual').should('have.attr', 'aria-checked', 'false')
+  cy.get('select[name="second-language"]').should('not.exist')
+  cy.get('select[name="union-affiliation"]').should('not.exist')
+}
+
 describe('New employee workflow', () => {
 
   it('Submitter logs in, creates a new employee workflow, and submits it', () => {
@@ -98,6 +153,8 @@ describe('New employee workflow', () => {
         salaryViewAndEdit
         // Can view but not edit the fiscal field
         fiscalViewNotEdit()
+        // Can view and edit all other fields
+        otherFieldsViewAndEdit()
       })
     })
   })
@@ -115,6 +172,8 @@ describe('New employee workflow', () => {
       managerViewNotEdit()
       // Can view but not edit the fiscal field
       fiscalViewNotEdit()
+      // Can view but not edit all other fields
+      otherFieldsViewNotEdit()
     })
   })
 
@@ -131,6 +190,8 @@ describe('New employee workflow', () => {
       managerViewNotEdit()
       // Can view but not edit the fiscal field
       fiscalViewNotEdit()
+      // Can view and edit all other fields
+      otherFieldsViewAndEdit()
     })
   })
 
@@ -147,6 +208,8 @@ describe('New employee workflow', () => {
       managerViewNotEdit()
       // Can view but not edit the fiscal field
       fiscalViewNotEdit()
+      // Can view and edit all other fields
+      otherFieldsViewAndEdit()
     })
   })
 
@@ -163,6 +226,8 @@ describe('New employee workflow', () => {
       managerViewNotEdit()
       // Can view and edit the fiscal field
       fiscalViewAndEdit()
+      // Can view and edit all other fields
+      otherFieldsViewAndEdit()
     })
   })
 
@@ -179,6 +244,8 @@ describe('New employee workflow', () => {
       managerViewNotEdit()
       // Can view and edit the fiscal field
       fiscalViewNotEdit()
+      // Can view and edit all other fields
+      otherFieldsViewAndEdit()
     })
   })
 

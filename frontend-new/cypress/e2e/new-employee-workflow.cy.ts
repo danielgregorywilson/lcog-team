@@ -1,4 +1,4 @@
-import { title } from 'process'
+import { send, title } from 'process'
 import { loginSuperuser, loginUser, randomString, visitUrl } from '../support/helpers'
 
 // Cypress clears localstorage between tests, so use this to store data
@@ -226,6 +226,41 @@ function otherFieldsViewNotEdit() {
   cy.get('button[name="save-button"]').should('not.exist')
 }
 
+function noSubmitButtonsExist() {
+  cy.get('button[name="send-sds-button"]').should('not.exist')
+  cy.get('button[name="send-fiscal-button"]').should('not.exist')
+  cy.get('button[name="send-hr-button"]').should('not.exist')
+  cy.get('button[name="send-stn-button"]').should('not.exist')
+}
+
+function sendSDSButtonExists() {
+  cy.get('button[name="send-sds-button"]').should('exist')
+  cy.get('button[name="send-fiscal-button"]').should('not.exist')
+  cy.get('button[name="send-hr-button"]').should('not.exist')
+  cy.get('button[name="send-stn-button"]').should('not.exist')
+}
+
+function sendFiscalButtonExists() {
+  cy.get('button[name="send-sds-button"]').should('not.exist')
+  cy.get('button[name="send-fiscal-button"]').should('exist')
+  cy.get('button[name="send-hr-button"]').should('not.exist')
+  cy.get('button[name="send-stn-button"]').should('not.exist')
+}
+
+function sendHRButtonExists() {
+  cy.get('button[name="send-sds-button"]').should('not.exist')
+  cy.get('button[name="send-fiscal-button"]').should('not.exist')
+  cy.get('button[name="send-hr-button"]').should('exist')
+  cy.get('button[name="send-stn-button"]').should('not.exist')
+}
+
+function sendSTNButtonExists() {
+  cy.get('button[name="send-sds-button"]').should('not.exist')
+  cy.get('button[name="send-fiscal-button"]').should('not.exist')
+  cy.get('button[name="send-hr-button"]').should('not.exist')
+  cy.get('button[name="send-stn-button"]').should('exist')
+}
+
 describe('New employee workflow', () => {
 
   it('Submitter logs in, creates a new employee workflow, and submits it', () => {
@@ -272,6 +307,8 @@ describe('New employee workflow', () => {
         fiscalViewNotEdit()
         // Can view and edit all other fields
         otherFieldsViewAndEdit()
+
+        sendSDSButtonExists()
       })
     })
   })
@@ -291,6 +328,8 @@ describe('New employee workflow', () => {
       fiscalViewNotEdit()
       // Can view but not edit all other fields
       otherFieldsViewNotEdit()
+
+      noSubmitButtonsExist()
     })
   })
 
@@ -309,6 +348,48 @@ describe('New employee workflow', () => {
       fiscalViewNotEdit()
       // Can view and edit all other fields
       otherFieldsViewAndEdit()
+
+      sendSDSButtonExists()
+    })
+  })
+
+  it ('SDS Hiring Lead can view the workflow and edit certain fields', () => {
+    const pk = LOCAL_STORAGE_MEMORY['workflowPK']
+    loginUser(Cypress.env('users').sdshiringlead).then(() => {
+      visitUrl(`/wf/${pk}/transition`)
+
+      // Can view but not edit employee ID fields
+      employeeIDViewNotEdit()
+      // Can view and edit the salary fields
+      salaryViewAndEdit()
+      // Can view but not edit the manager field
+      managerViewNotEdit()
+      // Can view and edit the fiscal field
+      fiscalViewNotEdit()
+      // Can view and edit all other fields
+      otherFieldsViewAndEdit()
+
+      sendFiscalButtonExists()
+    })
+  })
+
+  it('Fiscal can view the workflow and edit certain fields', () => {
+    const pk = LOCAL_STORAGE_MEMORY['workflowPK']
+    loginUser(Cypress.env('users').fiscalemployee).then(() => {
+      visitUrl(`/wf/${pk}/transition`)
+
+      // Can view but not edit employee ID fields
+      employeeIDViewNotEdit()
+      // Can view and edit the salary fields
+      salaryViewAndEdit()
+      // Can view but not edit the manager field
+      managerViewNotEdit()
+      // Can view and edit the fiscal field
+      fiscalViewAndEdit()
+      // Can view and edit all other fields
+      otherFieldsViewAndEdit()
+
+      sendHRButtonExists()
     })
   })
 
@@ -328,42 +409,8 @@ describe('New employee workflow', () => {
       // Can view and edit all other fields
       otherFieldsViewAndEdit()
     })
-  })
 
-  it('Fiscal can view the workflow and edit certain fields', () => {
-    const pk = LOCAL_STORAGE_MEMORY['workflowPK']
-    loginUser(Cypress.env('users').fiscalemployee).then(() => {
-      visitUrl(`/wf/${pk}/transition`)
-
-      // Can view but not edit employee ID fields
-      employeeIDViewNotEdit()
-      // Can view and edit the salary fields
-      salaryViewAndEdit()
-      // Can view but not edit the manager field
-      managerViewNotEdit()
-      // Can view and edit the fiscal field
-      fiscalViewAndEdit()
-      // Can view and edit all other fields
-      otherFieldsViewAndEdit()
-    })
-  })
-
-  it ('SDS Hiring Lead can view the workflow and edit certain fields', () => {
-    const pk = LOCAL_STORAGE_MEMORY['workflowPK']
-    loginUser(Cypress.env('users').sdshiringlead).then(() => {
-      visitUrl(`/wf/${pk}/transition`)
-
-      // Can view but not edit employee ID fields
-      employeeIDViewNotEdit()
-      // Can view and edit the salary fields
-      salaryViewAndEdit()
-      // Can view but not edit the manager field
-      managerViewNotEdit()
-      // Can view and edit the fiscal field
-      fiscalViewNotEdit()
-      // Can view and edit all other fields
-      otherFieldsViewAndEdit()
-    })
+    sendSTNButtonExists()
   })
 
   it('Deletes the workflow', () => {

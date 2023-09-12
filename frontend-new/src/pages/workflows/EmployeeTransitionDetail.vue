@@ -635,6 +635,39 @@
       </q-card>
     </q-dialog>
 
+    <!-- Send to Fiscal Dialog -->
+    <q-dialog v-model="showSendToFiscalDialog">
+      <q-card class="q-pa-md" style="width: 400px">
+        <div class="text-h6">Send transition to Fiscal?</div>
+        <q-chip
+          v-if="valuesAreChanged()"
+          color="warning"
+          text-color="white"
+          icon="warning"
+          label="Unsaved changes"
+        />
+        <q-form
+          @submit='onSubmitSendDialog("FI")'
+          class="q-gutter-md"
+        >
+          <q-input
+            v-model="sendDialogMessage"
+            filled
+            type="textarea"
+            label="Extra message to include"
+          />
+          <div>
+            <q-btn
+              label="Send"
+              icon-right="send"
+              type="submit"
+              color="primary"
+            />
+          </div>
+        </q-form>
+      </q-card>
+    </q-dialog>
+
     <!-- Send to HR Dialog -->
     <q-dialog v-model="showSendToHRDialog">
       <q-card class="q-pa-md" style="width: 400px">
@@ -750,6 +783,7 @@
         />
         <q-btn
           v-if="canSendToTransitionNews()"
+          name="send-stn-button"
           class="q-ml-sm"
           color="white"
           text-color="black"
@@ -759,6 +793,7 @@
         />
         <q-btn
           v-else-if="canSendToHR()"
+          name="send-hr-button"
           class="q-ml-sm"
           color="white"
           text-color="black"
@@ -767,7 +802,18 @@
           @click="showSendToHRDialog = true"
         />
         <q-btn
+          v-else-if="canSendToFiscal()"
+          name="send-fiscal-button"
+          class="q-ml-sm"
+          color="white"
+          text-color="black"
+          icon="send"
+          label="Send to Fiscal"
+          @click="showSendToFiscalDialog = true"
+        />
+        <q-btn
           v-else-if="canEditOtherFields()"
+          name="send-sds-button"
           class="q-ml-sm"
           color="white"
           text-color="black"
@@ -970,6 +1016,7 @@ let errorDialogPosition = ref('top') as Ref<QDialogProps['position']>
 let showChangesDialog = ref(false)
 
 let showSendToSDSHiringLeadsDialog = ref(false)
+let showSendToFiscalDialog = ref(false)
 let showSendToHRDialog = ref(false)
 let showSendToSTNDialog = ref(false)
 let sendDialogMessage = ref('')
@@ -1413,8 +1460,12 @@ function canEditOtherFields() {
     cookies.get('is_sds_hiring_lead') == 'true'
 }
 
-function canSendToHR() {
+function canSendToFiscal() {
   return cookies.get('is_sds_hiring_lead') == 'true'
+}
+
+function canSendToHR() {
+  return cookies.get('is_fiscal_employee') == 'true'
 }
 
 function canSendToTransitionNews() {
@@ -1563,7 +1614,7 @@ function sendGasPINNotificationEmail() {
     })
 }
 
-function onSubmitSendDialog(type: 'SDS'|'HR'|'STN') {
+function onSubmitSendDialog(type: 'SDS'|'FI'|'HR'|'STN') {
   workflowsStore.sendTransitionToEmailList(transitionPk.value, {
     type: type,
     update: sendDialogUpdate.value,
@@ -1579,6 +1630,7 @@ function onSubmitSendDialog(type: 'SDS'|'HR'|'STN') {
         icon: 'send'
       })
       showSendToSDSHiringLeadsDialog.value = false
+      showSendToFiscalDialog.value = false
       showSendToHRDialog.value = false
       showSendToSTNDialog.value = false
       sendDialogUpdate.value = false

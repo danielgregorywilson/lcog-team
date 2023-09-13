@@ -101,6 +101,21 @@ class EmployeeTransition(models.Model):
         (PHONE_REQUEST_DELETE_VM, PHONE_REQUEST_DELETE_VM)
     ]
 
+    ASSIGNEE_NONE = 'None'
+    ASSIGNEE_SUBMITTER = 'Submitter'
+    ASSIGNEE_HIRING_LEAD = 'Hiring Lead'
+    ASSIGNEE_FISCAL = 'Fiscal'
+    ASSIGNEE_HR = 'HR'
+    ASSIGNEE_COMPLETE = 'Complete'
+    ASSIGNEE_CHOICES = [
+        (ASSIGNEE_NONE, ASSIGNEE_NONE),
+        (ASSIGNEE_SUBMITTER, ASSIGNEE_SUBMITTER),
+        (ASSIGNEE_HIRING_LEAD, ASSIGNEE_HIRING_LEAD),
+        (ASSIGNEE_FISCAL, ASSIGNEE_FISCAL),
+        (ASSIGNEE_HR, ASSIGNEE_HR),
+        (ASSIGNEE_COMPLETE, ASSIGNEE_COMPLETE)
+    ]
+
     class Meta:
         ordering = ["pk"]
 
@@ -174,6 +189,10 @@ class EmployeeTransition(models.Model):
     )
     special_instructions = models.TextField(blank=True)
     fiscal_field = models.TextField(blank=True)
+
+    assignee = models.CharField(
+        max_length=100, choices=ASSIGNEE_CHOICES, default=ASSIGNEE_NONE
+    )
 
     __original_values = {}
 

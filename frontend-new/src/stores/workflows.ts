@@ -23,7 +23,7 @@ export const useWorkflowsStore = defineStore('workflows', {
       }
       state.currentWorkflowInstance.process_instances.forEach(pi => {
         if (pi.current_step_instance) {
-          d[pi.pk] = pi.current_step_instance.pk  
+          d[pi.pk] = pi.current_step_instance.pk
         } else {
           d[pi.pk] = -1
         }
@@ -119,7 +119,7 @@ export const useWorkflowsStore = defineStore('workflows', {
         axios({ url: `${ apiURL }api/v1/stepinstance/${ stepInstancePk }`, data: {action: 'complete', stepInstancePk, nextStepPk}, method: 'PATCH' })
           .then(resp => {
             resolve(resp)
-          })  
+          })
           .catch(e => {
             handlePromiseError(reject, 'Error completing current step instance', e)
           })
@@ -130,7 +130,7 @@ export const useWorkflowsStore = defineStore('workflows', {
         axios({ url: `${ apiURL }api/v1/stepinstance/${ stepInstancePk }`, data: {action: 'undo', stepInstancePk, nextStepInstancePk}, method: 'PATCH' })
           .then(resp => {
             resolve(resp)
-          })  
+          })
           .catch(e => {
             handlePromiseError(reject, 'Error undoing current step instance completion', e)
           })
@@ -161,7 +161,7 @@ export const useWorkflowsStore = defineStore('workflows', {
       })
     },
     sendTransitionToEmailList(pk: string, data: {
-      type: 'SDS'|'HR'|'STN', update: boolean, extraMessage: string,
+      type: 'SDS'|'FI'|'HR'|'STN', update: boolean, extraMessage: string,
       senderName: string, senderEmail: string, transition_url: string
     }): Promise<boolean> {
       return new Promise((resolve, reject) => {

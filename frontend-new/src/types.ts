@@ -133,7 +133,7 @@ export interface PerformanceReviewRetrieve {
   evaluation_opportunities: string
   evaluation_goals_manager: string
   evaluation_comments_employee: string
-  
+
   position_description_link: string
   description_reviewed_employee: boolean
   signed_position_description: string
@@ -325,7 +325,7 @@ export interface TeleworkApplicationRetrieve {
   manager_comments: string
   dependent_care_checklist_1: string
   dependent_care_documentation: string
-  
+
   program_manager_signature_0: [number, string, string, string, number, boolean]
   employee_signature_0: [number, string, string, string, number, boolean]
   employee_signature_1: [number, string, string, string, number, boolean]
@@ -766,6 +766,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   access_emails_name: string
   special_instructions: string
   fiscal_field: string
+  assignee: string
   changes: Array<TransitionChange>
 }
 
@@ -811,6 +812,7 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   access_emails_pk?: number
   special_instructions?: string
   fiscal_field?: string
+  assignee?: string
 }
 
 ////////////////////////////////////////////////

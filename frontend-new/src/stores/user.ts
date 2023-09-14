@@ -44,7 +44,7 @@ export const useUserStore = defineStore('user', {
 
   getters: {
     getEmployeeProfile: state => state.profile,
-    isProfileLoaded: state => !!state.profile.name,
+    isProfileLoaded: state => !!state.profile.username,
     isManager: state => state.profile.is_manager,
     hasWorkflowRoles: state => !!state.profile.workflow_roles.length,
     canViewMOWRoutes: state => state.profile.can_view_mow_routes,

@@ -739,17 +739,39 @@
     <div style="height: 80px;"></div>
 
     <div id="sticky-footer" class="row justify-between" v-if="!props.print">
-      <q-btn
-        v-if="canEditOtherFields()"
-        class="col-1"
-        color="white"
-        text-color="black"
-        label="Save"
-        name="save-button"
-        :disabled="!valuesAreChanged()"
-        @click="updateTransition()"
-      />
-      <div v-else></div>
+      <div class="row">
+        <q-btn
+          v-if="canEditOtherFields()"
+          class="q-mr-sm"
+          color="white"
+          text-color="black"
+          label="Save"
+          name="save-button"
+          style="width: 86.33px; height: 36px;"
+          :disabled="!valuesAreChanged()"
+          @click="updateTransition()"
+        />
+        <div v-else></div>
+        <q-btn-dropdown
+          style="height: 36px;"
+          color="primary"
+          :label="assigneeLabel()"
+        >
+          <q-list>
+            <q-item
+              v-for="option of assigneeOptions()"
+              :key="option"
+              clickable
+              v-close-popup
+              @click="setAssignee(option)"
+            >
+              <q-item-section>
+                <q-item-label>{{ option }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
+      </div>
       <q-chip
         v-if="valuesAreChanged()"
         color="warning"
@@ -1006,6 +1028,40 @@ let specialInstructionsCurrentVal = ref('')
 let specialInstructions = ref('')
 let fiscalFieldCurrentVal = ref('')
 let fiscalField = ref('')
+let assigneeCurrentVal = ref('')
+let assignee = ref('')
+
+function assigneeOptions() {
+  if (assigneeCurrentVal.value == 'Hiring Lead') {
+    return ['Submitter', 'Hiring Lead']
+  } else if (assigneeCurrentVal.value == 'Fiscal') {
+    return ['Submitter', 'Hiring Lead', 'Fiscal']
+  } else if (assigneeCurrentVal.value == 'HR') {
+    return ['Submitter', 'Hiring Lead', 'Fiscal', 'HR']
+  } else if (assigneeCurrentVal.value == 'Complete') {
+    return ['Submitter', 'Hiring Lead', 'Fiscal', 'HR', 'Complete']
+  } else {
+    return []
+  }
+}
+
+function assigneeLabel() {
+  if (assignee.value == 'None') {
+    return 'Status: Not submitted'
+  } else if (assignee.value == 'Submitter') {
+    return 'Assigned to: ' + submitterName.value
+  } else if (assignee.value == 'Hiring Lead') {
+    return 'Assigned to: Hiring Lead'
+  } else if (assignee.value == 'Fiscal') {
+    return 'Assigned to: Fiscal'
+  } else if (assignee.value == 'HR') {
+    return 'Assigned to: HR'
+  } else if (assignee.value == 'Complete') {
+    return 'Status: Complete'
+  } else {
+    return ''
+  }
+}
 
 let changes = ref(null) as Ref<TransitionChange[] | null>
 
@@ -1132,6 +1188,8 @@ function retrieveEmployeeTransition() {
     specialInstructionsCurrentVal.value = specialInstructions.value
     fiscalField.value = t.fiscal_field
     fiscalFieldCurrentVal.value = fiscalField.value
+    assignee.value = t.assignee
+    assigneeCurrentVal.value = assignee.value
 
     changes.value = t.changes
 
@@ -1198,7 +1256,8 @@ function valuesAreChanged(): boolean {
     showAccessEmails.value == showAccessEmailsCurrentVal.value &&
     accessEmails.value.pk == accessEmailsCurrentVal.value.pk &&
     specialInstructions.value == specialInstructionsCurrentVal.value &&
-    fiscalField.value == fiscalFieldCurrentVal.value
+    fiscalField.value == fiscalFieldCurrentVal.value &&
+    assignee.value == assigneeCurrentVal.value
   ) {
     return false
   } else {
@@ -1281,7 +1340,8 @@ function updateTransition() {
       prox_card_returned: proxCardReturned.value,
       access_emails_pk: accessEmails.value.pk,
       special_instructions: specialInstructions.value,
-      fiscal_field: fiscalField.value
+      fiscal_field: fiscalField.value,
+      assignee: assignee.value
     })
     .then((t) => {
       typeCurrentVal.value = t.type
@@ -1339,6 +1399,7 @@ function updateTransition() {
       }
       specialInstructionsCurrentVal.value = t.special_instructions
       fiscalFieldCurrentVal.value = t.fiscal_field
+      assigneeCurrentVal.value = t.assignee
 
       changes.value = t.changes
 
@@ -1408,6 +1469,10 @@ function formErrorItems(): Array<[string, string]> {
   return errorItems
 }
 
+function setAssignee(option: string) {
+  assignee.value = option
+}
+
 /////////////////////////////////
 // Field view/edit permissions //
 /////////////////////////////////
@@ -1458,6 +1523,10 @@ function canEditOtherFields() {
     cookies.get('is_hr_employee') == 'true' ||
     cookies.get('is_fiscal_employee') == 'true' ||
     cookies.get('is_sds_hiring_lead') == 'true'
+}
+
+function canEditAssignee() {
+  return true
 }
 
 function canSendToFiscal() {

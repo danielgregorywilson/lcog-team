@@ -329,7 +329,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             ])
             editing_salary_range = all([
                 'salary_range' in request.data,
-                request.data['salary_range'] != t.salary_range
+                request.data['salary_range'] != str(t.salary_range)
             ])
             editing_salary_step = all([
                 'salary_step' in request.data,
@@ -338,7 +338,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             editing_salary = editing_salary_range or editing_salary_step
             if editing_salary and not user_can_edit_salary:
                 message = 'Only the hiring manager, fiscal, or HR can edit salary fields.'
-                record_error(message, e, request, traceback.format_exc())
+                record_error(message, None, request, traceback.format_exc())
                 return Response(
                     data=message,
                     status=status.HTTP_403_FORBIDDEN
@@ -419,6 +419,8 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             user_is_fiscal = request.user.employee.is_fiscal_employee
             if user_is_fiscal:
                 t.fiscal_field = request.data['fiscal_field']
+
+            t.assignee = request.data['assignee']
 
             t.save()
             serialized_transition = EmployeeTransitionSerializer(t,

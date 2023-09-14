@@ -35,13 +35,15 @@ def get_host_url(request):
         return f'http://{ host }/' 
 
 
-def record_error(message, error, request=None):
+def record_error(message, error, request=None, traceback=None):
     message += '\n'
     message += 'User: ' + str(request.user)
     message += '\n'
     message += 'Error: ' + str(error)
     message += '\n'
     message += str(request.__dict__)
+    message += '\n'
+    message += str(traceback)
     logger.error(message)
 
 def send_email(to_address, subject, body, html_body):

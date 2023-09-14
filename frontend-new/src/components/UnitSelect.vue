@@ -65,9 +65,13 @@ function retrieveUnitList() {
 function units(): Array<Unit> {    
   const unitList = peopleStore.unitList
   if (unitList.length) {
-    return unitList.filter((unit: Unit) => {
-      return unit.name.toLowerCase().indexOf(needle.value) != -1
-    })
+    return unitList
+      .filter((unit: Unit) => {
+        return ['Administrative Services', 'Government Services', 'Senior & Disability Services', 'Test Division'].indexOf(unit.name) != -1
+      })
+      .filter((unit: Unit) => {
+        return unit.name.toLowerCase().indexOf(needle.value) != -1
+      })
   } else {
     return []
   }

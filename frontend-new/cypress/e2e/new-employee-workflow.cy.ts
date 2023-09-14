@@ -1,4 +1,3 @@
-
 import { loginSuperuser, loginUser, randomString, visitUrl } from '../support/helpers'
 
 // Cypress clears localstorage between tests, so use this to store data

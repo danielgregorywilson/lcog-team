@@ -304,8 +304,6 @@ const router = useRouter()
 const userStore = useUserStore()
 const workflowsStore = useWorkflowsStore()
 
-let workflowsLoaded = ref(true)
-
 let deleteDialogVisible = ref(false)
 let deleteDialogPositionName = ref('Not Set')
 let deleteDialogPercentComplete = ref(0)
@@ -316,6 +314,7 @@ const props = defineProps<{
   complete: boolean,
   type: 'all' | 'new' | 'return' | 'change' | 'exit'
   allowAddDelete: boolean,
+  workflowsLoaded: boolean,
   // TODO: Move action required into the table as a column
   // actionRequired?: boolean,
 }>()

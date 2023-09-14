@@ -22,6 +22,7 @@
     :complete="false"
     type="new"
     :allowAddDelete="true"
+    :workflowsLoaded="workflowsLoaded"
     v-on:retrieve="retrieveWorkflows"
   />
   <div class="row items-center q-mb-sm q-mt-md">
@@ -40,6 +41,7 @@
     :complete="false"
     type="return"
     :allowAddDelete="true"
+    :workflowsLoaded="workflowsLoaded"
     v-on:retrieve="retrieveWorkflows"
   />
   <div class="row items-center q-mb-sm q-mt-md">
@@ -58,6 +60,7 @@
     :complete="false"
     type="change"
     :allowAddDelete="true"
+    :workflowsLoaded="workflowsLoaded"
     v-on:retrieve="retrieveWorkflows()"
   />
   <div class="row items-center q-mb-sm q-mt-md">
@@ -76,6 +79,7 @@
     :complete="false"
     type="exit"
     :allowAddDelete="true"
+    :workflowsLoaded="workflowsLoaded"
     v-on:retrieve="retrieveWorkflows"
   />
 </template>

@@ -101,6 +101,21 @@ class EmployeeTransition(models.Model):
         (PHONE_REQUEST_DELETE_VM, PHONE_REQUEST_DELETE_VM)
     ]
 
+    ASSIGNEE_NONE = 'None'
+    ASSIGNEE_SUBMITTER = 'Submitter'
+    ASSIGNEE_HIRING_LEAD = 'Hiring Lead'
+    ASSIGNEE_FISCAL = 'Fiscal'
+    ASSIGNEE_HR = 'HR'
+    ASSIGNEE_COMPLETE = 'Complete'
+    ASSIGNEE_CHOICES = [
+        (ASSIGNEE_NONE, ASSIGNEE_NONE),
+        (ASSIGNEE_SUBMITTER, ASSIGNEE_SUBMITTER),
+        (ASSIGNEE_HIRING_LEAD, ASSIGNEE_HIRING_LEAD),
+        (ASSIGNEE_FISCAL, ASSIGNEE_FISCAL),
+        (ASSIGNEE_HR, ASSIGNEE_HR),
+        (ASSIGNEE_COMPLETE, ASSIGNEE_COMPLETE)
+    ]
+
     class Meta:
         ordering = ["pk"]
 
@@ -109,7 +124,9 @@ class EmployeeTransition(models.Model):
             date = datetime.strftime(self.transition_date, '%m/%d/%Y')
         else:
             date = "No date"
-        return "EmployeeTransition ({}): {} - {}".format(self.pk, self.title, date)
+        return "EmployeeTransition ({}): {} - {}".format(
+            self.pk, self.title, date
+        )
 
     type = models.CharField(
         _("transition type"), max_length=20, choices=TRANSITION_TYPE_CHOICES,
@@ -127,16 +144,22 @@ class EmployeeTransition(models.Model):
     employee_last_name = models.CharField(blank=True, max_length=50)
     employee_preferred_name = models.CharField(blank=True, max_length=100)
     employee_number = models.PositiveSmallIntegerField(blank=True, null=True)
-    employee_id = models.CharField(blank=True, max_length=4, choices=EMPLOYEE_ID_CHOICES)
+    employee_id = models.CharField(
+        blank=True, max_length=4, choices=EMPLOYEE_ID_CHOICES
+    )
     employee_email = models.EmailField(blank=True)
     title = models.ForeignKey(
         JobTitle, blank=True, null=True, on_delete=models.SET_NULL
     )
     fte = models.FloatField(blank=True, default=1.0)
-    salary_range = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2)
+    salary_range = models.DecimalField(
+        blank=True, null=True, max_digits=10, decimal_places=2
+    )
     salary_step = models.PositiveSmallIntegerField(blank=True, null=True)
     bilingual = models.BooleanField(default=False)
-    second_language = models.CharField(max_length=20, choices=LANGUAGE_CHOICES, blank=True)
+    second_language = models.CharField(
+        max_length=20, choices=LANGUAGE_CHOICES, blank=True
+    )
     manager = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name="manager_of_transitions"
@@ -149,16 +172,26 @@ class EmployeeTransition(models.Model):
     lwop_details = models.TextField(blank=True, null=True)
     preliminary_hire = models.BooleanField(default=False)
     delete_profile = models.BooleanField(default=False)
-    office_location = models.CharField(max_length=30, choices=LOCATION_CHOICES, blank=True)
-    cubicle_number = models.CharField(max_length=10, blank=True, null=True)
-    union_affiliation = models.CharField(max_length=20, choices=UNION_CHOICES, blank=True)
+    office_location = models.CharField(
+        max_length=30, choices=LOCATION_CHOICES, blank=True
+    )
+    cubicle_number = models.CharField(
+        max_length=10, blank=True, null=True
+    )
+    union_affiliation = models.CharField(
+        max_length=20, choices=UNION_CHOICES, blank=True
+    )
     teleworking = models.BooleanField(default=False)
-    computer_type = models.CharField(max_length=10, choices=COMPUTER_TYPE_CHOICES, blank=True)
+    computer_type = models.CharField(
+        max_length=10, choices=COMPUTER_TYPE_CHOICES, blank=True
+    )
     computer_gl = models.CharField(max_length=30, blank=True)
     computer_description = models.CharField(max_length=200, blank=True)
     phone_number = models.CharField(max_length=20, blank=True)
     desk_phone = models.BooleanField(default=False)
-    phone_request = models.CharField(max_length=30, choices=PHONE_REQUEST_CHOICES, blank=True)
+    phone_request = models.CharField(
+        max_length=30, choices=PHONE_REQUEST_CHOICES, blank=True
+    )
     phone_request_data = models.CharField(max_length=50, blank=True)
     load_code = models.CharField(max_length=50, blank=True)
     cell_phone = models.BooleanField(default=False)
@@ -174,6 +207,10 @@ class EmployeeTransition(models.Model):
     )
     special_instructions = models.TextField(blank=True)
     fiscal_field = models.TextField(blank=True)
+
+    assignee = models.CharField(
+        max_length=100, choices=ASSIGNEE_CHOICES, default=ASSIGNEE_NONE
+    )
 
     __original_values = {}
 
@@ -196,11 +233,15 @@ class EmployeeTransition(models.Model):
                 new_date = new[field.name]
                 # When coming from the form, the date is a string
                 if type(new_date) == str:
-                    new_date = datetime.strptime(new_date, '%Y-%m-%dT%H:%M:%S.%fZ').replace(tzinfo=timezone.utc)
+                    new_date = datetime.strptime(
+                        new_date, '%Y-%m-%dT%H:%M:%S.%fZ'
+                    ).replace(tzinfo=timezone.utc)
                 # Strip microseconds from timestamps
                 new_date -= timedelta(microseconds=new_date.microsecond)
                 if original_date:
-                  original_date -= timedelta(microseconds=original_date.microsecond)
+                    original_date -= timedelta(
+                        microseconds=original_date.microsecond
+                    )
                 # Do not create a change record if the date has not changed
                 if original_date == new_date:
                     continue
@@ -218,7 +259,8 @@ class EmployeeTransition(models.Model):
         if len(changes):
             json_changes = json.dumps(changes, sort_keys=True, default=str)
             TransitionChange.objects.create(
-                transition=self, created_by=self.submitter, changes=json_changes
+                transition=self, created_by=self.submitter,
+                changes=json_changes
             )
 
 
@@ -624,7 +666,9 @@ class ProcessInstance(HasTimeStampsMixin):
             return False
         current_step = self.current_step_instance.step
         if current_step.role:
-            return employee.workflow_roles.filter(pk=self.current_step_instance.step.role.pk).count() > 0
+            return employee.workflow_roles.filter(
+                pk=self.current_step_instance.step.role.pk
+            ).count() > 0
         return False
 
 
@@ -652,7 +696,8 @@ class StepInstance(HasTimeStampsMixin):
         if self.step.next_step:
             # If there is a next step, we can undo if it is incomplete
             return self.step.next_step.stepinstance_set.filter(
-                process_instance=self.process_instance, completed_at__isnull=True
+                process_instance=self.process_instance,
+                completed_at__isnull=True
             ).exists()
         else:
             # If there is no next step, we can undo
@@ -663,5 +708,7 @@ class StepInstance(HasTimeStampsMixin):
     def employee_action_required(self, employee):
         # Return True if the employee is responsible for completing this step
         if self.step.role:
-            return employee.workflow_roles.filter(pk=self.step.role.pk).count() > 0
+            return employee.workflow_roles.filter(
+                pk=self.step.role.pk
+            ).count() > 0
         return False

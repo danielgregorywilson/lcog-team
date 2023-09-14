@@ -2,13 +2,33 @@
   <div class="q-pt-md">
     <div class="text-h6 transition-form-section-heading">Type</div>
     <div class="row items-center">
-      <q-radio v-model="type" val="New" />
+      <q-radio
+        v-model="type"
+        val="New"
+        id="type-new"
+        :disable="!canEditOtherFields()"
+      />
       <div>New</div>
-      <q-radio v-model="type" val="Return" />
+      <q-radio
+        v-model="type"
+        val="Return"
+        id="type-return"
+        :disable="!canEditOtherFields()"
+      />
       <div>Return</div>
-      <q-radio v-model="type" val="Change/Modify" />
+      <q-radio
+        v-model="type"
+        val="Change/Modify"
+        id="type-change"
+        :disable="!canEditOtherFields()"
+      />
       <div>Change/Modify</div>
-      <q-radio v-model="type" val="Exit" />
+      <q-radio
+        v-model="type"
+        val="Exit"
+        id="type-exit"
+        :disable="!canEditOtherFields()"
+      />
       <div>Exit</div>
     </div>
     <div class="text-h6 transition-form-section-heading">Submission Info</div>
@@ -26,30 +46,37 @@
         label="First"
         class="q-mr-md"
         name="first-name"
+        :readonly="!canEditOtherFields()"
       />
       <q-input
         v-model="employeeMiddleInitial"
         maxlength=5
         label="M"
         class="q-mr-md"
+        name="middle-initial"
         style="width: 4em"
+        :readonly="!canEditOtherFields()"
       />
       <q-input
         v-model="employeeLastName"
         label="Last"
         class="q-mr-md"
         name="last-name"
+        :readonly="!canEditOtherFields()"
       />
       <q-input
         v-model="employeePreferredName"
         label="Preferred Name, if different"
         style="width: 25em"
-        name="preferredName"
+        name="preferred-name"
+        :readonly="!canEditOtherFields()"
       />
     </div>
     <div class="row">
       <q-select
         v-model="employeeID"
+        name="employee-id"
+        id="employee-id"
         :options="['CLSD', 'CLID']"
         label="Employee ID"
         class="q-mr-sm"
@@ -71,6 +98,7 @@
         v-model="employeeNumber"
         type="number"
         label="Employee Number"
+        name="employee-number"
         mask="####"
         class="q-mr-md"
         :readonly="!canEditEmployeeNumberFields()"
@@ -93,9 +121,22 @@
         v-on:clear="title=emptyTitle"
         class="q-mr-md"
         name="title"
+        :disable="!canEditOtherFields()"
       />
-      <q-input v-model="fte" label="FTE" class="q-mr-md" />
-      <q-checkbox v-model="bilingual" label="Bilingual" class="q-mr-md" />
+      <q-input
+        v-model="fte"
+        name="fte"
+        label="FTE"
+        class="q-mr-md"
+        :readonly="!canEditOtherFields()"
+      />
+      <q-checkbox
+        v-model="bilingual"
+        label="Bilingual"
+        class="q-mr-md"
+        id="bilingual"
+        :disable="!canEditOtherFields()"
+      />
       <!-- TODO: For some reason this component won't initialize with secondLanguage -->
       <!-- <LanguageSelect
         v-if="bilingual"
@@ -111,6 +152,8 @@
         v-model="secondLanguage"
         :options="languageOptions"
         class="language-select"
+        id="second-language"
+        :disable="!canEditOtherFields()"
       >
         <template v-if="secondLanguage" v-slot:append>
           <q-icon
@@ -124,6 +167,7 @@
       <q-input
         v-if="canViewSalaryFields()"
         v-model="salaryRange"
+        name="salary-range"
         label="Salary Range"
         class="q-mr-md"
         clearable
@@ -134,6 +178,8 @@
       <q-select
         v-if="canViewSalaryFields()"
         v-model="salaryStep"
+        id="salary-step"
+        name="salary-step"
         :options="Array.from({length:10}, (x, i) => i+1)"
         label="Salary Step"
         class="q-mr-md"
@@ -144,6 +190,8 @@
         v-model="unionAffiliation"
         :options="['Non-Represented','EA', 'SEIU', 'Management']"
         label="Union Affiliation"
+        id="union-affiliation"
+        :disable="!canEditOtherFields()"
         style="width: 172px;"
       >
         <template v-if="unionAffiliation" v-slot:append>
@@ -157,6 +205,7 @@
     </div>
     <div class="row items-center">
       <EmployeeSelect
+        name="manager"
         label="Manager"
         :employee="manager"
         :useLegalName="true"
@@ -164,13 +213,14 @@
         v-on:clear="manager=emptyEmployee"
         class="q-mr-md"
         :readOnly="!canEditManagerField()"
-        name="manager"
       />
       <UnitSelect
         label="Unit"
+        name="unit"
         :unit="unit"
         v-on:input="unit=$event"
         v-on:clear="unit=emptyUnit"
+        :disable="!canEditOtherFields()"
       />
     </div>
     <div class="text-h6 transition-form-section-heading">Work Details</div>
@@ -181,42 +231,55 @@
     <div v-if="props.print" class="row q-my-sm">{{ transitionDate }}</div>
     <div v-else class="row q-my-sm">
       <q-date
+        id="transition-date"
         v-model="transitionDate"
         mask="YYYY-MM-DD HH:mm"
         class="q-mr-md"
+        :readonly="!canEditOtherFields()"
       />
       <q-time
+        id="transition-time"
         v-model="transitionDate"
         mask="YYYY-MM-DD HH:mm"
+        :readonly="!canEditOtherFields()"
       />
     </div>
     <div class="row q-my-sm" v-if="['New', 'Return'].indexOf(type) != -1">
       <q-checkbox
+        id="lwop"
         v-model="lwop"
         label="Pre Approved LWOP at time of hire"
         class="q-mr-md"
+        :disable="!canEditOtherFields()"
       />
       <q-input
+        name="lwop-details"
         v-model="lwopDetails"
         v-if="lwop"
         label="Dates and hours approved"
         style="width: 350px;"
+        :readonly="!canEditOtherFields()"
       />
     </div>
     <div class="row q-my-sm">
       <q-checkbox
+        id="preliminary-hire"
         v-model="preliminaryHire"
         v-if="employeeID != 'CLID'"
         label="Preliminary Hire"
+        :disable="!canEditOtherFields()"
       />
       <q-checkbox
+        name="delete-profile"
         v-if="type=='Exit'"
         v-model="deleteProfile"
         label="Delete Profile"
+        :disable="!canEditOtherFields()"
       />
     </div>
     <div class="row">
       <q-select
+        name="office-location"
         v-model="officeLocation"
         :options="[
           'Cottage Grove', 'Florence', 'Junction City', 'Oakridge',
@@ -228,6 +291,7 @@
         label="Office Location"
         class="q-mr-md"
         style="width: 193px;"
+        :disable="!canEditOtherFields()"
       >
         <template v-if="officeLocation" v-slot:append>
           <q-icon
@@ -238,31 +302,54 @@
         </template>
       </q-select>
       <q-input
+        name="cubicle-number"
         v-model="cubicleNumber"
         mask="NNNNNNNNNN"
         label="Cubicle Number"
         class="q-mr-md"
+        :readonly="!canEditOtherFields()"
       />
-      <q-checkbox v-model="teleworking" label="Teleworking" />
+      <q-checkbox
+        id="teleworking"
+        v-model="teleworking"
+        label="Teleworking"
+        :disable="!canEditOtherFields()"
+      />
     </div>
     <div v-if="['New', 'Return'].indexOf(type) != -1">
       <div class="text-h6 transition-form-section-heading">Computer</div>
       <div class="row items-center" id="computer-type">
         <div class="q-gutter-sm q-mr-md">
-          <q-radio v-model="computerType" val="New" label="New" />
-          <q-radio v-model="computerType" val="Repurposed" label="Repurposed" />
+          <q-radio
+            id="computer-new"
+            v-model="computerType"
+            val="New"
+            label="New"
+            :disable="!canEditOtherFields()"
+          />
+          <q-radio
+            id="computer-repurposed"
+            v-model="computerType"
+            val="Repurposed"
+            label="Repurposed"
+            :disable="!canEditOtherFields()"
+          />
         </div>
         <q-input
           v-if="computerType == 'New'"
+          name="computer-gl"
           v-model="computerGL"
           label="GL Code"
           style="width: 250px;"
+          :readonly="!canEditOtherFields()"
         />
         <q-input
           v-else
+          name="computer-description"
           v-model="computerDescription"
           label="Description of existing computer"
           style="width: 350px;"
+          :readonly="!canEditOtherFields()"
         />
       </div>
       <div
@@ -276,14 +363,17 @@
     <div class="text-h6 transition-form-section-heading">Phone</div>
     <div class="row">
       <q-input
+        name="phone-number"
         v-model="phoneNumber"
         type="tel"
         label="Phone Number"
         mask="(###) ###-####"
         fill-mask
         class="q-mr-md"
+        :readonly="!canEditOtherFields()"
       />
       <q-select
+        name="phone-request"
         v-model="phoneRequest"
         :options="[
           'New number needed', 'Remove phone', 'Delete number', 'Reassign to:',
@@ -292,6 +382,7 @@
         label="Phone Update"
         style="width: 218px;"
         class="q-mr-md"
+        :disable="!canEditOtherFields()"
       >
         <template v-if="phoneRequest" v-slot:append>
           <q-icon
@@ -302,62 +393,95 @@
         </template>
       </q-select>
       <q-input
+        name="phone-request-data"
         v-model="phoneRequestData"
         v-if="[
           'Reassign to:', 'Change name display to:'
         ].indexOf(phoneRequest) != -1"
         label="To whom?"
+        :readonly="!canEditOtherFields()"
       />
     </div>
     <div class="row">
       <q-checkbox
+        id="desk-phone-needed"
         v-model="deskPhone"
         label="Desk Phone Needed"
         class="q-mr-md"
+        :disable="!canEditOtherFields()"
       />
     </div>
     <div class="row">
       <q-input
+        name="load-code"
         v-model="loadCode"
         v-if="employeeID != 'CLID'"
         label="Load Code"
+        :readonly="!canEditOtherFields()"
       />
     </div>
     <div>
       <q-checkbox
+        id="cell-phone-needed"
         v-model="cellPhone"
         label="Cell Phone Needed"
         class="q-mr-md"
+        :disable="!canEditOtherFields()"
       />
     </div>
     <div v-if="type=='Exit'" class="row">
-      <q-checkbox v-model="shouldDelete" label="Delete?" />
+      <q-checkbox
+        id="delete"
+        v-model="shouldDelete"
+        label="Delete?"
+        :disable="!canEditOtherFields()"
+      />
     </div>
     <div v-if="type=='Exit'" class="row">
       <q-input
+        name="reassign-to"
         v-model="reassignTo"
         label="Reassign to"
+        :readonly="!canEditOtherFields()"
       />
     </div>
     <div v-if="['New', 'Return', 'Change/Modify'].indexOf(type) != -1">
       <div class="text-h6 transition-form-section-heading">Gas PIN</div>
       <div class="row">
-        <q-checkbox v-model="gasPINNeeded" label="Gas PIN Needed" />
+        <q-checkbox
+          id="gas-pin-needed"
+          v-model="gasPINNeeded"
+          label="Gas PIN Needed"
+          :disable="!canEditOtherFields()"
+        />
       </div>
     </div>
     <div class="text-h6 transition-form-section-heading">Business Cards</div>
     <div class="row">
-      <q-checkbox v-model="businessCards" label="Order Business Cards" />
+      <q-checkbox
+        id="business-cards"
+        v-model="businessCards"
+        label="Order Business Cards"
+        :disable="!canEditOtherFields()"
+      />
     </div>
     <div class="text-h6 transition-form-section-heading">
       Proxy Card/Photo ID
     </div>
     <div class="row">
-      <q-checkbox v-if="type!='Exit'" v-model="proxCardNeeded" label="Needed" />
+      <q-checkbox
+        v-if="type!='Exit'"
+        id="prox-card-needed"
+        v-model="proxCardNeeded"
+        label="Needed"
+        :disable="!canEditOtherFields()"
+      />
       <q-checkbox
         v-if="type=='Exit'"
+        id="prox-card-returned"
         v-model="proxCardReturned"
         label="Turned In"
+        :disable="!canEditOtherFields()"
       />
     </div>
     <div v-if="type=='Exit'">
@@ -375,11 +499,15 @@
       </div>
       <div class="row">
         <q-checkbox
+          id="show-access-emails"
           v-model="showAccessEmails"
           label="Does someone need to access current emails?"
-          class="q-mr-md" />
+          class="q-mr-md"
+          :disable="!canEditOtherFields()"
+        />
         <EmployeeSelect
           v-if="showAccessEmails"
+          name="access-emails"
           label="Who?"
           :employee="accessEmails"
           :useLegalName="true"
@@ -387,6 +515,7 @@
           v-on:input="accessEmails=$event"
           v-on:clear="accessEmails=emptyEmployee"
           class="q-mr-md"
+          :disable="!canEditOtherFields()"
         />
       </div>
     </div>
@@ -394,7 +523,13 @@
       Special Instructions
     </div>
     <div class="row">
-      <q-input v-model="specialInstructions" autogrow style="width:100%" />
+      <q-input
+        name="special-instructions"
+        v-model="specialInstructions"
+        autogrow
+        style="width:100%"
+        :readonly="!canEditOtherFields()"
+      />
     </div>
     <div class="text-h6 transition-form-section-heading">
       Fiscal Use Only
@@ -402,6 +537,7 @@
     <div class="row">
       <q-input
         v-model="fiscalField"
+        name="fiscal-field"
         autogrow
         style="width:100%"
         hint="_ _ _ - _ _ - _ _ _ _ / Allocation %"
@@ -499,6 +635,39 @@
       </q-card>
     </q-dialog>
 
+    <!-- Send to Fiscal Dialog -->
+    <q-dialog v-model="showSendToFiscalDialog">
+      <q-card class="q-pa-md" style="width: 400px">
+        <div class="text-h6">Send transition to Fiscal?</div>
+        <q-chip
+          v-if="valuesAreChanged()"
+          color="warning"
+          text-color="white"
+          icon="warning"
+          label="Unsaved changes"
+        />
+        <q-form
+          @submit='onSubmitSendDialog("FI")'
+          class="q-gutter-md"
+        >
+          <q-input
+            v-model="sendDialogMessage"
+            filled
+            type="textarea"
+            label="Extra message to include"
+          />
+          <div>
+            <q-btn
+              label="Send"
+              icon-right="send"
+              type="submit"
+              color="primary"
+            />
+          </div>
+        </q-form>
+      </q-card>
+    </q-dialog>
+
     <!-- Send to HR Dialog -->
     <q-dialog v-model="showSendToHRDialog">
       <q-card class="q-pa-md" style="width: 400px">
@@ -570,15 +739,39 @@
     <div style="height: 80px;"></div>
 
     <div id="sticky-footer" class="row justify-between" v-if="!props.print">
-      <q-btn
-        class="col-1"
-        color="white"
-        text-color="black"
-        label="Save"
-        name="save-button"
-        :disabled="!valuesAreChanged()"
-        @click="updateTransition()"
-      />
+      <div class="row">
+        <q-btn
+          v-if="canEditOtherFields()"
+          class="q-mr-sm"
+          color="white"
+          text-color="black"
+          label="Save"
+          name="save-button"
+          style="width: 86.33px; height: 36px;"
+          :disabled="!valuesAreChanged()"
+          @click="updateTransition()"
+        />
+        <div v-else></div>
+        <q-btn-dropdown
+          style="height: 36px;"
+          color="primary"
+          :label="assigneeLabel()"
+        >
+          <q-list>
+            <q-item
+              v-for="option of assigneeOptions()"
+              :key="option"
+              clickable
+              v-close-popup
+              @click="setAssignee(option)"
+            >
+              <q-item-section>
+                <q-item-label>{{ option }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
+      </div>
       <q-chip
         v-if="valuesAreChanged()"
         color="warning"
@@ -612,6 +805,7 @@
         />
         <q-btn
           v-if="canSendToTransitionNews()"
+          name="send-stn-button"
           class="q-ml-sm"
           color="white"
           text-color="black"
@@ -621,6 +815,7 @@
         />
         <q-btn
           v-else-if="canSendToHR()"
+          name="send-hr-button"
           class="q-ml-sm"
           color="white"
           text-color="black"
@@ -629,7 +824,18 @@
           @click="showSendToHRDialog = true"
         />
         <q-btn
-          v-else
+          v-else-if="canSendToFiscal()"
+          name="send-fiscal-button"
+          class="q-ml-sm"
+          color="white"
+          text-color="black"
+          icon="send"
+          label="Send to Fiscal"
+          @click="showSendToFiscalDialog = true"
+        />
+        <q-btn
+          v-else-if="canEditOtherFields()"
+          name="send-sds-button"
           class="q-ml-sm"
           color="white"
           text-color="black"
@@ -822,6 +1028,40 @@ let specialInstructionsCurrentVal = ref('')
 let specialInstructions = ref('')
 let fiscalFieldCurrentVal = ref('')
 let fiscalField = ref('')
+let assigneeCurrentVal = ref('')
+let assignee = ref('')
+
+function assigneeOptions() {
+  if (assigneeCurrentVal.value == 'Hiring Lead') {
+    return ['Submitter', 'Hiring Lead']
+  } else if (assigneeCurrentVal.value == 'Fiscal') {
+    return ['Submitter', 'Hiring Lead', 'Fiscal']
+  } else if (assigneeCurrentVal.value == 'HR') {
+    return ['Submitter', 'Hiring Lead', 'Fiscal', 'HR']
+  } else if (assigneeCurrentVal.value == 'Complete') {
+    return ['Submitter', 'Hiring Lead', 'Fiscal', 'HR', 'Complete']
+  } else {
+    return []
+  }
+}
+
+function assigneeLabel() {
+  if (assignee.value == 'None') {
+    return 'Status: Not submitted'
+  } else if (assignee.value == 'Submitter') {
+    return 'Assigned to: ' + submitterName.value
+  } else if (assignee.value == 'Hiring Lead') {
+    return 'Assigned to: Hiring Lead'
+  } else if (assignee.value == 'Fiscal') {
+    return 'Assigned to: Fiscal'
+  } else if (assignee.value == 'HR') {
+    return 'Assigned to: HR'
+  } else if (assignee.value == 'Complete') {
+    return 'Status: Complete'
+  } else {
+    return ''
+  }
+}
 
 let changes = ref(null) as Ref<TransitionChange[] | null>
 
@@ -832,6 +1072,7 @@ let errorDialogPosition = ref('top') as Ref<QDialogProps['position']>
 let showChangesDialog = ref(false)
 
 let showSendToSDSHiringLeadsDialog = ref(false)
+let showSendToFiscalDialog = ref(false)
 let showSendToHRDialog = ref(false)
 let showSendToSTNDialog = ref(false)
 let sendDialogMessage = ref('')
@@ -947,6 +1188,8 @@ function retrieveEmployeeTransition() {
     specialInstructionsCurrentVal.value = specialInstructions.value
     fiscalField.value = t.fiscal_field
     fiscalFieldCurrentVal.value = fiscalField.value
+    assignee.value = t.assignee
+    assigneeCurrentVal.value = assignee.value
 
     changes.value = t.changes
 
@@ -1013,7 +1256,8 @@ function valuesAreChanged(): boolean {
     showAccessEmails.value == showAccessEmailsCurrentVal.value &&
     accessEmails.value.pk == accessEmailsCurrentVal.value.pk &&
     specialInstructions.value == specialInstructionsCurrentVal.value &&
-    fiscalField.value == fiscalFieldCurrentVal.value
+    fiscalField.value == fiscalFieldCurrentVal.value &&
+    assignee.value == assigneeCurrentVal.value
   ) {
     return false
   } else {
@@ -1096,7 +1340,8 @@ function updateTransition() {
       prox_card_returned: proxCardReturned.value,
       access_emails_pk: accessEmails.value.pk,
       special_instructions: specialInstructions.value,
-      fiscal_field: fiscalField.value
+      fiscal_field: fiscalField.value,
+      assignee: assignee.value
     })
     .then((t) => {
       typeCurrentVal.value = t.type
@@ -1154,6 +1399,7 @@ function updateTransition() {
       }
       specialInstructionsCurrentVal.value = t.special_instructions
       fiscalFieldCurrentVal.value = t.fiscal_field
+      assigneeCurrentVal.value = t.assignee
 
       changes.value = t.changes
 
@@ -1223,6 +1469,10 @@ function formErrorItems(): Array<[string, string]> {
   return errorItems
 }
 
+function setAssignee(option: string) {
+  assignee.value = option
+}
+
 /////////////////////////////////
 // Field view/edit permissions //
 /////////////////////////////////
@@ -1264,8 +1514,27 @@ function canEditFiscalField() {
   return cookies.get('is_fiscal_employee') == 'true'
 }
 
-function canSendToHR() {
+// If the form is submitted, other fields are editable only by submitter, hiring
+// manager, HR, fiscal, and SDS hiring leads.
+function canEditOtherFields() {
+  return !formSubmitted() ||
+    employeeIsSubmitter() ||
+    userStore.getEmployeeProfile.employee_pk == manager.value.pk ||
+    cookies.get('is_hr_employee') == 'true' ||
+    cookies.get('is_fiscal_employee') == 'true' ||
+    cookies.get('is_sds_hiring_lead') == 'true'
+}
+
+function canEditAssignee() {
+  return true
+}
+
+function canSendToFiscal() {
   return cookies.get('is_sds_hiring_lead') == 'true'
+}
+
+function canSendToHR() {
+  return cookies.get('is_fiscal_employee') == 'true'
 }
 
 function canSendToTransitionNews() {
@@ -1414,7 +1683,7 @@ function sendGasPINNotificationEmail() {
     })
 }
 
-function onSubmitSendDialog(type: 'SDS'|'HR'|'STN') {
+function onSubmitSendDialog(type: 'SDS'|'FI'|'HR'|'STN') {
   workflowsStore.sendTransitionToEmailList(transitionPk.value, {
     type: type,
     update: sendDialogUpdate.value,
@@ -1430,6 +1699,7 @@ function onSubmitSendDialog(type: 'SDS'|'HR'|'STN') {
         icon: 'send'
       })
       showSendToSDSHiringLeadsDialog.value = false
+      showSendToFiscalDialog.value = false
       showSendToHRDialog.value = false
       showSendToSTNDialog.value = false
       sendDialogUpdate.value = false

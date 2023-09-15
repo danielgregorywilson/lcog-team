@@ -4,6 +4,16 @@
 
 export const releases = [
   {
+    version: '0.18.1',
+    date: new Date(2023, 8, 15),
+    changes: [
+      {
+        type: 'fix',
+        description: 'Fixed an issue that caused some workflow tables to never load.'
+      }
+    ]
+  },
+  {
     version: '0.18.0',
     date: new Date(2023, 8, 13),
     changes: [

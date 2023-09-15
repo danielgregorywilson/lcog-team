@@ -425,10 +425,11 @@ describe('New employee workflow', () => {
     const pk = LOCAL_STORAGE_MEMORY['workflowPK']
     loginSuperuser().then(() => {
       const token = localStorage.getItem('user-token')
+      const url = `${ Cypress.env('api_url') }/api/v1/workflowinstance/${ pk }`
       if (pk) {
         cy.request({
           method: 'DELETE',
-          url: `http://localhost:8000/api/v1/workflowinstance/${ pk }`,
+          url,
           headers: {
             Authorization: `Token ${ token }`,
           },

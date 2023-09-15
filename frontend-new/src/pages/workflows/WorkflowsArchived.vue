@@ -14,6 +14,7 @@
     :complete="false"
     type="all"
     :allowAddDelete="false"
+    :workflowsLoaded="workflowsLoaded"
     v-on:retrieve="retrieveWorkflows"
   />
 </template>
@@ -41,7 +42,7 @@ function retrieveWorkflows(): void {
   workflowsStore.getWorkflows({archived: true, complete: false})
     .then(() => {
       workflowsLoaded.value = true
-    })  
+    })
     .catch(e => {
       console.error('Error retrieving incomplete workflows:', e)
     })

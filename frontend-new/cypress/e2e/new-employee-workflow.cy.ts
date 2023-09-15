@@ -262,6 +262,15 @@ function sendSTNButtonExists() {
 
 describe('New employee workflow', () => {
 
+  it('Completed and deleted workflows load', () => {
+    loginUser(Cypress.env('users').manager).then(() => {
+      visitUrl(Cypress.env('workflows_complete_path'))
+      cy.get('.q-table__container').should('exist')
+      visitUrl(Cypress.env('workflows_deleted_path'))
+      cy.get('.q-table__container').should('exist')
+    })
+  })
+
   it('Submitter logs in, creates a new employee workflow, and submits it', () => {
     // Create a new employee workflow
     loginUser(Cypress.env('users').manager).then(() => {

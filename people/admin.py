@@ -118,6 +118,7 @@ class ReviewNoteAdmin(admin.ModelAdmin):
 @admin.register(ViewedSecurityMessage)
 class ViewedSecurityMessageAdmin(admin.ModelAdmin):
     list_display = ("employee", "security_message", "datetime")
+    list_filter = ("security_message",)
 
 
 class TeleworkSignatureInline(admin.TabularInline):

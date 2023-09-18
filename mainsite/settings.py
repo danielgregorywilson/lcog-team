@@ -323,6 +323,11 @@ LOGGING = {
             # but still see more verbose logs in the console. See the watchtower
             # documentation for other parameters that can be set here.
             'level': 'DEBUG'
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'django-log.log',
         }
     },
     'loggers': {
@@ -331,7 +336,11 @@ LOGGING = {
             'handlers': ['watchtower'],
             'propagate': False,
         },
-        # add your other loggers here...
+        # Log DB queries to a file
+        # 'django.db': {
+        #     'level': 'DEBUG',
+        #     'handlers': ['file'],
+        # }
     },
 }
 

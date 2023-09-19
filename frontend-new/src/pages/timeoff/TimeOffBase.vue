@@ -18,9 +18,12 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useTimeOffStore } from 'src/stores/timeoff'
 import { useUserStore } from 'src/stores/user'
+import { getCurrentUser, userIsISEmployee } from 'src/utils'
 
+const router = useRouter()
 const timeOffStore = useTimeOffStore()
 const userStore = useUserStore()
 
@@ -46,7 +49,15 @@ function retrieveManagedTimeOffRequests(): void {
 }
 
 onMounted(() => {
-  retrieveManagedTimeOffRequests()
+  getCurrentUser()
+    .then(() => {
+      if (userIsISEmployee()) {
+        retrieveManagedTimeOffRequests()
+      } else {
+        router.push({ name: 'dashboard' })
+      }
+    })
+
 })
 
 </script>

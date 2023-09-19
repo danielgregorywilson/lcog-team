@@ -125,17 +125,23 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
         if user.is_authenticated:
             archived = self.request.query_params.get('archived', None)
             if archived is not None and is_true_string(archived):
-                return WorkflowInstance.inactive_objects.all()
+                return WorkflowInstance.inactive_objects.all().select_related(
+                    'transition', 'workflow', 'workflow__role'
+                ).prefetch_related('processinstance_set')
             elif archived is not None and not is_true_string(archived):
                 complete = self.request.query_params.get('complete', None)
                 if complete is not None and is_true_string(complete):
                     return WorkflowInstance.active_objects.filter(
                         complete=True
-                    )
+                    ).select_related(
+                        'transition', 'workflow', 'workflow__role'
+                    ).prefetch_related('processinstance_set')
                 elif complete is not None and not is_true_string(complete):
                     return WorkflowInstance.active_objects.filter(
                         complete=False
-                    )
+                    ).select_related(
+                        'transition', 'workflow', 'workflow__role'
+                    ).prefetch_related('processinstance_set')
             return WorkflowInstance.objects.all()
         else:
             return WorkflowInstance.objects.none()

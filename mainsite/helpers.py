@@ -36,6 +36,7 @@ def get_host_url(request):
 
 
 def record_error(message, error, request=None, traceback=None):
+    message = 'Environment: ' + os.environ.get('ENVIRONMENT') + '\n' + message
     message += '\n'
     message += 'User: ' + str(request.user)
     message += '\n'

@@ -118,6 +118,10 @@ class Employee(models.Model):
             return "".join(map(lambda x: x[0], self.user.get_full_name().split(' '))).upper()
 
     @property
+    def is_is_employee(self):
+        return self.user.groups.filter(name='IS Employee').exists()
+    
+    @property
     def is_hr_employee(self):
         return self.user.groups.filter(name='HR Employee').exists()
     

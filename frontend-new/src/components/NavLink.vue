@@ -47,6 +47,11 @@ export default defineComponent({
       required: false,
       default: false
     },
+    isISEmployee: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
     eligibleForTeleworkApplicationOnly: {
       type: Boolean,
       required: false,
@@ -66,10 +71,17 @@ export default defineComponent({
   methods: {
     isVisible (): boolean {
       const shouldNotViewBecauseNotManager = this.managerOnly && this.userStore.isManager
+      const shouldNotViewBecauseNotISEmployee = this.isISEmployee && !this.userStore.getEmployeeProfile.is_is_employee
       const shouldNotViewBecauseNotEligibleForTeleworkApplication = this.eligibleForTeleworkApplicationOnly && !this.userStore.getEmployeeProfile.is_eligible_for_telework_application
       const shouldNotViewBecauseNoWorkflowRoles = this.hasWorkflowRoles && !this.userStore.hasWorkflowRoles
       const cannotViewMealsOnWheelsRoutes = this.canViewMOWRoutes && !this.userStore.getEmployeeProfile.can_view_mow_routes
-      if (shouldNotViewBecauseNotManager || shouldNotViewBecauseNotEligibleForTeleworkApplication || shouldNotViewBecauseNoWorkflowRoles || cannotViewMealsOnWheelsRoutes) {
+      if (
+        shouldNotViewBecauseNotManager ||
+        shouldNotViewBecauseNotISEmployee ||
+        shouldNotViewBecauseNotEligibleForTeleworkApplication ||
+        shouldNotViewBecauseNoWorkflowRoles ||
+        cannotViewMealsOnWheelsRoutes
+      ) {
         return false
       } else {
         return true

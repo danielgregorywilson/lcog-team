@@ -216,11 +216,11 @@
 
 <script setup lang="ts">
 import { onMounted, ref, Ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useQuasar, QSelect } from 'quasar'
 
-import { getRoutePk } from 'src/utils'
-import { 
+import { getCurrentUser, getRoutePk, userIsISEmployee } from 'src/utils'
+import {
   Responsibility, ResponsibilityTagRetrieve, SimpleEmployeeRetrieve,
   SimpleResponsibilityTagRetrieve 
 } from 'src/types'
@@ -231,6 +231,7 @@ import { usePeopleStore } from 'src/stores/people'
 
 const quasar = useQuasar()
 const route = useRoute()
+const router = useRouter()
 const { bus } = useEventBus()
 const responsibilityStore = useResponsibilityStore()
 const peopleStore = usePeopleStore()
@@ -621,9 +622,16 @@ watch(() => bus.value.get('emitOpenDeleteTagDialog'), (row: ResponsibilityTagRet
 })
 
 onMounted(() => {
-  if (!employees().length) {
-    retrieveSimpleEmployeeList()
-    retrieveSimpleTagList()
-  }
+  getCurrentUser()
+    .then(() => {
+      if (userIsISEmployee()) {
+        if (!employees().length) {
+          retrieveSimpleEmployeeList()
+          retrieveSimpleTagList()
+        }
+      } else {
+        router.push({ name: 'dashboard' })
+      }
+    })
 })
 </script>

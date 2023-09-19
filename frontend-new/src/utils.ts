@@ -43,3 +43,7 @@ export function getCurrentUser(): Promise<any> {
     }
   })
 }
+
+export function userIsISEmployee(): boolean {
+  return userStore.getEmployeeProfile.is_is_employee
+}

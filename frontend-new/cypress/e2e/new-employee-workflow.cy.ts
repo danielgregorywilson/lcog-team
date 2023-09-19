@@ -284,29 +284,22 @@ describe('New employee workflow', () => {
           LOCAL_STORAGE_MEMORY['workflowPK'] = pk
         }
         cy.log(`Created workflow pk: ${ pk }`)
-
         // Enter data into the form
         cy.get('input[name="first-name"]').type('Xavier')
         cy.get('input[name="last-name"]').type('Xanthopoulos')
-
         // TODO: Try cypress-real-events to focus the email field
         cy.get('input[name="email"]').focus()
-
         const titleInput = cy.get('select[name="title"]').siblings('input')
         titleInput.type('Case')
         cy.wait(500) // Wait for the title to be selected
         titleInput.type('{downArrow}{enter}')
-
         const managerInput = cy.get('select[name="manager"]').siblings('input')
         managerInput.type('Hiring M')
         cy.wait(500) // Wait for the title to be selected
         managerInput.type('{downArrow}{enter}')
-
         cy.get('#lwop').click()
-
         // Save the form
         cy.get('button[name="save-button"]').click()
-
         // Can view but not edit employee ID fields
         employeeIDViewNotEdit()
         // Can view and edit the salary fields
@@ -315,7 +308,6 @@ describe('New employee workflow', () => {
         fiscalViewNotEdit()
         // Can view and edit all other fields
         otherFieldsViewAndEdit()
-
         sendSDSButtonExists()
       })
     })
@@ -325,7 +317,6 @@ describe('New employee workflow', () => {
     const pk = LOCAL_STORAGE_MEMORY['workflowPK']
     loginUser(Cypress.env('users').manager2).then(() => {
       visitUrl(`/wf/${pk}/transition`)
-
       // Can view but not edit employee ID fields
       employeeIDViewNotEdit()
       // Cannot view the salary fields
@@ -336,7 +327,6 @@ describe('New employee workflow', () => {
       fiscalViewNotEdit()
       // Can view but not edit all other fields
       otherFieldsViewNotEdit()
-
       noSubmitButtonsExist()
     })
   })
@@ -345,7 +335,6 @@ describe('New employee workflow', () => {
     const pk = LOCAL_STORAGE_MEMORY['workflowPK']
     loginUser(Cypress.env('users').hiringmanager).then(() => {
       visitUrl(`/wf/${pk}/transition`)
-
       // Can view but not edit employee ID fields
       employeeIDViewNotEdit()
       // Can view and edit the salary fields
@@ -356,7 +345,6 @@ describe('New employee workflow', () => {
       fiscalViewNotEdit()
       // Can view and edit all other fields
       otherFieldsViewAndEdit()
-
       sendSDSButtonExists()
     })
   })
@@ -365,7 +353,6 @@ describe('New employee workflow', () => {
     const pk = LOCAL_STORAGE_MEMORY['workflowPK']
     loginUser(Cypress.env('users').sdshiringlead).then(() => {
       visitUrl(`/wf/${pk}/transition`)
-
       // Can view but not edit employee ID fields
       employeeIDViewNotEdit()
       // Can view and edit the salary fields
@@ -376,7 +363,6 @@ describe('New employee workflow', () => {
       fiscalViewNotEdit()
       // Can view and edit all other fields
       otherFieldsViewAndEdit()
-
       sendFiscalButtonExists()
     })
   })
@@ -385,7 +371,6 @@ describe('New employee workflow', () => {
     const pk = LOCAL_STORAGE_MEMORY['workflowPK']
     loginUser(Cypress.env('users').fiscalemployee).then(() => {
       visitUrl(`/wf/${pk}/transition`)
-
       // Can view but not edit employee ID fields
       employeeIDViewNotEdit()
       // Can view and edit the salary fields
@@ -396,7 +381,6 @@ describe('New employee workflow', () => {
       fiscalViewAndEdit()
       // Can view and edit all other fields
       otherFieldsViewAndEdit()
-
       sendHRButtonExists()
     })
   })
@@ -405,7 +389,6 @@ describe('New employee workflow', () => {
     const pk = LOCAL_STORAGE_MEMORY['workflowPK']
     loginUser(Cypress.env('users').hremployee).then(() => {
       visitUrl(`/wf/${pk}/transition`)
-
       // Can view and edit employee ID fields
       employeeIDViewAndEdit()
       // Can view and edit the salary fields
@@ -417,8 +400,19 @@ describe('New employee workflow', () => {
       // Can view and edit all other fields
       otherFieldsViewAndEdit()
     })
-
     sendSTNButtonExists()
+  })
+
+  it('Non-qualified users cannot view the workflow', () => {
+    const pk = LOCAL_STORAGE_MEMORY['workflowPK']
+    loginUser(Cypress.env('users').employee).then(() => {
+      visitUrl(Cypress.env('workflows_dashboard_path')).then(() => {
+        cy.location('pathname').should('eq', Cypress.env('dashboard_path'))
+      })
+      visitUrl(`/wf/${pk}/transition`).then(() => {
+        cy.location('pathname').should('eq', Cypress.env('dashboard_path'))
+      })
+    })
   })
 
   it('Deletes the workflow', () => {

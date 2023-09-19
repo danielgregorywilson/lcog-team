@@ -324,11 +324,12 @@ LOGGING = {
             # documentation for other parameters that can be set here.
             'level': 'DEBUG'
         },
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'django-log.log',
-        }
+        # Log to a file
+        # 'file': {
+        #     'level': 'DEBUG',
+        #     'class': 'logging.FileHandler',
+        #     'filename': 'django-log.log',
+        # }
     },
     'loggers': {
         AWS_LOGGER_NAME: {

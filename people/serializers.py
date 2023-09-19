@@ -76,7 +76,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
         model = Employee
         fields = [
             'url', 'pk', 'name', 'user', 'username', 'email', 'manager',
-            'is_manager', 'has_manager', 'is_hr_employee',
+            'is_manager', 'has_manager', 'is_is_employee', 'is_hr_employee',
             'is_sds_hiring_lead', 'is_fiscal_employee',
             'is_eligible_for_telework_application', 'can_view_seating_charts',
             'can_edit_seating_charts', 'can_view_desk_reservation_reports',

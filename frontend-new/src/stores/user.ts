@@ -18,6 +18,7 @@ export const useUserStore = defineStore('user', {
       name: '',
       is_manager: false,
       has_manager: false,
+      is_is_employee: false,
       is_hr_employee: false,
       is_sds_hiring_lead: false,
       is_fiscal_employee: false,
@@ -65,6 +66,7 @@ export const useUserStore = defineStore('user', {
             this.profile.name = resp.data.name
             this.profile.is_manager = resp.data.is_manager
             this.profile.has_manager = resp.data.has_manager
+            this.profile.is_is_employee = resp.data.is_is_employee
             this.profile.is_hr_employee = resp.data.is_hr_employee
             this.profile.is_sds_hiring_lead = resp.data.is_sds_hiring_lead
             this.profile.is_fiscal_employee = resp.data.is_fiscal_employee
@@ -86,6 +88,7 @@ export const useUserStore = defineStore('user', {
             this.profile.can_manage_mow_stops = resp.data.can_manage_mow_stops
             cookies.set('is_manager', resp.data.is_manager.toString())
             cookies.set('has_manager', resp.data.has_manager.toString())
+            cookies.set('is_is_employee', resp.data.is_is_employee.toString())
             cookies.set('is_hr_employee', resp.data.is_hr_employee.toString())
             cookies.set('is_sds_hiring_lead', resp.data.is_sds_hiring_lead.toString())
             cookies.set('is_fiscal_employee', resp.data.is_fiscal_employee.toString())
@@ -132,6 +135,7 @@ export const useUserStore = defineStore('user', {
         this.$reset()
         cookies.remove('is_manager')
         cookies.remove('has_manager')
+        cookies.remove('is_is_employee')
         cookies.remove('is_hr_employee')
         cookies.remove('is_sds_hiring_lead')
         cookies.remove('is_fiscal_employee')

@@ -112,6 +112,7 @@ interface LinkData {
   link: string;
   id?: string;
   managerOnly?: boolean;
+  isISEmployee?: boolean
   eligibleForTeleworkApplicationOnly?: boolean;
   hasWorkflowRoles?: boolean
   canViewMOWRoutes?: boolean
@@ -121,12 +122,14 @@ const navLinks: Array<LinkData> = [
   {
     title: 'Time Off',
     icon: 'schedule',
-    link: '/timeoff'
+    link: '/timeoff',
+    isISEmployee: true
   },
   {
     title: 'Responsibilities',
     icon: 'hardware',
-    link: '/responsibilities'
+    link: '/responsibilities',
+    isISEmployee: true
   },
   {
     title: 'Workflows',

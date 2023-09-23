@@ -426,8 +426,6 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             if user_is_fiscal:
                 t.fiscal_field = request.data['fiscal_field']
 
-            t.assignee = request.data['assignee']
-
             t.save()
             serialized_transition = EmployeeTransitionSerializer(t,
                 context={'request': request})
@@ -500,6 +498,16 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
                 url=request.data['transition_url']
             )
             create_process_instances(transition)
+        elif request.data['type'] == 'ASSIGN':
+            import pdb; pdb.set_trace()
+            
+            send_transition_hr_email(
+                transition,
+                extra_message=request.data['extraMessage'],
+                sender_name=request.data['senderName'],
+                sender_email=request.data['senderEmail'],
+                url=request.data['transition_url']
+            )
         else:
             return Response(
                 data="Invalid type.",

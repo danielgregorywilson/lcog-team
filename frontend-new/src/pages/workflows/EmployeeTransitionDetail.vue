@@ -735,6 +735,54 @@
       </q-card>
     </q-dialog>
 
+    <!-- Update assignee Dialog -->
+    <q-dialog v-model="showAssigneeDialog">
+      <q-card class="q-pa-md">
+        <div class="text-h6">Reassign transition form?</div>
+        <div class="text-red text-uppercase text-bold q-mt-sm q-mb-md">This action cannot be undone</div>
+        <q-form
+          @submit='onSubmitSendDialog("ASSIGN")'
+          class="q-gutter-md"
+        >
+          <q-btn-dropdown
+            style="height: 36px;"
+            color="primary"
+            :label="assigneeLabel('DB')"
+          >
+            <q-list>
+              <q-item
+                v-for="option of assigneeOptions()"
+                :key="option"
+                clickable
+                v-close-popup
+                @click="setAssignee(option)"
+              >
+                <q-item-section>
+                  <q-item-label>{{ option }}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+          <q-input
+            v-model="reassignDialogMessage"
+            filled
+            type="textarea"
+            label="Extra message to include"
+          />
+          <div>
+            <q-btn
+              label="Reassign"
+              icon-right="send"
+              type="submit"
+              color="primary"
+              :disable="reassignDialogMessage.length == 0 ||
+                assignee == assigneeCurrentVal"
+            />
+          </div>
+        </q-form>
+      </q-card>
+    </q-dialog>
+
     <!-- Spacing for footer -->
     <div style="height: 80px;"></div>
 
@@ -752,25 +800,12 @@
           @click="updateTransition()"
         />
         <div v-else></div>
-        <q-btn-dropdown
+        <q-btn
           style="height: 36px;"
           color="primary"
-          :label="assigneeLabel()"
-        >
-          <q-list>
-            <q-item
-              v-for="option of assigneeOptions()"
-              :key="option"
-              clickable
-              v-close-popup
-              @click="setAssignee(option)"
-            >
-              <q-item-section>
-                <q-item-label>{{ option }}</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-btn-dropdown>
+          :label="assigneeLabel('CURRENT')"
+          @click="showAssigneeDialog=true"
+        />
       </div>
       <q-chip
         v-if="valuesAreChanged()"
@@ -1045,18 +1080,20 @@ function assigneeOptions() {
   }
 }
 
-function assigneeLabel() {
-  if (assignee.value == 'None') {
+function assigneeLabel(assigneeType: 'CURRENT' | 'DB') {
+  let aVal = assigneeType == 'CURRENT' ? assigneeCurrentVal.value : assignee.value
+
+  if (aVal == 'None') {
     return 'Status: Not submitted'
-  } else if (assignee.value == 'Submitter') {
+  } else if (aVal == 'Submitter') {
     return 'Assigned to: ' + submitterName.value
-  } else if (assignee.value == 'Hiring Lead') {
+  } else if (aVal == 'Hiring Lead') {
     return 'Assigned to: Hiring Lead'
-  } else if (assignee.value == 'Fiscal') {
+  } else if (aVal == 'Fiscal') {
     return 'Assigned to: Fiscal'
-  } else if (assignee.value == 'HR') {
+  } else if (aVal == 'HR') {
     return 'Assigned to: HR'
-  } else if (assignee.value == 'Complete') {
+  } else if (aVal == 'Complete') {
     return 'Status: Complete'
   } else {
     return ''
@@ -1075,8 +1112,10 @@ let showSendToSDSHiringLeadsDialog = ref(false)
 let showSendToFiscalDialog = ref(false)
 let showSendToHRDialog = ref(false)
 let showSendToSTNDialog = ref(false)
+let showAssigneeDialog = ref(false)
 let sendDialogMessage = ref('')
 let sendDialogUpdate = ref(false)
+let reassignDialogMessage = ref('')
 
 ////////////////////////////
 // Retrieve/Modify/Submit //
@@ -1256,8 +1295,7 @@ function valuesAreChanged(): boolean {
     showAccessEmails.value == showAccessEmailsCurrentVal.value &&
     accessEmails.value.pk == accessEmailsCurrentVal.value.pk &&
     specialInstructions.value == specialInstructionsCurrentVal.value &&
-    fiscalField.value == fiscalFieldCurrentVal.value &&
-    assignee.value == assigneeCurrentVal.value
+    fiscalField.value == fiscalFieldCurrentVal.value
   ) {
     return false
   } else {
@@ -1340,8 +1378,7 @@ function updateTransition() {
       prox_card_returned: proxCardReturned.value,
       access_emails_pk: accessEmails.value.pk,
       special_instructions: specialInstructions.value,
-      fiscal_field: fiscalField.value,
-      assignee: assignee.value
+      fiscal_field: fiscalField.value
     })
     .then((t) => {
       typeCurrentVal.value = t.type
@@ -1399,7 +1436,6 @@ function updateTransition() {
       }
       specialInstructionsCurrentVal.value = t.special_instructions
       fiscalFieldCurrentVal.value = t.fiscal_field
-      assigneeCurrentVal.value = t.assignee
 
       changes.value = t.changes
 
@@ -1526,6 +1562,7 @@ function canEditOtherFields() {
 }
 
 function canEditAssignee() {
+  // TODO
   return true
 }
 
@@ -1683,9 +1720,10 @@ function sendGasPINNotificationEmail() {
     })
 }
 
-function onSubmitSendDialog(type: 'SDS'|'FI'|'HR'|'STN') {
+function onSubmitSendDialog(type: 'SDS'|'FI'|'HR'|'STN'|'ASSIGN') {
   workflowsStore.sendTransitionToEmailList(transitionPk.value, {
     type: type,
+    reassignTo: assignee.value,
     update: sendDialogUpdate.value,
     extraMessage: sendDialogMessage.value,
     senderName: userStore.getEmployeeProfile.name,
@@ -1702,8 +1740,10 @@ function onSubmitSendDialog(type: 'SDS'|'FI'|'HR'|'STN') {
       showSendToFiscalDialog.value = false
       showSendToHRDialog.value = false
       showSendToSTNDialog.value = false
+      showAssigneeDialog.value = false
       sendDialogUpdate.value = false
       sendDialogMessage.value = ''
+      reassignDialogMessage.value = ''
       if (type == 'STN') {
         // Signal to WorkflowInstanceDetail that process instances were created.
         bus.emit('processInstancesCreated', Math.random())

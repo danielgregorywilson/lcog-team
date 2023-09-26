@@ -459,7 +459,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             transition,
             sender_name=request.data['senderName'],
             sender_email=request.data['senderEmail'],
-            url=request.data['transition_url'] )
+            url=request.data['transitionUrl'] )
         return Response("Gas PIN notification email sent.")
 
     @action(detail=True, methods=['post'])
@@ -471,7 +471,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
                 extra_message=request.data['extraMessage'],
                 sender_name=request.data['senderName'],
                 sender_email=request.data['senderEmail'],
-                url=request.data['transition_url']
+                url=request.data['transitionUrl']
             )
         elif request.data['type'] == 'FI':
             send_transition_fiscal_email(
@@ -479,7 +479,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
                 extra_message=request.data['extraMessage'],
                 sender_name=request.data['senderName'],
                 sender_email=request.data['senderEmail'],
-                url=request.data['transition_url']
+                url=request.data['transitionUrl']
             )
         elif request.data['type'] == 'HR':
             send_transition_hr_email(
@@ -487,7 +487,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
                 extra_message=request.data['extraMessage'],
                 sender_name=request.data['senderName'],
                 sender_email=request.data['senderEmail'],
-                url=request.data['transition_url']
+                url=request.data['transitionUrl']
             )
         elif request.data['type'] == 'STN':
             send_transition_stn_email(
@@ -495,19 +495,36 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
                 update=request.data['update'],
                 extra_message=request.data['extraMessage'],
                 sender_name=request.data['senderName'],
-                url=request.data['transition_url']
+                url=request.data['transitionUrl']
             )
             create_process_instances(transition)
         elif request.data['type'] == 'ASSIGN':
             import pdb; pdb.set_trace()
-            
-            send_transition_hr_email(
-                transition,
-                extra_message=request.data['extraMessage'],
-                sender_name=request.data['senderName'],
-                sender_email=request.data['senderEmail'],
-                url=request.data['transition_url']
-            )
+            if request.data['reassignTo'] == 'Submitte':
+                pass
+            elif request.data['reassignTo'] == 'Hiring Lead':
+                pass
+            elif request.data['reassignTo'] == 'Fiscal':
+                send_transition_fiscal_email(
+                    transition,
+                    extra_message=request.data['extraMessage'],
+                    sender_name=request.data['senderName'],
+                    sender_email=request.data['senderEmail'],
+                    url=request.data['transitionUrl']
+                )
+            elif request.data['reassignTo'] == 'HR':
+                send_transition_hr_email(
+                    transition,
+                    extra_message=request.data['extraMessage'],
+                    sender_name=request.data['senderName'],
+                    sender_email=request.data['senderEmail'],
+                    url=request.data['transitionUrl']
+                )
+            else:
+                return Response(
+                    data="Invalid assignee.",
+                    status=status.HTTP_400_BAD_REQUEST
+                )
         else:
             return Response(
                 data="Invalid type.",

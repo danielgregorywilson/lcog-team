@@ -1721,14 +1721,15 @@ function sendGasPINNotificationEmail() {
 }
 
 function onSubmitSendDialog(type: 'SDS'|'FI'|'HR'|'STN'|'ASSIGN') {
+  const extraMessage = type == 'ASSIGN' ? reassignDialogMessage.value : sendDialogMessage.value
   workflowsStore.sendTransitionToEmailList(transitionPk.value, {
     type: type,
     reassignTo: assignee.value,
     update: sendDialogUpdate.value,
-    extraMessage: sendDialogMessage.value,
+    extraMessage,
     senderName: userStore.getEmployeeProfile.name,
     senderEmail: userStore.getEmployeeProfile.email,
-    transition_url: route.fullPath
+    transitionUrl: route.fullPath
   })
     .then(() => {
       quasar.notify({

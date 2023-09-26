@@ -23,7 +23,8 @@ from timeoff.helpers import (
 from workflows.helpers import (
     create_process_instances, send_gas_pin_notification_email,
     send_transition_fiscal_email, send_transition_hr_email,
-    send_transition_sds_hiring_leads_email, send_transition_stn_email
+    send_transition_sds_hiring_leads_email, send_transition_stn_email,
+    send_transition_submitter_email
 )
 from workflows.models import (
     EmployeeTransition, Process, ProcessInstance, Role, Step, StepChoice,
@@ -466,6 +467,8 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
     def send_transition_to_email_list(self, request, pk):
         transition = EmployeeTransition.objects.get(pk=pk)
         if request.data['type'] == 'SDS':
+            transition.assignee = EmployeeTransition.ASSIGNEE_HIRING_LEAD
+            transition.save()
             send_transition_sds_hiring_leads_email(
                 transition,
                 extra_message=request.data['extraMessage'],
@@ -474,6 +477,8 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
                 url=request.data['transitionUrl']
             )
         elif request.data['type'] == 'FI':
+            transition.assignee = EmployeeTransition.ASSIGNEE_FISCAL
+            transition.save()
             send_transition_fiscal_email(
                 transition,
                 extra_message=request.data['extraMessage'],
@@ -482,6 +487,8 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
                 url=request.data['transitionUrl']
             )
         elif request.data['type'] == 'HR':
+            transition.assignee = EmployeeTransition.ASSIGNEE_HR
+            transition.save()
             send_transition_hr_email(
                 transition,
                 extra_message=request.data['extraMessage'],
@@ -490,6 +497,8 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
                 url=request.data['transitionUrl']
             )
         elif request.data['type'] == 'STN':
+            transition.assignee = EmployeeTransition.ASSIGNEE_COMPLETE
+            transition.save()
             send_transition_stn_email(
                 transition,
                 update=request.data['update'],
@@ -499,26 +508,49 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             )
             create_process_instances(transition)
         elif request.data['type'] == 'ASSIGN':
-            import pdb; pdb.set_trace()
-            if request.data['reassignTo'] == 'Submitte':
-                pass
+            if request.data['reassignTo'] == 'Submitter':
+                transition.assignee = EmployeeTransition.ASSIGNEE_SUBMITTER
+                transition.save()
+                send_transition_submitter_email(
+                    transition,
+                    extra_message=request.data['extraMessage'],
+                    sender_name=request.data['senderName'],
+                    sender_email=request.data['senderEmail'],
+                    url=request.data['transitionUrl'],
+                    reassigned=True
+                )
             elif request.data['reassignTo'] == 'Hiring Lead':
-                pass
+                transition.assignee = EmployeeTransition.ASSIGNEE_HIRING_LEAD
+                transition.save()
+                send_transition_sds_hiring_leads_email(
+                    transition,
+                    extra_message=request.data['extraMessage'],
+                    sender_name=request.data['senderName'],
+                    sender_email=request.data['senderEmail'],
+                    url=request.data['transitionUrl'],
+                    reassigned=True
+                )
             elif request.data['reassignTo'] == 'Fiscal':
+                transition.assignee = EmployeeTransition.ASSIGNEE_FISCAL
+                transition.save()
                 send_transition_fiscal_email(
                     transition,
                     extra_message=request.data['extraMessage'],
                     sender_name=request.data['senderName'],
                     sender_email=request.data['senderEmail'],
-                    url=request.data['transitionUrl']
+                    url=request.data['transitionUrl'],
+                    reassigned=True
                 )
             elif request.data['reassignTo'] == 'HR':
+                transition.assignee = EmployeeTransition.ASSIGNEE_HR
+                transition.save()
                 send_transition_hr_email(
                     transition,
                     extra_message=request.data['extraMessage'],
                     sender_name=request.data['senderName'],
                     sender_email=request.data['senderEmail'],
-                    url=request.data['transitionUrl']
+                    url=request.data['transitionUrl'],
+                    reassigned=True
                 )
             else:
                 return Response(

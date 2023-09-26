@@ -165,7 +165,6 @@ export const useWorkflowsStore = defineStore('workflows', {
       extraMessage: string, senderName: string, senderEmail: string,
       transitionUrl: string
     }): Promise<boolean> {
-      debugger
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/employeetransition/${ pk }/send_transition_to_email_list`, data, method: 'POST' })
           .then(() => {

@@ -804,6 +804,7 @@
           style="height: 36px;"
           color="primary"
           :label="assigneeLabel('CURRENT')"
+          :disable="!canUpdateAssignee()"
           @click="showAssigneeDialog=true"
         />
       </div>
@@ -1561,8 +1562,22 @@ function canEditOtherFields() {
     cookies.get('is_sds_hiring_lead') == 'true'
 }
 
-function canEditAssignee() {
+function canUpdateAssignee() {
   // TODO
+  const assignee = assigneeCurrentVal.value
+  if (assignee == 'Submitter') {
+    return false // No one to assign back to
+  } else if (assignee == 'Hiring Lead') {
+    return cookies.get('is_sds_hiring_lead') == 'true'
+  } else if (assignee == 'Fiscal') {
+    return cookies.get('is_fiscal_employee') == 'true'
+  } else if (assignee == 'HR') {
+    return cookies.get('is_hr_employee') == 'true'
+  } else if (assignee == 'Complete') {
+    return false
+  } else {
+    return false
+  }
   return true
 }
 
@@ -1745,10 +1760,10 @@ function onSubmitSendDialog(type: 'SDS'|'FI'|'HR'|'STN'|'ASSIGN') {
       sendDialogUpdate.value = false
       sendDialogMessage.value = ''
       reassignDialogMessage.value = ''
-      if (type == 'STN') {
-        // Signal to WorkflowInstanceDetail that process instances were created.
-        bus.emit('processInstancesCreated', Math.random())
-      }
+      // Signal to WorkflowInstanceDetail that the transition was reassigned or
+      // completed, in which case we need to get the newly created process
+      // instances.
+      bus.emit('transitionReassigned', Math.random())
     })
     .catch(e => {
       console.error('Error sending email', e)

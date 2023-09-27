@@ -52,6 +52,17 @@ class SecurityMessage(models.Model):
             from people.models import Employee # Avoid circular import
             self.num_active_employees = Employee.objects.filter(active=True).count()
         super().save(*args, **kwargs)
+    
+    @property
+    def viewed_by(self):
+        viewed = list(self.viewedsecuritymessage_set.all().values_list('employee__user__first_name', 'employee__user__last_name'))
+        return ', '.join([f'{name} {last}' for name, last in viewed])
+    
+    @property
+    def unviewed_by(self):
+        from people.models import Employee # Avoid circular import
+        unviewed = list(Employee.objects.filter(active=True).exclude(viewedsecuritymessage__security_message=self).values_list('user__first_name', 'user__last_name'))
+        return ', '.join([f'{name} {last}' for name, last in unviewed])
 
 
 class TrustedIPAddress(models.Model):

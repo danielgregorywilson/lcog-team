@@ -10,7 +10,7 @@
     "format": "prettier --write \"**/*.{js,ts,vue,scss,html,md,json}\" --ignore-path .gitignore",
     "test": "echo \"No test specified\" && exit 0",
     "cypress:open": "cypress open",
-    "cypress:run": "cypress run --record --key 5d28166b-e4e8-4983-b97e-60508f99ff18"
+    "cypress:run": "cypress run --browser chrome --record --key 5d28166b-e4e8-4983-b97e-60508f99ff18"
   },
   "dependencies": {
     "@quasar/extras": "^1.16.4",

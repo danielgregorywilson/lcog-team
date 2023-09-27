@@ -303,7 +303,7 @@ describe('New employee workflow', () => {
         // Can view but not edit employee ID fields
         employeeIDViewNotEdit()
         // Can view and edit the salary fields
-        salaryViewAndEdit
+        salaryViewAndEdit()
         // Can view but not edit the fiscal field
         fiscalViewNotEdit()
         // Can view and edit all other fields
@@ -399,8 +399,8 @@ describe('New employee workflow', () => {
       fiscalViewNotEdit()
       // Can view and edit all other fields
       otherFieldsViewAndEdit()
+      sendSTNButtonExists()
     })
-    sendSTNButtonExists()
   })
 
   it('Non-qualified users cannot view the workflow', () => {

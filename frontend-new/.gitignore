@@ -34,3 +34,4 @@ yarn-error.log*
 
 # Cypress
 cypress.config.ts
+cypress/screenshots/*

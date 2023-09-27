@@ -281,6 +281,7 @@ class WorkflowInstanceSimpleSerializer(WorkflowInstanceBaseSerializer):
     """
     Used for WorkflowTable component
     """
+    status = serializers.SerializerMethodField()
     transition_type = serializers.CharField(
         source='transition.type', required=False
     )
@@ -291,13 +292,20 @@ class WorkflowInstanceSimpleSerializer(WorkflowInstanceBaseSerializer):
         model = WorkflowInstance
         fields = [
             'url', 'pk', 'started_at', 'complete', 'completed_at',
-            'percent_complete', 'employee_name', 'title_name',
+            'percent_complete', 'status', 'employee_name', 'title_name',
             'transition_type', 'transition_submitter',
             'transition_date_submitted', 'transition_date', 'workflow_role_pk',
             'employee_action_required'
         ]
         depth = 1
     
+    @staticmethod
+    def get_status(wfi):
+        if wfi.transition and wfi.transition.assignee != 'Complete':
+            return wfi.transition.assignee
+        else:
+            return wfi.percent_complete
+
     @staticmethod
     def get_transition_submitter(wfi):
         if wfi.transition:

@@ -680,6 +680,7 @@ export interface WorkflowInstanceSimple {
   complete: boolean
   completed_at: string
   percent_complete: number
+  status: string | number
   employee_name: string
   title_name: string
   transition_type: string

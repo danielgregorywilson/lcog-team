@@ -625,6 +625,7 @@
           />
           <div>
             <q-btn
+              name="send-sds-dialog-button"
               label="Send"
               icon-right="send"
               type="submit"
@@ -658,6 +659,7 @@
           />
           <div>
             <q-btn
+              name="send-fiscal-dialog-button"
               label="Send"
               icon-right="send"
               type="submit"
@@ -691,6 +693,7 @@
           />
           <div>
             <q-btn
+              name="send-hr-dialog-button"
               label="Send"
               icon-right="send"
               type="submit"
@@ -725,10 +728,62 @@
           />
           <div>
             <q-btn
+              name="send-stn-dialog-button"
               label="Send to STN"
               icon-right="send"
               type="submit"
               color="primary"
+            />
+          </div>
+        </q-form>
+      </q-card>
+    </q-dialog>
+
+    <!-- Update assignee Dialog -->
+    <q-dialog v-model="showAssigneeDialog">
+      <q-card class="q-pa-md">
+        <div class="text-h6">Reassign transition form?</div>
+        <div class="text-red text-uppercase text-bold q-mt-sm q-mb-md">This action cannot be undone</div>
+        <q-form
+          @submit='onSubmitSendDialog("ASSIGN")'
+          class="q-gutter-md"
+        >
+          <q-btn-dropdown
+            name="reassign-dialog-assignee-dropdown"
+            style="height: 36px;"
+            color="primary"
+            :label="assigneeLabel('DB')"
+          >
+            <q-list>
+              <q-item
+                v-for="option of assigneeOptions()"
+                :key="option"
+                clickable
+                v-close-popup
+                @click="setAssignee(option)"
+              >
+                <q-item-section>
+                  <q-item-label>{{ option }}</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+          <q-input
+            name="reassign-extra-message"
+            v-model="reassignDialogMessage"
+            filled
+            type="textarea"
+            label="Extra message to include"
+          />
+          <div>
+            <q-btn
+              name="reassign-dialog-button"
+              label="Reassign"
+              icon-right="send"
+              type="submit"
+              color="primary"
+              :disable="reassignDialogMessage.length == 0 ||
+                assignee == assigneeCurrentVal"
             />
           </div>
         </q-form>
@@ -752,25 +807,14 @@
           @click="updateTransition()"
         />
         <div v-else></div>
-        <q-btn-dropdown
+        <q-btn
+          name="reassign-button"
           style="height: 36px;"
           color="primary"
-          :label="assigneeLabel()"
-        >
-          <q-list>
-            <q-item
-              v-for="option of assigneeOptions()"
-              :key="option"
-              clickable
-              v-close-popup
-              @click="setAssignee(option)"
-            >
-              <q-item-section>
-                <q-item-label>{{ option }}</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-btn-dropdown>
+          :label="assigneeLabel('CURRENT')"
+          :disable="!canUpdateAssignee()"
+          @click="showAssigneeDialog=true"
+        />
       </div>
       <q-chip
         v-if="valuesAreChanged()"
@@ -1045,18 +1089,20 @@ function assigneeOptions() {
   }
 }
 
-function assigneeLabel() {
-  if (assignee.value == 'None') {
+function assigneeLabel(assigneeType: 'CURRENT' | 'DB') {
+  let aVal = assigneeType == 'CURRENT' ? assigneeCurrentVal.value : assignee.value
+
+  if (aVal == 'None') {
     return 'Status: Not submitted'
-  } else if (assignee.value == 'Submitter') {
+  } else if (aVal == 'Submitter') {
     return 'Assigned to: ' + submitterName.value
-  } else if (assignee.value == 'Hiring Lead') {
+  } else if (aVal == 'Hiring Lead') {
     return 'Assigned to: Hiring Lead'
-  } else if (assignee.value == 'Fiscal') {
+  } else if (aVal == 'Fiscal') {
     return 'Assigned to: Fiscal'
-  } else if (assignee.value == 'HR') {
+  } else if (aVal == 'HR') {
     return 'Assigned to: HR'
-  } else if (assignee.value == 'Complete') {
+  } else if (aVal == 'Complete') {
     return 'Status: Complete'
   } else {
     return ''
@@ -1075,8 +1121,10 @@ let showSendToSDSHiringLeadsDialog = ref(false)
 let showSendToFiscalDialog = ref(false)
 let showSendToHRDialog = ref(false)
 let showSendToSTNDialog = ref(false)
+let showAssigneeDialog = ref(false)
 let sendDialogMessage = ref('')
 let sendDialogUpdate = ref(false)
+let reassignDialogMessage = ref('')
 
 ////////////////////////////
 // Retrieve/Modify/Submit //
@@ -1256,8 +1304,7 @@ function valuesAreChanged(): boolean {
     showAccessEmails.value == showAccessEmailsCurrentVal.value &&
     accessEmails.value.pk == accessEmailsCurrentVal.value.pk &&
     specialInstructions.value == specialInstructionsCurrentVal.value &&
-    fiscalField.value == fiscalFieldCurrentVal.value &&
-    assignee.value == assigneeCurrentVal.value
+    fiscalField.value == fiscalFieldCurrentVal.value
   ) {
     return false
   } else {
@@ -1340,8 +1387,7 @@ function updateTransition() {
       prox_card_returned: proxCardReturned.value,
       access_emails_pk: accessEmails.value.pk,
       special_instructions: specialInstructions.value,
-      fiscal_field: fiscalField.value,
-      assignee: assignee.value
+      fiscal_field: fiscalField.value
     })
     .then((t) => {
       typeCurrentVal.value = t.type
@@ -1399,7 +1445,6 @@ function updateTransition() {
       }
       specialInstructionsCurrentVal.value = t.special_instructions
       fiscalFieldCurrentVal.value = t.fiscal_field
-      assigneeCurrentVal.value = t.assignee
 
       changes.value = t.changes
 
@@ -1525,7 +1570,22 @@ function canEditOtherFields() {
     cookies.get('is_sds_hiring_lead') == 'true'
 }
 
-function canEditAssignee() {
+function canUpdateAssignee() {
+  // TODO
+  const assignee = assigneeCurrentVal.value
+  if (assignee == 'Submitter') {
+    return false // No one to assign back to
+  } else if (assignee == 'Hiring Lead') {
+    return cookies.get('is_sds_hiring_lead') == 'true'
+  } else if (assignee == 'Fiscal') {
+    return cookies.get('is_fiscal_employee') == 'true'
+  } else if (assignee == 'HR') {
+    return cookies.get('is_hr_employee') == 'true'
+  } else if (assignee == 'Complete') {
+    return false
+  } else {
+    return false
+  }
   return true
 }
 
@@ -1683,14 +1743,16 @@ function sendGasPINNotificationEmail() {
     })
 }
 
-function onSubmitSendDialog(type: 'SDS'|'FI'|'HR'|'STN') {
+function onSubmitSendDialog(type: 'SDS'|'FI'|'HR'|'STN'|'ASSIGN') {
+  const extraMessage = type == 'ASSIGN' ? reassignDialogMessage.value : sendDialogMessage.value
   workflowsStore.sendTransitionToEmailList(transitionPk.value, {
     type: type,
+    reassignTo: assignee.value,
     update: sendDialogUpdate.value,
-    extraMessage: sendDialogMessage.value,
+    extraMessage,
     senderName: userStore.getEmployeeProfile.name,
     senderEmail: userStore.getEmployeeProfile.email,
-    transition_url: route.fullPath
+    transitionUrl: route.fullPath
   })
     .then(() => {
       quasar.notify({
@@ -1702,12 +1764,14 @@ function onSubmitSendDialog(type: 'SDS'|'FI'|'HR'|'STN') {
       showSendToFiscalDialog.value = false
       showSendToHRDialog.value = false
       showSendToSTNDialog.value = false
+      showAssigneeDialog.value = false
       sendDialogUpdate.value = false
       sendDialogMessage.value = ''
-      if (type == 'STN') {
-        // Signal to WorkflowInstanceDetail that process instances were created.
-        bus.emit('processInstancesCreated', Math.random())
-      }
+      reassignDialogMessage.value = ''
+      // Signal to WorkflowInstanceDetail that the transition was reassigned or
+      // completed, in which case we need to get the newly created process
+      // instances.
+      bus.emit('transitionReassigned', Math.random())
     })
     .catch(e => {
       console.error('Error sending email', e)

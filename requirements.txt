@@ -14,6 +14,7 @@ djangorestframework==3.14.0  # API framework
 jmespath==0.10.0
 Pillow==9.4.0                # For image uploads
 psycopg==3.1.10              # Postgres adapter for Python
+psycopg2-binary==2.9.5       # Postgres driver - binary to install correctly
 python-dateutil==2.8.2
 python-dotenv==0.18.0        # Secrets manager
 pytz==2021.1
@@ -23,4 +24,4 @@ six==1.16.0
 sqlparse==0.4.4
 supervisor==4.2.4            # Process control system for running Daphne on production
 urllib3==1.26.6
-watchtower==3.0.1            # AWS CloudWatch logging
+watchtower==3.0.1            # AWS CloudWatch logginga

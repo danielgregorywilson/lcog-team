@@ -62,9 +62,10 @@
           {{ readableDate(props.row.completed_at) }}
         </q-td>
       </template>
-      <template v-slot:body-cell-percentComplete="props">
-        <q-td key="percentComplete" :props="props">
+      <template v-slot:body-cell-status="props">
+        <q-td key="status" :props="props">
           <q-linear-progress
+            v-if="isInteger(props.row.status)"
             rounded size="25px"
             :value="props.row.percent_complete/100"
             color="primary"
@@ -77,7 +78,8 @@
               />
             </div>
           </q-linear-progress>
-      </q-td>
+          <div v-else>Assigned to: {{ props.row.status }}</div>
+        </q-td>
       </template>
       <template v-slot:body-cell-actions="props">
         <q-td key="actions" :props="props">
@@ -101,7 +103,7 @@
             icon="assignment"
           />
           <q-btn
-            v-if="!archived && canDeleteWorkflowInstance(props.row)"
+            v-if="!archived && canArchiveWorkflowInstance(props.row)"
             class="col"
             dense
             round
@@ -111,7 +113,7 @@
             icon="delete"
           />
           <q-btn
-            v-if="archived && canDeleteWorkflowInstance(props.row)"
+            v-if="archived && canArchiveWorkflowInstance(props.row)"
             class="col"
             dense
             round
@@ -180,7 +182,7 @@
                       icon="assignment"
                     />
                     <q-btn
-                      v-if="!archived && canDeleteWorkflowInstance(props.row)"
+                      v-if="!archived && canArchiveWorkflowInstance(props.row)"
                       class="col"
                       dense
                       round
@@ -190,7 +192,7 @@
                       icon="delete"
                     />
                     <q-btn
-                      v-if="archived && canDeleteWorkflowInstance(props.row)"
+                      v-if="archived && canArchiveWorkflowInstance(props.row)"
                       class="col"
                       dense
                       round
@@ -231,7 +233,7 @@
       </template>
     </q-table>
 
-    <q-dialog v-model="deleteDialogVisible">
+    <q-dialog v-model="archiveDialogVisible">
       <q-card>
         <q-card-section>
           <div class="row items-center">
@@ -243,10 +245,10 @@
             <span class="q-ml-sm">Are you sure you want to <span v-if="!archived">delete</span><span v-else>restore</span> this workflow?</span>
           </div>
           <div class="row justify-center text-center">
-            Position: {{ deleteDialogPositionName }}
+            Position: {{ archiveDialogPositionName }}
           </div>
           <div class="row justify-center text-center">
-            {{ deleteDialogPercentComplete }}% Complete
+            {{ archiveDialogPercentComplete }}% Complete
           </div>
         </q-card-section>
 
@@ -257,7 +259,7 @@
             flat
             label="Yes, delete it"
             color="primary"
-            @click="deleteRow()"
+            @click="archiveRow()"
             v-close-popup
           />
           <q-btn
@@ -298,15 +300,16 @@ import { WorkflowInstanceSimple } from 'src/types'
 import { readableDate } from 'src/filters'
 import { useUserStore } from 'src/stores/user'
 import { useWorkflowsStore } from 'src/stores/workflows'
+import { isInteger } from 'src/utils'
 
 const quasar = useQuasar()
 const router = useRouter()
 const userStore = useUserStore()
 const workflowsStore = useWorkflowsStore()
 
-let deleteDialogVisible = ref(false)
-let deleteDialogPositionName = ref('Not Set')
-let deleteDialogPercentComplete = ref(0)
+let archiveDialogVisible = ref(false)
+let archiveDialogPositionName = ref('Not Set')
+let archiveDialogPercentComplete = ref(0)
 let rowPkToArchive = ref('')
 
 const props = defineProps<{
@@ -328,22 +331,24 @@ const activeColumns: QTableProps['columns'] = [
   { name: 'name', label: 'Name', align: 'center', field: 'employee_name' },
   { name: 'created', align: 'center', label: 'Created', field: 'created', sortable: true },
   { name: 'transitionDate', align: 'center', label: 'Transition Date', field: 'transition_date', sortable: true },
-  { name: 'percentComplete', align: 'center', label: '% Complete', field: 'percent_complete', sortable: true },
+  { name: 'status', align: 'center', label: 'Status', field: 'status', sortable: true },
   { name: 'actions', label: 'Actions', align: 'center', field: '' },
 ]
 
 const archivedColumns: QTableProps['columns'] = [
   { name: 'type', label: 'Type', align: 'center', field: 'transition_type'},
+  { name: 'position', label: 'Position', align: 'center', field: 'title_name' },
   { name: 'created', align: 'center', label: 'Created', field: 'created', sortable: true },
-  { name: 'percentComplete', align: 'center', label: '% Complete', field: 'percent_complete', sortable: true },
+  { name: 'status', align: 'center', label: 'Status', field: 'status', sortable: true },
   { name: 'actions', label: 'Actions', align: 'center', field: '' },
 ]
 
 const completedColumns: QTableProps['columns'] = [
   { name: 'type', label: 'Type', align: 'center', field: 'transition_type'},
+  { name: 'position', label: 'Position', align: 'center', field: 'title_name' },
   { name: 'created', align: 'center', label: 'Created', field: 'created', sortable: true },
+  { name: 'status', align: 'center', label: 'Status', field: 'status', sortable: true },
   { name: 'completed', align: 'center', label: 'Completed', field: 'completed_at', sortable: true},
-  { name: 'percentComplete', align: 'center', label: '% Complete', field: 'percent_complete', sortable: true },
   { name: 'actions', label: 'Actions', align: 'center', field: '' },
 ]
 
@@ -453,15 +458,15 @@ function editTransitionForm(workflowInstance: WorkflowInstanceSimple) {
     })
 }
 
-function canDeleteWorkflowInstance(workflowInstance: WorkflowInstanceSimple): boolean {
+function canArchiveWorkflowInstance(workflowInstance: WorkflowInstanceSimple): boolean {
   if (workflowInstance.complete || workflowInstance.completed_at) {
     return false
   }
   if (userStore.getEmployeeProfile.is_all_workflows_admin) {
-    // If they are an All-Workflows-Admin, allow delete
+    // If they are an All-Workflows-Admin, allow archive
     return true
   } else if (workflowInstance.workflow_role_pk) {
-    // If they are an admin of the workflow, allow delete
+    // If they are an admin of the workflow, allow archive
     return userStore.getEmployeeProfile.workflow_roles.indexOf(workflowInstance.workflow_role_pk) != -1
   } else {
     // TODO: What should happen if no role assigned? Only admins? Everyone? Require all steps to have roles?
@@ -471,12 +476,12 @@ function canDeleteWorkflowInstance(workflowInstance: WorkflowInstanceSimple): bo
 
 function showArchiveDialog(row: WorkflowInstanceSimple): void {
   rowPkToArchive.value = row.pk.toString()
-  deleteDialogPositionName.value = row.title_name
-  deleteDialogPercentComplete.value = row.percent_complete
-  deleteDialogVisible.value = true
+  archiveDialogPositionName.value = row.title_name
+  archiveDialogPercentComplete.value = row.percent_complete
+  archiveDialogVisible.value = true
 }
 
-function deleteRow(): void {
+function archiveRow(): void {
   workflowsStore.archiveWorkflowInstance(rowPkToArchive.value)
     .then(() => {
       quasar.notify('Deleted a workflow.')

@@ -47,3 +47,7 @@ export function getCurrentUser(): Promise<any> {
 export function userIsISEmployee(): boolean {
   return userStore.getEmployeeProfile.is_is_employee
 }
+
+export function isInteger(str: string): boolean {
+  return /^\+?(0|[1-9]\d*)$/.test(str);
+}

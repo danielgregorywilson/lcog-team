@@ -19,7 +19,7 @@ class ImageUploadAdmin(admin.ModelAdmin):
 
 @admin.register(SecurityMessage)
 class SecurityMessageAdmin(admin.ModelAdmin):
-    list_display = ("description", "date", "active")
+    list_display = ("date", "description", "num_viewed", "percent_viewed", "active")
 
 
 @admin.register(TrustedIPAddress)

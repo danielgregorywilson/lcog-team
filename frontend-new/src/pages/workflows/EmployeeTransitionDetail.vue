@@ -625,6 +625,7 @@
           />
           <div>
             <q-btn
+              name="send-sds-dialog-button"
               label="Send"
               icon-right="send"
               type="submit"
@@ -658,6 +659,7 @@
           />
           <div>
             <q-btn
+              name="send-fiscal-dialog-button"
               label="Send"
               icon-right="send"
               type="submit"
@@ -691,6 +693,7 @@
           />
           <div>
             <q-btn
+              name="send-hr-dialog-button"
               label="Send"
               icon-right="send"
               type="submit"
@@ -725,6 +728,7 @@
           />
           <div>
             <q-btn
+              name="send-stn-dialog-button"
               label="Send to STN"
               icon-right="send"
               type="submit"
@@ -745,6 +749,7 @@
           class="q-gutter-md"
         >
           <q-btn-dropdown
+            name="reassign-dialog-assignee-dropdown"
             style="height: 36px;"
             color="primary"
             :label="assigneeLabel('DB')"
@@ -764,6 +769,7 @@
             </q-list>
           </q-btn-dropdown>
           <q-input
+            name="reassign-extra-message"
             v-model="reassignDialogMessage"
             filled
             type="textarea"
@@ -771,6 +777,7 @@
           />
           <div>
             <q-btn
+              name="reassign-dialog-button"
               label="Reassign"
               icon-right="send"
               type="submit"
@@ -801,6 +808,7 @@
         />
         <div v-else></div>
         <q-btn
+          name="reassign-button"
           style="height: 36px;"
           color="primary"
           :label="assigneeLabel('CURRENT')"

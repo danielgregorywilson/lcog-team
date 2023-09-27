@@ -26,7 +26,7 @@ export function loginSuperuser() {
     const username = Cypress.env('users').superuser.username
     const password = Cypress.env('users').superuser.password
 
-    cy.request('POST', 'http://localhost:8000/api/api-token-auth-password/', {username, password})
+    cy.request('POST', `${ Cypress.env('api_url') }/api/api-token-auth-password/`, {username, password})
       .its('body.token')
       .should('exist')
       .then(token => {

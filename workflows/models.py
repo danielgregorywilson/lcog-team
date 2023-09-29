@@ -6,6 +6,7 @@ from django.db import models
 from django.utils.translation import gettext as _
 
 from mainsite.models import ActiveManager, InactiveManager, LANGUAGE_CHOICES
+from people.middleware import get_current_employee
 from people.models import Employee, JobTitle, UnitOrProgram
 
 
@@ -258,8 +259,9 @@ class EmployeeTransition(models.Model):
                 }
         if len(changes):
             json_changes = json.dumps(changes, sort_keys=True, default=str)
+            employee = get_current_employee()
             TransitionChange.objects.create(
-                transition=self, created_by=self.submitter,
+                transition=self, created_by=employee,
                 changes=json_changes
             )
 

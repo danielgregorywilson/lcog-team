@@ -57,7 +57,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     name = serializers.CharField()
     username = serializers.EmailField(source='user.username')
     email = serializers.EmailField(source='user.email')
-    division = serializers.CharField(source='unit_or_program.division.name')
+    division = serializers.CharField(source='unit_or_program.division.name', default='')
     is_manager = serializers.SerializerMethodField()
     has_manager = serializers.SerializerMethodField()
     is_eligible_for_telework_application = serializers.SerializerMethodField()

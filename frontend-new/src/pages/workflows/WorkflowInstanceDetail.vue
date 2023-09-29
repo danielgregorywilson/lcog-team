@@ -116,7 +116,7 @@ function retrieveWorkflowInstance() {
       resolve('Got Workflow Instance')
     })
     .catch(e => {
-      console.error('Error retrieving workflow instance', e)
+      console.error('Error retrieving workflow instance:', e)
       reject(e)
     })
   })
@@ -187,7 +187,11 @@ onMounted(() => {
         retrieveWorkflowInstance()
           .then(() => bus.emit('workflowInstanceRetrieved', Math.random()))
           .catch(e => {
-            console.error('Error retrieving workflow instance:', e)
+            console.log('Workflow instance does not seem to exist. Redirecting...')
+            router.push('/')
+              .catch(e => {
+                console.error('Error navigating to dashboard upon not finding a matching Workflow Instance:', e)
+              })
           })
       }
     })

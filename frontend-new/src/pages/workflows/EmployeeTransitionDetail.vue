@@ -1482,6 +1482,10 @@ function updateTransition() {
       } else {
         quasar.notify('Updated Employee Transition')
       }
+
+      // Signal to WorkflowInstanceDetail that the transition was assigned.
+      bus.emit('transitionReassigned', Math.random())
+
       resolve('Updated')
     })
     .catch(e => {
@@ -1771,7 +1775,7 @@ function onSubmitSendDialog(type: 'SDS'|'FI'|'HR'|'STN'|'ASSIGN') {
       sendDialogUpdate.value = false
       sendDialogMessage.value = ''
       reassignDialogMessage.value = ''
-      // Signal to WorkflowInstanceDetail that the transition was reassigned or
+      // Signal to WorkflowInstanceDetail that the transition was assigned or
       // completed, in which case we need to get the newly created process
       // instances.
       bus.emit('transitionReassigned', Math.random())

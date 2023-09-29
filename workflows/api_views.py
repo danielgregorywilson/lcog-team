@@ -303,6 +303,8 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
                     'submitter_pk' in request.data else None
                 t.submitter = submitter
                 t.date_submitted = datetime.now(tz=get_current_timezone())
+                # Also set the assignee
+                t.assignee = EmployeeTransition.ASSIGNEE_SUBMITTER
 
             t.type = request.data['type']
             t.employee_first_name = request.data['employee_first_name']

@@ -617,6 +617,12 @@ class WorkflowInstance(HasTimeStampsMixin):
             if pi.employee_action_required(employee):
                 return True
         return False
+    
+    def delete(self, *args, **kwargs):
+        # Delete any employee transitions
+        if self.transition:
+            self.transition.delete()
+        super().delete(*args, **kwargs)
 
 
 class ProcessInstance(HasTimeStampsMixin):

@@ -16,6 +16,7 @@ export const useUserStore = defineStore('user', {
       username: '',
       email: '',
       name: '',
+      division: '',
       is_manager: false,
       has_manager: false,
       is_is_employee: false,
@@ -64,6 +65,7 @@ export const useUserStore = defineStore('user', {
             this.profile.username = resp.data.username
             this.profile.email = resp.data.email
             this.profile.name = resp.data.name
+            this.profile.division = resp.data.division
             this.profile.is_manager = resp.data.is_manager
             this.profile.has_manager = resp.data.has_manager
             this.profile.is_is_employee = resp.data.is_is_employee
@@ -86,6 +88,7 @@ export const useUserStore = defineStore('user', {
             this.profile.is_all_workflows_admin = resp.data.is_all_workflows_admin
             this.profile.can_view_mow_routes = resp.data.can_view_mow_routes
             this.profile.can_manage_mow_stops = resp.data.can_manage_mow_stops
+            cookies.set('division', resp.data.division.toString())
             cookies.set('is_manager', resp.data.is_manager.toString())
             cookies.set('has_manager', resp.data.has_manager.toString())
             cookies.set('is_is_employee', resp.data.is_is_employee.toString())
@@ -133,6 +136,7 @@ export const useUserStore = defineStore('user', {
     authLogout() {
       return new Promise((resolve) => {
         this.$reset()
+        cookies.remove('division')
         cookies.remove('is_manager')
         cookies.remove('has_manager')
         cookies.remove('is_is_employee')

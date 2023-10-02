@@ -66,7 +66,8 @@ class ProcessInstanceForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(ProcessInstanceForm, self).__init__(*args, **kwargs)
         self.fields['current_step_instance'].queryset = StepInstance.objects.filter(process_instance=self.instance)
-        self.fields['workflow_instance'].queryset = WorkflowInstance.objects.filter(workflow=self.instance.process.workflow)
+        if hasattr(self.instance, 'process'):
+            self.fields['workflow_instance'].queryset = WorkflowInstance.objects.filter(workflow=self.instance.process.workflow)
 
 
 class StepInstanceForm(ModelForm):

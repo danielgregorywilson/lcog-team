@@ -29,6 +29,7 @@ export interface EmployeeRetrieve {
   username: string
   email: string
   manager: Url
+  division: string
   is_manager: boolean
   has_manager: boolean
   is_is_employee: boolean

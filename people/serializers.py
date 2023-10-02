@@ -57,6 +57,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     name = serializers.CharField()
     username = serializers.EmailField(source='user.username')
     email = serializers.EmailField(source='user.email')
+    division = serializers.CharField(source='unit_or_program.division.name', default='')
     is_manager = serializers.SerializerMethodField()
     has_manager = serializers.SerializerMethodField()
     is_eligible_for_telework_application = serializers.SerializerMethodField()
@@ -76,8 +77,8 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
         model = Employee
         fields = [
             'url', 'pk', 'name', 'user', 'username', 'email', 'manager',
-            'is_manager', 'has_manager', 'is_is_employee', 'is_hr_employee',
-            'is_sds_hiring_lead', 'is_fiscal_employee',
+            'division', 'is_manager', 'has_manager', 'is_is_employee',
+            'is_hr_employee', 'is_sds_hiring_lead', 'is_fiscal_employee',
             'is_eligible_for_telework_application', 'can_view_seating_charts',
             'can_edit_seating_charts', 'can_view_desk_reservation_reports',
             'is_upper_manager', 'is_hr_manager', 'is_executive_director',

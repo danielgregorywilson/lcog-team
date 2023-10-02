@@ -884,7 +884,7 @@
           color="white"
           text-color="black"
           icon="send"
-          label="Submit"
+          label="Send to Hiring Leads"
           @click="showSendToSDSHiringLeadsDialog = true"
         />
       </div>
@@ -1482,6 +1482,10 @@ function updateTransition() {
       } else {
         quasar.notify('Updated Employee Transition')
       }
+
+      // Signal to WorkflowInstanceDetail that the transition was assigned.
+      bus.emit('transitionReassigned', Math.random())
+
       resolve('Updated')
     })
     .catch(e => {
@@ -1590,7 +1594,10 @@ function canUpdateAssignee() {
 }
 
 function canSendToFiscal() {
-  return cookies.get('is_sds_hiring_lead') == 'true'
+  // GS employees send to fiscal. SDS managers send to SDS hiring leads.
+  const division = cookies.get('division')
+  const isGSSubmitter = employeeIsSubmitter() && division != 'Senior & Disability Services'
+  return cookies.get('is_sds_hiring_lead') == 'true' || isGSSubmitter
 }
 
 function canSendToHR() {
@@ -1768,7 +1775,7 @@ function onSubmitSendDialog(type: 'SDS'|'FI'|'HR'|'STN'|'ASSIGN') {
       sendDialogUpdate.value = false
       sendDialogMessage.value = ''
       reassignDialogMessage.value = ''
-      // Signal to WorkflowInstanceDetail that the transition was reassigned or
+      // Signal to WorkflowInstanceDetail that the transition was assigned or
       // completed, in which case we need to get the newly created process
       // instances.
       bus.emit('transitionReassigned', Math.random())

@@ -6,6 +6,7 @@ from django.db import models
 from django.utils.translation import gettext as _
 
 from mainsite.models import ActiveManager, InactiveManager, LANGUAGE_CHOICES
+from people.middleware import get_current_employee
 from people.models import Employee, JobTitle, UnitOrProgram
 
 
@@ -258,10 +259,27 @@ class EmployeeTransition(models.Model):
                 }
         if len(changes):
             json_changes = json.dumps(changes, sort_keys=True, default=str)
+            employee = get_current_employee()
             TransitionChange.objects.create(
-                transition=self, created_by=self.submitter,
+                transition=self, created_by=employee,
                 changes=json_changes
             )
+
+    def employee_action_required(self, employee):
+        # Return True if the employee is responsible for reviewing the form
+        assignee = self.assignee
+        if assignee in [self.ASSIGNEE_NONE, self.ASSIGNEE_COMPLETE]:
+            return False
+        elif assignee == self.ASSIGNEE_SUBMITTER:
+            if self.submitter == employee:
+                return True
+        elif assignee == self.ASSIGNEE_HIRING_LEAD:
+            return employee.is_sds_hiring_lead
+        elif assignee == self.ASSIGNEE_FISCAL:
+            return employee.is_fiscal_employee
+        elif assignee == self.ASSIGNEE_HR:
+            return employee.is_hr_employee
+        return False
 
 
 class TransitionChange(models.Model):
@@ -581,10 +599,6 @@ class WorkflowInstance(HasTimeStampsMixin):
     active = models.BooleanField(default=True)
     complete = models.BooleanField(default=False)
 
-    # @property
-    # def current_step_instance(self):
-    #     import pdb; pdb.set_trace();
-
     @property
     def percent_complete(self):
         pis = self.processinstance_set.all()
@@ -611,10 +625,20 @@ class WorkflowInstance(HasTimeStampsMixin):
         
     def employee_action_required(self, employee):
         # Return True if the employee is responsible for completing the current step of any of the process instances
+        pis_action_required = False
         for pi in self.processinstance_set.all():
             if pi.employee_action_required(employee):
-                return True
-        return False
+                pis_action_required = True
+        transition_action_required = False
+        if self.transition:
+            transition_action_required = self.transition.employee_action_required(employee)
+        return pis_action_required or transition_action_required
+    
+    def delete(self, *args, **kwargs):
+        # Delete any employee transitions
+        if self.transition:
+            self.transition.delete()
+        super().delete(*args, **kwargs)
 
 
 class ProcessInstance(HasTimeStampsMixin):
@@ -664,12 +688,7 @@ class ProcessInstance(HasTimeStampsMixin):
         if not self.current_step_instance:
             # TODO: This should not happen; maybe log an error
             return False
-        current_step = self.current_step_instance.step
-        if current_step.role:
-            return employee.workflow_roles.filter(
-                pk=self.current_step_instance.step.role.pk
-            ).count() > 0
-        return False
+        return self.current_step_instance.employee_action_required(employee)
 
 
 class StepInstance(HasTimeStampsMixin):

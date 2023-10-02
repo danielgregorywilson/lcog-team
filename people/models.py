@@ -114,8 +114,10 @@ class Employee(models.Model):
     def initials(self):
         if self.display_name:
             return "".join(map(lambda x: x[0], self.display_name.split(' '))).upper()
-        else:
+        elif self.user.get_full_name():
             return "".join(map(lambda x: x[0], self.user.get_full_name().split(' '))).upper()
+        else:
+            return self.user.username
 
     @property
     def is_is_employee(self):

@@ -116,7 +116,7 @@ function retrieveWorkflowInstance() {
       resolve('Got Workflow Instance')
     })
     .catch(e => {
-      console.error('Error retrieving workflow instance', e)
+      console.error('Error retrieving workflow instance:', e)
       reject(e)
     })
   })
@@ -187,7 +187,11 @@ onMounted(() => {
         retrieveWorkflowInstance()
           .then(() => bus.emit('workflowInstanceRetrieved', Math.random()))
           .catch(e => {
-            console.error('Error retrieving workflow instance:', e)
+            console.log('Workflow instance does not seem to exist. Redirecting...')
+            router.push('/')
+              .catch(e => {
+                console.error('Error navigating to dashboard upon not finding a matching Workflow Instance:', e)
+              })
           })
       }
     })
@@ -209,7 +213,7 @@ watch(() => bus.bus.value.get('completedStep'), () => {
 })
 
 watch(() => bus.bus.value.get('transitionReassigned'), () => {
-  // When transition form is reassigned, get the workflowinstance again so the
+  // When transition form is assigned, get the workflowinstance again so the
   // form updates. In the case of sending to STN and completing the form,
   // process instances are also created, so we get those as well.
   retrieveWorkflowInstance()

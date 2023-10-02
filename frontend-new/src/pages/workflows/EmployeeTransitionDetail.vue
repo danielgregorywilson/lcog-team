@@ -1596,8 +1596,8 @@ function canUpdateAssignee() {
 function canSendToFiscal() {
   // GS employees send to fiscal. SDS managers send to SDS hiring leads.
   const division = cookies.get('division')
-  return cookies.get('is_sds_hiring_lead') == 'true' ||
-    division != 'Senior & Disability Services'
+  const isGSSubmitter = employeeIsSubmitter() && division != 'Senior & Disability Services'
+  return cookies.get('is_sds_hiring_lead') == 'true' || isGSSubmitter
 }
 
 function canSendToHR() {

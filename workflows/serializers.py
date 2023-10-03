@@ -301,7 +301,9 @@ class WorkflowInstanceSimpleSerializer(WorkflowInstanceBaseSerializer):
     
     @staticmethod
     def get_status(wfi):
-        if wfi.transition and wfi.transition.assignee != 'Complete':
+        if wfi.transition and wfi.transition.assignee == 'Submitter':
+            return wfi.transition.submitter.name
+        elif wfi.transition and wfi.transition.assignee != 'Complete':
             return wfi.transition.assignee
         else:
             return wfi.percent_complete

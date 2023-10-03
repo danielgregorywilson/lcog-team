@@ -1590,7 +1590,6 @@ function canUpdateAssignee() {
   } else {
     return false
   }
-  return true
 }
 
 function canSendToFiscal() {

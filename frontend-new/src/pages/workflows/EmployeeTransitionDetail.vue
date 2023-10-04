@@ -623,14 +623,22 @@
             type="textarea"
             label="Extra message to include"
           />
-          <div>
+          <div class="row justify-between">
             <q-btn
               name="send-sds-dialog-button"
               label="Send"
               icon-right="send"
               type="submit"
               color="primary"
+              :disable="formErrors()"
             />
+            <div
+              v-if="formErrors()"
+              class="text-red text-bold"
+              style="width:180px;"
+            >
+              There are errors in the form. Fix before submitting.
+            </div>
           </div>
         </q-form>
       </q-card>
@@ -657,14 +665,22 @@
             type="textarea"
             label="Extra message to include"
           />
-          <div>
+          <div class="row justify-between">
             <q-btn
               name="send-fiscal-dialog-button"
               label="Send"
               icon-right="send"
               type="submit"
               color="primary"
+              :disable="formErrors()"
             />
+            <div
+              v-if="formErrors()"
+              class="text-red text-bold"
+              style="width:180px;"
+            >
+              There are errors in the form. Fix before submitting.
+            </div>
           </div>
         </q-form>
       </q-card>
@@ -691,14 +707,22 @@
             type="textarea"
             label="Extra message to include"
           />
-          <div>
+          <div class="row justify-between">
             <q-btn
               name="send-hr-dialog-button"
               label="Send"
               icon-right="send"
               type="submit"
               color="primary"
+              :disable="formErrors()"
             />
+            <div
+              v-if="formErrors()"
+              class="text-red text-bold"
+              style="width:180px;"
+            >
+              There are errors in the form. Fix before submitting.
+            </div>
           </div>
         </q-form>
       </q-card>
@@ -726,14 +750,22 @@
             type="textarea"
             label="Extra message to include"
           />
-          <div>
+          <div class="row justify-between">
             <q-btn
               name="send-stn-dialog-button"
               label="Send to STN"
               icon-right="send"
               type="submit"
               color="primary"
+              :disable="formErrors()"
             />
+            <div
+              v-if="formErrors()"
+              class="text-red text-bold"
+              style="width:180px;"
+            >
+              There are errors in the form. Fix before submitting.
+            </div>
           </div>
         </q-form>
       </q-card>
@@ -832,7 +864,7 @@
           @click="showChangesDialog = true"
         />
         <q-btn
-          v-if="showErrorButton && formErrorItems().length > 0"
+          v-if="showErrorButton && formErrors()"
           label="Show errors"
           icon="check"
           color="warning"
@@ -1102,8 +1134,6 @@ function assigneeOptions() {
       return []
     }
   }
-
-
 }
 
 function assigneeLabel(assigneeType: 'CURRENT' | 'DB') {
@@ -1142,6 +1172,10 @@ let showAssigneeDialog = ref(false)
 let sendDialogMessage = ref('')
 let sendDialogUpdate = ref(false)
 let reassignDialogMessage = ref('')
+
+function formErrors() {
+  return formErrorItems().length > 0
+}
 
 ////////////////////////////
 // Retrieve/Modify/Submit //
@@ -1259,7 +1293,7 @@ function retrieveEmployeeTransition() {
 
     changes.value = t.changes
 
-    if (formErrorItems().length > 0) {
+    if (formErrors()) {
       showErrorButton.value = true
     }
     resolve('Retrieved employee transition')
@@ -1480,7 +1514,7 @@ function updateTransition() {
           })
       }
 
-      if (formErrorItems().length > 0) {
+      if (formErrors()) {
         showErrorButton.value = true
       }
 

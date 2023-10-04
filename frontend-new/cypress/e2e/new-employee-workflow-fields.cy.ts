@@ -263,7 +263,7 @@ function sendSTNButtonExists() {
 describe('New employee workflow', () => {
 
   it('Completed and deleted workflows load', () => {
-    loginUser(Cypress.env('users').manager).then(() => {
+    loginUser(Cypress.env('users').sdsmanager).then(() => {
       visitUrl(Cypress.env('workflows_complete_path'))
       cy.get('.q-table__container').should('exist')
       visitUrl(Cypress.env('workflows_deleted_path'))
@@ -273,7 +273,7 @@ describe('New employee workflow', () => {
 
   it('Submitter logs in, creates a new employee workflow, and submits it', () => {
     // Create a new employee workflow
-    loginUser(Cypress.env('users').manager).then(() => {
+    loginUser(Cypress.env('users').sdsmanager).then(() => {
       visitUrl(Cypress.env('workflows_dashboard_path'))
       cy.get('.workflowtable-new .row-add-new').click()
       cy.wait(500) // Wait for the new transition form to load
@@ -315,7 +315,7 @@ describe('New employee workflow', () => {
 
   it('Another manager can view the workflow but not edit certain fields', () => {
     const pk = LOCAL_STORAGE_MEMORY['workflowPK']
-    loginUser(Cypress.env('users').manager2).then(() => {
+    loginUser(Cypress.env('users').gsmanager).then(() => {
       visitUrl(`/wf/${pk}/transition`)
       // Can view but not edit employee ID fields
       employeeIDViewNotEdit()

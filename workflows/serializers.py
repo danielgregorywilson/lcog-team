@@ -136,7 +136,12 @@ class TransitionChangeSerializer(serializers.ModelSerializer):
 
 class EmployeeTransitionSerializer(serializers.ModelSerializer):
     submitter_pk = serializers.CharField(source='submitter.pk', required=False)
-    submitter_name = serializers.CharField(source='submitter.name', required=False)
+    submitter_name = serializers.CharField(
+        source='submitter.name', required=False
+    )
+    submitter_division = serializers.CharField(
+        source='submitter.unit_or_program.division.name', required=False
+    )
     title_pk = serializers.SerializerMethodField()
     title_name = serializers.SerializerMethodField()
     manager_pk = serializers.SerializerMethodField()
@@ -151,14 +156,15 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
         model = EmployeeTransition
         fields = [
             'url', 'pk', 'type', 'date_submitted', 'submitter_pk',
-            'submitter_name', 'employee_first_name', 'employee_middle_initial',
-            'employee_last_name', 'employee_preferred_name', 'employee_number',
-            'employee_id', 'employee_email', 'title_pk', 'title_name', 'fte',
-            'salary_range', 'salary_step', 'bilingual', 'second_language',
-            'manager_pk', 'manager_name', 'unit_pk', 'unit_name',
-            'transition_date', 'lwop', 'lwop_details', 'preliminary_hire',
-            'delete_profile', 'office_location', 'cubicle_number',
-            'union_affiliation', 'teleworking', 'computer_type', 'computer_gl',
+            'submitter_name', 'submitter_division', 'employee_first_name',
+            'employee_middle_initial', 'employee_last_name',
+            'employee_preferred_name', 'employee_number', 'employee_id',
+            'employee_email', 'title_pk', 'title_name', 'fte', 'salary_range',
+            'salary_step', 'bilingual', 'second_language', 'manager_pk',
+            'manager_name', 'unit_pk', 'unit_name', 'transition_date', 'lwop',
+            'lwop_details', 'preliminary_hire', 'delete_profile',
+            'office_location', 'cubicle_number', 'union_affiliation',
+            'teleworking', 'computer_type', 'computer_gl',
             'computer_description', 'phone_number', 'desk_phone',
             'phone_request', 'phone_request_data', 'load_code', 'cell_phone',
             'should_delete', 'reassign_to', 'gas_pin_needed', 'business_cards',
@@ -166,7 +172,7 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
             'access_emails_name', 'special_instructions', 'fiscal_field',
             'assignee', 'changes'
         ]
-    
+
     @staticmethod
     def get_manager_pk(transition):
         if transition.manager:
@@ -237,11 +243,12 @@ class EmployeeTransitionRedactedSerializer(EmployeeTransitionSerializer):
         model = EmployeeTransition
         fields = [
             'url', 'pk', 'type', 'date_submitted', 'submitter_pk',
-            'submitter_name', 'employee_first_name', 'employee_middle_initial',
-            'employee_last_name', 'employee_preferred_name', 'employee_number',
-            'employee_id', 'employee_email', 'title_pk', 'title_name', 'fte',
-            'bilingual', 'second_language', 'manager_pk', 'manager_name',
-            'unit_pk', 'unit_name', 'transition_date', 'lwop', 'lwop_details',
+            'submitter_name', 'submitter_division', 'employee_first_name',
+            'employee_middle_initial', 'employee_last_name',
+            'employee_preferred_name', 'employee_number', 'employee_id',
+            'employee_email', 'title_pk', 'title_name', 'fte', 'bilingual',
+            'second_language', 'manager_pk', 'manager_name', 'unit_pk',
+            'unit_name', 'transition_date', 'lwop', 'lwop_details',
             'preliminary_hire', 'delete_profile', 'office_location',
             'cubicle_number', 'union_affiliation', 'teleworking',
             'computer_type', 'computer_gl', 'computer_description',

@@ -986,6 +986,7 @@ let type = ref('')
 let dateSubmitted = ref(new Date())
 let submitterPk = ref(-1)
 let submitterName = ref('')
+let submitterDivision = ref('')
 let employeeFirstNameCurrentVal = ref('')
 let employeeFirstName = ref('')
 let employeeMiddleInitialCurrentVal = ref('')
@@ -1076,17 +1077,33 @@ let assigneeCurrentVal = ref('')
 let assignee = ref('')
 
 function assigneeOptions() {
-  if (assigneeCurrentVal.value == 'Hiring Lead') {
-    return ['Submitter', 'Hiring Lead']
-  } else if (assigneeCurrentVal.value == 'Fiscal') {
-    return ['Submitter', 'Hiring Lead', 'Fiscal']
-  } else if (assigneeCurrentVal.value == 'HR') {
-    return ['Submitter', 'Hiring Lead', 'Fiscal', 'HR']
-  } else if (assigneeCurrentVal.value == 'Complete') {
-    return ['Submitter', 'Hiring Lead', 'Fiscal', 'HR', 'Complete']
+  if (submitterDivision.value == 'Senior & Disability Services') {
+    if (assigneeCurrentVal.value == 'Hiring Lead') {
+      return ['Submitter', 'Hiring Lead']
+    } else if (assigneeCurrentVal.value == 'Fiscal') {
+      return ['Submitter', 'Hiring Lead', 'Fiscal']
+    } else if (assigneeCurrentVal.value == 'HR') {
+      return ['Submitter', 'Hiring Lead', 'Fiscal', 'HR']
+    } else if (assigneeCurrentVal.value == 'Complete') {
+      return ['Submitter', 'Hiring Lead', 'Fiscal', 'HR', 'Complete']
+    } else {
+      return []
+    }
   } else {
-    return []
+    if (assigneeCurrentVal.value == 'Hiring Lead') {
+      return ['Submitter']
+    } else if (assigneeCurrentVal.value == 'Fiscal') {
+      return ['Submitter', 'Fiscal']
+    } else if (assigneeCurrentVal.value == 'HR') {
+      return ['Submitter', 'Fiscal', 'HR']
+    } else if (assigneeCurrentVal.value == 'Complete') {
+      return ['Submitter', 'Fiscal', 'HR', 'Complete']
+    } else {
+      return []
+    }
   }
+
+
 }
 
 function assigneeLabel(assigneeType: 'CURRENT' | 'DB') {
@@ -1141,6 +1158,7 @@ function retrieveEmployeeTransition() {
     dateSubmitted.value = t.date_submitted
     submitterPk.value = t.submitter_pk
     submitterName.value = t.submitter_name
+    submitterDivision.value = t.submitter_division
 
     employeeFirstName.value = t.employee_first_name
     employeeFirstNameCurrentVal.value = employeeFirstName.value
@@ -1395,6 +1413,7 @@ function updateTransition() {
       dateSubmitted.value = t.date_submitted
       submitterPk.value = t.submitter_pk
       submitterName.value = t.submitter_name
+      submitterDivision.value = t.submitter_division
 
       employeeFirstNameCurrentVal.value = t.employee_first_name
       employeeMiddleInitialCurrentVal.value = t.employee_middle_initial
@@ -1532,10 +1551,6 @@ function formSubmitted() {
 
 function employeeIsSubmitter() {
   return userStore.getEmployeeProfile.employee_pk == submitterPk.value
-}
-
-function employeeIsAssignee() {
-  return userStore.getEmployeeProfile.employee_pk == assignee.value
 }
 
 // Only HR can edit employee number fields. Anyone can view them.

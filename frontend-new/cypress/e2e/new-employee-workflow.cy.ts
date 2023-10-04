@@ -345,7 +345,7 @@ describe('New employee workflow', () => {
       fiscalViewNotEdit()
       // Can view and edit all other fields
       otherFieldsViewAndEdit()
-      sendSDSButtonExists()
+      noSubmitButtonsExist()
     })
   })
 
@@ -363,7 +363,7 @@ describe('New employee workflow', () => {
       fiscalViewNotEdit()
       // Can view and edit all other fields
       otherFieldsViewAndEdit()
-      sendFiscalButtonExists()
+      noSubmitButtonsExist()
     })
   })
 
@@ -381,7 +381,7 @@ describe('New employee workflow', () => {
       fiscalViewAndEdit()
       // Can view and edit all other fields
       otherFieldsViewAndEdit()
-      sendHRButtonExists()
+      noSubmitButtonsExist()
     })
   })
 
@@ -399,7 +399,7 @@ describe('New employee workflow', () => {
       fiscalViewNotEdit()
       // Can view and edit all other fields
       otherFieldsViewAndEdit()
-      sendSTNButtonExists()
+      noSubmitButtonsExist()
     })
   })
 

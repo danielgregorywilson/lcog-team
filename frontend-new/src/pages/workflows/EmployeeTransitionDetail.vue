@@ -878,7 +878,7 @@
           @click="showSendToFiscalDialog = true"
         />
         <q-btn
-          v-else-if="canEditOtherFields()"
+          v-else-if="canSendToHiringLeads()"
           name="send-sds-button"
           class="q-ml-sm"
           color="white"
@@ -1534,6 +1534,10 @@ function employeeIsSubmitter() {
   return userStore.getEmployeeProfile.employee_pk == submitterPk.value
 }
 
+function employeeIsAssignee() {
+  return userStore.getEmployeeProfile.employee_pk == assignee.value
+}
+
 // Only HR can edit employee number fields. Anyone can view them.
 function canEditEmployeeNumberFields() {
   return cookies.get('is_hr_employee') == 'true'
@@ -1574,8 +1578,9 @@ function canEditOtherFields() {
     cookies.get('is_sds_hiring_lead') == 'true'
 }
 
+// Can only update the assignee if there is an assignee that is not the
+// submitter and the current user is in the assignee group.
 function canUpdateAssignee() {
-  // TODO
   const assignee = assigneeCurrentVal.value
   if (assignee == 'Submitter') {
     return false // No one to assign back to
@@ -1592,19 +1597,32 @@ function canUpdateAssignee() {
   }
 }
 
+function canSendToHiringLeads() {
+  return assigneeCurrentVal.value == 'Submitter' && employeeIsSubmitter() &&
+    cookies.get('division') == 'Senior & Disability Services'
+}
+
 function canSendToFiscal() {
   // GS employees send to fiscal. SDS managers send to SDS hiring leads.
   const division = cookies.get('division')
   const isGSSubmitter = employeeIsSubmitter() && division != 'Senior & Disability Services'
-  return cookies.get('is_sds_hiring_lead') == 'true' || isGSSubmitter
+  const isHiringLeadAndAssignee = assigneeCurrentVal.value == 'Hiring Lead' &&
+    cookies.get('is_sds_hiring_lead') == 'true'
+  const isGSSubmitterAndAssignee = assigneeCurrentVal.value == 'Submitter' &&
+    isGSSubmitter
+  return isHiringLeadAndAssignee || isGSSubmitterAndAssignee
 }
 
 function canSendToHR() {
-  return cookies.get('is_fiscal_employee') == 'true'
+  return assigneeCurrentVal.value == 'Fiscal' &&
+    cookies.get('is_fiscal_employee') == 'true'
+
 }
 
 function canSendToTransitionNews() {
-  return cookies.get('is_hr_employee') == 'true'
+  return assigneeCurrentVal.value == 'HR' &&
+    cookies.get('is_hr_employee') == 'true'
+
 }
 
 ////////////////////////

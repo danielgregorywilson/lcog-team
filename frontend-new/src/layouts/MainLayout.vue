@@ -107,14 +107,16 @@ const router = useRouter()
 let leftDrawerOpen = ref(false)
 
 interface LinkData {
-  title: string;
-  icon: string;
-  link: string;
-  id?: string;
-  managerOnly?: boolean;
+  title: string
+  icon: string
+  link: string
+  id?: string
+  managerOnly?: boolean
   isISEmployee?: boolean
-  eligibleForTeleworkApplicationOnly?: boolean;
+  isFiscalEmployee?: boolean
+  eligibleForTeleworkApplicationOnly?: boolean
   hasWorkflowRoles?: boolean
+  canViewExpenses?: boolean
   canViewMOWRoutes?: boolean
 }
 
@@ -136,6 +138,18 @@ const navLinks: Array<LinkData> = [
     icon: 'double_arrow',
     link: '/workflows',
     hasWorkflowRoles: true
+  },
+  {
+    title: 'Expenses',
+    icon: 'credit_card',
+    link: '/expenses',
+    canViewExpenses: true
+  },
+  {
+    title: 'Expense Reports',
+    icon: 'request_quote',
+    link: '/expenses-review',
+    isFiscalEmployee: true
   },
   // {
   //   title: 'Performance Reviews',

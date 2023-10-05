@@ -24,13 +24,13 @@ const routes: RouteRecordRaw[] = [
         path: 'expenses',
         name: 'expenses',
         component: () => import('src/pages/purchases/Expenses.vue'),
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: true, requiresCanViewExpenses: true },
       },
       {
         path: 'expenses-review',
         name: 'expenses-review',
         component: () => import('src/pages/purchases/ExpensesReview.vue'),
-        meta: { requiresFiscal: true },
+        meta: { requiresAuth: true, requiresFiscal: true },
       },
 
       //////////////////////
@@ -158,7 +158,7 @@ const routes: RouteRecordRaw[] = [
             path: 'request-detail/:pk',
             name: 'timeoff-request-detail',
             component: () => import('src/pages/timeoff/RequestDetail.vue'),
-            meta: { requiresCanViewTimeOffRequest: true }
+            meta: { requiresAuth: true, requiresCanViewTimeOffRequest: true }
           },
           {
             path: 'manage-requests',
@@ -301,7 +301,7 @@ const routes: RouteRecordRaw[] = [
         path: 'reports',
         name: 'reports',
         component: () => import('src/pages/deskReservation/Report.vue'),
-        meta: { requiresDeskReservationReportsPermission: true }
+        meta: { requiresAuth: true, requiresDeskReservationReportsPermission: true }
       }
     ]
   },
@@ -336,7 +336,7 @@ const routes: RouteRecordRaw[] = [
     path: '/mow-map',
     name: 'mow-map',
     component: () => import('src/pages/meals/MOWMap.vue'),
-    meta: { requiresMealsOnWheelsPermission: true }
+    meta: { requiresAuth: true, requiresMealsOnWheelsPermission: true }
   },
 
   //////////////////

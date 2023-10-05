@@ -57,6 +57,7 @@ export interface EmployeeRetrieve {
   admin_of_workflows: Array<number>
   admin_of_processes: Array<number>
   workflow_roles: Array<number>
+  can_view_expenses: boolean
   can_view_mow_routes: boolean
   can_manage_mow_stops: boolean
 }

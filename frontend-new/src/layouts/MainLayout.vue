@@ -140,13 +140,13 @@ const navLinks: Array<LinkData> = [
     hasWorkflowRoles: true
   },
   {
-    title: 'Expenses',
+    title: 'Credit Card Expenses',
     icon: 'credit_card',
     link: '/expenses',
     canViewExpenses: true
   },
   {
-    title: 'Expense Reports',
+    title: 'Credit Card Expense Reports',
     icon: 'request_quote',
     link: '/expenses-review',
     isFiscalEmployee: true

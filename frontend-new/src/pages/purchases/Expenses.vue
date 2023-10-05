@@ -27,29 +27,41 @@
         <q-tr :props="props">
           <q-td key="name" :props="props">
             {{ props.row.name }}
-            <q-popup-edit v-model="props.row.name" v-slot="scope">
-              <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
+            <q-popup-edit v-model="props.row.name" buttons v-slot="scope">
+              <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
             </q-popup-edit>
           </q-td>
           <q-td key="date" :props="props">
-            {{ props.row.date }}
-            <q-popup-edit v-model="props.row.calories" title="Update date" buttons v-slot="scope">
-              <q-input type="date" v-model="scope.value" dense autofocus />
+            {{ readableDate(props.row.date) }}
+            <q-popup-edit v-model="props.row.date" buttons v-slot="scope">
+              <q-input type="date" v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
             </q-popup-edit>
           </q-td>
           <q-td key="gl" :props="props">
             <div class="text-pre-wrap">{{ props.row.gl }}</div>
-            <q-popup-edit v-model="props.row.gl" v-slot="scope">
-              <q-input type="textarea" v-model="scope.value" dense autofocus />
+            <q-popup-edit v-model="props.row.gl" buttons v-slot="scope">
+              <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
             </q-popup-edit>
           </q-td>
           <q-td key="approver" :props="props">
             {{ props.row.approver }}
-            <q-popup-edit v-model="props.row.approver" title="Update approver" buttons persistent v-slot="scope">
-              <q-input type="number" v-model="scope.value" dense autofocus hint="Use buttons to close" />
+            <q-popup-edit v-model="props.row.approver" buttons v-slot="scope">
+              <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
             </q-popup-edit>
           </q-td>
-          <q-td key="receipt" :props="props">{{ props.row.receipt }}</q-td>
+          <q-td key="receipt" :props="props">
+            {{ props.row.receipt }}
+            <q-popup-edit v-model="props.row.receipt" buttons v-slot="scope">
+              <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
+            </q-popup-edit>
+          </q-td>
+        </q-tr>
+      </template>
+      <template v-slot:bottom-row>
+        <q-tr @click="clickAddExpense()" class="cursor-pointer row-add-new">
+          <q-td colspan="100%">
+            <q-icon name="add" size="md" class="q-pr-sm"/>New Expense
+          </q-td>
         </q-tr>
       </template>
     </q-table>
@@ -60,6 +72,7 @@
 <script setup lang="ts">
 
 import { onMounted, ref } from 'vue'
+import { readableDate } from 'src/filters'
 import { TimeOffRequestRetrieve } from 'src/types'
 import { useTimeOffStore } from 'src/stores/timeoff'
 
@@ -93,78 +106,78 @@ const columns = [
   { name: 'receipt', label: 'Receipt', field: 'receipt' }
 ]
 
-const rows = [
+const rows = ref([
   {
     name: 'Frozen Yogurt',
-    date: new Date(),
+    date: '2023-10-01',
     gl: '43-45045-232',
     approver: 'Danny',
     receipt: 'file.txt'
   },
   {
     name: 'Ice cream sandwich',
-    date: new Date(),
+    date: '2023-10-01',
     gl: '43-45045-232',
     approver: 'Danny',
     receipt: 'file.txt'
   },
   {
     name: 'Eclair',
-    date: new Date(),
+    date: '2023-10-01',
     gl: '43-45045-232',
     approver: 'Danny',
     receipt: 'file.txt'
   },
   {
     name: 'Cupcake',
-    date: new Date(),
+    date: '2023-10-01',
     gl: '43-45045-232',
     approver: 'Danny',
     receipt: 'file.txt'
   },
   {
     name: 'Gingerbread',
-    date: new Date(),
+    date: '2023-10-01',
     gl: '43-45045-232',
     approver: 'Danny',
     receipt: 'file.txt'
   },
   {
     name: 'Jelly bean',
-    date: new Date(),
+    date: '2023-10-01',
     gl: '43-45045-232',
     approver: 'Danny',
     receipt: 'file.txt'
   },
   {
     name: 'Lollipop',
-    date: new Date(),
+    date: '2023-10-01',
     gl: '43-45045-232',
     approver: 'Danny',
     receipt: 'file.txt'
   },
   {
     name: 'Honeycomb',
-    date: new Date(),
+    date: '2023-10-01',
     gl: '43-45045-232',
     approver: 'Danny',
     receipt: 'file.txt'
   },
   {
     name: 'Donut',
-    date: new Date(),
+    date: '2023-10-01',
     gl: '43-45045-232',
     approver: 'Danny',
     receipt: 'file.txt'
   },
   {
     name: 'KitKat',
-    date: new Date(),
+    date: '2023-10-01',
     gl: '43-45045-232',
     approver: 'Danny',
     receipt: 'file.txt'
   }
-]
+])
 
 function monthExpenses(): TimeOffCalendarData {
   const apiResults = timeOffStore.teamTimeOffRequests
@@ -236,6 +249,24 @@ function monthForward() {
   firstOfSelectedMonth.value = firstOfSelectedMonth.value.getMonth() === 11
     ? new Date(firstOfSelectedMonth.value.getFullYear() + 1, 0, 1)
     : new Date(firstOfSelectedMonth.value.getFullYear(), firstOfSelectedMonth.value.getMonth() + 1, 1)
+}
+
+function clickAddExpense(): void {
+  rows.value.push({
+    name: '',
+    date: '',
+    gl: '',
+    approver: '',
+    receipt: ''
+  })
+
+  // workflowsStore.createNewEmployeeOnboarding()
+  //   .then((wfi) => {
+  //     navigateToWorkflowTransitionForm(wfi.pk)
+  //   })
+  //   .catch(e => {
+  //     console.error('Error creating a new employee onboarding workflow instance', e)
+  //   })
 }
 
 onMounted(() => {

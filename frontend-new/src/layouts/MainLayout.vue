@@ -28,7 +28,7 @@
       content-class="bg-grey-1"
       :width="210"
     >
-      <q-list>        
+      <q-list>
         <q-item
           clickable
           :to="{ name: 'dashboard' }"
@@ -192,7 +192,7 @@ const navLinks: Array<LinkData> = [
   },
 ]
 
-// For msal.js Azure/AD SSO 
+// For msal.js Azure/AD SSO
 const msalConfig: Configuration = {
   auth: {
     clientId: '2c4ec8a0-6be9-4c9c-a6b6-6a40392b8e3e',
@@ -237,7 +237,7 @@ function loginWithMicrosoft(): void {
         authStore.authWithMicrosoft({ username: account.userName, firstName, lastName })
           .then(() => router.push('/'))
           .catch((err) => console.log(err))
-      }      
+      }
     }).catch(function (error) {
         console.log(error)
     })

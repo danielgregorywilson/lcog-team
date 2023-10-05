@@ -44,6 +44,15 @@ export function canViewTimeOffRequest(to: RouteLocationNormalized) {
   }
 }
 
+export function isFiscal() {
+  if (cookies.get('is_fiscal_employee') == 'true') {
+    return true
+  } else {
+    console.info('User is not fiscal employee. Redirecting to dashboard.')
+    return false
+  }
+}
+
 export function isAuthenticated() {
   const authStore = useAuthStore()
   if (authStore.isAuthenticated) {

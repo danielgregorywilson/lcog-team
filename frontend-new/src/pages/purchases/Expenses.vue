@@ -44,15 +44,32 @@
             </q-popup-edit>
           </q-td>
           <q-td key="approver" :props="props">
-            {{ props.row.approver }}
+            {{ props.row.approver.name }}
             <q-popup-edit v-model="props.row.approver" buttons v-slot="scope">
-              <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
+              <EmployeeSelect
+                name="approver"
+                label="Approver"
+                :employee="props.row.approver"
+                :useLegalName="true"
+                v-on:input="props.row.approver=$event"
+                v-on:clear="props.row.approver=EmployeeSelect.emptyEmployee"
+                class="q-mr-md"
+                :readOnly=false
+                @keyup.enter="scope.set()"
+              />
             </q-popup-edit>
           </q-td>
           <q-td key="receipt" :props="props">
             {{ props.row.receipt }}
             <q-popup-edit v-model="props.row.receipt" buttons v-slot="scope">
-              <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
+              <FileUploader
+                name="receipt"
+                label="Receipt"
+                v-model="props.row.receipt"
+                class="q-mr-md"
+                :readOnly=false
+                @keyup.enter="scope.set()"
+              />
             </q-popup-edit>
           </q-td>
         </q-tr>
@@ -72,6 +89,8 @@
 <script setup lang="ts">
 
 import { onMounted, ref } from 'vue'
+import EmployeeSelect from 'src/components/EmployeeSelect.vue'
+import FileUploader from 'src/components/FileUploader.vue'
 import { readableDate } from 'src/filters'
 import { TimeOffRequestRetrieve } from 'src/types'
 import { useTimeOffStore } from 'src/stores/timeoff'
@@ -111,70 +130,70 @@ const rows = ref([
     name: 'Frozen Yogurt',
     date: '2023-10-01',
     gl: '43-45045-232',
-    approver: 'Danny',
+    approver: { "pk": 5, "name": "Dan Wilson", "legal_name": "Daniel Wilson" },
     receipt: 'file.txt'
   },
   {
     name: 'Ice cream sandwich',
     date: '2023-10-01',
     gl: '43-45045-232',
-    approver: 'Danny',
+    approver: {pk: -1, name: '', legal_name: ''},
     receipt: 'file.txt'
   },
   {
     name: 'Eclair',
     date: '2023-10-01',
     gl: '43-45045-232',
-    approver: 'Danny',
+    approver: {pk: -1, name: '', legal_name: ''},
     receipt: 'file.txt'
   },
   {
     name: 'Cupcake',
     date: '2023-10-01',
     gl: '43-45045-232',
-    approver: 'Danny',
+    approver: {pk: -1, name: '', legal_name: ''},
     receipt: 'file.txt'
   },
   {
     name: 'Gingerbread',
     date: '2023-10-01',
     gl: '43-45045-232',
-    approver: 'Danny',
+    approver: {pk: -1, name: '', legal_name: ''},
     receipt: 'file.txt'
   },
   {
     name: 'Jelly bean',
     date: '2023-10-01',
     gl: '43-45045-232',
-    approver: 'Danny',
+    approver: {pk: -1, name: '', legal_name: ''},
     receipt: 'file.txt'
   },
   {
     name: 'Lollipop',
     date: '2023-10-01',
     gl: '43-45045-232',
-    approver: 'Danny',
+    approver: {pk: -1, name: '', legal_name: ''},
     receipt: 'file.txt'
   },
   {
     name: 'Honeycomb',
     date: '2023-10-01',
     gl: '43-45045-232',
-    approver: 'Danny',
+    approver: {pk: -1, name: '', legal_name: ''},
     receipt: 'file.txt'
   },
   {
     name: 'Donut',
     date: '2023-10-01',
     gl: '43-45045-232',
-    approver: 'Danny',
+    approver: {pk: -1, name: '', legal_name: ''},
     receipt: 'file.txt'
   },
   {
     name: 'KitKat',
     date: '2023-10-01',
     gl: '43-45045-232',
-    approver: 'Danny',
+    approver: {pk: -1, name: '', legal_name: ''},
     receipt: 'file.txt'
   }
 ])

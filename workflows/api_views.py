@@ -338,7 +338,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             ])
             editing_salary_range = all([
                 'salary_range' in request.data,
-                request.data['salary_range'] != str(t.salary_range)
+                request.data['salary_range'] != t.salary_range
             ])
             editing_salary_step = all([
                 'salary_step' in request.data,

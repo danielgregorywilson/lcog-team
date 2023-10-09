@@ -3,11 +3,11 @@ import { loginSuperuser, loginUser, visitUrl } from '../support/helpers'
 // Cypress clears localstorage between tests, so use this to store data
 const LOCAL_STORAGE_MEMORY: { [key: string]: string } = {}
 
-describe('New employee workflow check assignments', () => {
+describe('New GS employee workflow check assignments', () => {
 
   it('Submitter logs in, creates a new employee workflow, and submits it', () => {
     // Create a new employee workflow
-    loginUser(Cypress.env('users').manager).then(() => {
+    loginUser(Cypress.env('users').gsmanager).then(() => {
       visitUrl(Cypress.env('workflows_dashboard_path'))
       cy.get('.workflowtable-new .row-add-new').click()
       cy.wait(500) // Wait for the new transition form to load
@@ -37,29 +37,14 @@ describe('New employee workflow check assignments', () => {
         cy.get('button[name="reassign-button"]').should('have.attr', 'disabled')
         cy.get('button[name="reassign-button"]').contains('Status: Not submitted')
         // Submit the form
-        cy.get('button[name="send-sds-button"]').click()
-        cy.get('button[name="send-sds-dialog-button"]').click()
-        cy.get('button[name="reassign-button"]').contains('Assigned to: Hiring Lead')
+        cy.get('button[name="send-fiscal-button"]').click()
+        cy.get('button[name="send-fiscal-dialog-button"]').click()
+        cy.get('button[name="reassign-button"]').contains('Assigned to: Fiscal')
       })
     })
   })
 
-  it ('SDS Hiring Lead sends to fiscal', () => {
-    const pk = LOCAL_STORAGE_MEMORY['workflowPK']
-    loginUser(Cypress.env('users').sdshiringlead).then(() => {
-      visitUrl(`/wf/${pk}/transition`)
-      // Can reassign
-      const reassignButton = cy.get('button[name="reassign-button"]')
-      reassignButton.should('not.have.attr', 'disabled')
-      reassignButton.contains('Assigned to: Hiring Lead')
-      // Submit the form
-      cy.get('button[name="send-fiscal-button"]').click()
-      cy.get('button[name="send-fiscal-dialog-button"]').click()
-      cy.get('button[name="reassign-button"]').contains('Assigned to: Fiscal')
-    })
-  })
-
-  it('Fiscal reassigns back to SDS Hiring Lead', () => {
+  it('Fiscal reassigns back to submitter', () => {
     const pk = LOCAL_STORAGE_MEMORY['workflowPK']
     loginUser(Cypress.env('users').fiscalemployee).then(() => {
       visitUrl(`/wf/${pk}/transition`)
@@ -70,23 +55,22 @@ describe('New employee workflow check assignments', () => {
       // Reassign to SDS Hiring Lead
       reassignButton.click()
       cy.get('button[name="reassign-dialog-assignee-dropdown"]').click()
-      cy.get('.q-menu > .q-list > .q-item').eq(1).click()
-      cy.get('textarea[name="reassign-extra-message"]').type('Reassigning to SDS Hiring Lead')
+      cy.get('.q-menu > .q-list > .q-item').first().click()
+      cy.get('textarea[name="reassign-extra-message"]').type('Reassigning to Submitter')
       cy.get('button[name="reassign-dialog-button"]').click()
       // Now cannot reassign
       cy.get('button[name="reassign-button"]').should('have.attr', 'disabled')
-      cy.get('button[name="reassign-button"]').contains('Assigned to: Hiring Lead')
+      cy.get('button[name="reassign-button"]').contains('Assigned to: GS Manager')
     })
   })
 
-  it ('SDS Hiring Lead sends to fiscal a second time', () => {
+  it ('Submitter sends to fiscal a second time', () => {
     const pk = LOCAL_STORAGE_MEMORY['workflowPK']
-    loginUser(Cypress.env('users').sdshiringlead).then(() => {
+    loginUser(Cypress.env('users').gsmanager).then(() => {
       visitUrl(`/wf/${pk}/transition`)
-      // Can reassign
-      const reassignButton = cy.get('button[name="reassign-button"]')
-      reassignButton.should('not.have.attr', 'disabled')
-      reassignButton.contains('Assigned to: Hiring Lead')
+      // Cannot reassign
+      cy.get('button[name="reassign-button"]').should('have.attr', 'disabled')
+      cy.get('button[name="reassign-button"]').contains('Assigned to: GS Manager')
       // Submit the form
       cy.get('button[name="send-fiscal-button"]').click()
       cy.get('button[name="send-fiscal-dialog-button"]').click()

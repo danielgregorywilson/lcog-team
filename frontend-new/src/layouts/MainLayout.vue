@@ -28,7 +28,7 @@
       content-class="bg-grey-1"
       :width="210"
     >
-      <q-list>        
+      <q-list>
         <q-item
           clickable
           :to="{ name: 'dashboard' }"
@@ -107,14 +107,16 @@ const router = useRouter()
 let leftDrawerOpen = ref(false)
 
 interface LinkData {
-  title: string;
-  icon: string;
-  link: string;
-  id?: string;
-  managerOnly?: boolean;
+  title: string
+  icon: string
+  link: string
+  id?: string
+  managerOnly?: boolean
   isISEmployee?: boolean
-  eligibleForTeleworkApplicationOnly?: boolean;
+  isFiscalEmployee?: boolean
+  eligibleForTeleworkApplicationOnly?: boolean
   hasWorkflowRoles?: boolean
+  canViewExpenses?: boolean
   canViewMOWRoutes?: boolean
 }
 
@@ -136,6 +138,18 @@ const navLinks: Array<LinkData> = [
     icon: 'double_arrow',
     link: '/workflows',
     hasWorkflowRoles: true
+  },
+  {
+    title: 'Credit Card Expenses',
+    icon: 'credit_card',
+    link: '/expenses',
+    canViewExpenses: true
+  },
+  {
+    title: 'Credit Card Expense Reports',
+    icon: 'request_quote',
+    link: '/expenses-review',
+    isFiscalEmployee: true
   },
   // {
   //   title: 'Performance Reviews',
@@ -178,7 +192,7 @@ const navLinks: Array<LinkData> = [
   },
 ]
 
-// For msal.js Azure/AD SSO 
+// For msal.js Azure/AD SSO
 const msalConfig: Configuration = {
   auth: {
     clientId: '2c4ec8a0-6be9-4c9c-a6b6-6a40392b8e3e',
@@ -223,7 +237,7 @@ function loginWithMicrosoft(): void {
         authStore.authWithMicrosoft({ username: account.userName, firstName, lastName })
           .then(() => router.push('/'))
           .catch((err) => console.log(err))
-      }      
+      }
     }).catch(function (error) {
         console.log(error)
     })

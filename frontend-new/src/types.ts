@@ -57,6 +57,7 @@ export interface EmployeeRetrieve {
   admin_of_workflows: Array<number>
   admin_of_processes: Array<number>
   workflow_roles: Array<number>
+  can_view_expenses: boolean
   can_view_mow_routes: boolean
   can_manage_mow_stops: boolean
 }
@@ -725,6 +726,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   date_submitted: Date
   submitter_pk: number
   submitter_name: string
+  submitter_division: string
   employee_first_name: string
   employee_middle_initial: string
   employee_last_name: string

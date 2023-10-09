@@ -143,7 +143,7 @@ export interface PerformanceReviewRetrieve {
   evaluation_opportunities: string
   evaluation_goals_manager: string
   evaluation_comments_employee: string
-  
+
   position_description_link: string
   description_reviewed_employee: boolean
   signed_position_description: string
@@ -390,7 +390,7 @@ export interface TeleworkApplicationRetrieve {
   manager_comments: string
   dependent_care_checklist_1: string
   dependent_care_documentation: string
-  
+
   program_manager_signature_0: [number, string, string, string, number, boolean]
   employee_signature_0: [number, string, string, string, number, boolean]
   employee_signature_1: [number, string, string, string, number, boolean]
@@ -398,12 +398,12 @@ export interface TeleworkApplicationRetrieve {
   program_manager_signature_1: [number, string, string, string, number, boolean]
   division_director_signature: [number, string, string, string, number, boolean]
 
-  
+
   // employee_division: string
   // employee_unit_or_program: string
   // employee_job_title: string
   // manager_pk: number
-  
+
   // days_until_review: number
   // status: string
   // period_start_date: Date
@@ -431,7 +431,7 @@ export interface TeleworkApplicationRetrieve {
   // evaluation_opportunities: string
   // evaluation_goals_manager: string
   // evaluation_comments_employee: string
-  
+
   // position_description_link: string
   // description_reviewed_employee: boolean
   // signed_position_description: string

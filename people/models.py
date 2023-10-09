@@ -76,7 +76,10 @@ class Employee(models.Model):
 
     active = models.BooleanField(default=True)
     temporary = models.BooleanField(default=False, verbose_name=_("temporary employee"), help_text="Employee is temporary or exists for test purposes. They are not present in the payroll system, but should not be deactivated.")
-    user = models.OneToOneField("auth.User", verbose_name=_("user"), on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        "auth.User", verbose_name=_("user"), on_delete=models.CASCADE,
+        related_name="employee"
+    )
     number = models.IntegerField("number", unique=True, blank=True, null=True)
     
     # User Profile Preferences
@@ -485,6 +488,13 @@ class Employee(models.Model):
         all_processes = apps.get_model('workflows', 'Process').objects.all().select_related('role')
         return [process.id for process in list(all_processes) if process.role and self in process.role.members.all()]
     
+    def can_view_expenses(self):
+        view_expenses = self.user.groups.filter(name='View Expenses').exists()
+        if view_expenses:
+            return True
+        else:
+            return False
+
     def can_view_mow_routes(self):
         view_mow_routes = self.user.groups.filter(name='View Meals on Wheels Routes').exists()
         if view_mow_routes:

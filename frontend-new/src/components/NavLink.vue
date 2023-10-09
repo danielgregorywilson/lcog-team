@@ -52,12 +52,22 @@ export default defineComponent({
       required: false,
       default: false
     },
+    isFiscalEmployee: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
     eligibleForTeleworkApplicationOnly: {
       type: Boolean,
       required: false,
       default: false
     },
     hasWorkflowRoles: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    canViewExpenses: {
       type: Boolean,
       required: false,
       default: false
@@ -72,14 +82,18 @@ export default defineComponent({
     isVisible (): boolean {
       const shouldNotViewBecauseNotManager = this.managerOnly && this.userStore.isManager
       const shouldNotViewBecauseNotISEmployee = this.isISEmployee && !this.userStore.getEmployeeProfile.is_is_employee
+      const shouldNotViewBecauseNotFiscalEmployee = this.isFiscalEmployee && !this.userStore.getEmployeeProfile.is_fiscal_employee
       const shouldNotViewBecauseNotEligibleForTeleworkApplication = this.eligibleForTeleworkApplicationOnly && !this.userStore.getEmployeeProfile.is_eligible_for_telework_application
       const shouldNotViewBecauseNoWorkflowRoles = this.hasWorkflowRoles && !this.userStore.hasWorkflowRoles
+      const shouldNotViewBecauseNoExpenseRoles = this.canViewExpenses && !this.userStore.getEmployeeProfile.can_view_expenses
       const cannotViewMealsOnWheelsRoutes = this.canViewMOWRoutes && !this.userStore.getEmployeeProfile.can_view_mow_routes
       if (
         shouldNotViewBecauseNotManager ||
         shouldNotViewBecauseNotISEmployee ||
+        shouldNotViewBecauseNotFiscalEmployee ||
         shouldNotViewBecauseNotEligibleForTeleworkApplication ||
         shouldNotViewBecauseNoWorkflowRoles ||
+        shouldNotViewBecauseNoExpenseRoles ||
         cannotViewMealsOnWheelsRoutes
       ) {
         return false

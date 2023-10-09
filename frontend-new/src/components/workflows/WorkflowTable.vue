@@ -545,12 +545,12 @@ function clickAddWorkflow(): void {
     default:
       break
   }
+}
 
-  function navigateToWorkflowTransitionForm(pk: number): void {
-    router.push({name: 'workflow-transition-form', params: {pk: pk.toString()}})
-      .catch(e => {
-        console.error('Error navigating to workflow transition form:', e)
-      })
-  }
+function navigateToWorkflowTransitionForm(pk: number): void {
+  router.push({name: 'workflow-transition-form', params: {pk: pk.toString()}})
+    .catch(e => {
+      console.error('Error navigating to workflow transition form:', e)
+    })
 }
 </script>

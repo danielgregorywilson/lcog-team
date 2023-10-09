@@ -9,8 +9,8 @@ import {
 import routes from 'src/router/routes'
 
 import {
-  canViewDeskReservationReports, canViewMealsOnWheelsRoutes,
-  canViewTimeOffRequest, isAuthenticated
+  canViewDeskReservationReports, canViewExpenses, canViewMealsOnWheelsRoutes,
+  canViewTimeOffRequest, isAuthenticated, isFiscal
 } from './guards'
 
 /*
@@ -47,13 +47,19 @@ export default route(function (/* { store, ssrContext } */) {
         return '/dashboard'
       }
     }
+    if (to.meta.requiresFiscal && !isFiscal()) {
+      return '/dashboard'
+    }
+    if (to.meta.requiresCanViewExpenses && !canViewExpenses()) {
+      return '/dashboard'
+    }
     if (to.meta.requiresMealsOnWheelsPermission && !canViewMealsOnWheelsRoutes()) {
       return '/dashboard'
     }
     if (to.meta.requiresCanViewTimeOffRequest && !canViewTimeOffRequest(to)) {
       return '/timeoff'
     }
-    
+
   })
 
   return Router

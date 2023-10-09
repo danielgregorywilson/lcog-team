@@ -26,12 +26,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('src/pages/purchases/Expenses.vue'),
         meta: { requiresAuth: true, requiresCanViewExpenses: true },
       },
-      {
-        path: 'expenses-review',
-        name: 'expenses-review',
-        component: () => import('src/pages/purchases/ExpensesReview.vue'),
-        meta: { requiresAuth: true, requiresFiscal: true },
-      },
+      // {
+      //   path: 'expenses-review',
+      //   name: 'expenses-review',
+      //   component: () => import('src/pages/purchases/ExpensesReview.vue'),
+      //   meta: { requiresAuth: true, requiresFiscal: true },
+      // },
 
       //////////////////////
       // SECURITY MESSAGE //

@@ -37,6 +37,7 @@ export const useUserStore = defineStore('user', {
       next_to_sign_prs: '',
       workflow_roles: [] as Array<number>,
       is_all_workflows_admin: false,
+      can_view_expenses: false,
       can_view_mow_routes: false,
       can_manage_mow_stops: false
     },
@@ -49,6 +50,7 @@ export const useUserStore = defineStore('user', {
     isProfileLoaded: state => !!state.profile.username,
     isManager: state => state.profile.is_manager,
     hasWorkflowRoles: state => !!state.profile.workflow_roles.length,
+    canViewExpenses: state => state.profile.can_view_expenses,
     canViewMOWRoutes: state => state.profile.can_view_mow_routes,
     canManageMOWStops: state => state.profile.can_manage_mow_stops
   },
@@ -86,6 +88,7 @@ export const useUserStore = defineStore('user', {
             this.profile.next_to_sign_prs = resp.data.next_to_sign_prs
             this.profile.workflow_roles = resp.data.workflow_roles
             this.profile.is_all_workflows_admin = resp.data.is_all_workflows_admin
+            this.profile.can_view_expenses = resp.data.can_view_expenses
             this.profile.can_view_mow_routes = resp.data.can_view_mow_routes
             this.profile.can_manage_mow_stops = resp.data.can_manage_mow_stops
             cookies.set('division', resp.data.division.toString())
@@ -103,6 +106,7 @@ export const useUserStore = defineStore('user', {
             cookies.set('telework_applications_can_view', resp.data.telework_applications_can_view.toString())
             cookies.set('time_off_requests_can_view', resp.data.time_off_requests_can_view.toString())
             cookies.set('workflow_roles', resp.data.workflow_roles.toString())
+            cookies.set('can_view_expenses', resp.data.can_view_expenses.toString())
             cookies.set('can_view_mow_routes', resp.data.can_view_mow_routes.toString())
             cookies.set('can_manage_mow_stops', resp.data.can_manage_mow_stops.toString())
 
@@ -151,6 +155,7 @@ export const useUserStore = defineStore('user', {
         cookies.remove('telework_applications_can_view')
         cookies.remove('time_off_requests_can_view')
         cookies.remove('workflow_roles')
+        cookies.remove('can_view_expenses')
         cookies.remove('can_view_mow_routes')
         cookies.remove('can_manage_mow_stops')
         resolve('Successfully triggered logout')

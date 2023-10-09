@@ -4,6 +4,23 @@
 
 export const releases = [
   {
+    version: '0.19.2',
+    date: new Date(2023, 9, 9),
+    changes: [
+      { type: 'new',
+        description: 'Add Expenses module to track employee expenses.'
+      },
+      {
+        type: 'improved',
+        description: 'Various improvements to workflows.'
+      },
+      {
+        type: 'fixed',
+        description: 'Fixed some issues with employee transitions.'
+      },
+    ]
+  },
+  {
     version: '0.19.1',
     date: new Date(2023, 8, 29),
     changes: [

@@ -623,14 +623,22 @@
             type="textarea"
             label="Extra message to include"
           />
-          <div>
+          <div class="row justify-between">
             <q-btn
               name="send-sds-dialog-button"
               label="Send"
               icon-right="send"
               type="submit"
               color="primary"
+              :disable="formErrors()"
             />
+            <div
+              v-if="formErrors()"
+              class="text-red text-bold"
+              style="width:180px;"
+            >
+              There are errors in the form. Fix before submitting.
+            </div>
           </div>
         </q-form>
       </q-card>
@@ -657,14 +665,22 @@
             type="textarea"
             label="Extra message to include"
           />
-          <div>
+          <div class="row justify-between">
             <q-btn
               name="send-fiscal-dialog-button"
               label="Send"
               icon-right="send"
               type="submit"
               color="primary"
+              :disable="formErrors()"
             />
+            <div
+              v-if="formErrors()"
+              class="text-red text-bold"
+              style="width:180px;"
+            >
+              There are errors in the form. Fix before submitting.
+            </div>
           </div>
         </q-form>
       </q-card>
@@ -691,14 +707,22 @@
             type="textarea"
             label="Extra message to include"
           />
-          <div>
+          <div class="row justify-between">
             <q-btn
               name="send-hr-dialog-button"
               label="Send"
               icon-right="send"
               type="submit"
               color="primary"
+              :disable="formErrors()"
             />
+            <div
+              v-if="formErrors()"
+              class="text-red text-bold"
+              style="width:180px;"
+            >
+              There are errors in the form. Fix before submitting.
+            </div>
           </div>
         </q-form>
       </q-card>
@@ -726,14 +750,22 @@
             type="textarea"
             label="Extra message to include"
           />
-          <div>
+          <div class="row justify-between">
             <q-btn
               name="send-stn-dialog-button"
               label="Send to STN"
               icon-right="send"
               type="submit"
               color="primary"
+              :disable="formErrors()"
             />
+            <div
+              v-if="formErrors()"
+              class="text-red text-bold"
+              style="width:180px;"
+            >
+              There are errors in the form. Fix before submitting.
+            </div>
           </div>
         </q-form>
       </q-card>
@@ -832,7 +864,7 @@
           @click="showChangesDialog = true"
         />
         <q-btn
-          v-if="showErrorButton && formErrorItems().length > 0"
+          v-if="showErrorButton && formErrors()"
           label="Show errors"
           icon="check"
           color="warning"
@@ -878,7 +910,7 @@
           @click="showSendToFiscalDialog = true"
         />
         <q-btn
-          v-else-if="canEditOtherFields()"
+          v-else-if="canSendToHiringLeads()"
           name="send-sds-button"
           class="q-ml-sm"
           color="white"
@@ -986,6 +1018,7 @@ let type = ref('')
 let dateSubmitted = ref(new Date())
 let submitterPk = ref(-1)
 let submitterName = ref('')
+let submitterDivision = ref('')
 let employeeFirstNameCurrentVal = ref('')
 let employeeFirstName = ref('')
 let employeeMiddleInitialCurrentVal = ref('')
@@ -1076,16 +1109,30 @@ let assigneeCurrentVal = ref('')
 let assignee = ref('')
 
 function assigneeOptions() {
-  if (assigneeCurrentVal.value == 'Hiring Lead') {
-    return ['Submitter', 'Hiring Lead']
-  } else if (assigneeCurrentVal.value == 'Fiscal') {
-    return ['Submitter', 'Hiring Lead', 'Fiscal']
-  } else if (assigneeCurrentVal.value == 'HR') {
-    return ['Submitter', 'Hiring Lead', 'Fiscal', 'HR']
-  } else if (assigneeCurrentVal.value == 'Complete') {
-    return ['Submitter', 'Hiring Lead', 'Fiscal', 'HR', 'Complete']
+  if (submitterDivision.value == 'Senior & Disability Services') {
+    if (assigneeCurrentVal.value == 'Hiring Lead') {
+      return ['Submitter', 'Hiring Lead']
+    } else if (assigneeCurrentVal.value == 'Fiscal') {
+      return ['Submitter', 'Hiring Lead', 'Fiscal']
+    } else if (assigneeCurrentVal.value == 'HR') {
+      return ['Submitter', 'Hiring Lead', 'Fiscal', 'HR']
+    } else if (assigneeCurrentVal.value == 'Complete') {
+      return ['Submitter', 'Hiring Lead', 'Fiscal', 'HR', 'Complete']
+    } else {
+      return []
+    }
   } else {
-    return []
+    if (assigneeCurrentVal.value == 'Hiring Lead') {
+      return ['Submitter']
+    } else if (assigneeCurrentVal.value == 'Fiscal') {
+      return ['Submitter', 'Fiscal']
+    } else if (assigneeCurrentVal.value == 'HR') {
+      return ['Submitter', 'Fiscal', 'HR']
+    } else if (assigneeCurrentVal.value == 'Complete') {
+      return ['Submitter', 'Fiscal', 'HR', 'Complete']
+    } else {
+      return []
+    }
   }
 }
 
@@ -1126,6 +1173,10 @@ let sendDialogMessage = ref('')
 let sendDialogUpdate = ref(false)
 let reassignDialogMessage = ref('')
 
+function formErrors() {
+  return formErrorItems().length > 0
+}
+
 ////////////////////////////
 // Retrieve/Modify/Submit //
 ////////////////////////////
@@ -1141,6 +1192,7 @@ function retrieveEmployeeTransition() {
     dateSubmitted.value = t.date_submitted
     submitterPk.value = t.submitter_pk
     submitterName.value = t.submitter_name
+    submitterDivision.value = t.submitter_division
 
     employeeFirstName.value = t.employee_first_name
     employeeFirstNameCurrentVal.value = employeeFirstName.value
@@ -1241,7 +1293,7 @@ function retrieveEmployeeTransition() {
 
     changes.value = t.changes
 
-    if (formErrorItems().length > 0) {
+    if (formErrors()) {
       showErrorButton.value = true
     }
     resolve('Retrieved employee transition')
@@ -1395,6 +1447,7 @@ function updateTransition() {
       dateSubmitted.value = t.date_submitted
       submitterPk.value = t.submitter_pk
       submitterName.value = t.submitter_name
+      submitterDivision.value = t.submitter_division
 
       employeeFirstNameCurrentVal.value = t.employee_first_name
       employeeMiddleInitialCurrentVal.value = t.employee_middle_initial
@@ -1461,7 +1514,7 @@ function updateTransition() {
           })
       }
 
-      if (formErrorItems().length > 0) {
+      if (formErrors()) {
         showErrorButton.value = true
       }
 
@@ -1574,8 +1627,9 @@ function canEditOtherFields() {
     cookies.get('is_sds_hiring_lead') == 'true'
 }
 
+// Can only update the assignee if there is an assignee that is not the
+// submitter and the current user is in the assignee group.
 function canUpdateAssignee() {
-  // TODO
   const assignee = assigneeCurrentVal.value
   if (assignee == 'Submitter') {
     return false // No one to assign back to
@@ -1590,22 +1644,34 @@ function canUpdateAssignee() {
   } else {
     return false
   }
-  return true
+}
+
+function canSendToHiringLeads() {
+  return assigneeCurrentVal.value == 'Submitter' && employeeIsSubmitter() &&
+    cookies.get('division') == 'Senior & Disability Services'
 }
 
 function canSendToFiscal() {
   // GS employees send to fiscal. SDS managers send to SDS hiring leads.
   const division = cookies.get('division')
   const isGSSubmitter = employeeIsSubmitter() && division != 'Senior & Disability Services'
-  return cookies.get('is_sds_hiring_lead') == 'true' || isGSSubmitter
+  const isHiringLeadAndAssignee = assigneeCurrentVal.value == 'Hiring Lead' &&
+    cookies.get('is_sds_hiring_lead') == 'true'
+  const isGSSubmitterAndAssignee = assigneeCurrentVal.value == 'Submitter' &&
+    isGSSubmitter
+  return isHiringLeadAndAssignee || isGSSubmitterAndAssignee
 }
 
 function canSendToHR() {
-  return cookies.get('is_fiscal_employee') == 'true'
+  return assigneeCurrentVal.value == 'Fiscal' &&
+    cookies.get('is_fiscal_employee') == 'true'
+
 }
 
 function canSendToTransitionNews() {
-  return cookies.get('is_hr_employee') == 'true'
+  return assigneeCurrentVal.value == 'HR' &&
+    cookies.get('is_hr_employee') == 'true'
+
 }
 
 ////////////////////////

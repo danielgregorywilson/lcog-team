@@ -22,6 +22,15 @@ export function canViewDeskReservationReports(): Promise<boolean> {
     })
 }
 
+export function canViewExpenses() {
+  if (cookies.get('can_view_expenses') == 'true') {
+    return true
+  } else {
+    console.info('User cannot view Expenses. Redirecting to dashboard.')
+    return false
+  }
+}
+
 export function canViewMealsOnWheelsRoutes() {
   if (cookies.get('can_view_mow_routes') == 'true') {
     return true
@@ -40,6 +49,15 @@ export function canViewTimeOffRequest(to: RouteLocationNormalized) {
   ) {
     return true
   } else {
+    return false
+  }
+}
+
+export function isFiscal() {
+  if (cookies.get('is_fiscal_employee') == 'true') {
+    return true
+  } else {
+    console.info('User is not fiscal employee. Redirecting to dashboard.')
     return false
   }
 }

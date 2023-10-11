@@ -61,14 +61,13 @@
           </q-td>
           <q-td key="receipt" :props="props">
             {{ props.row.receipt }}
-            <q-popup-edit v-model="props.row.receipt" buttons v-slot="scope">
+            <q-popup-edit v-model="props.row.receipt" buttons>
               <FileUploader
-                name="receipt"
                 label="Receipt"
-                v-model="props.row.receipt"
-                class="q-mr-md"
+                :file="props.row.receipt"
+                contentTypeAppLabel="purchases"
+                contentTypeModel="expense"
                 :readOnly=false
-                @keyup.enter="scope.set()"
               />
             </q-popup-edit>
           </q-td>

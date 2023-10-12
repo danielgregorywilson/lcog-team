@@ -332,21 +332,26 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             user_is_hiring_manager = request.user.employee == t.manager
             user_is_hr = request.user.employee.is_hr_employee
             user_is_fiscal = request.user.employee.is_fiscal_employee
+            user_is_sds_hiring_lead = request.user.employee.is_sds_hiring_lead
             user_can_edit_salary = any([
                 user_is_submitter, user_is_hiring_manager, user_is_hr,
-                user_is_fiscal
+                user_is_fiscal, user_is_sds_hiring_lead
             ])
-            editing_salary_range = all([
-                'salary_range' in request.data,
-                request.data['salary_range'] != t.salary_range
-            ])
+            if request.data['salary_range'] == None and t.salary_range == None:
+                editing_salary_range = False
+            else:
+                editing_salary_range = all([
+                    'salary_range' in request.data,
+                    request.data['salary_range'] != str(t.salary_range)
+                ])
             editing_salary_step = all([
                 'salary_step' in request.data,
                 request.data['salary_step'] != t.salary_step
             ])
             editing_salary = editing_salary_range or editing_salary_step
             if editing_salary and not user_can_edit_salary:
-                message = 'Only the hiring manager, fiscal, or HR can edit salary fields.'
+                message = 'Only the submitter, hiring manager, fiscal, HR, \
+                    or hiring leads can edit salary fields.'
                 record_error(message, None, request, traceback.format_exc())
                 return Response(
                     data=message,

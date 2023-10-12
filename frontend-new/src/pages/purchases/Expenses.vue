@@ -6,6 +6,7 @@
       <q-btn color="secondary" icon="west" @click="monthBackward()"/>
       <q-btn color="secondary" icon="east" @click="monthForward()"/>
     </q-btn-group>
+    <q-btn @click="showSubmitToFiscalDialog = true">Submit to Fiscal</q-btn>
   </div>
   <q-spinner-grid
     v-if="!calendarLoaded"
@@ -82,6 +83,41 @@
       </template>
     </q-table>
   </div>
+
+  <!-- Submit to Fiscal Dialog -->
+  <q-dialog v-model="showSubmitToFiscalDialog">
+      <q-card class="q-pa-md" style="width: 400px">
+        <div class="text-h6">Submit {{monthDisplay()}} expenses to Fiscal?</div>
+        <q-form
+          @submit='onSubmitFiscalDialog()'
+          class="q-gutter-md"
+        >
+          <q-input
+            v-model="sendDialogMessage"
+            filled
+            type="textarea"
+            label="Extra message to include"
+          />
+          <div class="row justify-between">
+            <q-btn
+              name="send-fiscal-dialog-button"
+              label="Send"
+              icon-right="send"
+              type="submit"
+              color="primary"
+              :disable="formErrors()"
+            />
+            <!-- <div
+              v-if="formErrors()"
+              class="text-red text-bold"
+              style="width:180px;"
+            >
+              There are errors in the form. Fix before submitting.
+            </div> -->
+          </div>
+        </q-form>
+      </q-card>
+    </q-dialog>
 </q-page>
 </template>
 
@@ -99,6 +135,8 @@ type TimeOffCalendarData = Array<{date: string, isToday: boolean, requests: Arra
 const timeOffStore = useTimeOffStore()
 
 let calendarLoaded = ref(true)
+let showSubmitToFiscalDialog = ref(false)
+let sendDialogMessage = ref('')
 
 let today = ref(new Date())
 let firstOfThisMonth = ref(new Date())
@@ -129,68 +167,26 @@ const rows = ref([
     name: 'Frozen Yogurt',
     date: '2023-10-01',
     gl: '43-45045-232',
-    approver: { "pk": 5, "name": "Dan Wilson", "legal_name": "Daniel Wilson" },
+    approver: { 'pk': 5, 'name': 'Dan Wilson', 'legal_name': 'Daniel Wilson' },
     receipt: 'file.txt'
   },
   {
     name: 'Ice cream sandwich',
-    date: '2023-10-01',
-    gl: '43-45045-232',
+    date: '2023-10-04',
+    gl: '55-55555-555',
     approver: {pk: -1, name: '', legal_name: ''},
     receipt: 'file.txt'
   },
   {
     name: 'Eclair',
-    date: '2023-10-01',
-    gl: '43-45045-232',
+    date: '2023-10-07',
+    gl: '12-34567-890',
     approver: {pk: -1, name: '', legal_name: ''},
     receipt: 'file.txt'
   },
   {
     name: 'Cupcake',
-    date: '2023-10-01',
-    gl: '43-45045-232',
-    approver: {pk: -1, name: '', legal_name: ''},
-    receipt: 'file.txt'
-  },
-  {
-    name: 'Gingerbread',
-    date: '2023-10-01',
-    gl: '43-45045-232',
-    approver: {pk: -1, name: '', legal_name: ''},
-    receipt: 'file.txt'
-  },
-  {
-    name: 'Jelly bean',
-    date: '2023-10-01',
-    gl: '43-45045-232',
-    approver: {pk: -1, name: '', legal_name: ''},
-    receipt: 'file.txt'
-  },
-  {
-    name: 'Lollipop',
-    date: '2023-10-01',
-    gl: '43-45045-232',
-    approver: {pk: -1, name: '', legal_name: ''},
-    receipt: 'file.txt'
-  },
-  {
-    name: 'Honeycomb',
-    date: '2023-10-01',
-    gl: '43-45045-232',
-    approver: {pk: -1, name: '', legal_name: ''},
-    receipt: 'file.txt'
-  },
-  {
-    name: 'Donut',
-    date: '2023-10-01',
-    gl: '43-45045-232',
-    approver: {pk: -1, name: '', legal_name: ''},
-    receipt: 'file.txt'
-  },
-  {
-    name: 'KitKat',
-    date: '2023-10-01',
+    date: '2023-10-07',
     gl: '43-45045-232',
     approver: {pk: -1, name: '', legal_name: ''},
     receipt: 'file.txt'
@@ -277,6 +273,68 @@ function clickAddExpense(): void {
     approver: '',
     receipt: ''
   })
+
+function formErrorItems(): Array<[string, string]> {
+  let errorItems: Array<[string, string]> = []
+  // if (computerTypeCurrentVal.value == 'New' && !computerGLCurrentVal.value) {
+  //   errorItems.push(
+  //     ['computer-type', 'Provide a valid GL code for computer purchase']
+  //   )
+  // }
+  // if (
+  //   computerTypeCurrentVal.value == 'Repurposed' &&
+  //   !computerDescriptionCurrentVal.value
+  // ) {
+  //   errorItems.push(
+  //     ['computer-type', 'Provide a description of existing computer']
+  //   )
+  // }
+  return errorItems
+}
+
+function formErrors() {
+  return formErrorItems().length > 0
+}
+
+function onSubmitFiscalDialog() {
+  const extraMessage = type == 'ASSIGN' ? reassignDialogMessage.value : sendDialogMessage.value
+  workflowsStore.sendTransitionToEmailList(transitionPk.value, {
+    type: type,
+    reassignTo: assignee.value,
+    update: sendDialogUpdate.value,
+    extraMessage,
+    senderName: userStore.getEmployeeProfile.name,
+    senderEmail: userStore.getEmployeeProfile.email,
+    transitionUrl: route.fullPath
+  })
+    .then(() => {
+      quasar.notify({
+        message: 'Sent',
+        color: 'positive',
+        icon: 'send'
+      })
+      showSendToSDSHiringLeadsDialog.value = false
+      showSendToFiscalDialog.value = false
+      showSendToHRDialog.value = false
+      showSendToSTNDialog.value = false
+      showAssigneeDialog.value = false
+      sendDialogUpdate.value = false
+      sendDialogMessage.value = ''
+      reassignDialogMessage.value = ''
+      // Signal to WorkflowInstanceDetail that the transition was assigned or
+      // completed, in which case we need to get the newly created process
+      // instances.
+      bus.emit('transitionReassigned', Math.random())
+    })
+    .catch(e => {
+      console.error('Error sending email', e)
+      quasar.notify({
+        message: 'Error sending email',
+        color: 'negative',
+        icon: 'report_problem'
+      })
+    })
+}
 
   // workflowsStore.createNewEmployeeOnboarding()
   //   .then((wfi) => {

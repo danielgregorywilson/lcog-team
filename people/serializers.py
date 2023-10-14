@@ -300,13 +300,6 @@ class PerformanceReviewFileUploadSerializer(serializers.HyperlinkedModelSerializ
         ]
 
 
-class FileUploadSerializer(serializers.Serializer):
-    file_upload = serializers.FileField()
-
-    class Meta:
-        fields = ['file_upload']
-
-
 class SignatureSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Signature

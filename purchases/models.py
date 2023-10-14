@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from people.models import Employee
 
@@ -87,3 +88,7 @@ class PurchaseRequest(models.Model):
         if not self.pk:
             self.status = self.PR_STATUS_REQUESTED
         super().save(*args, **kwargs)
+
+
+class Expense(models.Model):
+    receipt = models.FileField(_("receipt"), upload_to="uploads/expenses", blank=True, null=True)

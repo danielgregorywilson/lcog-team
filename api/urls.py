@@ -4,11 +4,13 @@ from rest_framework.authtoken.views import obtain_auth_token
 from django.urls import include, path
 
 from deskreservation.api_views import DeskReservationViewSet, DeskViewSet
-from mainsite.api_views import TrustedIPViewSet, SecurityMessageViewSet
+from mainsite.api_views import (
+    FileUploadViewSet, SecurityMessageViewSet, TrustedIPViewSet
+)
 from mainsite.views import obtain_auth_token_without_password
 from meals.api_views import AddressLatLong, MealStopViewSet
 from people.api_views import (
-    CurrentUserView, EmployeeViewSet, FileUploadViewSet, GroupViewSet,
+    CurrentUserView, EmployeeViewSet, GroupViewSet,
     JobTitleViewSet, PerformanceReviewViewSet, ReviewNoteViewSet,
     SignatureViewSet, TeleworkApplicationFileUploadViewSet,
     TeleworkApplicationViewSet, TeleworkSignatureViewSet, UnitViewSet,

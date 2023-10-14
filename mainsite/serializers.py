@@ -34,6 +34,13 @@ class TrustedIPSerializer(serializers.Serializer):
     address = serializers.CharField(label=_("address"))
 
 
+class FileUploadSerializer(serializers.Serializer):
+    file_upload = serializers.FileField()
+
+    class Meta:
+        fields = ['file_upload']
+
+
 class SecurityMessageSerializer(serializers.ModelSerializer):
 
     class Meta:

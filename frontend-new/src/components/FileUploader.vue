@@ -2,6 +2,7 @@
 <q-uploader
   ref="fileuploader"
   url=""
+  @added="file_selected"
   max-file-size="20000000"
   @rejected="rejectFileTooLarge"
   style="max-width: 300px"
@@ -52,7 +53,9 @@
 </template>
 
 <script setup lang="ts">
+import axios from 'axios'
 import { onMounted, onUpdated, ref } from 'vue'
+import { apiURL, handlePromiseError } from 'src/stores/index'
 
 let selectedFile = ref(new File([''], ''))
 let fileTooLarge = ref(false)
@@ -61,20 +64,22 @@ let fileSuccessfullyUploaded = ref(false)
 
 // const emptyEmployee = {pk: -1, name: '', legal_name: ''}
 
-// const props = defineProps<{
-//   label: string,
-//   employee: SimpleEmployeeRetrieve,
-//   useLegalName: boolean
-//   readOnly: boolean
-// }>()
+const props = defineProps<{
+  label: string,
+  file: File,
+  contentTypeAppLabel: string,
+  contentTypeModel: string,
+  objectPk?: string,
+  readOnly: boolean
+}>()
 
 // const emit = defineEmits<{
 //   (e: 'clear'): void
 //   (e: 'input', arg: SimpleEmployeeRetrieve): void
 // }>()
 
-function file_selected(file: Array<File>) {
-  selectedFile.value = file[0];
+function file_selected(files: Array<File>) {
+  selectedFile.value = files[0];
 }
 
 function rejectFileTooLarge() {
@@ -84,8 +89,17 @@ function rejectFileTooLarge() {
 
 function uploadFile() {
   let fd = new FormData();
-  fd.append('pk', this.prPk)
-  fd.append('file', this.selectedFile)
+  fd.append('content_type_app_label', props.contentTypeAppLabel)
+  fd.append('content_type_model', props.contentTypeModel)
+  fd.append('object_pk', props.objectPk || '')
+  fd.append('file', selectedFile.value)
+  doUpload(fd).then(() => {
+    console.log('success')
+  }).catch(() => {
+    console.log('error')
+  })
+
+
 
   // PerformanceReviewDataService.uploadSignedPositionDescription(fd)
   //   .then((response: FileUploadDescriptionUploadServerResponse) => {
@@ -103,6 +117,18 @@ function uploadFile() {
   //   .catch(e => {
   //     console.error('Error uploading signed position description:', e)
   //   })
+}
+
+function doUpload(data: FormData): Promise<any> {
+  return new Promise((resolve, reject) => {
+    axios({ url: `${ apiURL }api/v1/fileupload`, method: 'POST', data })
+      .then((resp) => {
+        resolve(resp.data)
+      })
+      .catch(e => {
+        handlePromiseError(reject, 'Error uploading file', e)
+      })
+  })
 }
 
 onMounted(() => {

@@ -16,14 +16,15 @@ from mainsite.helpers import (
     send_signature_email_to_executive_director,
     send_signature_email_to_hr_manager, send_signature_email_to_manager
 )
+from mainsite.serializers import FileUploadSerializer
 from people.models import (
     Employee, JobTitle, PerformanceReview, ReviewNote, Signature,
     TeleworkApplication, TeleworkSignature, UnitOrProgram,
     ViewedSecurityMessage
 )
 from people.serializers import (
-    EmployeeSerializer, EmployeeEmailSerializer, FileUploadSerializer,
-    GroupSerializer, JobTitleSerializer, PerformanceReviewFileUploadSerializer,
+    EmployeeSerializer, EmployeeEmailSerializer, GroupSerializer,
+    JobTitleSerializer, PerformanceReviewFileUploadSerializer,
     PerformanceReviewSerializer, ReviewNoteSerializer, SignatureSerializer,
     SimpleEmployeeSerializer, TeleworkApplicationFileUploadSerializer,
     TeleworkApplicationSerializer, TeleworkSignatureSerializer, UnitSerializer,
@@ -313,7 +314,7 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
         return Response(serialized_review.data)
 
 
-class FileUploadViewSet(viewsets.ViewSet):
+class PRFileUploadViewSet(viewsets.ViewSet):
     serializer_class = FileUploadSerializer
     # permission_classes = [IsAuthenticated]
 

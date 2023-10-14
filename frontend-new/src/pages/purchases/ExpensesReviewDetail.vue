@@ -1,13 +1,15 @@
 <template>
 <q-page class="q-pa-md">
-  <div class="q-gutter-md">
+  <div class="row q-gutter-md">
     <q-btn @click="setThisMonth()">This Month</q-btn>
     <q-btn-group>
       <q-btn color="secondary" icon="west" @click="monthBackward()"/>
       <q-btn color="secondary" icon="east" @click="monthForward()"/>
     </q-btn-group>
-    <q-btn v-if="submitted" @click="showUnsubmitDialog = true">Unsubmit</q-btn>
-    <q-btn v-else @click="showSubmitToFiscalDialog = true">Submit to Fiscal</q-btn>
+    <div>
+      <q-icon v-if="approved" color="green" name="check_circle" size="lg" class="q-mr-sm" />
+      <q-icon v-else-if="denied" color="red" name="cancel" size="lg" class="q-mr-sm" />
+    </div>
   </div>
   <q-spinner-grid
     v-if="!calendarLoaded"
@@ -18,7 +20,7 @@
   <div v-else class="q-mt-lg">
     <q-table
       flat bordered
-      :title="monthDisplay()"
+      :title="tableTitleDisplay()"
       :rows="rows"
       :columns="columns"
       row-key="name"
@@ -27,112 +29,71 @@
       class="expense-table"
     >
       <template v-slot:body="props">
-        <q-tr :props="props" :class="submitted?'bg-grey':''">
+        <q-tr :props="props">
           <q-td key="name" :props="props">
             {{ props.row.name }}
-            <q-popup-edit v-if="!submitted" v-model="props.row.name" buttons v-slot="scope">
-              <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
-            </q-popup-edit>
           </q-td>
           <q-td key="date" :props="props">
             {{ readableDate(props.row.date) }}
-            <q-popup-edit v-if="!submitted" v-model="props.row.date" buttons v-slot="scope">
-              <q-input type="date" v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
-            </q-popup-edit>
           </q-td>
           <q-td key="gl" :props="props">
             <div class="text-pre-wrap">{{ props.row.gl }}</div>
-            <q-popup-edit v-if="!submitted" v-model="props.row.gl" buttons v-slot="scope">
-              <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
-            </q-popup-edit>
           </q-td>
           <q-td key="approver" :props="props">
             {{ props.row.approver.name }}
-            <q-popup-edit v-if="!submitted" v-model="props.row.approver" buttons v-slot="scope">
-              <EmployeeSelect
-                name="approver"
-                label="Approver"
-                :employee="props.row.approver"
-                :useLegalName="true"
-                v-on:input="props.row.approver=$event"
-                v-on:clear="props.row.approver=EmployeeSelect.emptyEmployee"
-                class="q-mr-md"
-                :readOnly=false
-                @keyup.enter="scope.set()"
-              />
-            </q-popup-edit>
           </q-td>
           <q-td key="receipt" :props="props">
             {{ props.row.receipt }}
-            <q-popup-edit v-if="!submitted" v-model="props.row.receipt" buttons>
-              <FileUploader
-                label="Receipt"
-                :file="props.row.receipt"
-                contentTypeAppLabel="purchases"
-                contentTypeModel="expense"
-                :readOnly=false
-              />
-            </q-popup-edit>
-          </q-td>
-        </q-tr>
-      </template>
-      <template v-slot:bottom-row v-if="!submitted">
-        <q-tr @click="clickAddExpense()" class="cursor-pointer row-add-new">
-          <q-td colspan="100%">
-            <q-icon name="add" size="md" class="q-pr-sm"/>New Expense
           </q-td>
         </q-tr>
       </template>
     </q-table>
+    <div class="q-mt-sm q-gutter-md">
+      <q-btn :class="approved?'bg-green':''" @click="showApproveDialog = true">Approve Expenses</q-btn>
+      <q-btn :class="denied?'bg-red':''" @click="showDenyDialog = true">Deny Expenses</q-btn>
+    </div>
   </div>
 
-  <!-- Submit to Fiscal Dialog -->
-  <q-dialog v-model="showSubmitToFiscalDialog">
+  <!-- Approve Dialog -->
+  <q-dialog v-model="showApproveDialog">
     <q-card class="q-pa-md" style="width: 400px">
-      <div class="text-h6">Submit {{monthDisplay()}} expenses to Fiscal?</div>
+      <div class="text-h6">Approve {{monthDisplay()}} expenses for {{ employeeName }}?</div>
       <q-form
-        @submit='onSubmitFiscalDialog()'
+        @submit='onSubmitApproveDialog()'
         class="q-gutter-md"
       >
-        <q-input
-          v-model="sendDialogMessage"
-          filled
-          type="textarea"
-          label="Extra message to include"
-        />
         <div class="row justify-between">
           <q-btn
-            name="send-fiscal-dialog-button"
-            label="Send"
-            icon-right="send"
+            name="approve-dialog-button"
+            label="Approve"
+            icon-right="check"
             type="submit"
             color="primary"
-            :disable="formErrors()"
           />
-          <!-- <div
-            v-if="formErrors()"
-            class="text-red text-bold"
-            style="width:180px;"
-          >
-            There are errors in the form. Fix before submitting.
-          </div> -->
         </div>
       </q-form>
     </q-card>
   </q-dialog>
 
-  <!-- Unsubmit Dialog -->
-  <q-dialog v-model="showUnsubmitDialog">
+  <!-- Deny Dialog -->
+  <q-dialog v-model="showDenyDialog">
     <q-card class="q-pa-md" style="width: 400px">
-      <div class="text-h6">Unsubmit {{monthDisplay()}} expenses?</div>
+      <div class="text-h6">Deny {{monthDisplay()}} expenses for {{ employeeName }}?</div>
       <q-form
-        @submit='onUnsubmitDialog()'
+        @submit='onSubmitDenyDialog()'
         class="q-gutter-md"
       >
+        <q-input
+          v-model="denyDialogMessage"
+          filled
+          type="textarea"
+          label="Message to include"
+          :rules="[ val => val && val.length > 0 || 'Must include a message']"
+        />
         <div class="row justify-between">
           <q-btn
-            name="unsubmit-dialog-button"
-            label="Unsubmit"
+            name="deny-dialog-button"
+            label="Send"
             icon-right="cancel"
             type="submit"
             color="primary"
@@ -141,6 +102,8 @@
       </q-form>
     </q-card>
   </q-dialog>
+
+
 </q-page>
 </template>
 
@@ -164,12 +127,14 @@ type Expense = {date: string, isToday: boolean}
 const quasar = useQuasar()
 const timeOffStore = useTimeOffStore()
 
-let submitted = ref(false)
+let approved = ref(false)
+let denied = ref(false)
 let calendarLoaded = ref(true)
-let showSubmitToFiscalDialog = ref(false)
-let sendDialogMessage = ref('')
-let showUnsubmitDialog = ref(false)
+let showApproveDialog = ref(false)
+let showDenyDialog = ref(false)
+let denyDialogMessage = ref('')
 
+let employeeName = 'Dan Wilson'
 let today = ref(new Date())
 let firstOfThisMonth = ref(new Date())
 let firstOfSelectedMonth = ref(new Date())
@@ -263,6 +228,10 @@ function monthDisplay(): string {
   return `${firstOfSelectedMonth.value.toLocaleDateString('en-us', { month: 'long' })} ${firstOfSelectedMonth.value.getFullYear()}`
 }
 
+function tableTitleDisplay(): string {
+  return `${monthDisplay()} expenses for ${employeeName}`
+}
+
 // TODO: This currently gets all time off; should probably just get for a period
 function retrieveTeamTimeOff(): void {
   timeOffStore.getTeamTimeOffRequests()
@@ -298,39 +267,7 @@ function monthForward() {
     : new Date(firstOfSelectedMonth.value.getFullYear(), firstOfSelectedMonth.value.getMonth() + 1, 1)
 }
 
-function clickAddExpense(): void {
-  rows.value.push({
-    name: '',
-    date: '',
-    gl: '',
-    approver: '',
-    receipt: ''
-  })
-}
-
-function formErrorItems(): Array<[string, string]> {
-  let errorItems: Array<[string, string]> = []
-  // if (computerTypeCurrentVal.value == 'New' && !computerGLCurrentVal.value) {
-  //   errorItems.push(
-  //     ['computer-type', 'Provide a valid GL code for computer purchase']
-  //   )
-  // }
-  // if (
-  //   computerTypeCurrentVal.value == 'Repurposed' &&
-  //   !computerDescriptionCurrentVal.value
-  // ) {
-  //   errorItems.push(
-  //     ['computer-type', 'Provide a description of existing computer']
-  //   )
-  // }
-  return errorItems
-}
-
-function formErrors() {
-  return formErrorItems().length > 0
-}
-
-function onSubmitFiscalDialog() {
+function onSubmitApproveDialog() {
   // const extraMessage = type == 'ASSIGN' ? reassignDialogMessage.value : sendDialogMessage.value
   // workflowsStore.sendTransitionToEmailList(transitionPk.value, {
   //   type: type,
@@ -368,23 +305,24 @@ function onSubmitFiscalDialog() {
   //       icon: 'report_problem'
   //     })
   //   })
-  showSubmitToFiscalDialog.value = false
-  submitted.value = true
-  rows.value.forEach(row => row.submitted = true)
+  showApproveDialog.value = false
+  approved.value = true
+  denied.value = false
   quasar.notify({
-    message: 'Sent',
+    message: 'Approved',
     color: 'positive',
     icon: 'send'
   })
 }
 
-function onUnsubmitDialog() {
-  showUnsubmitDialog.value = false
-  submitted.value = false
-  rows.value.forEach(row => row.submitted = false)
+function onSubmitDenyDialog() {
+  showDenyDialog.value = false
+  approved.value = false
+  denied.value = true
+  denyDialogMessage.value = ''
   quasar.notify({
-    message: 'Unsubmitted',
-    color: 'positive',
+    message: 'Denied',
+    color: 'negative',
     icon: 'cancel'
   })
 }

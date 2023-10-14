@@ -4,6 +4,23 @@
 
 export const releases = [
   {
+    version: '0.20.0',
+    date: new Date(2023, 9, 13),
+    changes: [
+      {
+        type: 'new',
+        description: 'Demo credit card reimbursements pages.'
+      },
+      { type: 'new',
+        description: 'View floor plan map in employee transition form.'
+      },
+      {
+        type: 'fix',
+        description: 'Fixes to employee transition form.'
+      },
+    ]
+  },
+  {
     version: '0.19.2',
     date: new Date(2023, 9, 9),
     changes: [
@@ -15,7 +32,7 @@ export const releases = [
         description: 'Various improvements to workflows.'
       },
       {
-        type: 'fixed',
+        type: 'fix',
         description: 'Fixed some issues with employee transitions.'
       },
     ]

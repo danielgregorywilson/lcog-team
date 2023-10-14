@@ -278,6 +278,17 @@
       />
     </div>
     <div class="row">
+      <q-btn
+        v-if="showMapButton()"
+        square
+        icon="map"
+        color="primary"
+        flat
+        class="q-mr-sm"
+        @click="navigateToMap()"
+      >
+        <q-tooltip>Map</q-tooltip>
+      </q-btn>
       <q-select
         name="office-location"
         v-model="officeLocation"
@@ -1787,6 +1798,31 @@ function handlePrint() {
           })
       })
   }
+}
+
+function showMapButton() {
+  return [
+    'Schaefers - 1st Floor', 'Schaefers - 2nd Floor', 'Schaefers - 3rd Floor'
+  ].indexOf(officeLocation.value) != -1
+}
+
+function navigateToMap() {
+  let route = ''
+  switch(officeLocation.value) {
+    case 'Schaefers - 1st Floor':
+      route = 'schaefers/1'
+      break
+    case 'Schaefers - 2nd Floor':
+      route = 'schaefers/2'
+      break
+    case 'Schaefers - 3rd Floor':
+      route = 'schaefers/3'
+      break
+    default:
+      return
+  }
+  const url = `/desk-reservation/${route}`
+  window.open(url, '_blank')
 }
 
 ////////////////////////

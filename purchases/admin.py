@@ -1,6 +1,8 @@
 from django.contrib import admin
 
-from .models import PurchaseCategory, PurchaseObject, PurchaseRequest, Role
+from .models import (
+    Expense, PurchaseCategory, PurchaseObject, PurchaseRequest, Role
+)
 
 
 @admin.register(Role)
@@ -23,4 +25,11 @@ class PurchaseObjectAdmin(admin.ModelAdmin):
 class PurchaseRequestAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'request_for', 'purchase_object', 'name', 'quantity', 'status'
+    )
+
+
+@admin.register(Expense)
+class ExpenseAdmin(admin.ModelAdmin):
+    list_display = (
+        'id', 'receipt'
     )

@@ -124,11 +124,13 @@
         :disable="!canEditOtherFields()"
       />
       <q-input
+        v-if="type!='Exit'"
         v-model="fte"
         name="fte"
         label="FTE"
         class="q-mr-md"
         :readonly="!canEditOtherFields()"
+        :rules="[val => decimalNumberRegex.test(val) || 'Must be a number']"
       />
       <q-checkbox
         v-model="bilingual"
@@ -1014,6 +1016,8 @@ const languageOptions = [
   'Thai', 'Turkish', 'Urdu', 'Vietnamese', 'Welsh', 'Xhosa', 'Zulu',
 ]
 
+const decimalNumberRegex = /^[+-]?(([1-9][0-9]*)?[0-9](\.[0-9]*)?|\.[0-9]+)$/
+
 const props = defineProps<{
   print?: boolean
 }>()
@@ -1378,6 +1382,9 @@ function valuesAreChanged(): boolean {
 function updateTransition() {
   return new Promise((resolve, reject) => {
     // Clean fields
+    if (!fte.value) {
+      fte.value = '0'
+    }
     if (!bilingual.value) {
       secondLanguage.value = ''
     }

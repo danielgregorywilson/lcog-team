@@ -415,7 +415,7 @@
         :readonly="!canEditOtherFields()"
       />
     </div>
-    <div class="row">
+    <div class="row items-center">
       <q-checkbox
         id="desk-phone-needed"
         v-model="deskPhone"
@@ -423,6 +423,12 @@
         class="q-mr-md"
         :disable="!canEditOtherFields()"
       />
+      <div
+        v-if="deskPhone && officeLocation.indexOf('PPB') != -1"
+        class="text-red"
+      >
+        Telecom: Add to PPB Paging Alert System
+      </div>
     </div>
     <div class="row">
       <q-input

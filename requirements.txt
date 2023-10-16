@@ -1,7 +1,7 @@
 asgiref==3.6.0
 # backports.zoneinfo==0.2.1  # TODO: Removed this on rebuild upgrade Python 3.10 - 3.11: Breaks, but maybe I don't need it?
-boto3==1.26.88               # For AWS deployment
-botocore==1.29.88
+boto3==1.28.38               # For AWS deployment
+botocore==1.31.64
 channels==3.0.4              # Websockets for Django - for use on desk reservation kiosk app
 channels-redis==3.3.1        # Redis channel layer for Django Channels - for use on desk reservation kiosk app
 daphne==3.0.2                # Daphne server for handling Websockets connections on production
@@ -12,7 +12,7 @@ django-js-asset==2.0.0
 django-storages==1.13.2      # Static and media file storage
 djangorestframework==3.14.0  # API framework
 jmespath==0.10.0
-Pillow==9.4.0                # For image uploads
+Pillow==10.1.0               # For image uploads
 psycopg==3.1.10              # Postgres adapter for Python
 psycopg2-binary==2.9.5       # Postgres driver - binary to install correctly
 python-dateutil==2.8.2
@@ -23,5 +23,5 @@ s3transfer==0.6.0
 six==1.16.0
 sqlparse==0.4.4
 supervisor==4.2.4            # Process control system for running Daphne on production
-urllib3==1.26.6
+urllib3==1.26.17
 watchtower==3.0.1            # AWS CloudWatch logging

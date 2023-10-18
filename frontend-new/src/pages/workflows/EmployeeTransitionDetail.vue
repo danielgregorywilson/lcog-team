@@ -124,11 +124,13 @@
         :disable="!canEditOtherFields()"
       />
       <q-input
+        v-if="type!='Exit'"
         v-model="fte"
         name="fte"
         label="FTE"
         class="q-mr-md"
         :readonly="!canEditOtherFields()"
+        :rules="[val => decimalNumberRegex.test(val) || 'Must be a number']"
       />
       <q-checkbox
         v-model="bilingual"
@@ -413,7 +415,7 @@
         :readonly="!canEditOtherFields()"
       />
     </div>
-    <div class="row">
+    <div class="row items-center">
       <q-checkbox
         id="desk-phone-needed"
         v-model="deskPhone"
@@ -421,6 +423,12 @@
         class="q-mr-md"
         :disable="!canEditOtherFields()"
       />
+      <div
+        v-if="deskPhone && officeLocation.indexOf('PPB') != -1"
+        class="text-red"
+      >
+        Telecom: Add to PPB Paging Alert System
+      </div>
     </div>
     <div class="row">
       <q-input
@@ -1014,6 +1022,8 @@ const languageOptions = [
   'Thai', 'Turkish', 'Urdu', 'Vietnamese', 'Welsh', 'Xhosa', 'Zulu',
 ]
 
+const decimalNumberRegex = /^[+-]?(([1-9][0-9]*)?[0-9](\.[0-9]*)?|\.[0-9]+)$/
+
 const props = defineProps<{
   print?: boolean
 }>()
@@ -1378,6 +1388,9 @@ function valuesAreChanged(): boolean {
 function updateTransition() {
   return new Promise((resolve, reject) => {
     // Clean fields
+    if (!fte.value) {
+      fte.value = '0'
+    }
     if (!bilingual.value) {
       secondLanguage.value = ''
     }

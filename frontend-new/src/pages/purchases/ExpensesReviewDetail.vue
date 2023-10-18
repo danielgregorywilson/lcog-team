@@ -116,10 +116,10 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useQuasar } from 'quasar'
-import EmployeeSelect from 'src/components/EmployeeSelect.vue'
-import FileUploader from 'src/components/FileUploader.vue'
+// import EmployeeSelect from 'src/components/EmployeeSelect.vue'
+// import FileUploader from 'src/components/FileUploader.vue'
 import { readableDate } from 'src/filters'
-import { TimeOffRequestRetrieve } from 'src/types'
+// import { TimeOffRequestRetrieve } from 'src/types'
 import { useTimeOffStore } from 'src/stores/timeoff'
 
 type Expense = {date: string, isToday: boolean}
@@ -135,7 +135,7 @@ let showDenyDialog = ref(false)
 let denyDialogMessage = ref('')
 
 let employeeName = 'Dan Wilson'
-let today = ref(new Date())
+// let today = ref(new Date())
 let firstOfThisMonth = ref(new Date())
 let firstOfSelectedMonth = ref(new Date())
 
@@ -190,39 +190,39 @@ const rows = ref([
   }
 ])
 
-function monthExpenses(): Expense[] {
-  return []
-  // const apiResults = timeOffStore.teamTimeOffRequests
-  // let sortedTimeOff: TimeOffCalendarData = []
-  // if (apiResults) {
-  //   for (let i=0; i<5; i++) {
-  //     let d = new Date(selectedMonday.value.getTime() + i*(1000 * 60 * 60 * 24))
-  //     let isToday = d.setHours(0,0,0,0) === today.value.setHours(0,0,0,0)
-  //     sortedTimeOff.push({
-  //       date: d.toLocaleDateString('en-us', { weekday: 'long', month: 'long', day: 'numeric' }),
-  //       isToday: isToday,
-  //       requests: apiResults.filter(request => {
-  //         const targetDateMS = d.setHours(0,0,0,0)
+// function monthExpenses(): Expense[] {
+//   return []
+//   // const apiResults = timeOffStore.teamTimeOffRequests
+//   // let sortedTimeOff: TimeOffCalendarData = []
+//   // if (apiResults) {
+//   //   for (let i=0; i<5; i++) {
+//   //     let d = new Date(selectedMonday.value.getTime() + i*(1000 * 60 * 60 * 24))
+//   //     let isToday = d.setHours(0,0,0,0) === today.value.setHours(0,0,0,0)
+//   //     sortedTimeOff.push({
+//   //       date: d.toLocaleDateString('en-us', { weekday: 'long', month: 'long', day: 'numeric' }),
+//   //       isToday: isToday,
+//   //       requests: apiResults.filter(request => {
+//   //         const targetDateMS = d.setHours(0,0,0,0)
 
-  //         const fromDate = new Date(request.start_date)
-  //         const fromTZOffset = fromDate.getTimezoneOffset() * 60000
-  //         const fromDateMS = new Date(fromDate.getTime() + fromTZOffset).setHours(0,0,0,0)
+//   //         const fromDate = new Date(request.start_date)
+//   //         const fromTZOffset = fromDate.getTimezoneOffset() * 60000
+//   //         const fromDateMS = new Date(fromDate.getTime() + fromTZOffset).setHours(0,0,0,0)
 
-  //         const toDate = new Date(request.end_date)
-  //         const toTZOffset = toDate.getTimezoneOffset() * 60000
-  //         const toDateMS = new Date(toDate.getTime() + toTZOffset).setHours(0,0,0,0)
+//   //         const toDate = new Date(request.end_date)
+//   //         const toTZOffset = toDate.getTimezoneOffset() * 60000
+//   //         const toDateMS = new Date(toDate.getTime() + toTZOffset).setHours(0,0,0,0)
 
-  //         if (fromDateMS <= targetDateMS && targetDateMS <= toDateMS) {
-  //           return true
-  //         } else {
-  //           return false
-  //         }
-  //       })
-  //     })
-  //   }
-  // }
-  // return sortedTimeOff
-}
+//   //         if (fromDateMS <= targetDateMS && targetDateMS <= toDateMS) {
+//   //           return true
+//   //         } else {
+//   //           return false
+//   //         }
+//   //       })
+//   //     })
+//   //   }
+//   // }
+//   // return sortedTimeOff
+// }
 
 function monthDisplay(): string {
   return `${firstOfSelectedMonth.value.toLocaleDateString('en-us', { month: 'long' })} ${firstOfSelectedMonth.value.getFullYear()}`
@@ -233,15 +233,15 @@ function tableTitleDisplay(): string {
 }
 
 // TODO: This currently gets all time off; should probably just get for a period
-function retrieveTeamTimeOff(): void {
-  timeOffStore.getTeamTimeOffRequests()
-    .then(() => {
-      calendarLoaded.value = true
-    })
-    .catch(e => {
-      console.error('Error retrieving team time off', e)
-    })
-}
+// function retrieveTeamTimeOff(): void {
+//   timeOffStore.getTeamTimeOffRequests()
+//     .then(() => {
+//       calendarLoaded.value = true
+//     })
+//     .catch(e => {
+//       console.error('Error retrieving team time off', e)
+//     })
+// }
 
 function setDates() {
   let firstOfThisMonth = new Date()

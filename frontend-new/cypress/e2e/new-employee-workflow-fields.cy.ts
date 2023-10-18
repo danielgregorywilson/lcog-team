@@ -57,6 +57,10 @@ function fiscalViewNotEdit() {
 }
 
 function otherFieldsViewAndEdit() {
+  // FTE doesn't exist on exits
+  const fte = 2
+  cy.get('input[name="fte"]').clear().type(fte.toString())
+  cy.get('input[name="fte"]').should('have.value', fte.toString())
   cy.get('#type-return').click()
   cy.get('#type-return').should('have.attr', 'aria-checked', 'true')
   cy.get('#type-change').click()
@@ -80,9 +84,7 @@ function otherFieldsViewAndEdit() {
   cy.wait(500) // Wait for the title to be selected
   titleInput.type('{downArrow}{enter}')
   titleInput.should('have.value', 'Senior Web Developer')
-  const fte = 2
-  cy.get('input[name="fte"]').clear().type(fte.toString())
-  cy.get('input[name="fte"]').should('have.value', fte.toString())
+  cy.get('input[name="fte"]').should('not.exist')
   cy.get('#bilingual').click()
   cy.get('#bilingual').should('have.attr', 'aria-checked', 'true')
   cy.get('#second-language').click()
@@ -237,27 +239,6 @@ function sendSDSButtonExists() {
   cy.get('button[name="send-fiscal-button"]').should('not.exist')
   cy.get('button[name="send-hr-button"]').should('not.exist')
   cy.get('button[name="send-stn-button"]').should('not.exist')
-}
-
-function sendFiscalButtonExists() {
-  cy.get('button[name="send-sds-button"]').should('not.exist')
-  cy.get('button[name="send-fiscal-button"]').should('exist')
-  cy.get('button[name="send-hr-button"]').should('not.exist')
-  cy.get('button[name="send-stn-button"]').should('not.exist')
-}
-
-function sendHRButtonExists() {
-  cy.get('button[name="send-sds-button"]').should('not.exist')
-  cy.get('button[name="send-fiscal-button"]').should('not.exist')
-  cy.get('button[name="send-hr-button"]').should('exist')
-  cy.get('button[name="send-stn-button"]').should('not.exist')
-}
-
-function sendSTNButtonExists() {
-  cy.get('button[name="send-sds-button"]').should('not.exist')
-  cy.get('button[name="send-fiscal-button"]').should('not.exist')
-  cy.get('button[name="send-hr-button"]').should('not.exist')
-  cy.get('button[name="send-stn-button"]').should('exist')
 }
 
 describe('New employee workflow', () => {

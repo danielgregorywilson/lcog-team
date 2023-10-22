@@ -4,6 +4,16 @@
 
 export const releases = [
   {
+    version: '0.20.2',
+    date: new Date(2023, 9, 21),
+    changes: [
+      {
+        type: 'fix',
+        description: 'Fix a bug where Gas PIN notifications were not being sent for employee transitions.'
+      }
+    ]
+  },
+  {
     version: '0.20.1',
     date: new Date(2023, 9, 18),
     changes: [

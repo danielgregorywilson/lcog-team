@@ -1846,7 +1846,7 @@ function sendGasPINNotificationEmail() {
   workflowsStore.sendGasPINNotificationEmail(transitionPk.value, {
     senderName: userStore.getEmployeeProfile.name,
     senderEmail: userStore.getEmployeeProfile.email,
-    transition_url: route.fullPath
+    transitionUrl: route.fullPath
   })
     .then(() => {
       quasar.notify({

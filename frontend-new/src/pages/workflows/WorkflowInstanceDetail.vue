@@ -186,8 +186,7 @@ onMounted(() => {
       } else {
         retrieveWorkflowInstance()
           .then(() => bus.emit('workflowInstanceRetrieved', Math.random()))
-          .catch(e => {
-            console.log('Workflow instance does not seem to exist. Redirecting...')
+          .catch(() => {
             router.push('/')
               .catch(e => {
                 console.error('Error navigating to dashboard upon not finding a matching Workflow Instance:', e)

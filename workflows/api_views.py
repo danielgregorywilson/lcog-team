@@ -366,6 +366,8 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             
             # On an update, only the original submitter can edit manager field
             user_is_submitter = request.user.employee == t.submitter
+            user_is_hr = request.user.employee.is_hr_employee
+            user_can_edit_manager = any([user_is_submitter, user_is_hr])
             current_manager = t.manager.pk if t.manager else -1
             editing_manager = all([
                 # Manager field is being edited
@@ -373,14 +375,15 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
                 # Manager field is being changed
                 request.data['manager_pk'] != current_manager
             ])
-            if editing_manager and not user_is_submitter:
-                message = 'Only the original submitter can edit the manager field.'
+            if editing_manager and not user_can_edit_manager:
+                message = 'Only the submitter and HR can edit the manager \
+                    field.'
                 record_error(message, e, request, traceback.format_exc())
                 return Response(
                     data=message,
                     status=status.HTTP_403_FORBIDDEN
                 )
-            if user_is_submitter:
+            if user_can_edit_manager:
                 if editing_manager and request.data['manager_pk'] != -1:
                     t.manager = Employee.objects.get(pk=request.data['manager_pk'])
                 else:

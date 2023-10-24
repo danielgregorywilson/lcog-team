@@ -40,6 +40,11 @@ function salaryNotView() {
   cy.get('#salary-step input').should('not.exist')
 }
 
+function managerViewAndEdit() {
+  const managerInput = cy.get('select[name="manager"]').siblings('input')
+  managerInput.should('not.have.attr', 'readonly', 'readonly')
+}
+
 function managerViewNotEdit() {
   const managerInput = cy.get('select[name="manager"]').siblings('input')
   managerInput.should('have.attr', 'readonly', 'readonly')
@@ -274,6 +279,7 @@ describe('New employee workflow', () => {
         titleInput.type('Case')
         cy.wait(500) // Wait for the title to be selected
         titleInput.type('{downArrow}{enter}')
+        managerViewAndEdit()
         const managerInput = cy.get('select[name="manager"]').siblings('input')
         managerInput.type('Hiring M')
         cy.wait(500) // Wait for the title to be selected
@@ -375,7 +381,7 @@ describe('New employee workflow', () => {
       // Can view and edit the salary fields
       salaryViewAndEdit()
       // Can view but not edit the manager field
-      managerViewNotEdit()
+      managerViewAndEdit()
       // Can view but not edit the fiscal field
       fiscalViewNotEdit()
       // Can view and edit all other fields

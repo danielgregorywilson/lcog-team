@@ -40,6 +40,12 @@
               <q-input type="date" v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
             </q-popup-edit>
           </q-td>
+          <q-td key="job" :props="props">
+            <div class="text-pre-wrap">{{ props.row.job }}</div>
+            <q-popup-edit v-if="!submitted" v-model="props.row.job" buttons v-slot="scope">
+              <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
+            </q-popup-edit>
+          </q-td>
           <q-td key="gl" :props="props">
             <div class="text-pre-wrap">{{ props.row.gl }}</div>
             <q-popup-edit v-if="!submitted" v-model="props.row.gl" buttons v-slot="scope">
@@ -156,7 +162,6 @@ import { useQuasar } from 'quasar'
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import FileUploader from 'src/components/FileUploader.vue'
 import { readableDate } from 'src/filters'
-import { TimeOffRequestRetrieve } from 'src/types'
 import { useTimeOffStore } from 'src/stores/timeoff'
 
 type Expense = {date: string, isToday: boolean}
@@ -180,24 +185,28 @@ const pagination = {
 
 const columns = [
   {
-    name: 'name',
-    required: true,
-    label: 'Name',
-    align: 'left',
-    field: row => row.name,
-    format: val => `${val}`,
+    name: 'name', field: 'name', label: 'Name', required: true, align: 'left',
     sortable: true
   },
-  { name: 'date', align: 'center', label: 'Date', field: 'calories', sortable: true },
-  { name: 'gl', label: 'GL Code', field: 'fat', sortable: true, style: 'width: 10px' },
-  { name: 'approver', label: 'Approver', field: 'approver' },
-  { name: 'receipt', label: 'Receipt', field: 'receipt' }
+  {
+    name: 'date', field: 'date', label: 'Date', align: 'center', sortable: true
+  },
+  {
+    name: 'job', field: 'job', label: 'Job #', align: 'center', sortable: true
+  },
+  {
+    name: 'gl', field: 'gl', label: 'GL Code', align: 'center', sortable: true,
+    style: 'width: 10px'
+  },
+  { name: 'approver', field: 'approver', label: 'Approver', align: 'center' },
+  { name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' }
 ]
 
 const rows = ref([
   {
     name: 'Frozen Yogurt',
     date: '2023-10-01',
+    job: '',
     gl: '43-45045-232',
     approver: { 'pk': 5, 'name': 'Dan Wilson', 'legal_name': 'Daniel Wilson' },
     receipt: 'file.txt'
@@ -205,6 +214,7 @@ const rows = ref([
   {
     name: 'Ice cream sandwich',
     date: '2023-10-04',
+    job: '123',
     gl: '55-55555-555',
     approver: {pk: -1, name: '', legal_name: ''},
     receipt: 'file.txt'
@@ -212,6 +222,7 @@ const rows = ref([
   {
     name: 'Eclair',
     date: '2023-10-07',
+    job: '',
     gl: '12-34567-890',
     approver: {pk: -1, name: '', legal_name: ''},
     receipt: 'file.txt'
@@ -219,6 +230,7 @@ const rows = ref([
   {
     name: 'Cupcake',
     date: '2023-10-07',
+    job: '',
     gl: '43-45045-232',
     approver: {pk: -1, name: '', legal_name: ''},
     receipt: 'file.txt'

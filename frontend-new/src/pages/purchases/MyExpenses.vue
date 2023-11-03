@@ -58,7 +58,6 @@
                 :useLegalName="true"
                 v-on:input="props.row.approver=$event"
                 v-on:clear="props.row.approver=EmployeeSelect.emptyEmployee"
-                class="q-mr-md"
                 :readOnly=false
                 @keyup.enter="scope.set()"
               />

@@ -1,24 +1,20 @@
 <template>
-<q-page class="q-pa-md">
+<div class="q-mt-md">
   <div class="q-gutter-md">
-    <q-btn @click="setThisMonth()">This Month</q-btn>
-    <q-btn-group>
-      <q-btn color="secondary" icon="west" @click="monthBackward()"/>
-      <q-btn color="secondary" icon="east" @click="monthForward()"/>
-    </q-btn-group>
     <q-btn v-if="submitted" @click="showUnsubmitDialog = true">Unsubmit</q-btn>
     <q-btn v-else @click="showSubmitToFiscalDialog = true">Submit to Fiscal</q-btn>
   </div>
-  <q-spinner-grid
-    v-if="!calendarLoaded"
-    class="spinner q-mt-lg"
-    color="primary"
-    size="xl"
-  />
-  <div v-else class="q-mt-lg">
+  <div class="q-mt-lg">
+    <q-spinner-grid
+      v-if="!calendarLoaded"
+      class="spinner q-mt-lg"
+      color="primary"
+      size="xl"
+    />
     <q-table
+      v-else
       flat bordered
-      :title="monthDisplay()"
+      :title="monthDisplay"
       :rows="rows"
       :columns="columns"
       row-key="name"
@@ -95,7 +91,7 @@
   <!-- Submit to Fiscal Dialog -->
   <q-dialog v-model="showSubmitToFiscalDialog">
     <q-card class="q-pa-md" style="width: 400px">
-      <div class="text-h6">Submit {{monthDisplay()}} expenses to Fiscal?</div>
+      <div class="text-h6">Submit {{ monthDisplay }} expenses to Fiscal?</div>
       <q-form
         @submit='onSubmitFiscalDialog()'
         class="q-gutter-md"
@@ -130,7 +126,7 @@
   <!-- Unsubmit Dialog -->
   <q-dialog v-model="showUnsubmitDialog">
     <q-card class="q-pa-md" style="width: 400px">
-      <div class="text-h6">Unsubmit {{monthDisplay()}} expenses?</div>
+      <div class="text-h6">Unsubmit {{ monthDisplay }} expenses?</div>
       <q-form
         @submit='onUnsubmitDialog()'
         class="q-gutter-md"
@@ -147,14 +143,10 @@
       </q-form>
     </q-card>
   </q-dialog>
-</q-page>
+</div>
 </template>
 
-<style scoped lang="scss">
-  // .expense-table {
-  //   width: 221px
-  // }
-</style>
+<style scoped lang="scss"></style>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
@@ -162,22 +154,20 @@ import { useQuasar } from 'quasar'
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import FileUploader from 'src/components/FileUploader.vue'
 import { readableDate } from 'src/filters'
-import { useTimeOffStore } from 'src/stores/timeoff'
 
 type Expense = {date: string, isToday: boolean}
 
 const quasar = useQuasar()
-const timeOffStore = useTimeOffStore()
+
+defineProps<{
+  monthDisplay: string
+}>()
 
 let submitted = ref(false)
 let calendarLoaded = ref(true)
 let showSubmitToFiscalDialog = ref(false)
 let sendDialogMessage = ref('')
 let showUnsubmitDialog = ref(false)
-
-let today = ref(new Date())
-let firstOfThisMonth = ref(new Date())
-let firstOfSelectedMonth = ref(new Date())
 
 const pagination = {
   rowsPerPage: '50'
@@ -271,51 +261,13 @@ function monthExpenses(): Expense[] {
   // return sortedTimeOff
 }
 
-function monthDisplay(): string {
-  return `${firstOfSelectedMonth.value.toLocaleDateString('en-us', { month: 'long' })} ${firstOfSelectedMonth.value.getFullYear()}`
-}
-
-// TODO: This currently gets all time off; should probably just get for a period
-function retrieveTeamTimeOff(): void {
-  timeOffStore.getTeamTimeOffRequests()
-    .then(() => {
-      calendarLoaded.value = true
-    })
-    .catch(e => {
-      console.error('Error retrieving team time off', e)
-    })
-}
-
-function setDates() {
-  let firstOfThisMonth = new Date()
-  firstOfThisMonth.setDate(1)
-  firstOfThisMonth.setHours(0,0,0,0)
-  firstOfThisMonth.value = firstOfThisMonth
-  firstOfSelectedMonth.value = firstOfThisMonth
-}
-
-function setThisMonth() {
-  firstOfSelectedMonth.value = firstOfThisMonth.value
-}
-
-function monthBackward() {
-  firstOfSelectedMonth.value = firstOfSelectedMonth.value.getMonth() === 0
-    ? new Date(firstOfSelectedMonth.value.getFullYear() - 1, 11, 1)
-    : new Date(firstOfSelectedMonth.value.getFullYear(), firstOfSelectedMonth.value.getMonth() - 1, 1)
-}
-
-function monthForward() {
-  firstOfSelectedMonth.value = firstOfSelectedMonth.value.getMonth() === 11
-    ? new Date(firstOfSelectedMonth.value.getFullYear() + 1, 0, 1)
-    : new Date(firstOfSelectedMonth.value.getFullYear(), firstOfSelectedMonth.value.getMonth() + 1, 1)
-}
-
 function clickAddExpense(): void {
   rows.value.push({
     name: '',
     date: '',
+    job: '',
     gl: '',
-    approver: '',
+    approver: {pk: -1, name: '', legal_name: ''},
     receipt: ''
   })
 }
@@ -343,43 +295,6 @@ function formErrors() {
 }
 
 function onSubmitFiscalDialog() {
-  // const extraMessage = type == 'ASSIGN' ? reassignDialogMessage.value : sendDialogMessage.value
-  // workflowsStore.sendTransitionToEmailList(transitionPk.value, {
-  //   type: type,
-  //   reassignTo: assignee.value,
-  //   update: sendDialogUpdate.value,
-  //   extraMessage,
-  //   senderName: userStore.getEmployeeProfile.name,
-  //   senderEmail: userStore.getEmployeeProfile.email,
-  //   transitionUrl: route.fullPath
-  // })
-  //   .then(() => {
-  //     quasar.notify({
-  //       message: 'Sent',
-  //       color: 'positive',
-  //       icon: 'send'
-  //     })
-  //     showSendToSDSHiringLeadsDialog.value = false
-  //     showSendToFiscalDialog.value = false
-  //     showSendToHRDialog.value = false
-  //     showSendToSTNDialog.value = false
-  //     showAssigneeDialog.value = false
-  //     sendDialogUpdate.value = false
-  //     sendDialogMessage.value = ''
-  //     reassignDialogMessage.value = ''
-  //     // Signal to WorkflowInstanceDetail that the transition was assigned or
-  //     // completed, in which case we need to get the newly created process
-  //     // instances.
-  //     bus.emit('transitionReassigned', Math.random())
-  //   })
-  //   .catch(e => {
-  //     console.error('Error sending email', e)
-  //     quasar.notify({
-  //       message: 'Error sending email',
-  //       color: 'negative',
-  //       icon: 'report_problem'
-  //     })
-  //   })
   showSubmitToFiscalDialog.value = false
   submitted.value = true
   rows.value.forEach(row => row.submitted = true)
@@ -402,8 +317,7 @@ function onUnsubmitDialog() {
 }
 
 onMounted(() => {
-  setDates()
-  // retrieveTeamTimeOff()
+  // retrieveExpenses()
 })
 
 </script>

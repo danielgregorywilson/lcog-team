@@ -10,49 +10,51 @@
       <div>Denied</div>
     </div>
   </div>
-  <q-spinner-grid
-    v-if="!calendarLoaded"
-    class="spinner q-mt-lg"
-    color="primary"
-    size="xl"
-  />
-  <div v-else class="q-mt-lg">
-    <q-table
-      flat bordered
-      :title="tableTitleDisplay()"
-      :rows="rows"
-      :columns="columns"
-      row-key="name"
-      binary-state-sort
-      :pagination="pagination"
-      class="expense-table"
-    >
-      <template v-slot:body="props">
-        <q-tr :props="props">
-          <q-td key="name" :props="props">
-            {{ props.row.name }}
-          </q-td>
-          <q-td key="date" :props="props">
-            {{ readableDate(props.row.date) }}
-          </q-td>
-          <q-td key="job" :props="props">
-            <div class="text-pre-wrap">{{ props.row.job }}</div>
-          </q-td>
-          <q-td key="gl" :props="props">
-            <div class="text-pre-wrap">{{ props.row.gl }}</div>
-          </q-td>
-          <q-td key="approver" :props="props">
-            {{ props.row.approver.name }}
-          </q-td>
-          <q-td key="receipt" :props="props">
-            {{ props.row.receipt }}
-          </q-td>
-        </q-tr>
-      </template>
-    </q-table>
-    <div class="q-mt-sm q-gutter-md">
-      <q-btn :class="approved?'bg-green':''" @click="showApproveDialog = true">Approve Expenses</q-btn>
-      <q-btn :class="denied?'bg-red':''" @click="showDenyDialog = true">Deny Expenses</q-btn>
+  <div class="q-mt-md">
+    <q-spinner-grid
+      v-if="!calendarLoaded"
+      class="spinner"
+      color="primary"
+      size="xl"
+    />
+    <div v-else>
+      <q-table
+        flat bordered
+        :title="tableTitleDisplay()"
+        :rows="rows"
+        :columns="columns"
+        row-key="name"
+        binary-state-sort
+        :pagination="pagination"
+        class="expense-table"
+      >
+        <template v-slot:body="props">
+          <q-tr :props="props">
+            <q-td key="name" :props="props">
+              {{ props.row.name }}
+            </q-td>
+            <q-td key="date" :props="props">
+              {{ readableDate(props.row.date) }}
+            </q-td>
+            <q-td key="job" :props="props">
+              <div class="text-pre-wrap">{{ props.row.job }}</div>
+            </q-td>
+            <q-td key="gl" :props="props">
+              <div class="text-pre-wrap">{{ props.row.gl }}</div>
+            </q-td>
+            <q-td key="approver" :props="props">
+              {{ props.row.approver.name }}
+            </q-td>
+            <q-td key="receipt" :props="props">
+              {{ props.row.receipt }}
+            </q-td>
+          </q-tr>
+        </template>
+      </q-table>
+      <div class="q-mt-sm q-gutter-md">
+        <q-btn :class="approved?'bg-green':''" @click="showApproveDialog = true">Approve Expenses</q-btn>
+        <q-btn :class="denied?'bg-red':''" @click="showDenyDialog = true">Deny Expenses</q-btn>
+      </div>
     </div>
   </div>
 

@@ -1,13 +1,13 @@
 <template>
 <div class="q-mt-md">
-  <div>
+  <div class="q-mt-md">
     <q-spinner-grid
       v-if="!calendarLoaded"
-      class="spinner q-mt-lg"
+      class="spinner"
       color="primary"
       size="xl"
     />
-    <div v-else class="q-mt-lg">
+    <div v-else>
       <q-table
         flat bordered
         :title="monthDisplay"

@@ -19,13 +19,16 @@
         class="expense-table"
       >
         <template v-slot:body="props">
-          <q-tr :props="props" @click="navigateToDetail(props.row.employeePk)">
+          <q-tr :props="props" :no-hover="!props.row.submitted" @click="navigateToDetail(props.row.submitted, props.row.employeePk)">
             <q-td key="employee" :props="props">
               {{ props.row.employee }}
             </q-td>
+            <q-td key="submitted" :props="props">
+              <q-icon v-if="props.row.submitted" name="check" size="lg" />
+            </q-td>
             <q-td key="approved" :props="props">
-              <q-icon v-if="props.row.approved==true" color="green" name="check_circle" size="lg" class="q-mr-sm" />
-              <q-icon v-else-if="props.row.approved==false" color="red" name="cancel" size="lg" class="q-mr-sm" />
+              <q-icon v-if="props.row.approved==true" color="green" name="check_circle" size="lg" />
+              <q-icon v-else-if="props.row.approved==false" color="red" name="cancel" size="lg" />
             </q-td>
           </q-tr>
         </template>
@@ -59,23 +62,27 @@ const pagination = {
 
 const columns = [
   { name: 'employee', required: true, label: 'Name', align: 'left' },
-  { name: 'approved', label: 'Approved', field: 'approved', align: 'center' }
+  { name: 'submitted', label: 'Submitted', field: 'submitted', sortable: true, align: 'center'},
+  { name: 'approved', label: 'Approved', field: 'approved', sortable: true, align: 'center' }
 ]
 
 const rows = ref([
   {
     employee: 'Dan Wilson',
     employeePk: 1,
+    submitted: true,
     approved: true
   },
   {
     employee: 'Dan Hogue',
     employeePk: 2,
+    submitted: true,
     approved: false
   },
   {
     employee: 'Andy Smith',
     employeePk: 3,
+    submitted: false,
     approved: null
   }
 ])
@@ -114,18 +121,20 @@ function monthExpenses(): Expense[] {
   // return sortedTimeOff
 }
 
-function navigateToDetail(employeePk: number) {
-  router.push({
-    name: 'expenses-review-detail',
-    params: {
-      employeePk: employeePk.toString(),
-      month: props.monthInt,
-      year: props.yearInt
-    }
-  })
+function navigateToDetail(submitted: boolean, employeePk: number) {
+  if (submitted) {
+    router.push({
+      name: 'expenses-review-detail',
+      params: {
+        employeePk: employeePk.toString(),
+        month: props.monthInt,
+        year: props.yearInt
+      }
+    })
     .catch(e => {
       console.error('Error navigating to time off request detail:', e)
     })
+  }
 }
 
 onMounted(() => {

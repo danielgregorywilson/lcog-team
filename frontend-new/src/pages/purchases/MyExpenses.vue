@@ -14,7 +14,7 @@
     <q-table
       v-else
       flat bordered
-      :title="monthDisplay"
+      :title="tableTitleDisplay()"
       :rows="rows"
       :columns="columns"
       row-key="name"
@@ -158,7 +158,7 @@ type Expense = {date: string, isToday: boolean}
 
 const quasar = useQuasar()
 
-defineProps<{
+const props = defineProps<{
   monthDisplay: string
 }>()
 
@@ -225,6 +225,11 @@ const rows = ref([
     receipt: 'file.txt'
   }
 ])
+
+function tableTitleDisplay(): string {
+  const submittedText = submitted.value ? ' - Submitted' : ''
+  return `${props.monthDisplay}${submittedText}`
+}
 
 function monthExpenses(): Expense[] {
   return []

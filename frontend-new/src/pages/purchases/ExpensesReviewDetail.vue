@@ -29,7 +29,7 @@
         class="expense-table"
       >
         <template v-slot:body="props">
-          <q-tr :props="props">
+          <q-tr :props="props" no-hover>
             <q-td key="name" :props="props">
               {{ props.row.name }}
             </q-td>
@@ -44,6 +44,9 @@
             </q-td>
             <q-td key="approver" :props="props">
               {{ props.row.approver.name }}
+            </q-td>
+            <q-td key="approvalNotes" :props="props">
+              {{ props.row.approvalNotes }}
             </q-td>
             <q-td key="receipt" :props="props">
               {{ props.row.receipt }}
@@ -111,7 +114,11 @@
 </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+  .approval-notes {
+    white-space: normal;
+  }
+  </style>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
@@ -155,6 +162,10 @@ const columns = [
     style: 'width: 10px'
   },
   { name: 'approver', field: 'approver', label: 'Approver', align: 'center' },
+  {
+    name: 'approvalNotes', field: 'approvalNotes', label: 'Approval Notes',
+    align: 'center', classes: 'approval-notes', headerClasses: 'approval-notes'
+  },
   { name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' }
 ]
 
@@ -165,6 +176,7 @@ const rows = ref([
     job: '',
     gl: '43-45045-232',
     approver: { 'pk': 5, 'name': 'Dan Wilson', 'legal_name': 'Daniel Wilson' },
+    approvalNotes: 'Dan feigned faintness so I fetched froyo. Follow?',
     receipt: 'file.txt'
   },
   {
@@ -173,6 +185,7 @@ const rows = ref([
     job: '123',
     gl: '55-55555-555',
     approver: {pk: -1, name: '', legal_name: ''},
+    approvalNotes: '',
     receipt: 'file.txt'
   },
   {
@@ -181,6 +194,7 @@ const rows = ref([
     job: '',
     gl: '12-34567-890',
     approver: {pk: -1, name: '', legal_name: ''},
+    approvalNotes: '',
     receipt: 'file.txt'
   },
   {
@@ -189,6 +203,7 @@ const rows = ref([
     job: '',
     gl: '43-45045-232',
     approver: {pk: -1, name: '', legal_name: ''},
+    approvalNotes: '',
     receipt: 'file.txt'
   }
 ])

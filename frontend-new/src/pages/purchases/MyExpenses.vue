@@ -4,7 +4,7 @@
     <q-btn v-if="submitted" @click="showUnsubmitDialog = true">Unsubmit</q-btn>
     <q-btn v-else @click="showSubmitToFiscalDialog = true">Submit to Fiscal</q-btn>
   </div>
-  <div class="q-mt-lg">
+  <div>
     <q-spinner-grid
       v-if="!calendarLoaded"
       class="spinner q-mt-lg"

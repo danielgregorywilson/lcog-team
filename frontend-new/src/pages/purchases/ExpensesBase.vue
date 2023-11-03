@@ -8,7 +8,11 @@
       </q-btn-group>
     </div>
     <div>
-      <router-view :monthDisplay="monthDisplay()"></router-view>
+      <router-view
+        :monthDisplay="monthDisplay()"
+        :monthInt="firstOfSelectedMonth.getMonth().toString()"
+        :yearInt="firstOfSelectedMonth.getFullYear().toString()"
+      ></router-view>
     </div>
   </q-page>
   </template>

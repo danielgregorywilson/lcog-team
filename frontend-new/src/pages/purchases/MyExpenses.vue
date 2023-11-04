@@ -42,8 +42,10 @@
               <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
             </q-popup-edit>
           </q-td>
-          <q-td key="gl" :props="props">
-            <div class="text-pre-wrap">{{ props.row.gl }}</div>
+          <q-td key="gls" :props="props">
+            <div class="text-pre-wrap" v-for="gl in props.row.gls" :key="props.row.gls.indexOf(gl)">
+              {{ gl.gl }}: {{ gl.percent }}%
+            </div>
             <q-popup-edit v-if="!submitted" v-model="props.row.gl" buttons v-slot="scope">
               <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
             </q-popup-edit>
@@ -194,7 +196,7 @@ const columns = [
     name: 'job', field: 'job', label: 'Job #', align: 'center', sortable: true
   },
   {
-    name: 'gl', field: 'gl', label: 'GL Code', align: 'center', sortable: true,
+    name: 'gls', field: 'gls', label: 'GL Codes', align: 'center', sortable: true,
     style: 'width: 10px'
   },
   { name: 'approver', field: 'approver', label: 'Approver', align: 'center' },
@@ -210,7 +212,7 @@ const rows = ref([
     name: 'Frozen Yogurt',
     date: '2023-10-01',
     job: '',
-    gl: '43-45045-232',
+    gls: [{gl: '43-45045-232', percent: 100}],
     approver: { 'pk': 5, 'name': 'Dan Wilson', 'legal_name': 'Daniel Wilson' },
     approvalNotes: 'Dan feigned faintness so I fetched froyo. Follow?',
     receipt: 'file.txt'
@@ -219,7 +221,7 @@ const rows = ref([
     name: 'Ice cream sandwich',
     date: '2023-10-04',
     job: '123',
-    gl: '55-55555-555',
+    gls: [{gl: '55-55555-555', percent: 50}, {gl: '43-45045-232', percent: 50}],
     approver: {pk: -1, name: '', legal_name: ''},
     approvalNotes: '',
     receipt: 'file.txt'
@@ -228,7 +230,7 @@ const rows = ref([
     name: 'Eclair',
     date: '2023-10-07',
     job: '',
-    gl: '12-34567-890',
+    gls: [{gl: '12-34567-890', percent: 100}],
     approver: {pk: -1, name: '', legal_name: ''},
     approvalNotes: '',
     receipt: 'file.txt'
@@ -237,7 +239,7 @@ const rows = ref([
     name: 'Cupcake',
     date: '2023-10-07',
     job: '',
-    gl: '43-45045-232',
+    gls: [{gl: '43-45045-232', percent: 100}],
     approver: {pk: -1, name: '', legal_name: ''},
     approvalNotes: '',
     receipt: 'file.txt'

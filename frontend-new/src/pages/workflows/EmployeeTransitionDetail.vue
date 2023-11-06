@@ -1632,7 +1632,8 @@ function canViewSalaryFields() {
 // If the form is submitted, only the original submitter can edit manager field.
 // Anyone can view it.
 function canEditManagerField() {
-  return !formSubmitted() || employeeIsSubmitter()
+  return !formSubmitted() || employeeIsSubmitter() ||
+    cookies.get('is_hr_employee') == 'true'
 }
 
 // Only fiscal can edit the fiscal field. Anyone can view it.
@@ -1693,7 +1694,7 @@ function canSendToHR() {
 }
 
 function canSendToTransitionNews() {
-  return assigneeCurrentVal.value == 'HR' &&
+  return ['HR', 'Complete'].indexOf(assigneeCurrentVal.value) != -1 &&
     cookies.get('is_hr_employee') == 'true'
 
 }

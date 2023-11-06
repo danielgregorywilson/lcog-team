@@ -1694,7 +1694,7 @@ function canSendToHR() {
 }
 
 function canSendToTransitionNews() {
-  return assigneeCurrentVal.value == 'HR' &&
+  return ['HR', 'Complete'].indexOf(assigneeCurrentVal.value) != -1 &&
     cookies.get('is_hr_employee') == 'true'
 
 }

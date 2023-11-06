@@ -46,8 +46,34 @@
             <div class="text-pre-wrap" v-for="gl in props.row.gls" :key="props.row.gls.indexOf(gl)">
               {{ gl.gl }}: {{ gl.percent }}%
             </div>
-            <q-popup-edit v-if="!submitted" v-model="props.row.gl" buttons v-slot="scope">
-              <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
+            <q-popup-edit v-if="!submitted" v-model="props.row.gls" buttons v-slot="scope">
+              <div v-for="gl in scope.value" :key="scope.value.indexOf(gl)" class="row">
+                <q-input
+                  v-model="gl.gl"
+                  class="q-mr-sm"
+                  outlined dense autofocus
+                  mask="##-#####-###"
+                  @keyup.enter="scope.set()"
+                  :rules="[
+                    val => !!val || 'Required',
+                  ]"
+                />
+                <div class="row">
+                  <q-input
+                    v-model="gl.percent"
+                    type="number"
+                    class="gl-percent"
+                    outlined dense autofocus
+                    @keyup.enter="scope.set()"
+                    :rules="[
+                      val => !!val || '* Required',
+                      val => val <= 100 || 'Please use a number less than 100',
+                    ]"
+                  />
+                  <div class="gl-percent-symbol">%</div>
+                </div>
+              </div>
+              <q-btn @click="scope.value.push({gl: '', percent: 0})">Add a GL</q-btn>
             </q-popup-edit>
           </q-td>
           <q-td key="approver" :props="props">
@@ -157,6 +183,14 @@
   .approval-notes {
     white-space: normal;
   }
+
+  .gl-percent {
+    max-width: 80px;
+  }
+
+  .gl-percent-symbol {
+    margin: 9px 0 0 3px;
+  }
 </style>
 
 <script setup lang="ts">
@@ -214,7 +248,7 @@ const rows = ref([
     job: '',
     gls: [{gl: '43-45045-232', percent: 100}],
     approver: { 'pk': 5, 'name': 'Dan Wilson', 'legal_name': 'Daniel Wilson' },
-    approvalNotes: 'Dan feigned faintness so I fetched froyo. Follow?',
+    approvalNotes: 'Felicity feigned faintness so I fetched froyo. Follow?',
     receipt: 'file.txt'
   },
   {
@@ -290,8 +324,9 @@ function clickAddExpense(): void {
     name: '',
     date: '',
     job: '',
-    gl: '',
+    gls: [{gl: '', percent: 0}],
     approver: {pk: -1, name: '', legal_name: ''},
+    approvalNotes: '',
     receipt: ''
   })
 }

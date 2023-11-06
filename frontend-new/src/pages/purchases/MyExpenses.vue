@@ -1,24 +1,20 @@
 <template>
-<q-page class="q-pa-md">
+<div class="q-mt-md">
   <div class="q-gutter-md">
-    <q-btn @click="setThisMonth()">This Month</q-btn>
-    <q-btn-group>
-      <q-btn color="secondary" icon="west" @click="monthBackward()"/>
-      <q-btn color="secondary" icon="east" @click="monthForward()"/>
-    </q-btn-group>
     <q-btn v-if="submitted" @click="showUnsubmitDialog = true">Unsubmit</q-btn>
     <q-btn v-else @click="showSubmitToFiscalDialog = true">Submit to Fiscal</q-btn>
   </div>
-  <q-spinner-grid
-    v-if="!calendarLoaded"
-    class="spinner q-mt-lg"
-    color="primary"
-    size="xl"
-  />
-  <div v-else class="q-mt-lg">
+  <div class="q-mt-md">
+    <q-spinner-grid
+      v-if="!calendarLoaded"
+      class="spinner"
+      color="primary"
+      size="xl"
+    />
     <q-table
+      v-else
       flat bordered
-      :title="monthDisplay()"
+      :title="tableTitleDisplay()"
       :rows="rows"
       :columns="columns"
       row-key="name"
@@ -40,10 +36,44 @@
               <q-input type="date" v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
             </q-popup-edit>
           </q-td>
-          <q-td key="gl" :props="props">
-            <div class="text-pre-wrap">{{ props.row.gl }}</div>
-            <q-popup-edit v-if="!submitted" v-model="props.row.gl" buttons v-slot="scope">
+          <q-td key="job" :props="props">
+            <div class="text-pre-wrap">{{ props.row.job }}</div>
+            <q-popup-edit v-if="!submitted" v-model="props.row.job" buttons v-slot="scope">
               <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
+            </q-popup-edit>
+          </q-td>
+          <q-td key="gls" :props="props">
+            <div class="text-pre-wrap" v-for="gl in props.row.gls" :key="props.row.gls.indexOf(gl)">
+              {{ gl.gl }}: {{ gl.percent }}%
+            </div>
+            <q-popup-edit v-if="!submitted" v-model="props.row.gls" buttons v-slot="scope">
+              <div v-for="gl in scope.value" :key="scope.value.indexOf(gl)" class="row">
+                <q-input
+                  v-model="gl.gl"
+                  class="q-mr-sm"
+                  outlined dense autofocus
+                  mask="##-#####-###"
+                  @keyup.enter="scope.set()"
+                  :rules="[
+                    val => !!val || 'Required',
+                  ]"
+                />
+                <div class="row">
+                  <q-input
+                    v-model="gl.percent"
+                    type="number"
+                    class="gl-percent"
+                    outlined dense autofocus
+                    @keyup.enter="scope.set()"
+                    :rules="[
+                      val => !!val || '* Required',
+                      val => val <= 100 || 'Please use a number less than 100',
+                    ]"
+                  />
+                  <div class="gl-percent-symbol">%</div>
+                </div>
+              </div>
+              <q-btn @click="scope.value.push({gl: '', percent: 0})">Add a GL</q-btn>
             </q-popup-edit>
           </q-td>
           <q-td key="approver" :props="props">
@@ -56,10 +86,15 @@
                 :useLegalName="true"
                 v-on:input="props.row.approver=$event"
                 v-on:clear="props.row.approver=EmployeeSelect.emptyEmployee"
-                class="q-mr-md"
                 :readOnly=false
                 @keyup.enter="scope.set()"
               />
+            </q-popup-edit>
+          </q-td>
+          <q-td key="approvalNotes" :props="props">
+            {{ props.row.approvalNotes }}
+            <q-popup-edit v-if="!submitted" v-model="props.row.approvalNotes" buttons v-slot="scope">
+              <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
             </q-popup-edit>
           </q-td>
           <q-td key="receipt" :props="props">
@@ -89,7 +124,7 @@
   <!-- Submit to Fiscal Dialog -->
   <q-dialog v-model="showSubmitToFiscalDialog">
     <q-card class="q-pa-md" style="width: 400px">
-      <div class="text-h6">Submit {{monthDisplay()}} expenses to Fiscal?</div>
+      <div class="text-h6">Submit {{ monthDisplay }} expenses to Fiscal?</div>
       <q-form
         @submit='onSubmitFiscalDialog()'
         class="q-gutter-md"
@@ -124,7 +159,7 @@
   <!-- Unsubmit Dialog -->
   <q-dialog v-model="showUnsubmitDialog">
     <q-card class="q-pa-md" style="width: 400px">
-      <div class="text-h6">Unsubmit {{monthDisplay()}} expenses?</div>
+      <div class="text-h6">Unsubmit {{ monthDisplay }} expenses?</div>
       <q-form
         @submit='onUnsubmitDialog()'
         class="q-gutter-md"
@@ -141,13 +176,21 @@
       </q-form>
     </q-card>
   </q-dialog>
-</q-page>
+</div>
 </template>
 
 <style scoped lang="scss">
-  // .expense-table {
-  //   width: 221px
-  // }
+  .approval-notes {
+    white-space: normal;
+  }
+
+  .gl-percent {
+    max-width: 80px;
+  }
+
+  .gl-percent-symbol {
+    margin: 9px 0 0 3px;
+  }
 </style>
 
 <script setup lang="ts">
@@ -156,13 +199,14 @@ import { useQuasar } from 'quasar'
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import FileUploader from 'src/components/FileUploader.vue'
 import { readableDate } from 'src/filters'
-import { TimeOffRequestRetrieve } from 'src/types'
-import { useTimeOffStore } from 'src/stores/timeoff'
 
 type Expense = {date: string, isToday: boolean}
 
 const quasar = useQuasar()
-const timeOffStore = useTimeOffStore()
+
+const props = defineProps<{
+  monthDisplay: string
+}>()
 
 let submitted = ref(false)
 let calendarLoaded = ref(true)
@@ -170,60 +214,76 @@ let showSubmitToFiscalDialog = ref(false)
 let sendDialogMessage = ref('')
 let showUnsubmitDialog = ref(false)
 
-let today = ref(new Date())
-let firstOfThisMonth = ref(new Date())
-let firstOfSelectedMonth = ref(new Date())
-
 const pagination = {
   rowsPerPage: '50'
 }
 
 const columns = [
   {
-    name: 'name',
-    required: true,
-    label: 'Name',
-    align: 'left',
-    field: row => row.name,
-    format: val => `${val}`,
+    name: 'name', field: 'name', label: 'Name', required: true, align: 'left',
     sortable: true
   },
-  { name: 'date', align: 'center', label: 'Date', field: 'calories', sortable: true },
-  { name: 'gl', label: 'GL Code', field: 'fat', sortable: true, style: 'width: 10px' },
-  { name: 'approver', label: 'Approver', field: 'approver' },
-  { name: 'receipt', label: 'Receipt', field: 'receipt' }
+  {
+    name: 'date', field: 'date', label: 'Date', align: 'center', sortable: true
+  },
+  {
+    name: 'job', field: 'job', label: 'Job #', align: 'center', sortable: true
+  },
+  {
+    name: 'gls', field: 'gls', label: 'GL Codes', align: 'center', sortable: true,
+    style: 'width: 10px'
+  },
+  { name: 'approver', field: 'approver', label: 'Approver', align: 'center' },
+  {
+    name: 'approvalNotes', field: 'approvalNotes', label: 'Approval Notes',
+    align: 'center', classes: 'approval-notes', headerClasses: 'approval-notes'
+  },
+  { name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' }
 ]
 
 const rows = ref([
   {
     name: 'Frozen Yogurt',
     date: '2023-10-01',
-    gl: '43-45045-232',
+    job: '',
+    gls: [{gl: '43-45045-232', percent: 100}],
     approver: { 'pk': 5, 'name': 'Dan Wilson', 'legal_name': 'Daniel Wilson' },
+    approvalNotes: 'Felicity feigned faintness so I fetched froyo. Follow?',
     receipt: 'file.txt'
   },
   {
     name: 'Ice cream sandwich',
     date: '2023-10-04',
-    gl: '55-55555-555',
+    job: '123',
+    gls: [{gl: '55-55555-555', percent: 50}, {gl: '43-45045-232', percent: 50}],
     approver: {pk: -1, name: '', legal_name: ''},
+    approvalNotes: '',
     receipt: 'file.txt'
   },
   {
     name: 'Eclair',
     date: '2023-10-07',
-    gl: '12-34567-890',
+    job: '',
+    gls: [{gl: '12-34567-890', percent: 100}],
     approver: {pk: -1, name: '', legal_name: ''},
+    approvalNotes: '',
     receipt: 'file.txt'
   },
   {
     name: 'Cupcake',
     date: '2023-10-07',
-    gl: '43-45045-232',
+    job: '',
+    gls: [{gl: '43-45045-232', percent: 100}],
     approver: {pk: -1, name: '', legal_name: ''},
+    approvalNotes: '',
     receipt: 'file.txt'
   }
 ])
+
+function tableTitleDisplay(): string {
+  const submittedText = submitted.value ? ' - Submitted' : ''
+  return `${props.monthDisplay}${submittedText}`
+}
 
 function monthExpenses(): Expense[] {
   return []
@@ -259,51 +319,14 @@ function monthExpenses(): Expense[] {
   // return sortedTimeOff
 }
 
-function monthDisplay(): string {
-  return `${firstOfSelectedMonth.value.toLocaleDateString('en-us', { month: 'long' })} ${firstOfSelectedMonth.value.getFullYear()}`
-}
-
-// TODO: This currently gets all time off; should probably just get for a period
-function retrieveTeamTimeOff(): void {
-  timeOffStore.getTeamTimeOffRequests()
-    .then(() => {
-      calendarLoaded.value = true
-    })
-    .catch(e => {
-      console.error('Error retrieving team time off', e)
-    })
-}
-
-function setDates() {
-  let firstOfThisMonth = new Date()
-  firstOfThisMonth.setDate(1)
-  firstOfThisMonth.setHours(0,0,0,0)
-  firstOfThisMonth.value = firstOfThisMonth
-  firstOfSelectedMonth.value = firstOfThisMonth
-}
-
-function setThisMonth() {
-  firstOfSelectedMonth.value = firstOfThisMonth.value
-}
-
-function monthBackward() {
-  firstOfSelectedMonth.value = firstOfSelectedMonth.value.getMonth() === 0
-    ? new Date(firstOfSelectedMonth.value.getFullYear() - 1, 11, 1)
-    : new Date(firstOfSelectedMonth.value.getFullYear(), firstOfSelectedMonth.value.getMonth() - 1, 1)
-}
-
-function monthForward() {
-  firstOfSelectedMonth.value = firstOfSelectedMonth.value.getMonth() === 11
-    ? new Date(firstOfSelectedMonth.value.getFullYear() + 1, 0, 1)
-    : new Date(firstOfSelectedMonth.value.getFullYear(), firstOfSelectedMonth.value.getMonth() + 1, 1)
-}
-
 function clickAddExpense(): void {
   rows.value.push({
     name: '',
     date: '',
-    gl: '',
-    approver: '',
+    job: '',
+    gls: [{gl: '', percent: 0}],
+    approver: {pk: -1, name: '', legal_name: ''},
+    approvalNotes: '',
     receipt: ''
   })
 }
@@ -331,43 +354,6 @@ function formErrors() {
 }
 
 function onSubmitFiscalDialog() {
-  // const extraMessage = type == 'ASSIGN' ? reassignDialogMessage.value : sendDialogMessage.value
-  // workflowsStore.sendTransitionToEmailList(transitionPk.value, {
-  //   type: type,
-  //   reassignTo: assignee.value,
-  //   update: sendDialogUpdate.value,
-  //   extraMessage,
-  //   senderName: userStore.getEmployeeProfile.name,
-  //   senderEmail: userStore.getEmployeeProfile.email,
-  //   transitionUrl: route.fullPath
-  // })
-  //   .then(() => {
-  //     quasar.notify({
-  //       message: 'Sent',
-  //       color: 'positive',
-  //       icon: 'send'
-  //     })
-  //     showSendToSDSHiringLeadsDialog.value = false
-  //     showSendToFiscalDialog.value = false
-  //     showSendToHRDialog.value = false
-  //     showSendToSTNDialog.value = false
-  //     showAssigneeDialog.value = false
-  //     sendDialogUpdate.value = false
-  //     sendDialogMessage.value = ''
-  //     reassignDialogMessage.value = ''
-  //     // Signal to WorkflowInstanceDetail that the transition was assigned or
-  //     // completed, in which case we need to get the newly created process
-  //     // instances.
-  //     bus.emit('transitionReassigned', Math.random())
-  //   })
-  //   .catch(e => {
-  //     console.error('Error sending email', e)
-  //     quasar.notify({
-  //       message: 'Error sending email',
-  //       color: 'negative',
-  //       icon: 'report_problem'
-  //     })
-  //   })
   showSubmitToFiscalDialog.value = false
   submitted.value = true
   rows.value.forEach(row => row.submitted = true)
@@ -390,8 +376,7 @@ function onUnsubmitDialog() {
 }
 
 onMounted(() => {
-  setDates()
-  // retrieveTeamTimeOff()
+  // retrieveExpenses()
 })
 
 </script>

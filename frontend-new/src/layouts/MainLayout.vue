@@ -142,13 +142,13 @@ const navLinks: Array<LinkData> = [
   {
     title: 'Credit Card Expenses',
     icon: 'credit_card',
-    link: '/expenses',
+    link: '/expenses/my',
     canViewExpenses: true
   },
   {
     title: 'Credit Card Expense Reports',
     icon: 'request_quote',
-    link: '/expenses-review',
+    link: '/expenses/review',
     isFiscalEmployee: true
   },
   // {

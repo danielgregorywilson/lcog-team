@@ -23,20 +23,27 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'expenses',
         name: 'expenses',
-        component: () => import('src/pages/purchases/Expenses.vue'),
-        meta: { requiresAuth: true, requiresCanViewExpenses: true },
-      },
-      {
-        path: 'expenses-review',
-        name: 'expenses-review',
-        component: () => import('src/pages/purchases/ExpensesReview.vue'),
-        meta: { requiresAuth: true, requiresFiscal: true },
-      },
-      {
-        path: 'expenses-review/:employeePk/:year/:month',
-        name: 'expenses-review-detail',
-        component: () => import('src/pages/purchases/ExpensesReviewDetail.vue'),
-        meta: { requiresAuth: true, requiresFiscal: true },
+        component: () => import('src/pages/purchases/ExpensesBase.vue'),
+        children: [
+          {
+            path: 'my',
+            name: 'my-expenses',
+            component: () => import('src/pages/purchases/MyExpenses.vue'),
+            meta: { requiresAuth: true, requiresCanViewExpenses: true },
+          },
+          {
+            path: 'review',
+            name: 'expenses-review',
+            component: () => import('src/pages/purchases/ExpensesReview.vue'),
+            meta: { requiresAuth: true, requiresFiscal: true },
+          },
+          {
+            path: 'review/:employeePk/:year/:month',
+            name: 'expenses-review-detail',
+            component: () => import('src/pages/purchases/ExpensesReviewDetail.vue'),
+            meta: { requiresAuth: true, requiresFiscal: true },
+          },
+        ]
       },
 
       //////////////////////

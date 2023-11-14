@@ -1679,7 +1679,18 @@ function canSendToHiringLeads() {
 function canSendToFiscal() {
   // GS employees send to fiscal. SDS managers send to SDS hiring leads.
   const division = cookies.get('division')
-  const isGSSubmitter = employeeIsSubmitter() && division != 'Senior & Disability Services'
+  // They function the same, so treat AS as GS
+  const isGS = [
+    'Administrative Services', 'Government Services'
+  ].indexOf(division) != -1
+  const isSDS = division == 'Senior & Disability Services'
+  if (!(isGS || isSDS)) {
+    userStore.logError({
+      message: `User does not seem to have a correct division: ${division}`,
+      location: 'EmployeeTransitionDetail: canSendToFiscal'
+    })
+  }
+  const isGSSubmitter = employeeIsSubmitter() && isGS
   const isHiringLeadAndAssignee = assigneeCurrentVal.value == 'Hiring Lead' &&
     cookies.get('is_sds_hiring_lead') == 'true'
   const isGSSubmitterAndAssignee = assigneeCurrentVal.value == 'Submitter' &&

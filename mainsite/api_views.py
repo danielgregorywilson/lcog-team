@@ -1,3 +1,6 @@
+import json
+import traceback
+
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -7,9 +10,11 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
 
+from mainsite.helpers import record_error
 from mainsite.models import SecurityMessage, TrustedIPAddress
 from mainsite.serializers import (
-    FileUploadSerializer, SecurityMessageSerializer, TrustedIPSerializer
+    FileUploadSerializer, SecurityMessageSerializer,
+    TrustedIPSerializer
 )
 from purchases.models import Expense
 
@@ -40,6 +45,15 @@ class LargeResultsSetPagination(PageNumberPagination):
 #                 return True
         
 #         return False
+
+
+class LogErrorView(viewsets.ViewSet):
+
+    def create(self, request):
+        record_error(
+            json.dumps(request.data), None, request, traceback.format_exc()
+        )
+        return Response("Client error recorded", status=202)
 
 
 class TrustedIPViewSet(viewsets.ViewSet):

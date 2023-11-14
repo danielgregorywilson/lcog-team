@@ -4,7 +4,9 @@ import { useCookies } from 'vue3-cookies'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
 import { useSecurityMessageStore } from 'src/stores/securitymessage'
-import { EmployeeRetrieve, SimpleEmployeeRetrieve } from 'src/types'
+import {
+  ClientError, EmployeeRetrieve, SimpleEmployeeRetrieve
+} from 'src/types'
 
 const { cookies } = useCookies()
 
@@ -160,6 +162,19 @@ export const useUserStore = defineStore('user', {
         cookies.remove('can_manage_mow_stops')
         resolve('Successfully triggered logout')
       })
-    }
+    },
+    // Log a frontend error in AWS CloudWatch
+    // TODO: This doesn't belong here, but I don't have a generic utility store.
+    logError(data: ClientError) {
+      return new Promise((resolve, reject) => {
+        axios({ url: `${ apiURL }api/v1/log-error`, data, method: 'POST' })
+          .then(resp => {
+            resolve(resp)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error logging error LOL:', e)
+          })
+      })
+    },
   }
 })

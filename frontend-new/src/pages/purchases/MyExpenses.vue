@@ -200,7 +200,7 @@ import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import FileUploader from 'src/components/FileUploader.vue'
 import { readableDate } from 'src/filters'
 
-type Expense = {date: string, isToday: boolean}
+// type Expense = {date: string, isToday: boolean}
 
 const quasar = useQuasar()
 
@@ -285,39 +285,39 @@ function tableTitleDisplay(): string {
   return `${props.monthDisplay}${submittedText}`
 }
 
-function monthExpenses(): Expense[] {
-  return []
-  // const apiResults = timeOffStore.teamTimeOffRequests
-  // let sortedTimeOff: TimeOffCalendarData = []
-  // if (apiResults) {
-  //   for (let i=0; i<5; i++) {
-  //     let d = new Date(selectedMonday.value.getTime() + i*(1000 * 60 * 60 * 24))
-  //     let isToday = d.setHours(0,0,0,0) === today.value.setHours(0,0,0,0)
-  //     sortedTimeOff.push({
-  //       date: d.toLocaleDateString('en-us', { weekday: 'long', month: 'long', day: 'numeric' }),
-  //       isToday: isToday,
-  //       requests: apiResults.filter(request => {
-  //         const targetDateMS = d.setHours(0,0,0,0)
+// function monthExpenses(): Expense[] {
+//   return []
+//   const apiResults = timeOffStore.teamTimeOffRequests
+//   let sortedTimeOff: TimeOffCalendarData = []
+//   if (apiResults) {
+//     for (let i=0; i<5; i++) {
+//       let d = new Date(selectedMonday.value.getTime() + i*(1000 * 60 * 60 * 24))
+//       let isToday = d.setHours(0,0,0,0) === today.value.setHours(0,0,0,0)
+//       sortedTimeOff.push({
+//         date: d.toLocaleDateString('en-us', { weekday: 'long', month: 'long', day: 'numeric' }),
+//         isToday: isToday,
+//         requests: apiResults.filter(request => {
+//           const targetDateMS = d.setHours(0,0,0,0)
 
-  //         const fromDate = new Date(request.start_date)
-  //         const fromTZOffset = fromDate.getTimezoneOffset() * 60000
-  //         const fromDateMS = new Date(fromDate.getTime() + fromTZOffset).setHours(0,0,0,0)
+//           const fromDate = new Date(request.start_date)
+//           const fromTZOffset = fromDate.getTimezoneOffset() * 60000
+//           const fromDateMS = new Date(fromDate.getTime() + fromTZOffset).setHours(0,0,0,0)
 
-  //         const toDate = new Date(request.end_date)
-  //         const toTZOffset = toDate.getTimezoneOffset() * 60000
-  //         const toDateMS = new Date(toDate.getTime() + toTZOffset).setHours(0,0,0,0)
+//           const toDate = new Date(request.end_date)
+//           const toTZOffset = toDate.getTimezoneOffset() * 60000
+//           const toDateMS = new Date(toDate.getTime() + toTZOffset).setHours(0,0,0,0)
 
-  //         if (fromDateMS <= targetDateMS && targetDateMS <= toDateMS) {
-  //           return true
-  //         } else {
-  //           return false
-  //         }
-  //       })
-  //     })
-  //   }
-  // }
-  // return sortedTimeOff
-}
+//           if (fromDateMS <= targetDateMS && targetDateMS <= toDateMS) {
+//             return true
+//           } else {
+//             return false
+//           }
+//         })
+//       })
+//     }
+//   }
+//   return sortedTimeOff
+// }
 
 function clickAddExpense(): void {
   rows.value.push({

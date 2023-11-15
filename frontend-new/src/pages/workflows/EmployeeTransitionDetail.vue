@@ -1681,7 +1681,7 @@ function canSendToFiscal() {
   const division = cookies.get('division')
   // They function the same, so treat AS as GS
   const isGS = [
-    'Administrative Services', 'Government Services'
+    'Administrative Services', 'Government Services', 'Test Division'
   ].indexOf(division) != -1
   const isSDS = division == 'Senior & Disability Services'
   if (!(isGS || isSDS)) {

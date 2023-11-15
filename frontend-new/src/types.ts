@@ -851,3 +851,12 @@ export interface Stop {
   updated_at?: Date
   new?: boolean
 }
+
+///////////////
+// Utilities //
+///////////////
+
+export interface ClientError {
+  message: string
+  location: string
+}

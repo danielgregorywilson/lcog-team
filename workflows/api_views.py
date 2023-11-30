@@ -384,10 +384,11 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_403_FORBIDDEN
                 )
             if user_can_edit_manager:
-                if editing_manager and request.data['manager_pk'] != -1:
-                    t.manager = Employee.objects.get(pk=request.data['manager_pk'])
-                else:
-                    t.manager = None
+                if editing_manager:
+                    if request.data['manager_pk'] != -1:
+                        t.manager = Employee.objects.get(pk=request.data['manager_pk'])
+                    else:
+                        t.manager = None
                 
             if prop_in_obj(request.data, 'unit_pk', -1):
                 t.unit = UnitOrProgram.objects.get(pk=request.data['unit_pk'])

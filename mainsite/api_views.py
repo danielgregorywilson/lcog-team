@@ -1,3 +1,4 @@
+from ipaddress import ip_address
 import json
 import traceback
 
@@ -64,7 +65,15 @@ class TrustedIPViewSet(viewsets.ViewSet):
     serializer_class = TrustedIPSerializer
 
     def list(self, request):
-        admin_ips = map(lambda ip: ip.address, TrustedIPAddress.objects.all())
+        admin_ips = []
+        for ip in TrustedIPAddress.objects.all():
+            current_ip = ip_address(ip.address)
+            admin_ips.append(str(current_ip))
+            if ip.address_range_end:
+                range_end = ip_address(ip.address_range_end)
+                while current_ip < range_end:
+                    current_ip += 1
+                    admin_ips.append(str(current_ip))
         settings_ips = settings.REST_FRAMEWORK_TRUSTED_IPS_LIST
         trusted_ips = list(admin_ips) + settings_ips
         x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')

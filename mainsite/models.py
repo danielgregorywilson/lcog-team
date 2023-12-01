@@ -78,6 +78,12 @@ class TrustedIPAddress(models.Model):
         return _("Trusted IP Address")
 
     address = models.GenericIPAddressField()
+    address_range_end = models.GenericIPAddressField(
+        blank=True,
+        null=True,
+        help_text=_("Optional. If you want to allow a range of IP addresses, "
+                    "enter the end of the range here.")
+    )
     description = models.CharField(max_length=255)
 
 

@@ -176,5 +176,33 @@ export const useUserStore = defineStore('user', {
           })
       })
     },
+
+    // TODO: More stuff that doesn't belong here: Zoom test create meetings
+    // Authenticate a Zoom user
+    authenticateZoomUser() {
+      return new Promise((resolve, reject) => {
+        axios({ url: `https://zoom.us/oauth/authorize?response_type=code&client_id=PFvjFxQERmqeMKlaJ_R4g&redirect_uri=https://team-staging.lcog.org/`, data: {  }, method: 'GET' })
+          .then(resp => {
+            resolve(resp)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error authenticating Zoom user:', e)
+          })
+      })
+    },
+
+    // Create a Zoom meeting link
+    createZoomMeeting(userId: string) {
+      return new Promise((resolve, reject) => {
+        axios({ url: `https://api.zoom.us/v2/users/${userId}/meetings`, data: { }, method: 'POST' })
+          .then(resp => {
+            debugger
+            resolve(resp)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error creating Zoom meeting link:', e)
+          })
+      })
+    },
   }
 })

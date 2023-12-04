@@ -26,7 +26,7 @@ class SecurityMessageAdmin(admin.ModelAdmin):
 
 @admin.register(TrustedIPAddress)
 class TrustedIPAddressAdmin(admin.ModelAdmin):
-    list_display = ["address", "description"]
+    list_display = ["address", "address_range_end", "description"]
 
 
 class UserCreationForm(BaseUserCreationForm):

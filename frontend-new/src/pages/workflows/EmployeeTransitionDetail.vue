@@ -42,6 +42,7 @@
     <div class="text-h6 transition-form-section-heading">Employee</div>
     <div class="row">
       <q-input
+        stack-label
         v-model="employeeFirstName"
         label="First"
         class="q-mr-md"
@@ -49,15 +50,17 @@
         :readonly="!canEditOtherFields()"
       />
       <q-input
+        stack-label
         v-model="employeeMiddleInitial"
         maxlength=5
-        label="M"
+        label="Middle Initial"
         class="q-mr-md"
         name="middle-initial"
-        style="width: 4em"
+        style="width: 5em"
         :readonly="!canEditOtherFields()"
       />
       <q-input
+        stack-label
         v-model="employeeLastName"
         label="Last"
         class="q-mr-md"

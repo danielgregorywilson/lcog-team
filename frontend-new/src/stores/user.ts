@@ -181,7 +181,7 @@ export const useUserStore = defineStore('user', {
     // Authenticate a Zoom user
     authenticateZoomUser() {
       return new Promise((resolve, reject) => {
-        axios({ url: `https://zoom.us/oauth/authorize?response_type=code&client_id=PFvjFxQERmqeMKlaJ_R4g&redirect_uri=https://team-staging.lcog.org/`, data: {  }, method: 'GET' })
+        axios({ url: 'https://zoom.us/oauth/authorize?response_type=code&client_id=PFvjFxQERmqeMKlaJ_R4g&redirect_uri=https://team-staging.lcog.org/', data: {  }, method: 'GET' })
           .then(resp => {
             resolve(resp)
           })
@@ -196,7 +196,6 @@ export const useUserStore = defineStore('user', {
       return new Promise((resolve, reject) => {
         axios({ url: `https://api.zoom.us/v2/users/${userId}/meetings`, data: { }, method: 'POST' })
           .then(resp => {
-            debugger
             resolve(resp)
           })
           .catch(e => {

@@ -15,6 +15,7 @@
           </q-btn>
         </div>
         {{ zoomAuthenticationCode }}
+        {{ typeof zoomAuthenticationCode }}
         {{ zoomAuthenticationCode !== '' }}
         <div class="row justify-center">{{ zoomLink }}</div>
       </div>
@@ -41,13 +42,12 @@ let zoomAuthenticationCode = route.query.code
 let zoomLink = ref('')
 
 function authenticated(): boolean {
-  return zoomAuthenticationCode !== ''
+  return typeof zoomAuthenticationCode == 'string' && zoomAuthenticationCode !== ''
 }
 
 function makeZoomLink(): void {
   userStore.createZoomMeeting(danUserId)
     .then(meetingLink => {
-      debugger
       zoomLink.value = meetingLink
     })
     .catch(e => {

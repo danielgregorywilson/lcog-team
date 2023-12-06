@@ -62,22 +62,24 @@ class ObtainZoomAccessToken(APIView):
         redirect_url = os.environ.get('ZOOM_REDIRECT_URL')
         ascii_string = f'{ client_id }: { client_secret }'.encode('ascii')
         encoded_string = base64.b64encode(ascii_string).decode('ascii')
-        response = requests.post(
-            'https://zoom.us/oauth/token',
-            data={
-                'grant_type': 'authorization_code',
-                'code': request.data['code'],
-                'redirect_uri': redirect_url,
-            },
-            headers={
-                'Authorization': f'Basic { encoded_string }',
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        )
-        record_error(
-            'Something happened', None, request, traceback.format_exc()
-        )
-        return Response(response)
+        try:
+            response = requests.post(
+                'https://zoom.us/oauth/token',
+                data={
+                    'grant_type': 'authorization_code',
+                    'code': request.data['code'],
+                    'redirect_uri': redirect_url,
+                },
+                headers={
+                    'Authorization': f'Basic { encoded_string }',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            )
+            return Response(response)
+        except (requests.exceptions.RequestException, requests.exceptions.HTTPError) as e:
+            record_error(
+                'Request exception:', e, request, traceback.format_exc()
+            )
 
 obtain_zoom_access_token = ObtainZoomAccessToken.as_view()
 

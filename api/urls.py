@@ -7,7 +7,9 @@ from deskreservation.api_views import DeskReservationViewSet, DeskViewSet
 from mainsite.api_views import (
     FileUploadViewSet, LogErrorView, SecurityMessageViewSet, TrustedIPViewSet
 )
-from mainsite.views import obtain_auth_token_without_password
+from mainsite.views import (
+    obtain_auth_token_without_password, obtain_zoom_access_token
+)
 from meals.api_views import AddressLatLong, MealStopViewSet
 from people.api_views import (
     CurrentUserView, EmployeeViewSet, GroupViewSet,
@@ -36,7 +38,8 @@ urlpatterns = [
         'v1/address-lat-long/',
         AddressLatLong.as_view(),
         name='address_lat_long'
-    )
+    ),
+    path('v1/zoom-access-token/', obtain_zoom_access_token),
 ]
 
 router = routers.DefaultRouter(trailing_slash=False)

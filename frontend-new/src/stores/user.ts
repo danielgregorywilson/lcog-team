@@ -179,14 +179,52 @@ export const useUserStore = defineStore('user', {
 
     // TODO: More stuff that doesn't belong here: Zoom test create meetings
     // Authenticate a Zoom user
-    authenticateZoomUser() {
+    // TODO: Unused
+    getZoomAuthorizationToken() {
       return new Promise((resolve, reject) => {
         axios({ url: 'https://zoom.us/oauth/authorize?response_type=code&client_id=PFvjFxQERmqeMKlaJ_R4g&redirect_uri=https://team-staging.lcog.org/', data: {  }, method: 'GET' })
           .then(resp => {
             resolve(resp)
           })
           .catch(e => {
-            handlePromiseError(reject, 'Error authenticating Zoom user:', e)
+            handlePromiseError(reject, 'Error authenticating Zoom user: requesting user authoriation:', e)
+          })
+      })
+    },
+
+    // Authenticate a Zoom user
+    getZoomAccessToken(authorizationCode: string) {
+      return new Promise((resolve, reject) => {
+        const client_id = 'PFvjFxQERmqeMKlaJ_R4g'
+        const client_secret = 'C6uv4I1k4vOfSgnJktUKCSrD4hJMKgUs'
+        const encodedString = btoa(`${ client_id }:${ client_secret }`)
+        axios({ url: `${ apiURL }api/v1/zoom-access-token/` })
+          .then(resp => resolve(resp.data))
+          .catch(e => handlePromiseError(
+            reject, 'Error getting Zoom access token', e
+          ))
+
+
+
+        axios({
+          url: 'https://zoom.us/oauth/token',
+          data: {
+            grant_type: 'authorization_code',
+            code: authorizationCode,
+            redirect_uri: 'https://team-staging.lcog.org/'
+          },
+          method: 'POST',
+          headers: {
+            'Authorization': `Basic ${ encodedString }`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        })
+          .then(resp => {
+            console.log(resp)
+            resolve(resp)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error authenticating Zoom user: requesting access token', e)
           })
       })
     },

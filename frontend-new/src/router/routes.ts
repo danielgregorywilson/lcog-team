@@ -352,6 +352,15 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true, requiresMealsOnWheelsPermission: true }
   },
 
+  ///////////////
+  // ZOOM TEST //
+  ///////////////
+  {
+    path: '/zoom',
+    name: 'zoom',
+    component: () => import('src/pages/ZoomTest.vue'),
+  },
+
   //////////////////
   // PRINT LAYOUT //
   //////////////////

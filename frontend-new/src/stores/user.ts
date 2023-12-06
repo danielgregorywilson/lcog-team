@@ -176,5 +176,84 @@ export const useUserStore = defineStore('user', {
           })
       })
     },
+
+    // TODO: More stuff that doesn't belong here: Zoom test create meetings
+    // Authenticate a Zoom user
+    // TODO: Unused
+    getZoomAuthorizationToken() {
+      return new Promise((resolve, reject) => {
+        const client_id = import.meta.env.VITE_ZOOM_CLIENT_ID
+        const redirect_uri = import.meta.env.VITE_ZOOM_REDIRECT_URI
+        axios({
+          url: `https://zoom.us/oauth/authorize?response_type=code&client_id=${ client_id }&redirect_uri=${ redirect_uri }`,
+          method: 'GET'
+        })
+          .then(resp => {
+            resolve(resp)
+          })
+          .catch(e => {
+            handlePromiseError(
+              reject,
+              'Error authenticating Zoom user: requesting user authoriation:',
+              e
+            )
+          })
+      })
+    },
+
+    // Authenticate a Zoom user
+    getZoomAccessToken(authorizationCode: string) {
+      return new Promise((resolve, reject) => {
+        const client_id = import.meta.env.VITE_ZOOM_CLIENT_ID
+        const client_secret = import.meta.env.VITE_ZOOM_CLIENT_SECRET
+        const encodedString = btoa(`${ client_id }:${ client_secret }`)
+        console.log('encoded:', encodedString)
+        axios({
+          url: `${ apiURL }api/v1/zoom-access-token/`,
+          data: { 'code': authorizationCode },
+          method: 'POST',
+        })
+          .then(resp => resolve(resp.data))
+          .catch(e => handlePromiseError(
+            reject, 'Error getting Zoom access token', e
+          ))
+
+
+
+        // axios({
+        //   url: 'https://zoom.us/oauth/token',
+        //   data: {
+        //     grant_type: 'authorization_code',
+        //     code: authorizationCode,
+        //     redirect_uri: 'https://team-staging.lcog.org/'
+        //   },
+        //   method: 'POST',
+        //   headers: {
+        //     'Authorization': `Basic ${ encodedString }`,
+        //     'Content-Type': 'application/x-www-form-urlencoded'
+        //   }
+        // })
+        //   .then(resp => {
+        //     console.log(resp)
+        //     resolve(resp)
+        //   })
+        //   .catch(e => {
+        //     handlePromiseError(reject, 'Error authenticating Zoom user: requesting access token', e)
+        //   })
+      })
+    },
+
+    // Create a Zoom meeting link
+    createZoomMeeting(userId: string) {
+      return new Promise((resolve, reject) => {
+        axios({ url: `https://api.zoom.us/v2/users/${userId}/meetings`, data: { }, method: 'POST' })
+          .then(resp => {
+            resolve(resp)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error creating Zoom meeting link:', e)
+          })
+      })
+    },
   }
 })

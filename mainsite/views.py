@@ -1,6 +1,7 @@
 import base64
 import os
 import requests
+import traceback
 
 from django.contrib.auth.models import User
 from django.http.response import HttpResponse
@@ -12,6 +13,7 @@ from rest_framework.response import Response
 from rest_framework.schemas import ManualSchema
 from rest_framework.views import APIView
 
+from mainsite.helpers import record_error
 from mainsite.serializers import AuthTokenSerializerWithoutPassword
 from people.models import Employee
 
@@ -71,6 +73,9 @@ class ObtainZoomAccessToken(APIView):
                 'Authorization': f'Basic { encoded_string }',
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
+        )
+        record_error(
+            'Something happened', None, request, traceback.format_exc()
         )
         return Response(response)
 

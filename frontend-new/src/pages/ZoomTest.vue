@@ -63,8 +63,8 @@ function hasAccessToken(): boolean {
 
 function getAccessToken(): void {
   userStore.getZoomAccessToken(authorizationCode().value)
-  .then(accessToken => {
-    accessToken.value = accessToken
+  .then(resp => {
+    accessToken.value = resp.access_token
   })
   .catch(e => {
     console.error('Error requesting a zoom access token:', e)

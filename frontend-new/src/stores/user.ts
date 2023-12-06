@@ -182,12 +182,21 @@ export const useUserStore = defineStore('user', {
     // TODO: Unused
     getZoomAuthorizationToken() {
       return new Promise((resolve, reject) => {
-        axios({ url: 'https://zoom.us/oauth/authorize?response_type=code&client_id=PFvjFxQERmqeMKlaJ_R4g&redirect_uri=https://team-staging.lcog.org/', data: {  }, method: 'GET' })
+        const client_id = import.meta.env.VITE_ZOOM_CLIENT_ID
+        const redirect_uri = import.meta.env.VITE_ZOOM_REDIRECT_URI
+        axios({
+          url: `https://zoom.us/oauth/authorize?response_type=code&client_id=${ client_id }&redirect_uri=${ redirect_uri }`,
+          method: 'GET'
+        })
           .then(resp => {
             resolve(resp)
           })
           .catch(e => {
-            handlePromiseError(reject, 'Error authenticating Zoom user: requesting user authoriation:', e)
+            handlePromiseError(
+              reject,
+              'Error authenticating Zoom user: requesting user authoriation:',
+              e
+            )
           })
       })
     },
@@ -195,10 +204,15 @@ export const useUserStore = defineStore('user', {
     // Authenticate a Zoom user
     getZoomAccessToken(authorizationCode: string) {
       return new Promise((resolve, reject) => {
-        const client_id = 'PFvjFxQERmqeMKlaJ_R4g'
-        const client_secret = 'C6uv4I1k4vOfSgnJktUKCSrD4hJMKgUs'
+        const client_id = import.meta.env.VITE_ZOOM_CLIENT_ID
+        const client_secret = import.meta.env.VITE_ZOOM_CLIENT_SECRET
         const encodedString = btoa(`${ client_id }:${ client_secret }`)
-        axios({ url: `${ apiURL }api/v1/zoom-access-token/` })
+        console.log('encoded:', encodedString)
+        axios({
+          url: `${ apiURL }api/v1/zoom-access-token/`,
+          data: { 'code': authorizationCode },
+          method: 'POST',
+        })
           .then(resp => resolve(resp.data))
           .catch(e => handlePromiseError(
             reject, 'Error getting Zoom access token', e
@@ -206,26 +220,26 @@ export const useUserStore = defineStore('user', {
 
 
 
-        axios({
-          url: 'https://zoom.us/oauth/token',
-          data: {
-            grant_type: 'authorization_code',
-            code: authorizationCode,
-            redirect_uri: 'https://team-staging.lcog.org/'
-          },
-          method: 'POST',
-          headers: {
-            'Authorization': `Basic ${ encodedString }`,
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        })
-          .then(resp => {
-            console.log(resp)
-            resolve(resp)
-          })
-          .catch(e => {
-            handlePromiseError(reject, 'Error authenticating Zoom user: requesting access token', e)
-          })
+        // axios({
+        //   url: 'https://zoom.us/oauth/token',
+        //   data: {
+        //     grant_type: 'authorization_code',
+        //     code: authorizationCode,
+        //     redirect_uri: 'https://team-staging.lcog.org/'
+        //   },
+        //   method: 'POST',
+        //   headers: {
+        //     'Authorization': `Basic ${ encodedString }`,
+        //     'Content-Type': 'application/x-www-form-urlencoded'
+        //   }
+        // })
+        //   .then(resp => {
+        //     console.log(resp)
+        //     resolve(resp)
+        //   })
+        //   .catch(e => {
+        //     handlePromiseError(reject, 'Error authenticating Zoom user: requesting access token', e)
+        //   })
       })
     },
 

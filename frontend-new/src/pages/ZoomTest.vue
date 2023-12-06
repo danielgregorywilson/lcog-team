@@ -22,8 +22,7 @@
         </div>
         <div>Authorization Code: {{ authorizationCode() }}</div>
         <div>Access Token: {{ accessToken }}</div>
-        <div class="row justify-center">{{ zoomLink }}</div>
-        {{ ABC }}A
+        <div>Zoom Link: {{ zoomLink }}</div>
       </div>
     </q-page>
   </q-page-container>
@@ -41,8 +40,6 @@ import { useUserStore } from 'src/stores/user'
 
 const route = useRoute()
 const userStore = useUserStore()
-
-const ABC = import.meta.env.VUE_APP_ZOOM_CLIENT_ID
 
 const danUserId = '7826406771'
 

@@ -76,6 +76,9 @@ class ObtainZoomAccessToken(APIView):
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
             )
+            record_error(
+                'Here is the response', response, request, traceback.format_exc()
+            )
             return Response(response)
         except (requests.exceptions.RequestException, requests.exceptions.HTTPError) as e:
             record_error(

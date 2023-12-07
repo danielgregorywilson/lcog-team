@@ -8,7 +8,8 @@ from mainsite.api_views import (
     FileUploadViewSet, LogErrorView, SecurityMessageViewSet, TrustedIPViewSet
 )
 from mainsite.views import (
-    obtain_auth_token_without_password, obtain_zoom_access_token
+    create_new_zoom_meeting, obtain_auth_token_without_password,
+    obtain_zoom_access_token
 )
 from meals.api_views import AddressLatLong, MealStopViewSet
 from people.api_views import (
@@ -40,6 +41,7 @@ urlpatterns = [
         name='address_lat_long'
     ),
     path('v1/zoom-access-token/', obtain_zoom_access_token),
+    path('v1/zoom-new-meeting/', create_new_zoom_meeting),
 ]
 
 router = routers.DefaultRouter(trailing_slash=False)

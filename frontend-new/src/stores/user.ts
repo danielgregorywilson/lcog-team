@@ -249,22 +249,42 @@ export const useUserStore = defineStore('user', {
 
     // Create a Zoom meeting link
     createZoomMeeting(userId: string, accessToken: string) {
+      console.log(`Bearer ${accessToken}`)
       return new Promise((resolve, reject) => {
         axios({
-          // url: `https://api.zoom.us/v2/users/${userId}/meetings`,
-          url: 'https://api.zoom.us/v2/users/me/meetings',
-          data: { },
+          url: `${ apiURL }api/v1/zoom-new-meeting/`,
+          data: { 'accessToken': accessToken },
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          }
         })
           .then(resp => {
-            resolve(resp)
+            console.log("THISISTHERESP:", resp)
+            const data = resp.data.join('')
+            const accessToken = JSON.parse(data)
+            resolve(accessToken)
           })
-          .catch(e => {
-            handlePromiseError(reject, 'Error creating Zoom meeting link:', e)
-          })
+          .catch(e => handlePromiseError(
+            reject, 'Error creating Zoom meeting', e
+          ))
+
+
+
+
+        // axios({
+        //   // url: `https://api.zoom.us/v2/users/${userId}/meetings`,
+        //   // url: 'https://api.zoom.us/v2/users/me/meetings',
+        //   // url: 'https://api.zoom.us/v2/users/me',
+        //   url: `https://api.zoom.us/v2/users/${userId}`,
+        //   method: 'GET',
+        //   headers: {
+        //     'Authorization': `Bearer ${accessToken}`,
+        //   }
+        // })
+        //   .then(resp => {
+        //     resolve(resp)
+        //   })
+        //   .catch(e => {
+        //     handlePromiseError(reject, 'Error creating Zoom meeting link:', e)
+        //   })
       })
     },
   }

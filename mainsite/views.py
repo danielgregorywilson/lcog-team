@@ -76,6 +76,26 @@ class ObtainZoomAccessToken(APIView):
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
             )
+            return Response(response)
+        except (requests.exceptions.RequestException, requests.exceptions.HTTPError) as e:
+            record_error(
+                'Request exception:', e, request, traceback.format_exc()
+            )
+
+obtain_zoom_access_token = ObtainZoomAccessToken.as_view()
+
+
+class CreateNewZoomMeeting(APIView):
+    def post(self, request, *args, **kwargs):
+        accessToken = request.data['accessToken']
+        try:
+            response = requests.post(
+                'https://api.zoom.us/v2/users/me',
+                headers={
+                    'Authorization': f'Bearer { accessToken }',
+                    # 'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            )
             record_error(
                 'Here is the response', response, request, traceback.format_exc()
             )
@@ -85,7 +105,7 @@ class ObtainZoomAccessToken(APIView):
                 'Request exception:', e, request, traceback.format_exc()
             )
 
-obtain_zoom_access_token = ObtainZoomAccessToken.as_view()
+create_new_zoom_meeting = CreateNewZoomMeeting.as_view()
 
 
 def health_check_view(request):

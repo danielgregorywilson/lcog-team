@@ -90,7 +90,7 @@ class CreateNewZoomMeeting(APIView):
         accessToken = request.data['accessToken']
         try:
             response = requests.post(
-                'https://api.zoom.us/v2/users/me',
+                'https://api.zoom.us/v2/users/me/meetings',
                 headers={
                     'Authorization': f'Bearer { accessToken }',
                     # 'Content-Type': 'application/x-www-form-urlencoded'

@@ -21,7 +21,7 @@
           </q-btn>
         </div>
         <div>Authorization Code: {{ authorizationCode() }}</div>
-        <div>Access Token: {{ accessToken }}</div>
+        <div>Access Token (expires in 1 hour): {{ accessToken }}</div>
         <div>Zoom Link: {{ zoomLink }}</div>
       </div>
     </q-page>
@@ -63,8 +63,8 @@ function hasAccessToken(): boolean {
 
 function getAccessToken(): void {
   userStore.getZoomAccessToken(authorizationCode().value)
-  .then(resp => {
-    accessToken.value = resp.access_token
+  .then(token => {
+    accessToken.value = token
   })
   .catch(e => {
     console.error('Error requesting a zoom access token:', e)
@@ -72,8 +72,9 @@ function getAccessToken(): void {
 }
 
 function makeZoomLink(): void {
-  userStore.createZoomMeeting(danUserId)
+  userStore.createZoomMeeting(danUserId, accessToken.value)
     .then(meetingLink => {
+      console.log(meetingLink)
       zoomLink.value = meetingLink
     })
     .catch(e => {

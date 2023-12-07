@@ -202,7 +202,7 @@ export const useUserStore = defineStore('user', {
     },
 
     // Authenticate a Zoom user
-    getZoomAccessToken(authorizationCode: string) {
+    getZoomAccessToken(authorizationCode: string): Promise<string> {
       return new Promise((resolve, reject) => {
         const client_id = import.meta.env.VITE_ZOOM_CLIENT_ID
         const client_secret = import.meta.env.VITE_ZOOM_CLIENT_SECRET
@@ -213,7 +213,11 @@ export const useUserStore = defineStore('user', {
           data: { 'code': authorizationCode },
           method: 'POST',
         })
-          .then(resp => resolve(resp.data))
+          .then(resp => {
+            const data = resp.data.join('')
+            const accessToken = JSON.parse(data).access_token
+            resolve(accessToken)
+          })
           .catch(e => handlePromiseError(
             reject, 'Error getting Zoom access token', e
           ))
@@ -244,9 +248,17 @@ export const useUserStore = defineStore('user', {
     },
 
     // Create a Zoom meeting link
-    createZoomMeeting(userId: string) {
+    createZoomMeeting(userId: string, accessToken: string) {
       return new Promise((resolve, reject) => {
-        axios({ url: `https://api.zoom.us/v2/users/${userId}/meetings`, data: { }, method: 'POST' })
+        axios({
+          // url: `https://api.zoom.us/v2/users/${userId}/meetings`,
+          url: 'https://api.zoom.us/v2/users/me/meetings',
+          data: { },
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          }
+        })
           .then(resp => {
             resolve(resp)
           })

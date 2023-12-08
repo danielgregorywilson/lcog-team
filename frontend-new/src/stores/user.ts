@@ -206,7 +206,6 @@ export const useUserStore = defineStore('user', {
       return new Promise((resolve, reject) => {
         const client_id = import.meta.env.VITE_ZOOM_CLIENT_ID
         const client_secret = import.meta.env.VITE_ZOOM_CLIENT_SECRET
-        const encodedString = btoa(`${ client_id }:${ client_secret }`)
         axios({
           url: `${ apiURL }api/v1/zoom-access-token/`,
           data: { 'code': authorizationCode },

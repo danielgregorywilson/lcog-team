@@ -207,7 +207,6 @@ export const useUserStore = defineStore('user', {
         const client_id = import.meta.env.VITE_ZOOM_CLIENT_ID
         const client_secret = import.meta.env.VITE_ZOOM_CLIENT_SECRET
         const encodedString = btoa(`${ client_id }:${ client_secret }`)
-        console.log('encoded:', encodedString)
         axios({
           url: `${ apiURL }api/v1/zoom-access-token/`,
           data: { 'code': authorizationCode },
@@ -249,18 +248,18 @@ export const useUserStore = defineStore('user', {
 
     // Create a Zoom meeting link
     createZoomMeeting(userId: string, accessToken: string) {
-      console.log(`Bearer ${accessToken}`)
       return new Promise((resolve, reject) => {
         axios({
           url: `${ apiURL }api/v1/zoom-new-meeting/`,
-          data: { 'accessToken': accessToken },
+          data: { 'userId': userId, 'accessToken': accessToken },
           method: 'POST',
         })
           .then(resp => {
-            console.log("THISISTHERESP:", resp)
+            console.log('resp:', resp)
             const data = resp.data.join('')
-            const accessToken = JSON.parse(data)
-            resolve(accessToken)
+            console.log('data:', data)
+            // const accessToken = JSON.parse(data)
+            // resolve(accessToken)
           })
           .catch(e => handlePromiseError(
             reject, 'Error creating Zoom meeting', e

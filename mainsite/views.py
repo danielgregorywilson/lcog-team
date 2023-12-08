@@ -97,6 +97,7 @@ class CreateNewZoomMeeting(APIView):
                 },
                 headers={
                     'Authorization': f'Bearer { accessToken }',
+                    'Content-Type': 'application/json'
                 }
             )
             record_error(

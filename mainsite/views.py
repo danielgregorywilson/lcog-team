@@ -62,7 +62,7 @@ class ObtainZoomAccessToken(APIView):
         redirect_url = os.environ.get('ZOOM_REDIRECT_URL')
         ascii_string = f'{ client_id }: { client_secret }'.encode('ascii')
         encoded_string = base64.b64encode(ascii_string).decode('ascii')
-        encoded_string = 'UEZ2akZ4UUVSbXFlTUtsYUpfUjRnOmUwTkZ4YzRzV3lVdnZIWHdvS0hzQW04QjJvb0JXMnBD'
+        encoded_string = 'VXFnX2VwYVhTZWVGT2wxSmNMclhROlRVank4dVhmSE5lb2trT1NEejlNdVlvR1Zodnp0OUJt'
         try:
             response = requests.post(
                 'https://zoom.us/oauth/token',

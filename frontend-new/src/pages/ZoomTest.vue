@@ -4,7 +4,7 @@
     <q-page class="row items-center">
       <div class="col">
         <div class="row justify-center items-center">
-          <q-btn :disable="hasAuthorizationCode()" href="https://zoom.us/oauth/authorize?response_type=code&client_id=PFvjFxQERmqeMKlaJ_R4g&redirect_uri=https://team-staging.lcog.org/zoom">
+          <q-btn :disable="hasAuthorizationCode()" :href=authCodeURL>
             Get Auth Code
           </q-btn>
           <q-icon v-if="hasAuthorizationCode()" name="check" color="green" size="2em" />
@@ -42,6 +42,10 @@ const route = useRoute()
 const userStore = useUserStore()
 
 const danUserId = '7826406771'
+const clientID = import.meta.env.VITE_ZOOM_CLIENT_ID
+const authCodeURL =
+  'https://zoom.us/oauth/authorize?response_type=code&client_id=' + clientID +
+  '&redirect_uri=https://team-staging.lcog.org/zoom'
 
 let accessToken = ref('')
 let zoomLink = ref('')

@@ -42,9 +42,9 @@ def record_error(message, error, request=None, traceback=None):
     message += '\n'
     message += 'Error: ' + str(error)
     message += '\n'
-    message += str(request.__dict__)
+    message += 'Request:' + str(request.__dict__)
     message += '\n'
-    message += str(traceback)
+    message += 'Traceback:' + str(traceback)
     logger.error(message)
 
 def send_email(to_address, subject, body, html_body):

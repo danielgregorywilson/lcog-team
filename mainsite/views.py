@@ -92,12 +92,11 @@ class CreateNewZoomMeeting(APIView):
             response = requests.post(
                 'https://api.zoom.us/v2/users/me/meetings',
                 data={
-                    "agenda": "Test Meeting",
-                    "duration": 60,
+                    "agenda": "Test Meeting"
                 },
                 headers={
                     'Authorization': f'Bearer { accessToken }',
-                    # 'Content-Type': 'application/x-www-form-urlencoded'
+                    'Content-Type': 'application/x-www-form-urlencoded'
                 }
             )
             record_error(

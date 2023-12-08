@@ -204,8 +204,6 @@ export const useUserStore = defineStore('user', {
     // Authenticate a Zoom user
     getZoomAccessToken(authorizationCode: string): Promise<string> {
       return new Promise((resolve, reject) => {
-        const client_id = import.meta.env.VITE_ZOOM_CLIENT_ID
-        const client_secret = import.meta.env.VITE_ZOOM_CLIENT_SECRET
         axios({
           url: `${ apiURL }api/v1/zoom-access-token/`,
           data: { 'code': authorizationCode },

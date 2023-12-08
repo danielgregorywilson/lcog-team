@@ -91,7 +91,7 @@ class CreateNewZoomMeeting(APIView):
         accessToken = request.data['accessToken']
         try:
             response = requests.post(
-                f'https://api.zoom.us/v2/users/{ userId }/meetings',
+                f'https://api.zoom.us/v2/users/me/meetings',
                 data={
                     "agenda": "Test Meeting"
                 },

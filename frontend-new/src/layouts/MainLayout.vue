@@ -111,7 +111,7 @@ interface LinkData {
   icon: string
   link: string
   id?: string
-  managerOnly?: boolean
+  isManager?: boolean
   isISEmployee?: boolean
   isFiscalEmployee?: boolean
   eligibleForTeleworkApplicationOnly?: boolean
@@ -155,7 +155,7 @@ const navLinks: Array<LinkData> = [
     title: 'Performance Reviews',
     icon: 'assignment_turned_in',
     link: '/reviews',
-    managerOnly: true
+    isManager: true
   },
   {
     title: 'Schaefers Desk Reservation',

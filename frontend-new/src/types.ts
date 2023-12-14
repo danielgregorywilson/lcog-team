@@ -248,6 +248,7 @@ export interface ReviewNoteRetrieve {
 }
 
 export interface ReviewNoteUpdate {
+  pk: number
   employee_pk?: number
   note?: string
 }

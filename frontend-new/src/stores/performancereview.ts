@@ -3,7 +3,8 @@ import { defineStore } from 'pinia'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
 import {
-  PerformanceReviewRetrieve, ReviewNoteCreate, ReviewNoteRetrieve,
+  PerformanceReviewRetrieve, PerformanceReviewUpdate,
+  PerformanceReviewUpdatePartial, ReviewNoteCreate, ReviewNoteRetrieve,
   ReviewNoteUpdate, SignatureCreate
 } from 'src/types'
 
@@ -51,12 +52,12 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
     },
 
 
-    getPerformanceReview(data: {pk: number}) {
+    getPerformanceReview(pk: string): Promise<PerformanceReviewRetrieve> {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/performancereview/${ data.pk }` })
+        axios({ url: `${ apiURL }api/v1/performancereview/${ pk }` })
           .then(resp => {
             this.performanceReviewDetails = resp.data
-            resolve(resp)
+            resolve(resp.data)
           })
           .catch(e => {
             handlePromiseError(reject, 'Error getting performance review', e)
@@ -158,28 +159,39 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
       })
     },
 
-    // TODO: Still needed?
-    // updatePerformanceReview: ({ dispatch }, performanceReview: PerformanceReviewUpdate) => {
-    //   const token = localStorage.getItem('user-token')
-    //   console.log('TODO:UPDATE')
-    //   return new Promise((resolve, reject) => {
-    //     debugger
-    //     axios({ url: `${ apiURL }api/v1/performancereview/${performanceReview.pk}`, data: performanceReview, method: 'PUT', headers: { 'Authorization': `Token ${ token }`} }) // eslint-disable-line
-    //     .then(resp => {
-    //       dispatch('getAllPerformanceReviews')
-    //         .catch(e => {
-    //           console.error(e)
-    //         })
-    //       resolve(resp)
-    //     })
-    //     .catch(e => {
-    //       console.error(e)
-    //       reject(e)
-    //     })
-    //   })
-    // },
+    updatePerformanceReview(pk: string, pr: PerformanceReviewUpdate): Promise<PerformanceReviewRetrieve> {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/performancereview/${ pk }`,
+          data: pr,
+          method: 'PUT'
+        })
+          .then(resp => {
+            resolve(resp.data)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error updating performance review', e)
+          })
+      })
+    },
 
-    createSignature({}, signature: SignatureCreate) {
+    updatePerformanceReviewPartial(pk: string, pr: PerformanceReviewUpdatePartial): Promise<PerformanceReviewRetrieve> {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/performancereview/${ pk }`,
+          data: pr,
+          method: 'PATCH'
+        })
+          .then(resp => {
+            resolve(resp.data)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error updating performance review partial', e)
+          })
+      })
+    },
+
+    createSignature(signature: SignatureCreate) {
       return new Promise((resolve, reject) => {
         axios({
           url: `${ apiURL }api/v1/signature`, data: signature, method: 'POST'
@@ -189,6 +201,25 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
           })
           .catch(e => {
             handlePromiseError(reject, 'Error creating a signature', e)
+          })
+      })
+    },
+
+    uploadSignedPositionDescription(formData: FormData) {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/fileupload`,
+          data: formData,
+          method: 'POST'
+        })
+          .then((resp) => {
+            debugger
+            resolve('Successfully uploaded signed position description')
+          })
+          .catch(e => {
+            handlePromiseError(
+              reject, 'Error uploading signed position description', e
+            )
           })
       })
     },
@@ -223,6 +254,45 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
       })
     },
 
+    getReviewNote(pk: string): Promise<ReviewNoteRetrieve> {
+      return new Promise((resolve, reject) => {
+        axios({ url: `${ apiURL }api/v1/reviewnote/${ pk }` })
+          .then(resp => {
+            resolve(resp.data)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error getting all review notes', e)
+          })
+      })
+    },
+
+    getAllReviewNotes(): Promise<Array<ReviewNoteRetrieve>> {
+      return new Promise((resolve, reject) => {
+        axios({ url: `${ apiURL }api/v1/reviewnote` })
+          .then(resp => {
+            this.allReviewNotes = resp.data.results
+            resolve(resp.data.results)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error getting all review notes', e)
+          })
+      })
+    },
+
+    getAllManagerNotesForEmployee(pk: string): Promise<Array<ReviewNoteRetrieve>> {
+      return new Promise((resolve, reject) => {
+        axios({ url: `${ apiURL }api/v1/reviewnote/${pk}/notes_for_employee` })
+          .then(resp => {
+            resolve(resp.data)
+          })
+          .catch(e => {
+            handlePromiseError(
+              reject, 'Error getting all manager notes for employee', e
+            )
+          })
+      })
+    },
+
     updateReviewNote(reviewNote: ReviewNoteUpdate): Promise<ReviewNoteRetrieve> {
       return new Promise((resolve, reject) => {
         axios({
@@ -245,31 +315,6 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
           })
           .catch(e => {
             handlePromiseError(reject, 'Error updating a review note', e)
-          })
-      })
-    },
-
-    getReviewNote(pk: string): Promise<ReviewNoteRetrieve> {
-      return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/reviewnote/${ pk }` })
-          .then(resp => {
-            resolve(resp.data)
-          })
-          .catch(e => {
-            handlePromiseError(reject, 'Error getting all review notes', e)
-          })
-      })
-    },
-
-    getAllReviewNotes() {
-      return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/reviewnote` })
-          .then(resp => {
-            this.allReviewNotes = resp.data.results
-            resolve(resp)
-          })
-          .catch(e => {
-            handlePromiseError(reject, 'Error getting all review notes', e)
           })
       })
     },

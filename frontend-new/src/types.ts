@@ -217,7 +217,7 @@ export interface FileUploadDescriptionUploadServerResponse {
 /////////////////////////////////////////////////////
 
 export interface SignatureCreate {
-  review_pk: number
+  review_pk: string
   employee_pk: number
 }
 

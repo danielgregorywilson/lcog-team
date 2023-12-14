@@ -2,7 +2,10 @@ import axios from 'axios'
 import { defineStore } from 'pinia'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
-import { EmployeeEmailRetrieve, EmployeeRetrieve, EmployeeUpdatePartial, SimpleEmployeeRetrieve, Title, Unit } from 'src/types'
+import {
+  EmployeeEmailRetrieve, EmployeeRetrieve, EmployeeUpdatePartial,
+  SimpleEmployeeRetrieve, Title, Unit
+} from 'src/types'
 
 export const usePeopleStore = defineStore('people', {
   state: () => ({
@@ -56,6 +59,22 @@ export const usePeopleStore = defineStore('people', {
           })
           .catch(e => {
             handlePromiseError(reject, 'Error getting simple employee detail', e)
+          })
+      })
+    },
+    // Get employee direct reports
+    getDirectReports(pk?: number): Promise<Array<EmployeeRetrieve>> {
+      return new Promise((resolve, reject) => {
+        let url = `${ apiURL }api/v1/employee?direct-reports=True`
+        if (!!pk) {
+          url = `${ apiURL }api/v1/employee/${ pk }?direct-reports=True`
+        }
+        axios({ url })
+          .then(resp => {
+            resolve(resp.data.results)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error getting direct reports', e)
           })
       })
     },

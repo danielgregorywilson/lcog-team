@@ -1,13 +1,13 @@
 <template>
   <div class="q-py-sm">
     <q-table
-      :data="reviewNotes()"
+      :rows="performanceReviewStore.allReviewNotes"
       :columns="columns"
       row-key="name"
     >
       <template v-slot:body-cell-date="props">
         <q-td key="date" :props="props">
-          {{ props.row.date | readableDate }}
+          {{ readableDate(props.row.date) }}
         </q-td>
       </template>
       <template v-slot:body-cell-actions="props">
@@ -46,8 +46,61 @@
 </template>
 
 <script setup lang="ts">
+import { Notify, QTable, QTableProps } from 'quasar'
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
+import { readableDate } from 'src/filters'
+import { usePerformanceReviewStore } from 'src/stores/performancereview'
+import { ReviewNoteRetrieve } from 'src/types'
 
+interface QuasarReviewNoteTableRowClickActionProps {
+  evt: MouseEvent;
+  row: ReviewNoteRetrieve;
+}
 
+const router = useRouter()
+const performanceReviewStore = usePerformanceReviewStore()
 
+let columns: QTableProps['columns'] = [
+  { name: 'employeeName', label: 'Employee Name', align: 'left', field: 'employee_name', sortable: true },
+  { name: 'date', label: 'Date', field: 'date', sortable: true },
+  { name: 'actions', label: 'Actions', field: null },
+]
+let deleteDialogVisible = ref(false)
+let deleteDialogEmployeeName = ref('')
+let deleteDialogNoteText = ref('')
+let rowPkToDelete = ref(-1)
+
+function editNote(props: QuasarReviewNoteTableRowClickActionProps): void {
+  router.push(`note/${ props.row.pk }`)
+    .catch(e => {
+      console.error('Error navigating to note detail', e)
+    })
+}
+
+function showDeleteDialog(props: QuasarReviewNoteTableRowClickActionProps): void {
+  rowPkToDelete.value = props.row.pk
+  deleteDialogEmployeeName.value = props.row.employee_name
+  deleteDialogNoteText.value = props.row.note
+  deleteDialogVisible.value = true;
+}
+
+function deleteRow(): void {
+  performanceReviewStore.deleteReviewNote(rowPkToDelete.value)
+    .then(() => {
+      Notify.create('Deleted a review note.')
+    })
+}
+
+function clickAddNote(): void {
+  router.push({ name: 'note-create' })
+    .catch(e => {
+      console.error('Error navigating to new note page', e)
+    })
+}
+
+onMounted(() => {
+  performanceReviewStore.getAllReviewNotes()
+})
 </script>

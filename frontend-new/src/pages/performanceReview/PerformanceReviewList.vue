@@ -13,9 +13,9 @@
         <div class="text-h4">Current Reviews (For Managers)</div>
       </div>
       <div class="text-h6">Action Required</div>
-        <!-- <performance-review-table :actionRequired="true" /> -->
+        <PerformanceReviewTable :actionRequired="true" />
       <div class="text-h6">No Action Required</div>
-        <!-- <performance-review-table :actionRequired="false" /> -->
+        <PerformanceReviewTable :actionRequired="false" />
     </div>
   </q-page>
 </template>
@@ -24,6 +24,7 @@
 import { ref } from 'vue'
 
 import { useUserStore } from 'src/stores/user'
+import PerformanceReviewTable from 'src/components/PerformanceReviewTable.vue'
 import ReviewNoteTable from 'src/components/ReviewNoteTable.vue'
 
 

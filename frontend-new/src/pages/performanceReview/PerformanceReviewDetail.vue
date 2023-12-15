@@ -1133,20 +1133,24 @@ function uploadFile() {
   fd.append('pk', prPk.value)
   fd.append('file', selectedFile.value)
 
-  performanceReviewStore.uploadSignedPositionDescription(fd)
-    .then((response: FileUploadDescriptionUploadServerResponse) => {
-      debugger
-      if (response.status == 200) {
-        $refs.fileuploader.reset()
-        uploadedPositionDescriptionUrl.value = response.data
-        fileSuccessfullyUploaded.value = true
-        setTimeout(() => fileSuccessfullyUploaded.value = false, 5000)
-        updatePerformanceReview()
-      }
-    })
-    .catch(e => {
-      console.error('Error uploading signed position description:', e)
-    })
+  // TODO: Use new FileUploader component
+  fileSuccessfullyUploaded.value = true
+  updatePerformanceReview()
+
+  // performanceReviewStore.uploadSignedPositionDescription(fd)
+  //   .then((response: FileUploadDescriptionUploadServerResponse) => {
+  //     debugger
+  //     if (response.status == 200) {
+  //       $refs.fileuploader.reset()
+  //       uploadedPositionDescriptionUrl.value = response.data
+  //       fileSuccessfullyUploaded.value = true
+  //       setTimeout(() => fileSuccessfullyUploaded.value = false, 5000)
+  //       updatePerformanceReview()
+  //     }
+  //   })
+  //   .catch(e => {
+  //     console.error('Error uploading signed position description:', e)
+  //   })
 }
 
 function rejectFileTooLarge() {

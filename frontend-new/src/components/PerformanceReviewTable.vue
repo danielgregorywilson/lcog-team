@@ -107,7 +107,7 @@ const performanceReviewStore = usePerformanceReviewStore()
 function performanceReviews(): Array<PerformanceReviewRetrieve> {
   if (props.signature) {
     if (props.actionRequired) {
-      return performanceReviewStore.allSignaturePerformanceReviewsActionRequired.results
+      return performanceReviewStore.allSignaturePerformanceReviewsActionRequired
       // return this.$store.getters['performanceReviewModule/allSignaturePerformanceReviewsActionRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
     } else {
       return performanceReviewStore.allSignaturePerformanceReviewsActionNotRequired

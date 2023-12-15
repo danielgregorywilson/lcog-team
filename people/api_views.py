@@ -283,7 +283,9 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
             len(pr.evaluation_opportunities) > 0,
             len(pr.evaluation_goals_manager) > 0,
             pr.description_reviewed_employee,
-            pr.signed_position_description.name != ''
+
+            # TODO: Add this back once uploader done
+            # pr.signed_position_description.name != ''
         ]):
             pr.status = PerformanceReview.EVALUATION_WRITTEN
             send_evaluation_written_email_to_employee(pr.employee, pr)

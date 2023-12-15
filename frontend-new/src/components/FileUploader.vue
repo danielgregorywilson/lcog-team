@@ -1,9 +1,9 @@
 <template>
 <q-uploader
   ref="fileuploader"
+  max-file-size="20000000"
   url=""
   @added="file_selected"
-  max-file-size="20000000"
   @rejected="rejectFileTooLarge"
   style="max-width: 300px"
 >

@@ -388,6 +388,15 @@ const routes: RouteRecordRaw[] = [
     component: () => import('layouts/PrintLayout.vue'),
     children: [
       {
+        path: 'pr/:pk',
+        name: 'pr-print',
+        component: () => import('pages/performanceReview/PerformanceReviewDetail.vue'),
+        meta: { requiresManager: true },
+        props: {
+          print: true
+        }
+      },
+      {
         path: 'wf/:pk/transition',
         name: 'workflow-print',
         component: () => {

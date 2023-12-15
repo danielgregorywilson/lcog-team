@@ -57,7 +57,16 @@ export function isFiscal() {
   if (cookies.get('is_fiscal_employee') == 'true') {
     return true
   } else {
-    console.info('User is not fiscal employee. Redirecting to dashboard.')
+    console.info('User is not a fiscal employee. Redirecting to dashboard.')
+    return false
+  }
+}
+
+export function isManager() {
+  if (cookies.get('is_manager') == 'true') {
+    return true
+  } else {
+    console.info('User is not a manager. Redirecting to dashboard.')
     return false
   }
 }

@@ -111,7 +111,7 @@ interface LinkData {
   icon: string
   link: string
   id?: string
-  managerOnly?: boolean
+  isManager?: boolean
   isISEmployee?: boolean
   isFiscalEmployee?: boolean
   eligibleForTeleworkApplicationOnly?: boolean
@@ -151,12 +151,12 @@ const navLinks: Array<LinkData> = [
     link: '/expenses/review',
     isFiscalEmployee: true
   },
-  // {
-  //   title: 'Performance Reviews',
-  //   icon: 'assignment_turned_in',
-  //   link: '/reviews',
-  //   managerOnly: true
-  // },
+  {
+    title: 'Performance Reviews',
+    icon: 'assignment_turned_in',
+    link: '/reviews',
+    isManager: true
+  },
   {
     title: 'Schaefers Desk Reservation',
     icon: 'laptop',

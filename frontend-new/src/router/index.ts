@@ -10,7 +10,7 @@ import routes from 'src/router/routes'
 
 import {
   canViewDeskReservationReports, canViewExpenses, canViewMealsOnWheelsRoutes,
-  canViewTimeOffRequest, isAuthenticated, isFiscal
+  canViewTimeOffRequest, isAuthenticated, isFiscal, isManager
 } from './guards'
 
 /*
@@ -46,6 +46,9 @@ export default route(function (/* { store, ssrContext } */) {
       if (!canViewReports) {
         return '/dashboard'
       }
+    }
+    if (to.meta.requiresManager && !isManager()) {
+      return '/dashboard'
     }
     if (to.meta.requiresFiscal && !isFiscal()) {
       return '/dashboard'

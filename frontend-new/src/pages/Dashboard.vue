@@ -8,75 +8,91 @@
     />
     <div class="q-py-md">
       <div class="text-h4 q-mb-md">Your Next Review</div>
-      <div v-if="getNextReview().employee_pk">
-        <div class="q-mb-sm">Current Performance Period: {{ readableDate(getNextReview().period_start_date) }} - {{ readableDate(getNextReview().period_end_date) }}</div>
-        <div v-if="nextReviewNeedsEvaluation()">Your manager has not yet completed their evaluation.</div>
-        <div v-if="!nextReviewNeedsEvaluation() && !userSignedNextEvaluation()">
-          <div>Your manager has completed their evaluation and it is ready for your review.</div>
-          <q-btn @click="viewReview(getNextReview().pk)">View and Sign Evaluation</q-btn>
+      <div v-if="nextReview().employee_pk">
+        <div class="q-mb-sm">
+          Current Performance Period:
+          {{ readableDate(nextReview().period_start_date) }} -
+          {{ readableDate(nextReview().period_end_date) }}
         </div>
-        <q-btn v-if="!nextReviewNeedsEvaluation() && userSignedNextEvaluation()" @click="viewReview(getNextReview().pk)">View Evaluation</q-btn>
+        <div v-if="nextReviewNeedsEvaluation()">
+          Your manager has not yet completed their evaluation.
+        </div>
+        <div v-if="!nextReviewNeedsEvaluation() && !userSignedNextEvaluation()">
+          <div>
+            Your manager has completed their evaluation and it is ready for your
+            review.
+          </div>
+          <q-btn @click="viewReview(nextReview().pk)" class="q-mt-sm">
+            View and Sign Evaluation
+          </q-btn>
+        </div>
+        <q-btn
+          v-if="!nextReviewNeedsEvaluation() && userSignedNextEvaluation()"
+          @click="viewReview(nextReview().pk)"
+        >
+          View Evaluation
+        </q-btn>
 
       </div>
       <div v-else>
-        <div class="text-body1">You do not have a scheduled upcoming review</div>
+        <div class="text-body1">
+          You do not have a scheduled upcoming review
+        </div>
       </div>
     </div>
     <div class="q-py-md" v-if="isManager()">
       <div class="row items-center q-mb-md">
-        <q-avatar icon="insert_chart_outlined" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
-        <div class="text-h4">Review Notes</div>
-        <q-icon name="help" color="primary" size="xs" style="top: -10px;" >
-          <q-tooltip content-style="font-size: 16px">
-            Make a note about an employee to reference when completing their evaluation
-          </q-tooltip>
-        </q-icon>
-      </div>
-      <!-- <review-note-table /> -->
-    </div>
-    <div class="q-py-md" v-if="isManager()">
-      <div class="row items-center q-mb-md">
-        <q-avatar icon="assignment_ind" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
+        <q-avatar
+          icon="assignment_ind"
+          color="primary"
+          text-color="white"
+          font-size="32px"
+          class="q-mr-sm"
+        />
         <div class="text-h4">Reviews for your Direct Reports</div>
       </div>
       <div class="text-h6">Action Required</div>
-        <!-- <performance-review-table :actionRequired="true" /> -->
+        <PerformanceReviewTable :actionRequired="true" />
       <div class="text-h6">No Action Required</div>
-        <!-- <performance-review-table :actionRequired="false" /> -->
+        <PerformanceReviewTable :actionRequired="false" />
     </div>
-    <div class="q-py-md" v-if="isUpperManager() || isTheHRManager() || isTheExecutiveDirector()">
+    <div
+      class="q-py-md"
+      v-if="isUpperManager() || isTheHRManager() || isTheExecutiveDirector()"
+    >
       <div class="row items-center q-mb-md">
-        <q-avatar icon="assignment_turned_in" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
+        <q-avatar
+          icon="assignment_turned_in"
+          color="primary"
+          text-color="white"
+          font-size="32px"
+          class="q-mr-sm"
+        />
         <div class="text-h4">Reviews to Sign</div>
       </div>
       <div class="text-h6">Signature Required</div>
-        <!-- <performance-review-table :signature="true" :actionRequired="true" /> -->
+        <PerformanceReviewTable :signature="true" :actionRequired="true" />
       <div class="text-h6">Signed</div>
-        <!-- <performance-review-table :signature="true" :actionRequired="false" /> -->
-    </div>
-    <div class="q-py-md" v-if="isManager()">
-      <div class="row items-center q-mb-md">
-        <q-avatar icon="assignment_ind" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
-        <div class="text-h4">Telework Applications from your Direct Reports</div>
-      </div>
-      <div class="text-h6">Signature Required</div>
-        <!-- <telework-application-table :signature="true" /> -->
-      <div class="text-h6">Signed</div>
-        <!-- <telework-application-table :signature="false" /> -->
+        <PerformanceReviewTable :signature="true" :actionRequired="false" />
     </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+
+import PerformanceReviewTable from 'src/components/PerformanceReviewTable.vue'
 import { readableDate } from 'src/filters'
-import { PerformanceReviewRetrieve } from 'src/types'
 import { useAuthStore } from 'src/stores/auth'
+import { usePerformanceReviewStore } from 'src/stores/performancereview'
 import { useUserStore } from 'src/stores/user'
+import { PerformanceReviewRetrieve } from 'src/types'
+import { onMounted } from 'vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const userStore = useUserStore()
+const performanceReviewStore = usePerformanceReviewStore()
 
 function isAuthenticated(): boolean {
   return authStore.isAuthenticated
@@ -102,14 +118,15 @@ function isTheExecutiveDirector(): boolean {
   return userStore.getEmployeeProfile.is_executive_director
 }
 
-function getNextReview(): PerformanceReviewRetrieve {
-  return {} as PerformanceReviewRetrieve
+function nextReview(): PerformanceReviewRetrieve {
+  // return {} as PerformanceReviewRetrieve
   // TODO
+  return performanceReviewStore.nextPerformanceReview
   // return this.$store.getters['performanceReviewModule/nextPerformanceReview']
 }
 
 function nextReviewNeedsEvaluation(): boolean {
-  return getNextReview().status == 'Needs evaluation'
+  return nextReview().status == 'Needs evaluation'
 }
 
 function userSignedNextEvaluation(): boolean {
@@ -123,12 +140,21 @@ function userSignedNextEvaluation(): boolean {
   // }
 }
 
-    
+
 function viewReview(pk: number): void {
   router.push(`pr/${ pk }`)
     .catch(e => {
       console.error('Error navigating to PR detail', e)
     })
 }
+
+onMounted(() => {
+  performanceReviewStore.getNextPerformanceReview(
+    userStore.getEmployeeProfile.employee_pk
+  )
+    .catch(e => {
+      console.error('Error retrieving next performance review:', e)
+    })
+})
 
 </script>

@@ -66,6 +66,34 @@ const routes: RouteRecordRaw[] = [
         meta: { requiresAuth: true }
       },
 
+      /////////////////////////
+      // PERFORMANCE REVIEWS //
+      /////////////////////////
+      {
+        path: '/reviews',
+        name: 'reviews',
+        component: () => import('pages/performanceReview/PerformanceReviewList.vue'),
+        // beforeEnter: ifManager
+      },
+      {
+        path: '/pr/:pk',
+        name: 'pr-details',
+        component: () => import('pages/performanceReview/PerformanceReviewDetail.vue'),
+        // beforeEnter: ifCanViewReview
+      },
+      {
+        path: '/note/new',
+        name: 'note-create',
+        component: () => import('src/pages/performanceReview/ReviewNoteCreate.vue'),
+        // beforeEnter: ifManager
+      },
+      {
+        path: '/note/:pk',
+        name: 'note-details',
+        component: () => import('src/pages/performanceReview/ReviewNoteDetail.vue'),
+        // beforeEnter: ifCanViewNote
+      },
+
       //////////////////////
       // RESPONSIBILITIES //
       //////////////////////
@@ -368,6 +396,15 @@ const routes: RouteRecordRaw[] = [
     path: '/print',
     component: () => import('layouts/PrintLayout.vue'),
     children: [
+      {
+        path: 'pr/:pk',
+        name: 'pr-print',
+        component: () => import('pages/performanceReview/PerformanceReviewDetail.vue'),
+        meta: { requiresManager: true },
+        props: {
+          print: true
+        }
+      },
       {
         path: 'wf/:pk/transition',
         name: 'workflow-print',

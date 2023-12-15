@@ -32,12 +32,11 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
     // Performance Reviews //
     /////////////////////////
 
-    getNextPerformanceReview(data: {pk: number}) {
+    getNextPerformanceReview(employeePk: number) {
       return new Promise((resolve, reject) => {
         axios({
-          url: `${ apiURL }api/v1/employee/${data.pk}/` +
-            'employee_next_performance_review',
-          method: 'POST'
+          url: `${ apiURL }api/v1/employee/${ employeePk }/` +
+            'employee_next_performance_review'
         })
           .then(resp => {
             this.nextPerformanceReview = resp.data
@@ -212,7 +211,7 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
           data: formData,
           method: 'POST'
         })
-          .then((resp) => {
+          .then(() => {
             debugger
             resolve('Successfully uploaded signed position description')
           })

@@ -3,6 +3,8 @@ branch-defaults:
     environment: lcog-team-env
   staging:
     environment: lcog-team-staging
+  staging-with-prs:
+    environment: lcog-team-staging
 environment-defaults:
   lcog-team-env:
     branch: production

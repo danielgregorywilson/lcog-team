@@ -18,7 +18,10 @@
       </div>
       <div class="eval-box eval-box-3">
           <div class="row text-bold">Performance Period:</div>
-          <div class="row">{{ readableDate(periodStartDate) }} - {{ readableDate(periodEndDate) }}</div>
+          <div class="row">
+            {{ readableDate(periodStartDate) }} -
+            {{ readableDate(periodEndDate) }}
+          </div>
       </div>
       <div class="eval-box eval-box-4">
           <div class="row text-bold">Effective Date:</div>
@@ -40,21 +43,42 @@
         <div class="text-uppercase">Evaluation Type:</div>
         <div class="eval-box-full-1-probationary">
           <div class="label-radio-pair">
-            <q-radio v-model="evaluationType" val="P" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
+            <q-radio
+              v-model="evaluationType"
+              val="P"
+              :disable="!currentUserIsManagerOfEmployee() ||
+                employeeHasSigned()"
+            />
             <div class="text-uppercase">Probat&shy;ionary:</div>
           </div>
           <div class="label-radio-pair">
-            <q-radio v-model="probationaryEvaluationType" val="S" :disable="evaluationType != 'P' || !currentUserIsManagerOfEmployee() || employeeHasSigned()" />
+            <q-radio
+              v-model="probationaryEvaluationType"
+              val="S"
+              :disable="evaluationType != 'P' ||
+                !currentUserIsManagerOfEmployee() || employeeHasSigned()"
+            />
             <div>180 days</div>
           </div>
           <div class="label-radio-pair">
-            <q-radio v-model="probationaryEvaluationType" val="N" :disable="evaluationType != 'P' || !currentUserIsManagerOfEmployee() || employeeHasSigned()" />
+            <q-radio
+              v-model="probationaryEvaluationType"
+              val="N"
+              :disable="evaluationType != 'P' ||
+                !currentUserIsManagerOfEmployee() || employeeHasSigned()"
+            />
             <div>6 months</div>
           </div>
         </div>
         <div class="eval-box-full-1-annual">
           <div class="label-radio-pair">
-            <q-radio v-model="evaluationType" val="A" @input="() => probationaryEvaluationType = ''" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
+            <q-radio
+              v-model="evaluationType"
+              val="A"
+              @input="() => probationaryEvaluationType = ''"
+              :disable="!currentUserIsManagerOfEmployee() ||
+                employeeHasSigned()"
+            />
             <div class="text-uppercase">Annual</div>
           </div>
         </div>
@@ -63,42 +87,95 @@
         <div class="text-uppercase text-bold">Action:</div>
         <div class="label-radio-triplet">
           <div class="text-bold" id="step-increase">Step Increase:</div>
-          <q-radio v-model="stepIncrease" val="Y" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
+          <q-radio
+            v-model="stepIncrease"
+            val="Y"
+            :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+          />
           <div>Yes</div>
-          <q-radio v-model="stepIncrease" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
+          <q-radio
+            v-model="stepIncrease"
+            val="N"
+            :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+          />
           <div>No</div>
         </div>
         <div class="label-radio-triplet">
           <div class="text-bold" id="top-step-bonus">Top-Step Bonus</div>
-          <q-radio v-model="topStepBonus" val="Y" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
+          <q-radio
+            v-model="topStepBonus"
+            val="Y"
+            :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+          />
           <div>Yes</div>
-          <q-radio v-model="topStepBonus" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
+          <q-radio
+            v-model="topStepBonus"
+            val="N"
+            :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+          />
           <div>No</div>
         </div>
         <div id="action-other">
-          <q-input outlined v-model="actionOther" label="Other" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />
+          <q-input
+            outlined
+            v-model="actionOther"
+            label="Other"
+            :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+          />
         </div>
       </div>
     </div>
 
     <h5 class="text-uppercase text-center text-bold"><u>Rating Scale</u></h5>
     <div class="rating-grid-container">
-      <div class="rating-box"><span class="text-bold">(1)*</span> Needs Improvement</div>
-      <div class="rating-box">The employee’s work performance does not consistently meet the standards of the position. Serious effort is needed to improve performance.</div>
-      <div class="rating-box"><span class="text-bold">(2)</span> Meets Job Requirments</div>
-      <div class="rating-box">The employee’s work performance consistently meets the standards of the position.</div>
-      <div class="rating-box"><span class="text-bold">(3)</span> Exceeds Job Requirments</div>
-      <div class="rating-box">The employee’s work performance is frequently or consistently above the level of a satisfactory employee.</div>
-      <div class="rating-box"><span class="text-bold">(N/A)</span> Not Applicable</div>
-      <div class="rating-box">Does not pertain to the employee’s actual job duties.</div>
+      <div class="rating-box">
+        <span class="text-bold">(1)*</span> Needs Improvement
+      </div>
+      <div class="rating-box">
+        The employee’s work performance does not consistently meet the standards
+        of the position. Serious effort is needed to improve performance.
+      </div>
+      <div class="rating-box">
+        <span class="text-bold">(2)</span> Meets Job Requirments
+      </div>
+      <div class="rating-box">
+        The employee’s work performance consistently meets the standards of the
+        position.
+      </div>
+      <div class="rating-box">
+        <span class="text-bold">(3)</span> Exceeds Job Requirments
+      </div>
+      <div class="rating-box">
+        The employee’s work performance is frequently or consistently above the
+        level of a satisfactory employee.
+      </div>
+      <div class="rating-box">
+        <span class="text-bold">(N/A)</span> Not Applicable
+      </div>
+      <div class="rating-box">
+        Does not pertain to the employee’s actual job duties.
+      </div>
     </div>
-    <div>*Factors rated <span class="text-bold">(1)</span> Needs improvement must be addressed with a plan for improvement.</div>
+    <div>
+      *Factors rated <span class="text-bold">(1)</span> Needs improvement must
+      be addressed with a plan for improvement.
+    </div>
 
-    <div v-if="currentUserIsManagerOfEmployee() && reviewNotes.length" id="notes">
+    <div
+      v-if="currentUserIsManagerOfEmployee() && reviewNotes.length"
+      id="notes"
+    >
       <hr />
-      <h5 class="text-h5 text-uppercase text-bold q-my-md"><u>Your Notes for {{ employeeName }}</u></h5>
+      <h5 class="text-h5 text-uppercase text-bold q-my-md">
+        <u>Your Notes for {{ employeeName }}</u>
+      </h5>
       <div class="q-pa-md row items-start q-gutter-md">
-        <q-card v-for="note in reviewNotes" :key="note.pk" class="note-card" @click="onClickNoteCard(note.pk)">
+        <q-card
+          v-for="note in reviewNotes"
+          :key="note.pk"
+          class="note-card"
+          @click="onClickNoteCard(note.pk)"
+        >
           <q-card-section>
             <div class="text-bold">
               {{ readableDate(note.date) }}
@@ -113,123 +190,465 @@
 
     <hr />
 
-    <h5 class="text-uppercase text-bold q-my-md"><u>I. Performance Factors Reviewed</u></h5>
+    <h5 class="text-uppercase text-bold q-my-md">
+      <u>I. Performance Factors Reviewed</u>
+    </h5>
     <div class="factors-grid-container">
 
       <!-- Desktop/Tablet Headers -->
-      <div class="factors-header-box text-bold text-center factors-header-desktop factors-header-sticky">Performance Factors Reviewed</div>
-      <div class="factors-header-box text-bold text-center factors-header-desktop factors-header-sticky">Needs Improvement</div>
-      <div class="factors-header-box text-bold text-center factors-header-desktop factors-header-sticky">Meets Job Requirements</div>
-      <div class="factors-header-box text-bold text-center factors-header-desktop factors-header-sticky">Exceeds Job Requirements</div>
-      <div class="factors-header-box text-bold text-center factors-header-desktop factors-header-sticky">Not Applicable</div>
+      <div class="factors-header-box text-bold text-center
+        factors-header-desktop factors-header-sticky"
+      >
+        Performance Factors Reviewed
+      </div>
+      <div class="factors-header-box text-bold text-center
+        factors-header-desktop factors-header-sticky"
+      >
+        Needs Improvement
+      </div>
+      <div class="factors-header-box text-bold text-center
+        factors-header-desktop factors-header-sticky"
+      >
+        Meets Job Requirements
+      </div>
+      <div class="factors-header-box text-bold text-center
+        factors-header-desktop factors-header-sticky"
+      >
+        Exceeds Job Requirements
+      </div>
+      <div class="factors-header-box text-bold text-center
+        factors-header-desktop factors-header-sticky"
+      >
+        Not Applicable
+      </div>
 
       <!-- Mobile Headers -->
-      <div class="factors-header-box text-bold text-center factors-header-mobile factors-header-sticky">Performance Factors Reviewed</div>
-      <div class="factors-header-box text-bold text-center factors-header-mobile factors-header-sticky">Needs Improv&shy;ement</div>
-      <div class="factors-header-box text-bold text-center factors-header-mobile factors-header-sticky">Meets Job Require&shy;ments</div>
-      <div class="factors-header-box text-bold text-center factors-header-mobile factors-header-sticky">Exceeds Job Require&shy;ments</div>
-      <div class="factors-header-box text-bold text-center factors-header-mobile factors-header-sticky">Not Appli&shy;cable</div>
+      <div class="factors-header-box text-bold text-center
+        factors-header-mobile factors-header-sticky"
+      >
+        Performance Factors Reviewed
+      </div>
+      <div class="factors-header-box text-bold text-center
+        factors-header-mobile factors-header-sticky"
+      >
+        Needs Improv&shy;ement
+      </div>
+      <div class="factors-header-box text-bold text-center
+        factors-header-mobile factors-header-sticky"
+      >
+        Meets Job Require&shy;ments
+      </div>
+      <div class="factors-header-box text-bold text-center
+        factors-header-mobile factors-header-sticky"
+      >
+        Exceeds Job Require&shy;ments
+      </div>
+      <div class="factors-header-box text-bold text-center
+        factors-header-mobile factors-header-sticky"
+      >
+        Not Appli&shy;cable
+      </div>
 
       <div class="factors-box" id="factor-job-knowledge">
           <div class="row text-bold"><u>Job Knowledge</u></div>
-          <div class="row">Present knowledge of techniques, skills, procedures, technologies, equipment, rules and policies of position.</div>
+          <div class="row">
+            Present knowledge of techniques, skills, procedures, technologies,
+            equipment, rules and policies of position.
+          </div>
       </div>
-      <div class="factors-radio-box"><q-radio v-model="factorJobKnowledge" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorJobKnowledge" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorJobKnowledge" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"></div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorJobKnowledge"
+          val="N"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorJobKnowledge"
+          val="M"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorJobKnowledge"
+          val="E"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+
+
+      </div>
       <div class="factors-box">
           <div class="row text-bold" id="factor-work-quality"><u>Quality of Work</u></div>
           <div class="row">Turns in high quality work and very seldom makes errors.</div>
       </div>
-      <div class="factors-radio-box"><q-radio v-model="factorWorkQuality" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorWorkQuality" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorWorkQuality" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"></div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorWorkQuality"
+          val="N"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorWorkQuality"
+          val="M"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorWorkQuality"
+          val="E"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+
+
+      </div>
       <div class="factors-box" id="factor-work-quantity">
           <div class="row text-bold"><u>Quantity of Work</u></div>
           <div class="row">Accomplishes stated goals and expectations.</div>
       </div>
-      <div class="factors-radio-box"><q-radio v-model="factorWorkQuantity" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorWorkQuantity" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorWorkQuantity" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"></div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorWorkQuantity"
+          val="N"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorWorkQuantity"
+          val="M"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorWorkQuantity"
+          val="E"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+
+
+      </div>
       <div class="factors-box" id="factor-work-habits">
           <div class="row text-bold"><u>Work Habits</u></div>
-          <div class="row">Uses equipment, supplies and time efficiently; punctual and on time.</div>
+          <div class="row">
+            Uses equipment, supplies and time efficiently; punctual and on time.
+          </div>
       </div>
-      <div class="factors-radio-box"><q-radio v-model="factorWorkHabits" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorWorkHabits" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorWorkHabits" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"></div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorWorkHabits"
+          val="N"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorWorkHabits"
+          val="M"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorWorkHabits"
+          val="E"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+
+
+      </div>
       <div class="factors-box" id="factor-analysis">
           <div class="row text-bold"><u>Analysis and Decision-Making</u></div>
-          <div class="row">Has strong analytical abilities and makes sound judgements.</div>
+          <div class="row">
+            Has strong analytical abilities and makes sound judgements.
+          </div>
       </div>
-      <div class="factors-radio-box"><q-radio v-model="factorAnalysis" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorAnalysis" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorAnalysis" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"></div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorAnalysis"
+          val="N"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorAnalysis"
+          val="M"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorAnalysis"
+          val="E"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+
+
+      </div>
       <div class="factors-box" id="factor-initiative">
           <div class="row text-bold"><u>Initiative and Creativity</u></div>
-          <div class="row">A self-starter and seeks new responsibilities and opportunities for leadership; demonstrates creativity in performing tasks and identifying resolutions.</div>
+          <div class="row">
+            A self-starter and seeks new responsibilities and opportunities for
+            leadership; demonstrates creativity in performing tasks and
+            identifying resolutions.
+          </div>
       </div>
-      <div class="factors-radio-box"><q-radio v-model="factorInitiative" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorInitiative" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorInitiative" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"></div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorInitiative"
+          val="N"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorInitiative"
+          val="M"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorInitiative"
+          val="E"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+
+
+      </div>
       <div class="factors-box" id="factor-interpersonal">
           <div class="row text-bold"><u>Interpersonal Relations</u></div>
-          <div class="row">Presents good attitude, works well in teams, cooperates with others, and is thoughtful and courteous/polite.</div>
+          <div class="row">
+            Presents good attitude, works well in teams, cooperates with others,
+            and is thoughtful and courteous/polite.
+          </div>
       </div>
-      <div class="factors-radio-box"><q-radio v-model="factorInterpersonal" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorInterpersonal" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorInterpersonal" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"></div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorInterpersonal"
+          val="N"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorInterpersonal"
+          val="M"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorInterpersonal"
+          val="E"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+
+
+      </div>
       <div class="factors-box" id="factor-communication">
           <div class="row text-bold"><u>Communication</u></div>
-          <div class="row">Effectively communicates (oral and written) and keeps others appropriately informed.</div>
+          <div class="row">
+            Effectively communicates (oral and written) and keeps others
+            appropriately informed.
+          </div>
       </div>
-      <div class="factors-radio-box"><q-radio v-model="factorCommunication" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorCommunication" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorCommunication" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"></div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorCommunication"
+          val="N"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorCommunication"
+          val="M"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorCommunication"
+          val="E"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+
+
+      </div>
       <div class="factors-box" id="factor-dependability">
-          <div class="row text-bold"><u>Dependability and Responsibility</u></div>
-          <div class="row">Completes assigned work within prescribed timelines; rarely needs direct supervision.</div>
+          <div class="row text-bold">
+            <u>Dependability and Responsibility</u>
+          </div>
+          <div class="row">
+            Completes assigned work within prescribed timelines; rarely needs
+            direct supervision.
+          </div>
       </div>
-      <div class="factors-radio-box"><q-radio v-model="factorDependability" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorDependability" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorDependability" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"></div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorDependability"
+          val="N"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorDependability"
+          val="M"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorDependability"
+          val="E"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+
+
+      </div>
       <div class="factors-box" id="factor-professionalism">
-          <div class="row text-bold"><u>Professionalism and Customer Service</u></div>
-          <div class="row">Presents and represents oneself and the agency in a positive manner; provides and delivers professional, helpful, high quality service and assistance.</div>
+          <div class="row text-bold">
+            <u>Professionalism and Customer Service</u>
+          </div>
+          <div class="row">
+            Presents and represents oneself and the agency in a positive manner;
+            provides and delivers professional, helpful, high quality service
+            and assistance.
+          </div>
       </div>
-      <div class="factors-radio-box"><q-radio v-model="factorProfessionalism" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorProfessionalism" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorProfessionalism" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"></div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorProfessionalism"
+          val="N"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorProfessionalism"
+          val="M"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorProfessionalism"
+          val="E"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+
+
+      </div>
       <div class="factors-box" id="factor-management">
           <div class="row text-bold"><u>Project Management</u></div>
-          <div class="row">Coordinates, delegates tasks to team members, and communicates internally and externally about projects; projects are high quality and are completed within timelines.</div>
+          <div class="row">
+            Coordinates, delegates tasks to team members, and communicates
+            internally and externally about projects; projects are high quality
+            and are completed within timelines.
+          </div>
       </div>
-      <div class="factors-radio-box"><q-radio v-model="factorManagement" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorManagement" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorManagement" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorManagement" val="NA" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorManagement"
+          val="N"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorManagement"
+          val="M"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorManagement"
+          val="E"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorManagement"
+          val="NA"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
       <div class="factors-box" id="factor-supervision">
           <div class="row text-bold"><u>Supervision</u></div>
-          <div class="row">Provides support/guidance and motivation with open communication and transparency.</div>
+          <div class="row">
+            Provides support/guidance and motivation with open communication and
+            transparency.
+          </div>
       </div>
-      <div class="factors-radio-box"><q-radio v-model="factorSupervision" val="N" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorSupervision" val="M" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorSupervision" val="E" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
-      <div class="factors-radio-box"><q-radio v-model="factorSupervision" val="NA" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" /></div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorSupervision"
+          val="N"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorSupervision"
+          val="M"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorSupervision"
+          val="E"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
+      <div class="factors-radio-box">
+        <q-radio
+          v-model="factorSupervision"
+          val="NA"
+          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+        />
+      </div>
     </div>
 
-    <h5 class="text-uppercase text-bold q-my-md" id="evaluation-successes"><u>II. Employee's Successes</u></h5>
-    <div v-if="!currentUserIsManagerOfEmployee() || employeeHasSigned()" class="read-only-text-area">{{ evaluationSuccesses}}</div>
+    <h5 class="text-uppercase text-bold q-my-md" id="evaluation-successes">
+      <u>II. Employee's Successes</u>
+    </h5>
+    <div
+      v-if="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+      class="read-only-text-area"
+    >
+      {{ evaluationSuccesses}}
+    </div>
     <q-input
       v-else
       input-class="evaluation-successes"
@@ -237,16 +656,30 @@
       type="textarea"
     />
 
-    <h5 class="text-uppercase text-bold q-my-md" id="evaluation-opportunities"><u>III. Opportunities for Growth</u></h5>
-    <div v-if="!currentUserIsManagerOfEmployee() || employeeHasSigned()" class="read-only-text-area">{{ evaluationOpportunities}}</div>
+    <h5 class="text-uppercase text-bold q-my-md" id="evaluation-opportunities">
+      <u>III. Opportunities for Growth</u>
+    </h5>
+    <div
+      v-if="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+      class="read-only-text-area"
+    >
+      {{ evaluationOpportunities}}
+    </div>
     <q-input
       v-else
       v-model="evaluationOpportunities"
       type="textarea"
     />
 
-    <h5 class="text-uppercase text-bold q-my-md" id="evaluation-goals"><u>IV. Goals for the Coming Year</u></h5>
-    <div v-if="!currentUserIsManagerOfEmployee() || employeeHasSigned()" class="read-only-text-area">{{ evaluationGoalsManager}}</div>
+    <h5 class="text-uppercase text-bold q-my-md" id="evaluation-goals">
+      <u>IV. Goals for the Coming Year</u>
+    </h5>
+    <div
+      v-if="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+      class="read-only-text-area"
+    >
+      {{ evaluationGoalsManager}}
+    </div>
     <q-input
       v-else
       v-model="evaluationGoalsManager"
@@ -259,21 +692,59 @@
       type="textarea"
     /> -->
 
-    <h5><span class="text-uppercase text-bold q-my-md"><u>V. Employee Comments</u></span> (e.g. self-evaluation and goals)</h5>
-    <div v-if="!currentUserIsEmployee() || employeeHasSigned()" class="read-only-text-area">{{ evaluationCommentsEmployee}}</div>
+    <h5>
+      <span class="text-uppercase text-bold q-my-md">
+        <u>V. Employee Comments</u>
+      </span>
+      (e.g. self-evaluation and goals)
+    </h5>
+    <div
+      v-if="!currentUserIsEmployee() || employeeHasSigned()"
+      class="read-only-text-area"
+    >
+      {{ evaluationCommentsEmployee}}
+    </div>
     <q-input
       v-else
       input-class="evaluation-comments-employee"
       v-model="evaluationCommentsEmployee"
       type="textarea"
     />
-    <q-btn v-if="currentUserIsEmployee()" id="save-comments-employee" color="white" text-color="black" label="Save comments" @click="updateEmployeeComments()" class="q-mt-sm" :disable="!employeeCommentsIsChanged()" />
+    <q-btn
+      v-if="currentUserIsEmployee() && !employeeHasSigned()"
+      id="save-comments-employee"
+      color="white"
+      text-color="black"
+      label="Save comments"
+      @click="updateEmployeeComments()"
+      class="q-mt-sm"
+      :disable="!employeeCommentsIsChanged()"
+    />
 
     <div id="position-description-section">
-      <h5 class="text-uppercase text-bold q-my-md"><u>VI. Position Description Review</u></h5>
+      <h5 class="text-uppercase text-bold q-my-md">
+        <u>VI. Position Description Review</u>
+      </h5>
       <div class="q-my-md" id="position-description-review">
-        <div>Position Description: <a v-if="positionDescriptionLink" :href="positionDescriptionLink" target="_blank">{{ positionDescriptionLink }}</a><span v-else>No link provided</span></div>
-        <div><q-checkbox v-model="descriptionReviewedEmployee" :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()" />Position Description has been reviewed and signed by employee and manager</div>
+        <div>
+          Position Description:
+          <a
+            v-if="positionDescriptionLink"
+            :href="positionDescriptionLink"
+            target="_blank"
+          >
+            {{ positionDescriptionLink }}
+          </a>
+          <span v-else>No link provided</span>
+        </div>
+        <div>
+          <q-checkbox
+            v-model="descriptionReviewedEmployee"
+            :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+          />
+          Position Description has been reviewed and signed by employee and
+          manager
+        </div>
         <FileUploader
           label="Receipt"
           :file=selectedFile
@@ -282,21 +753,52 @@
           :objectPk=prPk
           :readOnly=false
         />
-        <div v-if="descriptionReviewedEmployee && uploadedPositionDescriptionUrl"> <a :href="uploadedPositionDescriptionUrl" target="_blank">Current uploaded signed position description</a></div>
+        <div
+          v-if="descriptionReviewedEmployee && uploadedPositionDescriptionUrl"
+        >
+          <a :href="uploadedPositionDescriptionUrl" target="_blank">
+            Current uploaded signed position description
+          </a>
+        </div>
       </div>
     </div>
 
-    <div v-for="(signature, index) in signatures" :key="index" class="row signature-block">
+    <div
+      v-for="(signature, index) in signatures"
+      :key="index"
+      class="row signature-block"
+    >
       <div class="col">
-        <div v-if="signature[1]" class="signature"><span class="signature-text">{{ signature[1] }}</span></div>
+        <div v-if="signature[1]" class="signature">
+          <span class="signature-text">{{ signature[1] }}</span>
+        </div>
         <div v-else class="signature">
-          <q-btn v-if="userCanSign(signature[3], signature[4])" color="white" text-color="black" label="Click to Sign" @click="signPerformanceReview()" class="signature-button" />
+          <q-btn
+            v-if="userCanSign(signature[3], signature[4])"
+            color="white"
+            text-color="black"
+            label="Click to Sign"
+            @click="signPerformanceReview()"
+            class="signature-button"
+          />
           <div v-else>&nbsp;</div>
         </div>
-        <div class="signature-type"><span class="text-bold">{{ signature[0] }} Signature</span><span v-if="signature[0] == 'Employee'"><b>:</b><i class="q-ml-xs">I have reviewed this evaluation and discussed it further with my manager. Signing does not necessarily indicate agreement.</i></span></div>
+        <div class="signature-type">
+          <span class="text-bold">{{ signature[0] }} Signature</span>
+          <span v-if="signature[0] == 'Employee'">
+            <b>:</b><i class="q-ml-xs">
+              I have reviewed this evaluation and discussed it further with my
+              manager. Signing does not necessarily indicate agreement.
+            </i>
+          </span>
+        </div>
       </div>
       <div class="col signature-date-block">
-        <div v-if="signature[2]" class="signature-date"><span class="signature-date-text">{{ readableDate(signature[2]) }}</span></div>
+        <div v-if="signature[2]" class="signature-date">
+          <span class="signature-date-text">
+            {{ readableDate(signature[2]) }}
+          </span>
+        </div>
         <div v-else class="signature-date">&nbsp;</div>
         <span>Date</span>
       </div>
@@ -315,7 +817,12 @@
     <q-dialog v-model="showErrorDialog" :position="errorDialogPosition">
       <q-card style="width: 350px">
         <q-list bordered separator>
-          <q-item v-for="(item, index) in formErrorItems()" :key="index" clickable @click="clickedErrorItem(item)">
+          <q-item
+            v-for="(item, index) in formErrorItems()"
+            :key="index"
+            clickable
+            @click="clickedErrorItem(item)"
+          >
             <q-item-label>{{item[1]}}</q-item-label>
           </q-item>
         </q-list>
@@ -328,14 +835,26 @@
         <q-card-section class="row items-center">
           <q-avatar icon="check" color="primary" text-color="white" />
           <div class="col">
-            <span class="q-ml-sm row">Your signature has been recorded, and you're all done!</span>
-            <span class="q-ml-sm row" v-if="nextPersonToSign() && !currentUserIsEmployee()">{{ nextPersonToSign() }} will be notified to sign next.</span>
+            <span class="q-ml-sm row">
+              Your signature has been recorded, and you're all done!
+            </span>
+            <span
+              class="q-ml-sm row"
+              v-if="nextPersonToSign() && !currentUserIsEmployee()"
+            >
+              {{ nextPersonToSign() }} will be notified to sign next.
+            </span>
           </div>
         </q-card-section>
 
         <q-card-actions align="right">
           <q-btn flat label="Cancel" color="primary" v-close-popup />
-          <q-btn flat label="Return to Dashboard" color="primary" @click="returnToDashboard()" />
+          <q-btn
+            flat
+            label="Return to Dashboard"
+            color="primary"
+            @click="returnToDashboard()"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -343,9 +862,27 @@
     <!-- Spacing for footer -->
     <div style="height: 80px;"></div>
 
-    <div id="sticky-footer" class="row justify-between" v-if="currentUserIsManagerOfEmployee()">
-      <q-btn id="update-button" class="col-1" color="white" text-color="black" label="Update" :disabled="!valuesAreChanged()" @click="updatePerformanceReview()" />
-      <q-btn v-if="showErrorButton && formErrorItems().length > 0" label="Show missing fields" icon="check" color="warning" @click="openErrorDialog('right')" />
+    <div
+      id="sticky-footer"
+      class="row justify-between"
+      v-if="currentUserIsManagerOfEmployee()"
+    >
+      <q-btn
+        id="update-button"
+        class="col-1"
+        color="white"
+        text-color="black"
+        label="Update"
+        :disabled="!valuesAreChanged()"
+        @click="updatePerformanceReview()"
+      />
+      <q-btn
+        v-if="showErrorButton && formErrorItems().length > 0"
+        label="Show missing fields"
+        icon="check"
+        color="warning"
+        @click="openErrorDialog('right')"
+      />
       <div class="col-3 self-center status">Current Status: {{ status }}</div>
     </div>
   </div>
@@ -738,7 +1275,8 @@ function currentUserIsEmployee(): boolean {
 function valuesAreChanged(): boolean {
   if (
     evaluationType.value == evaluationTypeCurrentVal.value &&
-    probationaryEvaluationType.value == probationaryEvaluationTypeCurrentVal.value &&
+    probationaryEvaluationType.value ==
+      probationaryEvaluationTypeCurrentVal.value &&
     stepIncrease.value == stepIncreaseCurrentVal.value &&
     topStepBonus.value == topStepBonusCurrentVal.value &&
     actionOther.value == actionOtherCurrentVal.value &&
@@ -757,8 +1295,10 @@ function valuesAreChanged(): boolean {
     evaluationSuccesses.value == evaluationSuccessesCurrentVal.value &&
     evaluationOpportunities.value == evaluationOpportunitiesCurrentVal.value &&
     evaluationGoalsManager.value == evaluationGoalsManagerCurrentVal.value &&
-    evaluationCommentsEmployee.value == evaluationCommentsEmployeeCurrentVal.value &&
-    descriptionReviewedEmployee.value == descriptionReviewedEmployeeCurrentVal.value
+    evaluationCommentsEmployee.value ==
+      evaluationCommentsEmployeeCurrentVal.value &&
+    descriptionReviewedEmployee.value ==
+      descriptionReviewedEmployeeCurrentVal.value
   ) {
     return false
   } else {
@@ -767,7 +1307,10 @@ function valuesAreChanged(): boolean {
 }
 
 function employeeCommentsIsChanged(): boolean {
-  if ( evaluationCommentsEmployee.value == evaluationCommentsEmployeeCurrentVal.value) {
+  if (
+    evaluationCommentsEmployee.value ==
+      evaluationCommentsEmployeeCurrentVal.value
+  ) {
     return false
   } else {
     return true
@@ -795,22 +1338,33 @@ function formErrorItems(): Array<[string, string]> {
     errorItems.push(['factor-work-habits', 'Evaluate Work Habits'])
   }
   if (!factorAnalysisCurrentVal.value) {
-    errorItems.push(['factor-analysis', 'Evaluate Analysis and Decision-Making'])
+    errorItems.push(
+      ['factor-analysis', 'Evaluate Analysis and Decision-Making']
+    )
   }
   if (!factorInitiativeCurrentVal.value) {
     errorItems.push(['factor-initiative', 'Evaluate Initiative and Creativity'])
   }
   if (!factorInterpersonalCurrentVal.value) {
-    errorItems.push(['factor-interpersonal', 'Evaluate Interpersonal Relations'])
+    errorItems.push(
+      ['factor-interpersonal', 'Evaluate Interpersonal Relations']
+    )
   }
   if (!factorCommunicationCurrentVal.value) {
     errorItems.push(['factor-communication', 'Evaluate Communication'])
   }
   if (!factorDependabilityCurrentVal.value) {
-    errorItems.push(['factor-dependability', 'Evaluate Dependability and Responsibility'])
+    errorItems.push(
+      ['factor-dependability', 'Evaluate Dependability and Responsibility']
+    )
   }
   if (!factorProfessionalismCurrentVal.value) {
-    errorItems.push(['factor-professionalism', 'Evaluate Professionalism and Customer Service'])
+    errorItems.push(
+      [
+        'factor-professionalism',
+        'Evaluate Professionalism and Customer Service'
+      ]
+    )
   }
   if (!factorManagementCurrentVal.value) {
     errorItems.push(['factor-management', 'Evaluate Project Management'])
@@ -822,16 +1376,28 @@ function formErrorItems(): Array<[string, string]> {
     errorItems.push(['evaluation-successes', 'Write Employee Successes'])
   }
   if (!evaluationOpportunitiesCurrentVal.value) {
-    errorItems.push(['evaluation-opportunities', 'Write Opportunities for Growth'])
+    errorItems.push(
+      ['evaluation-opportunities', 'Write Opportunities for Growth']
+    )
   }
   if (!evaluationGoalsManagerCurrentVal.value) {
     errorItems.push(['evaluation-goals', 'Write Goals for the Coming Year'])
   }
   if (!descriptionReviewedEmployeeCurrentVal.value) {
-    errorItems.push(['position-description-review', 'Review and Sign Position Description with Employee'])
+    errorItems.push(
+      [
+        'position-description-review',
+        'Review and Sign Position Description with Employee'
+      ]
+    )
   }
-  if (descriptionReviewedEmployeeCurrentVal.value && !uploadedPositionDescriptionUrl.value) {
-    errorItems.push(['position-description-review', 'Upload Signed Position Description'])
+  if (
+    descriptionReviewedEmployeeCurrentVal.value &&
+      !uploadedPositionDescriptionUrl.value
+  ) {
+    errorItems.push(
+      ['position-description-review', 'Upload Signed Position Description']
+    )
   }
   return errorItems
 }
@@ -846,7 +1412,11 @@ function retrievePerformanceReview() {
             console.log('PR does not seem to exist. Redirecting...')
             router.push('/')
               .catch(e => {
-                console.error('Error navigating to dashboard upon not finding a matching PR:', e)
+                console.error(
+                  'Error navigating to dashboard upon not finding a matching ' +
+                    'PR:',
+                  e
+                )
                 reject(e)
               })
             return
@@ -870,7 +1440,8 @@ function retrievePerformanceReview() {
           evaluationType.value = pr.evaluation_type
           evaluationTypeCurrentVal.value = evaluationType.value
           probationaryEvaluationType.value = pr.probationary_evaluation_type
-          probationaryEvaluationTypeCurrentVal.value = probationaryEvaluationType.value
+          probationaryEvaluationTypeCurrentVal.value =
+            probationaryEvaluationType.value
           stepIncrease.value = pr.step_increase
           stepIncreaseCurrentVal.value = stepIncrease.value
           topStepBonus.value = pr.top_step_bonus
@@ -906,15 +1477,18 @@ function retrievePerformanceReview() {
           evaluationSuccesses.value = pr.evaluation_successes
           evaluationSuccessesCurrentVal.value = evaluationSuccesses.value
           evaluationOpportunities.value = pr.evaluation_opportunities
-          evaluationOpportunitiesCurrentVal.value = evaluationOpportunities.value
+          evaluationOpportunitiesCurrentVal.value =
+            evaluationOpportunities.value
           evaluationGoalsManager.value = pr.evaluation_goals_manager
           evaluationGoalsManagerCurrentVal.value = evaluationGoalsManager.value
           evaluationCommentsEmployee.value = pr.evaluation_comments_employee
-          evaluationCommentsEmployeeCurrentVal.value = evaluationCommentsEmployee.value
+          evaluationCommentsEmployeeCurrentVal.value =
+            evaluationCommentsEmployee.value
 
           positionDescriptionLink.value = pr.position_description_link
           descriptionReviewedEmployee.value = pr.description_reviewed_employee
-          descriptionReviewedEmployeeCurrentVal.value = descriptionReviewedEmployee.value
+          descriptionReviewedEmployeeCurrentVal.value =
+            descriptionReviewedEmployee.value
           uploadedPositionDescriptionUrl.value = pr.signed_position_description
 
           signatures.value = pr.all_required_signatures
@@ -930,7 +1504,9 @@ function retrievePerformanceReview() {
 }
 
 function retrieveReviewNotes(): void {
-  performanceReviewStore.getAllManagerNotesForEmployee(employeePk.value.toString())
+  performanceReviewStore.getAllManagerNotesForEmployee(
+    employeePk.value.toString()
+  )
     .then((notes: Array<ReviewNoteRetrieve>) => {
       reviewNotes.value = notes
     })
@@ -969,7 +1545,8 @@ function updatePerformanceReview() {
       status.value = pr.status
 
       evaluationTypeCurrentVal.value = pr.evaluation_type
-      probationaryEvaluationTypeCurrentVal.value = pr.probationary_evaluation_type
+      probationaryEvaluationTypeCurrentVal.value =
+        pr.probationary_evaluation_type
       stepIncreaseCurrentVal.value = pr.step_increase
       topStepBonusCurrentVal.value = pr.top_step_bonus
       actionOtherCurrentVal.value = pr.action_other
@@ -990,9 +1567,11 @@ function updatePerformanceReview() {
       evaluationSuccessesCurrentVal.value = pr.evaluation_successes
       evaluationOpportunitiesCurrentVal.value = pr.evaluation_opportunities
       evaluationGoalsManagerCurrentVal.value = pr.evaluation_goals_manager
-      evaluationCommentsEmployeeCurrentVal.value = pr.evaluation_comments_employee
+      evaluationCommentsEmployeeCurrentVal.value =
+        pr.evaluation_comments_employee
 
-      descriptionReviewedEmployeeCurrentVal.value = pr.description_reviewed_employee
+      descriptionReviewedEmployeeCurrentVal.value =
+        pr.description_reviewed_employee
 
       signatures.value = pr.all_required_signatures
 
@@ -1017,17 +1596,19 @@ function updateEmployeeComments(): void {
     evaluation_comments_employee: evaluationCommentsEmployee.value,
   })
     .then((pr) => {
-      evaluationCommentsEmployeeCurrentVal.value = pr.evaluation_comments_employee
+      evaluationCommentsEmployeeCurrentVal.value =
+        pr.evaluation_comments_employee
     })
 }
 
-function userCanSign(employeePk: number, employeeIsReadyToSign: boolean): boolean {
+function userCanSign(
+  employeePk: number, employeeIsReadyToSign: boolean
+): boolean {
   const employeeIsCurrentUser = employeePk == currentUserPk()
   return employeeIsCurrentUser && employeeIsReadyToSign
 }
 
 function signPerformanceReview(): void {
-  // PerformanceReviewDataService.signPerformanceReview(parseInt(this.pk), this.managerPk)
   performanceReviewStore.createSignature({
     review_pk: prPk.value,
     employee_pk: currentUserPk()
@@ -1085,7 +1666,8 @@ onMounted(() => {
   retrievePerformanceReview()
     .then(() => {
       if (props.print) {
-        setTimeout(() => window.print(), 200) // TODO: Wait briefly for logo image to load
+        // TODO: Wait briefly for logo image to load
+        setTimeout(() => window.print(), 200)
       }
     })
     .catch(e => {

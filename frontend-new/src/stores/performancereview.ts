@@ -214,7 +214,6 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
           method: 'POST'
         })
           .then(() => {
-            debugger
             resolve('Successfully uploaded signed position description')
           })
           .catch(e => {

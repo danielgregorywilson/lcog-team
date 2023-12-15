@@ -31,17 +31,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-
 import { useUserStore } from 'src/stores/user'
 import PerformanceReviewTable from 'src/components/PerformanceReviewTable.vue'
 import ReviewNoteTable from 'src/components/ReviewNoteTable.vue'
 
 
 const userStore = useUserStore()
-
-let currentIndex = ref(-1)
-let title = ref('')
 
 function isManager() {
     return userStore.getEmployeeProfile.is_manager

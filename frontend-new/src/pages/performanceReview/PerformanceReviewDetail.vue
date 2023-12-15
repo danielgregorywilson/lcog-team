@@ -485,15 +485,6 @@
   .eval-box-full {
     grid-template-columns: auto;
   }
-  .eval-box-full-1 {
-
-  }
-  .eval-box-full-2 {
-
-    #action-other {
-      // grid-column-start: span 3;
-    }
-  }
   .label-radio-pair {
     justify-content: start;
   }
@@ -633,9 +624,7 @@ import FileUploader from 'src/components/FileUploader.vue'
 import { readableDate } from 'src/filters'
 import { usePerformanceReviewStore } from 'src/stores/performancereview'
 import { useUserStore } from 'src/stores/user'
-import {
-  ReviewNoteRetrieve, FileUploadDescriptionUploadServerResponse
-} from 'src/types'
+import { PRSignatures, ReviewNoteRetrieve } from 'src/types'
 import { getRoutePk } from 'src/utils'
 
 
@@ -648,6 +637,8 @@ const { getScrollTarget, setVerticalScrollPosition } = scroll
 const props = defineProps<{
   print?: boolean,
 }>()
+
+type PositionType = 'top' | 'standard' | 'right' | 'bottom' | 'left' | undefined
 
 let prPk = ref('')
 let status = ref('')
@@ -713,29 +704,19 @@ let descriptionReviewedEmployeeCurrentVal = ref(false)
 let descriptionReviewedEmployee = ref(false)
 let uploadedPositionDescriptionUrl = ref('')
 let selectedFile = ref(new File([''], ''))
-let fileTooLarge = ref(false)
-let fileSuccessfullyUploaded = ref(false)
 
-let signatures = ref([['', '', '']])
+let signatures: Ref<PRSignatures> = ref([['', '', new Date(), -1, false]])
 
 let showErrorButton = ref(false)
 let showErrorDialog = ref(false)
-let errorDialogPosition = ref('top')
+let errorDialogPosition: Ref<PositionType> = ref('standard')
 
 let showPRSignedAndCompleteDialog = ref(false)
 
 let reviewNotes = ref([]) as Ref<Array<ReviewNoteRetrieve>>
 
-// $refs!: {
-//   fileuploader: HTMLFormElement
-// }
-
 function currentUserPk(): number {
   return userStore.getEmployeeProfile.employee_pk
-}
-
-function currentUserIsUpperManager(): boolean {
-  return userStore.getEmployeeProfile.is_upper_manager
 }
 
 function currentUserIsManagerOfEmployee(): boolean {
@@ -1077,41 +1058,7 @@ function onClickNoteCard(pk: number): void {
     })
 }
 
-function file_selected(file: Array<File>) {
-  selectedFile.value = file[0];
-}
-
-function uploadFile() {
-  let fd = new FormData();
-  fd.append('pk', prPk.value)
-  fd.append('file', selectedFile.value)
-
-  // TODO: Use new FileUploader component
-  fileSuccessfullyUploaded.value = true
-  updatePerformanceReview()
-
-  // performanceReviewStore.uploadSignedPositionDescription(fd)
-  //   .then((response: FileUploadDescriptionUploadServerResponse) => {
-  //     debugger
-  //     if (response.status == 200) {
-  //       $refs.fileuploader.reset()
-  //       uploadedPositionDescriptionUrl.value = response.data
-  //       fileSuccessfullyUploaded.value = true
-  //       setTimeout(() => fileSuccessfullyUploaded.value = false, 5000)
-  //       updatePerformanceReview()
-  //     }
-  //   })
-  //   .catch(e => {
-  //     console.error('Error uploading signed position description:', e)
-  //   })
-}
-
-function rejectFileTooLarge() {
-  fileTooLarge.value = true
-  setTimeout(() => fileTooLarge.value = false, 5000)
-}
-
-function openErrorDialog(position: string) {
+function openErrorDialog(position: PositionType) {
   errorDialogPosition.value = position
   showErrorDialog.value = true
 }

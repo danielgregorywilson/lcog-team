@@ -99,6 +99,8 @@ export interface Unit {
 // PerformanceReview Structure from Django Rest Framework //
 ////////////////////////////////////////////////////////////
 
+export type PRSignatures = Array<[string, string, Date, number, boolean]>
+
 export interface PerformanceReviewRetrieve {
   url: Url
   pk: number
@@ -140,7 +142,7 @@ export interface PerformanceReviewRetrieve {
   position_description_link: string
   description_reviewed_employee: boolean
   signed_position_description: string
-  all_required_signatures: Array<[string, string, string]>
+  all_required_signatures: PRSignatures
 }
 
 export interface PerformanceReviewCreate {

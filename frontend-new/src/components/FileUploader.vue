@@ -13,11 +13,25 @@
         <q-uploader-add-trigger />
         <q-tooltip>Pick File</q-tooltip>
       </q-btn>
-      <q-btn v-if="scope.canUpload" icon="cloud_upload" @click="uploadFile()" round dense flat >
+      <q-btn
+        v-if="scope.canUpload"
+        icon="cloud_upload"
+        @click="uploadFile()"
+        round
+        dense
+        flat
+      >
         <q-tooltip>Upload File</q-tooltip>
       </q-btn>
 
-      <q-btn v-if="scope.isUploading" icon="clear" @click="scope.abort" round dense flat >
+      <q-btn
+        v-if="scope.isUploading"
+        icon="clear"
+        @click="scope.abort"
+        round
+        dense
+        flat
+      >
         <q-tooltip>Abort Upload</q-tooltip>
       </q-btn>
     </div>
@@ -48,7 +62,9 @@
     </q-list>
   </template>
 </q-uploader>
-<div v-if="fileSuccessfullyUploaded" class="text-green">Successfully uploaded</div>
+<div v-if="fileSuccessfullyUploaded" class="text-green">
+  Successfully uploaded
+</div>
 <div v-if="fileTooLarge" class="text-red">File is too large</div>
 </template>
 
@@ -98,26 +114,28 @@ function uploadFile() {
   }).catch(() => {
     console.log('error')
   })
-
-
-
-  // PerformanceReviewDataService.uploadSignedPositionDescription(fd)
-  //   .then((response: FileUploadDescriptionUploadServerResponse) => {
-  //     if (response.status == 200) {
-  //       this.$refs.fileuploader.reset()
-  //       this.uploadedPositionDescriptionUrl = response.data
-  //       this.fileSuccessfullyUploaded = true
-  //       setTimeout(() => this.fileSuccessfullyUploaded = false, 5000)
-  //       this.updatePerformanceReview()
-  //         .catch(e => {
-  //           console.error('Error updating PR after uploading signed position description:', e)
-  //         })
-  //     }
-  //   })
-  //   .catch(e => {
-  //     console.error('Error uploading signed position description:', e)
-  //   })
 }
+
+// PerformanceReviewDataService.uploadSignedPositionDescription(fd)
+//   .then((response: FileUploadDescriptionUploadServerResponse) => {
+//     if (response.status == 200) {
+//       this.$refs.fileuploader.reset()
+//       this.uploadedPositionDescriptionUrl = response.data
+//       this.fileSuccessfullyUploaded = true
+//       setTimeout(() => this.fileSuccessfullyUploaded = false, 5000)
+//       this.updatePerformanceReview()
+//         .catch(e => {
+//           console.error(
+//             'Error updating PR after uploading signed position description:',
+//             e
+//           )
+//         })
+//     }
+//   })
+//   .catch(e => {
+//     console.error('Error uploading signed position description:', e)
+//   })
+// }
 
 function doUpload(data: FormData): Promise<any> {
   return new Promise((resolve, reject) => {

@@ -2,14 +2,26 @@
   <q-page padding>
     <div class="q-py-md" v-if="isManager()">
       <div class="row items-center q-mb-md">
-        <q-avatar icon="insert_chart_outlined" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
+        <q-avatar
+          icon="insert_chart_outlined"
+          color="primary"
+          text-color="white"
+          font-size="32px"
+          class="q-mr-sm"
+        />
         <div class="text-h4">Review Notes</div>
       </div>
       <ReviewNoteTable />
     </div>
     <div class="q-py-md" v-if="isManager()">
       <div class="row items-center q-mb-md">
-        <q-avatar icon="assignment_ind" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
+        <q-avatar
+          icon="assignment_ind"
+          color="primary"
+          text-color="white"
+          font-size="32px"
+          class="q-mr-sm"
+        />
         <div class="text-h4">Current Reviews (For Managers)</div>
       </div>
       <div class="text-h6">Action Required</div>
@@ -17,9 +29,18 @@
       <div class="text-h6">No Action Required</div>
         <PerformanceReviewTable :actionRequired="false" />
     </div>
-    <div class="q-py-md" v-if="isUpperManager() || isTheHRManager() || isTheExecutiveDirector()">
+    <div
+      class="q-py-md"
+      v-if="isUpperManager() || isTheHRManager() || isTheExecutiveDirector()"
+    >
       <div class="row items-center q-mb-md">
-        <q-avatar icon="assignment_turned_in" color="primary" text-color="white" font-size="32px" class="q-mr-sm" />
+        <q-avatar
+          icon="assignment_turned_in"
+          color="primary"
+          text-color="white"
+          font-size="32px"
+          class="q-mr-sm"
+        />
         <div class="text-h4">Reviews to Sign</div>
       </div>
       <div class="text-h6">Signature Required</div>

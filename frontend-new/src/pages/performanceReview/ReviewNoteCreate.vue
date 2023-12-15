@@ -78,14 +78,14 @@ function createReviewNote(): void {
     note: note.value,
   })
     .then(() => {
-      Notify.create('Created a review note.')
-      router.push('/')
+      router.push({ name: 'reviews' })
         .then(() => {
-          // TODO: Fix this by loading in the user again, as in timeoff/NewRequest.vue
-          location.reload() // TODO: This seems to be necessary in order to immediately edit a review note after creating it.
+          Notify.create('Created a review note.')
         })
         .catch(e => {
-          console.error('Error navigating to dashboard after creating review note:', e)
+          console.error(
+            'Error navigating to dashboard after creating review note:', e
+          )
         })
     })
     .catch(e => {

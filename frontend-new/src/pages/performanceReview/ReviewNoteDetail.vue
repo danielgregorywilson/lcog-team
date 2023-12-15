@@ -2,8 +2,13 @@
   <q-page>
     <div class="q-px-md">
       <h4>Edit this Note</h4>
-      <p>Notes are visible to you when completing an evalutation for the employee. They are not visible to anyone else.</p>
-      <q-select v-model="employee" :options="options" label="Employee" class="q-pb-md" />
+      <p>
+        Notes are visible to you when completing an evalutation for the
+        employee. They are not visible to anyone else.
+      </p>
+      <q-select
+        v-model="employee" :options="options" label="Employee" class="q-pb-md"
+      />
       <q-input
         input-class="review-note"
         v-model="note"
@@ -11,7 +16,14 @@
         type="textarea"
         class="q-pb-md"
       />
-      <q-btn color="white" id="review-note-update-button" text-color="black" label="Update" :disabled="!valuesAreChanged()" @click="updateReviewNote()" />
+      <q-btn
+        color="white"
+        id="review-note-update-button"
+        text-color="black"
+        label="Update"
+        :disabled="!valuesAreChanged()"
+        @click="updateReviewNote()"
+      />
     </div>
   </q-page>
 </template>
@@ -53,7 +65,10 @@ function getOptions(): void {
 }
 
 function valuesAreChanged(): boolean {
-  if (employee.value.pk == employeeCurrentVal.value.pk && note.value == noteCurrentVal.value) {
+  if (
+    employee.value.pk == employeeCurrentVal.value.pk &&
+      note.value == noteCurrentVal.value
+  ) {
     return false
   } else {
     return true
@@ -67,7 +82,9 @@ function updateReviewNote(): void {
     note: note.value
   })
     .then((reviewNote) => {
-      employeeCurrentVal.value = {label: reviewNote.employee_name, pk: reviewNote.employee_pk}
+      employeeCurrentVal.value = {
+        label: reviewNote.employee_name, pk: reviewNote.employee_pk
+      }
       noteCurrentVal.value = reviewNote.note
     })
 }
@@ -78,7 +95,9 @@ function retrieveReviewNote(): void {
     notePk.value = routePk
     performanceReviewStore.getReviewNote(routePk)
       .then((reviewNote) => {
-        employee.value = {label: reviewNote.employee_name, pk: reviewNote.employee_pk}
+        employee.value = {
+          label: reviewNote.employee_name, pk: reviewNote.employee_pk
+        }
         note.value = reviewNote.note
         employeeCurrentVal.value = employee.value
         noteCurrentVal.value = note.value

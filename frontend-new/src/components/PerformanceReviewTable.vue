@@ -8,55 +8,129 @@
       :no-data-label="noDataLabel()"
       row-key="name"
     >
-      <!-- Slots for header cells: Shrink the width when the screen is too small to see the whole table width -->
+      <!-- Slots for header cells: Shrink the width when the screen is too
+        small to see the whole table width -->
       <template v-slot:header-cell-employeeName="props">
-        <th v-if="$q.screen.lt.lg" style="white-space: normal;">{{props.col.label}}</th>
+        <th v-if="$q.screen.lt.lg" style="white-space: normal;">
+          {{props.col.label}}
+        </th>
         <th v-else>{{props.col.label}}</th>
       </template>
       <template v-slot:header-cell-daysUntilReview="props">
-        <th v-if="$q.screen.lt.lg" style="white-space: normal;">{{props.col.label}}</th>
+        <th v-if="$q.screen.lt.lg" style="white-space: normal;">
+          {{props.col.label}}
+        </th>
         <th v-else>{{props.col.label}}</th>
       </template>
-      <!-- Slots for body cells: Show dates in a familiar format; make sure status can wrap, and display action buttons -->
+      <!-- Slots for body cells: Show dates in a familiar format; make sure
+        status can wrap, and display action buttons -->
       <template v-slot:body-cell-performancePeriod="props">
         <q-td key="performancePeriod" :props="props">
-          {{ readableDate(props.row.period_start_date) }} - {{ readableDate(props.row.period_end_date) }}
+          {{ readableDate(props.row.period_start_date) }} -
+          {{ readableDate(props.row.period_end_date) }}
         </q-td>
       </template>
       <template v-slot:body-cell-status="props">
-        <q-td style="white-space: normal;" :props="props">{{ props.row.status }}</q-td>
+        <q-td style="white-space: normal;" :props="props">
+          {{ props.row.status }}
+        </q-td>
       </template>
       <template v-slot:body-cell-actions="props">
         <q-td :props="props">
           <div class="row">
-            <q-btn class="col edit-button" dense round flat color="grey" @click="editEvaluation(props)" icon="edit"></q-btn>
-            <q-btn class="col print-button" dense round flat color="grey" @click="printEvaluation(props)" icon="print">
-              <q-tooltip content-style="font-size: 16px">Print Performance Review Form</q-tooltip>
+            <q-btn
+              class="col edit-button"
+              dense
+              round
+              flat
+              color="grey"
+              @click="editEvaluation(props)"
+              icon="edit"
+            />
+            <q-btn
+              class="col print-button"
+              dense
+              round
+              flat
+              color="grey"
+              @click="printEvaluation(props)"
+              icon="print"
+            >
+              <q-tooltip content-style="font-size: 16px">
+                Print Performance Review Form
+              </q-tooltip>
             </q-btn>
-            <q-btn v-if="props.row.signed_position_description" class="col print-button" dense round flat color="grey" @click="printEvaluationPositionDescription(props)" icon="print">
-              <q-tooltip content-style="font-size: 16px">Print Signed Position Description</q-tooltip>
+            <q-btn
+              v-if="props.row.signed_position_description"
+              class="col print-button"
+              dense
+              round
+              flat
+              color="grey"
+              @click="printEvaluationPositionDescription(props)"
+              icon="print"
+            >
+              <q-tooltip content-style="font-size: 16px">
+                Print Signed Position Description
+              </q-tooltip>
             </q-btn>
           </div>
         </q-td>
       </template>
-      <!-- For grid mode, we need to specify everything in order for our action buttons to render -->
+      <!-- For grid mode, we need to specify everything in order for our action
+        buttons to render -->
       <template v-slot:item="props">
-        <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
+        <div
+          class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3
+            grid-style-transition"
+        >
           <q-card class="q-py-sm">
             <q-list dense>
               <q-item v-for="col in props.cols" :key="col.name">
                 <div class="q-table__grid-item-row">
                   <div class="q-table__grid-item-title">{{ col.label }}</div>
-                  <div class="q-table__grid-item-value" v-if="col.label != 'Actions'">
+                  <div
+                    class="q-table__grid-item-value"
+                    v-if="col.label != 'Actions'"
+                  >
                     {{ col.value }}
                   </div>
                   <div class="q-table__grid-item-value row q-gutter-sm" v-else>
-                    <q-btn class="col edit-button" dense round flat color="grey" @click="editEvaluation(props)" icon="edit"></q-btn>
-                    <q-btn class="col print-button" dense round flat color="grey" @click="printEvaluation(props)" icon="print">
-                      <q-tooltip content-style="font-size: 16px">Print Performance Review Form</q-tooltip>
+                    <q-btn
+                      class="col edit-button"
+                      dense
+                      round
+                      flat
+                      color="grey"
+                      @click="editEvaluation(props)"
+                      icon="edit"
+                    />
+                    <q-btn
+                      class="col print-button"
+                      dense
+                      round
+                      flat
+                      color="grey"
+                      @click="printEvaluation(props)"
+                      icon="print"
+                    >
+                      <q-tooltip content-style="font-size: 16px">
+                        Print Performance Review Form
+                      </q-tooltip>
                     </q-btn>
-                    <q-btn v-if="props.row.signed_position_description" class="col print-button" dense round flat color="grey" @click="printEvaluationPositionDescription(props)" icon="print">
-                      <q-tooltip content-style="font-size: 16px">Print Signed Position Description</q-tooltip>
+                    <q-btn
+                      v-if="props.row.signed_position_description"
+                      class="col print-button"
+                      dense
+                      round
+                      flat
+                      color="grey"
+                      @click="printEvaluationPositionDescription(props)"
+                      icon="print"
+                    >
+                      <q-tooltip content-style="font-size: 16px">
+                        Print Signed Position Description
+                      </q-tooltip>
                     </q-btn>
                   </div>
                 </div>

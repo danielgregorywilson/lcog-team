@@ -2,11 +2,13 @@ import axios from 'axios'
 import { defineStore } from 'pinia'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
+import { useUserStore } from 'src/stores/user'
 import {
   PerformanceReviewRetrieve, PerformanceReviewUpdate,
   PerformanceReviewUpdatePartial, ReviewNoteCreate, ReviewNoteRetrieve,
   ReviewNoteUpdate, SignatureCreate
 } from 'src/types'
+
 
 export const usePerformanceReviewStore = defineStore('performancereview', {
   state: () => ({
@@ -237,7 +239,12 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
           .then(() => {
             this.getAllReviewNotes()
               .then(() => {
-                resolve('Successfully created a review note')
+                const userStore = useUserStore()
+                userStore.userRequest()
+                  .then(() => {
+                    resolve('Successfully created a review note')
+                  })
+                  .catch(err => console.log(err))
               })
               .catch(e => {
                 handlePromiseError(

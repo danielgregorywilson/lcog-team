@@ -1672,8 +1672,7 @@ onMounted(() => {
   retrievePerformanceReview()
     .then(() => {
       if (props.print) {
-        // TODO: Wait briefly for logo image to load
-        setTimeout(() => window.print(), 200)
+        window.print()
       }
     })
     .catch(e => {

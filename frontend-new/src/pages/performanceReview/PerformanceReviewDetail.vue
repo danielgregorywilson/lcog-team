@@ -746,12 +746,18 @@
           manager
         </div>
         <FileUploader
+          v-if="currentUserIsManagerOfEmployee() && descriptionReviewedEmployee"
           label="Receipt"
           :file=selectedFile
           contentTypeAppLabel="people"
           contentTypeModel="performancereview"
           :objectPk=prPk
           :readOnly=false
+          v-on="{
+            'uploaded': (url: string) => {
+              uploadedPositionDescriptionUrl = url
+            }
+          }"
         />
         <div
           v-if="descriptionReviewedEmployee && uploadedPositionDescriptionUrl"

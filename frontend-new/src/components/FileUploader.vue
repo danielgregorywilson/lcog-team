@@ -72,6 +72,7 @@
 import axios from 'axios'
 import { onMounted, onUpdated, ref } from 'vue'
 import { apiURL, handlePromiseError } from 'src/stores/index'
+import { emit } from 'process';
 
 let selectedFile = ref(new File([''], ''))
 let fileTooLarge = ref(false)
@@ -89,10 +90,9 @@ const props = defineProps<{
   readOnly: boolean
 }>()
 
-// const emit = defineEmits<{
-//   (e: 'clear'): void
-//   (e: 'input', arg: SimpleEmployeeRetrieve): void
-// }>()
+const emit = defineEmits<{
+  (e: 'uploaded', arg: URL): void
+}>()
 
 function file_selected(files: Array<File>) {
   selectedFile.value = files[0];
@@ -109,10 +109,10 @@ function uploadFile() {
   fd.append('content_type_model', props.contentTypeModel)
   fd.append('object_pk', props.objectPk || '')
   fd.append('file', selectedFile.value)
-  doUpload(fd).then(() => {
-    console.log('success')
-  }).catch(() => {
-    console.log('error')
+  doUpload(fd).then((url) => {
+    fileSuccessfullyUploaded.value = true
+    setTimeout(() => fileSuccessfullyUploaded.value = false, 5000)
+    emit('uploaded', url)
   })
 }
 

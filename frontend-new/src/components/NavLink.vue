@@ -2,6 +2,7 @@
   <q-item
     clickable
     :to="link"
+    :id="id"
     v-if="isVisible()"
   >
     <q-item-section

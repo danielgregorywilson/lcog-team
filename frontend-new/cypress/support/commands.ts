@@ -35,3 +35,23 @@
 //     }
 //   }
 // }
+
+import { visitUrl } from '../support/helpers'
+
+Cypress.Commands.add('loginEmployeeWithUI', () => {
+  visitUrl('/auth/login')
+  cy.get('#username')
+    .type(Cypress.env('users').employee.username)
+  cy.get('#password')
+    .type(Cypress.env('users').employee.password, {log: false})
+  cy.contains('Login').click()
+});
+
+Cypress.Commands.add('loginManagerWithUI', () => {
+  visitUrl('/auth/login')
+  cy.get('#username')
+    .type(Cypress.env('users').gsmanager.username)
+  cy.get('#password')
+    .type(Cypress.env('users').gsmanager.password, {log: false})
+  cy.contains('Login').click()
+});

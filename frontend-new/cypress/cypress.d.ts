@@ -6,5 +6,7 @@
 declare namespace Cypress {
   interface Chainable<Subject = any> {
     loginSuperuser(): Chainable<any>;
+    loginEmployeeWithUI(): Chainable<any>;
+    loginManagerWithUI(): Chainable<any>;
   }
 }

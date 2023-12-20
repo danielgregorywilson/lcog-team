@@ -1,4 +1,4 @@
-# Quasar App (frontend-new)
+# LCOG Team App Frontend Readme
 
 A Quasar Project
 
@@ -13,6 +13,12 @@ yarn
 # or
 npm install
 ```
+
+# Run the frontend locally
+# MacOS
+`cd frontend && quasar dev`
+# Windows
+`cd frontend; quasar dev`
 
 ### Start the app in development mode (hot-code reloading, error reporting, etc.)
 ```bash

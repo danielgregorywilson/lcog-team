@@ -55,3 +55,19 @@ Cypress.Commands.add('loginManagerWithUI', () => {
     .type(Cypress.env('users').gsmanager.password, {log: false})
   cy.contains('Login').click()
 });
+
+Cypress.Commands.add('loginEmployee', () => {
+  const username = Cypress.env('users').employee.username
+  const password = Cypress.env('users').employee.pw
+
+  cy.request('POST', 'http://localhost:8000/api/api-token-auth-password/', {username, password})
+    .its('body.token')
+    .should('exist')
+    .then(token =>
+        localStorage.setItem('user-token', `${token}`)
+    );
+    // TODO: Also need to set Axios default header for subsequent requests?
+
+    // Verify user token was set
+    // expect(localStorage.getItem('user-token')).to.eq('dbbe99f7301bf3134d2259e1919d82148a68676d')
+});

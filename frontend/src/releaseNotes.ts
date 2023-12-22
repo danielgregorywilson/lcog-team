@@ -4,6 +4,16 @@
 
 export const releases = [
   {
+    version: '0.21.1',
+    date: new Date(2023, 11, 21),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Migrate Performance Reviews module to the new Vue 3 app.'
+      }
+    ]
+  },
+  {
     version: '0.21.0',
     date: new Date(2023, 11, 1),
     changes: [

@@ -1,8 +1,512 @@
-// ////////////////////////////////
-// WATCH THOSE MONTH CODES, NOOB //
-///////////////////////////////////
+// //////////////////////////
+// WATCH THOSE MONTH CODES //
+/////////////////////////////
 
 export const releases = [
+  {
+    version: '0.21.1',
+    date: new Date(2023, 11, 21),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Migrate Performance Reviews module to the new Vue 3 app.'
+      }
+    ]
+  },
+  {
+    version: '0.21.0',
+    date: new Date(2023, 11, 1),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Improvements to transition form.'
+      },
+      {
+        type: 'improved',
+        description: 'Security improvements.'
+      }
+    ]
+  },
+  {
+    version: '0.20.8',
+    date: new Date(2023, 10, 29),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Improvements to transition form.'
+      }
+    ]
+  },
+  {
+    version: '0.20.7',
+    date: new Date(2023, 10, 14),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Improvements to transition form.'
+      }
+    ]
+  },
+  {
+    version: '0.20.6',
+    date: new Date(2023, 10, 13),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Security updates.'
+      }
+    ]
+  },
+  {
+    version: '0.20.5',
+    date: new Date(2023, 10, 6),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Credit card reconciliation demo features.'
+      }
+    ]
+  },
+  {
+    version: '0.20.4',
+    date: new Date(2023, 10, 6),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Minor change to employee transition form.'
+      }
+    ]
+  },
+  {
+    version: '0.20.3',
+    date: new Date(2023, 9, 21),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Minor change to employee transition form.'
+      }
+    ]
+  },
+  {
+    version: '0.20.2',
+    date: new Date(2023, 9, 21),
+    changes: [
+      {
+        type: 'fix',
+        description: 'Fix a bug where Gas PIN notifications were not being sent for employee transitions.'
+      }
+    ]
+  },
+  {
+    version: '0.20.1',
+    date: new Date(2023, 9, 18),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Various improvements to the employee transition form.'
+      },
+      {
+        type: 'improved',
+        description: 'Security updates'
+      }
+    ]
+  },
+  {
+    version: '0.20.0',
+    date: new Date(2023, 9, 13),
+    changes: [
+      {
+        type: 'new',
+        description: 'Demo credit card reimbursements pages.'
+      },
+      { type: 'new',
+        description: 'View floor plan map in employee transition form.'
+      },
+      {
+        type: 'fix',
+        description: 'Fixes to employee transition form.'
+      },
+    ]
+  },
+  {
+    version: '0.19.2',
+    date: new Date(2023, 9, 9),
+    changes: [
+      { type: 'new',
+        description: 'Add Expenses module to track employee expenses.'
+      },
+      {
+        type: 'improved',
+        description: 'Various improvements to workflows.'
+      },
+      {
+        type: 'fix',
+        description: 'Fixed some issues with employee transitions.'
+      },
+    ]
+  },
+  {
+    version: '0.19.1',
+    date: new Date(2023, 8, 29),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Various updates to the transition form process.'
+      },
+    ]
+  },
+  {
+    version: '0.19.0',
+    date: new Date(2023, 8, 27),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Employee transition forms can now be assigned.'
+      },
+      {
+        type: 'improved',
+        description: 'Track who has and has not viewed security messages in the admin.'
+      },
+    ]
+  },
+  {
+    version: '0.18.2',
+    date: new Date(2023, 8, 19),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Performance updates to workflow views.'
+      },
+    ]
+  },
+  {
+    version: '0.18.1',
+    date: new Date(2023, 8, 15),
+    changes: [
+      {
+        type: 'fix',
+        description: 'Fixed an issue that caused some workflow tables to never load.'
+      }
+    ]
+  },
+  {
+    version: '0.18.0',
+    date: new Date(2023, 8, 13),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Employee transition forms now have an assignee.'
+      },
+      {
+        type: 'improved',
+        description: 'Various updates to the transition form.'
+      },
+      {
+        type: 'improved',
+        description: 'Security and reliability improvements.'
+      }
+    ]
+  },
+  {
+    version: '0.17.2',
+    date: new Date(2023, 8, 6),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Security and reliability improvements.'
+      }
+    ]
+  },
+  {
+    version: '0.17.1',
+    date: new Date(2023, 7, 25),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Various improvements to the transition form.'
+      }
+    ]
+  },
+  {
+    version: '0.17.0',
+    date: new Date(2023, 7, 14),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Various improvements to the transition form.'
+      }
+    ]
+  },
+  {
+    version: '0.16.0',
+    date: new Date(2023, 7, 9),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Various improvements to the transition form.'
+      }
+    ]
+  },
+  {
+    version: '0.15.3',
+    date: new Date(2023, 7, 7),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Add a button for hiring managers to send transition email to SDS hiring admins.'
+      }
+    ]
+  },
+  {
+    version: '0.15.2',
+    date: new Date(2023, 7, 4),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Minor improvements to the transition form.'
+      }
+    ]
+  },
+  {
+    version: '0.15.1',
+    date: new Date(2023, 7, 2),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Minor improvements to the transition form.'
+      },
+      {
+        type: 'improved',
+        description: 'Minor improvements to the responsibilities table.'
+      },
+      {
+        type: 'improved',
+        description: 'Minor improvements to time off views.'
+      }
+    ]
+  },
+  {
+    version: '0.15.0',
+    date: new Date(2023, 6, 24),
+    changes: [
+      {
+        type: 'new',
+        description: 'Add pre-approved leave without pay to transition form'
+      },
+      {
+        type: 'improved',
+        description: 'Start transition workflow processes once a STN email is sent.'
+      },
+      {
+        type: 'improved',
+        description: 'Improve API access guards.'
+      },
+      {
+        type: 'improved',
+        description: 'Workflows can now be manually marked as complete.'
+      },
+      {
+        type: 'improved',
+        description: 'Minor improvements to workflows app.'
+      }
+    ]
+  },
+  {
+    version: '0.14.0',
+    date: new Date(2023, 6, 11),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Mark if action is required for the current user to complete a workflow step.'
+      },
+      {
+        type: 'improved',
+        description: 'Workflows are now archived rather than deleted. They can be restored from the archive.'
+      },
+      {
+        type: 'improved',
+        description: 'We no longer create process instances until the transition form is sent to Staff Transition News.'
+      },
+      {
+        type: 'improved',
+        description: 'Minor improvements to workflows app.'
+      },
+      {
+        type: 'fix',
+        description: 'Fix the way we calculate workflow percent complete.'
+      },
+      {
+        type: 'fix',
+        description: 'Display all job titles in the transition form dropdown.'
+      }
+    ]
+  },
+  {
+    version: '0.13.7',
+    date: new Date(2023, 6, 3),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Split out workflows by type in dashboard: onboarding, returning, changing, exiting.'
+      }
+    ]
+  },
+  {
+    version: '0.13.6',
+    date: new Date(2023, 5, 29),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Many improvements to transition form.'
+      },
+      {
+        type: 'improved',
+        description: 'Send notification about Gas PIN for new employees.'
+      }
+    ]
+  },
+  {
+    version: '0.13.5',
+    date: new Date(2023, 5, 27),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Added a second language select dropdown to transition form.'
+      },
+      {
+        type: 'improved',
+        description: 'Show percent complete in process instance views.'
+      },
+      {
+        type: 'fix',
+        description: 'Fix a bug where the transition form would not submit initially.'
+      }
+    ]
+  },
+  {
+    version: '0.13.4',
+    date: new Date(2023, 5, 21),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Optimize workflow dashboards.'
+      }
+    ]
+  },
+  {
+    version: '0.13.3',
+    date: new Date(2023, 5, 20),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Improvements to employee transition form.'
+      }
+    ]
+  },
+  {
+    version: '0.13.2',
+    date: new Date(2023, 5, 9),
+    changes: [
+      {
+        type: 'new',
+        description: 'Workflows archive page'
+      },
+      {
+        type: 'new',
+        description: 'Transition form print view'
+      },
+      {
+        type: 'new',
+        description: 'Transition form function to send form to staff transition news'
+      },
+      {
+        type: 'improved',
+        description: 'Add security for view and edit of transition form fields'
+      },
+      {
+        type: 'improved',
+        description: 'Various improvements to workflows pages'
+      }
+    ]
+  },
+  {
+    version: '0.13.1',
+    date: new Date(2023, 4, 30),
+    changes: [
+      {
+        type: 'new',
+        description: 'Allow undoing a workflow step'
+      },
+      {
+        type: 'new',
+        description: 'Keep change records for the transition form'
+      },
+      {
+        type: 'improved',
+        description: 'Various improvements to workflows pages'
+      },
+      {
+        type: 'improved',
+        description: 'When showing responsibility conflicts in the calendar, show all conflicts, not just the first one'
+      },
+    ]
+  },
+  {
+    version: '0.13.0',
+    date: new Date(2023, 4, 23),
+    changes: [
+      {
+        type: 'fix',
+        description: 'Fix a bug where employee transition form could not be submitted'
+      },
+      {
+        type: 'improved',
+        description: 'Employee transition form improvements, including new cell phone fields'
+      },
+      {
+        type: 'improved',
+        description: 'Loading spinners in more places'
+      },
+    ]
+  },
+  {
+    version: '0.12.2',
+    date: new Date(2023, 4, 15),
+    changes: [
+      {
+        type: 'fix',
+        description: 'Fix a bug where an employee could reserve multiple desks for the same day'
+      },
+      {
+        type: 'improved',
+        description: 'Employee transition form improvements, including new computer fields'
+      },
+      {
+        type: 'improved',
+        description: 'Team calendar loading spinner'
+      },
+    ]
+  },
+  {
+    version: '0.12.1',
+    date: new Date(2023, 4, 5),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Employee transition form improvements'
+      },
+    ]
+  },
+  {
+    version: '0.12.0',
+    date: new Date(2023, 4, 1),
+    changes: [
+      {
+        type: 'new',
+        description: 'Rebuild the Team App in Vue 3 for better performance and maintainability'
+      },
+    ]
+  },
   {
     version: '0.11.0',
     date: new Date(2023, 2, 7),

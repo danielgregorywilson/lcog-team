@@ -1,10 +1,6 @@
 {
-  "extends": "@quasar/app/tsconfig-preset",
+  "extends": "@quasar/app-vite/tsconfig-preset",
   "compilerOptions": {
-    "baseUrl": ".",
-    "target": "es6",
-    "experimentalDecorators": true,
-    "jsx": "react",
-    "moduleResolution": "node"
+    "baseUrl": "."
   },
 }

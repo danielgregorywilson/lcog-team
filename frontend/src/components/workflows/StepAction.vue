@@ -1,32 +1,27 @@
 <template>
-  <div>
-    <div v-if="action.type == 'LINK'">
-      <q-btn
-        @click="navigateToURL(action.url)"
-        color="secondary"
-        :label="action.name"
-      />
-      {{ action.description }}
-    </div>
-    <div v-if="action.type == 'API'"></div>
-    <div v-if="action.type == 'EMAIL'"></div>
+<div>
+  <div v-if="action.type == 'LINK'">
+    <q-btn
+      @click="navigateToURL(action.url.toString())"
+      color="secondary"
+      :label="action.name"
+    />
+    {{ action.description }}
   </div>
+  <div v-if="action.type == 'API'"></div>
+  <div v-if="action.type == 'EMAIL'"></div>
+</div>
 </template>
 
-<style scoped lang="scss">
-</style>
+<script setup lang="ts">
+import { Action } from 'src/types'
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
-import { Action } from '../../store/types'
+defineProps<{
+  action: Action
+}>()
 
-@Component
-export default class StepAction extends Vue {
-@Prop({required: true}) readonly action!: Action
-
-public navigateToURL(url: string) {
-  window.open(url, '_blank');
+function navigateToURL(url: string) {
+  window.open(url, '_blank')
 }
 
-}
 </script>

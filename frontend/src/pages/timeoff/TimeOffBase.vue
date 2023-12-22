@@ -1,4 +1,5 @@
 <template>
+  <div>
   <q-page class="q-pa-md">
     <div class="text-h4">Time Off</div>
     <div class="q-my-md">
@@ -12,45 +13,51 @@
     </div>
     <router-view :key="$route.path" />
   </q-page>
+</div>
 </template>
 
-<style scoped lang="scss">
-</style>
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useTimeOffStore } from 'src/stores/timeoff'
+import { useUserStore } from 'src/stores/user'
+import { getCurrentUser, userIsISEmployee } from 'src/utils'
 
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
-import { TimeOffRequestRetrieve, VuexStoreGetters } from '../../store/types'
+const router = useRouter()
+const timeOffStore = useTimeOffStore()
+const userStore = useUserStore()
 
-@Component
-export default class TimeOffBase extends Vue {
-  private getters = this.$store.getters as VuexStoreGetters
+function isManager() {
+  return userStore.isManager
+}
 
-  private isManager() {
-    return this.getters['userModule/getEmployeeProfile'].is_manager
-  }
+function managedTimeOffRequests() {
+  return timeOffStore.managedTimeOffRequests
+}
 
-  private managedTimeOffRequests(): Array<TimeOffRequestRetrieve> {
-    return this.getters['timeOffModule/managedTimeOffRequests'].results
-  }
-
-  private numUnacknowledgedManagedTimeOffRequests(): number {
-    const tors = this.getters['timeOffModule/managedTimeOffRequests'].results
-    if (tors) {
-      return tors.filter(tor => tor.acknowledged == null).length
-    } else {
-      return 0
-    }
-  }
-
-  private retrieveManagedTimeOffRequests(): void {
-    this.$store.dispatch('timeOffModule/getManagedTimeOffRequests')
-      .catch(e => {
-        console.error('Error retrieving my upcoming time off requests', e)
-      })
-  }
-
-  mounted() {
-    this.retrieveManagedTimeOffRequests()
+function numUnacknowledgedManagedTimeOffRequests(): number {
+  const tors = managedTimeOffRequests()
+  if (tors) {
+    return tors.filter(tor => tor.acknowledged == null).length
+  } else {
+    return 0
   }
 }
+
+function retrieveManagedTimeOffRequests(): void {
+  timeOffStore.getManagedTimeOffRequests()
+}
+
+onMounted(() => {
+  getCurrentUser()
+    .then(() => {
+      if (userIsISEmployee()) {
+        retrieveManagedTimeOffRequests()
+      } else {
+        router.push({ name: 'dashboard' })
+      }
+    })
+
+})
+
 </script>

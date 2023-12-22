@@ -43,29 +43,23 @@
 </template>
 
 <style lang="scss"> 
-
 #help-dialog {
   max-width: 700px;
 }
-
 </style>
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref, watch } from 'vue'
 
-import { Component, Vue } from 'vue-property-decorator'
-import { bus } from '../../App.vue'
+import useEventBus from 'src/eventBus'
 
-@Component
-export default class DeskReservation extends Vue{
+const { bus } = useEventBus()
 
-  private showHelp = false
+let showHelp = ref(false)
 
-  created() {
-    // We trigger opening the edit and delete dialogs in AllResponsibilities, EmployeeResponsibilites, or OrphanedResponsibilities
-    bus.$on('showReservationHelpDialog', () => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      this.showHelp = true
-    })
-  }
-
-}
+// We trigger opening the edit and delete dialogs in AllResponsibilities,
+// EmployeeResponsibilites, or OrphanedResponsibilities
+watch(() => bus.value.get('showReservationHelpDialog'), () => {
+  showHelp.value = true
+})
 </script>

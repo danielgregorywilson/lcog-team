@@ -1,93 +1,100 @@
 <template>
-<div>
-  <div style="display: none">{{ unit }}</div> <!-- TODO: This is a hack to force the component to render the currently selected unit -->
-  <q-select
-    v-model="selectedUnit"
-    :options="units()"
-    option-value="pk"
-    option-label="name"
-    :label="label"
-    use-input
-    hide-selected
-    fill-input
-    input-debounce="500"
-    @filter="filterFn"
-    @input="$emit('input', selectedUnit)"
-    class="unit-select"
-  >
-    <template v-slot:no-option>
-      <q-item>
-        <q-item-section class="text-grey">
-          No results
-        </q-item-section>
-      </q-item>
-    </template>
-    <template v-if="selectedUnit.name" v-slot:append>
-      <q-icon name="cancel" @click.stop="clearUnit()" class="cursor-pointer" />
-    </template>
-  </q-select>
-</div>
+<q-select
+  v-model="selectedUnit"
+  :options="units()"
+  option-value="pk"
+  option-label="name"
+  :label="label"
+  use-input
+  hide-selected
+  fill-input
+  input-debounce="500"
+  @filter="filterFn"
+  @update:model-value="emit('input', selectedUnit)"
+  class="unit-select"
+>
+  <template v-slot:no-option>
+    <q-item>
+      <q-item-section class="text-grey">
+        No results
+      </q-item-section>
+    </q-item>
+  </template>
+  <template v-if="selectedUnit.name" v-slot:append>
+    <q-icon name="cancel" @click.stop="clearUnit()" class="cursor-pointer" />
+  </template>
+</q-select>
 </template>
 
 <style scoped lang="scss">
   .unit-select {
-    width: 350px
+    width: 742px
   }
 </style>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
-import { Unit, VuexStoreGetters } from '../store/types'
+<script setup lang="ts">
+import { onMounted, onUpdated, ref } from 'vue'
 
-@Component
-export default class UnitSelect extends Vue {
-  private getters = this.$store.getters as VuexStoreGetters
-  public emptyUnit = {name: '', pk: -1}
-  
-  @Prop({required: true}) readonly label!: string
-  @Prop({required: true}) unit!: {name: string, pk: number}
+import { usePeopleStore } from 'src/stores/people'
+import { Unit } from 'src/types'
 
-  private needle = '' // For filtering unit list
-  public selectedUnit = this.emptyUnit
+const peopleStore = usePeopleStore()
 
-  private retrieveUnitList() {
-    this.$store.dispatch('peopleModule/getUnitList')
-      .catch(e => {
-        console.error('Error retrieving unit list', e)
-      })
-  }
+const emptyUnit = {name: '', pk: -1}
 
-  public units(): Array<Unit> {    
-    const units = this.getters['peopleModule/unitList'].results
-    if (units) {
-      return units.filter((unit: Unit) => {
-        return unit.name.toLowerCase().indexOf(this.needle) != -1
-      })
-    } else {
-      return []
-    }
-  }
+const props = defineProps<{
+  label: string,
+  unit: {name: string, pk: number},
+}>()
 
-  public filterFn (val: string, update: Function) { // eslint-disable-line @typescript-eslint/ban-types
-    update(() => {
-      this.needle = val.toLowerCase()
+const emit = defineEmits<{
+  (e: 'clear'): void
+  (e: 'input', arg: {name: string, pk: number}): void
+}>()
+
+let needle = ref('') // For filtering unit list
+let selectedUnit = ref(emptyUnit)
+
+function retrieveUnitList() {
+  peopleStore.getUnitList()
+    .catch(e => {
+      console.error('Error retrieving unit list', e)
     })
-  }
-
-  public clearUnit() {
-    this.selectedUnit = this.emptyUnit
-    this.$emit('clear')
-  }
-
-  mounted() {
-    if (!this.units().length) {
-      this.retrieveUnitList()
-    }
-  }
-
-  updated() {
-    this.selectedUnit = this.unit
-  }
-
 }
+
+function units(): Array<Unit> {    
+  const unitList = peopleStore.unitList
+  if (unitList.length) {
+    return unitList
+      .filter((unit: Unit) => {
+        return ['Administrative Services', 'Government Services', 'Senior & Disability Services', 'Test Division'].indexOf(unit.name) != -1
+      })
+      .filter((unit: Unit) => {
+        return unit.name.toLowerCase().indexOf(needle.value) != -1
+      })
+  } else {
+    return []
+  }
+}
+
+function filterFn (val: string, update: Function) { // eslint-disable-line @typescript-eslint/ban-types
+  update(() => {
+    needle.value = val.toLowerCase()
+  })
+}
+
+function clearUnit() {
+  selectedUnit.value = emptyUnit
+  emit('clear')
+}
+
+onMounted(() => {
+  if (!units().length) {
+    retrieveUnitList()
+  }
+})
+
+onUpdated(() => {
+  selectedUnit.value = props.unit
+})
 </script>

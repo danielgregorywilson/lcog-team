@@ -2,12 +2,12 @@
   <q-page class="q-mt-xs" id="schaefers-3-page">
     <div class="row justify-between items-center">
       <div class="row items-center q-ml-sm">
-        <q-btn-group push>
-          <q-btn push color="primary" glossy label="1F" :to="{ name: 'schaefers-1' }" />
-          <q-btn push color="primary" glossy label="2F" :to="{ name: 'schaefers-2' }" />
-          <q-btn push color="secondary" glossy label="3F" :to="{ name: 'schaefers-3' }"  />
-        </q-btn-group>
-      </div>
+          <q-btn-group push class="">
+            <q-btn push color="primary" glossy label="1F" :to="{ name: 'schaefers-1' }" />
+            <q-btn push color="primary" glossy label="2F" :to="{ name: 'schaefers-2' }" />
+            <q-btn push color="secondary" glossy label="3F" :to="{ name: 'schaefers-3' }"  />
+          </q-btn-group>
+        </div>
       <div class="row items-center q-gutter-md">
         <q-icon name="help" color="primary" size=48px class="cursor-pointer" @click="showHelp()" />
         <q-select class="" v-model="selectedEmployee" :options="employees()" option-value="pk" option-label="name" label="Select your name" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
@@ -38,7 +38,7 @@
             </div>
             <div class="row items-center q-gutter-sm">
               <div>Ergonomic Work Station</div>
-              <q-img src="../../assets/floorPlans/desk-ergo.png" width=35px />
+              <q-img :src=ErgoDeskImg width=35px />
             </div>
             <div class="row items-center q-gutter-sm">
               <div>Held</div>
@@ -135,493 +135,484 @@
   }
 </style>
 
-<script lang="ts">
-import { Notify } from 'quasar'
-import { Component, Vue } from 'vue-property-decorator'
-import { bus } from '../../App.vue'
-import FloorPlan from '../../assets/floorPlans/schaefers3.fpsvg'
-import DeskReservationDataService from '../../services/DeskReservationDataService'
-import TrustedIPDataService from '../../services/TrustedIPDataService'
-import { AxiosDeskReservationCreateServerResponse, Desk, DeskReservation, SimpleEmployeeRetrieve, VuexStoreGetters } from '../../store/types'
+<script setup lang="ts">
+import { Notify, QSelect } from 'quasar'
+import { onMounted, onUnmounted, ref, Ref } from 'vue'
+import { useRoute } from 'vue-router'
 
-interface EmployeeType {
-  name: string
-  selected: boolean
+import ErgoDeskImg from 'src/assets/floorPlans/desk-ergo.png'
+import StandardDeskImg from 'src/assets/floorPlans/desk-standard.png'
+import FloorPlan from 'src/assets/floorPlans/schaefers3.svg'
+import useEventBus from 'src/eventBus'
+import { useDeskReservationStore } from 'src/stores/deskreservation'
+import { usePeopleStore } from 'src/stores/people'
+import { Desk, DeskReservation, SimpleEmployeeRetrieve } from 'src/types'
+import { getRouteParam } from 'src/utils'
+
+const deskReservationStore = useDeskReservationStore()
+const peopleStore = usePeopleStore()
+const route = useRoute()
+const bus = useEventBus()
+
+let needle = ref('') // For filtering employee list
+
+const ignoreList = ['UP', 'DOWN', 'DN', 'DF', 'FE']
+
+const BUILDING = 'S'
+const FLOOR = '3'
+let desks = ref([]) as Ref<Array<Desk>>
+let deskReservations = ref([]) as Ref<Array<DeskReservation>>
+
+let highlightedDeskNumber = ref('')
+const deskNumber = getRouteParam(route, 'deskNumber')
+if (deskNumber) {
+  highlightedDeskNumber.value = deskNumber
+}
+  
+let highlightedDeskNumberX = ref(0)
+let highlightedDeskNumberY = ref(0)
+
+const emptyEmployee = {name: '', pk: -1}
+
+let moveReservationDialogVisible = ref(false)
+let activeUserReservations = ref([]) as Ref<Array<DeskReservation>>
+let selectedEmployee = ref(emptyEmployee)
+let selectedDeskNumber = ref('')
+
+let cancelDialogVisible = ref(false)
+let selectedDeskReservationToCancelPk = ref(-1)
+let selectedDeskNumberToCancel = ref('')
+let selectedDeskOccupantToCancel = ref('')
+let selectedDeskToCancelCheckInTime = ref('')
+
+// TODO: Use Quasar colors
+const primaryColor = '#1976d2'
+const greyColor = '#767676'
+const blackColor = '#000000'
+const redColor = 'red'
+const yellowColor = 'yellow'
+const orangeColor = 'orange'
+
+///////////////
+// EMPLOYEES //
+///////////////
+function employees(): Array<SimpleEmployeeRetrieve> {    
+  const employees = peopleStore.simpleEmployeeList
+  return employees.filter((employee) => {
+    return employee.name.toLowerCase().indexOf(needle.value) != -1
+  })
 }
 
-@Component({
-  components: { FloorPlan }
-})
-export default class Schaefers3 extends Vue{
-  private getters = this.$store.getters as VuexStoreGetters
-
-  private needle = '' // For filtering employee list
-  
-  private ignoreList = ['UP', 'DOWN', 'DN', 'DF', 'FE']
-  
-  private standardDesk = require('../../assets/floorPlans/desk-standard.png') as string // eslint-disable-line @typescript-eslint/no-var-requires
-  private ergoDesk = require('../../assets/floorPlans/desk-ergo.png') as string // eslint-disable-line @typescript-eslint/no-var-requires
-
-  private BUILDING = 'S'
-  private FLOOR = '3'
-  private desks: Array<Desk> = []
-  private deskReservations: Array<DeskReservation> = []
-  private highlightedDeskNumber = this.$route.params.deskNumber ? this.$route.params.deskNumber : ''
-  private highlightedDeskNumberX = 0
-  private highlightedDeskNumberY = 0
-
-  private emptyEmployee = {name: '', pk: -1}
-  
-  private moveReservationDialogVisible = false
-  private activeUserReservations: Array<DeskReservation> = []
-  private selectedEmployee = this.emptyEmployee
-  private selectedDeskNumber = ''
-  
-  private cancelDialogVisible = false
-  private selectedDeskReservationToCancelPk = -1
-  private selectedDeskNumberToCancel = ''
-  private selectedDeskOccupantToCancel = ''
-  private selectedDeskToCancelCheckInTime = ''
-  
-  // TODO: Use Quasar colors
-  private primaryColor = '#1976d2'
-  private greyColor = '#767676'
-  private blackColor = '#000000'
-  private redColor = 'red'
-  private yellowColor = 'yellow'
-  private orangeColor = 'orange'
-
-  ///////////////
-  // EMPLOYEES //
-  ///////////////
-  private employees(): Array<SimpleEmployeeRetrieve> {    
-    const employees = this.getters['responsibilityModule/simpleEmployeeList']
-    return employees.filter((employee) => {
-      return employee.name.toLowerCase().indexOf(this.needle) != -1
+function retrieveSimpleEmployeeList(): void {
+  peopleStore.getSimpleEmployeeList()
+    .catch(e => {
+      console.error('Error retrieving simple employee list', e)
     })
-  }
+}
 
-  private retrieveSimpleEmployeeList(): void {
-    this.$store.dispatch('responsibilityModule/getSimpleEmployeeList')
-      .catch(e => {
-        console.error('Error retrieving simple employee list', e)
-      })
-  }
+function filterFn (val: string, update: (callbackFn: () => void, afterFn?: (ref: QSelect) => void) => void) {
+  update(() => {
+    needle.value = val.toLowerCase()
+  })
+}
 
-  private filterFn (val: string, update: Function) { // eslint-disable-line @typescript-eslint/ban-types
-    update(() => {
-      this.needle = val.toLowerCase()
-    })
-  }
-
-  private deselectAllRoomButtons() {
-    Array.from(document.getElementsByClassName('desk-button') as HTMLCollectionOf<HTMLElement>).forEach(room => {
-      if (!room.classList.contains('reserved')) {
-        room.style.borderColor = this.greyColor
-        room.style.color = this.blackColor
-      }
-    })
-  }
-
-  private roomClick(roomButton: HTMLElement) {
-    if (roomButton.dataset.pk) {
-      const buttonNumber = roomButton.dataset.pk
-
-      if (buttonNumber == this.selectedDeskNumber) {
-        // Deselect the room
-        this.selectedDeskNumber = ''
-        roomButton.style.borderColor = this.greyColor
-        roomButton.style.color = this.blackColor
-      } else {
-        // Select the room (and deselect others)
-        this.selectedDeskNumber = buttonNumber
-        this.deselectAllRoomButtons()
-        roomButton.style.borderColor = this.primaryColor
-        roomButton.style.color = this.primaryColor
-      }
-
+function deselectAllRoomButtons() {
+  Array.from(document.getElementsByClassName('desk-button') as HTMLCollectionOf<HTMLElement>).forEach(room => {
+    if (!room.classList.contains('reserved')) {
+      room.style.borderColor = greyColor
+      room.style.color = blackColor
     }
-  }
+  })
+}
 
-  private reservedRoomClick(roomButton: HTMLElement) {
-    if (roomButton.dataset.pk) {
-      const buttonNumber = roomButton.dataset.pk
-      this.selectedDeskNumberToCancel = buttonNumber
-      const currentDeskReservation = this.deskReservations.filter(deskReservation => deskReservation.desk_number == buttonNumber)[0]
-      this.selectedDeskReservationToCancelPk = currentDeskReservation.pk
-      this.selectedDeskOccupantToCancel = currentDeskReservation.employee_name
-      const checkInDate = new Date(currentDeskReservation.check_in)
-      this.selectedDeskToCancelCheckInTime = checkInDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric' })
-
-      // Open reservation cancel dialog
-      this.cancelDialogVisible = true
-    }
-  }
-
-  private deleteReservation(pk: number) {
-    DeskReservationDataService.cancelReservation(pk) 
-      .then(() => {
-        if (this.selectedDeskNumberToCancel) {
-          Notify.create({message: `Canceled reservation of desk ${this.selectedDeskNumberToCancel} for ${this.selectedDeskOccupantToCancel}`})
-        }
-        this.selectedDeskReservationToCancelPk = -1
-        this.selectedDeskNumberToCancel = ''
-        this.selectedDeskOccupantToCancel = ''
-
-        // TODO: Temporarily restoring to remove sockets for production
-        this.initDeskReservations()
-          .then(() => {
-            this.handleSVG()
-          })
-          .catch(e => {
-            console.error('Error initializing desk reservations:', e)
-          })
-        
-        // Update reserved desks list everywhere with WebSocket
-        // this.deskReservationSocket.send(
-        //   JSON.stringify({
-        //     'message': `Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`
-        //   })
-        // );
-      })
-      .catch(e => {
-        console.error('Error cancelling desk reservation:' ,e)
-      })
-  }
-
-  private clickReserve() {
-    // Before we reserve the desk, ensure the user does not have any active reservations. If so, offer to move them
-    const activeUserReservations = this.deskReservations.filter(desk => desk.employee_pk == this.selectedEmployee.pk)
-    if (activeUserReservations.length) {
-      this.activeUserReservations = activeUserReservations
-      this.moveReservationDialogVisible = true
+function roomClick(roomButton: HTMLElement) {
+  if (roomButton.dataset.pk) {
+    const buttonNumber = roomButton.dataset.pk
+    if (buttonNumber == selectedDeskNumber.value) {
+      // Deselect the room
+      selectedDeskNumber.value = ''
+      roomButton.style.borderColor = greyColor
+      roomButton.style.color = blackColor
     } else {
-      this.reserveDesk()
-    }
-  }
-
-  private moveReservation() {
-    // Cancel all existing reservations and make the new one.
-    for (let i=0; i<this.activeUserReservations.length; i++) {
-      this.deleteReservation(this.activeUserReservations[i].pk)
-    }
-    this.reserveDesk()
-  }
-
-  private reserveDesk() {
-    DeskReservationDataService.create({
-      employee_pk: this.selectedEmployee.pk,
-      building: this.BUILDING,
-      floor: this.FLOOR,
-      desk_number: this.selectedDeskNumber
-    })
-      .then((response: AxiosDeskReservationCreateServerResponse) => {
-        this.selectedEmployee = this.emptyEmployee
-        this.selectedDeskNumber = ''
-        this.deselectAllRoomButtons()
-        if (response.data.created) {
-          Notify.create(`Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`)  
-        } else {
-          if (response.data.desk_held) {
-            Notify.create({message: `Sorry! Desk ${response.data.desk_number} is held today. Please choose another`, type: 'negative'})
-          } else {
-            Notify.create({message: `Sorry! Desk ${response.data.desk_number} is already reserved for ${response.data.employee_name}. Please choose another`, type: 'negative'})
-          }
-        }
-        
-        // TODO: Temporarily restoring to remove sockets for production
-        this.initDeskReservations()
-          .then(() => {
-            this.handleSVG()
-          })
-          .catch(e => {
-            console.error('Error initializing desk reservations:', e)
-          })
-        
-        // Update reserved desks list everywhere with WebSocket
-        // this.deskReservationSocket.send(
-        //   JSON.stringify({
-        //     'message': `Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`
-        //   })
-        // );
-      })
-      .catch(e => {
-        console.error('Error creating desk reservation:' ,e)
-      })
-  }
-
-  private initDesksAndReservations() {
-    return Promise.all([this.initDesks(), this.initDeskReservations()])
-      .catch(e => {
-        console.error('Error initializing desks and desk reservations from API:', e)
-      })
-  }
-
-  private initDesks() {
-    return new Promise((resolve, reject) => {
-      this.$store.dispatch('deskReservationModule/getAllDesks', {building: this.BUILDING, floor: this.FLOOR})
-        .then(() => {
-          this.desks = this.getters['deskReservationModule/allDesks'].results
-          resolve('Set desks')
-        })
-        .catch(e => {
-          console.error('Error getting desks from API:', e)
-          reject(e)
-        })
-    })
-  }
-
-  private initDeskReservations() {
-    return new Promise((resolve, reject) => {
-      this.$store.dispatch('deskReservationModule/getAllDeskReservations', {building: this.BUILDING, floor: this.FLOOR})
-        .then(() => {
-          this.deskReservations = this.getters['deskReservationModule/allDeskReservations'].results
-          resolve(this.deskReservations)
-        })
-        .catch(e => {
-          console.error('Error initializing desk reservations from API:', e)
-          reject(e)
-        })
-    })
-  }
-
-  private handleSVG() {
-    // Destroy any previously created annotation nodes
-    const staleAnnotationNodes = Array.from(document.querySelectorAll('.annotation'))
-    staleAnnotationNodes.forEach(node => { node.remove() })
-
-    // Destroy any desk highlight circles
-    const staleHighlightCircles = Array.from(document.querySelectorAll('.highlight'))
-    staleHighlightCircles.forEach(node => { node.remove() })
-
-    // Get horizontal and vertical offsets of svg floor plan
-    const floorPlanNode = document.getElementsByClassName('floor-plan')[0]
-    const floorPlanRect = floorPlanNode.getBoundingClientRect()
-
-    const textNodes = Array.from(document.querySelectorAll('text'))
-
-    textNodes
-      .filter(it => /^\s*/.exec(it.innerHTML))
-      .forEach(node => {
-        if (!node.firstElementChild) {
-          return
-        }
-        const text = node.firstElementChild.innerHTML
-        
-        // Ignore any text on the ignore list
-        if (this.ignoreList.indexOf(text) != -1) {
-          return
-        }
-
-        // Set the location of the highlight
-        let setHighlightedXAndY = () => {
-          const rect = node.getBoundingClientRect()
-          this.highlightedDeskNumberX = rect.left
-          this.highlightedDeskNumberY = rect.top
-        }
-        if (text.toLowerCase() == this.highlightedDeskNumber.toLowerCase()) {
-          setHighlightedXAndY()
-        } else if (['a', 'b'].indexOf(this.highlightedDeskNumber.toLowerCase().slice(-1)) != -1) {
-          if (text.toLowerCase() == this.highlightedDeskNumber.slice(0, -1).toLowerCase()) {
-            setHighlightedXAndY()
-          }
-        }
-
-        const matchingDesks = this.desks.filter((desk: Desk) => {
-          let number = ''
-          if (['A', 'B'].indexOf(desk.number.slice(-1)) == -1) {
-            number = desk.number
-          } else {
-            number = desk.number.substring(0, desk.number.length-1)
-            desk.letter = desk.number.slice(-1)
-          }
-          return desk.building == this.BUILDING && desk.floor == this.FLOOR && number == text
-        })
-        if (!matchingDesks.length) {
-          return
-        }
-
-        for (let desk of matchingDesks) {
-          // Determine if desk is already reserved
-          let deskReserved = false
-          const reservations = this.deskReservations.filter((reservation: DeskReservation) => {
-            return reservation.desk_building == this.BUILDING && reservation.desk_floor == this.FLOOR && reservation.desk_number == desk.number
-          })
-          if (reservations.length) {
-            // Hide any desk labels that shouldn't be displayed
-            deskReserved = true
-          }
-
-          // Determine if the desk is ergo and/or lead
-          // Use correct icon based on ergonomic or not
-          const deskLogo = desk.ergonomic ? this.ergoDesk : this.standardDesk
-          const deskLead = desk.lead
-        
-          // Determine if the desk has a hold on it today
-          const heldTodayText = desk.held_today ? '*' : ''
-
-          // Get the rectangle around the static map label
-          const rect = node.getBoundingClientRect()
-
-          // Create an annotation element to replace the static map label
-          const annotationElem = document.createElement('div')
-          annotationElem.className = 'annotation'
-        
-          annotationElem.innerHTML = `<button class="desk-button" data-pk="${desk.number}"><div class="desk-buttom-number">${desk.number}${heldTodayText}</div><img class="desk-button-ergo" src="${ deskLogo }" /></button>`
-          
-          // Position the annotation directly on top of the map label
-          // annotationElem.style.left = (rect.left + rect.width/2 - 88).toString() + 'px'
-          // annotationElem.style.top = (rect.top + rect.height/2 - 70).toString() + 'px'
-          
-          // On narrower screens, the header takes up 2-4 rows, so we need to nudge the buttons down to match.
-          var singleRowHeaderSpace = 76
-          var rowsHeaderSpace = 76
-          if (window.innerWidth < 519) {
-            // If width less than 519px, there are 3 rows of header
-            rowsHeaderSpace = 213
-          } else if (window.innerWidth < 561) {
-            // If width less that 561px, there are 2 tall rows of header
-            rowsHeaderSpace = 177
-          } else if (window.innerWidth < 1065) {
-            // If width less that 1065px, there are 2 short rows of header
-            rowsHeaderSpace = 132
-          }
-          var extraHeaderSpace = rowsHeaderSpace - singleRowHeaderSpace
-
-          // Adjust A and B desks so they both show up
-          let deskSplitHorizontalAdjustment = 0
-          if (desk.letter) {
-            if (desk.letter == 'A') {
-              deskSplitHorizontalAdjustment = -34
-            } else {
-              deskSplitHorizontalAdjustment = 34
-            }
-          }
-
-          // TODO: Finish and annotate this - can't brain today
-          annotationElem.style.left = (rect.left - floorPlanRect.left - rect.width/2 + annotationElem.offsetWidth/2 + deskSplitHorizontalAdjustment).toString() + 'px'
-          // TODO: Fix and annotate this - can't brain today
-          annotationElem.style.top = (rect.top - floorPlanRect.top + 68 + extraHeaderSpace).toString() + 'px'
-
-          const clickableButton = annotationElem.querySelector('button') as HTMLElement
-
-          if (clickableButton) {
-            if (deskReserved) {
-              clickableButton.style.borderColor = this.redColor
-              clickableButton.classList.add('reserved')
-              clickableButton.addEventListener('click', e => { // eslint-disable-line @typescript-eslint/no-non-null-assertion
-                const target = e.target as HTMLElement
-                const buttonElem = target.closest('button')
-                if (buttonElem) {
-                  this.reservedRoomClick(buttonElem)
-                }
-              })
-            } else {
-              if (deskLead) {
-                clickableButton.style.backgroundColor = this.orangeColor
-              } else {
-                clickableButton.style.backgroundColor = this.yellowColor
-              }
-              clickableButton.addEventListener('click', e => { // eslint-disable-line @typescript-eslint/no-non-null-assertion
-                const target = e.target as HTMLElement
-                const buttonElem = target.closest('button')
-                if (buttonElem) {
-                  this.roomClick(buttonElem)
-                }
-              })
-            }
-          }
-          
-          document.querySelector('#schaefers-3-page')?.appendChild(annotationElem)
-          
-          // const annotationSize = annotationElem.getBoundingClientRect()
-          
-          // annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
-          // annotationElem.style.marginTop = `-${annotationSize.height/2}px`
-        }
-    })
-
-    // Draw a red circle around the highlighted desk
-    if (this.highlightedDeskNumberX) {
-      const map = document.querySelector('#schaefers-3-page')
-      const highlightCircle = document.createElement('div')
-      highlightCircle.classList.add('highlight')
-      const mapPadding = map ? map.getBoundingClientRect().left : 0
-      highlightCircle.style.left = (this.highlightedDeskNumberX - 36 - mapPadding).toString() + 'px'
-      highlightCircle.style.top = (this.highlightedDeskNumberY - 45).toString() + 'px'
-      map?.appendChild(highlightCircle)
-    }
-  }
-
-  private windowResizeEventHandler = this.handleSVG.bind(this)
-
-  // WebSocket magic for sharing reservation changes
-  private webSocketUrl = process.env.WEBSOCKET_URL ? process.env.WEBSOCKET_URL : 'ws://api.team.lcog.org/'
-  // private deskReservationSocket = new WebSocket(
-  //   `${ this.webSocketUrl }ws/desk-reservation/${ this.BUILDING }/${ this.FLOOR }/`
-  // )
-
-  private showHelp() {
-    bus.$emit('showReservationHelpDialog') // eslint-disable-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  }
-
-  created() {
-    window.addEventListener('resize', this.windowResizeEventHandler)
-  }
-
-  destroyed() {
-    window.removeEventListener('resize', this.windowResizeEventHandler)
-  }
-
-  mounted() {
-    // When a WebSocket message is received
-    // this.deskReservationSocket.onmessage = (socketMessageObj) => {
-    //   const socketMessageData = JSON.parse(socketMessageObj.data) // eslint-disable-line @typescript-eslint/no-unsafe-assignment
-    //   const updateMessage = socketMessageData.message // eslint-disable-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    //   this.initDeskReservations()
-    //     .then(() => {
-    //       this.handleSVG()
-    //       Notify.create(updateMessage)
-    //     })
-    //     .catch(e => {
-    //       console.error('Error initializing desk reservations from socket message:', e)
-    //     })
-    // }
-
-    // We do not expect the socket to ever close
-    // this.deskReservationSocket.onclose = () => {
-    //   console.error('Desk Reservation socket closed unexpectedly');
-    // };
-
-    // Boot session to dashboard if not authenticated or IP not in trusted IP lists
-    const isAuthenticated = this.getters['authModule/isAuthenticated']
-    if (!isAuthenticated) {
-      TrustedIPDataService.getTrustedIPs()
-        .then((response: {data: boolean}) => {
-          const addressIsSafe = response.data
-          if (!addressIsSafe) {
-            this.$router.push('/')
-              .catch((e) => {
-                console.error('Error navigating to dashboard upon rejecting connection to desk reservations:', e)
-              })
-          }
-        })
-        .catch(e => {
-          console.error('Error getting safe IP address status from API:', e)
-        })
-    }
-    
-    this.initDesksAndReservations()
-      .then(() => {
-        this.handleSVG()
-      })
-      .catch(e => {
-        console.error('Error initializing desk reservations in component:', e)
-      })
-
-    if (!this.employees().length) {
-      this.retrieveSimpleEmployeeList()
+      // Select the room (and deselect others)
+      selectedDeskNumber.value = buttonNumber
+      deselectAllRoomButtons()
+      roomButton.style.borderColor = primaryColor
+      roomButton.style.color = primaryColor
     }
   }
 }
+
+function reservedRoomClick(roomButton: HTMLElement) {
+  if (roomButton.dataset.pk) {
+    const buttonNumber = roomButton.dataset.pk
+    selectedDeskNumberToCancel.value = buttonNumber
+    const currentDeskReservation = deskReservations.value.filter(
+      deskReservation => deskReservation.desk_number == buttonNumber
+    )[0]
+    selectedDeskReservationToCancelPk.value = currentDeskReservation.pk
+    selectedDeskOccupantToCancel.value = currentDeskReservation.employee_name
+    const checkInDate = new Date(currentDeskReservation.check_in)
+    selectedDeskToCancelCheckInTime.value = checkInDate.toLocaleTimeString(
+      'en-US', { hour: 'numeric', minute: 'numeric' }
+    )
+
+    // Open reservation cancel dialog
+    cancelDialogVisible.value = true
+  }
+}
+
+function deleteReservation(pk: number) {
+  deskReservationStore.cancelReservation(pk)
+    .then(() => {
+      if (selectedDeskNumberToCancel.value) {
+        Notify.create(
+          {message: `Canceled reservation of desk ${selectedDeskNumberToCancel.value} for ${selectedDeskOccupantToCancel.value}`}
+        )
+      }
+      selectedDeskReservationToCancelPk.value = -1
+      selectedDeskNumberToCancel.value = ''
+      selectedDeskOccupantToCancel.value = ''
+
+      // TODO: Temporarily restoring to remove sockets for production
+      initDeskReservations()
+        .then(() => {
+          handleSVG()
+        })
+        .catch(e => {
+          console.error('Error initializing desk reservations:', e)
+        })
+      
+      // Update reserved desks list everywhere with WebSocket
+      // this.deskReservationSocket.send(
+      //   JSON.stringify({
+      //     'message': `Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`
+      //   })
+      // )
+    })
+    .catch(e => {
+      console.error('Error cancelling desk reservation:' ,e)
+    })
+}
+
+function clickReserve() {
+  // Before we reserve the desk, ensure the user does not have any active
+  // reservations. If so, offer to move them.
+  initDeskReservations() // Get latest desk reservations in case they changed since page load
+    .then(() => {
+      const currentReservations = deskReservations.value
+        .filter(desk => desk.employee_pk == selectedEmployee.value.pk)
+      if (currentReservations.length) {
+        activeUserReservations.value = currentReservations
+        moveReservationDialogVisible.value = true
+      } else {
+        reserveDesk()
+      }
+    })
+    .catch(e => {
+      console.error('Error initializing desk reservations:', e)
+    })
+}
+
+function moveReservation() {
+  // Cancel all existing reservations and make the new one.
+  for (let i=0; i<activeUserReservations.value.length; i++) {
+    deleteReservation(activeUserReservations.value[i].pk)
+  }
+  reserveDesk()
+}
+
+function reserveDesk() {
+  deskReservationStore.createReservation({
+    employee_pk: selectedEmployee.value.pk,
+    building: BUILDING,
+    floor: FLOOR,
+    desk_number: selectedDeskNumber.value
+  })
+    .then((reservation) => {
+      selectedEmployee.value = emptyEmployee
+      selectedDeskNumber.value = ''
+      deselectAllRoomButtons()
+      if (reservation.created) {
+        Notify.create(`Reserved desk ${reservation.desk_number} for ${reservation.employee_name}`)  
+      } else {
+        if (reservation.desk_held) {
+          Notify.create({message: `Sorry! Desk ${reservation.desk_number} is held today. Please choose another`, type: 'negative'})
+        } else {
+          Notify.create({message: `Sorry! Desk ${reservation.desk_number} is already reserved for ${reservation.employee_name}. Please choose another`, type: 'negative'})
+        }
+      }
+      
+      // TODO: Temporarily restoring to remove sockets for production
+      initDeskReservations()
+        .then(() => {
+          handleSVG()
+        })
+        .catch(e => {
+          console.error('Error initializing desk reservations:', e)
+        })
+      
+      // Update reserved desks list everywhere with WebSocket
+      // this.deskReservationSocket.send(
+      //   JSON.stringify({
+      //     'message': `Reserved desk ${response.data.desk_number} for ${response.data.employee_name}`
+      //   })
+      // )
+    })
+    .catch(e => {
+      console.error('Error creating desk reservation:' ,e)
+    })
+}
+
+function initDesksAndReservations() {
+  return Promise.all([initDesks(), initDeskReservations()])
+    .catch(e => {
+      console.error('Error initializing desks and desk reservations from API:', e)
+    })
+}
+
+function initDesks() {
+  return new Promise((resolve, reject) => {
+    deskReservationStore.getAllDesks()
+      .then(() => {
+        desks.value = deskReservationStore.allDesks
+        resolve('Set desks')
+      })
+      .catch(e => {
+        console.error('Error getting desks from API:', e)
+        reject(e)
+      })
+  })
+}
+
+function initDeskReservations() {
+  return new Promise((resolve, reject) => {
+    deskReservationStore.getAllDeskReservations()
+      .then(() => {
+        deskReservations.value = deskReservationStore.allDeskReservations
+        resolve(deskReservations.value)
+      })
+      .catch(e => {
+        console.error('Error initializing desk reservations from API:', e)
+        reject(e)
+      })
+  })
+}
+
+function handleSVG() {
+  // Destroy any previously created annotation nodes
+  const staleAnnotationNodes = Array.from(document.querySelectorAll('.annotation'))
+  staleAnnotationNodes.forEach(node => { node.remove() })
+
+  // Destroy any desk highlight circles
+  const staleHighlightCircles = Array.from(document.querySelectorAll('.highlight'))
+  staleHighlightCircles.forEach(node => { node.remove() })
+
+  // Get horizontal and vertical offsets of svg floor plan
+  const floorPlanNode = document.getElementsByClassName('floor-plan')[0]
+  const floorPlanRect = floorPlanNode.getBoundingClientRect()
+
+  const textNodes = Array.from(document.querySelectorAll('text'))
+
+  textNodes
+    .filter(it => /^\s*/.exec(it.innerHTML))
+    .forEach(node => {
+      if (!node.firstElementChild) {
+        return
+      }
+      const text = node.firstElementChild.innerHTML
+      
+      // Ignore any text on the ignore list
+      if (ignoreList.indexOf(text) != -1) {
+        return
+      }
+
+      // Set the location of the highlight
+      let setHighlightedXAndY = () => {
+        const rect = node.getBoundingClientRect()
+        highlightedDeskNumberX.value = rect.left
+        highlightedDeskNumberY.value = rect.top
+      }
+      if (text.toLowerCase() == highlightedDeskNumber.value.toLowerCase()) {
+        setHighlightedXAndY()
+      } else if (['a', 'b'].indexOf(highlightedDeskNumber.value.toLowerCase().slice(-1)) != -1) {
+        if (text.toLowerCase() == highlightedDeskNumber.value.slice(0, -1).toLowerCase()) {
+          setHighlightedXAndY()
+        }
+      }
+
+      const matchingDesks = desks.value.filter((desk: Desk) => {
+        let number = ''
+        if (['A', 'B'].indexOf(desk.number.slice(-1)) == -1) {
+          number = desk.number
+        } else {
+          number = desk.number.substring(0, desk.number.length-1)
+          desk.letter = desk.number.slice(-1)
+        }
+        return desk.building == BUILDING && desk.floor == FLOOR && number == text
+      })
+      if (!matchingDesks.length) {
+        return
+      }
+
+      for (let desk of matchingDesks) {
+        // Determine if desk is already reserved
+        let deskReserved = false
+        const reservations = deskReservations.value.filter((reservation: DeskReservation) => {
+          return reservation.desk_building == BUILDING && reservation.desk_floor == FLOOR && reservation.desk_number == desk.number
+        })
+        if (reservations.length) {
+          // Hide any desk labels that shouldn't be displayed
+          deskReserved = true
+        }
+
+        // Determine if the desk is ergo and/or lead
+        // Use correct icon based on ergonomic or not
+        const deskLogo = desk.ergonomic ? ErgoDeskImg : StandardDeskImg
+        const deskLead = desk.lead
+
+        // Determine if the desk has a hold on it today
+        const heldTodayText = desk.held_today ? '*' : ''
+      
+        // Get the rectangle around the static map label
+        const rect = node.getBoundingClientRect()
+
+        // Create an annotation element to replace the static map label
+        const annotationElem = document.createElement('div')
+        annotationElem.className = 'annotation'
+      
+        annotationElem.innerHTML = `<button class="desk-button" data-pk="${desk.number}"><div class="desk-buttom-number">${desk.number}${heldTodayText}</div><img class="desk-button-ergo" src="${ deskLogo }" /></button>`
+        
+        // Position the annotation directly on top of the map label
+        // annotationElem.style.left = (rect.left + rect.width/2 - 88).toString() + 'px'
+        // annotationElem.style.top = (rect.top + rect.height/2 - 70).toString() + 'px'
+        
+        // On narrower screens, the header takes up 2-4 rows, so we need to nudge the buttons down to match.
+        var singleRowHeaderSpace = 76
+        var rowsHeaderSpace = 76
+        if (window.innerWidth < 519) {
+          // If width less than 519px, there are 3 rows of header
+          rowsHeaderSpace = 213
+        } else if (window.innerWidth < 561) {
+          // If width less that 561px, there are 2 tall rows of header
+          rowsHeaderSpace = 177
+        } else if (window.innerWidth < 1065) {
+          // If width less that 1065px, there are 2 short rows of header
+          rowsHeaderSpace = 132
+        }
+        var extraHeaderSpace = rowsHeaderSpace - singleRowHeaderSpace
+
+        // Adjust A and B desks so they both show up
+        let deskSplitHorizontalAdjustment = 0
+        if (desk.letter) {
+          if (desk.letter == 'A') {
+            deskSplitHorizontalAdjustment = -34
+          } else {
+            deskSplitHorizontalAdjustment = 34
+          }
+        }
+
+        // TODO: Finish and annotate this - can't brain today
+        annotationElem.style.left = (rect.left - floorPlanRect.left - rect.width/2 + annotationElem.offsetWidth/2 + deskSplitHorizontalAdjustment).toString() + 'px'
+        // TODO: Fix and annotate this - can't brain today
+        annotationElem.style.top = (rect.top - floorPlanRect.top + 68 + extraHeaderSpace).toString() + 'px'
+
+        const clickableButton = annotationElem.querySelector('button') as HTMLElement
+
+        if (clickableButton) {
+          if (deskReserved) {
+            clickableButton.style.borderColor = redColor
+            clickableButton.classList.add('reserved')
+            clickableButton.addEventListener('click', e => {
+              const target = e.target as HTMLElement
+              const buttonElem = target.closest('button')
+              if (buttonElem) {
+                reservedRoomClick(buttonElem)
+              }
+            })
+          } else {
+            if (deskLead) {
+              clickableButton.style.backgroundColor = orangeColor
+            } else {
+              clickableButton.style.backgroundColor = yellowColor
+            }
+            clickableButton.addEventListener('click', e => {
+              const target = e.target as HTMLElement
+              const buttonElem = target.closest('button')
+              if (buttonElem) {
+                roomClick(buttonElem)
+              }
+            })
+          }
+        }
+        
+        document.querySelector('#schaefers-3-page')?.appendChild(annotationElem)
+        
+        // const annotationSize = annotationElem.getBoundingClientRect()
+        
+        // annotationElem.style.marginLeft = `-${annotationSize.width/2}px`
+        // annotationElem.style.marginTop = `-${annotationSize.height/2}px`
+      }
+  })
+
+  // Draw a red circle around the highlighted desk
+  if (highlightedDeskNumberX.value) {
+    const map = document.querySelector('#schaefers-3-page')
+    const highlightCircle = document.createElement('div')
+    highlightCircle.classList.add('highlight')
+    const mapPadding = map ? map.getBoundingClientRect().left : 0
+    highlightCircle.style.left = (highlightedDeskNumberX.value - 36 - mapPadding).toString() + 'px'
+    highlightCircle.style.top = (highlightedDeskNumberY.value - 45).toString() + 'px'
+    map?.appendChild(highlightCircle)
+  }
+}
+
+// WebSocket magic for sharing reservation changes
+// const webSocketUrl = process.env.WEBSOCKET_URL ? process.env.WEBSOCKET_URL : 'ws://api.team.lcog.org/'
+// private deskReservationSocket = new WebSocket(
+//   `${ this.webSocketUrl }ws/desk-reservation/${ this.BUILDING }/${ this.FLOOR }/`
+// )
+
+function showHelp() {
+  bus.emit('showReservationHelpDialog', Math.random())
+}
+
+onMounted(() => {
+  window.addEventListener('resize', handleSVG)
+
+  // When a WebSocket message is received
+  // this.deskReservationSocket.onmessage = (socketMessageObj) => {
+  //   const socketMessageData = JSON.parse(socketMessageObj.data) // eslint-disable-line @typescript-eslint/no-unsafe-assignment
+  //   const updateMessage = socketMessageData.message // eslint-disable-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+  //   this.initDeskReservations()
+  //     .then(() => {
+  //       this.handleSVG()
+  //       Notify.create(updateMessage)
+  //     })
+  //     .catch(e => {
+  //       console.error('Error initializing desk reservations from socket message:', e)
+  //     })
+  // }
+
+  // We do not expect the socket to ever close
+  // this.deskReservationSocket.onclose = () => {
+  //   console.error('Desk Reservation socket closed unexpectedly')
+  // }
+  
+  initDesksAndReservations()
+    .then(() => {
+      handleSVG()
+    })
+    .catch(e => {
+      console.error('Error initializing desk reservations in component:', e)
+    })
+
+  if (!employees().length) {
+    retrieveSimpleEmployeeList()
+  }
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleSVG)
+})
 </script>

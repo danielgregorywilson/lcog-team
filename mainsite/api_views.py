@@ -17,6 +17,7 @@ from mainsite.serializers import (
     FileUploadSerializer, SecurityMessageSerializer,
     TrustedIPSerializer
 )
+from people.models import PerformanceReview
 from purchases.models import Expense
 
 class LargeResultsSetPagination(PageNumberPagination):
@@ -112,7 +113,18 @@ class FileUploadViewSet(viewsets.ViewSet):
         # will always be custom requirements.
         # content_type = ContentType.objects.get(app_label=app_label, model=model)
         object_pk = request.data.get('object_pk')
-        if model == 'expense':
+        if not object_pk:
+            return Response(data="Missing object PK", status=400)
+        
+        if model == 'performancereview':
+            try:
+                pr = PerformanceReview.objects.get(pk=object_pk)
+            except PerformanceReview.DoesNotExist:
+                return Response(data="Invalid PR PK", status=400)
+            pr.signed_position_description = file_upload
+            pr.save()
+            return Response(data=request.build_absolute_uri(pr.signed_position_description.url), status=200)
+        elif model == 'expense':
             if not object_pk:
                 expense = Expense.objects.create(receipt=file_upload)
             else:

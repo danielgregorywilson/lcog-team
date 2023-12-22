@@ -4,7 +4,7 @@
       <div class="q-gutter-x-sm">
         <q-btn :to="{ name: 'all-responsibilities' }" unelevated rounded color="primary" icon="visibility" label="View All" />
         <q-btn :to="{ name: 'orphaned-responsibilities' }" unelevated rounded color="primary" icon="visibility_off" label="View Orphaned" />
-        <q-btn :to="{ name: 'tags' }" unelevated rounded color="primary" icon="tag" label="View Tags" />
+        <q-btn :to="{ name: 'all-tags' }" unelevated rounded color="primary" icon="tag" label="View Tags" />
       </div>
       <div>
         <q-btn unelevated rounded color="primary" icon="add" label="Add" @click="addDialogVisible=true" />
@@ -40,7 +40,7 @@
             <div>Tags</div>
             <q-chip v-for="tag of addFormTags" :key="addFormTags.indexOf(tag)" removable @remove="addFormRemoveTag(addFormTags.indexOf(tag))" color="secondary" text-color="white">{{ tag.name }}</q-chip>
             <div class="row justify-between">
-              <q-select :value="addFormNewTag" :options="tags()" option-value="pk" option-label="name" label="Add Tag" use-input hide-selected fill-input input-debounce="500" @filter="tagFilterFn" @input-value="setNewAddTagName">
+              <q-select :model-value="addFormNewTag" @input-value="setNewAddTagName" :options="tags()" option-value="pk" option-label="name" label="Add Tag" use-input hide-selected fill-input input-debounce="500" @filter="tagFilterFn">
                 <template v-slot:no-option>
                   <q-item>
                     <q-item-section class="text-grey">
@@ -111,7 +111,7 @@
             <div>Tags</div>
             <q-chip v-for="tag of editFormTags" :key="editFormTags.indexOf(tag)" removable @remove="editFormRemoveTag(editFormTags.indexOf(tag))" color="secondary" text-color="white">{{ tag.name }}</q-chip>
             <div class="row justify-between">
-              <q-select :value="editFormNewTag" :options="tags()" option-value="pk" option-label="name" label="Add Tag" use-input hide-selected fill-input input-debounce="500" @filter="tagFilterFn" @input-value="setNewEditTagName">
+              <q-select :model-value="editFormNewTag" @input-value="setNewEditTagName" :options="tags()" option-value="pk" option-label="name" label="Add Tag" use-input hide-selected fill-input input-debounce="500" @filter="tagFilterFn">
                 <template v-slot:no-option>
                   <q-item>
                     <q-item-section class="text-grey">
@@ -120,7 +120,7 @@
                   </q-item>
                 </template>
               </q-select>
-              <q-btn label="Add" color="primary" :disable="!editFormNewTag" @click="editFormAddTag(editFormNewTag)"/>
+              <q-btn label="Add" color="primary" :disable="!editFormNewTag" @click="editFormAddTag()"/>
             </div>
             <q-select v-model="editFormPrimaryEmployee" :options="employees()" option-value="pk" option-label="name" label="Primary Employee" use-input hide-selected fill-input input-debounce="500" @filter="filterFn">
               <template v-slot:no-option>
@@ -214,418 +214,424 @@
   </q-page>
 </template>
 
-<style scoped lang="scss">
-</style>
+<script setup lang="ts">
+import { onMounted, ref, Ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useQuasar, QSelect } from 'quasar'
 
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
-import { Notify } from 'quasar'
-import { bus } from '../../App.vue'
-import { 
-  Responsibility, ResponsibilityTag, SimpleEmployeeRetrieve, SimpleResponsibilityTagRetrieve,
-  VuexStoreGetters 
-} from '../../store/types'
-import ResponsibilityDataService from '../../services/ResponsibilityDataService'
+import { getCurrentUser, getRoutePk, userIsISEmployee } from 'src/utils'
+import {
+  Responsibility, ResponsibilityTagRetrieve, SimpleEmployeeRetrieve,
+  SimpleResponsibilityTagRetrieve 
+} from 'src/types'
 
-@Component
-export default class Responsibilities extends Vue {
-  public emptyEmployee = {name: '', pk: -1}
-  
-  public addDialogVisible = false
-  public addFormName = ''
-  public addFormDescription = ''
-  public addFormLink = ''
-  public addFormTags: Array<{'name': string}> = []
-  public addFormNewTag = ''
-  public addFormPrimaryEmployee = this.emptyEmployee
-  public addFormSecondaryEmployee = this.emptyEmployee
+import useEventBus from 'src/eventBus'
+import { useResponsibilityStore } from 'src/stores/responsibility'
+import { usePeopleStore } from 'src/stores/people'
 
-  public editDialogVisible = false
-  public pkToEdit = -1
-  public editFormName = ''
-  public editFormDescription = ''
-  public editFormLink = ''
-  public editFormTags: Array<ResponsibilityTag> = []
-  public editFormNewTag = ''
-  public editFormPrimaryEmployee = this.emptyEmployee
-  public editFormSecondaryEmployee = this.emptyEmployee
-  
-  public deleteDialogVisible = false
-  public deleteDialogResponsibilityName = ''
-  public rowPkToDelete = ''
+const quasar = useQuasar()
+const route = useRoute()
+const router = useRouter()
+const { bus } = useEventBus()
+const responsibilityStore = useResponsibilityStore()
+const peopleStore = usePeopleStore()
 
-  public editTagDialogVisible = false
-  public tagPkToEdit = -1
-  public editTagFormName = ''
+const emptyEmployee = {name: '', pk: -1}
 
-  public deleteTagDialogVisible = false
-  public deleteTagDialogName = ''
-  public tagPkToDelete = ''
+let addDialogVisible = ref(false)
+let addFormName = ref('')
+let addFormDescription = ref('')
+let addFormLink = ref('')
+let addFormTags: Ref<Array<{'name': string}>> = ref([])
+let addFormNewTag = ref('')
+let addFormPrimaryEmployee = ref(emptyEmployee)
+let addFormSecondaryEmployee = ref(emptyEmployee)
 
-  private getters = this.$store.getters as VuexStoreGetters
+let editDialogVisible = ref(false)
+let pkToEdit = ref(-1)
+let editFormName = ref('')
+let editFormDescription = ref('')
+let editFormLink = ref('')
+let editFormTags: Ref<Array<ResponsibilityTagRetrieve>> = ref([])
+let editFormNewTag = ref('')
+let editFormPrimaryEmployee = ref(emptyEmployee)
+let editFormSecondaryEmployee = ref(emptyEmployee)
 
-  private needle = '' // For filtering employee list
-  private tagNeedle = '' // For filtering tag list
+let deleteDialogVisible = ref(false)
+let deleteDialogResponsibilityName = ref('')
+let rowPkToDelete = ref('')
 
-  ///////////////
-  // EMPLOYEES //
-  ///////////////
-  public employees(): Array<SimpleEmployeeRetrieve> {    
-    const employees = this.getters['responsibilityModule/simpleEmployeeList']
-    return employees.filter((employee) => {
-      return employee.name.toLowerCase().indexOf(this.needle) != -1
+let editTagDialogVisible = ref(false)
+let tagPkToEdit = ref(-1)
+let editTagFormName = ref('')
+
+let deleteTagDialogVisible = ref(false)
+let deleteTagDialogName = ref('')
+let tagPkToDelete = ref('')
+
+let needle = ref('') // For filtering employee list
+let tagNeedle = ref('') // For filtering tag list
+
+///////////////
+// EMPLOYEES //
+///////////////
+function employees(): Array<SimpleEmployeeRetrieve> {    
+  const employees = peopleStore.simpleEmployeeList
+  return employees.filter((employee) => {
+    return employee.name.toLowerCase().indexOf(needle.value) != -1
+  })
+}
+
+function retrieveSimpleEmployeeList(): void {
+  peopleStore.getSimpleEmployeeList()
+    .catch(e => {
+      console.error('Error retrieving simple employee list', e)
+    })
+}
+
+function filterFn (val: string, update: (callbackFn: () => void, afterFn?: (ref: QSelect) => void) => void) {
+  update(() => {
+    needle.value = val.toLowerCase()
+  })
+}
+
+//////////
+// TAGS //
+//////////
+function tags(): Array<SimpleResponsibilityTagRetrieve> {    
+  const tags = responsibilityStore.simpleTagList
+  return tags.filter((tag) => {
+    return tag.name.toLowerCase().indexOf(tagNeedle.value) != -1
+  })
+}
+
+function retrieveSimpleTagList(): void {
+  responsibilityStore.getSimpleTagList()
+}
+
+function tagFilterFn (val: string, update: (callbackFn: () => void, afterFn?: (ref: QSelect) => void) => void) {
+  update(() => {
+    tagNeedle.value = val.toLowerCase()
+  })
+}
+
+function setNewEditTagName(val: string) {
+  editFormNewTag.value = val
+}
+
+//////////////
+// ADD FORM //
+//////////////
+function setNewAddTagName(val: string) {
+  addFormNewTag.value = val
+}
+
+function addFormAddTag(): void {
+  addFormTags.value.push({'name': addFormNewTag.value})
+  addFormNewTag.value = ''
+}
+
+function addFormRemoveTag(tagIndex: number): void {
+  addFormTags.value.splice(tagIndex, 1)
+}
+
+function clearAddForm() {
+  addFormName.value = ''
+  addFormDescription.value = ''
+  addFormLink.value = ''
+  addFormNewTag.value = ''
+  addFormTags.value = []
+  addFormPrimaryEmployee.value = emptyEmployee
+  addFormSecondaryEmployee.value = emptyEmployee
+}
+
+function onAddFormSubmit () {
+  createResponsibility()
+    .then(() => {
+      updateResponsibiliyLists()
+      retrieveSimpleTagList()
+      addDialogVisible.value = false
+      quasar.notify('Created responsibility')
+      clearAddForm()
+    })
+    .catch(e => {
+      console.error('Error creating Responsibility:', e)
     })
   }
 
-  private retrieveSimpleEmployeeList(): void {
-    this.$store.dispatch('responsibilityModule/getSimpleEmployeeList')
-      .catch(e => {
-        console.error('Error retrieving simple employee list', e)
-      })
-  }
-
-  public filterFn (val: string, update: Function) { // eslint-disable-line @typescript-eslint/ban-types
-    update(() => {
-      this.needle = val.toLowerCase()
+function createResponsibility() {
+  return new Promise((resolve, reject) => {
+    responsibilityStore.createResponsibility({
+      name: addFormName.value,
+      description: addFormDescription.value,
+      link: addFormLink.value,
+      tags: addFormTags.value,
+      primary_employee: addFormPrimaryEmployee.value.pk,
+      secondary_employee: addFormSecondaryEmployee.value.pk
     })
-  }
-
-  //////////
-  // TAGS //
-  //////////
-  public tags(): Array<SimpleResponsibilityTagRetrieve> {    
-    const tags = this.getters['responsibilityModule/simpleTagList']
-    return tags.filter((tag) => {
-      return tag.name.toLowerCase().indexOf(this.tagNeedle) != -1
-    })
-  }
-
-  private retrieveSimpleTagList(): void {
-    this.$store.dispatch('responsibilityModule/getSimpleTagList')
-      .catch(e => {
-        console.error('Error retrieving simple tag list', e)
-      })
-  }
-
-  public tagFilterFn (val: string, update: Function) { // eslint-disable-line @typescript-eslint/ban-types
-    update(() => {
-      this.tagNeedle = val.toLowerCase()
-    })
-  }
-
-  public setNewEditTagName(val: string) {
-    this.editFormNewTag = val
-  }
-
-  //////////////
-  // ADD FORM //
-  //////////////
-  public setNewAddTagName(val: string) {
-    this.addFormNewTag = val
-  }
-  
-  public addFormAddTag(): void {
-    this.addFormTags.push({'name': this.addFormNewTag})
-    this.addFormNewTag = ''
-  }
-
-  public addFormRemoveTag(tagIndex: number): void {
-    this.addFormTags.splice(tagIndex, 1)
-  }
-  
-  public clearAddForm() {
-    this.addFormName = ''
-    this.addFormDescription = ''
-    this.addFormLink = ''
-    this.addFormNewTag = ''
-    this.addFormTags = []
-    this.addFormPrimaryEmployee = this.emptyEmployee
-    this.addFormSecondaryEmployee = this.emptyEmployee
-  }
-
-  public onAddFormSubmit () {
-    this.createResponsibility()
       .then(() => {
-        this.updateResponsibiliyLists()
-        this.retrieveSimpleTagList()
-        this.addDialogVisible = false
-        Notify.create('Created responsibility')
-        this.clearAddForm()
+        resolve('Created responsibility')
       })
       .catch(e => {
         console.error('Error creating Responsibility:', e)
+        reject(e)
       })
-   }
+  })
+}
 
-  private createResponsibility() {
-    return new Promise((resolve, reject) => {
-      ResponsibilityDataService.create({
-        name: this.addFormName,
-        description: this.addFormDescription,
-        link: this.addFormLink,
-        tags: this.addFormTags,
-        primary_employee: this.addFormPrimaryEmployee.pk,
-        secondary_employee: this.addFormSecondaryEmployee.pk
-      })
-        .then(() => {
-          resolve('Created')
-        })
-        .catch(e => {
-          console.error('Error creating Responsibility:', e)
-          reject(e)
-        })
+///////////////
+// EDIT FORM //
+///////////////
+
+function openEditDialog(row: Responsibility) {
+  pkToEdit.value = row.pk
+  editFormName.value = row.name
+  editFormDescription.value = row.description
+  editFormLink.value = row.link
+  editFormTags.value = row.tags
+  if (row.primary_employee_pk && row.primary_employee_name) {
+    editFormPrimaryEmployee.value = { pk: row.primary_employee_pk, name: row.primary_employee_name}
+  }
+  if (row.secondary_employee_pk && row.secondary_employee_name) {
+    editFormSecondaryEmployee.value = { pk: row.secondary_employee_pk, name: row.secondary_employee_name}
+  }
+  editDialogVisible.value = true
+}
+
+function editFormAddTag(): void {
+  let newTags = [...editFormTags.value]
+  newTags.push({'name': editFormNewTag.value})
+  editFormTags.value = newTags
+  editFormNewTag.value = ''
+}
+
+function editFormRemoveTag(tagIndex: number): void {
+  let newTags = [...editFormTags.value]
+  newTags.splice(tagIndex, 1)
+  editFormTags.value = newTags
+}
+
+function clearEditForm() {
+  pkToEdit.value = -1
+  editFormName.value = ''
+  editFormDescription.value = ''
+  editFormLink.value = ''
+  editFormTags.value = []
+  editFormNewTag.value = ''
+  editFormPrimaryEmployee.value = emptyEmployee
+  editFormSecondaryEmployee.value = emptyEmployee
+}
+
+function onEditFormSubmit () {
+  editResponsibility()
+    .then(() => {
+      updateResponsibiliyLists()
+      retrieveSimpleTagList()
+      editDialogVisible.value = false
+      quasar.notify('Updated responsibility')
+      clearEditForm()
     })
-  }
+    .catch(e => {
+      console.error('Error updating Responsibility:', e)
+    })
+}
 
-  ///////////////
-  // EDIT FORM //
-  ///////////////
-
-  private openEditDialog(row: Responsibility) {
-    this.pkToEdit = row.pk
-    this.editFormName = row.name
-    this.editFormDescription = row.description
-    this.editFormLink = row.link
-    this.editFormTags = row.tags
-    if (row.primary_employee_pk && row.primary_employee_name) {
-      this.editFormPrimaryEmployee = { pk: row.primary_employee_pk, name: row.primary_employee_name}
-    }
-    if (row.secondary_employee_pk && row.secondary_employee_name) {
-      this.editFormSecondaryEmployee = { pk: row.secondary_employee_pk, name: row.secondary_employee_name}
-    }
-    this.editDialogVisible = true
-  }
-
-  public editFormAddTag(editFormNewTag: string): void {
-    let newTags = [...this.editFormTags]
-    newTags.push({'name': editFormNewTag})
-    this.editFormTags = newTags
-    this.editFormNewTag = ''
-  }
-
-  public editFormRemoveTag(tagIndex: number): void {
-    let newTags = [...this.editFormTags]
-    newTags.splice(tagIndex, 1)
-    this.editFormTags = newTags
-  }
-
-  public clearEditForm() {
-    this.pkToEdit = -1
-    this.editFormName = ''
-    this.editFormDescription = ''
-    this.editFormLink = ''
-    this.editFormTags = []
-    this.editFormNewTag = ''
-    this.editFormPrimaryEmployee = this.emptyEmployee
-    this.editFormSecondaryEmployee = this.emptyEmployee
-  }
-
-  public onEditFormSubmit () {
-    this.editResponsibility()
+function editResponsibility() {
+  return new Promise((resolve, reject) => {
+    responsibilityStore.updateResponsibility(pkToEdit.value.toString(), {
+      name: editFormName.value,
+      description: editFormDescription.value,
+      link: editFormLink.value,
+      tags: editFormTags.value,
+      primary_employee: editFormPrimaryEmployee.value.pk,
+      secondary_employee: editFormSecondaryEmployee.value.pk
+    })
       .then(() => {
-        this.updateResponsibiliyLists()
-        this.retrieveSimpleTagList()
-        this.editDialogVisible = false
-        Notify.create('Updated responsibility')
-        this.clearEditForm()
+        resolve('Updated')
       })
       .catch(e => {
         console.error('Error updating Responsibility:', e)
+        reject(e)
       })
-  }
+  })
+}
 
-  private editResponsibility() {
-    return new Promise((resolve, reject) => {
-      ResponsibilityDataService.update(this.pkToEdit.toString(), {
-        name: this.editFormName,
-        description: this.editFormDescription,
-        link: this.editFormLink,
-        tags: this.editFormTags,
-        primary_employee: this.editFormPrimaryEmployee.pk,
-        secondary_employee: this.editFormSecondaryEmployee.pk
-      })
-        .then(() => {
-          resolve('Updated')
-        })
-        .catch(e => {
-          console.error('Error updating Responsibility:', e)
-          reject(e)
-        })
+////////////////////////////////
+// DELETE RESPONSIBILITY FORM //
+////////////////////////////////
+
+function openDeleteDialog(row: Responsibility) {
+  rowPkToDelete.value = row.pk.toString()
+  deleteDialogResponsibilityName.value = row.name
+  deleteDialogVisible.value = true
+}
+
+function deleteRow(): void {
+  responsibilityStore.deleteResponsibility(rowPkToDelete.value)
+    .then(() => {
+      updateResponsibiliyLists()
+      quasar.notify('Deleted a responsibility.')
     })
+    .catch(e => {
+      console.error('Error deleting responsibility', e)
+    })
+}
+
+///////////////////
+// EDIT TAG FORM //
+///////////////////
+
+function openTagEditDialog(tag: ResponsibilityTagRetrieve) {
+  if (tag.pk) {
+    tagPkToEdit.value = tag.pk
+    editTagFormName.value = tag.name
+    editTagDialogVisible.value = true
   }
+}
 
-  ////////////////////////////////
-  // DELETE RESPONSIBILITY FORM //
-  ////////////////////////////////
+function clearTagEditForm() {
+  tagPkToEdit.value = -1
+  editTagFormName.value = ''
+}
 
-  public openDeleteDialog(row: Responsibility) {
-    this.rowPkToDelete = row.pk.toString()
-    this.deleteDialogResponsibilityName = row.name
-    this.deleteDialogVisible = true;
-  }
+function onTagEditFormSubmit () {
+  editTag()
+    .then(() => {
+      updateTagLists()
+      editTagDialogVisible.value = false
+      quasar.notify('Updated tag')
+      clearTagEditForm()
+    })
+    .catch(e => {
+      console.error('Error updating Tag:', e)
+    })
+}
 
-  public deleteRow(): void {
-    ResponsibilityDataService.delete(this.rowPkToDelete)
+function editTag() {
+  return new Promise((resolve, reject) => {
+    responsibilityStore.updateTag(tagPkToEdit.value.toString(), {
+      name: editTagFormName.value,
+    })
       .then(() => {
-        this.updateResponsibiliyLists()
-        Notify.create('Deleted a responsibility.')
-      })
-      .catch(e => {
-        console.error('Error deleting responsibility', e)
-      })
-  }
-
-  ///////////////////
-  // EDIT TAG FORM //
-  ///////////////////
-
-  public openTagEditDialog(tag: ResponsibilityTag) {
-    if (tag.pk) {
-      this.tagPkToEdit = tag.pk
-      this.editTagFormName = tag.name
-      this.editTagDialogVisible = true
-    }
-  }
-
-  public clearTagEditForm() {
-    this.tagPkToEdit = -1
-    this.editTagFormName = ''
-  }
-
-  public onTagEditFormSubmit () {
-    this.editTag()
-      .then(() => {
-        this.updateTagLists()
-        this.editTagDialogVisible = false
-        Notify.create('Updated tag')
-        this.clearTagEditForm()
+        resolve('Updated')
       })
       .catch(e => {
         console.error('Error updating Tag:', e)
+        reject(e)
       })
-  }
+  })
+}
 
-  public editTag() {
-    return new Promise((resolve, reject) => {
-      ResponsibilityDataService.updateTag(this.tagPkToEdit.toString(), {
-        name: this.editTagFormName,
-      })
-        .then(() => {
-          resolve('Updated')
-        })
-        .catch(e => {
-          console.error('Error updating Tag:', e)
-          reject(e)
-        })
-    })
-  }
+/////////////////////
+// DELETE TAG FORM //
+/////////////////////
 
-  /////////////////////
-  // DELETE TAG FORM //
-  /////////////////////
-
-  public openDeleteTagDialog(row: ResponsibilityTag) {
-    if (row.pk) {
-      this.tagPkToDelete = row.pk.toString()
-      this.deleteTagDialogName = row.name
-      this.deleteTagDialogVisible = true
-    }
-  }
-
-  public deleteTag(): void {
-    ResponsibilityDataService.deleteTag(this.tagPkToDelete)
-      .then(() => {
-        this.updateTagLists()
-        Notify.create('Deleted a tag.')
-      })
-      .catch(e => {
-        console.error('Error deleting tag', e)
-      })
-  }
-
-  ///////////////
-  // SET STATE //
-  ///////////////
-
-  // Update the various responsibility lists in Vuex
-  private updateResponsibiliyLists(): void {
-    this.retrieveAllResponsibilites()
-    this.retrieveOrphanedResponsibilites()
-    const pk = this.$route.params.pk
-    if (pk) {
-      this.retrieveEmployeeResponsibilites(pk)
-      this.retrieveEmployeeSecondaryResponsibilites(pk)
-    }
-  }
-
-  // Update the various tag lists in Vuex
-  private updateTagLists(): void {
-    this.retrieveAllTags()
-    this.retrieveSimpleTagList()
-  }
-
-  // Update All Tags Table
-  private retrieveAllTags(): void {
-    this.$store.dispatch('responsibilityModule/getAllTags')
-      .catch(e => {
-        console.error('Error retrieving tags', e)
-      })
-  }
-
-  // Update All Responsibilities Table
-  private retrieveAllResponsibilites(): void {
-    this.$store.dispatch('responsibilityModule/getAllResponsibilities')
-      .catch(e => {
-        console.error('Error retrieving responsibilities', e)
-      })
-  }
-
-  // Update Orphaned Responsibilities Table
-  private retrieveOrphanedResponsibilites(): void {
-    this.$store.dispatch('responsibilityModule/getOrphanedResponsibilities')
-      .catch(e => {
-        console.error('Error retrieving orphaned responsibilities', e)
-      })
-  }
-
-  // Update Employee Responsibilities Table
-  private retrieveEmployeeResponsibilites(employeePk: string | (string | null)[]): void {
-    this.$store.dispatch('responsibilityModule/getEmployeePrimaryResponsibilities', {pk: employeePk})
-      .catch(e => {
-        console.error('Error retrieving employee responsibilities', e)
-      })
-  }
-
-  // Update Employee Secondary Responsibilities Table
-  private retrieveEmployeeSecondaryResponsibilites(employeePk: string | (string | null)[]): void {
-    this.$store.dispatch('responsibilityModule/getEmployeeSecondaryResponsibilities', {pk: employeePk})
-      .catch(e => {
-        console.error('Error retrieving employee secondary responsibilities', e)
-      })
-  }
-
-  created() {
-    // We trigger opening the edit and delete dialogs in AllResponsibilities, EmployeeResponsibilites, or OrphanedResponsibilities
-    bus.$on('emitOpenEditDialog', (row: Responsibility) => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      this.openEditDialog(row)
-    })
-    bus.$on('emitOpenDeleteDialog', (row: Responsibility) => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      this.openDeleteDialog(row)
-    })
-    bus.$on('emitOpenEditTagDialog', (row: ResponsibilityTag) => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      this.openTagEditDialog(row)
-    })
-    bus.$on('emitOpenDeleteTagDialog', (row: ResponsibilityTag) => { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-      this.openDeleteTagDialog(row)
-    })
-  }
-
-  mounted() {
-    if (!this.employees().length) {
-      this.retrieveSimpleEmployeeList()
-      this.retrieveSimpleTagList()
-    }
-    
+function openDeleteTagDialog(row: ResponsibilityTagRetrieve) {
+  if (row.pk) {
+    tagPkToDelete.value = row.pk.toString()
+    deleteTagDialogName.value = row.name
+    deleteTagDialogVisible.value = true
   }
 }
+
+function deleteTag(): void {
+  responsibilityStore.deleteTag(tagPkToDelete.value)
+    .then(() => {
+      updateTagLists()
+      quasar.notify('Deleted a tag.')
+    })
+    .catch(e => {
+      console.error('Error deleting tag', e)
+    })
+}
+
+///////////////
+// SET STATE //
+///////////////
+
+// Update the various responsibility lists in Vuex
+function updateResponsibiliyLists(): void {
+  retrieveAllResponsibilites()
+  retrieveOrphanedResponsibilites()
+  const pk = getRoutePk(route)
+  if (pk) {
+    retrieveEmployeeResponsibilites(pk)
+    retrieveEmployeeSecondaryResponsibilites(pk)
+  }
+}
+
+// Update the various tag lists in Vuex
+function updateTagLists(): void {
+  retrieveAllTags()
+  retrieveSimpleTagList()
+}
+
+// Update All Tags Table
+function retrieveAllTags(): void {
+  responsibilityStore.getAllTags()
+    .catch(e => {
+      console.error('Error retrieving tags', e)
+    })
+}
+
+// Update All Responsibilities Table
+function retrieveAllResponsibilites(): void {
+  responsibilityStore.getAllResponsibilities()
+    .catch(e => {
+      console.error('Error retrieving responsibilities', e)
+    })
+}
+
+// Update Orphaned Responsibilities Table
+function retrieveOrphanedResponsibilites(): void {
+  responsibilityStore.getOrphanedResponsibilities()
+    .catch(e => {
+      console.error('Error retrieving orphaned responsibilities', e)
+    })
+}
+
+// Update Employee Responsibilities Table
+function retrieveEmployeeResponsibilites(employeePk: string): void {
+  responsibilityStore.getEmployeePrimaryResponsibilities({pk: employeePk})
+    .catch(e => {
+      console.error('Error retrieving employee responsibilities', e)
+    })
+}
+
+// Update Employee Secondary Responsibilities Table
+function retrieveEmployeeSecondaryResponsibilites(employeePk: string): void {
+  responsibilityStore.getEmployeeSecondaryResponsibilities({pk: employeePk})
+    .catch(e => {
+      console.error('Error retrieving employee secondary responsibilities', e)
+    })
+}
+
+// We trigger opening the edit and delete dialogs in AllResponsibilities,
+// EmployeeResponsibilites, or OrphanedResponsibilities
+watch(() => bus.value.get('emitOpenEditDialog'), (row: Responsibility) => {
+  openEditDialog(row)
+})
+watch(() => bus.value.get('emitOpenDeleteDialog'), (row: Responsibility) => {
+  openDeleteDialog(row)
+})
+watch(() => bus.value.get('emitOpenEditTagDialog'), (row: ResponsibilityTagRetrieve) => {
+  openTagEditDialog(row)
+})
+watch(() => bus.value.get('emitOpenDeleteTagDialog'), (row: ResponsibilityTagRetrieve) => {
+  openDeleteTagDialog(row)
+})
+
+onMounted(() => {
+  getCurrentUser()
+    .then(() => {
+      if (userIsISEmployee()) {
+        if (!employees().length) {
+          retrieveSimpleEmployeeList()
+          retrieveSimpleTagList()
+        }
+      } else {
+        router.push({ name: 'dashboard' })
+      }
+    })
+})
 </script>

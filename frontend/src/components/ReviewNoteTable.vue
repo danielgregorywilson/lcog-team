@@ -1,13 +1,13 @@
 <template>
   <div class="q-py-sm">
     <q-table
-      :data="reviewNotes()"
+      :rows="performanceReviewStore.allReviewNotes"
       :columns="columns"
       row-key="name"
     >
       <template v-slot:body-cell-date="props">
         <q-td key="date" :props="props">
-          {{ props.row.date | readableDate }}
+          {{ readableDate(props.row.date) }}
         </q-td>
       </template>
       <template v-slot:body-cell-actions="props">
@@ -45,84 +45,62 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Notify } from 'quasar'
-import { Component, Vue } from 'vue-property-decorator'
-import ReviewNoteDataService from '../services/ReviewNoteDataService';
-import { ReviewNoteRetrieve } from '../store/types'
-import '../filters'
+<script setup lang="ts">
+import { Notify, QTable, QTableProps } from 'quasar'
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-interface ReviewNoteColumn {
-  name: string;
-  label: string;
-  align?: string;
-  field?: string;
-  sortable?: boolean;
-}
+import { readableDate } from 'src/filters'
+import { usePerformanceReviewStore } from 'src/stores/performancereview'
+import { ReviewNoteRetrieve } from 'src/types'
 
 interface QuasarReviewNoteTableRowClickActionProps {
   evt: MouseEvent;
   row: ReviewNoteRetrieve;
 }
 
-@Component
-export default class ReviewNoteTable extends Vue {
-  private reviewNotes(): Array<ReviewNoteRetrieve> {
-    return this.$store.getters['performanceReviewModule/allReviewNotes'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
-  }
-  private columns: Array<ReviewNoteColumn> = [
-    { name: 'employeeName', label: 'Employee Name', align: 'left', field: 'employee_name', sortable: true },
-    { name: 'date', label: 'Date', field: 'date', sortable: true },
-    { name: 'actions', label: 'Actions' },
-  ]
-  private deleteDialogVisible = false
-  private deleteDialogEmployeeName = ''
-  private deleteDialogNoteText = ''
-  private rowPkToDelete = ''
+const router = useRouter()
+const performanceReviewStore = usePerformanceReviewStore()
 
-  private retrieveReviewNotes(): void {
-    this.$store.dispatch('performanceReviewModule/getAllReviewNotes')
-      .catch(e => {
-        console.error('Error retrieving review notes', e)
-      })
-  }
+let columns: QTableProps['columns'] = [
+  { name: 'employeeName', label: 'Employee Name', align: 'left', field: 'employee_name', sortable: true },
+  { name: 'date', label: 'Date', field: 'date', sortable: true },
+  { name: 'actions', label: 'Actions', field: null },
+]
+let deleteDialogVisible = ref(false)
+let deleteDialogEmployeeName = ref('')
+let deleteDialogNoteText = ref('')
+let rowPkToDelete = ref(-1)
 
-  private editNote(props: QuasarReviewNoteTableRowClickActionProps): void {
-    this.$router.push(`note/${ props.row.pk }`)
-      .catch(e => {
-        console.error('Error navigating to note detail', e)
-      })
-  }
-
-  private showDeleteDialog(props: QuasarReviewNoteTableRowClickActionProps): void {
-    this.rowPkToDelete = props.row.pk.toString()
-    this.deleteDialogEmployeeName = props.row.employee_name
-    this.deleteDialogNoteText = props.row.note
-    this.deleteDialogVisible = true;
-  }
-
-  private deleteRow(): void {
-    ReviewNoteDataService.delete(this.rowPkToDelete)
-      .then(() => {
-        Notify.create('Deleted a review note.')
-        this.retrieveReviewNotes()
-      })
-      .catch(e => {
-        console.error('Error deleting review note', e)
-      })
-  }
-
-  private clickAddNote(): void {
-    this.$router.push('note/new')
-      .catch(e => {
-        console.error('Error navigating to new note page', e)
-      })
-  }
-
-  mounted() {
-    if (this.reviewNotes() == null) {
-      this.retrieveReviewNotes();
-    }
-  }
+function editNote(props: QuasarReviewNoteTableRowClickActionProps): void {
+  router.push(`note/${ props.row.pk }`)
+    .catch(e => {
+      console.error('Error navigating to note detail', e)
+    })
 }
+
+function showDeleteDialog(props: QuasarReviewNoteTableRowClickActionProps): void {
+  rowPkToDelete.value = props.row.pk
+  deleteDialogEmployeeName.value = props.row.employee_name
+  deleteDialogNoteText.value = props.row.note
+  deleteDialogVisible.value = true;
+}
+
+function deleteRow(): void {
+  performanceReviewStore.deleteReviewNote(rowPkToDelete.value)
+    .then(() => {
+      Notify.create('Deleted a review note.')
+    })
+}
+
+function clickAddNote(): void {
+  router.push({ name: 'note-create' })
+    .catch(e => {
+      console.error('Error navigating to new note page', e)
+    })
+}
+
+onMounted(() => {
+  performanceReviewStore.getAllReviewNotes()
+})
 </script>

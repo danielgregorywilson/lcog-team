@@ -1,9 +1,7 @@
 .DS_Store
 .thumbs.db
 node_modules
-node_modules-OLD
-package-lock
-*.env
+.npmrc
 
 # Quasar core related directories
 .quasar
@@ -36,7 +34,5 @@ yarn-error.log*
 *.sln
 
 # Cypress
-/cypress/screenshots
-/cypress/videos
-applitools.config.js
-cypress.json
+cypress.config.ts
+cypress/screenshots/*

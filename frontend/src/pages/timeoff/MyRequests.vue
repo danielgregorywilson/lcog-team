@@ -2,7 +2,7 @@
   <div>
     <q-table
       :dense="$q.screen.lt.sm"
-      :data="myTimeOffRequests()"
+      :rows="myTimeOffRequests()"
       :columns="columns"
       :pagination="tablePagination"
       row-key="pk"
@@ -14,7 +14,7 @@
         </q-th>
       </template>
       <template v-slot:body-cell-dates="props">
-        <q-td key="dates" :props="props">
+        <q-td key="dates" :props="props" :data-past="props.row.past">
           <div v-if="$q.screen.gt.xs">{{ props.row.start_date }} - {{ props.row.end_date }}</div>
           <div v-if="$q.screen.xs">
             <div>{{ props.row.start_date }}</div>
@@ -46,10 +46,10 @@
                   <q-icon v-if="props.row.acknowledged && props.row.acknowledged==true" color="green" name="check_circle" size="lg" class="q-mr-sm" />
                   <div>Your manager has acknowledged this request.</div>
                 </div>
-                <div>One or more team members with shared responsibilities will be also be unavailable:</div>
+                <div>One or more team members with shared responsibilities will also be unavailable:</div>
                 <ul>
                   <li v-for="employee of props.row.conflicts" :key="employee.pk">
-                    {{ employee.name }}: {{ employee.responsibility_names[0] }}<span v-if="employee.responsibility_names.length > 1"> and {{ employee.responsibility_names.length - 1 }} more</span>
+                    {{ employee.name }}: <span v-for="(name, idx) of employee.responsibility_names" :key="idx"><span v-if="idx==0">{{ name }}</span><span v-else>, {{ name }}</span></span>
                   </li>
                 </ul>
               </q-tooltip>
@@ -117,87 +117,93 @@
   }
 }
 
+tr:has(> td[data-past="true"]) {
+  background-color: lightgray;
+}
+
 </style>
 
-<script lang="ts">
-import TimeOffDataService from 'src/services/TimeOffDataService'
-import { Notify } from 'quasar'
-import { Component, Vue } from 'vue-property-decorator'
-import { TimeOffRequestRetrieve, VuexStoreGetters } from '../../store/types'
+<script setup lang="ts">
+
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { QTableProps, useQuasar } from 'quasar'
+
+import { useTimeOffStore } from 'src/stores/timeoff'
+import { TimeOffRequestRetrieve } from 'src/types'
+
+const quasar = useQuasar()
+const router = useRouter()
+const timeOffStore = useTimeOffStore()
 
 interface QuasarTimeOffRequestTableRowClickActionProps {
-  evt: MouseEvent;
-  row: TimeOffRequestRetrieve;
+  row: TimeOffRequestRetrieve
 }
 
-@Component
-export default class TimeOffMyRequests extends Vue {
-  private getters = this.$store.getters as VuexStoreGetters
+const columns: QTableProps['columns'] = [
+  { name: 'dates', label: 'Dates', field: 'start_date', sortable: true, align: 'center' },
+  { name: 'notes', label: 'Note', field: 'notes', align: 'center', classes: 'table-note' },
+  { name: 'acknowledged', label: 'Acknowledged', field: 'approved', align: 'center' },
+  { name: 'actions', label: 'Actions', field: null }
+]
 
-  private columns = [
-    { name: 'dates', label: 'Dates', field: 'start_date', sortable: true, align: 'center' },
-    { name: 'notes', label: 'Note', field: 'notes', align: 'center', classes: 'table-note' },
-    { name: 'acknowledged', label: 'Acknowledged', field: 'approved', align: 'center' },
-    { name: 'actions', label: 'Actions' },
-  ]
-
-  private tablePagination = {
-    sortBy: 'dates',
-    descending: true,
-    rowsPerPage: 10
-  }
-
-  private deleteDialogVisible = false
-  private deleteDialogDatesText = ''
-  private deleteDialogNoteText = ''
-  private rowPkToDelete = ''
-
-  private myTimeOffRequests(): Array<TimeOffRequestRetrieve> {
-    return this.getters['timeOffModule/myTimeOffRequests'].results
-  }
-
-  private retrieveMyTimeOffRequests(): void {
-    this.$store.dispatch('timeOffModule/getMyTimeOffRequests')
-      .catch(e => {
-        console.error('Error retrieving my upcoming time off requests', e)
-      })
-  }
-
-  private editRequest(props: QuasarTimeOffRequestTableRowClickActionProps): void {
-    const rowPk = props.row.pk.toString()
-    this.$router.push({ name: 'timeoff-request-detail', params: { pk: rowPk }})
-      .catch(e => {
-        console.error('Error navigating to time off request detail:', e)
-      })
-  }
-
-  private showDeleteDialog(props: QuasarTimeOffRequestTableRowClickActionProps): void {
-    this.rowPkToDelete = props.row.pk.toString()
-    this.deleteDialogDatesText = `${props.row.start_date.toString()} - ${props.row.end_date.toString()}`
-    this.deleteDialogNoteText = props.row.note
-    this.deleteDialogVisible = true;
-  }
-
-  private deleteRow(): void {
-    TimeOffDataService.delete(this.rowPkToDelete)
-      .then(() => {
-        Notify.create('Deleted a time off request.')
-        this.retrieveMyTimeOffRequests()
-      })
-      .catch(e => {
-        console.error('Error deleting time off request', e)
-      })
-  }
-
-  private clickMakeRequest(): void {
-    this.$router.push({'name': 'timeoff-new-request'})
-      .catch(e => {
-        console.error('Error navigating to new request page', e)
-      })
-  }
-
-  mounted() {
-    this.retrieveMyTimeOffRequests()
-  }
+const tablePagination = {
+  sortBy: 'dates',
+  descending: true,
+  rowsPerPage: 10
 }
+
+let deleteDialogVisible = ref(false)
+let deleteDialogDatesText = ref('')
+let deleteDialogNoteText = ref('')
+let rowPkToDelete = ref('')
+
+function myTimeOffRequests() {
+  return timeOffStore.myTimeOffRequests
+}
+
+function retrieveMyTimeOffRequests(): void {
+  timeOffStore.getMyTimeOffRequests()
+    .catch(e => {
+      console.error('Error retrieving my upcoming time off requests', e)
+    })
+}
+
+function editRequest(props: QuasarTimeOffRequestTableRowClickActionProps): void {
+  const rowPk = props.row.pk.toString()
+  router.push({ name: 'timeoff-request-detail', params: { pk: rowPk }})
+    .catch(e => {
+      console.error('Error navigating to time off request detail:', e)
+    })
+}
+
+function showDeleteDialog(props: QuasarTimeOffRequestTableRowClickActionProps): void {
+  rowPkToDelete.value = props.row.pk.toString()
+  deleteDialogDatesText.value = `${props.row.start_date.toString()} - ${props.row.end_date.toString()}`
+  deleteDialogNoteText.value = props.row.note
+  deleteDialogVisible.value = true
+}
+
+function deleteRow(): void {
+  timeOffStore.deleteTimeOffRequest(rowPkToDelete.value)
+    .then(() => {
+      quasar.notify('Deleted a time off request.')
+      retrieveMyTimeOffRequests()
+    })
+    .catch(e => {
+      console.error('Error deleting time off request', e)
+    })
+}
+
+function clickMakeRequest(): void {
+  router.push({'name': 'timeoff-new-request'})
+    .catch(e => {
+      console.error('Error navigating to new request page', e)
+    })
+}
+
+onMounted(() => {
+  retrieveMyTimeOffRequests()
+})
+
 </script>

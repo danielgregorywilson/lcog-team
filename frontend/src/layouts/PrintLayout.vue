@@ -6,12 +6,6 @@
   </q-layout>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 
-import { Component, Vue } from 'vue-property-decorator'
-
-@Component({})
-export default class PrintLayout extends Vue{
-
-};
 </script>

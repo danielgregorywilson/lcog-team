@@ -1,3 +1,4 @@
+<!-- Not converted from Quasar 1/Vue 2 -->
 <template>
   <div class="q-pt-sm">
     <q-form

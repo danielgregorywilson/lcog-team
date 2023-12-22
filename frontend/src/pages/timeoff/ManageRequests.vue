@@ -1,7 +1,7 @@
 <template>
   <div>
     <q-table
-      :data="managedTimeOffRequests()"
+      :rows="managedTimeOffRequests()"
       :columns="columns"
       :pagination="tablePagination"
       row-key="pk"
@@ -37,10 +37,10 @@
           <div v-if="props.row.conflicts.length != 0" class="q-ml-sm">
             <q-icon color="orange" name="warning" size="md">
               <q-tooltip content-style="font-size: 16px">
-                <div>One or more team members with shared responsibilities will be also be unavailable:</div>
+                <div>One or more team members with shared responsibilities will also be unavailable:</div>
                 <ul>
                   <li v-for="employee of props.row.conflicts" :key="employee.pk">
-                    {{ employee.name }}: {{ employee.responsibility_names[0] }}<span v-if="employee.responsibility_names.length > 1"> and {{ employee.responsibility_names.length - 1 }} more</span>
+                    {{ employee.name }}: <span v-for="(name, idx) of employee.responsibility_names" :key="idx"><span v-if="idx==0">{{ name }}</span><span v-else>, {{ name }}</span></span>
                   </li>
                 </ul>
               </q-tooltip>
@@ -81,10 +81,10 @@
                     <div v-if="props.row.conflicts.length != 0" class="q-ml-sm">
                       <q-icon color="orange" name="warning" size="md">
                         <q-tooltip content-style="font-size: 16px">
-                          <div>One or more team members with shared responsibilities will be also be unavailable:</div>
+                          <div>One or more team members with shared responsibilities will also be unavailable:</div>
                           <ul>
                             <li v-for="employee of props.row.conflicts" :key="employee.pk">
-                              {{ employee.name }}: {{ employee.responsibility_names[0] }}<span v-if="employee.responsibility_names.length > 1"> and {{ employee.responsibility_names.length - 1 }} more</span>
+                              {{ employee.name }}: <span v-for="(name, idx) of employee.responsibility_names" :key="idx"><span v-if="idx==0">{{ name }}</span><span v-else>, {{ name }}</span></span>
                             </li>
                           </ul>
                         </q-tooltip>
@@ -109,48 +109,46 @@
 }
 </style>
 
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
-import { TimeOffRequestRetrieve, VuexStoreGetters } from '../../store/types'
-import TimeOffDataService from '../../services/TimeOffDataService'
+<script setup lang="ts">
 
-@Component
-export default class TimeOffManageRequests extends Vue {
-  private getters = this.$store.getters as VuexStoreGetters
+import { QTableProps } from 'quasar'
+import { useTimeOffStore } from 'src/stores/timeoff'
 
-  private columns = [
-    { name: 'employee', label: 'Employee', field: 'employee_name', sortable: true, align: 'center' },
-    { name: 'dates', label: 'Dates', field: 'start_date', sortable: true, align: 'center' },
-    { name: 'notes', label: 'Notes', field: 'notes', align: 'center' },
-    { name: 'acknowledge', label: 'Acknowledge?', field: 'acknowledged', align: 'center' },
-  ]
+const timeOffStore = useTimeOffStore()
 
-  private tablePagination = {
-    sortBy: 'dates',
-    descending: true,
-    rowsPerPage: 10
-  }
+const columns: QTableProps['columns'] = [
+  { name: 'employee', label: 'Employee', field: 'employee_name', sortable: true, align: 'center' },
+  { name: 'dates', label: 'Dates', field: 'start_date', sortable: true, align: 'center' },
+  { name: 'notes', label: 'Notes', field: 'notes', align: 'center' },
+  { name: 'acknowledge', label: 'Acknowledge?', field: 'acknowledged', align: 'center' },
+]
 
-  private managedTimeOffRequests(): Array<TimeOffRequestRetrieve> {
-    return this.getters['timeOffModule/managedTimeOffRequests'].results
-  }
-
-  private retrieveManagedTimeOffRequests(): void {
-    this.$store.dispatch('timeOffModule/getManagedTimeOffRequests')
-      .catch(e => {
-        console.error('Error retrieving my upcoming time off requests', e)
-      })
-  }
-
-  private acknowledgeRequest(pk: number, approve: boolean): void {
-    TimeOffDataService.updatePartial(pk.toString(), {acknowledged: approve})
-      .then(() => {
-        // TODO: Get just the one we changed, not all of them
-        this.retrieveManagedTimeOffRequests()
-      })
-      .catch(e => {
-        console.error('Error acknowledging time off request', e)
-      })
-  }
+const tablePagination = {
+  sortBy: 'dates',
+  descending: true,
+  rowsPerPage: 10
 }
+
+function managedTimeOffRequests() {
+  return timeOffStore.managedTimeOffRequests
+}
+
+function retrieveManagedTimeOffRequests(): void {
+  timeOffStore.getManagedTimeOffRequests()
+    .catch(e => {
+      console.error('Error retrieving my upcoming time off requests', e)
+    })
+}
+
+function acknowledgeRequest(pk: number, acknowledged: boolean): void {
+  timeOffStore.acknowledgeTimeOffRequest({pk, acknowledged})
+    .then(() => {
+      // TODO: Get just the one we changed, not all of them
+      retrieveManagedTimeOffRequests()
+    })
+    .catch(e => {
+      console.error('Error acknowledging time off request', e)
+    })
+}
+
 </script>

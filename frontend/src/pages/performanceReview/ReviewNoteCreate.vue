@@ -2,8 +2,16 @@
   <q-page>
     <div class="q-px-md">
       <h4>Add a New Note</h4>
-      <p>Notes are visible to you when completing an evalutation for the employee. They are not visible to anyone else.</p>
-      <q-select v-model="employee" :options="options" label="Employee" class="q-pb-md" />
+      <p>
+        Notes are visible to you when completing an evalutation for the
+        employee. They are not visible to anyone else.
+      </p>
+      <q-select
+        v-model="employee"
+        :options="options"
+        label="Employee"
+        class="q-pb-md"
+      />
       <q-input
         input-class="review-note"
         v-model="note"
@@ -11,69 +19,81 @@
         type="textarea"
         class="q-pb-md"
       />
-      <q-btn id="review-note-create-button" color="white" text-color="black" label="Create" :disabled="!formIsFilled()" @click="createReviewNote()" />
+      <q-btn
+        id="review-note-create-button"
+        color="white"
+        text-color="black"
+        label="Create"
+        :disabled="!formIsFilled()"
+        @click="createReviewNote()"
+      />
     </div>
   </q-page>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { Notify } from 'quasar'
-import { Component, Vue } from 'vue-property-decorator'
-import { AxiosEmployeeRetrieveManyServerResponse } from '../../store/types'
-import EmployeeDataService from '../../services/EmployeeDataService'
+import { onMounted, ref, Ref } from 'vue'
+import { useRouter } from 'vue-router'
 
+import { usePeopleStore } from 'src/stores/people'
+import { usePerformanceReviewStore } from 'src/stores/performancereview'
 
 interface EmployeeOption {
   label: string;
-  value: number;
+  pk: number;
 }
 
-@Component
-export default class ReviewNoteCreate extends Vue{
-  private options: Array<EmployeeOption> = []
-  private employee: EmployeeOption = {label: '', value: -1}
-  private note = ''
+const router = useRouter()
+const peopleStore = usePeopleStore()
+const performanceReviewStore = usePerformanceReviewStore()
 
-  private getOptions(): void {
-    EmployeeDataService.getDirectReports()
-      .then((response: AxiosEmployeeRetrieveManyServerResponse) => {
-        this.options = response.data.results.map(obj => {
-          return {label: obj.name, value: obj.pk}
+let options = ref([]) as Ref<Array<EmployeeOption>>
+let employee = ref({label: '', pk: -1}) as Ref<EmployeeOption>
+let note = ref('')
+
+function getOptions(): void {
+  peopleStore.getDirectReports()
+    .then((employees) => {
+      options.value = employees.map(obj => {
+        return {label: obj.name, pk: obj.pk}
+      })
+    })
+    .catch(e => {
+      console.error('Error getting direct reports:', e)
+    })
+}
+
+function formIsFilled(): boolean {
+  if (!!employee.value.pk && !!note.value) {
+    return true
+  } else {
+    return false
+  }
+}
+
+function createReviewNote(): void {
+  performanceReviewStore.createReviewNote({
+    employee_pk: employee.value.pk,
+    note: note.value,
+  })
+    .then(() => {
+      router.push({ name: 'reviews' })
+        .then(() => {
+          Notify.create('Created a review note.')
         })
-      })
-      .catch(e => {
-        console.error('Error getting direct reports:', e)
-      })
-  }
-
-  private formIsFilled(): boolean {
-    if (!!this.employee.value && !!this.note) {
-      return true
-    } else {
-      return false
-    }
-  }
-
-  private createReviewNote(): void {
-    this.$store.dispatch('performanceReviewModule/createReviewNote', {employee_pk: this.employee.value, note: this.note})
-      .then(() => {
-        Notify.create('Created a review note.')
-        this.$router.push('/')
-          .then(() => {
-            // TODO: Fix this by loading in the user again, as in timeoff/NewRequest.vue
-            location.reload() // TODO: This seems to be necessary in order to immediately edit a review note after creating it.
-          })
-          .catch(e => {
-            console.error('Error navigating to dashboard after creating review note:', e)
-          })
-      })
-      .catch(e => {
-        console.error('Error creating review note:', e)
-      })
-  }
-
-  mounted() {
-    this.getOptions();
-  }
+        .catch(e => {
+          console.error(
+            'Error navigating to dashboard after creating review note:', e
+          )
+        })
+    })
+    .catch(e => {
+      console.error('Error creating review note:', e)
+    })
 }
+
+onMounted(() => {
+  getOptions();
+})
 </script>

@@ -18,12 +18,22 @@
         :done="!!si.completed_at"
       >
         <div>{{ si.step.description }}</div>
-        <step-action v-for="action of si.step.optional_actions" :action="action" :key="action.pk" />
+        <StepAction v-for="action of si.step.optional_actions" :action="action" :key="action.pk" />
         <div v-if="si.completed_at" class="text-secondary">Completed by {{ si.completed_by_name }} on {{ formatDate(si.completed_at, 'dddd, M/D/YY [at] HH:MM') }}</div>
-        <q-stepper-navigation v-if="!stepInstanceIsComplete(si)">
+        <q-stepper-navigation v-if="stepInstanceIsComplete(si)">
+          <div v-if="si.undo_completion_possible">
+            <q-btn
+              :disable="!canUndoStepCompletion(si) || disableCompletions"
+              @click="undoStepCompletion(si.pk)"
+              color="warning"
+              label="Undo Completion"
+            />
+          </div>
+        </q-stepper-navigation>
+        <q-stepper-navigation v-else>
           <div v-if="si.step.next_step">
             <q-btn
-              :disable="!canCompleteStepInstance(si)"
+              :disable="!canCompleteStepInstance(si) || disableCompletions"
               @click="completeStep(si.pk)"
               color="primary"
               label="Mark as Complete"
@@ -38,7 +48,7 @@
               @click="completeStep(si.pk, choice.next_step_pk)"
               color="primary"
               :label="choice.choice_text"
-              :disable="!canCompleteStepInstance(si)"
+              :disable="!canCompleteStepInstance(si) || disableCompletions"
             />
           </div>
         </q-stepper-navigation>
@@ -47,87 +57,115 @@
   </div>
 </template>
 
-<style scoped lang="scss">
-
-</style>
-
-<script lang="ts">
+<script setup lang="ts">
+import { onMounted, ref, watch } from 'vue'
 import { date } from 'quasar'
-import { Component, Prop, Vue } from 'vue-property-decorator'
-import { bus } from '../../App.vue'
-import StepAction from '../../components/workflows/StepAction.vue'
-import { ProcessInstance, StepInstance, VuexStoreGetters } from '../../store/types'
-// import { readableDate } from '../../filters'
+import StepAction from 'src/components/workflows/StepAction.vue'
+import { ProcessInstance, StepInstance } from 'src/types'
 
-@Component({
-  components: { StepAction }
-})
-export default class ProcessInstanceDetail extends Vue {
-  @Prop({required: true}) readonly pi!: ProcessInstance
+import useEventBus from 'src/eventBus'
+import { useUserStore } from 'src/stores/user'
+import { useWorkflowsStore } from 'src/stores/workflows'
 
-  public formatDate = date.formatDate
+const userStore = useUserStore()
+const workflowsStore = useWorkflowsStore()
+const bus = useEventBus()
 
-  private getters = this.$store.getters as VuexStoreGetters
+const props = defineProps<{
+  pi: ProcessInstance
+}>()
 
-  public currentStepInstance = -1;
+const formatDate = date.formatDate
 
-  public setCurrentStepInstance() {
-    this.currentStepInstance = this.getters['workflowModule/processInstanceCurrentStepPks'][this.pi.pk]
-  }
+let currentStepInstance = ref(-1)
+let disableCompletions = ref(false) // Prevent completing a step instance twice
 
-  public stepInstanceIsComplete(stepInstance: StepInstance): boolean {
-    if (stepInstance.completed_at) {
-      return true
-    } else {
-      return false
-    }
-  }
-
-  public canCompleteStepInstance(stepInstance: StepInstance): boolean {
-    if (stepInstance.completed_at) {
-      return false
-    }
-    const step = stepInstance.step
-    if (this.$store.getters['userModule/getEmployeeProfile'].is_all_workflows_admin) {
-      // If they are an All-Workflows-Admin, allow completion
-      return true
-    } else if (step.workflow_role_pk) {
-      // If they are an admin of the workflow, allow completion
-      return this.$store.getters['userModule/getEmployeeProfile'].workflow_roles.indexOf(step.workflow_role_pk) != -1
-    } else if (step.process_role_pk) {
-      // If they are an admin of the process, allow completion
-      return this.$store.getters['userModule/getEmployeeProfile'].workflow_roles.indexOf(step.process_role_pk) != -1
-    } else if (step.role) {
-      // If they are assigned to the step's role, allow completion
-      return this.$store.getters['userModule/getEmployeeProfile'].workflow_roles.indexOf(step.role.pk) != -1
-    } else {
-      // TODO: What should happen if no role assigned? Only admins? Everyone? Require all steps to have roles?
-      return true
-    }
-  }
-
-  public completeStep(stepInstancePk: number, nextStepPk?: number): void {
-    this.$store.dispatch('workflowModule/completeStepInstance', { stepInstancePk, nextStepPk })
-      .then(() => {
-        this.setCurrentStepInstance()
-        bus.$emit('completedStep')
-      })
-      .catch(e => {
-        console.error('Error completing step instance', e)
-      })
-  }
-
-  created() {
-    // We trigger updating the current step instance in WorkflowInstanceDetail when we complete a step and reload it.
-    bus.$on('updateProcessInstances', () => {
-      this.setCurrentStepInstance()
-    })
-  }
-
-  mounted() {
-    this.setCurrentStepInstance()
-  }
-
+function latestStepInstance() {
+  return props.pi.step_instances[props.pi.step_instances.length - 1]
 }
+
+function setCurrentStepInstance() {
+  currentStepInstance.value = workflowsStore.processInstanceCurrentStepPks[props.pi.pk]
+}
+
+function stepInstanceIsComplete(stepInstance: StepInstance): boolean {
+  if (stepInstance.completed_at) {
+    return true
+  } else {
+    return false
+  }
+}
+
+function userAllowedToCompleteStepInstance(stepInstance: StepInstance): boolean {
+  const step = stepInstance.step
+  if (userStore.getEmployeeProfile.is_all_workflows_admin) {
+    // If they are an All-Workflows-Admin, allow completion
+    return true
+  } else if (step.workflow_role_pk) {
+    // If they are an admin of the workflow, allow completion
+    return userStore.getEmployeeProfile.workflow_roles.indexOf(step.workflow_role_pk) != -1
+  } else if (step.process_role_pk) {
+    // If they are an admin of the process, allow completion
+    return userStore.getEmployeeProfile.workflow_roles.indexOf(step.process_role_pk) != -1
+  } else if (step.role) {
+    // If they are assigned to the step's role, allow completion
+    return userStore.getEmployeeProfile.workflow_roles.indexOf(step.role.pk) != -1
+  } else {
+    // TODO: What should happen if no role assigned? Only admins? Everyone? Require all steps to have roles?
+    return true
+  }
+}
+
+function canCompleteStepInstance(stepInstance: StepInstance): boolean {
+  if (stepInstance.completed_at) {
+    return false
+  }
+  return userAllowedToCompleteStepInstance(stepInstance)
+}
+
+function canUndoStepCompletion(stepInstance: StepInstance): boolean {
+  if (!stepInstance.completed_at) {
+    return false
+  }
+  return userAllowedToCompleteStepInstance(stepInstance)
+}
+
+function completeStep(stepInstancePk: number, nextStepPk?: number): void {
+  disableCompletions.value = true
+  workflowsStore.completeStepInstance(stepInstancePk, nextStepPk)
+    .then(() => {
+      setCurrentStepInstance()
+      bus.emit('completedStep', Math.random())
+      disableCompletions.value = false
+    })
+    .catch(e => {
+      console.error('Error completing step instance', e)
+      disableCompletions.value = false
+    })
+}
+
+function undoStepCompletion(stepInstancePk: number): void {
+  disableCompletions.value = true
+  // The next step will always be the process instance's current step
+  const nextStepPk = latestStepInstance().pk
+  workflowsStore.undoStepInstanceCompletion(stepInstancePk, nextStepPk)
+    .then(() => {
+      setCurrentStepInstance()
+      bus.emit('completedStep', Math.random())
+      disableCompletions.value = false
+    })
+    .catch(e => {
+      console.error('Error undoing step instance completion', e)
+    })
+}
+
+// We trigger updating the current step instance in WorkflowInstanceDetail when
+// we complete a step and reload it.
+watch(() => bus.bus.value.get('updateProcessInstances'), () => {
+  setCurrentStepInstance()
+})
+
+onMounted(() => {
+  setCurrentStepInstance()
+})
 </script>
-  

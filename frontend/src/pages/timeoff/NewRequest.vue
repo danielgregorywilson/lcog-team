@@ -1,14 +1,27 @@
 <template>
   <div>
     <div class="q-gutter-md row">
-      <q-date v-model="dates" range @input="dateChanged()"/>
-      <div v-if="touchedCalendar && conflictingResponsibilityBuddies().length != 0">
+      <q-date v-model="dates" range @update:model-value="dateChanged()"/>
+      <div v-if="touchedCalendar && conflictingResponsibilities().length != 0">
         <q-icon color="orange" name="warning" size="xl" class="q-ml-sm" />
         <div>
-          <div>One or more team members with shared responsibilities will be also be unavailable:</div>
+          <div>
+            One or more team members with shared responsibilities will also be
+            unavailable:
+          </div>
           <ul>
-            <li v-for="employee of conflictingResponsibilityBuddies()" :key="employee.pk">
-              <router-link :to="{ name: 'employee-responsibilities', params: { pk: employee.pk } }">{{ employee.name }}</router-link>: {{ employee.responsibility_names[0] }}<span v-if="employee.responsibility_names.length > 1"> and {{ employee.responsibility_names.length - 1 }} more</span>
+            <li v-for="tor of conflictingResponsibilities()" :key="tor.pk">
+              <router-link
+                :to="{ name: 'employee-responsibilities',
+                params: { pk: tor.pk } }"
+              >
+                {{ tor.name }}
+              </router-link>
+              : 
+              <span v-for="(name, idx) of tor.responsibility_names" :key="idx">
+                <span v-if="idx==0">{{ name }}</span>
+                <span v-else>, {{ name }}</span>
+              </span>
             </li>
           </ul>
         </div>
@@ -24,18 +37,30 @@
       label="Private Note (visible to manager only)"
       class="q-pb-md"
     />
-    <q-btn color="white" text-color="black" label="Create" :disabled="!formIsFilled()" @click="createTimeOffRequest()" />
+    <q-btn
+      color="white"
+      text-color="black"
+      label="Create"
+      :disabled="!formIsFilled()"
+      @click="createTimeOffRequest()"
+    />
   </div>
 </template>
 
-<style lang="scss">
+<script setup lang="ts">
 
-</style>
+import { ref, Ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-<script lang="ts">
-import { Notify } from 'quasar'
-import { Component, Vue } from 'vue-property-decorator'
-import { TimeOffRequestDates, TimeOffRequestRetrieve, VuexStoreGetters } from '../../store/types'
+import { useQuasar } from 'quasar'
+import {
+  EmployeeConflictingResponsibilities, TimeOffRequestDates
+} from 'src/types'
+import { useTimeOffStore } from 'src/stores/timeoff'
+
+const quasar = useQuasar()
+const router = useRouter()
+const timeOffStore = useTimeOffStore()
 
 const newRequestMessages = [
   'Good for you! You deserve a break.',
@@ -45,57 +70,67 @@ const newRequestMessages = [
   'Your team appreciates you! Come back refreshed.',
 ]
 
-@Component
-export default class TimeOffRequest extends Vue {
-  private getters = this.$store.getters as VuexStoreGetters
+let touchedCalendar = ref(false)
+let dates: Ref<TimeOffRequestDates> = ref({'from': '', 'to': ''})
+let note = ref('')
+let privateNote = ref('')
 
-  private touchedCalendar = false
-  private dates: TimeOffRequestDates = {'from': '', 'to': ''}
-  private note = ''
-  private privateNote = ''
-
-  private formIsFilled(): boolean {
-    if (this.dates && (typeof this.dates != 'string' && this.dates.from != '') || (typeof this.dates == 'string' && this.dates != '')) {
-      return true
-    } else {
-      return false
-    }
+function formIsFilled(): boolean {
+  if (
+    dates.value &&
+    (typeof dates.value != 'string' && dates.value.from != '') ||
+    (typeof dates.value == 'string' && dates.value != '')
+  ) {
+    return true
+  } else {
+    return false
   }
+}
 
-  private conflictingResponsibilityBuddies(): Array<TimeOffRequestRetrieve> {
-    return this.getters['timeOffModule/conflictingTimeOffRequests']
-  }
+function conflictingResponsibilities():
+  Array<EmployeeConflictingResponsibilities>
+{
+  return timeOffStore.conflictingResponsibilities
+}
 
-  private dateChanged(): void {
-    // Check if there are any coworkers out with shared responsibilities
-    this.touchedCalendar = true
-    if (this.dates) {
-      this.$store.dispatch('timeOffModule/getConflictingResponsibilities', { dates: this.dates })
-        .catch(e => {
-          console.error('Error getting conflicting responsibilities:', e)
-        })
-    }
-  }
-
-  private randomChoice(array: Array<string>) {
-    return array[Math.floor(Math.random() * array.length)];
-  }
-
-  private createTimeOffRequest(): void {
-    if (typeof this.dates != 'string' && this.dates.from == '') {
-      return
-    }    
-    this.$store.dispatch('timeOffModule/createTimeOffRequest', { dates: this.dates, note: this.note, privateNote: this.privateNote })
-      .then(() => {
-        Notify.create(`Time off successfully recorded. ${this.randomChoice(newRequestMessages)}`)
-        this.$router.push({ name: 'timeoff-my-requests'})
-          .catch(e => {
-            console.error('Error navigating to My Requests page after creating time off request:', e)
-          })
-      })
+function dateChanged(): void {
+  // Check if there are any coworkers out with shared responsibilities
+  touchedCalendar.value = true
+  if (dates.value) {
+    timeOffStore.getConflictingResponsibilites({ dates: dates.value })
       .catch(e => {
-        console.error('Error creating time off request:', e)
+        console.error('Error getting conflicting responsibilities:', e)
       })
   }
 }
+
+function randomChoice(array: Array<string>) {
+  return array[Math.floor(Math.random() * array.length)]
+}
+
+function createTimeOffRequest(): void {
+  if (typeof dates.value != 'string' && dates.value.from == '') {
+    return
+  }    
+  timeOffStore.createTimeOffRequest(
+    { dates: dates.value, note: note.value, privateNote: privateNote.value }
+  )
+    .then(() => {
+      quasar.notify(
+        `Time off successfully recorded. ${randomChoice(newRequestMessages)}`
+      )
+      router.push({ name: 'timeoff-my-requests'})
+        .catch(e => {
+          console.error(
+            'Error navigating to My Requests page after creating time off',
+            'request:',
+            e
+          )
+        })
+    })
+    .catch(e => {
+      console.error('Error creating time off request:', e)
+    })
+}
+
 </script>

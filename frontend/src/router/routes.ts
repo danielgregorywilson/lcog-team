@@ -1,130 +1,6 @@
-import Vue from 'vue';
-import { Route, RouteConfig } from 'vue-router';
+import { RouteRecordRaw } from 'vue-router'
 
-import http from '../http-common';
-import authState from '../store/modules/auth/state'
-
-import { AxiosUserRetrieveOneServerResponse } from '../store/types'
-
-
-type Next = (path?: string) => void
-
-// const ifNotAuthenticated = (to: Route, from: Route, next: Next) => {
-//   if (!authState.token) { // TODO: This should use the isAuthenticated getter
-//     next()
-//     return
-//   }
-//   next('/')
-// }
-
-const ifAuthenticated = (to: Route, from: Route, next: Next) => {
-  if (!!authState.token) { // TODO: This should use the isAuthenticated getter
-    next()
-    return
-  }
-  next('dashboard')
-}
-
-const ifManager = (to: Route, from: Route, next: Next) => {
-  if (!!authState.token && Vue.prototype.$cookies.get('is_manager') == 'true') { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    next()
-    return
-  }
-  next('dashboard')
-}
-
-const ifEligibleForTeleworkApplication = (to: Route, from: Route, next: Next) => {
-  if (!!authState.token && Vue.prototype.$cookies.get('is_eligible_for_telework_application') == 'true') { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    next()
-    return
-  }
-  next('dashboard')
-}
-
-// const ifHasManager = (to: Route, from: Route, next: Next) => {
-//   if (!!authState.token && Vue.prototype.$cookies.get('has_manager') == 'true') { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-//     next()
-//     return
-//   }
-//   next('dashboard')
-// }
-
-const ifCanViewReview = (to: Route, from: Route, next: Next) => {
-  if (!!authState.token && Vue.prototype.$cookies.get('prs_can_view').indexOf(to.params.pk) != -1) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    next()
-    return
-  } else {
-    console.info('User cannot view PR', to.params.pk, 'Redirecting to dashboard.')
-    next('dashboard')
-  }
-}
-
-const ifCanViewNote = (to: Route, from: Route, next: Next) => {
-  if (!!authState.token && Vue.prototype.$cookies.get('notes_can_view') && Vue.prototype.$cookies.get('notes_can_view').indexOf(parseInt(to.params.pk)) != -1) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    next()
-    return
-  } else {
-    next('dashboard')
-  }
-}
-
-const ifCanViewTeleworkApplication = (to: Route, from: Route, next: Next) => {
-  if (!!authState.token && Vue.prototype.$cookies.get('telework_applications_can_view').indexOf(to.params.pk) != -1) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    next()
-    return
-  } else {
-    console.info('User cannot view Telework Application', to.params.pk, 'Redirecting to dashboard.')
-    next('dashboard')
-  }
-}
-
-// const ifCanViewSeatingCharts = (to: Route, from: Route, next: Next) => {
-//   if (!!authState.token && Vue.prototype.$cookies.get('can_view_seating_charts') == 'true') { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-//     next()
-//     return
-//   } else {
-//     console.info('User cannot view seating charts. Redirecting to dashboard.')
-//     next('dashboard')
-//   }
-// }
-
-const ifCanViewDeskReservationReports = (to: Route, from: Route, next: Next) => {
-  http.get('api/v1/current-user/')
-    .then((resp: AxiosUserRetrieveOneServerResponse) => {
-      if (resp.data.can_view_desk_reservation_reports) {
-        next()
-        return
-      } else {
-        console.info('User cannot view Desk Reservation Reports', to.params.pk, 'Redirecting to dashboard.')
-        next('dashboard')
-      }
-    })
-    .catch(e => {
-      console.error('Error getting current user:', e)
-    })
-}
-
-const ifCanViewTimeOffRequest = (to: Route, from: Route, next: Next) => {
-  if (!!authState.token && Vue.prototype.$cookies.get('time_off_requests_can_view') && Vue.prototype.$cookies.get('time_off_requests_can_view').indexOf(parseInt(to.params.pk)) != -1) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    next()
-    return
-  } else {
-    next('/timeoff')
-  }
-}
-
-const ifCanViewMealsOnWheelsRoutes = (to: Route, from: Route, next: Next) => {
-  if (!!authState.token && Vue.prototype.$cookies.get('can_view_mow_routes') == 'true') { // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    next()
-    return
-  } else {
-    console.info('User cannot view Meals on Wheels routes. Redirecting to dashboard.')
-    next('dashboard')
-  }
-}
-
-// TODO: Add a reset password view as in Django version, unless we're authenticating with LDAP
-const routes: RouteConfig[] = [
+const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
@@ -140,117 +16,160 @@ const routes: RouteConfig[] = [
         name: 'release-notes',
         component: () => import('src/pages/ReleaseNotes.vue')
       },
-      
-      //////////////////////
-      // RESPONSIBILITIES //
-      //////////////////////
+
+      //////////////
+      // EXPENSES //
+      //////////////
       {
-        path: '/responsibilities',
-        name: 'responsibilities',
-        component: () => import('src/pages/responsibilities/Responsibilities.vue'),
-        redirect: {name: 'all-responsibilities'},
+        path: 'expenses',
+        name: 'expenses',
+        component: () => import('src/pages/purchases/ExpensesBase.vue'),
         children: [
           {
-            path: 'all',
-            name: 'all-responsibilities',
-            component: () => import('src/pages/responsibilities/AllResponsibilities.vue'),
+            path: 'my',
+            name: 'my-expenses',
+            component: () => import('src/pages/purchases/MyExpenses.vue'),
+            meta: { requiresAuth: true, requiresCanViewExpenses: true },
           },
           {
-            path: 'orphaned',
-            name: 'orphaned-responsibilities',
-            component: () => import('src/pages/responsibilities/OrphanedResponsibilities.vue'),
+            path: 'review',
+            name: 'expenses-review',
+            component: () => import('src/pages/purchases/ExpensesReview.vue'),
+            meta: { requiresAuth: true, requiresFiscal: true },
           },
           {
-            path: 'tags',
-            name: 'tags',
-            component: () => import('src/pages/responsibilities/Tags.vue'),
+            path: 'review/:employeePk/:year/:month',
+            name: 'expenses-review-detail',
+            component: () => import('src/pages/purchases/ExpensesReviewDetail.vue'),
+            meta: { requiresAuth: true, requiresFiscal: true },
           },
-          {
-            path: 'tag',
-            name: 'tag',
-            component: () => import('src/pages/responsibilities/TaggedResponsibilities.vue'),
-            children: [
-              {
-                path: ':pk',
-                name: 'tagged-responsibilities',
-                component: () => import ('src/pages/responsibilities/TaggedResponsibility.vue')
-              }
-            ]
-          },
-          {
-            path: ':pk',
-            name: 'employee-responsibilities',
-            component: () => import('src/pages/responsibilities/EmployeeResponsibilities.vue'),
-            children: [
-              {
-                path: 'secondary',
-                name: 'employee-secondary-responsibilities',
-                props: { secondary: true }
-              }
-            ]
-          }
         ]
       },
-      
+
+      //////////////////////
+      // SECURITY MESSAGE //
+      //////////////////////
+      {
+        path: '/security-message',
+        name: 'security-message',
+        component: () => import('pages/SecurityMessage.vue'),
+        meta: { requiresAuth: true }
+      },
+
+      /////////////
+      // PROFILE //
+      /////////////
+      {
+        path: '/profile',
+        name: 'profile',
+        component: () => import('src/pages/Profile.vue'),
+        meta: { requiresAuth: true }
+      },
+
       /////////////////////////
       // PERFORMANCE REVIEWS //
       /////////////////////////
       {
         path: '/reviews',
         name: 'reviews',
-        component: () => import('pages/performanceReview/PerformanceReviews.vue'),
-        beforeEnter: ifManager
-      },
-      {
-        path: '/note/new',
-        name: 'note-create',
-        component: () => import('src/pages/performanceReview/ReviewNoteCreate.vue'),
-        beforeEnter: ifManager
-      },
-      {
-        path: '/note/:pk',
-        name: 'note-details',
-        component: () => import('src/pages/performanceReview/ReviewNoteDetail.vue'),
-        beforeEnter: ifCanViewNote
+        component: () => import('pages/performanceReview/PerformanceReviewList.vue'),
+        // beforeEnter: ifManager
       },
       {
         path: '/pr/:pk',
         name: 'pr-details',
         component: () => import('pages/performanceReview/PerformanceReviewDetail.vue'),
-        beforeEnter: ifCanViewReview
+        // beforeEnter: ifCanViewReview
       },
-      
-      ///////////////////////////
-      // MILEAGE REIMBURSEMENT //
-      ///////////////////////////
       {
-        path: '/mileage-reimbursement',
-        name: 'mileage-reimbursement',
-        component: () => import('src/pages/mileageReimbursement/MileageReimbursement.vue'),
-        children: [
-          {
-            path: 'create',
-            name: 'mileage-reimbursement-create',
-            component: () => import('src/pages/mileageReimbursement/MileageReimbursementCreate.vue'),
-          },
-          {
-            path: 'list',
-            name: 'mileage-reimbursement-list',
-            component: () => import('src/pages/mileageReimbursement/MileageReimbursementList.vue'),
-          },
-          // {
-          //   path: 'approve',
-          //   name: 'mileage-reimbursement-approve',
-          //   component: () => import('src/pages/mileageReimbursement/MileageReimbursementApprove.vue'),
-          // },
-          // {
-          //   path: ':pk',
-          //   name: 'mileage-reimbursement-detail',
-          //   component: () => import('src/pages/mileageReimbursement/MileageReimbursementDetail.vue'),
-          // }
-        ]
+        path: '/note/new',
+        name: 'note-create',
+        component: () => import('src/pages/performanceReview/ReviewNoteCreate.vue'),
+        // beforeEnter: ifManager
+      },
+      {
+        path: '/note/:pk',
+        name: 'note-details',
+        component: () => import('src/pages/performanceReview/ReviewNoteDetail.vue'),
+        // beforeEnter: ifCanViewNote
       },
 
+      //////////////////////
+      // RESPONSIBILITIES //
+      //////////////////////
+      {
+        path: '/responsibilities',
+        name: 'responsibilities',
+        component: () => {
+          return import('src/pages/responsibilities/Responsibilities.vue')
+        },
+        redirect: {name: 'all-responsibilities'},
+        meta: { requiresAuth: true },
+        children: [
+          {
+            path: 'all',
+            name: 'all-responsibilities',
+            component: () => {
+              return import(
+                'src/pages/responsibilities/AllResponsibilities.vue'
+              )
+            }
+          },
+          {
+            path: 'orphaned',
+            name: 'orphaned-responsibilities',
+            component: () => {
+              return import(
+                'src/pages/responsibilities/OrphanedResponsibilities.vue'
+              )
+            }
+          },
+          {
+            path: 'tag',
+            name: 'tag',
+            component: () => import('src/pages/responsibilities/Tags.vue'),
+            children: [
+              {
+                path: 'all',
+                name: 'all-tags',
+                component: () => {
+                  return import('src/pages/responsibilities/AllTags.vue')
+                }
+              },
+              {
+                path: ':pk',
+                name: 'tagged-responsibilities',
+                component: () => {
+                  return import (
+                    'src/pages/responsibilities/TaggedResponsibilities.vue'
+                  )
+                }
+              }
+            ]
+          },
+          {
+            path: ':pk',
+            name: 'employee-responsibilities',
+            component: () => {
+              return import(
+                'src/pages/responsibilities/EmployeeResponsibilities.vue'
+              )
+            },
+            children: [
+              {
+                path: 'secondary',
+                name: 'employee-secondary-responsibilities',
+                component: () => {
+                  return import(
+                    'src/pages/responsibilities/EmployeeResponsibilities.vue'
+                  )
+                },
+                props: { secondary: true }
+              }
+            ]
+          }
+        ]
+      },
       //////////////
       // TIME OFF //
       //////////////
@@ -258,7 +177,7 @@ const routes: RouteConfig[] = [
         path: '/timeoff',
         name: 'timeoff',
         component: () => import('src/pages/timeoff/TimeOffBase.vue'),
-        beforeEnter: ifAuthenticated,
+        meta: { requiresAuth: true },
         redirect: {name: 'timeoff-my-requests'},
         children: [
           {
@@ -280,7 +199,7 @@ const routes: RouteConfig[] = [
             path: 'request-detail/:pk',
             name: 'timeoff-request-detail',
             component: () => import('src/pages/timeoff/RequestDetail.vue'),
-            beforeEnter: ifCanViewTimeOffRequest,
+            meta: { requiresAuth: true, requiresCanViewTimeOffRequest: true }
           },
           {
             path: 'manage-requests',
@@ -295,111 +214,74 @@ const routes: RouteConfig[] = [
       ///////////////
       {
         path: '/workflows',
-        name: 'workflow-dashboard',
+        name: 'workflows',
         component: () => import('pages/workflows/Workflows.vue'),
-        // beforeEnter: ifManager
+        meta: { requiresAuth: true },
+        children: [
+          {
+            path: '',
+            name: 'workflow-dashboard-redirect',
+            redirect: { name: 'workflow-dashboard' }
+          },
+          {
+            path: 'dashboard',
+            name: 'workflow-dashboard',
+            component: () => import('pages/workflows/WorkflowDashboard.vue')
+          },
+          {
+            path: 'complete',
+            name: 'workflows-complete',
+            component: () => import('src/pages/workflows/WorkflowsComplete.vue'),
+            // TODO: For now we just have one complete page/table
+            // children: [
+            //   {
+            //     path: '',
+            //     name: 'workflows-complete-onboarding-redirect',
+            //     redirect: { name: 'workflows-complete-onboarding' }
+            //   },
+            //   {
+            //     path: 'onboarding',
+            //     name: 'workflows-complete-onboarding',
+            //     component: () => {
+            //       return import(
+            //         'src/pages/workflows/WorkflowsCompleteOnboarding.vue'
+            //       )
+            //     }
+            //   }
+            // ]
+          },
+          {
+            path: 'deleted',
+            name: 'workflows-archived',
+            component: () => import('src/pages/workflows/WorkflowsArchived.vue')
+          }
+        ]
       },
       {
         path: '/wf/:pk',
         name: 'workflow-instance-detail',
-        component: () => import('src/pages/workflows/WorkflowInstanceDetail.vue'),
-        // beforeEnter: ifCanViewTimeOffRequest,
+        component: () => {
+          return import('src/pages/workflows/WorkflowInstanceDetail.vue')
+        },
+        meta: { requiresAuth: true },
         children: [
           {
             path: 'processes',
             name: 'workflow-processes',
             component: () => import('src/pages/workflows/WorkflowProcesses.vue')
-            // TODO: beforeEnter: TODO
           },
           {
             path: 'transition',
             name: 'workflow-transition-form',
-            component: () => import('src/pages/workflows/EmployeeTransitionDetail.vue')
-            // TODO: beforeEnter: TODO
+            component: () => {
+              return import('src/pages/workflows/EmployeeTransitionDetail.vue')
+            }
           }
         ]
-      },
-      // TODO: Remove EIS demo page
-      {
-        path: '/eis',
-        name: 'eis',
-        component: () => import('src/pages/workflows/EIS.vue'),
-        beforeEnter: ifAuthenticated,
-      },
-
-      //////////////
-      // TELEWORK //
-      //////////////
-      {
-        path: '/telework-application',
-        name: 'telework-application',
-        component: () => import('pages/TeleworkApplicationGetOrCreate.vue'),
-        beforeEnter: ifEligibleForTeleworkApplication
-      },
-      {
-        path: '/telework-application/:pk',
-        name: 'telework-application-detail',
-        component: () => import('pages/TeleworkApplication.vue'),
-        beforeEnter: ifCanViewTeleworkApplication
-      },
-      {
-        path: '/telework',
-        name: 'telework',
-        component: () => import('pages/TeleworkPolicy.vue'),
-        // beforeEnter: ifAuthenticated
-      },
-
-      //////////////////////
-      // SECURITY MESSAGE //
-      //////////////////////
-      {
-        path: '/security-message',
-        name: 'security-message',
-        component: () => import('pages/SecurityMessage.vue'),
-        beforeEnter: ifAuthenticated
-      },
-
-      /////////////
-      // PROFILE //
-      /////////////
-      {
-        path: '/profile',
-        name: 'profile',
-        component: () => import('pages/Profile.vue'),
-        beforeEnter: ifAuthenticated
-      },
-    ]
-  },
-  // Print Layout
-  {
-    path: '/print',
-    component: () => import('layouts/PrintLayout.vue'),
-    children: [
-      {
-        path: 'pr/:pk',
-        name: 'pr-print',
-        component: () => import('pages/performanceReview/PerformanceReviewDetail.vue'),
-        beforeEnter: ifManager,
-        props: {
-          print: true
-        }
       }
-    ]
+    ],
   },
-  
-  {
-    path: '/auth',
-    component: () => import('layouts/AuthLayout.vue'),
-    children: [
-      {
-        path: 'login',
-        name: 'login',
-        component: () => import('pages/auth/Login.vue'),
-        // beforeEnter: ifNotAuthenticated,
-      },
-    ]
-  },
-  
+
   //////////////////////
   // DESK RESERVATION //
   //////////////////////
@@ -420,6 +302,9 @@ const routes: RouteConfig[] = [
               {
                 path: 'desk/:deskNumber',
                 name: 'schaefers-1-desk',
+                component: () => {
+                  return import('src/pages/deskReservation/Schaefers1.vue')
+                }
               }
             ]
           },
@@ -431,6 +316,9 @@ const routes: RouteConfig[] = [
               {
                 path: 'desk/:deskNumber',
                 name: 'schaefers-2-desk',
+                component: () => {
+                  return import('src/pages/deskReservation/Schaefers2.vue')
+                }
               }
             ]
           },
@@ -442,25 +330,11 @@ const routes: RouteConfig[] = [
               {
                 path: 'desk/:deskNumber',
                 name: 'schaefers-3-desk',
+                component: () => {
+                  return import('src/pages/deskReservation/Schaefers3.vue')
+                }
               }
             ]
-          }
-        ]
-      },
-      {
-        path: 'park-place',
-        name: 'park-place',
-        component: () => import('src/pages/deskReservation/ParkPlace.vue'),
-        children: [
-          {
-            path: '4',
-            name: 'park-place-4',
-            component: () => import('src/pages/deskReservation/ParkPlace4.vue'),
-          },
-          {
-            path: '5',
-            name: 'park-place-5',
-            component: () => import('src/pages/deskReservation/ParkPlace5.vue'),
           }
         ]
       },
@@ -468,7 +342,7 @@ const routes: RouteConfig[] = [
         path: 'reports',
         name: 'reports',
         component: () => import('src/pages/deskReservation/Report.vue'),
-        beforeEnter: ifCanViewDeskReservationReports
+        meta: { requiresAuth: true, requiresDeskReservationReportsPermission: true }
       }
     ]
   },
@@ -502,23 +376,80 @@ const routes: RouteConfig[] = [
   {
     path: '/mow-map',
     name: 'mow-map',
-    component: () => import('src/pages/MOWMap.vue'),
-    beforeEnter: ifCanViewMealsOnWheelsRoutes
+    component: () => import('src/pages/meals/MOWMap.vue'),
+    meta: { requiresAuth: true, requiresMealsOnWheelsPermission: true }
+  },
+
+  ///////////////
+  // ZOOM TEST //
+  ///////////////
+  {
+    path: '/zoom',
+    name: 'zoom',
+    component: () => import('src/pages/ZoomTest.vue'),
+  },
+
+  //////////////////
+  // PRINT LAYOUT //
+  //////////////////
+  {
+    path: '/print',
+    component: () => import('layouts/PrintLayout.vue'),
+    children: [
+      {
+        path: 'pr/:pk',
+        name: 'pr-print',
+        component: () => import('pages/performanceReview/PerformanceReviewDetail.vue'),
+        meta: { requiresManager: true },
+        props: {
+          print: true
+        }
+      },
+      {
+        path: 'wf/:pk/transition',
+        name: 'workflow-print',
+        component: () => {
+          return import('src/pages/workflows/EmployeeTransitionDetail.vue')
+        },
+        meta: { requiresAuth: true },
+        props: {
+          print: true
+        }
+      }
+    ]
+  },
+
+  /////////////////////////
+  // USERNAME LOGIN PAGE //
+  /////////////////////////
+  {
+    path: '/auth',
+    component: () => import('layouts/AuthLayout.vue'),
+    children: [
+      {
+        path: 'login',
+        name: 'login',
+        component: () => import('pages/UsernameLogin.vue'),
+        // beforeEnter: ifNotAuthenticated,
+      },
+    ]
+  },
+
+  /////////////////
+  // Outage page //
+  /////////////////
+  {
+    path: '/outage',
+    name: 'outage-notice',
+    component: () => import('src/pages/OutageNotice.vue'),
   },
 
   // Always leave this as last one,
   // but you can also remove it
   {
-    path: '/404',
-    component: () => import('pages/Error404.vue')
+    path: '/:catchAll(.*)*',
+    component: () => import('pages/ErrorNotFound.vue'),
   },
-  {
-    path: '*',
-    component: () => {
-      console.log('Hit the 404')
-      return import('pages/Error404.vue')
-    }
-  }
-];
+]
 
-export default routes;
+export default routes

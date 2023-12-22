@@ -24,29 +24,48 @@
 </template>
 
 <style lang="scss"> 
-
 #schaefers-page {
   width: 1366px;
 }
-
 </style>
 
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-@Component
-export default class Schaefers extends Vue{
-  private showScreensaver = false
+import TrustedIPDataService from 'src/services/TrustedIPDataService'
+import { useAuthStore } from 'src/stores/auth'
 
-  mouseMoveOverScreensaver() {
-    this.showScreensaver = false
-  }
+const authStore = useAuthStore()
+const router = useRouter()
 
-  mounted() {
-    const hourOfDay = new Date().getHours()
-    if (hourOfDay < 6 || hourOfDay >= 18) {
-      this.showScreensaver = true
-    }
-  }
+let showScreensaver = ref(false)
+
+function mouseMoveOverScreensaver() {
+  showScreensaver.value = false
 }
+
+onMounted(() => {
+  // Boot session to dashboard if not authenticated or IP not in trusted IP lists
+  if (!authStore.isAuthenticated) {
+    TrustedIPDataService.getTrustedIPs()
+      .then((response: {data: boolean}) => {
+        const addressIsSafe = response.data
+        if (!addressIsSafe) {
+          router.push('/')
+            .catch((e) => {
+              console.error('Error navigating to dashboard upon rejecting connection to desk reservations:', e)
+            })
+        }
+      })
+      .catch(e => {
+        console.error('Error getting safe IP address status from API:', e)
+      })
+  }
+  
+  const hourOfDay = new Date().getHours()
+  if (hourOfDay < 6 || hourOfDay >= 18) {
+    showScreensaver.value = true
+  }
+})
 </script>

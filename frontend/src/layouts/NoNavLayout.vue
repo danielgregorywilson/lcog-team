@@ -1,3 +1,4 @@
+<!-- Not converted from Quasar 1/Vue 2 -->
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-page-container>

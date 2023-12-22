@@ -8,13 +8,12 @@
           round
           icon="menu"
           aria-label="Menu"
-          id="menu-button"
-          @click="leftDrawerOpen = !leftDrawerOpen"
+          @click="toggleLeftDrawer"
         />
 
         <q-toolbar-title>
-          <div v-if="name()">
-            Hi {{ name() }}
+          <div v-if="emplayeeName()">
+            Hi {{ emplayeeName() }}
           </div>
         </q-toolbar-title>
 
@@ -29,7 +28,7 @@
       content-class="bg-grey-1"
       :width="210"
     >
-      <q-list>        
+      <q-list>
         <q-item
           clickable
           :to="{ name: 'dashboard' }"
@@ -54,7 +53,7 @@
           <q-item-section avatar>
             <q-img
               id="ms-logo"
-              src="../assets/microsoft-logo.svg"
+              src="../assets/microsoft-logo.png"
               style="width: 24px;"
             />
           </q-item-section>
@@ -91,48 +90,48 @@
   </q-layout>
 </template>
 
-<style lang="scss"> 
-  #lcog-logo {
-    color: black;
-    .q-img__image {
-      background-position: 0% 0% !important;
-    }
-  }
-
-  #nav-profile {
-    border-top: 1px black solid;
-  }
-</style>
-
-<script lang="ts">
+<script setup lang="ts">
+import { UserAgentApplication } from 'msal'
+import { ref, onMounted } from 'vue'
+import { useAuthStore } from 'src/stores/auth'
+import { useUserStore } from 'src/stores/user'
+import { getCurrentUser } from 'src/utils'
+import { Configuration } from 'electron-builder'
 import NavLink from 'components/NavLink.vue'
+import { useRouter } from 'vue-router'
 
-import { Component, Vue } from 'vue-property-decorator'
+const authStore = useAuthStore()
+const userStore = useUserStore()
+const router = useRouter()
 
-import { UserAgentApplication } from 'msal';
-import { Configuration } from 'electron-builder';
+let leftDrawerOpen = ref(false)
 
 interface LinkData {
-  title: string;
-  icon: string;
-  link: string;
-  id?: string;
-  managerOnly?: boolean;
-  eligibleForTeleworkApplicationOnly?: boolean;
+  title: string
+  icon: string
+  link: string
+  id?: string
+  isManager?: boolean
+  isISEmployee?: boolean
+  isFiscalEmployee?: boolean
+  eligibleForTeleworkApplicationOnly?: boolean
   hasWorkflowRoles?: boolean
+  canViewExpenses?: boolean
   canViewMOWRoutes?: boolean
 }
 
-const linksData: Array<LinkData> = [
+const navLinks: Array<LinkData> = [
   {
     title: 'Time Off',
     icon: 'schedule',
-    link: '/timeoff'
+    link: '/timeoff',
+    isISEmployee: true
   },
   {
     title: 'Responsibilities',
     icon: 'hardware',
-    link: '/responsibilities'
+    link: '/responsibilities',
+    isISEmployee: true
   },
   {
     title: 'Workflows',
@@ -140,12 +139,25 @@ const linksData: Array<LinkData> = [
     link: '/workflows',
     hasWorkflowRoles: true
   },
-  // {
-  //   title: 'Performance Reviews',
-  //   icon: 'assignment_turned_in',
-  //   link: '/reviews',
-  //   managerOnly: true
-  // },
+  {
+    title: 'Credit Card Expenses',
+    icon: 'credit_card',
+    link: '/expenses/my',
+    canViewExpenses: true
+  },
+  {
+    title: 'Credit Card Expense Reports',
+    icon: 'request_quote',
+    link: '/expenses/review',
+    isFiscalEmployee: true
+  },
+  {
+    title: 'Performance Reviews',
+    icon: 'assignment_turned_in',
+    link: '/reviews',
+    id: 'nav-reviews',
+    isManager: true
+  },
   {
     title: 'Schaefers Desk Reservation',
     icon: 'laptop',
@@ -179,115 +191,71 @@ const linksData: Array<LinkData> = [
     link: '/profile',
     id: 'nav-profile'
   },
-];
+]
 
-interface LayoutData {
-  name: string
+// For msal.js Azure/AD SSO
+const msalConfig: Configuration = {
+  auth: {
+    clientId: '2c4ec8a0-6be9-4c9c-a6b6-6a40392b8e3e',
+    authority: 'https://login.microsoftonline.com/9a80ddb7-1790-4782-a634-ef32f273169c',
+    redirectUri: process.env.DASHBOARD_URL,
+  },
+  cache: {
+    cacheLocation: 'sessionStorage', // This configures where your cache will be stored
+    storeAuthStateInCookie: false, // Set this to "true" if you are having issues on IE11 or Edge
+  }
 }
 
-@Component({
-  components: { NavLink }
+const myMSALObj = new UserAgentApplication(msalConfig)
+
+const loginRequest = {
+  scopes: ['openid', 'profile', 'User.Read']
+}
+
+function toggleLeftDrawer () {
+  leftDrawerOpen.value = !leftDrawerOpen.value
+}
+
+function appVersionTag() {
+  return process.env.APP_VERSION_TAG
+}
+
+function isAuthenticated(): boolean {
+  return authStore['isAuthenticated']
+}
+
+function emplayeeName(): string {
+  return userStore['getEmployeeProfile'].name
+}
+
+function loginWithMicrosoft(): void {
+  myMSALObj.loginPopup(loginRequest)
+    .then(() => {
+      if (myMSALObj.getAccount()) {
+        let account = myMSALObj.getAccount()
+        let firstName = account.name.split(' ')[1][0].toUpperCase() + account.name.split(' ')[1].substring(1).toLowerCase()
+        let lastName = account.name.split(' ')[0][0].toUpperCase() + account.name.split(' ')[0].substring(1).toLowerCase()
+        authStore.authWithMicrosoft({ username: account.userName, firstName, lastName })
+          .then(() => router.push('/'))
+          .catch((err) => console.log(err))
+      }
+    }).catch(function (error) {
+        console.log(error)
+    })
+}
+
+function logout() {
+  authStore.authLogout()
+    .then(() => {
+      myMSALObj.logout()
+    })
+    .catch(e => {
+      console.error('Error logging out', e)
+    })
+}
+
+onMounted(() => {
+  getCurrentUser()
 })
-export default class MainLayout extends Vue{
-  public leftDrawerOpen = false;
-  public navLinks: Array<LinkData> = linksData;
-  
-  public appVersionTag() {
-    return process.env.APP_VERSION_TAG
-  }
 
-  public isAuthenticated(): boolean {
-    return this.$store.getters['authModule/isAuthenticated'] // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
-  }
-  
-  public name() {
-    return this.$store.getters['userModule/getEmployeeProfile'].name // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
-  }
-
-  private getCurrentUser(): void {
-    if (this.$store.getters['authModule/isAuthenticated'] && !this.$store.getters['userModule/isProfileLoaded']) { // eslint-disable-line @typescript-eslint/no-unsafe-member-access
-      this.$store.dispatch('userModule/userRequest')
-        .catch(e => {
-          console.error('Error getting user from store', e)
-        })
-    }
-  }
-
-  // For msal.js Azure/AD SSO 
-  private msalConfig: Configuration = {
-    auth: {
-      clientId: '2c4ec8a0-6be9-4c9c-a6b6-6a40392b8e3e',
-      authority: 'https://login.microsoftonline.com/9a80ddb7-1790-4782-a634-ef32f273169c',
-      redirectUri: process.env.DASHBOARD_URL,
-    },
-    cache: {
-      cacheLocation: 'sessionStorage', // This configures where your cache will be stored
-      storeAuthStateInCookie: false, // Set this to "true" if you are having issues on IE11 or Edge
-    }
-  };
-
-  private myMSALObj = new UserAgentApplication(this.msalConfig);
-
-  private loginRequest = {
-    scopes: ['openid', 'profile', 'User.Read']
-  };
-
-  public loginWithMicrosoft(): void {
-    this.myMSALObj.loginPopup(this.loginRequest)
-      .then(() => {
-        if (this.myMSALObj.getAccount()) {
-          let account = this.myMSALObj.getAccount()
-          let firstName = account.name.split(' ')[1][0].toUpperCase() + account.name.split(' ')[1].substring(1).toLowerCase()
-          let lastName = account.name.split(' ')[0][0].toUpperCase() + account.name.split(' ')[0].substring(1).toLowerCase()
-          this.$store.dispatch('authModule/setAuth', { username: account.userName, firstName, lastName })
-            .then(() => this.$router.push('/'))
-            .catch((err) => console.log(err))
-        }      
-      }).catch(function (error) {
-          console.log(error);
-      });
-  }
-
-  public loginDev(): void {
-    this.$router.push('/auth/login')
-      .catch(e => {
-        console.error('Error navigating to login page', e)
-      })
-  }
-
-  public logout() {
-    if (process.env.DEV) {
-      this.logoutDev()
-    } else {
-      this.logoutWithMicrosoft()
-    }
-  }
-
-  public logoutWithMicrosoft() {
-    this.$store.dispatch('authModule/authLogout')
-    .then(() => {
-      this.myMSALObj.logout();
-    })
-    .catch(e => {
-      console.error('Error logging out', e);
-    })
-  }
-
-  // TODO: Old logout
-  public logoutDev(): void {
-    this.$store.dispatch('authModule/authLogout')
-    .then(() => {
-      this.$router.push('/auth/login')
-        .catch(e => {
-          console.error('Error navigating to login page after logout', e)
-        })
-    })
-    .catch(e => {
-      console.error('Error logging out', e);
-    })
-  }
-  mounted() {
-    this.getCurrentUser();
-  }
-};
 </script>

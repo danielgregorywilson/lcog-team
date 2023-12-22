@@ -2,8 +2,13 @@
   <q-page>
     <div class="q-px-md">
       <h4>Edit this Note</h4>
-      <p>Notes are visible to you when completing an evalutation for the employee. They are not visible to anyone else.</p>
-      <q-select v-model="employee" :options="options" label="Employee" class="q-pb-md" />
+      <p>
+        Notes are visible to you when completing an evalutation for the
+        employee. They are not visible to anyone else.
+      </p>
+      <q-select
+        v-model="employee" :options="options" label="Employee" class="q-pb-md"
+      />
       <q-input
         input-class="review-note"
         v-model="note"
@@ -11,82 +16,97 @@
         type="textarea"
         class="q-pb-md"
       />
-      <q-btn color="white" id="review-note-update-button" text-color="black" label="Update" :disabled="!valuesAreChanged()" @click="updateReviewNote()" />
+      <q-btn
+        color="white"
+        id="review-note-update-button"
+        text-color="black"
+        label="Update"
+        :disabled="!valuesAreChanged()"
+        @click="updateReviewNote()"
+      />
     </div>
   </q-page>
 </template>
 
-<script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
-import { AxiosEmployeeRetrieveManyServerResponse, AxiosReviewNoteRetrieveOneServerResponse, AxiosReviewNoteUpdateServerResponse } from '../../store/types'
-import EmployeeDataService from '../../services/EmployeeDataService'
-import ReviewNoteDataService from '../../services/ReviewNoteDataService'
+<script setup lang="ts">
+import { onMounted, ref, Ref } from 'vue'
+import { useRoute } from 'vue-router'
 
+import { usePeopleStore } from 'src/stores/people'
+import { usePerformanceReviewStore } from 'src/stores/performancereview'
+import { getRoutePk } from 'src/utils'
 
-@Component
-export default class ReviewNoteDetail extends Vue{
-  private pk = ''
-  private employeeCurrentVal: {label: string, value: number} = {label: '', value: -1}
-  private noteCurrentVal = ''
-  private employee: {label: string, value: number} = {label: '', value: -1}
-  private note = ''
-  private options: Array<{label: string; value: string}> = []
+interface EmployeeOption {
+  label: string;
+  pk: number;
+}
 
-  private valuesAreChanged(): boolean {
-    if (this.employee.value == this.employeeCurrentVal.value && this.note == this.noteCurrentVal) {
-      return false
-    } else {
-      return true
-    }
-  }
+const route = useRoute()
+const peopleStore = usePeopleStore()
+const performanceReviewStore = usePerformanceReviewStore()
 
-  private updateReviewNote(): void {
-    ReviewNoteDataService.update(this.pk, {
-      employee_pk: this.employee.value,
-      note: this.note
+const notePk = ref('')
+let options = ref([]) as Ref<Array<EmployeeOption>>
+let employee = ref({label: '', pk: -1}) as Ref<EmployeeOption>
+let employeeCurrentVal = ref({label: '', pk: -1}) as Ref<EmployeeOption>
+let note = ref('')
+let noteCurrentVal = ref('')
+
+function getOptions(): void {
+  peopleStore.getDirectReports()
+    .then((employees) => {
+      options.value = employees.map(obj => {
+        return {label: obj.name, pk: obj.pk}
+      })
     })
-      .then((response: AxiosReviewNoteUpdateServerResponse) => {
-        this.employeeCurrentVal = {label: response.data.employee_name, value: response.data.employee_pk}
-        this.noteCurrentVal = response.data.note
-        this.$store.dispatch('performanceReviewModule/getAllReviewNotes')
-          .catch(e => {
-            console.error('Error getting all review notes after updating a review note:', e)
-          })
-      })
-      .catch(e => {
-        console.error('Error updating review note:', e)
-      })
-  }
+    .catch(e => {
+      console.error('Error getting direct reports:', e)
+    })
+}
 
-  private retrieveReviewNote(): void {
-    ReviewNoteDataService.get(this.$route.params.pk)
-      .then((response: AxiosReviewNoteRetrieveOneServerResponse) => {
-        this.pk = response.data.pk.toString()
-        this.employee = {label: response.data.employee_name, value: response.data.employee_pk}
-        this.note = response.data.note
-        this.employeeCurrentVal = this.employee
-        this.noteCurrentVal = this.note
-      })
-      .catch(e => {
-        console.error('Error getting review note:', e)
-      });
-  }
-
-  private getOptions(): void {
-    EmployeeDataService.getDirectReports()
-      .then((response: AxiosEmployeeRetrieveManyServerResponse) => {
-        this.options = response.data.results.map(obj => {
-          return {label: obj.name, value: obj.pk.toString()}
-        })
-      })
-      .catch(e => {
-        console.error('Error getting direct reports:', e)
-      })
-  }
-
-  mounted() {
-    this.retrieveReviewNote();
-    this.getOptions();
+function valuesAreChanged(): boolean {
+  if (
+    employee.value.pk == employeeCurrentVal.value.pk &&
+      note.value == noteCurrentVal.value
+  ) {
+    return false
+  } else {
+    return true
   }
 }
+
+function updateReviewNote(): void {
+  performanceReviewStore.updateReviewNote({
+    pk: parseInt(notePk.value),
+    employee_pk: employee.value.pk,
+    note: note.value
+  })
+    .then((reviewNote) => {
+      employeeCurrentVal.value = {
+        label: reviewNote.employee_name, pk: reviewNote.employee_pk
+      }
+      noteCurrentVal.value = reviewNote.note
+    })
+}
+
+function retrieveReviewNote(): void {
+  const routePk = getRoutePk(route)
+  if (routePk) {
+    notePk.value = routePk
+    performanceReviewStore.getReviewNote(routePk)
+      .then((reviewNote) => {
+        employee.value = {
+          label: reviewNote.employee_name, pk: reviewNote.employee_pk
+        }
+        note.value = reviewNote.note
+        employeeCurrentVal.value = employee.value
+        noteCurrentVal.value = note.value
+      })
+  }
+}
+
+onMounted(() => {
+  retrieveReviewNote();
+  getOptions();
+})
 </script>

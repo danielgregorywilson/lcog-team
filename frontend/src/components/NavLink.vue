@@ -2,6 +2,7 @@
   <q-item
     clickable
     :to="link"
+    :id="id"
     v-if="isVisible()"
   >
     <q-item-section
@@ -18,31 +19,96 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
-import { VuexStoreGetters } from '../store/types'
+import { defineComponent } from 'vue'
+import { useUserStore } from 'src/stores/user'
 
-@Component
-export default class NavLink extends Vue{
-  @Prop({required: true}) readonly title!: string
-  @Prop({default: '#'}) readonly link!: string
-  @Prop({default: ''}) readonly icon!: string
-  @Prop({default: false}) readonly managerOnly!: boolean
-  @Prop({default: false}) readonly eligibleForTeleworkApplicationOnly!: boolean
-  @Prop({default: false}) readonly hasWorkflowRoles!: boolean
-  @Prop({default: false}) readonly canViewMOWRoutes!: boolean
+export default defineComponent({
+  name: 'NavLink',
+  props: {
+    title: {
+      type: String,
+      required: true
+    },
+    link: {
+      type: String,
+      required: false,
+      default: '#'
+    },
+    icon: {
+      type: String,
+      required: false,
+      default: ''
+    },
+    id: {
+      type: String,
+      required: false
+    },
+    isManager: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    isISEmployee: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    isFiscalEmployee: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    eligibleForTeleworkApplicationOnly: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    hasWorkflowRoles: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    canViewExpenses: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    canViewMOWRoutes: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
+  },
+  methods: {
+    isVisible (): boolean {
+      const shouldNotViewBecauseNotManager = this.isManager && !this.userStore.getEmployeeProfile.is_manager
+      const shouldNotViewBecauseNotISEmployee = this.isISEmployee && !this.userStore.getEmployeeProfile.is_is_employee
+      const shouldNotViewBecauseNotFiscalEmployee = this.isFiscalEmployee && !this.userStore.getEmployeeProfile.is_fiscal_employee
+      const shouldNotViewBecauseNotEligibleForTeleworkApplication = this.eligibleForTeleworkApplicationOnly && !this.userStore.getEmployeeProfile.is_eligible_for_telework_application
+      const shouldNotViewBecauseNoWorkflowRoles = this.hasWorkflowRoles && !this.userStore.hasWorkflowRoles
+      const shouldNotViewBecauseNoExpenseRoles = this.canViewExpenses && !this.userStore.getEmployeeProfile.can_view_expenses
+      const cannotViewMealsOnWheelsRoutes = this.canViewMOWRoutes && !this.userStore.getEmployeeProfile.can_view_mow_routes
+      if (
+        shouldNotViewBecauseNotManager ||
+        shouldNotViewBecauseNotISEmployee ||
+        shouldNotViewBecauseNotFiscalEmployee ||
+        shouldNotViewBecauseNotEligibleForTeleworkApplication ||
+        shouldNotViewBecauseNoWorkflowRoles ||
+        shouldNotViewBecauseNoExpenseRoles ||
+        cannotViewMealsOnWheelsRoutes
+      ) {
+        return false
+      } else {
+        return true
+      }
+    }
+  },
+  setup () {
+    const userStore = useUserStore()
 
-  private getters = this.$store.getters as VuexStoreGetters
-
-  private isVisible(): boolean {
-    const shouldNotViewBecauseNotManager = this.managerOnly && this.getters['userModule/isManager']
-    const shouldNotViewBecauseNotEligibleForTeleworkApplication = this.eligibleForTeleworkApplicationOnly && !this.getters['userModule/getEmployeeProfile'].is_eligible_for_telework_application
-    const shouldNotViewBecauseNoWorkflowRoles = this.hasWorkflowRoles && !this.getters['userModule/hasWorkflowRoles']
-    const cannotViewMealsOnWheelsRoutes = this.canViewMOWRoutes && !this.getters['userModule/getEmployeeProfile'].can_view_mow_routes
-    if (shouldNotViewBecauseNotManager || shouldNotViewBecauseNotEligibleForTeleworkApplication || shouldNotViewBecauseNoWorkflowRoles || cannotViewMealsOnWheelsRoutes) {
-      return false
-    } else {
-      return true
+    return {
+      userStore
     }
   }
-};
+})
 </script>

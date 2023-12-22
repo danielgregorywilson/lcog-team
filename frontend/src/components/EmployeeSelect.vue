@@ -1,80 +1,109 @@
 <template>
-  <q-select
-    v-model="selectedEmployee"
-    :options="employees()"
-    option-value="pk"
-    option-label="name"
-    :label="label"
-    use-input
-    hide-selected
-    fill-input
-    input-debounce="500"
-    @filter="filterFn"
-    @input="$emit('input', selectedEmployee)"
-  >
-    <template v-slot:no-option>
-      <q-item>
-        <q-item-section class="text-grey">
-          No results
-        </q-item-section>
-      </q-item>
-    </template>
-    <template v-if="selectedEmployee.name" v-slot:append>
-      <q-icon name="cancel" @click.stop="clearEmployee()" class="cursor-pointer" />
-    </template>
-  </q-select>
+<q-select
+  v-model="selectedEmployee"
+  :options="employees()"
+  option-value="pk"
+  :option-label="selectOptionLabel()"
+  :label="label"
+  :readonly = "readOnly"
+  use-input
+  hide-selected
+  fill-input
+  input-debounce="500"
+  @filter="filterFn"
+  @update:model-value="emit('input', selectedEmployee)"
+>
+  <template v-slot:no-option>
+    <q-item>
+      <q-item-section class="text-grey">
+        No results
+      </q-item-section>
+    </q-item>
+  </template>
+  <template v-if="!readOnly && selectedEmployeeName()" v-slot:append>
+    <q-icon name="cancel" @click.stop="clearEmployee()" class="cursor-pointer" />
+  </template>
+</q-select>
 </template>
 
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
-import { SimpleEmployeeRetrieve, VuexStoreGetters } from '../store/types'
+<script setup lang="ts">
+import { onMounted, onUpdated, ref } from 'vue'
 
-@Component
-export default class EmployeeSelect extends Vue {
-  private getters = this.$store.getters as VuexStoreGetters
-  public emptyEmployee = {name: '', pk: -1}
-  
-  @Prop({required: true}) readonly label!: string
-  @Prop({required: true}) employee!: {name: string, pk: number}
+import { usePeopleStore } from 'src/stores/people'
+import { SimpleEmployeeRetrieve } from 'src/types'
 
-  private needle = '' // For filtering employee list
-  public selectedEmployee = this.emptyEmployee
+const peopleStore = usePeopleStore()
 
-  private retrieveSimpleEmployeeList(): void {
-    this.$store.dispatch('peopleModule/getSimpleEmployeeList')
-      .catch(e => {
-        console.error('Error retrieving simple employee list', e)
-      })
+const emptyEmployee = {pk: -1, name: '', legal_name: ''}
+
+const props = defineProps<{
+  label: string,
+  employee: SimpleEmployeeRetrieve,
+  useLegalName: boolean
+  readOnly: boolean
+}>()
+
+const emit = defineEmits<{
+  (e: 'clear'): void
+  (e: 'input', arg: SimpleEmployeeRetrieve): void
+}>()
+
+let needle = ref('') // For filtering employee list
+let selectedEmployee = ref(emptyEmployee)
+
+function selectOptionLabel(): string {
+  if (props.useLegalName) {
+    return 'legal_name'
+  } else {
+    return 'name'
   }
-
-  public employees(): Array<SimpleEmployeeRetrieve> {    
-    const employees = this.getters['peopleModule/simpleEmployeeList']
-    return employees.filter((employee) => {
-      return employee.name.toLowerCase().indexOf(this.needle) != -1
-    })
-  }
-
-  public filterFn (val: string, update: Function) { // eslint-disable-line @typescript-eslint/ban-types
-    update(() => {
-      this.needle = val.toLowerCase()
-    })
-  }
-
-  public clearEmployee() {
-    this.selectedEmployee = this.emptyEmployee
-    this.$emit('clear')
-  }
-
-  mounted() {
-    if (!this.employees().length) {
-      this.retrieveSimpleEmployeeList()
-    }
-    this.selectedEmployee = this.employee
-  }
-
-  updated() {
-    this.selectedEmployee = this.employee
-  }
-
 }
+
+function selectedEmployeeName(): string {
+  if (props.useLegalName) {
+    return selectedEmployee.value.legal_name
+  } else {
+    return selectedEmployee.value.name
+  }
+}
+
+function retrieveSimpleEmployeeList(): void {
+  peopleStore.getSimpleEmployeeList()
+    .catch(e => {
+      console.error('Error retrieving simple employee list', e)
+    })
+}
+
+function employees() {    
+  const employeesList = peopleStore.simpleEmployeeList
+  return employeesList.filter((employee) => {
+    if (props.useLegalName) {
+      return employee.legal_name.toLowerCase().indexOf(needle.value) != -1
+    } else {
+      return employee.name.toLowerCase().indexOf(needle.value) != -1
+    }
+  })
+}
+
+function filterFn (val: string, update: Function) { // eslint-disable-line @typescript-eslint/ban-types
+  update(() => {
+    needle.value = val.toLowerCase()
+  })
+}
+
+function clearEmployee() {
+  selectedEmployee.value = emptyEmployee
+  emit('clear')
+}
+
+onMounted(() => {
+  if (!employees().length) {
+    retrieveSimpleEmployeeList()
+  }
+  selectedEmployee.value = props.employee
+})
+
+onUpdated(() => {
+  selectedEmployee.value = props.employee
+})
 </script>

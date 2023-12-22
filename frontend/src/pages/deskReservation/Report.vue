@@ -82,100 +82,99 @@
   </q-page>
 </template>
 
-<script lang="ts">
-import DeskReservationDataService from 'src/services/DeskReservationDataService'
-import { Component, Vue } from 'vue-property-decorator'
+<script setup lang="ts">
+import { ref } from 'vue'
 import {
-  AxiosGetDeskReservationReportDataServerResponse, AxiosGetEmployeeDeskReservationReportDataServerResponse,
   GetDeskReservationDataInterface, GetEmployeeDeskReservationDataInterface
-} from '../../store/types'
+} from 'src/types'
+import { useDeskReservationStore } from 'src/stores/deskreservation'
 
-@Component
-export default class Report extends Vue{
-  private showReport = 'desk'
-  private startDateTime = ''
-  private endDateTime = ''
-  private formSubmitted = false
+const deskReservationStore = useDeskReservationStore()
 
-  private deskFormSubmit (): void {
-    this.formSubmitted = true
-    DeskReservationDataService.getDeskUsageReport({
-      startDateTime: this.startDateTime,
-      endDateTime: this.endDateTime
+let showReport = ref('desk')
+let startDateTime = ref('')
+let endDateTime = ref('')
+let formSubmitted = ref(false)
+
+function deskFormSubmit () {
+  formSubmitted.value = true
+  deskReservationStore.getDeskUsageReport({
+    startDateTime: startDateTime.value,
+    endDateTime: endDateTime.value
+  })
+    .then((reportData) => {
+      download_desk_usage_report(reportData)
+      formReset()
+      formSubmitted.value = false
     })
-      .then((response: AxiosGetDeskReservationReportDataServerResponse) => {
-        this.download_desk_usage_report(response.data)
-        this.formReset()
-        this.formSubmitted = false
-      })
-      .catch(e => {
-        console.error('Error generating desk usage report:', e)
-      })
-  }
-
-  private employeeFormSubmit (): void {
-    this.formSubmitted = true
-    DeskReservationDataService.getEmployeeDeskUsageReport({
-      startDateTime: this.startDateTime,
-      endDateTime: this.endDateTime
+    .catch(e => {
+      console.error('Error generating desk usage report:', e)
     })
-      .then((response: AxiosGetEmployeeDeskReservationReportDataServerResponse) => {
-        this.download_employee_desk_usage_report(response.data)
-        this.formReset()
-        this.formSubmitted = false
-      })
-      .catch(e => {
-        console.error('Error generating employee desk usage report:', e)
-      })
-  }
-
-  private formReset (): void {
-    this.startDateTime = ''
-    this.endDateTime = ''
-  }
-
-  private download_desk_usage_report(data: GetDeskReservationDataInterface) {
-    // Define the heading for each row of the data
-    var csv = 'Desk,Total Hours,Days Utilized,Most Frequent Employee\n'
-
-    // Merge the data with CSV
-    Object.keys(data).forEach((key) => {
-      var row = [key, data[key]['total_hours'], data[key]['days_utilized'], data[key]['most_frequent_employee']].join(',')
-      csv += row
-      csv += '\n'
-    });
-
-    var hiddenElement = document.createElement('a')
-    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv)
-    hiddenElement.target = '_blank'
-
-    // Provide the name for the CSV file to be downloaded
-    let startString = this.startDateTime ? this.startDateTime.replace(' ','_') : 'beginning_of_last_month'
-    let endString = this.endDateTime ? this.endDateTime.replace(' ','_') : 'end_of_last_month'
-    hiddenElement.download = `desk_usage_report_${startString}_${endString}.csv`
-    hiddenElement.click()
-  }
-
-  private download_employee_desk_usage_report(data: GetEmployeeDeskReservationDataInterface) {
-    // Define the heading for each row of the data
-    var csv = 'Employee,Total Hours,Days Utilized,Most Frequent Desk\n'
-
-    // Merge the data with CSV
-    Object.keys(data).forEach((key) => {
-      var row = [key, data[key]['total_hours'], data[key]['days_utilized'], data[key]['most_frequent_desk']].join(',')
-      csv += row
-      csv += '\n'
-    });
-
-    var hiddenElement = document.createElement('a')
-    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv)
-    hiddenElement.target = '_blank'
-
-    // Provide the name for the CSV file to be downloaded
-    let startString = this.startDateTime ? this.startDateTime.replace(' ','_') : 'beginning_of_last_month'
-    let endString = this.endDateTime ? this.endDateTime.replace(' ','_') : 'end_of_last_month'
-    hiddenElement.download = `employee_desk_usage_report_${startString}_${endString}.csv`
-    hiddenElement.click()
-  }
 }
+
+function employeeFormSubmit() {
+  formSubmitted.value = true
+  deskReservationStore.getEmployeeDeskUsageReport({
+    startDateTime: startDateTime.value,
+    endDateTime: endDateTime.value
+  })
+    .then((reportData) => {
+      download_employee_desk_usage_report(reportData)
+      formReset()
+      formSubmitted.value = false
+    })
+    .catch(e => {
+      console.error('Error generating employee desk usage report:', e)
+    })
+}
+
+function formReset() {
+  startDateTime.value = ''
+  endDateTime.value = ''
+}
+
+function download_desk_usage_report(data: GetDeskReservationDataInterface) {
+  // Define the heading for each row of the data
+  var csv = 'Desk,Total Hours,Days Utilized,Most Frequent Employee\n'
+
+  // Merge the data with CSV
+  Object.keys(data).forEach((key) => {
+    var row = [key, data[key]['total_hours'], data[key]['days_utilized'], data[key]['most_frequent_employee']].join(',')
+    csv += row
+    csv += '\n'
+  })
+
+  var hiddenElement = document.createElement('a')
+  hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv)
+  hiddenElement.target = '_blank'
+
+  // Provide the name for the CSV file to be downloaded
+  let startString = startDateTime.value ? startDateTime.value.replace(' ','_') : 'beginning_of_last_month'
+  let endString = endDateTime.value ? endDateTime.value.replace(' ','_') : 'end_of_last_month'
+  hiddenElement.download = `desk_usage_report_${startString}_${endString}.csv`
+  hiddenElement.click()
+}
+
+function download_employee_desk_usage_report(data: GetEmployeeDeskReservationDataInterface) {
+  // Define the heading for each row of the data
+  var csv = 'Employee,Total Hours,Days Utilized,Most Frequent Desk\n'
+
+  // Merge the data with CSV
+  Object.keys(data).forEach((key) => {
+    var row = [key, data[key]['total_hours'], data[key]['days_utilized'], data[key]['most_frequent_desk']].join(',')
+    csv += row
+    csv += '\n'
+  })
+
+  var hiddenElement = document.createElement('a')
+  hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv)
+  hiddenElement.target = '_blank'
+
+  // Provide the name for the CSV file to be downloaded
+  let startString = startDateTime.value ? startDateTime.value.replace(' ','_') : 'beginning_of_last_month'
+  let endString = endDateTime.value ? endDateTime.value.replace(' ','_') : 'end_of_last_month'
+  hiddenElement.download = `employee_desk_usage_report_${startString}_${endString}.csv`
+  hiddenElement.click()
+}
+
 </script>

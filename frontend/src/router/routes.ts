@@ -444,6 +444,15 @@ const routes: RouteRecordRaw[] = [
     component: () => import('src/pages/OutageNotice.vue'),
   },
 
+  ///////////////
+  // Test page //
+  ///////////////
+  {
+    path: '/test204kjfmo4oerpkg',
+    name: 'test-page',
+    component: () => import('src/pages/TestPage.vue'),
+  },
+
   // Always leave this as last one,
   // but you can also remove it
   {

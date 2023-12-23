@@ -246,7 +246,7 @@ function sendSDSButtonExists() {
   cy.get('button[name="send-stn-button"]').should('not.exist')
 }
 
-describe('New employee workflow', () => {
+describe('Fill out new employee form', () => {
 
   it('Completed and deleted workflows load', () => {
     loginUser(Cypress.env('users').sdsmanager).then(() => {

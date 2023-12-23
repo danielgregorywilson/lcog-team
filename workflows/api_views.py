@@ -126,18 +126,21 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
         if user.is_authenticated:
             archived = self.request.query_params.get('archived', None)
             if archived is not None and is_true_string(archived):
+                # Archived WFIs
                 return WorkflowInstance.inactive_objects.all().select_related(
                     'transition', 'workflow', 'workflow__role'
                 ).prefetch_related('processinstance_set')
             elif archived is not None and not is_true_string(archived):
                 complete = self.request.query_params.get('complete', None)
                 if complete is not None and is_true_string(complete):
+                    # Complete WFIs
                     return WorkflowInstance.active_objects.filter(
                         complete=True
                     ).select_related(
                         'transition', 'workflow', 'workflow__role'
                     ).prefetch_related('processinstance_set')
                 elif complete is not None and not is_true_string(complete):
+                    # Current active WFIs
                     return WorkflowInstance.active_objects.filter(
                         complete=False
                     ).select_related(
@@ -743,10 +746,12 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
                     process_instance=processinstance
                 )
                 processinstance.current_step_instance = new_stepinstance
+            processinstance.update_percent_complete()
             processinstance.save()
+            workflowinstance = processinstance.workflow_instance
+            workflowinstance.update_percent_complete()
 
             # If step instance completion triggers a new process, start it
-            workflow_instance = stepinstance.process_instance.workflow_instance
             if stepinstance.step.trigger_processes.count():
                 for process in stepinstance.step.trigger_processes.all():
                     process.create_process_instance(workflow_instance)
@@ -776,7 +781,10 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
                 # un-complete the process
                 processinstance.completed_at = None
             processinstance.current_step_instance = stepinstance
+            processinstance.update_percent_complete()
             processinstance.save()
+            workflowinstance = processinstance.workflow_instance
+            workflowinstance.update_percent_complete()
 
             # Delete next SI
             nextStepInstance.delete()

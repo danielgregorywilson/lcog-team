@@ -30,7 +30,8 @@ class Command(BaseCommand):
                     '8/1/20.\n\n12/11/2020 07:05 PM - clid1559',
                     '$2,187.68.\n06/26/2020 04:37 PM - clid1559',
                     'Report Criteria:',
-                    'Include review notes'
+                    'Include review notes',
+                    'EA Range 25 Step 6 to EA Range 25 Step 7, and then a 1-step increase on 1/1/19 from EA Range 25 Step 7 to EA Range 25 Step 8.  So, I am putting her in for this pay period (as of 6/2/19) as a 2-step increase, and I am asking Payroll to process retroactive pay for her for the period of 1/1/18 to 12/31/18 (which includes a COLA at 7/1/18) at Step 6 and for the period 1/1/19 to 6/1/19 at Step 7.\n\n06/12/2019 05:57 PM - clid1559'
                 ]:
                     continue
                 if row[0]:
@@ -39,7 +40,10 @@ class Command(BaseCommand):
                         self.check_review_rows(employee_review_rows, employee)
 
                     # Start a new employee section
-                    number = row[1]
+                    try:
+                        number = row[1]
+                    except IndexError:
+                        import pdb; pdb.set_trace();
                     try:
                         employee = Employee.objects.get(number=number)
                     except MultipleObjectsReturned:

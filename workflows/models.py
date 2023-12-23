@@ -354,16 +354,16 @@ class Process(models.Model):
     def total_steps(self):
         # Count the number of steps before the final one. Don't count the final
         # step because it is the "complete" step and cannot be completed.
-        return self.step_set.filter(end=True).first().num_steps_before
+        return self.steps.filter(end=True).first().num_steps_before
 
     # def save(self, *args, **kwargs):
     #     super().save(*args, **kwargs)
     #     # If a Process has any Steps, it must have exactly one start Step and
     #     # one end Step.
-    #     if self.step_set.count():
-    #         if self.step_set.filter(start=True).count() != 1:
+    #     if self.steps.count():
+    #         if self.steps.filter(start=True).count() != 1:
     #             raise ValidationError("A process must have exactly one start step.")
-    #         if self.step_set.filter(end=True).count() != 1:
+    #         if self.steps.filter(end=True).count() != 1:
     #             raise ValidationError("A process must have exactly one end step.")
 
     # TODO: Get this working either here or on the Step class
@@ -371,19 +371,19 @@ class Process(models.Model):
     #     # If a Process has any Steps, it must have exactly one start Step and
     #     # one end Step.
     #     if (self.pk):
-    #         if self.step_set.count():
-    #             if self.step_set.filter(start=True).count() == 0:
-    #                 self.step_set.first().start = True
+    #         if self.steps.count():
+    #             if self.steps.filter(start=True).count() == 0:
+    #                 self.steps.first().start = True
     #                 self.save()
-    #             if self.step_set.filter(end=True).count() == 0:
-    #                 self.step_set.last().end = True
+    #             if self.steps.filter(end=True).count() == 0:
+    #                 self.steps.last().end = True
     #                 self.save()
 
     def create_process_instance(self, wfi):
         pi = ProcessInstance.objects.create(
             process=self, workflow_instance=wfi
         )
-        first_step = self.step_set.filter(start=True)[0]
+        first_step = self.steps.filter(start=True)[0]
         si = StepInstance.objects.create(step=first_step, process_instance=pi)
         pi.current_step_instance = si
         pi.save()
@@ -430,7 +430,9 @@ class Step(models.Model):
     def __str__(self):
         return f"{self.order} - {self.name}"
 
-    process = models.ForeignKey(Process, on_delete=models.CASCADE)
+    process = models.ForeignKey(
+        Process, related_name="steps", on_delete=models.CASCADE
+    )
     order = models.IntegerField(
         help_text=_("Display order in admin Process detail"), default=0
     )
@@ -468,9 +470,9 @@ class Step(models.Model):
     # TODO: These checks are not working with StepInline readonly_fields
     # def clean(self):
     #     # A process can only have one start and one end step
-    #     if self.start and self.process.step_set.filter(start=True).count() > 1:
+    #     if self.start and self.process.steps.filter(start=True).count() > 1:
     #         raise ValidationError("A process can't have more than one start step.")
-    #     if self.end and self.process.step_set.filter(end=True).count() > 1:
+    #     if self.end and self.process.steps.filter(end=True).count() > 1:
     #         raise ValidationError("A process can't have more than one end step.")
         
     #     # TODO: Implement check for infinite loops?
@@ -598,15 +600,7 @@ class WorkflowInstance(HasTimeStampsMixin):
     )
     active = models.BooleanField(default=True)
     complete = models.BooleanField(default=False)
-
-    @property
-    def percent_complete(self):
-        pis = self.processinstance_set.all()
-        total_steps = sum([pi.total_steps for pi in pis])
-        if total_steps == 0:
-            return 0
-        complete_steps = sum([pi.complete_steps for pi in pis])
-        return int((complete_steps / total_steps) * 100)
+    percent_complete = models.IntegerField(default=0)
     
     @property
     def employee_name(self):
@@ -639,6 +633,16 @@ class WorkflowInstance(HasTimeStampsMixin):
         if self.transition:
             self.transition.delete()
         super().delete(*args, **kwargs)
+    
+    def update_percent_complete(self):
+        pis = self.processinstance_set.all()
+        total_steps = sum([pi.total_steps for pi in pis])
+        if total_steps == 0:
+            self.percent_complete = 0
+        else:
+            complete_steps = sum([pi.complete_steps for pi in pis])
+            self.percent_complete = int((complete_steps / total_steps) * 100)
+        self.save()
 
 
 class ProcessInstance(HasTimeStampsMixin):
@@ -656,21 +660,7 @@ class ProcessInstance(HasTimeStampsMixin):
         "workflows.StepInstance", blank=True, null=True,
         on_delete=models.SET_NULL
     )
-
-    @property
-    def percent_complete(self):
-        if not self.current_step_instance:
-            return 100
-        else:
-            num_steps_before = self.current_step_instance.step.num_steps_before
-            num_steps_after = self.current_step_instance.step.num_steps_after
-            # Add the steps before, the current step, and the steps after, but
-            # subtract one because the final step is the "complete" step and
-            # cannot be completed.
-            total_steps = num_steps_before + 1 + num_steps_after - 1
-            if total_steps == 0:
-                return 0
-            return int((num_steps_before / total_steps) * 100)
+    percent_complete = models.IntegerField(default=0)
 
     @property
     def total_steps(self):
@@ -689,6 +679,22 @@ class ProcessInstance(HasTimeStampsMixin):
             # TODO: This should not happen; maybe log an error
             return False
         return self.current_step_instance.employee_action_required(employee)
+
+    def update_percent_complete(self):
+        if not self.current_step_instance:
+            self.percent_complete = 100
+        else:
+            num_steps_before = self.current_step_instance.step.num_steps_before
+            num_steps_after = self.current_step_instance.step.num_steps_after
+            # Add the steps before, the current step, and the steps after, but
+            # subtract one because the final step is the "complete" step and
+            # cannot be completed.
+            total_steps = num_steps_before + 1 + num_steps_after - 1
+            if total_steps == 0:
+                self.percent_complete = 0
+            else:
+                self.percent_complete = int((num_steps_before / total_steps) * 100)
+        self.save()
 
 
 class StepInstance(HasTimeStampsMixin):

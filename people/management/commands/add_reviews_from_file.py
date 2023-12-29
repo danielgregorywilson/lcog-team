@@ -35,9 +35,9 @@ class Command(BaseCommand):
                 ]:
                     continue
                 if row[0]:
-                    # Check review rows for the previous employee
+                    # Create any new reviews for the previous employee
                     if len(employee_review_rows):
-                        self.check_review_rows(employee_review_rows, employee)
+                        self.process_review_rows(employee_review_rows, employee)
 
                     # Start a new employee section
                     try:
@@ -59,7 +59,10 @@ class Command(BaseCommand):
         
         self.stdout.write(self.style.SUCCESS('Successfully imported reviews.'))
 
-    def check_review_rows(self, rows, employee):
+    def process_review_rows(self, rows, employee):
+        '''
+        Creates a review for the employee based on the most recent review in the rows
+        '''
         # Get the most recent review
         filtered_rows = filter(lambda row: row[4] != '' and row[9] != '', rows) # Remove rows without a date
         sorted_rows = sorted(filtered_rows, key=lambda row: datetime.datetime.strptime(row[9], '%m/%d/%Y'))
@@ -69,7 +72,7 @@ class Command(BaseCommand):
         review_date = datetime.datetime.strptime(most_recent_row[4], '%m/%d/%Y')
         next_review_date = datetime.datetime.strptime(most_recent_row[9], '%m/%d/%Y')
         try:   
-            existing_reviews = PerformanceReview.objects.filter(employee=employee).exists()
+            existing_reviews = PerformanceReview.objects.filter(employee=employee, period_start_date=review_date).exists()
             if not existing_reviews:
                 # review_range = next_review_date - review_date
                 if len(rows) > 1:

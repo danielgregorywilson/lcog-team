@@ -14,8 +14,8 @@ from mainsite.helpers import (
 from mainsite.models import ActiveManager, SecurityMessage
 
 
-# SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE = 60
-SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE = 360
+SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE = 60
+# SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE = 360
 
 
 class Division(models.Model):

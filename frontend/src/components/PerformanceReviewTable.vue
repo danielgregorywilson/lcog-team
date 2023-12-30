@@ -8,20 +8,6 @@
       :no-data-label="noDataLabel()"
       row-key="name"
     >
-      <!-- Slots for header cells: Shrink the width when the screen is too
-        small to see the whole table width -->
-      <template v-slot:header-cell-employeeName="props">
-        <th v-if="$q.screen.lt.lg" style="white-space: normal;">
-          {{props.col.label}}
-        </th>
-        <th v-else>{{props.col.label}}</th>
-      </template>
-      <template v-slot:header-cell-daysUntilReview="props">
-        <th v-if="$q.screen.lt.lg" style="white-space: normal;">
-          {{props.col.label}}
-        </th>
-        <th v-else>{{props.col.label}}</th>
-      </template>
       <!-- Slots for body cells: Show dates in a familiar format; make sure
         status can wrap, and display action buttons -->
       <template v-slot:body-cell-performancePeriod="props">
@@ -179,23 +165,27 @@ const { bus } = useEventBus()
 const performanceReviewStore = usePerformanceReviewStore()
 
 function performanceReviews(): Array<PerformanceReviewRetrieve> {
+  let prs = []
   if (props.signature) {
     if (props.actionRequired) {
-      return performanceReviewStore.allSignaturePerformanceReviewsActionRequired
+      prs = performanceReviewStore.allSignaturePerformanceReviewsActionRequired
       // return this.$store.getters['performanceReviewModule/allSignaturePerformanceReviewsActionRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
     } else {
-      return performanceReviewStore.allSignaturePerformanceReviewsActionNotRequired
+      prs = performanceReviewStore.allSignaturePerformanceReviewsActionNotRequired
       // return this.$store.getters['performanceReviewModule/allSignaturePerformanceReviewsActionNotRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
     }
   } else {
     if (props.actionRequired) {
-      return performanceReviewStore.allPerformanceReviewsActionRequired
+      prs = performanceReviewStore.allPerformanceReviewsActionRequired
       // return this.$store.getters['performanceReviewModule/allPerformanceReviewsActionRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
     } else {
-      return performanceReviewStore.allPerformanceReviewsActionNotRequired
+      prs = performanceReviewStore.allPerformanceReviewsActionNotRequired
       // return this.$store.getters['performanceReviewModule/allPerformanceReviewsActionNotRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
     }
   }
+  return prs.sort((a, b) => {
+    return a.days_until_review - b.days_until_review
+  })
 }
 
 function columns(): QTableProps['columns'] {
@@ -203,17 +193,17 @@ function columns(): QTableProps['columns'] {
     return [
       { name: 'employeeName', label: 'Employee', align: 'center', field: 'employee_name', sortable: true },
       { name: 'managerName', label: 'Manager', align: 'center', field: 'manager_name', sortable: true },
-      { name: 'performancePeriod', align: 'center', label: 'Performance Period', field: 'performance_period', sortable: true },
+      { name: 'performancePeriod', align: 'center', label: 'Performance Period', field: 'performance_period' },
       { name: 'daysUntilReview', align: 'center', label: 'Days Until Review', field: 'days_until_review', sortable: true },
-      { name: 'status', align: 'center', label: 'Status', field: 'status' },
+      { name: 'status', align: 'center', label: 'Status', field: 'status', sortable: true },
       { name: 'actions', label: 'Actions', align: 'around', },
     ]
   } else {
     return [
       { name: 'employeeName', label: 'Employee', align: 'center', field: 'employee_name', sortable: true },
-      { name: 'performancePeriod', align: 'center', label: 'Performance Period', field: 'performance_period', sortable: true },
+      { name: 'performancePeriod', align: 'center', label: 'Performance Period', field: 'performance_period' },
       { name: 'daysUntilReview', align: 'center', label: 'Days Until Review', field: 'days_until_review', sortable: true },
-      { name: 'status', align: 'center', label: 'Status', field: 'status' },
+      { name: 'status', align: 'center', label: 'Status', field: 'status', sortable: true },
       { name: 'actions', label: 'Actions', align: 'around', },
     ]
   }

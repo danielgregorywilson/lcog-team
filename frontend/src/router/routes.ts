@@ -61,9 +61,15 @@ const routes: RouteRecordRaw[] = [
       /////////////
       {
         path: '/profile',
+        name: 'my-profile',
+        component: () => import('src/pages/MyProfile.vue'),
+        meta: { requiresAuth: true }
+      },
+      {
+        path: 'profile/:pk',
         name: 'profile',
         component: () => import('src/pages/Profile.vue'),
-        meta: { requiresAuth: true }
+        meta: { requiresAuth: true, requiresManager: true }
       },
 
       /////////////////////////

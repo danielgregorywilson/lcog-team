@@ -50,12 +50,12 @@ export const usePeopleStore = defineStore('people', {
       })
     },
     // Simple detail of one employee
-    getSimpleEmployeeDetail(data: {pk: number}) {
+    getSimpleEmployeeDetail(data: {pk: number}): Promise<EmployeeRetrieve> {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/employee/${ data.pk }/simple_detail`})
           .then(resp => {
-            this.simpleEmployeeDetail = resp.data
-            resolve('Got simple employee detail')
+            this.simpleEmployeeDetail = resp.data as SimpleEmployeeRetrieve
+            resolve(resp.data)
           })
           .catch(e => {
             handlePromiseError(reject, 'Error getting simple employee detail', e)

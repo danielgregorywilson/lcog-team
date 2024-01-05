@@ -23,6 +23,7 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
       Array<PerformanceReviewRetrieve>,
     allSignaturePerformanceReviewsActionNotRequired: [] as
       Array<PerformanceReviewRetrieve>,
+    allEmployeePerformanceReviews: [] as Array<PerformanceReviewRetrieve>,
     allReviewNotes: [] as Array<ReviewNoteRetrieve>
   }),
 
@@ -155,6 +156,23 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
           .catch(e => {
             handlePromiseError(
               reject, 'Error getting all signature PRs action not required', e
+            )
+          })
+      })
+    },
+
+    getAllEmployeePerformanceReviews(employeePk: number) {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/performancereview?employee=${ employeePk }`
+        })
+          .then(resp => {
+            this.allEmployeePerformanceReviews = resp.data.results
+            resolve(resp)
+          })
+          .catch(e => {
+            handlePromiseError(
+              reject, 'Error getting all employee performance reviews', e
             )
           })
       })

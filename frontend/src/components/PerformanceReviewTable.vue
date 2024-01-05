@@ -10,6 +10,19 @@
     >
       <!-- Slots for body cells: Show dates in a familiar format; make sure
         status can wrap, and display action buttons -->
+      <template v-slot:body-cell-employeeName="props">
+        <q-td key="employeeName" :props="props">
+          <q-btn
+            @click="navigateToEmployeeDetail(props)"
+            class="employee-name"
+            flat
+            rounded
+            no-caps
+          >
+            {{ props.row.employee_name }}
+          </q-btn>
+        </q-td>
+      </template>
       <template v-slot:body-cell-performancePeriod="props">
         <q-td key="performancePeriod" :props="props">
           {{ readableDate(props.row.period_start_date) }} -
@@ -77,11 +90,29 @@
                   <div class="q-table__grid-item-title">{{ col.label }}</div>
                   <div
                     class="q-table__grid-item-value"
-                    v-if="col.label != 'Actions'"
+                    v-if="col.label == 'Employee'"
                   >
-                    {{ col.value }}
+                    <q-btn
+                      @click="navigateToEmployeeDetail(props)"
+                      class="employee-name"
+                      padding="none"
+                      flat
+                      no-caps
+                    >
+                      {{ col.value }}
+                    </q-btn>
                   </div>
-                  <div class="q-table__grid-item-value row q-gutter-sm" v-else>
+                  <div
+                    class="q-table__grid-item-value"
+                    v-else-if="col.label == 'Performance Period'"
+                  >
+                    {{ readableDate(props.row.period_start_date) }} -
+                    {{ readableDate(props.row.period_end_date) }}
+                  </div>
+                  <div
+                    class="q-table__grid-item-value row q-gutter-sm"
+                    v-else-if="col.label == 'Actions'"
+                  >
                     <q-btn
                       class="col edit-button"
                       dense
@@ -118,6 +149,12 @@
                         Print Signed Position Description
                       </q-tooltip>
                     </q-btn>
+                  </div>
+                  <div
+                    class="q-table__grid-item-value"
+                    v-else
+                  >
+                    {{ col.value }}
                   </div>
                 </div>
               </q-item>
@@ -157,7 +194,9 @@ interface QuasarPerformanceReviewTableRowClickActionProps {
 
 const props = defineProps<{
   signature?: boolean,
-  actionRequired: boolean
+  actionRequired?: boolean,
+  employee?: boolean,
+  pk?: number
 }>()
 
 const router = useRouter()
@@ -166,21 +205,23 @@ const performanceReviewStore = usePerformanceReviewStore()
 
 function performanceReviews(): Array<PerformanceReviewRetrieve> {
   let prs = []
-  if (props.signature) {
+  if (props.employee) {
+    if (props.pk) {
+      prs = performanceReviewStore.allEmployeePerformanceReviews
+    } else {
+      prs = []
+    }
+  } else if (props.signature) {
     if (props.actionRequired) {
       prs = performanceReviewStore.allSignaturePerformanceReviewsActionRequired
-      // return this.$store.getters['performanceReviewModule/allSignaturePerformanceReviewsActionRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
     } else {
       prs = performanceReviewStore.allSignaturePerformanceReviewsActionNotRequired
-      // return this.$store.getters['performanceReviewModule/allSignaturePerformanceReviewsActionNotRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
     }
   } else {
     if (props.actionRequired) {
       prs = performanceReviewStore.allPerformanceReviewsActionRequired
-      // return this.$store.getters['performanceReviewModule/allPerformanceReviewsActionRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
     } else {
       prs = performanceReviewStore.allPerformanceReviewsActionNotRequired
-      // return this.$store.getters['performanceReviewModule/allPerformanceReviewsActionNotRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
     }
   }
   return prs.sort((a, b) => {
@@ -218,6 +259,10 @@ function noDataLabel(): string {
 }
 
 function retrievePerformanceReviews(): void {
+  if (props.employee && props.pk) {
+    performanceReviewStore.getAllEmployeePerformanceReviews(props.pk)
+  }
+  
   if (props.signature) {
     if (props.actionRequired) {
       performanceReviewStore.getAllSignaturePerformanceReviewsActionRequired()
@@ -255,15 +300,22 @@ function retrievePerformanceReviews(): void {
   }
 }
 
+function navigateToEmployeeDetail(props: QuasarPerformanceReviewTableRowClickActionProps): void {
+  router.push({ name: 'profile', params: { pk: props.row.employee_pk } })
+    .catch(e => {
+      console.error('Error navigating to employee PRs:', e)
+    })
+}
+
 function editEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {
-  router.push(`pr/${ props.row.pk }`)
+  router.push({ name: 'pr-details', params: { pk: props.row.pk } })
     .catch(e => {
       console.error('Error navigating to PR detail:', e)
     })
 }
 
 function printEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {
-  router.push(`print/pr/${ props.row.pk }`)
+  router.push({ name: 'pr-print', params: { pk: props.row.pk } })
     .catch(e => {
       console.error('Error printing PR:', e)
     })

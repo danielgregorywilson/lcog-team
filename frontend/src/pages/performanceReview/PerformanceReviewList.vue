@@ -3,19 +3,6 @@
     <div class="q-py-md" v-if="isManager()">
       <div class="row items-center q-mb-md">
         <q-avatar
-          icon="insert_chart_outlined"
-          color="primary"
-          text-color="white"
-          font-size="32px"
-          class="q-mr-sm"
-        />
-        <div class="text-h4">Review Notes</div>
-      </div>
-      <ReviewNoteTable />
-    </div>
-    <div class="q-py-md" v-if="isManager()">
-      <div class="row items-center q-mb-md">
-        <q-avatar
           icon="assignment_ind"
           color="primary"
           text-color="white"
@@ -47,6 +34,19 @@
         <PerformanceReviewTable :signature="true" :actionRequired="true" />
       <div class="text-h6">Signed</div>
         <PerformanceReviewTable :signature="true" :actionRequired="false" />
+    </div>
+    <div class="q-py-md" v-if="isManager()">
+      <div class="row items-center q-mb-md">
+        <q-avatar
+          icon="insert_chart_outlined"
+          color="primary"
+          text-color="white"
+          font-size="32px"
+          class="q-mr-sm"
+        />
+        <div class="text-h4">Review Notes</div>
+      </div>
+      <ReviewNoteTable />
     </div>
   </q-page>
 </template>

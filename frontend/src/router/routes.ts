@@ -71,6 +71,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('src/pages/Profile.vue'),
         meta: { requiresAuth: true, requiresManager: true }
       },
+      {
+        path: 'organization',
+        name: 'organization',
+        component: () => import('src/pages/Organization.vue'),
+        meta: { requiresAuth: true, requiresManager: true }
+      },
 
       /////////////////////////
       // PERFORMANCE REVIEWS //

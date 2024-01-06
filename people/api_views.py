@@ -162,6 +162,16 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         serializer = SimpleEmployeeSerializer(employees, many=True)
         return Response(serializer.data)
 
+    # A simple list of the current user's direct reports
+    @action(detail=False, methods=['get'])
+    def direct_reports(self, request):
+        employees = Employee.active_objects.filter(
+            manager=self.request.user.employee
+        )
+        import pdb; pdb.set_trace()
+        serializer = SimpleEmployeeSerializer(employees, many=True)
+        return Response(serializer.data)
+
     # A simple list of employee emails for populating dropdowns
     @action(detail=False, methods=['get'])
     def email_list(self, request):

@@ -10,6 +10,7 @@ import {
 export const usePeopleStore = defineStore('people', {
   state: () => ({
     simpleEmployeeList: [] as Array<SimpleEmployeeRetrieve>,
+    directReports: [] as Array<EmployeeRetrieve>,
     simpleEmployeeDetail: { pk: -1, name: '' } as SimpleEmployeeRetrieve,
     employeeEmailList: [] as Array<string>,
     titleList: [] as Array<Title>,
@@ -25,6 +26,25 @@ export const usePeopleStore = defineStore('people', {
         axios({ url: `${ apiURL }api/v1/employee/simple_list`})
           .then(resp => {
             this.simpleEmployeeList = resp.data.sort((a: SimpleEmployeeRetrieve, b: SimpleEmployeeRetrieve) => {
+              if (a.name < b.name) return -1
+              if (a.name > b.name) return 1
+              return 0
+            })
+            resolve('Successfully got simple employee list')
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error getting simple employee list', e)
+          })
+      })
+    },
+    // Simple list of all direct reports of current user
+    getDirectReports() {
+      debugger
+      return new Promise((resolve, reject) => {
+        debugger
+        axios({ url: `${ apiURL }api/v1/employee/direct_reports`})
+          .then(resp => {
+            this.directReports = resp.data.sort((a: SimpleEmployeeRetrieve, b: SimpleEmployeeRetrieve) => {
               if (a.name < b.name) return -1
               if (a.name > b.name) return 1
               return 0

@@ -125,12 +125,14 @@ const navLinks: Array<LinkData> = [
     title: 'Time Off',
     icon: 'schedule',
     link: '/timeoff',
+    id: 'nav-timeoff',
     isISEmployee: true
   },
   {
     title: 'Responsibilities',
     icon: 'hardware',
     link: '/responsibilities',
+    id: 'nav-responsibilities',
     isISEmployee: true
   },
   {
@@ -143,12 +145,14 @@ const navLinks: Array<LinkData> = [
     title: 'Credit Card Expenses',
     icon: 'credit_card',
     link: '/expenses/my',
+    id: 'nav-my-expenses',
     canViewExpenses: true
   },
   {
     title: 'Credit Card Expense Reports',
     icon: 'request_quote',
     link: '/expenses/review',
+    id: 'nav-expense-reports',
     isFiscalEmployee: true
   },
   {
@@ -161,12 +165,14 @@ const navLinks: Array<LinkData> = [
   {
     title: 'Schaefers Desk Reservation',
     icon: 'laptop',
-    link: '/desk-reservation/schaefers/1'
+    link: '/desk-reservation/schaefers/1',
+    id: 'nav-schaefers-desk-reservation',
   },
   {
     title: 'Meals on Wheels Map',
     icon: 'map',
     link: '/mow-map',
+    id: 'nav-mow',
     canViewMOWRoutes: true
   },
   // {
@@ -185,6 +191,12 @@ const navLinks: Array<LinkData> = [
   //   icon: 'security',
   //   link: '/security-message'
   // },
+  {
+    title: 'Organization',
+    icon: 'diversity_3',
+    link: '/organization',
+    id: 'nav-organization'
+  },
   {
     title: 'My Profile',
     icon: 'person',

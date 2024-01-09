@@ -29,6 +29,15 @@
           {{ readableDate(props.row.period_end_date) }}
         </q-td>
       </template>
+      <template v-slot:body-cell-daysUntilReview="props">
+        <q-td
+          key="daysUntilReview"
+          :props="props"
+          :class="lateReviewClass(props.value)"
+        >
+          {{props.value}}
+        </q-td>
+      </template>
       <template v-slot:body-cell-status="props">
         <q-td style="white-space: normal;" :props="props">
           {{ props.row.status }}
@@ -283,6 +292,16 @@ function columns(): QTableProps['columns'] {
       },
       { name: 'actions', label: 'Actions', align: 'around', },
     ]
+  }
+}
+
+function lateReviewClass(daysUntilReview: number): string {
+  if (daysUntilReview < 0) {
+    return 'bg-negative text-white'
+  } else if (daysUntilReview < 7) {
+    return 'bg-warning text-black'
+  } else {
+    return 'bg-white text-black'
   }
 }
 

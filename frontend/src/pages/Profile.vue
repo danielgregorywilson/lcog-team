@@ -7,12 +7,18 @@
       <div>Title: {{ peopleStore.fullEmployeeDetail.title }}</div>
     </div>
     <div>
-      <div class="text-h5 q-mb-sm">Direct Reports</div>
-      <EmployeeTable :pk=pk() />
-      <div class="text-h5 q-mb-sm">Performance Reviews</div>
-      <PerformanceReviewTable :employee="true" :pk=pk() />
-      <div class="text-h5 q-mb-sm">Managed Performance Reviews</div>
-      <PerformanceReviewTable :manager="true" :pk=pk() />
+      <div class="q-mb-md">
+        <div class="text-h5 q-mb-sm">Direct Reports</div>
+        <EmployeeTable :pk=pk() />
+      </div>
+      <div class="q-mb-md">
+        <div class="text-h5 q-mb-sm">Performance Reviews</div>
+        <PerformanceReviewTable :employee="true" :pk=pk() />
+      </div>
+      <div class="q-mb-md">
+        <div class="text-h5 q-mb-sm">Managed Performance Reviews</div>
+        <PerformanceReviewTable :manager="true" :pk=pk() />
+      </div>
     </div>
   </q-page>
 </template>

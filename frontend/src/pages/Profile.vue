@@ -11,6 +11,8 @@
       <EmployeeTable :pk=pk() />
       <div class="text-h5 q-mb-sm">Performance Reviews</div>
       <PerformanceReviewTable :employee="true" :pk=pk() />
+      <div class="text-h5 q-mb-sm">Managed Performance Reviews</div>
+      <PerformanceReviewTable :manager="true" :pk=pk() />
     </div>
   </q-page>
 </template>

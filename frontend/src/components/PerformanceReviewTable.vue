@@ -179,7 +179,7 @@
 
 <script setup lang="ts">
 import { QTable, QTableProps } from 'quasar'
-import { onMounted, watch } from 'vue'
+import { onMounted, onUpdated, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import useEventBus from 'src/eventBus'
@@ -193,21 +193,30 @@ interface QuasarPerformanceReviewTableRowClickActionProps {
 }
 
 const props = defineProps<{
+  pk: number
   signature?: boolean,
   actionRequired?: boolean,
   employee?: boolean,
-  pk?: number
+  manager?: boolean,
 }>()
 
 const router = useRouter()
 const { bus } = useEventBus()
 const performanceReviewStore = usePerformanceReviewStore()
 
+let lastPk = ref(-1)
+
 function performanceReviews(): Array<PerformanceReviewRetrieve> {
   let prs = []
   if (props.employee) {
     if (props.pk) {
       prs = performanceReviewStore.allEmployeePerformanceReviews
+    } else {
+      prs = []
+    }
+  } else if (props.manager) {
+    if (props.pk) {
+      prs = performanceReviewStore.allManagerPerformanceReviews
     } else {
       prs = []
     }
@@ -286,8 +295,17 @@ function noDataLabel(): string {
 }
 
 function retrievePerformanceReviews(): void {
+  // Only get PRs if we haven't done it before
+  if (props.pk == lastPk.value) {
+    return
+  }
+  lastPk.value = props.pk
+
   if (props.employee && props.pk) {
     performanceReviewStore.getAllEmployeePerformanceReviews(props.pk)
+  }
+  if (props.manager && props.pk) {
+    performanceReviewStore.getAllManagerPerformanceReviews(props.pk)
   }
   
   if (props.signature) {
@@ -364,6 +382,10 @@ function printEvaluationPositionDescription(
 
 watch(() => bus.value.get('updateTeleworkApplicationTables'), () => {
   retrievePerformanceReviews()
+})
+
+onUpdated(() => {
+  retrievePerformanceReviews();
 })
 
 onMounted(() => {

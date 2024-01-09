@@ -222,6 +222,7 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
                 queryset = PerformanceReview.objects.all()
             else:
                 employee = self.request.query_params.get('employee', None)
+                manager = self.request.query_params.get('manager', None)
                 signature = self.request.query_params.get('signature', None)
                 action_required = self.request.query_params.get(
                     'action_required', None
@@ -230,6 +231,11 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
                     # All PRs for a given employee
                     queryset = PerformanceReview.objects.filter(
                         employee__pk=int(employee)
+                    )
+                elif manager is not None:
+                    # All PRs managed by a given employee
+                    queryset = PerformanceReview.objects.filter(
+                        employee__manager__pk=int(manager)
                     )
                 elif is_true_string(signature):
                     if action_required is not None:

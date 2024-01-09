@@ -232,19 +232,46 @@ function performanceReviews(): Array<PerformanceReviewRetrieve> {
 function columns(): QTableProps['columns'] {
   if (props.signature) {
     return [
-      { name: 'employeeName', label: 'Employee', align: 'center', field: 'employee_name', sortable: true },
-      { name: 'managerName', label: 'Manager', align: 'center', field: 'manager_name', sortable: true },
-      { name: 'performancePeriod', align: 'center', label: 'Performance Period', field: 'performance_period' },
-      { name: 'daysUntilReview', align: 'center', label: 'Days Until Review', field: 'days_until_review', sortable: true },
-      { name: 'status', align: 'center', label: 'Status', field: 'status', sortable: true },
+      {
+        name: 'employeeName', label: 'Employee', align: 'center',
+        field: 'employee_name', sortable: true
+      },
+      {
+        name: 'managerName', label: 'Manager', align: 'center',
+        field: 'manager_name', sortable: true
+      },
+      {
+        name: 'performancePeriod', align: 'center', label: 'Performance Period',
+        field: 'performance_period'
+      },
+      {
+        name: 'daysUntilReview', align: 'center', label: 'Days Until Review',
+        field: 'days_until_review', sortable: true
+      },
+      {
+        name: 'status', align: 'center', label: 'Status', field: 'status',
+        sortable: true
+      },
       { name: 'actions', label: 'Actions', align: 'around', },
     ]
   } else {
     return [
-      { name: 'employeeName', label: 'Employee', align: 'center', field: 'employee_name', sortable: true },
-      { name: 'performancePeriod', align: 'center', label: 'Performance Period', field: 'performance_period' },
-      { name: 'daysUntilReview', align: 'center', label: 'Days Until Review', field: 'days_until_review', sortable: true },
-      { name: 'status', align: 'center', label: 'Status', field: 'status', sortable: true },
+      {
+        name: 'employeeName', label: 'Employee', align: 'center',
+        field: 'employee_name', sortable: true
+      },
+      {
+        name: 'performancePeriod', align: 'center', label: 'Performance Period',
+        field: 'performance_period'
+      },
+      {
+        name: 'daysUntilReview', align: 'center', label: 'Days Until Review',
+        field: 'days_until_review', sortable: true
+      },
+      {
+        name: 'status', align: 'center', label: 'Status', field: 'status',
+        sortable: true
+      },
       { name: 'actions', label: 'Actions', align: 'around', },
     ]
   }
@@ -273,10 +300,12 @@ function retrievePerformanceReviews(): void {
           )
         })
     } else {
-      performanceReviewStore.getAllSignaturePerformanceReviewsActionNotRequired()
+      performanceReviewStore
+        .getAllSignaturePerformanceReviewsActionNotRequired()
         .catch(e => {
           console.error(
-            'Error retrieving getAllSignaturePerformanceReviewsActionNotRequired:',
+            'Error retrieving',
+            'getAllSignaturePerformanceReviewsActionNotRequired:',
             e
           )
         })
@@ -300,28 +329,36 @@ function retrievePerformanceReviews(): void {
   }
 }
 
-function navigateToEmployeeDetail(props: QuasarPerformanceReviewTableRowClickActionProps): void {
+function navigateToEmployeeDetail(
+  props: QuasarPerformanceReviewTableRowClickActionProps
+): void {
   router.push({ name: 'profile', params: { pk: props.row.employee_pk } })
     .catch(e => {
       console.error('Error navigating to employee PRs:', e)
     })
 }
 
-function editEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {
+function editEvaluation(
+  props: QuasarPerformanceReviewTableRowClickActionProps
+): void {
   router.push({ name: 'pr-details', params: { pk: props.row.pk } })
     .catch(e => {
       console.error('Error navigating to PR detail:', e)
     })
 }
 
-function printEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {
+function printEvaluation(
+  props: QuasarPerformanceReviewTableRowClickActionProps
+): void {
   router.push({ name: 'pr-print', params: { pk: props.row.pk } })
     .catch(e => {
       console.error('Error printing PR:', e)
     })
 }
 
-function printEvaluationPositionDescription(props: QuasarPerformanceReviewTableRowClickActionProps): void {
+function printEvaluationPositionDescription(
+  props: QuasarPerformanceReviewTableRowClickActionProps
+): void {
   window.location.href = props.row.signed_position_description
 }
 

@@ -33,11 +33,13 @@
 
 <script setup lang="ts">
 import { Notify } from 'quasar'
-import { onMounted, ref, Ref } from 'vue'
+import { onMounted, ref, Ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
+import useEventBus from 'src/eventBus'
 import { usePeopleStore } from 'src/stores/people'
 import { usePerformanceReviewStore } from 'src/stores/performancereview'
+import { useUserStore } from 'src/stores/user'
 
 interface EmployeeOption {
   label: string;
@@ -45,15 +47,17 @@ interface EmployeeOption {
 }
 
 const router = useRouter()
+const { bus } = useEventBus()
 const peopleStore = usePeopleStore()
 const performanceReviewStore = usePerformanceReviewStore()
+const userStore = useUserStore()
 
 let options = ref([]) as Ref<Array<EmployeeOption>>
 let employee = ref({label: '', pk: -1}) as Ref<EmployeeOption>
 let note = ref('')
 
 function getOptions(): void {
-  peopleStore.getDirectReports()
+  peopleStore.getDirectReports(userStore.getEmployeeProfile.employee_pk)
     .then((employees) => {
       options.value = employees.map(obj => {
         return {label: obj.name, pk: obj.pk}
@@ -93,7 +97,13 @@ function createReviewNote(): void {
     })
 }
 
+watch(() => bus.value.get('gotUserProfile'), () => {
+  getOptions()
+})
+
 onMounted(() => {
-  getOptions();
+  if (userStore.isProfileLoaded) {
+    getOptions()
+  }
 })
 </script>

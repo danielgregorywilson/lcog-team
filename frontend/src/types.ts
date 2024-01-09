@@ -25,9 +25,11 @@ export interface EmployeeRetrieve {
   url: string
   pk: number
   name: string
+  legal_name: string
   user: Url
   username: string
   email: string
+  title: string
   manager: Url
   division: string
   is_manager: boolean

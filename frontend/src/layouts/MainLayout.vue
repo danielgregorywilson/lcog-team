@@ -91,18 +91,21 @@
 </template>
 
 <script setup lang="ts">
+import { Configuration } from 'electron-builder'
 import { UserAgentApplication } from 'msal'
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+import NavLink from 'components/NavLink.vue'
+import useEventBus from 'src/eventBus'
 import { useAuthStore } from 'src/stores/auth'
 import { useUserStore } from 'src/stores/user'
 import { getCurrentUser } from 'src/utils'
-import { Configuration } from 'electron-builder'
-import NavLink from 'components/NavLink.vue'
-import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
 const userStore = useUserStore()
 const router = useRouter()
+const bus = useEventBus()
 
 let leftDrawerOpen = ref(false)
 
@@ -267,7 +270,9 @@ function logout() {
 }
 
 onMounted(() => {
-  getCurrentUser()
+  getCurrentUser().then(() => {
+    bus.emit('gotUserProfile', Math.random())
+  })
 })
 
 </script>

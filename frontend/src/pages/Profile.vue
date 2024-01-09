@@ -1,12 +1,14 @@
 <template>
   <q-page class="q-pa-md">
-    <div class="text-h4 q-mb-md">Employee Profile</div>
+    <div class="text-h4 q-mb-md">{{ peopleStore.fullEmployeeDetail.name }}</div>
     <div class="q-mb-md">
       <div class="text-h5 q-mb-sm">Basic Info</div>
-      <div>Legal Name: {{ employeeLegalName() }}</div>
-      <div>Display Name: {{ employeeName() }}</div>
+      <div>Legal Name: {{ peopleStore.fullEmployeeDetail.legal_name }}</div>
+      <div>Title: {{ peopleStore.fullEmployeeDetail.title }}</div>
     </div>
     <div>
+      <div class="text-h5 q-mb-sm">Direct Reports</div>
+      <EmployeeTable :pk=pk() />
       <div class="text-h5 q-mb-sm">Performance Reviews</div>
       <PerformanceReviewTable :employee="true" :pk=pk() />
     </div>
@@ -18,16 +20,15 @@
 </style>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, onUpdated } from 'vue'
 import { useRoute } from 'vue-router';
 
+import EmployeeTable from 'src/components/EmployeeTable.vue'
 import PerformanceReviewTable from 'src/components/PerformanceReviewTable.vue'
-import { useUserStore } from 'src/stores/user'
 import { usePeopleStore } from 'src/stores/people'
 import { EmployeeRetrieve } from 'src/types'
 
 const peopleStore = usePeopleStore()
-const userStore = useUserStore()
 const route = useRoute()
 
 function pk(): number {
@@ -38,18 +39,10 @@ function pk(): number {
   }
 }
 
-function employeeName(): string {
-  return peopleStore.simpleEmployeeDetail.name
-}
-
-function employeeLegalName(): string {
-  return peopleStore.simpleEmployeeDetail.legal_name
-}
-
 function retrieveProfile(): Promise<EmployeeRetrieve> {
   return new Promise((resolve, reject) => {
 
-    peopleStore.getSimpleEmployeeDetail({pk: pk()})
+    peopleStore.getFullEmployeeDetail({pk: pk()})
       .then((employee) => {
         resolve(employee)
       })
@@ -59,7 +52,11 @@ function retrieveProfile(): Promise<EmployeeRetrieve> {
   })
 }
 
-onMounted(() => { 
+onMounted(() => {
+  retrieveProfile()
+})
+
+onUpdated(() => {
   retrieveProfile()
 })
 </script>

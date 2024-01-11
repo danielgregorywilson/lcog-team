@@ -644,46 +644,39 @@
       <u>II. Employee's Successes</u>
     </h5>
     <div
-      v-if="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
-      class="read-only-text-area"
-    >
-      {{ evaluationSuccesses}}
-    </div>
-    <q-input
+      v-if="!currentUserIsManagerOfEmployee() || employeeHasSigned() || props.print"
+      class="read-only-text-area" v-html="evaluationSuccesses"
+    ></div>
+    <q-editor
       v-else
-      input-class="evaluation-successes"
       v-model="evaluationSuccesses"
-      type="textarea"
+      :toolbar="editorToolbar"
     />
 
     <h5 class="text-uppercase text-bold q-my-md" id="evaluation-opportunities">
       <u>III. Opportunities for Growth</u>
     </h5>
     <div
-      v-if="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
-      class="read-only-text-area"
-    >
-      {{ evaluationOpportunities}}
-    </div>
-    <q-input
+      v-if="!currentUserIsManagerOfEmployee() || employeeHasSigned() || props.print"
+      class="read-only-text-area" v-html="evaluationOpportunities"
+    ></div>
+    <q-editor
       v-else
       v-model="evaluationOpportunities"
-      type="textarea"
+      :toolbar="editorToolbar"
     />
 
     <h5 class="text-uppercase text-bold q-my-md" id="evaluation-goals">
       <u>IV. Goals for the Coming Year</u>
     </h5>
     <div
-      v-if="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
-      class="read-only-text-area"
-    >
-      {{ evaluationGoalsManager}}
-    </div>
-    <q-input
+      v-if="!currentUserIsManagerOfEmployee() || employeeHasSigned() || props.print"
+      class="read-only-text-area" v-html="evaluationGoalsManager"
+    ></div>
+    <q-editor
       v-else
       v-model="evaluationGoalsManager"
-      type="textarea"
+      :toolbar="editorToolbar"
     />
 
     <!-- <h5 class="text-uppercase">V. Goals for the Coming Year (Employee)</h5>
@@ -699,16 +692,13 @@
       (e.g. self-evaluation and goals)
     </h5>
     <div
-      v-if="!currentUserIsEmployee() || employeeHasSigned()"
-      class="read-only-text-area"
-    >
-      {{ evaluationCommentsEmployee}}
-    </div>
-    <q-input
+      v-if="!currentUserIsEmployee() || employeeHasSigned() || props.print"
+      class="read-only-text-area" v-html="evaluationCommentsEmployee"
+    ></div>
+    <q-editor
       v-else
-      input-class="evaluation-comments-employee"
       v-model="evaluationCommentsEmployee"
-      type="textarea"
+      :toolbar="editorToolbar"
     />
     <q-btn
       v-if="currentUserIsEmployee() && !employeeHasSigned()"
@@ -1159,7 +1149,7 @@
 </style>
 
 <script setup lang="ts">
-import { date as quasarDate, scroll } from 'quasar'
+import { date as quasarDate, scroll, useQuasar } from 'quasar'
 import { onMounted, ref, Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -1171,6 +1161,7 @@ import { PRSignatures, ReviewNoteRetrieve } from 'src/types'
 import { getRoutePk } from 'src/utils'
 
 
+const $q = useQuasar()
 const route = useRoute()
 const router = useRouter()
 const performanceReviewStore = usePerformanceReviewStore()
@@ -1257,6 +1248,22 @@ let errorDialogPosition: Ref<PositionType> = ref('standard')
 let showPRSignedAndCompleteDialog = ref(false)
 
 let reviewNotes = ref([]) as Ref<Array<ReviewNoteRetrieve>>
+
+let editorToolbar = [
+  [
+    {
+      label: $q.lang.editor.align,
+      icon: $q.iconSet.editor.align,
+      fixedLabel: true,
+      options: ['left', 'center', 'right', 'justify']
+    }
+  ],
+  ['bold', 'italic', 'underline', 'removeFormat'],
+  ['hr', 'link'],
+  ['fullscreen'],
+  ['quote', 'unordered', 'ordered', 'outdent', 'indent'],
+  ['undo', 'redo']
+]
 
 function currentUserPk(): number {
   return userStore.getEmployeeProfile.employee_pk

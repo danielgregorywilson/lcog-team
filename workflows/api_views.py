@@ -403,6 +403,11 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             else:
                 t.transition_date = None
 
+            if 'system_change_date' in request.data:
+                t.system_change_date = request.data['system_change_date']
+            else:
+                t.system_change_date = None
+
             t.lwop = request.data['lwop']
             t.lwop_details = request.data['lwop_details']
             t.preliminary_hire = request.data['preliminary_hire']

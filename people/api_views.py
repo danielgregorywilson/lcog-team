@@ -112,12 +112,17 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             if user.is_staff:
                 queryset = Employee.objects.all()
             else:
-                # Filter to just direct reports, or else them and all their descendants
-                direct_reports = self.request.query_params.get('direct-reports', None)
+                # Filter to just direct reports, or else them and all their
+                # descendants
+                direct_reports = self.request.query_params.get(
+                    'direct-reports', None
+                )
                 if direct_reports is not None and direct_reports == "True":
                     queryset = Employee.objects.filter(manager__user=user)
                 else:
-                    queryset = user.employee.get_direct_reports_descendants(include_self=True)
+                    queryset = user.employee.get_direct_reports_descendants(
+                        include_self=True
+                    )
         else:
             queryset = Employee.objects.none()
         return queryset
@@ -129,9 +134,15 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         employee = Employee.objects.get(pk=pk)
         employee.display_name = request.data['display_name']
         employee.email_opt_out_all = request.data['email_opt_out_all']
-        employee.email_opt_out_timeoff_all = request.data['email_opt_out_timeoff_all']
-        employee.email_opt_out_timeoff_weekly = request.data['email_opt_out_timeoff_weekly']
-        employee.email_opt_out_timeoff_daily = request.data['email_opt_out_timeoff_daily']
+        employee.email_opt_out_timeoff_all = request.data[
+            'email_opt_out_timeoff_all'
+        ]
+        employee.email_opt_out_timeoff_weekly = request.data[
+            'email_opt_out_timeoff_weekly'
+        ]
+        employee.email_opt_out_timeoff_daily = request.data[
+            'email_opt_out_timeoff_daily'
+        ]
         employee.save()
         serialized_employee = EmployeeSerializer(employee,
              context={'request': request})
@@ -148,6 +159,15 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def simple_list(self, request):
         employees = Employee.active_objects.all()
+        serializer = SimpleEmployeeSerializer(employees, many=True)
+        return Response(serializer.data)
+
+    # A simple list of a user's direct reports
+    @action(detail=True, methods=['get'])
+    def direct_reports(self, request, pk):
+        employees = Employee.active_objects.filter(
+            manager__pk=pk
+        )
         serializer = SimpleEmployeeSerializer(employees, many=True)
         return Response(serializer.data)
 
@@ -181,7 +201,9 @@ class PerformanceReviewPermission(BasePermission):
             if request.method in SAFE_METHODS:
                 return True
             # Write permissions are only allowed to the owners of the PR.
-            return request.user in [obj.employee.manager.user, obj.employee.user]
+            return request.user in [
+                obj.employee.manager.user, obj.employee.user
+            ]
 
 
 class PerformanceReviewViewSet(viewsets.ModelViewSet):
@@ -199,26 +221,54 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
             if user.is_staff:
                 queryset = PerformanceReview.objects.all()
             else:
+                employee = self.request.query_params.get('employee', None)
+                manager = self.request.query_params.get('manager', None)
                 signature = self.request.query_params.get('signature', None)
-                action_required = self.request.query_params.get('action_required',
-                    None)
-                if is_true_string(signature):
+                action_required = self.request.query_params.get(
+                    'action_required', None
+                )
+                if employee is not None:
+                    # All PRs for a given employee
+                    queryset = PerformanceReview.objects.filter(
+                        employee__pk=int(employee)
+                    )
+                elif manager is not None:
+                    # All PRs managed by a given employee
+                    queryset = PerformanceReview.objects.filter(
+                        employee__manager__pk=int(manager)
+                    )
+                elif is_true_string(signature):
                     if action_required is not None:
                         if is_true_string(action_required):
-                            queryset = PerformanceReview.signature_upcoming_reviews_action_required.get_queryset(user)
+                            # Signature and action required
+                            queryset = PerformanceReview\
+                                .signature_upcoming_reviews_action_required\
+                                .get_queryset(user)
                         else:
-                            queryset = PerformanceReview.signature_upcoming_reviews_no_action_required.get_queryset(user)    
+                            # Signature and no action required
+                            queryset = PerformanceReview\
+                                .signature_upcoming_reviews_no_action_required\
+                                .get_queryset(user)    
                     else:
-                        queryset = PerformanceReview.signature_all_relevant_upcoming_reviews.get_queryset(user)
+                        # Signature required
+                        queryset = PerformanceReview\
+                            .signature_all_relevant_upcoming_reviews\
+                            .get_queryset(user)
                 elif action_required is not None:
                     if is_true_string(action_required):
-                        queryset = PerformanceReview.manager_upcoming_reviews_action_required.get_queryset(user)
+                        queryset = PerformanceReview\
+                            .manager_upcoming_reviews_action_required\
+                            .get_queryset(user)
                     else:
-                        queryset = PerformanceReview.manager_upcoming_reviews_no_action_required.get_queryset(user)
+                        queryset = PerformanceReview\
+                            .manager_upcoming_reviews_no_action_required\
+                            .get_queryset(user)
                 else:
-                    manager_prs = PerformanceReview.objects.filter( # PRs for which the current user is the manager
+                    # PRs for which the current user is the manager
+                    manager_prs = PerformanceReview.objects.filter(
                         employee__manager__user=user)
-                    employee_prs = PerformanceReview.objects.filter( # PRs for the current user
+                    # PRs for the current user
+                    employee_prs = PerformanceReview.objects.filter(
                         employee__user=user)
                     queryset = manager_prs | employee_prs # Default queryset
         else:
@@ -322,13 +372,17 @@ class TeleworkApplicationFileUploadViewSet(viewsets.ViewSet):
 
     def list(self, request):
         queryset = TeleworkApplication.objects.all()
-        serializer = TeleworkApplicationFileUploadSerializer(queryset, many=True, context={'request': request})
+        serializer = TeleworkApplicationFileUploadSerializer(
+            queryset, many=True, context={'request': request}
+        )
         return Response(serializer.data)
     
     def retrieve(self, request, pk=None):
         queryset = TeleworkApplication.objects.all()
         application = get_object_or_404(queryset, pk=pk)
-        serializer = TeleworkApplicationFileUploadSerializer(application, context={'request': request})
+        serializer = TeleworkApplicationFileUploadSerializer(
+            application, context={'request': request}
+        )
         return Response(serializer.data)
     
     def create(self, request):
@@ -344,7 +398,12 @@ class TeleworkApplicationFileUploadViewSet(viewsets.ViewSet):
             return Response(data="Invalid application PK", status=400)
         application.dependent_care_documentation = file_upload
         application.save()
-        return Response(data=request.build_absolute_uri(application.dependent_care_documentation.url), status=200)
+        return Response(
+            data=request.build_absolute_uri(
+                application.dependent_care_documentation.url
+            ),
+            status=200
+        )
 
 
 class SignatureViewSet(viewsets.ModelViewSet):
@@ -360,7 +419,8 @@ class SignatureViewSet(viewsets.ModelViewSet):
         This view should return a list of all signatures made by this user.
         """
         user = self.request.user
-        # TODO: Don't do this. There is an issue where the detail view doesn't have the user
+        # TODO: Don't do this.
+        # TODO: There is an issue where the detail view doesn't have the user
         if user.is_anonymous:
             return Signature.objects.all()
         else:
@@ -380,11 +440,19 @@ class SignatureViewSet(viewsets.ModelViewSet):
 
         # Send notification to next manager in the chain
         if pr.status == PerformanceReview.EVALUATION_WRITTEN:
-            pr_employee_has_signed = Signature.objects.filter(review=pr, employee=pr.employee).count()
-            pr_manager_has_signed = Signature.objects.filter(review=pr, employee=pr.employee.manager).count()
+            pr_employee_has_signed = Signature.objects.filter(
+                review=pr, employee=pr.employee
+            ).count()
+            pr_manager_has_signed = Signature.objects.filter(
+                review=pr, employee=pr.employee.manager
+            ).count()
             if pr_employee_has_signed and pr_manager_has_signed:
-                # If the PR manager is the division director, mark as approved now that both manager and employee have signed
-                if pr.employee.manager.is_division_director or employee.is_division_director:
+                # If the PR manager is the division director, mark as approved
+                # now that both manager and employee have signed
+                if (
+                    pr.employee.manager.is_division_director or \
+                        employee.is_division_director
+                ):
                     pr.status = PerformanceReview.EVALUATION_APPROVED
                     pr.save()
                 if pr.employee.manager.is_hr_manager or employee.is_hr_manager:
@@ -398,7 +466,8 @@ class SignatureViewSet(viewsets.ModelViewSet):
             if employee.is_hr_manager:
                 pr.status = PerformanceReview.EVALUATION_HR_PROCESSED
                 pr.save()
-                # Send notification to next manager in the chain (executive director)
+                # Send notification to next manager in the chain
+                # (executive director)
                 send_signature_email_to_executive_director(pr)
         elif pr.status == PerformanceReview.EVALUATION_HR_PROCESSED:
             if employee.is_executive_director:
@@ -421,10 +490,12 @@ class ReviewNoteViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        This view should return a list of all review notes written by this user.
+        This view should return a list of all review notes written by this
+        user.
         """
         user = self.request.user
-        # TODO: Don't do this. There is an issue where the detail view doesn't have the user
+        # TODO: Don't do this.
+        # There is an issue where the detail view doesn't have the user
         if user.is_anonymous:
             return ReviewNote.objects.all()
         else:
@@ -472,8 +543,13 @@ class ViewedSecurityMessageViewSet(viewsets.ModelViewSet):
     def employee_viewed_latest_security_message(self, request):
         if not SecurityMessage.objects.count():
             return Response(False)
-        latest_security_message = SecurityMessage.objects.filter(active=True).latest()
-        viewed_security_message = ViewedSecurityMessage.objects.filter(employee=request.user.employee, security_message=latest_security_message)
+        latest_security_message = SecurityMessage.objects.filter(
+            active=True
+        ).latest()
+        viewed_security_message = ViewedSecurityMessage.objects.filter(
+            employee=request.user.employee,
+            security_message=latest_security_message
+        )
         if viewed_security_message.count():
             return Response(True)
         else:
@@ -481,7 +557,10 @@ class ViewedSecurityMessageViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['get'])
     def employee_viewed_security_message(self, request, pk=None):
-        viewed_security_message = ViewedSecurityMessage.objects.filter(employee=request.user.employee, security_message=pk)
+        viewed_security_message = ViewedSecurityMessage.objects.filter(
+            employee=request.user.employee,
+            security_message=pk
+        )
         if viewed_security_message.count():
             return Response(True)
         else:
@@ -490,10 +569,13 @@ class ViewedSecurityMessageViewSet(viewsets.ModelViewSet):
     def create(self, request):
         security_message = SecurityMessage.objects.latest()
         employee = Employee.objects.get(pk=request.data['employee_pk'])
-        viewed_security_message = ViewedSecurityMessage.objects.create(security_message=security_message, employee=employee)
+        viewed_security_message = ViewedSecurityMessage.objects.create(
+            security_message=security_message, employee=employee
+        )
         
-        serialized_object = ViewedSecurityMessageSerializer(viewed_security_message,
-            context={'request': request})
+        serialized_object = ViewedSecurityMessageSerializer(
+            viewed_security_message, context={'request': request}
+        )
         return Response(serialized_object.data)
 
 
@@ -512,7 +594,9 @@ class TeleworkApplicationPermission(BasePermission):
             if request.method in SAFE_METHODS:
                 return True
             # Write permissions are only allowed to the owners of the PR.
-            return request.user in [obj.employee.manager.user, obj.employee.user]
+            return request.user in [
+                obj.employee.manager.user, obj.employee.user
+            ]
 
 
 class TeleworkApplicationViewSet(viewsets.ModelViewSet):
@@ -536,12 +620,18 @@ class TeleworkApplicationViewSet(viewsets.ModelViewSet):
                     employee__user=user)
                 queryset = manager_prs | employee_prs # Default queryset
                 if hasattr(user, 'employee'):
-                    signature = self.request.query_params.get('signature', None)
+                    signature = self.request.query_params.get(
+                        'signature', None
+                    )
                     if signature is not None:
                         if is_true_string(signature):
-                            queryset = TeleworkApplication.applications_signature_required.get_queryset(user)
+                            queryset = TeleworkApplication\
+                                .applications_signature_required\
+                                .get_queryset(user)
                         else:
-                            queryset = TeleworkApplication.applications_signature_not_required.get_queryset(user)
+                            queryset = TeleworkApplication\
+                                .applications_signature_not_required\
+                                .get_queryset(user)
                     else:
                         # Use default queryset
                         pass
@@ -559,7 +649,9 @@ class TeleworkApplicationViewSet(viewsets.ModelViewSet):
                 application = TeleworkApplication.objects.get(employee__pk=pk)
             except TeleworkApplication.DoesNotExist:
                 employee = Employee.objects.get(pk=pk)
-                application = TeleworkApplication.objects.create(employee=employee)
+                application = TeleworkApplication.objects.create(
+                    employee=employee
+                )
         else:
             queryset = TeleworkApplication.objects.all()
             application = get_object_or_404(queryset, pk=pk)
@@ -570,7 +662,8 @@ class TeleworkApplicationViewSet(viewsets.ModelViewSet):
     def update(self, request, pk=None):
         application = TeleworkApplication.objects.get(pk=pk)
         application.date = request.data['date']
-        application.program_manager_approve = request.data['program_manager_approve']
+        application.program_manager_approve = \
+            request.data['program_manager_approve']
         application.hours_onsite = request.data['hours_onsite']
         application.telework_location = request.data['telework_location']
         application.hours_working = request.data['hours_working']
@@ -578,36 +671,64 @@ class TeleworkApplicationViewSet(viewsets.ModelViewSet):
         application.communication_when = request.data['communication_when']
         application.communication_time = request.data['communication_time']
         application.communication_how = request.data['communication_how']
-        application.equipment_provided_phone = request.data['equipment_provided_phone']
-        application.equipment_provided_laptop = request.data['equipment_provided_laptop']
-        application.equipment_provided_desktop = request.data['equipment_provided_desktop']
-        application.equipment_provided_monitor = request.data['equipment_provided_monitor']
-        application.equipment_provided_access = request.data['equipment_provided_access']
-        application.equipment_provided_other = request.data['equipment_provided_other']
-        application.equipment_provided_other_value = request.data['equipment_provided_other_value']
-        application.workspace_checklist_1 = request.data['workspace_checklist_1']
-        application.workspace_checklist_2 = request.data['workspace_checklist_2']
-        application.workspace_checklist_3 = request.data['workspace_checklist_3']
-        application.workspace_checklist_4 = request.data['workspace_checklist_4']
-        application.workspace_checklist_5 = request.data['workspace_checklist_5']
-        application.workspace_checklist_6 = request.data['workspace_checklist_6']
-        application.workspace_checklist_7 = request.data['workspace_checklist_7']
-        application.workspace_checklist_8 = request.data['workspace_checklist_8']
-        application.workspace_checklist_9 = request.data['workspace_checklist_9']
-        application.workspace_checklist_10 = request.data['workspace_checklist_10']
-        application.workspace_checklist_11 = request.data['workspace_checklist_11']
-        application.workspace_checklist_12 = request.data['workspace_checklist_12']
-        application.emergency_checklist_1 = request.data['emergency_checklist_1']
-        application.emergency_checklist_2 = request.data['emergency_checklist_2']
-        application.emergency_checklist_3 = request.data['emergency_checklist_3']
-        application.ergonomics_checklist_1 = request.data['ergonomics_checklist_1']
-        application.ergonomics_checklist_2 = request.data['ergonomics_checklist_2']
-        application.ergonomics_checklist_3 = request.data['ergonomics_checklist_3']
-        application.ergonomics_checklist_4 = request.data['ergonomics_checklist_4']
-        application.ergonomics_checklist_5 = request.data['ergonomics_checklist_5']
+        application.equipment_provided_phone = \
+            request.data['equipment_provided_phone']
+        application.equipment_provided_laptop = \
+            request.data['equipment_provided_laptop']
+        application.equipment_provided_desktop = \
+            request.data['equipment_provided_desktop']
+        application.equipment_provided_monitor = \
+            request.data['equipment_provided_monitor']
+        application.equipment_provided_access = \
+            request.data['equipment_provided_access']
+        application.equipment_provided_other = \
+            request.data['equipment_provided_other']
+        application.equipment_provided_other_value = \
+            request.data['equipment_provided_other_value']
+        application.workspace_checklist_1 = \
+            request.data['workspace_checklist_1']
+        application.workspace_checklist_2 = \
+            request.data['workspace_checklist_2']
+        application.workspace_checklist_3 = \
+            request.data['workspace_checklist_3']
+        application.workspace_checklist_4 = \
+            request.data['workspace_checklist_4']
+        application.workspace_checklist_5 = \
+            request.data['workspace_checklist_5']
+        application.workspace_checklist_6 = \
+            request.data['workspace_checklist_6']
+        application.workspace_checklist_7 = \
+            request.data['workspace_checklist_7']
+        application.workspace_checklist_8 = \
+            request.data['workspace_checklist_8']
+        application.workspace_checklist_9 = \
+            request.data['workspace_checklist_9']
+        application.workspace_checklist_10 = \
+            request.data['workspace_checklist_10']
+        application.workspace_checklist_11 = \
+            request.data['workspace_checklist_11']
+        application.workspace_checklist_12 = \
+            request.data['workspace_checklist_12']
+        application.emergency_checklist_1 = \
+            request.data['emergency_checklist_1']
+        application.emergency_checklist_2 = \
+            request.data['emergency_checklist_2']
+        application.emergency_checklist_3 = \
+            request.data['emergency_checklist_3']
+        application.ergonomics_checklist_1 = \
+            request.data['ergonomics_checklist_1']
+        application.ergonomics_checklist_2 = \
+            request.data['ergonomics_checklist_2']
+        application.ergonomics_checklist_3 = \
+            request.data['ergonomics_checklist_3']
+        application.ergonomics_checklist_4 = \
+            request.data['ergonomics_checklist_4']
+        application.ergonomics_checklist_5 = \
+            request.data['ergonomics_checklist_5']
         application.teleworker_comments = request.data['teleworker_comments']
         application.manager_comments = request.data['manager_comments']
-        application.dependent_care_checklist_1 = request.data['dependent_care_checklist_1']
+        application.dependent_care_checklist_1 = \
+            request.data['dependent_care_checklist_1']
 
         application.save()
         serialized_application = TeleworkApplicationSerializer(application,
@@ -641,21 +762,36 @@ class TeleworkSignatureViewSet(viewsets.ModelViewSet):
         This view should return a list of all signatures made by this user.
         """
         user = self.request.user
-        # TODO: Don't do this. There is an issue where the detail view doesn't have the user
+        # TODO: Don't do this.
+        # There is an issue where the detail view doesn't have the user
         if user.is_anonymous:
             return TeleworkSignature.objects.all()
         else:
             return TeleworkSignature.objects.filter(employee__user=user)
     
     def create(self, request):
-        application = TeleworkApplication.objects.get(pk=request.data['application_pk'])
+        application = TeleworkApplication.objects.get(
+            pk=request.data['application_pk']
+        )
         employee = Employee.objects.get(pk=request.data['employee_pk'])
-        new_signature = TeleworkSignature.objects.create(application=application, employee=employee, index=request.data['index'])
+        new_signature = TeleworkSignature.objects.create(
+            application=application,
+            employee=employee,
+            index=request.data['index']
+        )
         
         # Send notification to next manager in the chain
-        # pr_employee_has_signed = Signature.objects.filter(employee=pr.employee).count() == 1
-        # pr_manager_has_signed = Signature.objects.filter(employee=pr.employee.manager).count() == 1
-        # if pr_employee_has_signed and pr_manager_has_signed and pr.status == PerformanceReview.EVALUATION_WRITTEN:
+        # pr_employee_has_signed = Signature.objects.filter(
+        #     employee=pr.employee
+        # ).count() == 1
+        # pr_manager_has_signed = Signature.objects.filter(
+        #     employee=pr.employee.manager
+        # ).count() == 1
+        # if all(
+        #     pr_employee_has_signed,
+        #     pr_manager_has_signed,
+        #     pr.status == PerformanceReview.EVALUATION_WRITTEN
+        # ):
         #     if employee == pr.employee:
         #         send_signature_email_to_manager(employee.manager.manager, pr)
         #     else:

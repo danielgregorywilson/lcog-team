@@ -249,6 +249,24 @@
         :readonly="!canEditOtherFields()"
       />
     </div>
+    <div class="row q-my-sm" v-if="['Change/Modify'].indexOf(type) != -1">
+      <q-checkbox
+        id="system-change-date-different"
+        v-model="systemChangeDateDifferent"
+        label="System changes date different from transition date"
+        class="q-mr-md"
+        :disable="!canEditOtherFields()"
+      />
+      <q-date
+        id="system-change-date"
+        v-model="systemChangeDate"
+        v-if="systemChangeDateDifferent"
+        landscape
+        mask="YYYY-MM-DD HH:mm"
+        class="q-mr-md"
+        :readonly="!canEditOtherFields()"
+      />
+    </div>
     <div class="row q-my-sm" v-if="['New', 'Return'].indexOf(type) != -1">
       <q-checkbox
         id="lwop"
@@ -1075,6 +1093,9 @@ let unitCurrentVal = ref(emptyUnit)
 let unit = ref(emptyUnit)
 let transitionDateCurrentVal = ref(null) as Ref<string | null>
 let transitionDate = ref(null) as Ref<string | null>
+let systemChangeDateDifferent = ref(false)
+let systemChangeDateCurrentVal = ref(null) as Ref<string | null>
+let systemChangeDate = ref(null) as Ref<string | null>
 let lwopCurrentVal = ref(false)
 let lwop = ref(false)
 let lwopDetailsCurrentVal = ref('')
@@ -1254,6 +1275,13 @@ function retrieveEmployeeTransition() {
       transitionDate.value = t.transition_date.replace('T', ' ')
     }
     transitionDateCurrentVal.value = transitionDate.value
+    if (t.system_change_date === null) {
+      systemChangeDate.value = null
+    } else {
+      systemChangeDate.value = t.system_change_date.replace('T', ' ')
+      systemChangeDateDifferent.value = true
+    }
+    systemChangeDateCurrentVal.value = systemChangeDate.value
     lwop.value = t.lwop
     lwopCurrentVal.value = lwop.value
     lwopDetails.value = t.lwop_details
@@ -1354,6 +1382,19 @@ function valuesAreChanged(): boolean {
         Date.parse(transitionDateCurrentVal.value)
       )
     ) &&
+    (
+      // If both dates are null, they are the same
+      (
+        systemChangeDate.value == null &&
+        systemChangeDateCurrentVal.value == null
+      ) ||
+      // If both dates are not null, compare them as dates
+      (
+        !!systemChangeDate.value && !!systemChangeDateCurrentVal.value &&
+        Date.parse(systemChangeDate.value) ==
+        Date.parse(systemChangeDateCurrentVal.value)
+      )
+    ) &&
     lwop.value == lwopCurrentVal.value &&
     lwopDetails.value == lwopDetailsCurrentVal.value &&
     preliminaryHire.value == preliminaryHireCurrentVal.value &&
@@ -1415,6 +1456,11 @@ function updateTransition() {
       transitionDateFromForm = new Date(transitionDate.value)
     }
 
+    let systemChangeDateFromForm: Date | undefined = undefined
+    if (systemChangeDate.value) {
+      systemChangeDateFromForm = new Date(systemChangeDate.value)
+    }
+
     // Mark for sending notifications
     let gasPINNotificationNeeded = false
     if (gasPINNeededCurrentVal.value == false && gasPINNeeded.value == true) {
@@ -1441,6 +1487,7 @@ function updateTransition() {
       manager_pk: manager.value.pk,
       unit_pk: unit.value.pk,
       transition_date: transitionDateFromForm,
+      system_change_date: systemChangeDateFromForm,
       lwop: lwop.value,
       lwop_details: lwopDetails.value,
       preliminary_hire: preliminaryHire.value,
@@ -1496,6 +1543,7 @@ function updateTransition() {
       }
       unitCurrentVal.value = {pk: t.unit_pk, name: t.unit_name}
       transitionDateCurrentVal.value = t.transition_date
+      systemChangeDateCurrentVal.value = t.system_change_date
       lwopCurrentVal.value = t.lwop
       lwopDetailsCurrentVal.value = t.lwop_details
       preliminaryHireCurrentVal.value = t.preliminary_hire

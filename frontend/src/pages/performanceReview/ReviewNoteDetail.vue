@@ -33,6 +33,7 @@ import { onMounted, ref, Ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { usePeopleStore } from 'src/stores/people'
+import { useUserStore } from 'src/stores/user'
 import { usePerformanceReviewStore } from 'src/stores/performancereview'
 import { getRoutePk } from 'src/utils'
 
@@ -44,6 +45,7 @@ interface EmployeeOption {
 const route = useRoute()
 const peopleStore = usePeopleStore()
 const performanceReviewStore = usePerformanceReviewStore()
+const userStore = useUserStore()
 
 const notePk = ref('')
 let options = ref([]) as Ref<Array<EmployeeOption>>
@@ -53,7 +55,7 @@ let note = ref('')
 let noteCurrentVal = ref('')
 
 function getOptions(): void {
-  peopleStore.getDirectReports()
+  peopleStore.getDirectReports(userStore.getEmployeeProfile.employee_pk)
     .then((employees) => {
       options.value = employees.map(obj => {
         return {label: obj.name, pk: obj.pk}

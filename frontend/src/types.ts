@@ -25,9 +25,11 @@ export interface EmployeeRetrieve {
   url: string
   pk: number
   name: string
+  legal_name: string
   user: Url
   username: string
   email: string
+  title: string
   manager: Url
   division: string
   is_manager: boolean
@@ -747,6 +749,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   unit_pk: number
   unit_name: string
   transition_date: string
+  system_change_date: string
   lwop: boolean
   lwop_details: string
   preliminary_hire: boolean
@@ -795,6 +798,7 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   manager_pk?: number
   unit_pk?: number
   transition_date?: Date
+  system_change_date?: Date
   lwop?: boolean
   lwop_details?: string
   preliminary_hire?: boolean

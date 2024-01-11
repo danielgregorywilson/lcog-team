@@ -18,7 +18,6 @@ import { useTimeOffStore } from 'src/stores/timeoff'
 import { useWorkflowsStore } from 'src/stores/workflows'
 
 const timeOffStore = useTimeOffStore()
-const workflowsStore = useWorkflowsStore()
 
 onMounted(() => {
   // workflowsStore.getWorkflows({archived: false, complete: false})

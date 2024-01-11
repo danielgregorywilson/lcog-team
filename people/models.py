@@ -658,7 +658,7 @@ class PerformanceReview(models.Model):
 
     step_increase = models.CharField(_("step increase"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
     top_step_bonus = models.CharField(_("top step bonus"), max_length=1, choices=NULLABLE_BOOLEAN_CHOICE, blank=True, null=True)
-    action_other = models.CharField(_("action other"), max_length=255, blank=True, null=True)
+    action_other = models.CharField(_("action other"), max_length=255, blank=True)
     
     factor_job_knowledge = models.CharField(_("job knowledge"), max_length=2, choices=PERFORMANCE_FACTOR_CHOICE, blank=True, null=True)
     factor_work_quality = models.CharField(_("quality of work"), max_length=2, choices=PERFORMANCE_FACTOR_CHOICE, blank=True, null=True)
@@ -673,11 +673,11 @@ class PerformanceReview(models.Model):
     factor_management = models.CharField(_("project management"), max_length=2, choices=PERFORMANCE_FACTOR_CHOICE, blank=True, null=True)
     factor_supervision = models.CharField(_("supervision"), max_length=2, choices=PERFORMANCE_FACTOR_CHOICE, blank=True, null=True)
 
-    evaluation_successes = models.TextField(_("employee's successes"), blank=True, null=True)
-    evaluation_opportunities = models.TextField(_("opportunities for growth"), blank=True, null=True)
-    evaluation_goals_manager = models.TextField(_("goals for the coming year (manager)"), blank=True, null=True)
-    evaluation_goals_employee = models.TextField(_("goals for the coming year (employee)"), blank=True, null=True)
-    evaluation_comments_employee = models.TextField(_("employee comments"), blank=True, null=True)
+    evaluation_successes = models.TextField(_("employee's successes"), blank=True)
+    evaluation_opportunities = models.TextField(_("opportunities for growth"), blank=True)
+    evaluation_goals_manager = models.TextField(_("goals for the coming year (manager)"), blank=True)
+    evaluation_goals_employee = models.TextField(_("goals for the coming year (employee)"), blank=True)
+    evaluation_comments_employee = models.TextField(_("employee comments"), blank=True)
 
     description_reviewed_employee = models.BooleanField(_("position description has been reviewed with employee"), default=False)
     signed_position_description = models.FileField(_("signed position description"), upload_to="uploads/signed-position-descriptions", blank=True, null=True)

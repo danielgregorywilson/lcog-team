@@ -57,6 +57,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     name = serializers.CharField()
     username = serializers.EmailField(source='user.username')
     email = serializers.EmailField(source='user.email')
+    title = serializers.CharField(source='job_title')
     division = serializers.CharField(source='unit_or_program.division.name', default='')
     is_manager = serializers.SerializerMethodField()
     has_manager = serializers.SerializerMethodField()
@@ -77,12 +78,13 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Employee
         fields = [
-            'url', 'pk', 'name', 'user', 'username', 'email', 'manager',
-            'division', 'is_manager', 'has_manager', 'is_is_employee',
-            'is_hr_employee', 'is_sds_hiring_lead', 'is_fiscal_employee',
-            'is_eligible_for_telework_application', 'can_view_seating_charts',
-            'can_edit_seating_charts', 'can_view_desk_reservation_reports',
-            'is_upper_manager', 'is_hr_manager', 'is_executive_director',
+            'url', 'pk', 'name', 'legal_name', 'user', 'username', 'email',
+            'title', 'manager', 'division', 'is_manager', 'has_manager',
+            'is_is_employee', 'is_hr_employee', 'is_sds_hiring_lead',
+            'is_fiscal_employee', 'is_eligible_for_telework_application',
+            'can_view_seating_charts', 'can_edit_seating_charts',
+            'can_view_desk_reservation_reports', 'is_upper_manager',
+            'is_hr_manager', 'is_executive_director',
             'viewed_security_message', 'prs_can_view', 'notes_can_view',
             'telework_applications_can_view', 'time_off_requests_can_view',
             'next_to_sign_prs', 'email_opt_out_all',
@@ -195,7 +197,9 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
 class SimpleEmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        fields = ['pk', 'name', 'legal_name']
+        fields = ['pk', 'name', 'legal_name', 'title']
+
+    title = serializers.CharField(source='job_title')
 
 
 class EmployeeEmailSerializer(serializers.ModelSerializer):

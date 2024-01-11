@@ -4,6 +4,30 @@
 
 export const releases = [
   {
+    version: '0.23.0',
+    date: new Date(2024, 0, 10),
+    changes: [
+      {
+        type: 'new',
+        description: 'Organization list and employee profile views for ' +
+          'managers to view their employees\' performance reviews.'
+      },
+      {
+        type: 'new',
+        description: 'Employee transition form system change date field.'
+      },
+      {
+        type: 'improved',
+        description: 'Sort performance review tables by date of review. Color' +
+          ' when late.'
+      },
+      {
+        type: 'improved',
+        description: 'Add rich text input to performance review forms.'
+      }
+    ]
+  },
+  {
     version: '0.22.0',
     date: new Date(2023, 11, 22),
     changes: [
@@ -103,7 +127,8 @@ export const releases = [
     changes: [
       {
         type: 'fix',
-        description: 'Fix a bug where Gas PIN notifications were not being sent for employee transitions.'
+        description: 'Fix a bug where Gas PIN notifications were not being ' +
+          'sent for employee transitions.'
       }
     ]
   },
@@ -175,7 +200,8 @@ export const releases = [
       },
       {
         type: 'improved',
-        description: 'Track who has and has not viewed security messages in the admin.'
+        description: 'Track who has and has not viewed security messages in ' +
+          'the admin.'
       },
     ]
   },
@@ -195,7 +221,8 @@ export const releases = [
     changes: [
       {
         type: 'fix',
-        description: 'Fixed an issue that caused some workflow tables to never load.'
+        description: 'Fixed an issue that caused some workflow tables to ' +
+          'never load.'
       }
     ]
   },
@@ -263,7 +290,8 @@ export const releases = [
     changes: [
       {
         type: 'improved',
-        description: 'Add a button for hiring managers to send transition email to SDS hiring admins.'
+        description: 'Add a button for hiring managers to send transition ' +
+          'email to SDS hiring admins.'
       }
     ]
   },
@@ -305,7 +333,8 @@ export const releases = [
       },
       {
         type: 'improved',
-        description: 'Start transition workflow processes once a STN email is sent.'
+        description: 'Start transition workflow processes once a STN email is' +
+          ' sent.'
       },
       {
         type: 'improved',
@@ -327,15 +356,18 @@ export const releases = [
     changes: [
       {
         type: 'improved',
-        description: 'Mark if action is required for the current user to complete a workflow step.'
+        description: 'Mark if action is required for the current user to ' +
+          'complete a workflow step.'
       },
       {
         type: 'improved',
-        description: 'Workflows are now archived rather than deleted. They can be restored from the archive.'
+        description: 'Workflows are now archived rather than deleted. They ' +
+          'can be restored from the archive.'
       },
       {
         type: 'improved',
-        description: 'We no longer create process instances until the transition form is sent to Staff Transition News.'
+        description: 'We no longer create process instances until the ' +
+          'transition form is sent to Staff Transition News.'
       },
       {
         type: 'improved',
@@ -357,7 +389,8 @@ export const releases = [
     changes: [
       {
         type: 'improved',
-        description: 'Split out workflows by type in dashboard: onboarding, returning, changing, exiting.'
+        description: 'Split out workflows by type in dashboard: onboarding, ' +
+          'returning, changing, exiting.'
       }
     ]
   },
@@ -381,7 +414,8 @@ export const releases = [
     changes: [
       {
         type: 'improved',
-        description: 'Added a second language select dropdown to transition form.'
+        description: 'Added a second language select dropdown to transition ' +
+          'form.'
       },
       {
         type: 'improved',
@@ -389,7 +423,8 @@ export const releases = [
       },
       {
         type: 'fix',
-        description: 'Fix a bug where the transition form would not submit initially.'
+        description: 'Fix a bug where the transition form would not submit ' +
+          'initially.'
       }
     ]
   },
@@ -427,7 +462,8 @@ export const releases = [
       },
       {
         type: 'new',
-        description: 'Transition form function to send form to staff transition news'
+        description: 'Transition form function to send form to staff ' +
+          'transition news'
       },
       {
         type: 'improved',
@@ -457,7 +493,8 @@ export const releases = [
       },
       {
         type: 'improved',
-        description: 'When showing responsibility conflicts in the calendar, show all conflicts, not just the first one'
+        description: 'When showing responsibility conflicts in the calendar, ' +
+          'show all conflicts, not just the first one'
       },
     ]
   },
@@ -467,11 +504,13 @@ export const releases = [
     changes: [
       {
         type: 'fix',
-        description: 'Fix a bug where employee transition form could not be submitted'
+        description: 'Fix a bug where employee transition form could not be ' +
+          'submitted'
       },
       {
         type: 'improved',
-        description: 'Employee transition form improvements, including new cell phone fields'
+        description: 'Employee transition form improvements, including new ' +
+          'cell phone fields'
       },
       {
         type: 'improved',
@@ -485,11 +524,13 @@ export const releases = [
     changes: [
       {
         type: 'fix',
-        description: 'Fix a bug where an employee could reserve multiple desks for the same day'
+        description: 'Fix a bug where an employee could reserve multiple ' +
+          'desks for the same day'
       },
       {
         type: 'improved',
-        description: 'Employee transition form improvements, including new computer fields'
+        description: 'Employee transition form improvements, including new ' +
+          'computer fields'
       },
       {
         type: 'improved',
@@ -513,7 +554,8 @@ export const releases = [
     changes: [
       {
         type: 'new',
-        description: 'Rebuild the Team App in Vue 3 for better performance and maintainability'
+        description: 'Rebuild the Team App in Vue 3 for better performance ' +
+          'and maintainability'
       },
     ]
   },
@@ -523,7 +565,8 @@ export const releases = [
     changes: [
       {
         type: 'new',
-        description: 'Meals on Wheels module to track and manage delivery routes'
+        description: 'Meals on Wheels module to track and manage delivery ' +
+          'routes'
       },
       {
         type: 'improved',
@@ -537,7 +580,8 @@ export const releases = [
     changes: [
       {
         type: 'new',
-        description: 'Workflows module to facilitate and automate business processes'
+        description: 'Workflows module to facilitate and automate business ' +
+          'processes'
       },
       {
         type: 'new',
@@ -551,7 +595,8 @@ export const releases = [
     changes: [
       {
         type: 'new',
-        description: 'Time Off approvers can set temporary approvers in their stead while they are on leave'
+        description: 'Time Off approvers can set temporary approvers in their' +
+          ' stead while they are on leave'
       },
       {
         type: 'improved',
@@ -585,7 +630,8 @@ export const releases = [
     changes: [
       {
         type: 'improved',
-        description: 'Block access to desk reservation pages for non-authenticated users unless they are on the LCOG network.'
+        description: 'Block access to desk reservation pages for ' +
+          'non-authenticated users unless they are on the LCOG network.'
       },
     ]
   },
@@ -609,7 +655,8 @@ export const releases = [
     changes: [
       {
         type: 'new',
-        description: 'Manage email notification preferences on user profile screen.'
+        description: 'Manage email notification preferences on user profile ' +
+          'screen.'
       },
       {
         type: 'improved',
@@ -657,7 +704,8 @@ export const releases = [
       },
       {
         type: 'new',
-        description: 'Add time off request private notes visible only to manager.'
+        description: 'Add time off request private notes visible only to ' +
+          'manager.'
       },
     ]
   },
@@ -735,7 +783,8 @@ export const releases = [
     changes: [
       {
         type: 'new',
-        description: 'Time off requests module: request, acknowledge, calendar, weekly report.'
+        description: 'Time off requests module: request, acknowledge, ' +
+          'calendar, weekly report.'
       },
     ]
   },
@@ -779,7 +828,8 @@ export const releases = [
     changes: [
       {
         type: 'improved',
-        description: 'Add a screensaver at night to the desk reservation screens.'
+        description: 'Add a screensaver at night to the desk reservation ' +
+          'screens.'
       },
       {
         type: 'improved',
@@ -827,11 +877,13 @@ export const releases = [
     changes: [
       {
         type: 'improved',
-        description: 'Desks can now have weekly holds placed on them for certain employees.'
+        description: 'Desks can now have weekly holds placed on them for ' +
+          'certain employees.'
       },
       {
         type: 'improved',
-        description: 'Desk reservation app now blocked unless you are authenticated or on a trusted IP.'
+        description: 'Desk reservation app now blocked unless you are ' +
+          'authenticated or on a trusted IP.'
       }
     ]
   },
@@ -841,7 +893,8 @@ export const releases = [
     changes: [
       {
         type: 'improved',
-        description: 'Update floor plans processing code to be compatible with new Illustrator version changes.'
+        description: 'Update floor plans processing code to be compatible ' +
+          'with new Illustrator version changes.'
       },
       {
         type: 'improved',
@@ -855,7 +908,8 @@ export const releases = [
     changes: [
       {
         type: 'improved',
-        description: 'Adjust desk reservation app to fit better on office laptop screens.'
+        description: 'Adjust desk reservation app to fit better on office ' +
+          'laptop screens.'
       }
     ]
   },
@@ -899,11 +953,13 @@ export const releases = [
     changes: [
       {
         type: 'improved',
-        description: 'Add end time, rather than delete, desk reservations upon check out.'
+        description: 'Add end time, rather than delete, desk reservations ' +
+          'upon check out.'
       },
       {
         type: 'improved',
-        description: 'Prevent double booking of desk reservations by canceling existing reservations when a new one is made.'
+        description: 'Prevent double booking of desk reservations by ' +
+          'canceling existing reservations when a new one is made.'
       }
     ]
   },
@@ -913,7 +969,8 @@ export const releases = [
     changes: [
       {
         type: 'improved',
-        description: 'Added second and third Schaefers floors to desk reservation app'
+        description: 'Added second and third Schaefers floors to desk ' +
+          'reservation app'
       },
       {
         type: 'improved',
@@ -939,7 +996,8 @@ export const releases = [
       },
       {
         type: 'new',
-        description: 'Filter all responsibility tables by name, description, and tag'
+        description: 'Filter all responsibility tables by name, description, ' +
+          'and tag'
       },
       {
         type: 'improved',
@@ -997,7 +1055,8 @@ export const releases = [
     changes: [
       {
         type: 'improved',
-        description: 'Responsibilities module: filter employee list dropdown by typing'
+        description: 'Responsibilities module: filter employee list dropdown ' +
+          'by typing'
       }
     ]
   },

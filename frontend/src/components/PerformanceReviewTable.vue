@@ -8,26 +8,34 @@
       :no-data-label="noDataLabel()"
       row-key="name"
     >
-      <!-- Slots for header cells: Shrink the width when the screen is too
-        small to see the whole table width -->
-      <template v-slot:header-cell-employeeName="props">
-        <th v-if="$q.screen.lt.lg" style="white-space: normal;">
-          {{props.col.label}}
-        </th>
-        <th v-else>{{props.col.label}}</th>
-      </template>
-      <template v-slot:header-cell-daysUntilReview="props">
-        <th v-if="$q.screen.lt.lg" style="white-space: normal;">
-          {{props.col.label}}
-        </th>
-        <th v-else>{{props.col.label}}</th>
-      </template>
       <!-- Slots for body cells: Show dates in a familiar format; make sure
         status can wrap, and display action buttons -->
+      <template v-slot:body-cell-employeeName="props">
+        <q-td key="employeeName" :props="props">
+          <q-btn
+            @click="navigateToEmployeeDetail(props)"
+            class="employee-name"
+            flat
+            rounded
+            no-caps
+          >
+            {{ props.row.employee_name }}
+          </q-btn>
+        </q-td>
+      </template>
       <template v-slot:body-cell-performancePeriod="props">
         <q-td key="performancePeriod" :props="props">
           {{ readableDate(props.row.period_start_date) }} -
           {{ readableDate(props.row.period_end_date) }}
+        </q-td>
+      </template>
+      <template v-slot:body-cell-daysUntilReview="props">
+        <q-td
+          key="daysUntilReview"
+          :props="props"
+          :class="lateReviewClass(props.value)"
+        >
+          {{props.value}}
         </q-td>
       </template>
       <template v-slot:body-cell-status="props">
@@ -91,11 +99,29 @@
                   <div class="q-table__grid-item-title">{{ col.label }}</div>
                   <div
                     class="q-table__grid-item-value"
-                    v-if="col.label != 'Actions'"
+                    v-if="col.label == 'Employee'"
                   >
-                    {{ col.value }}
+                    <q-btn
+                      @click="navigateToEmployeeDetail(props)"
+                      class="employee-name"
+                      padding="none"
+                      flat
+                      no-caps
+                    >
+                      {{ col.value }}
+                    </q-btn>
                   </div>
-                  <div class="q-table__grid-item-value row q-gutter-sm" v-else>
+                  <div
+                    class="q-table__grid-item-value"
+                    v-else-if="col.label == 'Performance Period'"
+                  >
+                    {{ readableDate(props.row.period_start_date) }} -
+                    {{ readableDate(props.row.period_end_date) }}
+                  </div>
+                  <div
+                    class="q-table__grid-item-value row q-gutter-sm"
+                    v-else-if="col.label == 'Actions'"
+                  >
                     <q-btn
                       class="col edit-button"
                       dense
@@ -133,6 +159,12 @@
                       </q-tooltip>
                     </q-btn>
                   </div>
+                  <div
+                    class="q-table__grid-item-value"
+                    v-else
+                  >
+                    {{ col.value }}
+                  </div>
                 </div>
               </q-item>
             </q-list>
@@ -156,7 +188,7 @@
 
 <script setup lang="ts">
 import { QTable, QTableProps } from 'quasar'
-import { onMounted, watch } from 'vue'
+import { onMounted, onUpdated, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import useEventBus from 'src/eventBus'
@@ -170,52 +202,106 @@ interface QuasarPerformanceReviewTableRowClickActionProps {
 }
 
 const props = defineProps<{
+  pk: number
   signature?: boolean,
-  actionRequired: boolean
+  actionRequired?: boolean,
+  employee?: boolean,
+  manager?: boolean,
 }>()
 
 const router = useRouter()
 const { bus } = useEventBus()
 const performanceReviewStore = usePerformanceReviewStore()
 
+let lastPk = ref(-1)
+
 function performanceReviews(): Array<PerformanceReviewRetrieve> {
-  if (props.signature) {
-    if (props.actionRequired) {
-      return performanceReviewStore.allSignaturePerformanceReviewsActionRequired
-      // return this.$store.getters['performanceReviewModule/allSignaturePerformanceReviewsActionRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+  let prs = []
+  if (props.employee) {
+    if (props.pk) {
+      prs = performanceReviewStore.allEmployeePerformanceReviews
     } else {
-      return performanceReviewStore.allSignaturePerformanceReviewsActionNotRequired
-      // return this.$store.getters['performanceReviewModule/allSignaturePerformanceReviewsActionNotRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+      prs = []
+    }
+  } else if (props.manager) {
+    if (props.pk) {
+      prs = performanceReviewStore.allManagerPerformanceReviews
+    } else {
+      prs = []
+    }
+  } else if (props.signature) {
+    if (props.actionRequired) {
+      prs = performanceReviewStore.allSignaturePerformanceReviewsActionRequired
+    } else {
+      prs = performanceReviewStore.allSignaturePerformanceReviewsActionNotRequired
     }
   } else {
     if (props.actionRequired) {
-      return performanceReviewStore.allPerformanceReviewsActionRequired
-      // return this.$store.getters['performanceReviewModule/allPerformanceReviewsActionRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+      prs = performanceReviewStore.allPerformanceReviewsActionRequired
     } else {
-      return performanceReviewStore.allPerformanceReviewsActionNotRequired
-      // return this.$store.getters['performanceReviewModule/allPerformanceReviewsActionNotRequired'].results // eslint-disable-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
+      prs = performanceReviewStore.allPerformanceReviewsActionNotRequired
     }
   }
+  return prs.sort((a, b) => {
+    return a.days_until_review - b.days_until_review
+  })
 }
 
 function columns(): QTableProps['columns'] {
   if (props.signature) {
     return [
-      { name: 'employeeName', label: 'Employee', align: 'center', field: 'employee_name', sortable: true },
-      { name: 'managerName', label: 'Manager', align: 'center', field: 'manager_name', sortable: true },
-      { name: 'performancePeriod', align: 'center', label: 'Performance Period', field: 'performance_period', sortable: true },
-      { name: 'daysUntilReview', align: 'center', label: 'Days Until Review', field: 'days_until_review', sortable: true },
-      { name: 'status', align: 'center', label: 'Status', field: 'status' },
+      {
+        name: 'employeeName', label: 'Employee', align: 'center',
+        field: 'employee_name', sortable: true
+      },
+      {
+        name: 'managerName', label: 'Manager', align: 'center',
+        field: 'manager_name', sortable: true
+      },
+      {
+        name: 'performancePeriod', align: 'center', label: 'Performance Period',
+        field: 'performance_period'
+      },
+      {
+        name: 'daysUntilReview', align: 'center', label: 'Days Until Review',
+        field: 'days_until_review', sortable: true
+      },
+      {
+        name: 'status', align: 'center', label: 'Status', field: 'status',
+        sortable: true
+      },
       { name: 'actions', label: 'Actions', align: 'around', },
     ]
   } else {
     return [
-      { name: 'employeeName', label: 'Employee', align: 'center', field: 'employee_name', sortable: true },
-      { name: 'performancePeriod', align: 'center', label: 'Performance Period', field: 'performance_period', sortable: true },
-      { name: 'daysUntilReview', align: 'center', label: 'Days Until Review', field: 'days_until_review', sortable: true },
-      { name: 'status', align: 'center', label: 'Status', field: 'status' },
+      {
+        name: 'employeeName', label: 'Employee', align: 'center',
+        field: 'employee_name', sortable: true
+      },
+      {
+        name: 'performancePeriod', align: 'center', label: 'Performance Period',
+        field: 'performance_period'
+      },
+      {
+        name: 'daysUntilReview', align: 'center', label: 'Days Until Review',
+        field: 'days_until_review', sortable: true
+      },
+      {
+        name: 'status', align: 'center', label: 'Status', field: 'status',
+        sortable: true
+      },
       { name: 'actions', label: 'Actions', align: 'around', },
     ]
+  }
+}
+
+function lateReviewClass(daysUntilReview: number): string {
+  if (daysUntilReview < 0) {
+    return 'bg-negative text-white'
+  } else if (daysUntilReview < 7) {
+    return 'bg-warning text-black'
+  } else {
+    return 'bg-white text-black'
   }
 }
 
@@ -228,6 +314,19 @@ function noDataLabel(): string {
 }
 
 function retrievePerformanceReviews(): void {
+  // Only get PRs if we haven't done it before
+  if (props.pk == lastPk.value) {
+    return
+  }
+  lastPk.value = props.pk
+
+  if (props.employee && props.pk) {
+    performanceReviewStore.getAllEmployeePerformanceReviews(props.pk)
+  }
+  if (props.manager && props.pk) {
+    performanceReviewStore.getAllManagerPerformanceReviews(props.pk)
+  }
+  
   if (props.signature) {
     if (props.actionRequired) {
       performanceReviewStore.getAllSignaturePerformanceReviewsActionRequired()
@@ -238,10 +337,12 @@ function retrievePerformanceReviews(): void {
           )
         })
     } else {
-      performanceReviewStore.getAllSignaturePerformanceReviewsActionNotRequired()
+      performanceReviewStore
+        .getAllSignaturePerformanceReviewsActionNotRequired()
         .catch(e => {
           console.error(
-            'Error retrieving getAllSignaturePerformanceReviewsActionNotRequired:',
+            'Error retrieving',
+            'getAllSignaturePerformanceReviewsActionNotRequired:',
             e
           )
         })
@@ -265,26 +366,45 @@ function retrievePerformanceReviews(): void {
   }
 }
 
-function editEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {
-  router.push(`pr/${ props.row.pk }`)
+function navigateToEmployeeDetail(
+  props: QuasarPerformanceReviewTableRowClickActionProps
+): void {
+  router.push({ name: 'profile', params: { pk: props.row.employee_pk } })
+    .catch(e => {
+      console.error('Error navigating to employee PRs:', e)
+    })
+}
+
+function editEvaluation(
+  props: QuasarPerformanceReviewTableRowClickActionProps
+): void {
+  router.push({ name: 'pr-details', params: { pk: props.row.pk } })
     .catch(e => {
       console.error('Error navigating to PR detail:', e)
     })
 }
 
-function printEvaluation(props: QuasarPerformanceReviewTableRowClickActionProps): void {
-  router.push(`print/pr/${ props.row.pk }`)
+function printEvaluation(
+  props: QuasarPerformanceReviewTableRowClickActionProps
+): void {
+  router.push({ name: 'pr-print', params: { pk: props.row.pk } })
     .catch(e => {
       console.error('Error printing PR:', e)
     })
 }
 
-function printEvaluationPositionDescription(props: QuasarPerformanceReviewTableRowClickActionProps): void {
+function printEvaluationPositionDescription(
+  props: QuasarPerformanceReviewTableRowClickActionProps
+): void {
   window.location.href = props.row.signed_position_description
 }
 
 watch(() => bus.value.get('updateTeleworkApplicationTables'), () => {
   retrievePerformanceReviews()
+})
+
+onUpdated(() => {
+  retrievePerformanceReviews();
 })
 
 onMounted(() => {

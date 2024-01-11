@@ -13,7 +13,6 @@ import {
 export const usePerformanceReviewStore = defineStore('performancereview', {
   state: () => ({
     nextPerformanceReview: {} as PerformanceReviewRetrieve,
-    // performanceReview: [] as Array<Responsibility>,
     performanceReviewDetails: {} as PerformanceReviewRetrieve,
     allPerformanceReviews: [] as Array<PerformanceReviewRetrieve>,
     allPerformanceReviewsActionRequired: [] as Array<PerformanceReviewRetrieve>,
@@ -23,6 +22,8 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
       Array<PerformanceReviewRetrieve>,
     allSignaturePerformanceReviewsActionNotRequired: [] as
       Array<PerformanceReviewRetrieve>,
+    allManagerPerformanceReviews: [] as Array<PerformanceReviewRetrieve>,
+    allEmployeePerformanceReviews: [] as Array<PerformanceReviewRetrieve>,
     allReviewNotes: [] as Array<ReviewNoteRetrieve>
   }),
 
@@ -155,6 +156,42 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
           .catch(e => {
             handlePromiseError(
               reject, 'Error getting all signature PRs action not required', e
+            )
+          })
+      })
+    },
+
+    getAllManagerPerformanceReviews(managerPk: number) {
+      // Get all performance reviews (past and present) managed by an employee
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/performancereview?manager=${ managerPk }`
+        })
+          .then(resp => {
+            this.allManagerPerformanceReviews = resp.data.results
+            resolve(resp)
+          })
+          .catch(e => {
+            handlePromiseError(
+              reject, 'Error getting all managed performance reviews', e
+            )
+          })
+      })
+    },
+    
+    getAllEmployeePerformanceReviews(employeePk: number) {
+      // Get all performance reviews (past and present) for an employee
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/performancereview?employee=${ employeePk }`
+        })
+          .then(resp => {
+            this.allEmployeePerformanceReviews = resp.data.results
+            resolve(resp)
+          })
+          .catch(e => {
+            handlePromiseError(
+              reject, 'Error getting all employee performance reviews', e
             )
           })
       })

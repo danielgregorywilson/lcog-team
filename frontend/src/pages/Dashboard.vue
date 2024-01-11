@@ -52,9 +52,15 @@
         <div class="text-h4">Reviews for your Direct Reports</div>
       </div>
       <div class="text-h6">Action Required</div>
-        <PerformanceReviewTable :actionRequired="true" />
+        <PerformanceReviewTable
+          :actionRequired="true"
+          :pk="userStore.getEmployeeProfile.employee_pk"
+        />
       <div class="text-h6">No Action Required</div>
-        <PerformanceReviewTable :actionRequired="false" />
+        <PerformanceReviewTable
+          :actionRequired="false"
+          :pk="userStore.getEmployeeProfile.employee_pk"
+        />
     </div>
     <div
       class="q-py-md"
@@ -71,9 +77,17 @@
         <div class="text-h4">Reviews to Sign</div>
       </div>
       <div class="text-h6">Signature Required</div>
-        <PerformanceReviewTable :signature="true" :actionRequired="true" />
+        <PerformanceReviewTable
+          :signature="true"
+          :actionRequired="true"
+          :pk="userStore.getEmployeeProfile.employee_pk"
+        />
       <div class="text-h6">Signed</div>
-        <PerformanceReviewTable :signature="true" :actionRequired="false" />
+        <PerformanceReviewTable
+          :signature="true"
+          :actionRequired="false"
+          :pk="userStore.getEmployeeProfile.employee_pk"
+        />
     </div>
   </q-page>
 </template>

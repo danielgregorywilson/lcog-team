@@ -169,6 +169,7 @@ class EmployeeTransition(models.Model):
         UnitOrProgram, blank=True, null=True, on_delete=models.SET_NULL
     )
     transition_date = models.DateTimeField(blank=True, null=True)
+    system_change_date = models.DateTimeField(blank=True, null=True)
     lwop = models.BooleanField(default=False)
     lwop_details = models.TextField(blank=True, null=True)
     preliminary_hire = models.BooleanField(default=False)
@@ -230,6 +231,26 @@ class EmployeeTransition(models.Model):
             if field.name in ["id", "date_submitted", "submitter"]:
                 continue
             if field.name == 'transition_date' and new[field.name]:
+                original_date = original[field.name]
+                new_date = new[field.name]
+                # When coming from the form, the date is a string
+                if type(new_date) == str:
+                    new_date = datetime.strptime(
+                        new_date, '%Y-%m-%dT%H:%M:%S.%fZ'
+                    ).replace(tzinfo=timezone.utc)
+                # Strip microseconds from timestamps
+                new_date -= timedelta(microseconds=new_date.microsecond)
+                if original_date:
+                    original_date -= timedelta(
+                        microseconds=original_date.microsecond
+                    )
+                # Do not create a change record if the date has not changed
+                if original_date == new_date:
+                    continue
+                # String representation of the date
+                original_value = str(original_date)
+                new_value = str(new_date)
+            elif field.name == 'system_change_date' and new[field.name]:
                 original_date = original[field.name]
                 new_date = new[field.name]
                 # When coming from the form, the date is a string

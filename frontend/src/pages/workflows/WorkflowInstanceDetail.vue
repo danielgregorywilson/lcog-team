@@ -130,6 +130,13 @@ function canCompleteWorkflowInstance(workflowInstance: WorkflowInstance): boolea
   if (!workflowInstance.active) {
     return false
   }
+  if (
+    hasEmployeeTransition() &&
+    workflowInstance.transition.assignee !== 'Complete'
+  ) {
+    // If there is an incomplete employee transition, disallow complete/reopen
+    return false
+  }
   if (userStore.getEmployeeProfile.is_all_workflows_admin) {
     // If they are an All-Workflows-Admin, allow complete/reopen
     return true

@@ -96,7 +96,7 @@ function retrieveWorkflowInstance() {
   return new Promise((resolve, reject) => {
     const pk = getRoutePk(route)
     if (!pk) {
-      handlePromiseError(reject, 'No pk found in route params', '')
+      handlePromiseError(reject, 'No pk found in route params')
       return
     }
     workflowsStore.getCurrentWorkflowInstance(pk)

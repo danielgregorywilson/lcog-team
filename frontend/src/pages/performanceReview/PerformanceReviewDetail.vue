@@ -1153,7 +1153,7 @@
 </style>
 
 <script setup lang="ts">
-import { date as quasarDate, scroll, useQuasar } from 'quasar'
+import { scroll, useQuasar } from 'quasar'
 import { onMounted, ref, Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -1649,6 +1649,7 @@ function signPerformanceReview(): void {
     })
 }
 
+// import { date as quasarDate } from 'quasar'
 // function noWeekends(date: string): boolean {
 //   const day = quasarDate.getDayOfWeek(new Date(date))
 //   return day !== 6 && day !== 7

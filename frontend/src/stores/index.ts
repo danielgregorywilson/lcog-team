@@ -32,12 +32,22 @@ export default store((/* { ssrContext } */) => {
   return pinia
 })
 
-export function handlePromiseError(reject: (reason?: any) => void, message: string, error: AxiosError) { // eslint-disable-line @typescript-eslint/no-explicit-any
-  let reason = error.message
-  if (error.response && error.response.data && error.response.data) {
-    reason = error.response.data as string
+export function handlePromiseError(
+  reject: (reason?: any) => void, message: string, error?: AxiosError
+) {
+  let reason: string | undefined
+  if (error) {
+    reason = error.message
+    if (error.response && error.response.data && error.response.data) {
+      reason = error.response.data as string
+    }
   }
-  const errorMessage = `${ message }: ${ reason }`
+  let errorMessage: string
+  if (reason) {
+    errorMessage = `${ message }: ${ reason }`
+  } else {
+    errorMessage = message
+  }
   console.error(errorMessage)
   reject(errorMessage)
 }

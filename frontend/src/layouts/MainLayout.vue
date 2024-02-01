@@ -274,6 +274,9 @@ onMounted(() => {
   getCurrentUser().then(() => {
     bus.emit('gotUserProfile', Math.random())
   })
+  .catch(e => {
+    console.log(e)
+  })
 })
 
 </script>

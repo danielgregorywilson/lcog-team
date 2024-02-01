@@ -2,7 +2,6 @@
 <q-uploader
   ref="fileuploader"
   max-file-size="20000000"
-  url=""
   @added="file_selected"
   @rejected="rejectFileTooLarge"
   style="max-width: 300px"
@@ -13,17 +12,6 @@
         <q-uploader-add-trigger />
         <q-tooltip>Pick File</q-tooltip>
       </q-btn>
-      <q-btn
-        v-if="scope.canUpload"
-        icon="cloud_upload"
-        @click="uploadFile()"
-        round
-        dense
-        flat
-      >
-        <q-tooltip>Upload File</q-tooltip>
-      </q-btn>
-
       <q-btn
         v-if="scope.isUploading"
         icon="clear"
@@ -72,7 +60,6 @@
 import axios from 'axios'
 import { onMounted, onUpdated, ref } from 'vue'
 import { apiURL, handlePromiseError } from 'src/stores/index'
-import { emit } from 'process';
 
 let selectedFile = ref(new File([''], ''))
 let fileTooLarge = ref(false)
@@ -96,6 +83,7 @@ const emit = defineEmits<{
 
 function file_selected(files: Array<File>) {
   selectedFile.value = files[0];
+  uploadFile()
 }
 
 function rejectFileTooLarge() {

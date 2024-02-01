@@ -735,8 +735,18 @@
           Position Description has been reviewed and signed by employee and
           manager
         </div>
+        <div v-if="descriptionReviewedEmployee && uploadedPositionDescriptionUrl && !uploadingAnother">
+          <q-btn color="primary">
+            <q-icon name="description" class="q-mr-sm" />
+            <div @click="openUploadedDescription">View Signed Position Description</div>
+          </q-btn>
+          <q-btn class="q-ml-md">
+            <q-icon name="restart_alt" class="q-mr-sm" />
+            <div @click="uploadingAnother = true">Upload Another</div>
+          </q-btn>
+        </div>
         <FileUploader
-          v-if="currentUserIsManagerOfEmployee() && descriptionReviewedEmployee"
+          v-if="currentUserIsManagerOfEmployee() && descriptionReviewedEmployee && (!uploadedPositionDescriptionUrl || uploadingAnother)"
           label="Receipt"
           :file=selectedFile
           contentTypeAppLabel="people"
@@ -746,16 +756,10 @@
           v-on="{
             'uploaded': (url: string) => {
               uploadedPositionDescriptionUrl = url
+              uploadingAnother = false
             }
           }"
         />
-        <div
-          v-if="descriptionReviewedEmployee && uploadedPositionDescriptionUrl"
-        >
-          <a :href="uploadedPositionDescriptionUrl" target="_blank">
-            Current uploaded signed position description
-          </a>
-        </div>
       </div>
     </div>
 
@@ -1238,6 +1242,7 @@ let descriptionReviewedEmployeeCurrentVal = ref(false)
 let descriptionReviewedEmployee = ref(false)
 let uploadedPositionDescriptionUrl = ref('')
 let selectedFile = ref(new File([''], ''))
+let uploadingAnother = ref(false)
 
 let signatures: Ref<PRSignatures> = ref([['', '', new Date(), -1, false]])
 
@@ -1612,6 +1617,10 @@ function updateEmployeeComments(): void {
       evaluationCommentsEmployeeCurrentVal.value =
         pr.evaluation_comments_employee
     })
+}
+
+function openUploadedDescription(): void {
+  window.open(uploadedPositionDescriptionUrl.value, '_blank')
 }
 
 function userCanSign(

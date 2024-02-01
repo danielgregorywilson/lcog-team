@@ -4,6 +4,25 @@
 
 export const releases = [
   {
+    version: '0.23.1',
+    date: new Date(2024, 1, 1),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Employee transition workflows cannot be completed until' +
+          ' the transition form has been completed.'
+      },
+      {
+        type: 'improved',
+        description: 'File uploader now auto-uploads.'
+      },
+      {
+        type: 'improved',
+        description: 'Security updates'
+      }
+    ]
+  },
+  {
     version: '0.23.0',
     date: new Date(2024, 0, 10),
     changes: [

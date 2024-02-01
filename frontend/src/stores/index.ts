@@ -37,7 +37,7 @@ export function handlePromiseError(
 ) {
   let reason: string | undefined
   if (error) {
-    let reason = error.message
+    reason = error.message
     if (error.response && error.response.data && error.response.data) {
       reason = error.response.data as string
     }

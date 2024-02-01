@@ -1649,10 +1649,10 @@ function signPerformanceReview(): void {
     })
 }
 
-function noWeekends(date: string): boolean {
-  const day = quasarDate.getDayOfWeek(new Date(date))
-  return day !== 6 && day !== 7
-}
+// function noWeekends(date: string): boolean {
+//   const day = quasarDate.getDayOfWeek(new Date(date))
+//   return day !== 6 && day !== 7
+// }
 
 function onClickNoteCard(pk: number): void {
   router.push(`/note/${ pk }`)

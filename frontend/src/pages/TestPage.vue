@@ -15,7 +15,6 @@
 import { onMounted } from 'vue'
 
 import { useTimeOffStore } from 'src/stores/timeoff'
-import { useWorkflowsStore } from 'src/stores/workflows'
 
 const timeOffStore = useTimeOffStore()
 

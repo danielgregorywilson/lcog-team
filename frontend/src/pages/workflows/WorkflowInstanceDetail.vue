@@ -3,9 +3,17 @@
     <div class="row items-center q-mb-sm">
       <div class="text-h4 q-mr-md">{{ wfi().workflow.name }}</div>
       <div class="q-mr-md" style="width: 100px;">
-        <q-linear-progress rounded size="25px" :value="wfi().percent_complete/100" color="primary">
+        <q-linear-progress
+          rounded size="25px"
+          :value="wfi().percent_complete/100"
+          color="primary"
+        >
           <div class="absolute-full flex flex-center">
-            <q-badge color="white" text-color="primary" :label="`${wfi().percent_complete}%`" />
+            <q-badge
+              color="white"
+              text-color="primary"
+              :label="`${wfi().percent_complete}%`"
+            />
           </div>
         </q-linear-progress>
       </div>
@@ -17,29 +25,63 @@
       ></q-btn>
     </div>
     <q-btn-group push v-if="hasEmployeeTransition()">
-      <q-btn push :color="isSelected('workflow-processes')" glossy label="Processes" :to="{name: 'workflow-processes', params: {pk: wfi().pk}}" />
-      <q-btn push :color="isSelected('workflow-transition-form')" glossy label="Employee Transition Form" :to="{name: 'workflow-transition-form', params: {pk: wfi().pk}}" />
+      <q-btn
+        push
+        :color="isSelected('workflow-processes')"
+        glossy
+        label="Processes"
+        :to="{name: 'workflow-processes', params: {pk: wfi().pk}}"
+      />
+      <q-btn
+        push
+        :color="isSelected('workflow-transition-form')"
+        glossy
+        label="Employee Transition Form"
+        :to="{name: 'workflow-transition-form', params: {pk: wfi().pk}}"
+      />
     </q-btn-group>
 
     <q-dialog v-model="completeDialogVisible">
       <q-card>
         <q-card-section>
           <div class="row items-center">
-            <q-avatar icon="insert_chart_outlined" color="primary" text-color="white" />
+            <q-avatar
+              icon="insert_chart_outlined"
+              color="primary"
+              text-color="white"
+            />
             <span class="q-ml-sm">
               Are you sure you want to
               <span v-if="!wfi().complete">complete</span>
               <span v-else>reopen</span> this workflow?
             </span>
           </div>
-          <div class="row justify-center text-center">Position: {{ completeDialogPositionName }}</div>
-          <div class="row justify-center text-center">{{ completeDialogPercentComplete }}% Complete</div>
+          <div class="row justify-center text-center">
+            Position: {{ completeDialogPositionName }}
+          </div>
+          <div class="row justify-center text-center">
+            {{ completeDialogPercentComplete }}% Complete
+          </div>
         </q-card-section>
 
         <q-card-actions class="row justify-around">
           <q-btn flat label="Cancel" color="primary" v-close-popup />
-          <q-btn v-if="!wfi().complete" flat label="Yes, complete it" color="primary" @click="completeWFI()" v-close-popup />
-          <q-btn v-else flat label="Yes, reopen it" color="primary" @click="reopenWFI()" v-close-popup />
+          <q-btn
+            v-if="!wfi().complete"
+            flat
+            label="Yes, complete it"
+            color="primary"
+            @click="completeWFI()"
+            v-close-popup
+          />
+          <q-btn
+            v-else
+            flat
+            label="Yes, reopen it"
+            color="primary"
+            @click="reopenWFI()"
+            v-close-popup
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -96,17 +138,22 @@ function retrieveWorkflowInstance() {
   return new Promise((resolve, reject) => {
     const pk = getRoutePk(route)
     if (!pk) {
-      handlePromiseError(reject, 'No pk found in route params', '')
+      handlePromiseError(reject, 'No pk found in route params')
       return
     }
     workflowsStore.getCurrentWorkflowInstance(pk)
     .then(() => {
-      const wfInstance: WorkflowInstance = workflowsStore.currentWorkflowInstance
+      const wfInstance: WorkflowInstance =
+        workflowsStore.currentWorkflowInstance
       if (!wfInstance) {
         console.log('Workflow instance does not seem to exist. Redirecting...')
         router.push('/')
           .catch(e => {
-            console.error('Error navigating to dashboard upon not finding a matching Workflow Instance:', e)
+            console.error(
+              'Error navigating to dashboard upon not finding a matching ' +
+              'Workflow Instance:',
+              e
+            )
             reject(e)
           })
         return
@@ -126,8 +173,17 @@ function userHasWorkflowRoles() {
   return userStore.getEmployeeProfile.workflow_roles.length > 0
 }
 
-function canCompleteWorkflowInstance(workflowInstance: WorkflowInstance): boolean {
+function canCompleteWorkflowInstance(
+  workflowInstance: WorkflowInstance
+): boolean {
   if (!workflowInstance.active) {
+    return false
+  }
+  if (
+    hasEmployeeTransition() &&
+    workflowInstance.transition.assignee !== 'Complete'
+  ) {
+    // If there is an incomplete employee transition, disallow complete/reopen
     return false
   }
   if (userStore.getEmployeeProfile.is_all_workflows_admin) {
@@ -135,9 +191,12 @@ function canCompleteWorkflowInstance(workflowInstance: WorkflowInstance): boolea
     return true
   } else if (workflowInstance.workflow_role_pk) {
     // If they are an admin of the workflow, allow complete/reopen
-    return userStore.getEmployeeProfile.workflow_roles.indexOf(workflowInstance.workflow_role_pk) != -1
+    return userStore.getEmployeeProfile.workflow_roles.indexOf(
+      workflowInstance.workflow_role_pk
+    ) != -1
   } else {
-    // TODO: What should happen if no role assigned? Only admins? Everyone? Require all steps to have roles?
+    // TODO: What should happen if no role assigned? Only admins? Everyone?
+    // Require all steps to have roles?
     return false
   }
 }
@@ -189,7 +248,11 @@ onMounted(() => {
           .catch(() => {
             router.push('/')
               .catch(e => {
-                console.error('Error navigating to dashboard upon not finding a matching Workflow Instance:', e)
+                console.error(
+                  'Error navigating to dashboard upon not finding a matching ' +
+                  'Workflow Instance:',
+                  e
+                )
               })
           })
       }

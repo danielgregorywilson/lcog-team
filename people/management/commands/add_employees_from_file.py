@@ -53,6 +53,16 @@ class Command(BaseCommand):
             last_name = row[1]
             first_name = row[2]
             email = row[3].lower()
+
+            if not email:
+                self.stdout.write("vvvvvvvvvvvv WARNING vvvvvvvvvvv")
+                self.stdout.write(
+                    'No email for employee {} {}'.format(first_name, last_name)
+                )
+                self.stdout.write("^^^^^^^^^^^^ WARNING ^^^^^^^^^^^^")
+                username = first_name[0].lower() + last_name.lower()
+            else:
+                username = email.split('@')[0]
             
             numbers_in_file.append(int(number))
             
@@ -98,6 +108,12 @@ class Command(BaseCommand):
                     self.stdout.write(
                         'Updated user {} {} name'.format(user.first_name, user.last_name)
                     )
+                if user.username != username:
+                    user.username = username
+                    user.save()
+                    self.stdout.write(
+                        'Updated user {} {} username to {}'.format(user.first_name, user.last_name, user.username)
+                    )
                 if user.email != email:
                     user.email = email
                     user.save()
@@ -105,7 +121,7 @@ class Command(BaseCommand):
                         'Updated user {} {} email to {}'.format(user.first_name, user.last_name, user.email)
                     )
             except User.DoesNotExist:
-                user = User.objects.create(email=email, username=email.split('@')[0], first_name=first_name, last_name=last_name)
+                user = User.objects.create(email=email, username=username, first_name=first_name, last_name=last_name)
                 self.stdout.write(
                     'Created user {} {}'.format(user.first_name, user.last_name)
                 )
@@ -168,7 +184,7 @@ class Command(BaseCommand):
 
             if manager_last_name:
                 try:
-                    if manager_last_name == 'Wilson':
+                    if manager_last_name == 'Moore':
                         manager = Employee.objects.get(is_executive_director=True)
                     elif manager_last_name == 'Johnson':
                         manager = Employee.objects.get(user__last_name=manager_last_name, user__first_name='Lynn')
@@ -192,15 +208,17 @@ class Command(BaseCommand):
                         manager = Employee.objects.get(user__last_name='Thompson', user__first_name='Paul')
                     elif manager_last_name == 'Blair':
                         manager = Employee.objects.get(user__last_name='Blair', user__first_name='Deborah')
+                    elif manager_last_name == 'Campbell':
+                        manager = Employee.objects.get(user__last_name='Campbell', user__first_name='Laura')
                     else:
                         try:
                             manager = Employee.objects.get(user__last_name=manager_last_name)
                         except Employee.MultipleObjectsReturned:
-                            self.stdout.write("~~~~~~~~~~~~~EXCEPTION~~~~~~~~~~~~")
+                            self.stdout.write("vvvvvvvvvvvv EXCEPTION vvvvvvvvvvv")
                             self.stdout.write(
                                 'Multiple managers with last name {}'.format(manager_last_name)
                             )
-                            self.stdout.write("~~~~~~~~~~~~~EXCEPTION~~~~~~~~~~~~")
+                            self.stdout.write("^^^^^^^^^^^^ EXCEPTION ^^^^^^^^^^^^")
                             manager = Employee.objects.get(user__email='dwilson@lcog.org')
                     if employee.manager != manager:
                         employee.manager = manager

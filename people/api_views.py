@@ -59,7 +59,7 @@ class IsAdmin(BasePermission):
 
 
 class JobTitleViewSet(viewsets.ModelViewSet):
-    queryset = JobTitle.objects.all()
+    queryset = JobTitle.active_objects.all()
     serializer_class = JobTitleSerializer
     pagination_class = LargeResultsSetPagination
 

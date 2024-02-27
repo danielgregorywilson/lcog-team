@@ -36,7 +36,11 @@ class UnitOrProgram(models.Model):
         verbose_name_plural = _("Units/Programs")
         ordering = ["division__name", "name"]
 
-    division = models.ForeignKey("people.Division", verbose_name=_("division"), on_delete=models.CASCADE)
+    division = models.ForeignKey(
+        "people.Division",
+        verbose_name=_("division"),
+        on_delete=models.CASCADE
+    )
     name = models.CharField(_("name"), max_length=100)
 
     def __str__(self):
@@ -49,8 +53,17 @@ class JobTitle(models.Model):
         verbose_name_plural = _("Job Titles")
         ordering = ["name"]
 
+    objects = models.Manager()
+    active_objects = ActiveManager()
+
+    active = models.BooleanField(default=True)
     name = models.CharField(_("name"), max_length=100)
-    position_description_link = models.URLField(_("position description link"), blank=True, null=True)
+    division = models.ForeignKey(
+        "people.Division", on_delete=models.SET_NULL, blank=True, null=True
+    )
+    position_description_link = models.URLField(
+        _("position description link"), blank=True, null=True
+    )
 
     def __str__(self):
         return self.name
@@ -75,7 +88,14 @@ class Employee(models.Model):
         return self.user.username
 
     active = models.BooleanField(default=True)
-    temporary = models.BooleanField(default=False, verbose_name=_("temporary employee"), help_text="Employee is temporary or exists for test purposes. They are not present in the payroll system, but should not be deactivated.")
+    temporary = models.BooleanField(
+        default=False,
+        verbose_name=_("temporary employee"),
+        help_text=(
+            "Employee is temporary or exists for test purposes. They are not "
+            "present in the payroll system, but should not be deactivated."
+        )
+    )
     user = models.OneToOneField(
         "auth.User", verbose_name=_("user"), on_delete=models.CASCADE,
         related_name="employee"
@@ -83,24 +103,53 @@ class Employee(models.Model):
     number = models.IntegerField("number", unique=True, blank=True, null=True)
     
     # User Profile Preferences
-    display_name = models.CharField(_("display name"), max_length=100, blank=True, null=True)
+    display_name = models.CharField(
+        _("display name"), max_length=100, blank=True, null=True
+    )
     email_opt_out_all = models.BooleanField(default=False)
     email_opt_out_timeoff_all = models.BooleanField(default=False)
     email_opt_out_timeoff_weekly = models.BooleanField(default=False)
     email_opt_out_timeoff_daily = models.BooleanField(default=False)
 
-    manager = models.ForeignKey("self", related_name="direct_reports", blank=True, null=True, verbose_name=_("manager"), on_delete=models.SET_NULL)
-    unit_or_program = models.ForeignKey("people.UnitOrProgram", verbose_name=_("unit/program"), on_delete=models.SET_NULL, blank=True, null=True)
-    job_title = models.ForeignKey("people.JobTitle", verbose_name=_("job title"), on_delete=models.SET_NULL, blank=True, null=True)
-    position_description_link_override = models.URLField(_("position description link override"), blank=True, null=True)
+    manager = models.ForeignKey(
+        "self",
+        related_name="direct_reports",
+        blank=True,
+        null=True,
+        verbose_name=_("manager"),
+        on_delete=models.SET_NULL
+    )
+    unit_or_program = models.ForeignKey(
+        "people.UnitOrProgram",
+        verbose_name=_("unit/program"),
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )
+    job_title = models.ForeignKey(
+        "people.JobTitle",
+        verbose_name=_("job title"),
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )
+    position_description_link_override = models.URLField(
+        _("position description link override"), blank=True, null=True
+    )
 
-    is_division_director = models.BooleanField(_("is a division director"), default=False)
+    is_division_director = models.BooleanField(
+        _("is a division director"), default=False
+    )
     
     # These are UNIQUELY TRUE, enforced in model save
     is_hr_manager = models.BooleanField(_("is the HR manager"), default=False)
-    is_executive_director = models.BooleanField(_("is the executive director"), default=False)
+    is_executive_director = models.BooleanField(
+        _("is the executive director"), default=False
+    )
 
-    viewed_security_message = models.BooleanField(_("has viewed security message"), default=False)
+    viewed_security_message = models.BooleanField(
+        _("has viewed security message"), default=False
+    )
 
     @property
     def name(self):
@@ -116,9 +165,13 @@ class Employee(models.Model):
     @property
     def initials(self):
         if self.display_name:
-            return "".join(map(lambda x: x[0], self.display_name.split(' '))).upper()
+            return "".join(
+                map(lambda x: x[0], self.display_name.split(' '))
+            ).upper()
         elif self.user.get_full_name():
-            return "".join(map(lambda x: x[0], self.user.get_full_name().split(' '))).upper()
+            return "".join(
+                map(lambda x: x[0], self.user.get_full_name().split(' '))
+            ).upper()
         else:
             return self.user.username
 
@@ -149,11 +202,17 @@ class Employee(models.Model):
             return False
         if current_employee.is_division_director:
             return False
-        if current_employee.manager and current_employee.manager.is_division_director:
+        if all(
+            current_employee.manager,
+            current_employee.manager.is_division_director
+        ):
             # They *are* the program manager
             return False
         while True:
-            if current_employee.manager and current_employee.manager.is_division_director:
+            if all(
+                current_employee.manager,
+                current_employee.manager.is_division_director
+            ):
                 return True
             if current_employee.manager:
                 current_employee = current_employee.manager
@@ -233,7 +292,8 @@ class Employee(models.Model):
         return True
 
     def employee_next_review(self):
-        return self.performancereview_set.all().order_by("period_end_date").first()
+        return self.performancereview_set.all().order_by("period_end_date")\
+            .first()
 
     def get_direct_reports(self):
         return self.direct_reports.all()
@@ -242,14 +302,21 @@ class Employee(models.Model):
         employee_and_descendants = [employee]
         descendants = employee.direct_reports.filter(active=True)
         for descendant in descendants:
-            employee_and_descendants += self.get_descendants_of_employee(descendant)
+            employee_and_descendants += \
+                self.get_descendants_of_employee(descendant)
         return employee_and_descendants
 
     def get_direct_reports_descendants(self, include_self=False):
         # Return all descendant direct reports, including the user's direct
         # reports.
-        direct_reports_descendants = [self.get_descendants_of_employee(employee) for employee in self.get_direct_reports()]
-        flat_list = [item for sublist in direct_reports_descendants for item in sublist] # Flatten the 2-D list
+        direct_reports_descendants = [
+            self.get_descendants_of_employee(employee) for employee in \
+                self.get_direct_reports()
+        ]
+        # Flatten the 2-D list
+        flat_list = [
+            item for sublist in direct_reports_descendants for item in sublist
+        ]
         pk_list = [item.pk for item in flat_list]
         if include_self:
             pk_list.append(self.pk)
@@ -261,7 +328,10 @@ class Employee(models.Model):
         for employee in self.get_direct_reports():
             employee_reviews = employee.performancereview_set.all()
             for review in employee_reviews:
-                if review.days_until_due() < SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE:
+                if (
+                    review.days_until_due() < \
+                        SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE
+                ):
                     reviews.append(review)
         return sorted(reviews, key=lambda review: review.period_end_date)
     
@@ -286,12 +356,18 @@ class Employee(models.Model):
         for employee in self.get_direct_reports():
             employee_reviews = employee.performancereview_set.all()
             for review in employee_reviews:
-                if review.days_until_due() < SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE:
+                if (
+                    review.days_until_due() < \
+                        SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE
+                ):
                     reviews.append(review)
         for employee in self.get_direct_reports_descendants():
             employee_reviews = employee.performancereview_set.all()
             for review in employee_reviews:
-                if review.days_until_due() < SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE:
+                if (
+                    review.days_until_due() < \
+                        SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE  
+                ):
                     reviews.append(review)
         return sorted(reviews, key=lambda review: review.period_end_date)
     
@@ -309,7 +385,10 @@ class Employee(models.Model):
         for employee in employees:
             employee_reviews = employee.performancereview_set.all()
             for review in employee_reviews:
-                if review.days_until_due() < SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE:
+                if (
+                    review.days_until_due() < \
+                        SHOW_REVIEW_TO_MANAGER_DAYS_BEFORE_DUE
+                ):
                     reviews.append(review)
         return sorted(reviews, key=lambda review: review.period_end_date)
     
@@ -319,14 +398,14 @@ class Employee(models.Model):
         reviews = []
         for review in self.signature_upcoming_reviews():
             if self.is_executive_director:
-                if (
-                    review.status == PerformanceReview.EVALUATION_HR_PROCESSED and
+                if all(
+                    review.status == PerformanceReview.EVALUATION_HR_PROCESSED,
                     review.signature_set.filter(employee=self).count() == 0
                 ):
                     reviews.append(review)
             elif self.is_hr_manager:
-                if (
-                    review.status == PerformanceReview.EVALUATION_APPROVED and
+                if all(
+                    review.status == PerformanceReview.EVALUATION_APPROVED,
                     review.signature_set.filter(employee=self).count() == 0
                 ):
                     reviews.append(review)
@@ -334,9 +413,11 @@ class Employee(models.Model):
                 direct_report = review.employee
                 while direct_report.manager != self:
                     direct_report = direct_report.manager
-                if (
-                    review.status == PerformanceReview.EVALUATION_WRITTEN and
-                    review.signature_set.filter(employee=direct_report).count() == 1 and
+                if all(
+                    review.status == PerformanceReview.EVALUATION_WRITTEN,
+                    review.signature_set.filter(
+                        employee=direct_report
+                    ).count() == 1,
                     review.signature_set.filter(employee=self).count() == 0
                 ):
                     reviews.append(review)

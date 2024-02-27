@@ -24,6 +24,7 @@ class DivisionAdmin(admin.ModelAdmin):
 class JobTitleAdmin(admin.ModelAdmin):
     list_display = ("name", "division", "active", "position_description_link")
     list_filter = ("division", "active",)
+    ordering = ("division", "name",)
 
 
 @admin.register(Employee)

@@ -53,6 +53,9 @@ class JobTitle(models.Model):
         verbose_name_plural = _("Job Titles")
         ordering = ["name"]
 
+    objects = models.Manager()
+    active_objects = ActiveManager()
+
     active = models.BooleanField(default=True)
     name = models.CharField(_("name"), max_length=100)
     division = models.ForeignKey(

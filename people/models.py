@@ -49,8 +49,14 @@ class JobTitle(models.Model):
         verbose_name_plural = _("Job Titles")
         ordering = ["name"]
 
+    active = models.BooleanField(default=True)
     name = models.CharField(_("name"), max_length=100)
-    position_description_link = models.URLField(_("position description link"), blank=True, null=True)
+    division = models.ForeignKey(
+        "people.Division", on_delete=models.SET_NULL, blank=True, null=True
+    )
+    position_description_link = models.URLField(
+        _("position description link"), blank=True, null=True
+    )
 
     def __str__(self):
         return self.name

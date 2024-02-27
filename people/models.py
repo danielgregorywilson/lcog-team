@@ -88,8 +88,10 @@ class Employee(models.Model):
     temporary = models.BooleanField(
         default=False,
         verbose_name=_("temporary employee"),
-        help_text="Employee is temporary or exists for test purposes. They are\
-            not present in the payroll system, but should not be deactivated."
+        help_text=(
+            "Employee is temporary or exists for test purposes. They are not "
+            "present in the payroll system, but should not be deactivated."
+        )
     )
     user = models.OneToOneField(
         "auth.User", verbose_name=_("user"), on_delete=models.CASCADE,

@@ -67,9 +67,6 @@ function units(): Array<Unit> {
   if (unitList.length) {
     return unitList
       .filter((unit: Unit) => {
-        return ['Administrative Services', 'Government Services', 'Senior & Disability Services', 'Test Division'].indexOf(unit.name) != -1
-      })
-      .filter((unit: Unit) => {
         return unit.name.toLowerCase().indexOf(needle.value) != -1
       })
   } else {

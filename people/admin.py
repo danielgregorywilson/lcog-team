@@ -14,7 +14,7 @@ from mainsite.admin import EditLinkToInlineObject
 class EmployeeInline(admin.TabularInline):
     model = Employee
     fields = ("edit_link", "active", "temporary", "number", "display_name", "unit_or_program", "manager")
-    readonly_fields = ("edit_link",)
+    readonly_fields = ("edit_link", "active", "temporary", "number", "display_name", "unit_or_program", "manager")
     extra = 0
 
     def edit_link(self, instance):

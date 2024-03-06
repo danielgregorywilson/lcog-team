@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.forms import BaseInlineFormSet, ModelForm
-from django.utils.safestring import mark_safe
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 from workflows.models import (
     Action, EmployeeTransition, Process, ProcessInstance, Role, Step,

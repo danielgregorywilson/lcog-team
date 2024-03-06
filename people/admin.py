@@ -9,6 +9,11 @@ from .models import (
 from mainsite.admin import EditLinkToInlineObject
 
 
+class EmployeeInline(admin.TabularInline):
+    model = Employee
+    extra = 0
+
+
 class UnitOrProgramInline(admin.TabularInline):
     model = UnitOrProgram
     extra = 0
@@ -23,8 +28,9 @@ class DivisionAdmin(admin.ModelAdmin):
 @admin.register(JobTitle)
 class JobTitleAdmin(admin.ModelAdmin):
     list_display = ("name", "division", "active", "position_description_link")
-    list_filter = ("division", "active",)
-    ordering = ("division", "name",)
+    list_filter = ("division", "active")
+    ordering = ("division", "name")
+    inlines = [EmployeeInline]
 
 
 @admin.register(Employee)

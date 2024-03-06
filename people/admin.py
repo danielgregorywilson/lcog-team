@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 from .models import (
     Division, Employee, JobTitle, PerformanceReview,
@@ -7,6 +9,21 @@ from .models import (
     ViewedSecurityMessage
 )
 from mainsite.admin import EditLinkToInlineObject
+
+
+class EmployeeInline(admin.TabularInline):
+    model = Employee
+    fields = ("edit_link", "active", "temporary", "number", "username", "unit_or_program", "manager")
+    readonly_fields = ("edit_link", "active", "temporary", "number", "username", "unit_or_program", "manager")
+    extra = 0
+
+    def edit_link(self, instance):
+        url = reverse('admin:%s_%s_change' % (
+            instance._meta.app_label,  instance._meta.model_name),  args=[instance.pk] )
+        if instance.pk:
+            return mark_safe(u'<a href="{u}">edit</a>'.format(u=url))
+        else:
+            return ''
 
 
 class UnitOrProgramInline(admin.TabularInline):
@@ -23,8 +40,9 @@ class DivisionAdmin(admin.ModelAdmin):
 @admin.register(JobTitle)
 class JobTitleAdmin(admin.ModelAdmin):
     list_display = ("name", "division", "active", "position_description_link")
-    list_filter = ("division", "active",)
-    ordering = ("division", "name",)
+    list_filter = ("division", "active")
+    ordering = ("division", "name")
+    inlines = [EmployeeInline]
 
 
 @admin.register(Employee)

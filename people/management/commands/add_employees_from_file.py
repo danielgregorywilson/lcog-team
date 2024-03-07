@@ -5,11 +5,52 @@ from django.core.management.base import BaseCommand
 
 from people.models import Division, Employee, JobTitle, UnitOrProgram
 
+
 class Command(BaseCommand):
     help = 'Imports employees after exporting from Caselle'
 
     def add_arguments(self, parser):
         parser.add_argument('--path', type=str)
+
+    def get_title(self, title):
+        new_title = title
+        if title in ['Senior Financial Analyst']:
+            new_title = 'Senior Financial Analyst (Government Services)'
+        elif title in ['IS Data Center & Systems Manager']:
+            new_title = 'Data Center and Systems Manager'
+        elif title in ['GIS Senior Analyst']:
+            new_title = 'GIS Senior'
+        elif title in ['IS Assistant']:
+            new_title = 'IS Assistant (Help Desk)'
+        elif title in ['Safe Routes to School Coord.']:
+            new_title = 'Safe Routes to School Coordinator'
+        elif title in ['Adult Protective Servs. Specialist']:
+            new_title = 'APS Specialist'
+        elif title in ['APS Lead Specialist']:
+            new_title = 'APS Specialist Lead Worker'
+        elif title in ['Case Manager.']:
+            new_title = 'Case Manager'
+        elif title in ['Case Manager - Housing Navigator Focus']:
+            new_title = 'Case Manager: Housing Navigator Focus'
+        elif title in ['Health Promotion Disease Prevention Program Coord.']:
+            new_title = 'Disease Prevention & Health Promotion Program Coordinator'
+        elif title in ['Senior and Disability Services Director']:
+            new_title = 'Division Director'
+        elif title in ['HCW Specialist']:
+            new_title = 'Home Care Worker Specialist'
+        elif title in ['Licensing & Monitoring Assistant']:
+            new_title = 'Licensing and Monitoring Assistant'
+        elif title in ['Licensing & Monitoring Specialist']:
+            new_title = 'Licensing and Monitoring Specialist'
+        elif title in ['Pre Admission Screener']:
+            new_title = 'Pre-Admission Screener'
+        elif title in ['Senior Meals Kitchen Assistant']:
+            new_title = 'Senior Meals - Kitchen Assistant'
+        elif title in ['Senior Meals Site Coordinator']:
+            new_title = 'Senior Meals - Site Coordinator'
+        elif title in ['TAD / Case Manager']:
+            new_title = 'Transition and Diversion Case Manager'
+        return new_title
 
     def handle(self, *args, **options):
         # Set up database if new
@@ -67,7 +108,17 @@ class Command(BaseCommand):
             numbers_in_file.append(int(number))
             
             title = row[4]
-            job_title = JobTitle.objects.get_or_create(name=title)[0]
+            job_title, created = JobTitle.objects.get_or_create(
+                name=self.get_title(title)
+            )
+            if created:
+                self.stdout.write("vvvvvvvvvvvv WARNING vvvvvvvvvvv")
+                self.stdout.write(
+                    'Created job title {} for employee {} {}'.format(
+                        job_title, first_name, last_name
+                    )
+                )
+                self.stdout.write("^^^^^^^^^^^^ WARNING ^^^^^^^^^^^^")
             
             department_col_pieces = row[5].split(' ')
             if department_col_pieces[0] == 'PR':

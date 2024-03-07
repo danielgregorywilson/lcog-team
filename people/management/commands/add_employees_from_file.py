@@ -48,6 +48,8 @@ class Command(BaseCommand):
             new_title = 'Senior Meals - Kitchen Assistant'
         elif title in ['Senior Meals Site Coordinator']:
             new_title = 'Senior Meals - Site Coordinator'
+        elif title in ['Senior Meals Lead']:
+            new_title = 'Senior Meals Lead Worker'
         elif title in ['TAD / Case Manager']:
             new_title = 'Transition and Diversion Case Manager'
         return new_title

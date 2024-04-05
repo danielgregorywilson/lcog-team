@@ -26,7 +26,7 @@ class Desk(models.Model):
 
     building = models.CharField(_("building"), max_length=1, choices=BUILDING_CHOICE, default=SCHAEFERS)
     floor = models.PositiveSmallIntegerField(default=1)
-    number = models.CharField(max_length=10)
+    number = models.CharField(max_length=10, unique=True)
     active = models.BooleanField(default=True)
     lead = models.BooleanField(default=False)
     ergonomic = models.BooleanField(default=False)

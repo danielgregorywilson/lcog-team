@@ -7,6 +7,7 @@ class DeskHoldInline(admin.TabularInline):
     model = DeskHold
     extra = 0
     max_num = 5
+    fields = ("employees", "day", "active")
     filter_horizontal = ("employees",)
 
 

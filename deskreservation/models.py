@@ -46,7 +46,7 @@ class Desk(models.Model):
             day = DeskHold.THURSDAY
         elif day_of_week == 4:
             day = DeskHold.FRIDAY
-        if self.holds.filter(day=day).count():
+        if DeskHold.active_objects.filter(desk=self, day=day).count():
             return True
         return False
     
@@ -64,8 +64,8 @@ class Desk(models.Model):
             day = DeskHold.THURSDAY
         elif day_of_week == 4:
             day = DeskHold.FRIDAY
-        if self.holds.filter(day=day).count():
-            return self.holds.filter(day=day).first()
+        if DeskHold.active_objects.filter(desk=self, day=day).count():
+            return DeskHold.active_objects.filter(desk=self, day=day).first()
         return None
 
 
@@ -89,6 +89,10 @@ class DeskHold(models.Model):
     def __str__(self):
         return f"Desk hold for {self.desk} on {self.get_day_display()}s"
 
+    objects = models.Manager()
+    active_objects = ActiveManager()
+
+    active = models.BooleanField(default=True)
     desk = models.ForeignKey("deskreservation.Desk", related_name="holds", on_delete=models.CASCADE)
     employees = models.ManyToManyField("people.Employee", related_name="desk_holds")
     day = models.CharField(_("day"), max_length=1, choices=DAY_CHOICE)

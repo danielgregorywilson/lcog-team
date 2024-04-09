@@ -1,10 +1,6 @@
-from datetime import datetime
-
-from django.utils.timezone import get_current_timezone
-
 from rest_framework import serializers
 
-from .models import Desk, DeskHold, DeskReservation
+from .models import Desk, DeskReservation
 
 
 class DeskSerializer(serializers.HyperlinkedModelSerializer):

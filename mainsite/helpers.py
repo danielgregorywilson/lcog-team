@@ -4,13 +4,14 @@ import os
 
 from django.apps import apps
 from django.contrib.sites.models import Site
-from django.core.mail import EmailMessage, EmailMultiAlternatives, send_mail
+from django.core.mail import EmailMultiAlternatives, send_mail
 from django.urls import reverse
 
 import requests
 import urllib.parse
 
-logger = logging.getLogger('watchtower-logger')
+error_logger = logging.getLogger('watchtower-error-logger')
+email_logger = logging.getLogger('watchtower-email-logger')
 
 SEND_MANAGER_FIRST_REMINDER_NEW_PR_DAYS_BEFORE = 60
 SEND_MANAGER_SECOND_REMINDER_NEW_PR_DAYS_BEFORE = 45
@@ -45,18 +46,31 @@ def record_error(message, error, request=None, traceback=None):
     message += str(request.__dict__)
     message += '\n'
     message += str(traceback)
-    logger.error(message)
+    error_logger.error(message)
+
+def record_email_sent(subject='', body='', to_addresses=[], cc_addresses=[]):
+    message = 'Environment: ' + os.environ.get('ENVIRONMENT') + '\n'
+    message += 'To: ' + ', '.join(to_addresses) + '\n'
+    message += 'CC: ' + ', '.join(cc_addresses) + '\n'
+    message += 'Subject: ' + subject + '\n'
+    message += 'Body: ' + body
+    email_logger.info(message)
 
 def send_email(to_address, subject, body, html_body):
-    return send_mail(
-        subject,
-        body,
-        from_email=os.environ.get('FROM_EMAIL'),
-        recipient_list=[to_address],
-        # auth_user=os.environ.get('FROM_EMAIL_USERNAME'),
-        # auth_password=os.environ.get('FROM_EMAIL_PASSWORD'),
-        html_message=html_body
-    )
+    try:
+        sent_email = send_mail(
+            subject,
+            body,
+            from_email=os.environ.get('FROM_EMAIL'),
+            recipient_list=[to_address],
+            # auth_user=os.environ.get('FROM_EMAIL_USERNAME'),
+            # auth_password=os.environ.get('FROM_EMAIL_PASSWORD'),
+            html_message=html_body
+        )
+        record_email_sent(subject, body, [to_address])
+        return sent_email
+    except Exception as e:
+        record_error('Error sending email', e)
 
 def send_email_multiple(to_addresses=[], cc_addresses=[], subject='', text_body='', html_body=''):
     email = EmailMultiAlternatives(
@@ -65,7 +79,12 @@ def send_email_multiple(to_addresses=[], cc_addresses=[], subject='', text_body=
         cc=cc_addresses
     )
     email.attach_alternative(html_body, "text/html")
-    return email.send()
+    try:
+        sent_email = email.send()
+        record_email_sent(subject, text_body, to_addresses, cc_addresses)
+        return sent_email
+    except Exception as e:
+        record_error('Error sending email', e)
 
 def send_evaluation_written_email_to_employee(employee, review):
     # Notification #5

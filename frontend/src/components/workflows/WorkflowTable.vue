@@ -91,7 +91,11 @@
             color="grey"
             @click="editWorkflowInstance(props.row)"
             icon="play_arrow"
-          />
+          >
+            <q-tooltip :delay="400">
+              View progress
+            </q-tooltip>
+          </q-btn>
           <q-btn
             v-if="workflowHasTransition() && canViewTransition()"
             class="col"
@@ -101,7 +105,11 @@
             color="grey"
             @click="editTransitionForm(props.row)"
             icon="assignment"
-          />
+          >
+            <q-tooltip :delay="400">
+              View form
+            </q-tooltip>
+          </q-btn>
           <q-btn
             v-if="!archived && canArchiveWorkflowInstance(props.row)"
             class="col"
@@ -170,7 +178,11 @@
                       color="grey"
                       @click="editWorkflowInstance(props.row)"
                       icon="play_arrow"
-                    />
+                    >
+                      <q-tooltip>
+                        View progress
+                      </q-tooltip>
+                    </q-btn>
                     <q-btn
                       v-if="workflowHasTransition() && canViewTransition()"
                       class="col"
@@ -180,7 +192,11 @@
                       color="grey"
                       @click="editTransitionForm(props.row)"
                       icon="assignment"
-                    />
+                    >
+                      <q-tooltip :delay="400">
+                        View form
+                      </q-tooltip>
+                    </q-btn>
                     <q-btn
                       v-if="!archived && canArchiveWorkflowInstance(props.row)"
                       class="col"

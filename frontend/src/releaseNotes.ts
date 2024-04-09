@@ -8,8 +8,12 @@ export const releases = [
     date: new Date(2024, 3, 5),
     changes: [
       {
+        type: 'new',
+        description: 'Added email logging.'
+      },
+      {
         type: 'improved',
-        description: 'Desk numbers are unique.'
+        description: 'Desk numbers are unique. Holds can be deactivated.'
       },
       {
         type: 'improved',
@@ -17,7 +21,7 @@ export const releases = [
       },
       {
         type: 'improved',
-        description: 'Improved logging.'
+        description: 'Security updates.'
       }
     ]
   },

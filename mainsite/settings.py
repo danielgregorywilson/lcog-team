@@ -292,11 +292,6 @@ DEFAULT_FROM_EMAIL = 'no-reply@lcog.org'
 # LOGGING #
 ###########
 
-AWS_LOG_GROUP = 'TeamAppLogGroup', # your log group
-AWS_LOG_STREAM = 'TeamAppLogStream', # your stream
-AWS_LOGGER_NAME = 'watchtower-logger' # your logger
-
-
 boto3_logs_client = boto3.client("logs", region_name=AWS_REGION_NAME)
 
 LOGGING = {
@@ -315,16 +310,20 @@ LOGGING = {
         'console': {
             'class': 'logging.StreamHandler',
         },
-        'watchtower': {
+        'watchtower-error-handler': {
             'class': 'watchtower.CloudWatchLogHandler',
             'boto3_client': boto3_logs_client,
             'log_group_name': 'TeamAppLogGroup',
-            'log_stream_name': 'TeamAppLogStream',
-            # Decrease the verbosity level here to send only those logs to watchtower,
-            # but still see more verbose logs in the console. See the watchtower
-            # documentation for other parameters that can be set here.
+            'log_stream_name': 'TeamAppErrorLogStream',
             'level': 'DEBUG'
         },
+        'watchtower-email-handler': {
+            'class': 'watchtower.CloudWatchLogHandler',
+            'boto3_client': boto3_logs_client,
+            'log_group_name': 'TeamAppLogGroup',
+            'log_stream_name': 'TeamAppEmailLogStream',
+            'level': 'DEBUG'
+        }
         # Log to a file
         # 'file': {
         #     'level': 'DEBUG',
@@ -333,9 +332,14 @@ LOGGING = {
         # }
     },
     'loggers': {
-        AWS_LOGGER_NAME: {
+        'watchtower-error-logger': {
             'level': 'DEBUG',
-            'handlers': ['watchtower'],
+            'handlers': ['watchtower-error-handler'],
+            'propagate': False,
+        },
+        'watchtower-email-logger': {
+            'level': 'DEBUG',
+            'handlers': ['watchtower-email-handler'],
             'propagate': False,
         },
         # Log DB queries to a file

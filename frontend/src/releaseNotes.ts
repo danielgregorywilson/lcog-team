@@ -4,6 +4,28 @@
 
 export const releases = [
   {
+    version: '0.25.0',
+    date: new Date(2024, 3, 5),
+    changes: [
+      {
+        type: 'new',
+        description: 'Added email logging.'
+      },
+      {
+        type: 'improved',
+        description: 'Desk numbers are unique. Holds can be deactivated.'
+      },
+      {
+        type: 'improved',
+        description: 'Added tooltips to workflow table buttons.'
+      },
+      {
+        type: 'improved',
+        description: 'Security updates.'
+      }
+    ]
+  },
+  {
     version: '0.24.1',
     date: new Date(2024, 2, 8),
     changes: [

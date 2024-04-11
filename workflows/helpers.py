@@ -5,7 +5,7 @@ from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
-from mainsite.helpers import send_email, send_email_multiple
+from mainsite.helpers import readable_date, send_email_multiple
 from people.models import JobTitle
 from workflows.models import EmployeeTransition, ProcessInstance
 
@@ -28,7 +28,7 @@ def send_gas_pin_notification_email(
         type_verb = 'terminating'
     else:
         type_verb = 'changing'
-    date_string = t.transition_date.strftime('%m-%d-%y') if t.transition_date else ''
+    date_string = readable_date(t.transition_date) if t.transition_date else ''
 
     subject = f'New Gas PIN needed for { name_string }'
 
@@ -64,7 +64,7 @@ def send_transition_submitter_email(
         type_verb = 'terminating'
     else:
         type_verb = 'changing'
-    date_string = t.transition_date.strftime('%m-%d-%y') if t.transition_date else ''
+    date_string = readable_date(t.transition_date) if t.transition_date else ''
 
     subject = f'{ reassigned_subject_string }{ title_string } EIS { type_verb } { date_string }'
 
@@ -101,7 +101,7 @@ def send_transition_sds_hiring_leads_email(
         type_verb = 'terminating'
     else:
         type_verb = 'changing'
-    date_string = t.transition_date.strftime('%m-%d-%y') if t.transition_date else ''
+    date_string = readable_date(t.transition_date) if t.transition_date else ''
 
     subject = f'{ reassigned_subject_string }{ title_string } EIS { type_verb } { date_string }'
 
@@ -144,7 +144,7 @@ def send_transition_fiscal_email(
         type_verb = 'terminating'
     else:
         type_verb = 'changing'
-    date_string = t.transition_date.strftime('%m-%d-%y') if t.transition_date else ''
+    date_string = readable_date(t.transition_date) if t.transition_date else ''
 
     subject = f'{ reassigned_subject_string }{ name_string } EIS { type_verb } { date_string }'
 
@@ -188,7 +188,7 @@ def send_transition_hr_email(
         type_verb = 'terminating'
     else:
         type_verb = 'changing'
-    date_string = t.transition_date.strftime('%m-%d-%y') if t.transition_date else ''
+    date_string = readable_date(t.transition_date) if t.transition_date else ''
 
     subject = f'{ reassigned_subject_string }{ name_string } EIS { type_verb } { date_string }'
 
@@ -226,7 +226,7 @@ def send_transition_stn_email(
     last_name = t.employee_last_name if t.employee_last_name else ''
     name_string = f'{ first_name } { last_name }'
     exit_subject_string = 'EXIT: ' if t.type == EmployeeTransition.TRANSITION_TYPE_EXIT else ''
-    date_string = t.transition_date.strftime('%m-%d-%y') if t.transition_date else ''
+    date_string = readable_date(t.transition_date) if t.transition_date else ''
 
     subject = f'{ reassigned_subject_string }{ updated_subject_string }{ name_string } { exit_subject_string }EIS { date_string }'
     

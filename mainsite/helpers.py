@@ -1,6 +1,7 @@
 import datetime
 import logging
 import os
+import pytz
 
 from django.apps import apps
 from django.contrib.sites.models import Site
@@ -27,6 +28,10 @@ HR_SIGNATURE_REMINDER_SUBSEQUENT = 1
 
 ED_SIGNATURE_REMINDER_SUBSEQUENT = 1
 
+
+def readable_date(date):
+    local_date = date.astimezone(pytz.timezone('America/Los_Angeles'))
+    return local_date.strftime('%m/%d/%y')
 
 def get_host_url(request):
     host = request.get_host()

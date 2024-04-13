@@ -17,6 +17,63 @@ export interface UserRetrieve {
   can_view_desk_reservation_reports: boolean
 }
 
+//////////////////////////////////////////////////////////
+// DeskReservation Structure from Django Rest Framework //
+//////////////////////////////////////////////////////////
+
+export interface Desk {
+  pk: number
+  building: string
+  floor: string
+  number: string
+  letter?: string
+  active: boolean
+  lead: boolean
+  ergonomic: boolean
+  held_today: boolean
+}
+
+export interface DeskReservation {
+  pk: number
+  employee_pk: number
+  employee_name: string
+  desk_building: string
+  desk_floor: string
+  desk_number: string
+  check_in: string
+  check_out: string
+  created?: boolean
+  desk_held?: boolean
+}
+
+export interface DeskReservationCreate {
+  employee_pk: number
+  building: string
+  floor: string
+  desk_number: string
+}
+
+export interface GetReservationReportData {
+  startDateTime: string
+  endDateTime: string
+}
+
+export interface GetDeskReservationDataInterface {
+  [key: string]: {
+    'total_hours': string,
+    'days_utilized': number,
+    'most_frequent_employee': string
+  }
+}
+
+export interface GetEmployeeDeskReservationDataInterface {
+  [key: string]: {
+    'total_hours': string,
+    'days_utilized': number,
+    'most_frequent_desk': string
+  }
+}
+
 ///////////////////////////////////////////////////
 // Employee Structure from Django Rest Framework //
 ///////////////////////////////////////////////////
@@ -81,6 +138,38 @@ export interface EmployeeUpdatePartial {
   email_opt_out_timeoff_all: boolean
   email_opt_out_timeoff_weekly: boolean
   email_opt_out_timeoff_daily: boolean
+}
+
+////////////////////////////////////////////////
+// Meals Structure from Django Rest Framework //
+////////////////////////////////////////////////
+
+export interface LatLong {
+  lat: number
+  long: number
+}
+
+export interface MealStateInterface {
+  stops: Array<Stop>
+}
+
+export interface Stop {
+  first_name: string
+  last_name: string
+  address: string
+  city: string
+  zip_code: number
+  latitude: number
+  longitude: number
+  meal_type: 'hot' | 'cold'
+  waitlist: boolean
+  phone: string
+  phone_notes: string
+  notes: string
+  route_name: string
+  created_at?: Date
+  updated_at?: Date
+  new?: boolean
 }
 
 /////////////////////////////////////////////////
@@ -216,21 +305,109 @@ export interface FileUploadDescriptionUploadServerResponse {
   statusText: string
 }
 
-/////////////////////////////////////////////////////
-// Signature Structure from Django Rest Framework //
-/////////////////////////////////////////////////////
+///////////////////////////////////////////////////
+// Purchase Structure from Django Rest Framework //
+///////////////////////////////////////////////////
 
-export interface SignatureCreate {
-  review_pk: string
-  employee_pk: number
+export interface Expense {
+  pk: number
+  name: string
+  date: string
+  job: string
+  gls: Array<GL>
+  purchaser_pk: number
+  approver_pk: number
+  approval_notes: string
+  receipt: File
 }
 
-export interface SignatureRetrieve {
-  url: Url
+type GL = {
+  gl: string
+  percent: number
+}
+
+export interface ExpenseCreate {
+  name?: string
+  date?: string
+  job?: string
+  gls?: Array<GL>
+  approver?: SimpleEmployeeRetrieve
+  approval_notes?: string
+  receipt?: File
+}
+
+export interface ExpenseUpdate {
+  name?: string
+  date?: string
+  job?: string
+  gls?: Array<GL>
+  approver_pk?: number
+  approval_notes?: string
+  receipt?: File
+}
+
+/////////////////////////////////////////////////////////
+// Responsibility Structure from Django Rest Framework //
+/////////////////////////////////////////////////////////
+
+export interface Responsibility {
   pk: number
-  review: Url
-  employee: Url
-  date: Date
+  name: string
+  description: string
+  link: string
+  tags: Array<ResponsibilityTagRetrieve>
+  primary_employee_pk?: number
+  primary_employee_name?: string
+  secondary_employee_pk?: number
+  secondary_employee_name?: string
+}
+
+export interface ResponsibilityCreate {
+  name: string
+  description?: string
+  link?: string
+  tags?: Array<ResponsibilityTagRetrieve>
+  primary_employee?: number
+  secondary_employee?: number
+}
+
+export interface ResponsibilityUpdate {
+  pk?: number
+  name?: string
+  description?: string
+  link?: string
+  tags?: Array<ResponsibilityTagRetrieve>
+  primary_employee?: number
+  secondary_employee?: number
+}
+
+export interface ResponsibilityNameUpdate extends ResponsibilityUpdate {
+  name: string
+}
+
+export interface EmployeeResponsibilitiesInterface {
+  pk: string
+  responsibilities: Array<Responsibility>
+}
+
+export interface SimpleResponsibilityTagRetrieve {
+  pk: number
+  name: string
+}
+
+export interface ResponsibilityTagRetrieve {
+  pk?: number
+  name: string
+  responsibilities: Array<Responsibility>
+}
+
+export interface ResponsibilityTagCreate {
+  name: string
+}
+
+export interface ResponsibilityTagUpdate {
+  pk?: number
+  name?: string
 }
 
 /////////////////////////////////////////////////////
@@ -257,25 +434,21 @@ export interface ReviewNoteUpdate {
   note?: string
 }
 
-////////////////////////////////////////////////////////////////
-// ViewedSecurityMessage Structure from Django Rest Framework //
-////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+// Signature Structure from Django Rest Framework //
+/////////////////////////////////////////////////////
 
-export interface SecurityMessage {
-  content: string
-}
-
-export interface ViewedSecurityMessageCreate {
+export interface SignatureCreate {
+  review_pk: string
   employee_pk: number
-  security_message_pk: number
 }
 
-export interface ViewedSecurityMessageRetrieve {
+export interface SignatureRetrieve {
   url: Url
   pk: number
-  employee_pk: number
-  security_message_pk: number
-  datetime: string
+  review: Url
+  employee: Url
+  date: Date
 }
 
 //////////////////////////////////////////////////////////////
@@ -438,127 +611,6 @@ export interface TeleworkSignatureRetrieve {
 }
 
 /////////////////////////////////////////////////////////
-// Responsibility Structure from Django Rest Framework //
-/////////////////////////////////////////////////////////
-
-export interface Responsibility {
-  pk: number
-  name: string
-  description: string
-  link: string
-  tags: Array<ResponsibilityTagRetrieve>
-  primary_employee_pk?: number
-  primary_employee_name?: string
-  secondary_employee_pk?: number
-  secondary_employee_name?: string
-}
-
-export interface ResponsibilityCreate {
-  name: string
-  description?: string
-  link?: string
-  tags?: Array<ResponsibilityTagRetrieve>
-  primary_employee?: number
-  secondary_employee?: number
-}
-
-export interface ResponsibilityUpdate {
-  pk?: number
-  name?: string
-  description?: string
-  link?: string
-  tags?: Array<ResponsibilityTagRetrieve>
-  primary_employee?: number
-  secondary_employee?: number
-}
-
-export interface ResponsibilityNameUpdate extends ResponsibilityUpdate {
-  name: string
-}
-
-export interface EmployeeResponsibilitiesInterface {
-  pk: string
-  responsibilities: Array<Responsibility>
-}
-
-export interface SimpleResponsibilityTagRetrieve {
-  pk: number
-  name: string
-}
-
-export interface ResponsibilityTagRetrieve {
-  pk?: number
-  name: string
-  responsibilities: Array<Responsibility>
-}
-
-export interface ResponsibilityTagCreate {
-  name: string
-}
-
-export interface ResponsibilityTagUpdate {
-  pk?: number
-  name?: string
-}
-
-//////////////////////////////////////////////////////////
-// DeskReservation Structure from Django Rest Framework //
-//////////////////////////////////////////////////////////
-
-export interface Desk {
-  pk: number
-  building: string
-  floor: string
-  number: string
-  letter?: string
-  active: boolean
-  lead: boolean
-  ergonomic: boolean
-  held_today: boolean
-}
-
-export interface DeskReservation {
-  pk: number
-  employee_pk: number
-  employee_name: string
-  desk_building: string
-  desk_floor: string
-  desk_number: string
-  check_in: string
-  check_out: string
-  created?: boolean
-  desk_held?: boolean
-}
-
-export interface DeskReservationCreate {
-  employee_pk: number
-  building: string
-  floor: string
-  desk_number: string
-}
-
-export interface GetReservationReportData {
-  startDateTime: string
-  endDateTime: string
-}
-
-export interface GetDeskReservationDataInterface {
-  [key: string]: {
-    'total_hours': string,
-    'days_utilized': number,
-    'most_frequent_employee': string
-  }
-}
-
-export interface GetEmployeeDeskReservationDataInterface {
-  [key: string]: {
-    'total_hours': string,
-    'days_utilized': number,
-    'most_frequent_desk': string
-  }
-}
-
-/////////////////////////////////////////////////////////
 // TimeOffRequest Structure from Django Rest Framework //
 /////////////////////////////////////////////////////////
 
@@ -605,6 +657,27 @@ export interface EmployeeConflictingResponsibilities {
   pk: number
   name: string
   responsibility_names: Array<string>
+}
+
+////////////////////////////////////////////////////////////////
+// ViewedSecurityMessage Structure from Django Rest Framework //
+////////////////////////////////////////////////////////////////
+
+export interface SecurityMessage {
+  content: string
+}
+
+export interface ViewedSecurityMessageCreate {
+  employee_pk: number
+  security_message_pk: number
+}
+
+export interface ViewedSecurityMessageRetrieve {
+  url: Url
+  pk: number
+  employee_pk: number
+  security_message_pk: number
+  datetime: string
 }
 
 ///////////////////////////////////////////////////
@@ -825,38 +898,6 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   special_instructions?: string
   fiscal_field?: string
   assignee?: string
-}
-
-////////////////////////////////////////////////
-// Meals Structure from Django Rest Framework //
-////////////////////////////////////////////////
-
-export interface LatLong {
-  lat: number
-  long: number
-}
-
-export interface MealStateInterface {
-  stops: Array<Stop>
-}
-
-export interface Stop {
-  first_name: string
-  last_name: string
-  address: string
-  city: string
-  zip_code: number
-  latitude: number
-  longitude: number
-  meal_type: 'hot' | 'cold'
-  waitlist: boolean
-  phone: string
-  phone_notes: string
-  notes: string
-  route_name: string
-  created_at?: Date
-  updated_at?: Date
-  new?: boolean
 }
 
 ///////////////

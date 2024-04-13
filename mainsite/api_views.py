@@ -126,7 +126,16 @@ class FileUploadViewSet(viewsets.ViewSet):
             return Response(data=request.build_absolute_uri(pr.signed_position_description.url), status=200)
         elif model == 'expense':
             if not object_pk:
-                expense = Expense.objects.create(receipt=file_upload)
+                expense = Expense.objects.create(
+                    name=request.data.get('name'),
+                    date=request.data.get('date'),
+                    job=request.data.get('job'),
+                    gls=request.data.get('gls'),
+                    purchaser=request.data.get('purchaser'),
+                    approver=request.data.get('approver'),
+                    approval_notes=request.data.get('approval_notes'),
+                    receipt=file_upload
+                )
             else:
                 # TODO: Object_pk should probably be an integer, but it's a string
                 expense = Expense.objects.filter(pk=object_pk)

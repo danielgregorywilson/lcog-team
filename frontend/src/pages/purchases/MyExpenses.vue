@@ -5,8 +5,9 @@
     <q-btn v-else @click="showSubmitToFiscalDialog = true">Submit to Fiscal</q-btn>
   </div>
   <div class="q-mt-md">
+    {{ expenses}}
     <q-spinner-grid
-      v-if="!calendarLoaded"
+      v-if="!expensesLoaded"
       class="spinner"
       color="primary"
       size="xl"
@@ -15,7 +16,7 @@
       v-else
       flat bordered
       :title="tableTitleDisplay()"
-      :rows="rows"
+      :rows="expenses"
       :columns="columns"
       row-key="name"
       binary-state-sort
@@ -39,7 +40,7 @@
           <q-td key="job" :props="props">
             <div class="text-pre-wrap">{{ props.row.job }}</div>
             <q-popup-edit v-if="!submitted" v-model="props.row.job" buttons v-slot="scope">
-              <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
+              <q-input v-model="scope.value" dense autofocus @save="debugger; updateExpense(props.row.pk)" />
             </q-popup-edit>
           </q-td>
           <q-td key="gls" :props="props">
@@ -77,7 +78,7 @@
             </q-popup-edit>
           </q-td>
           <q-td key="approver" :props="props">
-            {{ props.row.approver.name }}
+            {{ props.row.approver?.name }}
             <q-popup-edit v-if="!submitted" v-model="props.row.approver" buttons v-slot="scope">
               <EmployeeSelect
                 name="approver"
@@ -98,14 +99,20 @@
             </q-popup-edit>
           </q-td>
           <q-td key="receipt" :props="props">
-            {{ props.row.receipt }}
+            {{ props.row.receipt?.name }}
             <q-popup-edit v-if="!submitted" v-model="props.row.receipt" buttons>
               <FileUploader
-                label="Receipt"
                 :file="props.row.receipt"
                 contentTypeAppLabel="purchases"
                 contentTypeModel="expense"
+                :objectPk="props.row.pk.toString()"
                 :readOnly=false
+                v-on="{
+                  'uploaded': (url: string) => {
+                    // uploadedPositionDescriptionUrl = url
+                    // uploadingAnother = false
+                  }
+                }"
               />
             </q-popup-edit>
           </q-td>
@@ -194,20 +201,27 @@
 </style>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, Ref, ref } from 'vue'
 import { useQuasar } from 'quasar'
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import FileUploader from 'src/components/FileUploader.vue'
 import { readableDate } from 'src/filters'
+import { usePurchaseStore } from 'src/stores/purchase'
+import { Expense, SimpleEmployeeRetrieve } from 'src/types'
 
 // type Expense = {date: string, isToday: boolean}
 
 const quasar = useQuasar()
+const purchaseStore = usePurchaseStore()
 
 const props = defineProps<{
   monthDisplay: string
+  monthInt: string
+  yearInt: string
 }>()
 
+let expensesLoaded = ref(false)
+let expenses = ref([]) as Ref<Expense[]>
 let submitted = ref(false)
 let calendarLoaded = ref(true)
 let showSubmitToFiscalDialog = ref(false)
@@ -241,44 +255,45 @@ const columns = [
   { name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' }
 ]
 
-const rows = ref([
-  {
-    name: 'Frozen Yogurt',
-    date: '2023-10-01',
-    job: '',
-    gls: [{gl: '43-45045-232', percent: 100}],
-    approver: { 'pk': 5, 'name': 'Dan Wilson', 'legal_name': 'Daniel Wilson' },
-    approvalNotes: 'Felicity feigned faintness so I fetched froyo. Follow?',
-    receipt: 'file.txt'
-  },
-  {
-    name: 'Ice cream sandwich',
-    date: '2023-10-04',
-    job: '123',
-    gls: [{gl: '55-55555-555', percent: 50}, {gl: '43-45045-232', percent: 50}],
-    approver: {pk: -1, name: '', legal_name: ''},
-    approvalNotes: '',
-    receipt: 'file.txt'
-  },
-  {
-    name: 'Eclair',
-    date: '2023-10-07',
-    job: '',
-    gls: [{gl: '12-34567-890', percent: 100}],
-    approver: {pk: -1, name: '', legal_name: ''},
-    approvalNotes: '',
-    receipt: 'file.txt'
-  },
-  {
-    name: 'Cupcake',
-    date: '2023-10-07',
-    job: '',
-    gls: [{gl: '43-45045-232', percent: 100}],
-    approver: {pk: -1, name: '', legal_name: ''},
-    approvalNotes: '',
-    receipt: 'file.txt'
-  }
-])
+// const rows = ref([
+//   {
+//     pk: 1,
+//     name: 'Frozen Yogurt',
+//     date: '2023-10-01',
+//     job: '',
+//     gls: [{gl: '43-45045-232', percent: 100}],
+//     approver: { 'pk': 5, 'name': 'Dan Wilson', 'legal_name': 'Daniel Wilson' },
+//     approvalNotes: 'Felicity feigned faintness so I fetched froyo. Follow?',
+//     receipt: ''
+//   },
+//   {
+//     name: 'Ice cream sandwich',
+//     date: '2023-10-04',
+//     job: '123',
+//     gls: [{gl: '55-55555-555', percent: 50}, {gl: '43-45045-232', percent: 50}],
+//     approver: {pk: -1, name: '', legal_name: ''},
+//     approvalNotes: '',
+//     receipt: 'file.txt'
+//   },
+//   {
+//     name: 'Eclair',
+//     date: '2023-10-07',
+//     job: '',
+//     gls: [{gl: '12-34567-890', percent: 100}],
+//     approver: {pk: -1, name: '', legal_name: ''},
+//     approvalNotes: '',
+//     receipt: 'file.txt'
+//   },
+//   {
+//     name: 'Cupcake',
+//     date: '2023-10-07',
+//     job: '',
+//     gls: [{gl: '43-45045-232', percent: 100}],
+//     approver: {pk: -1, name: '', legal_name: ''},
+//     approvalNotes: '',
+//     receipt: 'file.txt'
+//   }
+// ])
 
 function tableTitleDisplay(): string {
   const submittedText = submitted.value ? ' - Submitted' : ''
@@ -320,15 +335,20 @@ function tableTitleDisplay(): string {
 // }
 
 function clickAddExpense(): void {
-  rows.value.push({
+
+  purchaseStore.createExpense({
     name: '',
-    date: '',
+    date: `${props.yearInt}-${props.monthInt}-1`,
     job: '',
     gls: [{gl: '', percent: 0}],
-    approver: {pk: -1, name: '', legal_name: ''},
-    approvalNotes: '',
-    receipt: ''
+    approval_notes: '',
   })
+    .then((results) => {
+      expenses.value = results
+    })
+    .catch((error) => {
+      console.log('Error adding expense', error)
+    })
 }
 
 function formErrorItems(): Array<[string, string]> {
@@ -356,7 +376,7 @@ function formErrors() {
 function onSubmitFiscalDialog() {
   showSubmitToFiscalDialog.value = false
   submitted.value = true
-  rows.value.forEach(row => row.submitted = true)
+  expenses.value.forEach(row => row.submitted = true)
   quasar.notify({
     message: 'Sent',
     color: 'positive',
@@ -367,7 +387,7 @@ function onSubmitFiscalDialog() {
 function onUnsubmitDialog() {
   showUnsubmitDialog.value = false
   submitted.value = false
-  rows.value.forEach(row => row.submitted = false)
+  expenses.value.forEach(row => row.submitted = false)
   quasar.notify({
     message: 'Unsubmitted',
     color: 'positive',
@@ -375,8 +395,33 @@ function onUnsubmitDialog() {
   })
 }
 
+function retrieveExpenses() {
+  purchaseStore.getAllExpenses()
+    .then((results) => {
+      expenses.value = results
+      expensesLoaded.value = true
+    })
+    .catch((error) => {
+      console.log('Error retrieving expenses', error)
+    })
+}
+
+function updateExpense(pk: number) {
+  debugger
+  const row = expenses.value.find(row => row.pk === pk)
+  if (row) {
+    purchaseStore.updateExpense(row)
+      .then((results) => {
+        // expenses.value = results
+      })
+      .catch((error) => {
+        console.log('Error updating expense', error)
+      })
+  }
+}
+
 onMounted(() => {
-  // retrieveExpenses()
+  retrieveExpenses()
 })
 
 </script>

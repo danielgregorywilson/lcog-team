@@ -18,6 +18,7 @@ from people.api_views import (
     TeleworkApplicationViewSet, TeleworkSignatureViewSet, UnitViewSet,
     UserViewSet, ViewedSecurityMessageViewSet
 )
+from purchases.api_views import ExpenseViewSet
 from responsibilities.api_views import (
     ResponsibilityViewSet, TagViewSet as ResponsibilityTagViewSet
 )
@@ -50,6 +51,7 @@ router.register('v1/responsibilities', ResponsibilityViewSet)
 router.register('v1/responsibilitytags', ResponsibilityTagViewSet)
 router.register('v1/desk', DeskViewSet)
 router.register('v1/deskreservation', DeskReservationViewSet)
+router.register('v1/expense', ExpenseViewSet)
 router.register('v1/performancereview', PerformanceReviewViewSet)
 router.register('v1/fileupload', FileUploadViewSet, basename='fileupload')
 router.register('v1/telework-fileupload', TeleworkApplicationFileUploadViewSet, basename='telework-fileupload')

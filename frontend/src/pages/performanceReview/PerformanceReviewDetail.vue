@@ -747,7 +747,6 @@
         </div>
         <FileUploader
           v-if="currentUserIsManagerOfEmployee() && descriptionReviewedEmployee && (!uploadedPositionDescriptionUrl || uploadingAnother)"
-          label="Receipt"
           :file=selectedFile
           contentTypeAppLabel="people"
           contentTypeModel="performancereview"

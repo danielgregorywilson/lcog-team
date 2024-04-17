@@ -91,6 +91,10 @@ class PurchaseRequest(models.Model):
 
 
 class Expense(models.Model):
+
+    class Meta:
+        ordering = ["pk",]
+
     name = models.CharField(max_length=255, blank=True, null=True)
     date = models.DateField(blank=True, null=True)
     job = models.CharField(max_length=255, blank=True, null=True)

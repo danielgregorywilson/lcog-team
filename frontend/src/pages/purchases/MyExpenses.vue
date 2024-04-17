@@ -33,14 +33,26 @@
           </q-td>
           <q-td key="date" :props="props">
             {{ readableDate(props.row.date) }}
-            <q-popup-edit v-if="!submitted" v-model="props.row.date" buttons v-slot="scope">
+            <q-popup-edit
+              v-if="!submitted"
+              v-model="props.row.date"
+              buttons
+              v-slot="scope"
+              @save="(val) => updateDate(props.row.pk, val)"
+            >
               <q-input type="date" v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
             </q-popup-edit>
           </q-td>
           <q-td key="job" :props="props">
             <div class="text-pre-wrap">{{ props.row.job }}</div>
-            <q-popup-edit v-if="!submitted" v-model="props.row.job" buttons v-slot="scope">
-              <q-input v-model="scope.value" dense autofocus @save="debugger; updateExpense(props.row.pk)" />
+            <q-popup-edit
+              v-if="!submitted"
+              v-model="props.row.job"
+              buttons
+              v-slot="scope"
+              @save="(val) => updateJob(props.row.pk, val)"
+            >
+              <q-input v-model="scope.value" dense autofocus />
             </q-popup-edit>
           </q-td>
           <q-td key="gls" :props="props">
@@ -406,17 +418,29 @@ function retrieveExpenses() {
     })
 }
 
-function updateExpense(pk: number) {
-  debugger
+function updateExpense(row: Expense) {
+  purchaseStore.updateExpense(row)
+    .then((results) => {
+      // expenses.value = results
+    })
+    .catch((error) => {
+      console.log('Error updating expense', error)
+    })
+}
+
+function updateDate(pk: number, val: string) {
   const row = expenses.value.find(row => row.pk === pk)
   if (row) {
-    purchaseStore.updateExpense(row)
-      .then((results) => {
-        // expenses.value = results
-      })
-      .catch((error) => {
-        console.log('Error updating expense', error)
-      })
+    row.date = val
+    updateExpense(row)
+  }
+}
+
+function updateJob(pk: number, val: string) {
+  const row = expenses.value.find(row => row.pk === pk)
+  if (row) {
+    row.job = val
+    updateExpense(row)
   }
 }
 

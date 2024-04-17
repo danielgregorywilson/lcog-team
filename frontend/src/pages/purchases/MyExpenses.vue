@@ -5,7 +5,6 @@
     <q-btn v-else @click="showSubmitToFiscalDialog = true">Submit to Fiscal</q-btn>
   </div>
   <div class="q-mt-md">
-    {{ expenses}}
     <q-spinner-grid
       v-if="!expensesLoaded"
       class="spinner"
@@ -27,8 +26,14 @@
         <q-tr :props="props" :class="submitted?'bg-grey':''">
           <q-td key="name" :props="props">
             {{ props.row.name }}
-            <q-popup-edit v-if="!submitted" v-model="props.row.name" buttons v-slot="scope">
-              <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
+            <q-popup-edit
+              v-if="!submitted"
+              v-model="props.row.name"
+              buttons
+              v-slot="scope"
+              @save="(val) => updateName(props.row.pk, val)"
+            >
+              <q-input v-model="scope.value" dense autofocus />
             </q-popup-edit>
           </q-td>
           <q-td key="date" :props="props">
@@ -40,7 +45,7 @@
               v-slot="scope"
               @save="(val) => updateDate(props.row.pk, val)"
             >
-              <q-input type="date" v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
+              <q-input type="date" v-model="scope.value" dense autofocus />
             </q-popup-edit>
           </q-td>
           <q-td key="job" :props="props">
@@ -56,17 +61,26 @@
             </q-popup-edit>
           </q-td>
           <q-td key="gls" :props="props">
-            <div class="text-pre-wrap" v-for="gl in props.row.gls" :key="props.row.gls.indexOf(gl)">
+            <div
+              class="text-pre-wrap"
+              v-for="gl in props.row.gls"
+              :key="props.row.gls.indexOf(gl)"
+            >
               {{ gl.gl }}: {{ gl.percent }}%
             </div>
-            <q-popup-edit v-if="!submitted" v-model="props.row.gls" buttons v-slot="scope">
+            <q-popup-edit
+              v-if="!submitted"
+              v-model="props.row.gls"
+              buttons
+              v-slot="scope"
+              @save="(val) => updateGLs(props.row.pk, val)"
+            >
               <div v-for="gl in scope.value" :key="scope.value.indexOf(gl)" class="row">
                 <q-input
                   v-model="gl.gl"
                   class="q-mr-sm"
                   outlined dense autofocus
                   mask="##-#####-###"
-                  @keyup.enter="scope.set()"
                   :rules="[
                     val => !!val || 'Required',
                   ]"
@@ -90,6 +104,7 @@
             </q-popup-edit>
           </q-td>
           <q-td key="approver" :props="props">
+            {{ props.row.approver }}
             {{ props.row.approver?.name }}
             <q-popup-edit v-if="!submitted" v-model="props.row.approver" buttons v-slot="scope">
               <EmployeeSelect
@@ -105,9 +120,15 @@
             </q-popup-edit>
           </q-td>
           <q-td key="approvalNotes" :props="props">
-            {{ props.row.approvalNotes }}
-            <q-popup-edit v-if="!submitted" v-model="props.row.approvalNotes" buttons v-slot="scope">
-              <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
+            {{ props.row.approval_notes }}
+            <q-popup-edit
+              v-if="!submitted"
+              v-model="props.row.approval_notes"
+              buttons
+              v-slot="scope"
+              @save="(val) => updateApprovalNotes(props.row.pk, val)"
+            >
+              <q-input v-model="scope.value" dense autofocus />
             </q-popup-edit>
           </q-td>
           <q-td key="receipt" :props="props">
@@ -428,6 +449,14 @@ function updateExpense(row: Expense) {
     })
 }
 
+function updateName(pk: number, val: string) {
+  const row = expenses.value.find(row => row.pk === pk)
+  if (row) {
+    row.name = val
+    updateExpense(row)
+  }
+}
+
 function updateDate(pk: number, val: string) {
   const row = expenses.value.find(row => row.pk === pk)
   if (row) {
@@ -440,6 +469,22 @@ function updateJob(pk: number, val: string) {
   const row = expenses.value.find(row => row.pk === pk)
   if (row) {
     row.job = val
+    updateExpense(row)
+  }
+}
+
+function updateGLs(pk: number, val: string) {
+  const row = expenses.value.find(row => row.pk === pk)
+  if (row) {
+    row.gls = val
+    updateExpense(row)
+  }
+}
+
+function updateApprovalNotes(pk: number, val: string) {
+  const row = expenses.value.find(row => row.pk === pk)
+  if (row) {
+    row.approval_notes = val
     updateExpense(row)
   }
 }

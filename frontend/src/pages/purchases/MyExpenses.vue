@@ -105,8 +105,9 @@
                 </div>
                 <q-icon
                   name="cancel"
+                  size="sm"
                   @click.stop="scope.value.splice(idx, 1)"
-                  class="cursor-pointer"
+                  class="cursor-pointer q-mt-sm q-ml-sm"
                 />
               </div>
               <q-btn @click="scope.value.push({gl: '', percent: 0})">
@@ -459,9 +460,6 @@ function retrieveExpenses() {
 
 function updateExpense(row: Expense) {
   purchaseStore.updateExpense(row)
-    .then((results) => {
-      // expenses.value = results
-    })
     .catch((error) => {
       console.log('Error updating expense', error)
     })

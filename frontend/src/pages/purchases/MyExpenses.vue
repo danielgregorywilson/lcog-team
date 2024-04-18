@@ -129,7 +129,7 @@
                 :employee="scope.value"
                 :useLegalName="true"
                 v-on:input="scope.value=$event"
-                v-on:clear="scope.value=EmployeeSelect.emptyEmployee"
+                v-on:clear="scope.value=emptyEmployee"
                 :readOnly=false
               />
             </q-popup-edit>

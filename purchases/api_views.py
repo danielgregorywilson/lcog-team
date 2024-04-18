@@ -31,11 +31,18 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             e.job = request.data.get('job', e.job)
             e.gls = request.data.get('gls', e.gls)
 
-            approver = request.data.get('approver')
-            if approver is not None:
-                pk = approver.get('pk', None)
-                if pk is not None and pk != e.approver.pk:
-                    e.approver = Employee.objects.get(pk=pk)
+            current_approver = e.approver
+            new_approver = request.data.get('approver')
+            if current_approver is None and new_approver is None:
+                pass
+            else:
+                current_pk = current_approver.pk if current_approver is not None else None
+                new_pk = new_approver.get('pk', None)
+                if current_pk != new_pk:
+                    if new_pk == -1:
+                        e.approver = None
+                    else:
+                        e.approver = Employee.objects.get(pk=new_pk)
             
             e.approval_notes = request.data.get(
                 'approval_notes', e.approval_notes

@@ -257,8 +257,6 @@ import { readableDate } from 'src/filters'
 import { usePurchaseStore } from 'src/stores/purchase'
 import { emptyEmployee, Expense, SimpleEmployeeRetrieve } from 'src/types'
 
-// type Expense = {date: string, isToday: boolean}
-
 const quasar = useQuasar()
 const purchaseStore = usePurchaseStore()
 
@@ -272,7 +270,6 @@ const props = defineProps<{
 let expensesLoaded = ref(false)
 let expenses = ref([]) as Ref<Expense[]>
 let submitted = ref(false)
-let calendarLoaded = ref(true)
 let showSubmitToFiscalDialog = ref(false)
 let sendDialogMessage = ref('')
 let showUnsubmitDialog = ref(false)
@@ -389,7 +386,7 @@ function clickAddExpense(): void {
     name: '',
     date: `${props.yearInt}-${props.monthInt}-${props.dayInt}`,
     job: '',
-    gls: [],
+    gls: '',
     approval_notes: '',
   })
     .then(() => {

@@ -13,5 +13,5 @@ class ExpenseSerializer(serializers.HyperlinkedModelSerializer):
             'approval_notes', 'receipt'
         ]
 
-    purchaser = SimpleEmployeeSerializer()
-    approver = SimpleEmployeeSerializer()
+    purchaser = SimpleEmployeeSerializer(required=False)
+    approver = SimpleEmployeeSerializer(required=False)

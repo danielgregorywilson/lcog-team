@@ -125,6 +125,11 @@ export interface SimpleEmployeeRetrieve {
   pk: number
   name: string
   legal_name: string
+  title: string
+}
+
+export const emptyEmployee: SimpleEmployeeRetrieve = {
+  pk: -1, name: '', legal_name: '', title: ''
 }
 
 export interface EmployeeEmailRetrieve {

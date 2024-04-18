@@ -32,9 +32,10 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             e.gls = request.data.get('gls', e.gls)
 
             approver = request.data.get('approver')
-            pk = approver.get('pk', None)
-            if pk is not None and pk != e.approver.pk:
-                e.approver = Employee.objects.get(pk=pk)
+            if approver is not None:
+                pk = approver.get('pk', None)
+                if pk is not None and pk != e.approver.pk:
+                    e.approver = Employee.objects.get(pk=pk)
             
             e.approval_notes = request.data.get(
                 'approval_notes', e.approval_notes

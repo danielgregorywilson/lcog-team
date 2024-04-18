@@ -255,7 +255,7 @@ import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import FileUploader from 'src/components/FileUploader.vue'
 import { readableDate } from 'src/filters'
 import { usePurchaseStore } from 'src/stores/purchase'
-import { Expense, SimpleEmployeeRetrieve } from 'src/types'
+import { emptyEmployee, Expense, SimpleEmployeeRetrieve } from 'src/types'
 
 // type Expense = {date: string, isToday: boolean}
 
@@ -264,6 +264,7 @@ const purchaseStore = usePurchaseStore()
 
 const props = defineProps<{
   monthDisplay: string
+  dayInt: string
   monthInt: string
   yearInt: string
 }>()
@@ -386,13 +387,13 @@ function clickAddExpense(): void {
 
   purchaseStore.createExpense({
     name: '',
-    date: `${props.yearInt}-${props.monthInt}-1`,
+    date: `${props.yearInt}-${props.monthInt}-${props.dayInt}`,
     job: '',
-    gls: [{gl: '', percent: 0}],
+    gls: [],
     approval_notes: '',
   })
-    .then((results) => {
-      expenses.value = results
+    .then(() => {
+      retrieveExpenses()
     })
     .catch((error) => {
       console.log('Error adding expense', error)

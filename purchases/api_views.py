@@ -49,9 +49,6 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             expense.approval_notes = request.data.get(
                 'approval_notes', expense.approval_notes
             )
-            expense.receipt_link = request.data.get(
-                'receipt_link', expense.receipt.url
-            )
 
             expense.save()
             serialized_expense = ExpenseSerializer(

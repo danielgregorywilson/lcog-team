@@ -1,7 +1,12 @@
-from rest_framework import viewsets
+import traceback
 
-from .models import Expense
-from .serializers import ExpenseSerializer
+from rest_framework import status, viewsets
+from rest_framework.response import Response
+
+from mainsite.helpers import record_error
+from people.models import Employee
+from purchases.models import Expense
+from purchases.serializers import ExpenseSerializer
 
 
 class ExpenseViewSet(viewsets.ModelViewSet):
@@ -10,6 +15,45 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     """
     queryset = Expense.objects.all()
     serializer_class = ExpenseSerializer
+
+    def update(self, request, pk=None):
+        """
+        Update the expense with the given pk.
+        """
+        try:
+            e = Expense.objects.get(pk=pk)
+
+            if e.purchaser is None:
+                e.purchaser = request.user.employee
+
+            e.name = request.data.get('name', e.name)
+            e.date = request.data.get('date', e.date)
+            e.job = request.data.get('job', e.job)
+            e.gls = request.data.get('gls', e.gls)
+
+            approver = request.data.get('approver')
+            pk = approver.get('pk', None)
+            if pk is not None and pk != e.approver.pk:
+                e.approver = Employee.objects.get(pk=pk)
+            
+            e.approval_notes = request.data.get(
+                'approval_notes', e.approval_notes
+            )
+            # e.receipt = request.data.get('receipt', e.receipt)
+
+            e.save()
+            serialized_expense = ExpenseSerializer(
+                e, context={'request': request}
+            )
+            return Response(serialized_expense.data)
+
+        except Exception as e:
+            message = 'Error updating expense.'
+            record_error(message, e, request, traceback.format_exc())
+            return Response(
+                data=message,
+                status=status.HTTP_403_FORBIDDEN
+            )
 
     # def get_queryset(self):
     #     """

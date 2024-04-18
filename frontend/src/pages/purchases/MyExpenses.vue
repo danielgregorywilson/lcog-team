@@ -104,18 +104,22 @@
             </q-popup-edit>
           </q-td>
           <q-td key="approver" :props="props">
-            {{ props.row.approver }}
             {{ props.row.approver?.name }}
-            <q-popup-edit v-if="!submitted" v-model="props.row.approver" buttons v-slot="scope">
+            <q-popup-edit
+              v-if="!submitted"
+              v-model="props.row.approver"
+              buttons
+              v-slot="scope"
+              @save="(val) => updateApprover(props.row.pk, val)"
+            >
               <EmployeeSelect
                 name="approver"
                 label="Approver"
-                :employee="props.row.approver"
+                :employee="scope.value"
                 :useLegalName="true"
-                v-on:input="props.row.approver=$event"
-                v-on:clear="props.row.approver=EmployeeSelect.emptyEmployee"
+                v-on:input="scope.value=$event"
+                v-on:clear="scope.value=EmployeeSelect.emptyEmployee"
                 :readOnly=false
-                @keyup.enter="scope.set()"
               />
             </q-popup-edit>
           </q-td>
@@ -477,6 +481,14 @@ function updateGLs(pk: number, val: string) {
   const row = expenses.value.find(row => row.pk === pk)
   if (row) {
     row.gls = val
+    updateExpense(row)
+  }
+}
+
+function updateApprover(pk: number, val: SimpleEmployeeRetrieve) {
+  const row = expenses.value.find(row => row.pk === pk)
+  if (row) {
+    row.approver = val
     updateExpense(row)
   }
 }

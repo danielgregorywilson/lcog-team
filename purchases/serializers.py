@@ -14,3 +14,4 @@ class ExpenseSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
     purchaser = SimpleEmployeeSerializer()
+    approver = SimpleEmployeeSerializer()

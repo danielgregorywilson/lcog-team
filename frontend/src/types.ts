@@ -315,8 +315,8 @@ export interface Expense {
   date: string
   job: string
   gls: Array<GL>
-  purchaser_pk: number
-  approver_pk: number
+  purchaser: SimpleEmployeeRetrieve
+  approver: SimpleEmployeeRetrieve
   approval_notes: string
   receipt: File
 }
@@ -341,7 +341,7 @@ export interface ExpenseUpdate {
   date?: string
   job?: string
   gls?: Array<GL>
-  approver_pk?: number
+  approver?: SimpleEmployeeRetrieve
   approval_notes?: string
   receipt?: File
 }

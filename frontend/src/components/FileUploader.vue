@@ -65,9 +65,6 @@ let selectedFile = ref(new File([''], ''))
 let fileTooLarge = ref(false)
 let fileSuccessfullyUploaded = ref(false)
 
-
-// const emptyEmployee = {pk: -1, name: '', legal_name: ''}
-
 const props = defineProps<{
   file: File,
   contentTypeAppLabel: string,

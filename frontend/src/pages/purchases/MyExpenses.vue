@@ -147,18 +147,23 @@
             </q-popup-edit>
           </q-td>
           <q-td key="receipt" :props="props">
-            {{ props.row.receipt?.name }}
-            <q-popup-edit v-if="!submitted" v-model="props.row.receipt" buttons>
+            {{ props.row.receipt?.split('/').pop() }}
+            <q-popup-edit
+              v-if="!submitted"
+              v-model="props.row.receipt"
+              buttons
+              v-slot="scope"
+            >
               <FileUploader
-                :file="props.row.receipt"
+                :file="scope.value"
                 contentTypeAppLabel="purchases"
                 contentTypeModel="expense"
                 :objectPk="props.row.pk.toString()"
                 :readOnly=false
                 v-on="{
                   'uploaded': (url: string) => {
-                    // uploadedPositionDescriptionUrl = url
-                    // uploadingAnother = false
+                    updateReceipt(props.row.pk, url)
+                    retrieveExpenses()
                   }
                 }"
               />
@@ -506,6 +511,14 @@ function updateApprovalNotes(pk: number, val: string) {
   const row = expenses.value.find(row => row.pk === pk)
   if (row) {
     row.approval_notes = val
+    updateExpense(row)
+  }
+}
+
+function updateReceipt(pk: number, val: string) {
+  const row = expenses.value.find(row => row.pk === pk)
+  if (row) {
+    row.receipt_link = val
     updateExpense(row)
   }
 }

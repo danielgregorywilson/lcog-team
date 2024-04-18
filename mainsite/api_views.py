@@ -123,23 +123,19 @@ class FileUploadViewSet(viewsets.ViewSet):
                 return Response(data="Invalid PR PK", status=400)
             pr.signed_position_description = file_upload
             pr.save()
-            return Response(data=request.build_absolute_uri(pr.signed_position_description.url), status=200)
+            return Response(
+                data=request.build_absolute_uri(
+                    pr.signed_position_description.url
+                ),
+                status=200
+            )
         elif model == 'expense':
-            if not object_pk:
-                expense = Expense.objects.create(
-                    name=request.data.get('name'),
-                    date=request.data.get('date'),
-                    job=request.data.get('job'),
-                    gls=request.data.get('gls'),
-                    purchaser=request.data.get('purchaser'),
-                    approver=request.data.get('approver'),
-                    approval_notes=request.data.get('approval_notes'),
-                    receipt=file_upload
-                )
-            else:
-                # TODO: Object_pk should probably be an integer, but it's a string
-                expense = Expense.objects.filter(pk=object_pk)
-                expense.save()
+            try:
+                expense = Expense.objects.get(pk=object_pk)
+            except Expense.DoesNotExist:
+                return Response(data="Invalid Expense PK", status=400)
+            expense.receipt = file_upload
+            expense.save()
             return Response(
                 data=request.build_absolute_uri(expense.receipt.url),
                 status=200

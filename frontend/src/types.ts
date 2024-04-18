@@ -319,36 +319,32 @@ export interface Expense {
   name: string
   date: string
   job: string
-  gls: Array<GL>
+  gls: string
   purchaser: SimpleEmployeeRetrieve
   approver: SimpleEmployeeRetrieve
   approval_notes: string
-  receipt: File
-}
-
-type GL = {
-  gl: string
-  percent: number
+  receipt_link: string
+  submitted: boolean
 }
 
 export interface ExpenseCreate {
   name?: string
   date?: string
   job?: string
-  gls?: Array<GL>
+  gls?: string
   approver?: SimpleEmployeeRetrieve
   approval_notes?: string
-  receipt?: File
+  receipt_link?: string
 }
 
 export interface ExpenseUpdate {
   name?: string
   date?: string
   job?: string
-  gls?: Array<GL>
+  gls?: string
   approver?: SimpleEmployeeRetrieve
   approval_notes?: string
-  receipt?: File
+  receipt_link?: string
 }
 
 /////////////////////////////////////////////////////////

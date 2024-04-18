@@ -21,37 +21,41 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         Update the expense with the given pk.
         """
         try:
-            e = Expense.objects.get(pk=pk)
+            expense = Expense.objects.get(pk=pk)
 
-            if e.purchaser is None:
-                e.purchaser = request.user.employee
+            if expense.purchaser is None:
+                expense.purchaser = request.user.employee
 
-            e.name = request.data.get('name', e.name)
-            e.date = request.data.get('date', e.date)
-            e.job = request.data.get('job', e.job)
-            e.gls = request.data.get('gls', e.gls)
+            expense.name = request.data.get('name', expense.name)
+            expense.date = request.data.get('date', expense.date)
+            expense.job = request.data.get('job', expense.job)
+            expense.gls = request.data.get('gls', expense.gls)
 
-            current_approver = e.approver
+            current_approver = expense.approver
             new_approver = request.data.get('approver')
             if current_approver is None and new_approver is None:
                 pass
             else:
-                current_pk = current_approver.pk if current_approver is not None else None
+                current_pk = None
+                if current_approver is not None:
+                    current_pk = current_approver.pk
                 new_pk = new_approver.get('pk', None)
                 if current_pk != new_pk:
                     if new_pk == -1:
-                        e.approver = None
+                        expense.approver = None
                     else:
-                        e.approver = Employee.objects.get(pk=new_pk)
+                        expense.approver = Employee.objects.get(pk=new_pk)
             
-            e.approval_notes = request.data.get(
-                'approval_notes', e.approval_notes
+            expense.approval_notes = request.data.get(
+                'approval_notes', expense.approval_notes
             )
-            # e.receipt = request.data.get('receipt', e.receipt)
+            expense.receipt_link = request.data.get(
+                'receipt_link', expense.receipt.url
+            )
 
-            e.save()
+            expense.save()
             serialized_expense = ExpenseSerializer(
-                e, context={'request': request}
+                expense, context={'request': request}
             )
             return Response(serialized_expense.data)
 

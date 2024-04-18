@@ -31,5 +31,5 @@ class PurchaseRequestAdmin(admin.ModelAdmin):
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'receipt'
+        'id', 'purchaser', 'date', 'name'
     )

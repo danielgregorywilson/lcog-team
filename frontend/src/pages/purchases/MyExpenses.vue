@@ -6,7 +6,7 @@
   </div>
   <div class="q-mt-md">
     <q-spinner-grid
-      v-if="!calendarLoaded"
+      v-if="!expensesLoaded"
       class="spinner"
       color="primary"
       size="xl"
@@ -15,7 +15,7 @@
       v-else
       flat bordered
       :title="tableTitleDisplay()"
-      :rows="rows"
+      :rows="expenses"
       :columns="columns"
       row-key="name"
       binary-state-sort
@@ -26,34 +26,65 @@
         <q-tr :props="props" :class="submitted?'bg-grey':''">
           <q-td key="name" :props="props">
             {{ props.row.name }}
-            <q-popup-edit v-if="!submitted" v-model="props.row.name" buttons v-slot="scope">
-              <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
+            <q-popup-edit
+              v-if="!submitted"
+              v-model="props.row.name"
+              buttons
+              v-slot="scope"
+              @save="(val) => updateName(props.row.pk, val)"
+            >
+              <q-input v-model="scope.value" dense autofocus />
             </q-popup-edit>
           </q-td>
           <q-td key="date" :props="props">
-            {{ readableDate(props.row.date) }}
-            <q-popup-edit v-if="!submitted" v-model="props.row.date" buttons v-slot="scope">
-              <q-input type="date" v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
+            {{ readableDateNEW(props.row.date) }}
+            <q-popup-edit
+              v-if="!submitted"
+              v-model="props.row.date"
+              buttons
+              v-slot="scope"
+              @save="(val) => updateDate(props.row.pk, val)"
+            >
+              <q-input type="date" v-model="scope.value" dense autofocus />
             </q-popup-edit>
           </q-td>
           <q-td key="job" :props="props">
             <div class="text-pre-wrap">{{ props.row.job }}</div>
-            <q-popup-edit v-if="!submitted" v-model="props.row.job" buttons v-slot="scope">
-              <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
+            <q-popup-edit
+              v-if="!submitted"
+              v-model="props.row.job"
+              buttons
+              v-slot="scope"
+              @save="(val) => updateJob(props.row.pk, val)"
+            >
+              <q-input v-model="scope.value" dense autofocus />
             </q-popup-edit>
           </q-td>
           <q-td key="gls" :props="props">
-            <div class="text-pre-wrap" v-for="gl in props.row.gls" :key="props.row.gls.indexOf(gl)">
+            <div
+              class="text-pre-wrap"
+              v-for="gl in props.row.gls"
+              :key="props.row.gls.indexOf(gl)"
+            >
               {{ gl.gl }}: {{ gl.percent }}%
             </div>
-            <q-popup-edit v-if="!submitted" v-model="props.row.gls" buttons v-slot="scope">
-              <div v-for="gl in scope.value" :key="scope.value.indexOf(gl)" class="row">
+            <q-popup-edit
+              v-if="!submitted"
+              v-model="props.row.gls"
+              buttons
+              v-slot="scope"
+              @save="(val) => updateGLs(props.row.pk, val)"
+            >
+              <div
+                v-for="(gl, idx) in scope.value"
+                :key="scope.value.indexOf(gl)"
+                class="row"
+              >
                 <q-input
                   v-model="gl.gl"
                   class="q-mr-sm"
                   outlined dense autofocus
                   mask="##-#####-###"
-                  @keyup.enter="scope.set()"
                   :rules="[
                     val => !!val || 'Required',
                   ]"
@@ -72,40 +103,70 @@
                   />
                   <div class="gl-percent-symbol">%</div>
                 </div>
+                <q-icon
+                  name="cancel"
+                  size="sm"
+                  @click.stop="scope.value.splice(idx, 1)"
+                  class="cursor-pointer q-mt-sm q-ml-sm"
+                />
               </div>
-              <q-btn @click="scope.value.push({gl: '', percent: 0})">Add a GL</q-btn>
+              <q-btn @click="scope.value.push({gl: '', percent: 0})">
+                Add a GL
+              </q-btn>
             </q-popup-edit>
           </q-td>
           <q-td key="approver" :props="props">
-            {{ props.row.approver.name }}
-            <q-popup-edit v-if="!submitted" v-model="props.row.approver" buttons v-slot="scope">
+            {{ props.row.approver?.name }}
+            <q-popup-edit
+              v-if="!submitted"
+              v-model="props.row.approver"
+              buttons
+              v-slot="scope"
+              @save="(val) => updateApprover(props.row.pk, val)"
+            >
               <EmployeeSelect
                 name="approver"
                 label="Approver"
-                :employee="props.row.approver"
+                :employee="scope.value"
                 :useLegalName="true"
-                v-on:input="props.row.approver=$event"
-                v-on:clear="props.row.approver=EmployeeSelect.emptyEmployee"
+                v-on:input="scope.value=$event"
+                v-on:clear="scope.value=emptyEmployee"
                 :readOnly=false
-                @keyup.enter="scope.set()"
               />
             </q-popup-edit>
           </q-td>
           <q-td key="approvalNotes" :props="props">
-            {{ props.row.approvalNotes }}
-            <q-popup-edit v-if="!submitted" v-model="props.row.approvalNotes" buttons v-slot="scope">
-              <q-input v-model="scope.value" dense autofocus @keyup.enter="scope.set()" />
+            {{ props.row.approval_notes }}
+            <q-popup-edit
+              v-if="!submitted"
+              v-model="props.row.approval_notes"
+              buttons
+              v-slot="scope"
+              @save="(val) => updateApprovalNotes(props.row.pk, val)"
+            >
+              <q-input v-model="scope.value" dense autofocus />
             </q-popup-edit>
           </q-td>
           <q-td key="receipt" :props="props">
-            {{ props.row.receipt }}
-            <q-popup-edit v-if="!submitted" v-model="props.row.receipt" buttons>
+            {{ props.row.receipt?.split('/').pop() }}
+            <q-popup-edit
+              v-if="!submitted"
+              v-model="props.row.receipt"
+              buttons
+              v-slot="scope"
+            >
               <FileUploader
-                label="Receipt"
-                :file="props.row.receipt"
+                :file="scope.value"
                 contentTypeAppLabel="purchases"
                 contentTypeModel="expense"
+                :objectPk="props.row.pk.toString()"
                 :readOnly=false
+                v-on="{
+                  'uploaded': (url: string) => {
+                    updateReceipt(props.row.pk, url)
+                    retrieveExpenses()
+                  }
+                }"
               />
             </q-popup-edit>
           </q-td>
@@ -194,22 +255,27 @@
 </style>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, Ref, ref } from 'vue'
 import { useQuasar } from 'quasar'
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import FileUploader from 'src/components/FileUploader.vue'
-import { readableDate } from 'src/filters'
-
-// type Expense = {date: string, isToday: boolean}
+import { readableDateNEW } from 'src/filters'
+import { usePurchaseStore } from 'src/stores/purchase'
+import { emptyEmployee, Expense, GL, SimpleEmployeeRetrieve } from 'src/types'
 
 const quasar = useQuasar()
+const purchaseStore = usePurchaseStore()
 
 const props = defineProps<{
   monthDisplay: string
+  dayInt: string
+  monthInt: string
+  yearInt: string
 }>()
 
+let expensesLoaded = ref(false)
+let expenses = ref([]) as Ref<Expense[]>
 let submitted = ref(false)
-let calendarLoaded = ref(true)
 let showSubmitToFiscalDialog = ref(false)
 let sendDialogMessage = ref('')
 let showUnsubmitDialog = ref(false)
@@ -241,44 +307,45 @@ const columns = [
   { name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' }
 ]
 
-const rows = ref([
-  {
-    name: 'Frozen Yogurt',
-    date: '2023-10-01',
-    job: '',
-    gls: [{gl: '43-45045-232', percent: 100}],
-    approver: { 'pk': 5, 'name': 'Dan Wilson', 'legal_name': 'Daniel Wilson' },
-    approvalNotes: 'Felicity feigned faintness so I fetched froyo. Follow?',
-    receipt: 'file.txt'
-  },
-  {
-    name: 'Ice cream sandwich',
-    date: '2023-10-04',
-    job: '123',
-    gls: [{gl: '55-55555-555', percent: 50}, {gl: '43-45045-232', percent: 50}],
-    approver: {pk: -1, name: '', legal_name: ''},
-    approvalNotes: '',
-    receipt: 'file.txt'
-  },
-  {
-    name: 'Eclair',
-    date: '2023-10-07',
-    job: '',
-    gls: [{gl: '12-34567-890', percent: 100}],
-    approver: {pk: -1, name: '', legal_name: ''},
-    approvalNotes: '',
-    receipt: 'file.txt'
-  },
-  {
-    name: 'Cupcake',
-    date: '2023-10-07',
-    job: '',
-    gls: [{gl: '43-45045-232', percent: 100}],
-    approver: {pk: -1, name: '', legal_name: ''},
-    approvalNotes: '',
-    receipt: 'file.txt'
-  }
-])
+// const rows = ref([
+//   {
+//     pk: 1,
+//     name: 'Frozen Yogurt',
+//     date: '2023-10-01',
+//     job: '',
+//     gls: [{gl: '43-45045-232', percent: 100}],
+//     approver: { 'pk': 5, 'name': 'Dan Wilson', 'legal_name': 'Daniel Wilson' },
+//     approvalNotes: 'Felicity feigned faintness so I fetched froyo. Follow?',
+//     receipt: ''
+//   },
+//   {
+//     name: 'Ice cream sandwich',
+//     date: '2023-10-04',
+//     job: '123',
+//     gls: [{gl: '55-55555-555', percent: 50}, {gl: '43-45045-232', percent: 50}],
+//     approver: {pk: -1, name: '', legal_name: ''},
+//     approvalNotes: '',
+//     receipt: 'file.txt'
+//   },
+//   {
+//     name: 'Eclair',
+//     date: '2023-10-07',
+//     job: '',
+//     gls: [{gl: '12-34567-890', percent: 100}],
+//     approver: {pk: -1, name: '', legal_name: ''},
+//     approvalNotes: '',
+//     receipt: 'file.txt'
+//   },
+//   {
+//     name: 'Cupcake',
+//     date: '2023-10-07',
+//     job: '',
+//     gls: [{gl: '43-45045-232', percent: 100}],
+//     approver: {pk: -1, name: '', legal_name: ''},
+//     approvalNotes: '',
+//     receipt: 'file.txt'
+//   }
+// ])
 
 function tableTitleDisplay(): string {
   const submittedText = submitted.value ? ' - Submitted' : ''
@@ -320,15 +387,20 @@ function tableTitleDisplay(): string {
 // }
 
 function clickAddExpense(): void {
-  rows.value.push({
+
+  purchaseStore.createExpense({
     name: '',
-    date: '',
+    date: `${props.yearInt}-${props.monthInt}-${props.dayInt}`,
     job: '',
-    gls: [{gl: '', percent: 0}],
-    approver: {pk: -1, name: '', legal_name: ''},
-    approvalNotes: '',
-    receipt: ''
+    gls: [],
+    approval_notes: '',
   })
+    .then(() => {
+      retrieveExpenses()
+    })
+    .catch((error) => {
+      console.log('Error adding expense', error)
+    })
 }
 
 function formErrorItems(): Array<[string, string]> {
@@ -356,7 +428,7 @@ function formErrors() {
 function onSubmitFiscalDialog() {
   showSubmitToFiscalDialog.value = false
   submitted.value = true
-  rows.value.forEach(row => row.submitted = true)
+  expenses.value.forEach(row => row.submitted = true)
   quasar.notify({
     message: 'Sent',
     color: 'positive',
@@ -367,7 +439,7 @@ function onSubmitFiscalDialog() {
 function onUnsubmitDialog() {
   showUnsubmitDialog.value = false
   submitted.value = false
-  rows.value.forEach(row => row.submitted = false)
+  expenses.value.forEach(row => row.submitted = false)
   quasar.notify({
     message: 'Unsubmitted',
     color: 'positive',
@@ -375,8 +447,82 @@ function onUnsubmitDialog() {
   })
 }
 
+function retrieveExpenses() {
+  purchaseStore.getAllExpenses()
+    .then((results) => {
+      expenses.value = results
+      expensesLoaded.value = true
+    })
+    .catch((error) => {
+      console.log('Error retrieving expenses', error)
+    })
+}
+
+function updateExpense(row: Expense) {
+  purchaseStore.updateExpense(row)
+    .catch((error) => {
+      console.log('Error updating expense', error)
+    })
+}
+
+function updateName(pk: number, val: string) {
+  const row = expenses.value.find(row => row.pk === pk)
+  if (row) {
+    row.name = val
+    updateExpense(row)
+  }
+}
+
+function updateDate(pk: number, val: string) {
+  const row = expenses.value.find(row => row.pk === pk)
+  if (row) {
+    row.date = val
+    updateExpense(row)
+  }
+}
+
+function updateJob(pk: number, val: string) {
+  const row = expenses.value.find(row => row.pk === pk)
+  if (row) {
+    row.job = val
+    updateExpense(row)
+  }
+}
+
+function updateGLs(pk: number, val: Array<GL>) {
+  const row = expenses.value.find(row => row.pk === pk)
+  if (row) {
+    row.gls = val
+    updateExpense(row)
+  }
+}
+
+function updateApprover(pk: number, val: SimpleEmployeeRetrieve) {
+  const row = expenses.value.find(row => row.pk === pk)
+  if (row) {
+    row.approver = val
+    updateExpense(row)
+  }
+}
+
+function updateApprovalNotes(pk: number, val: string) {
+  const row = expenses.value.find(row => row.pk === pk)
+  if (row) {
+    row.approval_notes = val
+    updateExpense(row)
+  }
+}
+
+function updateReceipt(pk: number, val: string) {
+  const row = expenses.value.find(row => row.pk === pk)
+  if (row) {
+    row.receipt_link = val
+    updateExpense(row)
+  }
+}
+
 onMounted(() => {
-  // retrieveExpenses()
+  retrieveExpenses()
 })
 
 </script>

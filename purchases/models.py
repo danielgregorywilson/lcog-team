@@ -98,7 +98,7 @@ class Expense(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True)
     date = models.DateField(blank=True, null=True)
     job = models.CharField(max_length=255, blank=True, null=True)
-    gls = models.JSONField(blank=True, null=True)
+    gls = models.JSONField(_("GL Codes"), blank=True, null=True)
     purchaser = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='expenses_purchased',

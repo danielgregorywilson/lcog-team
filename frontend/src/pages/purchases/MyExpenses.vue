@@ -37,7 +37,7 @@
             </q-popup-edit>
           </q-td>
           <q-td key="date" :props="props">
-            {{ readableDate(props.row.date) }}
+            {{ readableDateNEW(props.row.date) }}
             <q-popup-edit
               v-if="!submitted"
               v-model="props.row.date"
@@ -258,7 +258,7 @@ import { onMounted, Ref, ref } from 'vue'
 import { useQuasar } from 'quasar'
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import FileUploader from 'src/components/FileUploader.vue'
-import { readableDate } from 'src/filters'
+import { readableDateNEW } from 'src/filters'
 import { usePurchaseStore } from 'src/stores/purchase'
 import { emptyEmployee, Expense, SimpleEmployeeRetrieve } from 'src/types'
 

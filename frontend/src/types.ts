@@ -319,7 +319,7 @@ export interface Expense {
   name: string
   date: string
   job: string
-  gls: string
+  gls: Array<GL>
   purchaser: SimpleEmployeeRetrieve
   approver: SimpleEmployeeRetrieve
   approval_notes: string
@@ -331,7 +331,7 @@ export interface ExpenseCreate {
   name?: string
   date?: string
   job?: string
-  gls?: string
+  gls?: Array<GL>
   approver?: SimpleEmployeeRetrieve
   approval_notes?: string
   receipt_link?: string
@@ -341,10 +341,15 @@ export interface ExpenseUpdate {
   name?: string
   date?: string
   job?: string
-  gls?: string
+  gls?: Array<GL>
   approver?: SimpleEmployeeRetrieve
   approval_notes?: string
   receipt_link?: string
+}
+
+export interface GL {
+  gl: string
+  percent: string
 }
 
 /////////////////////////////////////////////////////////

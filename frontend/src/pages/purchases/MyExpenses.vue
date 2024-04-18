@@ -260,7 +260,7 @@ import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import FileUploader from 'src/components/FileUploader.vue'
 import { readableDateNEW } from 'src/filters'
 import { usePurchaseStore } from 'src/stores/purchase'
-import { emptyEmployee, Expense, SimpleEmployeeRetrieve } from 'src/types'
+import { emptyEmployee, Expense, GL, SimpleEmployeeRetrieve } from 'src/types'
 
 const quasar = useQuasar()
 const purchaseStore = usePurchaseStore()
@@ -391,7 +391,7 @@ function clickAddExpense(): void {
     name: '',
     date: `${props.yearInt}-${props.monthInt}-${props.dayInt}`,
     job: '',
-    gls: '',
+    gls: [],
     approval_notes: '',
   })
     .then(() => {
@@ -491,7 +491,7 @@ function updateJob(pk: number, val: string) {
   }
 }
 
-function updateGLs(pk: number, val: string) {
+function updateGLs(pk: number, val: Array<GL>) {
   const row = expenses.value.find(row => row.pk === pk)
   if (row) {
     row.gls = val

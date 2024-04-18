@@ -75,7 +75,11 @@
               v-slot="scope"
               @save="(val) => updateGLs(props.row.pk, val)"
             >
-              <div v-for="gl in scope.value" :key="scope.value.indexOf(gl)" class="row">
+              <div
+                v-for="(gl, idx) in scope.value"
+                :key="scope.value.indexOf(gl)"
+                class="row"
+              >
                 <q-input
                   v-model="gl.gl"
                   class="q-mr-sm"
@@ -99,8 +103,15 @@
                   />
                   <div class="gl-percent-symbol">%</div>
                 </div>
+                <q-icon
+                  name="cancel"
+                  @click.stop="scope.value.splice(idx, 1)"
+                  class="cursor-pointer"
+                />
               </div>
-              <q-btn @click="scope.value.push({gl: '', percent: 0})">Add a GL</q-btn>
+              <q-btn @click="scope.value.push({gl: '', percent: 0})">
+                Add a GL
+              </q-btn>
             </q-popup-edit>
           </q-td>
           <q-td key="approver" :props="props">

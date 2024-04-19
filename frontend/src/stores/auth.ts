@@ -4,6 +4,7 @@ import axios from 'axios'
 import { apiURL } from 'src/stores/index'
 import { useMealsStore } from 'src/stores/meals'
 import { usePeopleStore } from 'src/stores/people'
+import { usePurchaseStore } from 'src/stores/purchase'
 import { useResponsibilityStore } from 'src/stores/responsibility'
 import { useSecurityMessageStore } from 'src/stores/securitymessage'
 import { useTimeOffStore } from 'src/stores/timeoff'
@@ -63,6 +64,7 @@ export const useAuthStore = defineStore('auth', {
         localStorage.removeItem('user-token') // clear your user's token from localstorage
         const mealsStore = useMealsStore()
         const peopleStore = usePeopleStore()
+        const purchaseStore = usePurchaseStore()
         const responsibilityStore = useResponsibilityStore()
         const securityMessageStore = useSecurityMessageStore()
         const timeOffStore = useTimeOffStore()
@@ -75,6 +77,8 @@ export const useAuthStore = defineStore('auth', {
         // TODO: Uncomment these when the modules are ready
         // dispatch('performanceReviewModule/authLogout', null, { root: true })
         //   .catch(err => console.log(err))
+        purchaseStore.authLogout()
+          .catch(err => console.log(err))
         responsibilityStore.authLogout()
           .catch(err => console.log(err))
         securityMessageStore.authLogout()

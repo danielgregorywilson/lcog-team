@@ -30,15 +30,13 @@
 import { onMounted, onUpdated, ref } from 'vue'
 
 import { usePeopleStore } from 'src/stores/people'
-import { SimpleEmployeeRetrieve } from 'src/types'
+import { emptyEmployee, SimpleEmployeeRetrieve } from 'src/types'
 
 const peopleStore = usePeopleStore()
 
-const emptyEmployee = {pk: -1, name: '', legal_name: ''}
-
 const props = defineProps<{
   label: string,
-  employee: SimpleEmployeeRetrieve,
+  employee?: SimpleEmployeeRetrieve,
   useLegalName: boolean
   readOnly: boolean
 }>()
@@ -61,9 +59,9 @@ function selectOptionLabel(): string {
 
 function selectedEmployeeName(): string {
   if (props.useLegalName) {
-    return selectedEmployee.value.legal_name
+    return selectedEmployee.value?.legal_name
   } else {
-    return selectedEmployee.value.name
+    return selectedEmployee.value?.name
   }
 }
 

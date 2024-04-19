@@ -10,7 +10,8 @@
     <div>
       <router-view
         :monthDisplay="monthDisplay()"
-        :monthInt="firstOfSelectedMonth.getMonth().toString()"
+        :dayInt="new Date().getDate().toString()"
+        :monthInt="(firstOfSelectedMonth.getMonth() + 1).toString()"
         :yearInt="firstOfSelectedMonth.getFullYear().toString()"
       ></router-view>
     </div>

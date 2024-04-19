@@ -6,9 +6,6 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from django.contrib.auth.models import Group, User
-from django.db.models import Q
-from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.timezone import get_current_timezone
 

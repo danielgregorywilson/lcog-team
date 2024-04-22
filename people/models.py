@@ -202,17 +202,17 @@ class Employee(models.Model):
             return False
         if current_employee.is_division_director:
             return False
-        if all(
+        if all([
             current_employee.manager,
             current_employee.manager.is_division_director
-        ):
+        ]):
             # They *are* the program manager
             return False
         while True:
-            if all(
+            if all([
                 current_employee.manager,
                 current_employee.manager.is_division_director
-            ):
+            ]):
                 return True
             if current_employee.manager:
                 current_employee = current_employee.manager
@@ -398,28 +398,28 @@ class Employee(models.Model):
         reviews = []
         for review in self.signature_upcoming_reviews():
             if self.is_executive_director:
-                if all(
+                if all([
                     review.status == PerformanceReview.EVALUATION_HR_PROCESSED,
                     review.signature_set.filter(employee=self).count() == 0
-                ):
+                ]):
                     reviews.append(review)
             elif self.is_hr_manager:
-                if all(
+                if all([
                     review.status == PerformanceReview.EVALUATION_APPROVED,
                     review.signature_set.filter(employee=self).count() == 0
-                ):
+                ]):
                     reviews.append(review)
             else:
                 direct_report = review.employee
                 while direct_report.manager != self:
                     direct_report = direct_report.manager
-                if all(
+                if all([
                     review.status == PerformanceReview.EVALUATION_WRITTEN,
                     review.signature_set.filter(
                         employee=direct_report
                     ).count() == 1,
                     review.signature_set.filter(employee=self).count() == 0
-                ):
+                ]):
                     reviews.append(review)
         return reviews
     

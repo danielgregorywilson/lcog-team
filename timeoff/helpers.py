@@ -1,6 +1,7 @@
 from datetime import date, datetime
 import os
 
+from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
@@ -136,16 +137,8 @@ def send_daily_helpdesk_timeoff_today_report():
     calendar_url = current_site.domain + '/timeoff/calendar'
     profile_url = current_site.domain + '/profile'
     team_name = 'IS'
-    thomas = Employee.objects.get(user__username='tlemelin')
-    kathleen = Employee.objects.get(user__username='kmoore')
-    tony = Employee.objects.get(user__username='tshireman')
-    andy = Employee.objects.get(user__username='asmith')
-    matt = Employee.objects.get(user__username='mnasholm')
-    dan = Employee.objects.get(user__username='dhogue')
-    danw = Employee.objects.get(user__username='dwilson')
-    help_desk = [thomas, kathleen, tony, andy, matt, dan, danw]
-    manager = Employee.objects.get(user__username='hleyba')
-    is_team = manager.get_descendants_of_employee(manager)
+    help_desk = Employee.objects.filter(user__groups__name='IS Help Desk')
+    is_team = Employee.objects.filter(user__groups__name='IS Employee')
     tors = TimeOffRequest.objects.filter(employee__in=is_team)
     
     today = datetime.now().date()
@@ -162,9 +155,6 @@ def send_daily_helpdesk_timeoff_today_report():
         'from_email': os.environ.get('FROM_EMAIL')
     }, })
     plaintext_message = strip_tags(html_message)
-
-    # file1 = open('email.html', 'w')
-    # file1.write(html_message)
 
     for recipient in help_desk:
         if recipient.should_receive_email_of_type('timeoff', 'daily'):

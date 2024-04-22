@@ -10,31 +10,31 @@
         <p><strong>Monday, {{context.next_monday|date:"F"}} {{context.next_monday.day}}:</strong></p>
         <ul>
             {% for tor in context.monday_tors %}
-                <li>{{tor.employee.name}}</li>
+                <li>{{tor.employee.name}}{% if tor.note %} - {{ tor.note }}{% endif %}</li>
             {% endfor %}
         </ul>
         <p><strong>Tuesday, {{context.next_tuesday|date:"F"}} {{context.next_tuesday.day}}:</strong></p>
         <ul>
             {% for tor in context.tuesday_tors %}
-                <li>{{tor.employee.name}}</li>
+                <li>{{tor.employee.name}}{% if tor.note %} - {{ tor.note }}{% endif %}</li>
             {% endfor %}
         </ul>
         <p><strong>Wednesday, {{context.next_wednesday|date:"F"}} {{context.next_wednesday.day}}:</strong></p>
         <ul>
             {% for tor in context.wednesday_tors %}
-                <li>{{tor.employee.name}}</li>
+                <li>{{tor.employee.name}}{% if tor.note %} - {{ tor.note }}{% endif %}</li>
             {% endfor %}
         </ul>
         <p><strong>Thursday, {{context.next_thursday|date:"F"}} {{context.next_thursday.day}}:</strong></p>
         <ul>
             {% for tor in context.thursday_tors %}
-                <li>{{tor.employee.name}}</li>
+                <li>{{tor.employee.name}}{% if tor.note %} - {{ tor.note }}{% endif %}</li>
             {% endfor %}
         </ul>
         <p><strong>Friday, {{context.next_friday|date:"F"}} {{context.next_friday.day}}:</strong></p>
         <ul>
             {% for tor in context.friday_tors %}
-                <li>{{tor.employee.name}}</li>
+                <li>{{tor.employee.name}}{% if tor.note %} - {{ tor.note }}{% endif %}</li>
             {% endfor %}
         </ul>
         <p>View the full calendar: <a href="{{context.calendar_url}}">{{context.calendar_url}}</a></p>

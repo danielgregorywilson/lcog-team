@@ -15,24 +15,66 @@
   />
   <div v-else class="q-mt-lg">
     <div v-for="day of teamTimeOff()" :key="day.date">
-      <div class="text-h5"><span>{{day.date}}</span><span v-if="day.isToday"> (Today)</span></div>
+      <div class="text-h5">
+        <span>{{day.date}}</span><span v-if="day.isToday"> (Today)</span>
+      </div>
       <ul>
         <div v-for="request of day.requests" :key="request.pk">
-          <q-icon v-if="request.acknowledged==null" color="orange" name="help" size="sm" />
-          <q-icon v-if="request.acknowledged==false" color="red" name="cancel" size="sm" />
-          <q-icon v-if="request.acknowledged && request.acknowledged==true" color="green" name="check_circle" size="sm" />
-          <router-link :to="{ name: 'employee-responsibilities', params: { pk: request.employee_pk } }">{{ request.employee_name }}</router-link>
-          <q-icon v-if="request.conflicts.length != 0" color="orange" name="warning" size="sm" class="q-ml-sm">
+          <q-icon
+            v-if="request.acknowledged==null"
+            color="orange"
+            name="help"
+            size="sm"
+          />
+          <q-icon
+            v-if="request.acknowledged==false"
+            color="red"
+            name="cancel"
+            size="sm"
+          />
+          <q-icon
+            v-if="request.acknowledged && request.acknowledged==true"
+            color="green"
+            name="check_circle"
+            size="sm"
+          />
+          <router-link
+            :to="{
+              name: 'employee-responsibilities',
+              params: { pk: request.employee_pk }
+            }"
+          >
+            {{ request.employee_name }}
+          </router-link>
+          <q-icon
+            v-if="request.conflicts.length != 0"
+            color="orange"
+            name="warning"
+            size="sm"
+            class="q-ml-sm"
+          >
             <q-tooltip  content-style="font-size: 16px">
-              <div>One or more team members with shared responsibilities will also be unavailable:</div>
+              <div>
+                One or more team members with shared responsibilities will also
+                be unavailable:
+              </div>
               <ul>
                 <li v-for="employee of request.conflicts" :key="employee.pk">
-                  {{ employee.name }}: <span v-for="(name, idx) of employee.responsibility_names" :key="idx"><span v-if="idx==0">{{ name }}</span><span v-else>, {{ name }}</span></span>
+                  {{ employee.name }}:
+                  <span
+                    v-for="(name, idx) of employee.responsibility_names"
+                    :key="idx"
+                  >
+                    <span v-if="idx==0">{{ name }}</span>
+                    <span v-else>, {{ name }}</span>
+                  </span>
                 </li>
               </ul>
             </q-tooltip>
           </q-icon>
-          <span v-if="request.note" class="text-italic"> - {{ request.note }}</span>
+          <span v-if="request.note" class="text-italic">
+            - {{ request.note }}
+          </span>
         </div>
       </ul>
     </div>
@@ -46,7 +88,9 @@ import { onMounted, ref } from 'vue'
 import { TimeOffRequestRetrieve } from 'src/types'
 import { useTimeOffStore } from 'src/stores/timeoff'
 
-type TimeOffCalendarData = Array<{date: string, isToday: boolean, requests: Array<TimeOffRequestRetrieve>}>
+type TimeOffCalendarData = Array<{
+  date: string, isToday: boolean, requests: Array<TimeOffRequestRetrieve>
+}>
 
 const timeOffStore = useTimeOffStore()
 
@@ -73,18 +117,22 @@ function teamTimeOff(): TimeOffCalendarData {
       let d = new Date(selectedMonday.value.getTime() + i*(1000 * 60 * 60 * 24))
       let isToday = d.setHours(0,0,0,0) === today.value.setHours(0,0,0,0)
       sortedTimeOff.push({
-        date: d.toLocaleDateString('en-us', { weekday: 'long', month: 'long', day: 'numeric' }),
+        date: d.toLocaleDateString(
+          'en-us', { weekday: 'long', month: 'long', day: 'numeric' }
+        ),
         isToday: isToday,
         requests: apiResults.filter(request => {
           const targetDateMS = d.setHours(0,0,0,0)
           
           const fromDate = new Date(request.start_date)
           const fromTZOffset = fromDate.getTimezoneOffset() * 60000
-          const fromDateMS = new Date(fromDate.getTime() + fromTZOffset).setHours(0,0,0,0)
+          const fromDateMS = new Date(fromDate.getTime() + fromTZOffset)
+            .setHours(0,0,0,0)
           
           const toDate = new Date(request.end_date)
           const toTZOffset = toDate.getTimezoneOffset() * 60000
-          const toDateMS = new Date(toDate.getTime() + toTZOffset).setHours(0,0,0,0)
+          const toDateMS = new Date(toDate.getTime() + toTZOffset)
+            .setHours(0,0,0,0)
 
           if (fromDateMS <= targetDateMS && targetDateMS <= toDateMS) {
             return true
@@ -136,11 +184,15 @@ function setThisWeek() {
 }
 
 function weekBackward() {
-  selectedMonday.value = new Date(selectedMonday.value.getTime() - 7 * (1000 * 60 * 60 * 24))
+  selectedMonday.value = new Date(
+    selectedMonday.value.getTime() - 7 * (1000 * 60 * 60 * 24)
+  )
 }
 
 function weekForward() {
-  selectedMonday.value = new Date(selectedMonday.value.getTime() + 7 * (1000 * 60 * 60 * 24))
+  selectedMonday.value = new Date(
+    selectedMonday.value.getTime() + 7 * (1000 * 60 * 60 * 24)
+  )
 }
 
 onMounted(() => {

@@ -49,22 +49,29 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
             if user.is_superuser:
                 requests = TimeOffRequest.objects.all()
             elif 'managed' in self.request.GET and is_true_string(self.request.GET['managed']):
-                requests = TimeOffRequest.objects.filter(employee__manager=user.employee)
+                requests = TimeOffRequest.objects.filter(
+                    employee__manager=user.employee
+                )
                 # If this user is a temporary approver for someone else,
                 # also show their requests.
-                temporary_approvers = TimeOffRequestTemporaryApprover.objects.filter(
-                    employee_in_stead=user.employee,
-                    start_date__lte=datetime.date.today(),
-                    end_date__gte=datetime.date.today()
-                )
+                temporary_approvers = TimeOffRequestTemporaryApprover.objects\
+                    .filter(
+                        employee_in_stead=user.employee,
+                        start_date__lte=datetime.date.today(),
+                        end_date__gte=datetime.date.today()
+                    )
                 for approver in temporary_approvers:
                     employee_on_leave = approver.employee_on_leave
-                    employee_requests = TimeOffRequest.objects.filter(employee__manager=employee_on_leave)
+                    employee_requests = TimeOffRequest.objects.filter(
+                        employee__manager=employee_on_leave
+                    )
                     requests = requests | employee_requests
             elif 'team' in self.request.GET and is_true_string(self.request.GET['team']):
-                # Show requests from everyone including and under your program manager
+                # Show requests from everyone including and under your
+                # program manager
                 program_manager = user.employee.get_program_manager
-                program_manager_and_descendants = program_manager.get_descendants_of_employee(program_manager)
+                program_manager_and_descendants = program_manager\
+                    .get_descendants_of_employee(program_manager)
                 start = self.request.GET.get('start', None)
                 end = self.request.GET.get('end', None)
                 if start and end:
@@ -77,7 +84,9 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
                         employee__in=program_manager_and_descendants
                     )
             else:
-                requests = TimeOffRequest.objects.filter(employee=user.employee)
+                requests = TimeOffRequest.objects.filter(
+                    employee=user.employee
+                )
             for request in requests:
                 request.conflicts = [
                     {
@@ -120,7 +129,8 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
         if start_date != str(tor.start_date) or end_date != str(tor.end_date):
             tor.start_date = start_date
             tor.end_date = end_date
-            tor.acknowledged = None # Reset acknowledged status since we are making a change
+            # Reset acknowledged status since we are making a change
+            tor.acknowledged = None
         tor.save()
         serialized_tor = TimeOffRequestPrivateSerializer(tor,
             context={'request': request})
@@ -139,7 +149,9 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
             context={'request': request})
         return Response(serialized_tor.data)
 
-    # TODO: Duplicated in TimeOffRequest model property .conflicting_responsibilities. Use a generic helper function to handle both?
+    # TODO: Duplicated in TimeOffRequest model property
+    # TODO: .conflicting_responsibilities. Use a generic helper function to
+    # TODO: handle both?
     # A list of employees with time off requests in the same time period with
     # shared/backup responsibilities.
     @action(detail=False, methods=['post'])
@@ -167,8 +179,16 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
         conflicting_tors = TimeOffRequest.objects\
             .filter(employee__in=responsibility_buddies)\
             .exclude(employee=employee)\
-            .exclude(start_date__gt=datetime.date(int(end_year), int(end_month), int(end_day)))\
-            .exclude(end_date__lt=datetime.date(int(start_year), int(start_month), int(start_day)))
+            .exclude(
+                start_date__gt=datetime.date(int(end_year),
+                int(end_month),
+                int(end_day))
+            )\
+            .exclude(
+                end_date__lt=datetime.date(int(start_year),
+                int(start_month),
+                int(start_day))
+            )
 
         # Prune the buddy list of any employees that don't have any conflicting
         # time off requests, and then annotate them with the list of shared
@@ -181,7 +201,8 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
                 if tor.employee == buddy:
                     remove_buddy = False
             if remove_buddy:
-                responsibility_buddies = responsibility_buddies.exclude(pk=buddy.pk)
+                responsibility_buddies = responsibility_buddies\
+                    .exclude(pk=buddy.pk)
         # Second pass: Add the responsibility names to the serialized
         # employees.
         for buddy in responsibility_buddies:
@@ -191,8 +212,11 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
                         (Q(primary_employee=employee) & Q(secondary_employee=buddy)) |
                         (Q(secondary_employee=employee) & Q(primary_employee=buddy))
                     )
-                    buddy.responsibility_names = [r.name for r in conflicting_responsibilities]
+                    buddy.responsibility_names = [
+                        r.name for r in conflicting_responsibilities
+                    ]
 
-        serializer = ConflictingResponsibilitiesSerializer(responsibility_buddies, many=True,
-            context={'request': request})
+        serializer = ConflictingResponsibilitiesSerializer(
+            responsibility_buddies, many=True, context={'request': request}
+        )
         return Response(serializer.data)

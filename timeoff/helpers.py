@@ -15,9 +15,15 @@ def send_manager_new_timeoff_request_notification(tor):
     current_site = Site.objects.get_current()
     url = current_site.domain + '/timeoff/manage-requests'
     if tor.start_date == tor.end_date:
-        message = f'{tor.employee.name} has requested time off on {tor.start_date}. View and acknowledge here: {url}',
+        message = (
+            f'{tor.employee.name} has requested time off on {tor.start_date}. '
+            f'View and acknowledge here: {url}'
+        )
     else:
-        message = f'{tor.employee.name} has requested time off from {tor.start_date} to {tor.end_date}. View and acknowledge here: {url}',
+        message = (
+            f'{tor.employee.name} has requested time off from {tor.start_date}'
+            f' to {tor.end_date}. View and acknowledge here: {url}'
+        )
     emails = [tor.employee.manager.user.email]
 
     # If this user is a temporary approver for someone else,
@@ -34,12 +40,14 @@ def send_manager_new_timeoff_request_notification(tor):
         send_email(
             email,
             f'New time off request: {tor.employee.name}',
-            message[0],
-            message[0]
+            message,
+            message
         )
 
 
-def send_employee_manager_acknowledged_timeoff_request_notification(tor, manager=None):
+def send_employee_manager_acknowledged_timeoff_request_notification(
+    tor, manager=None
+):
     """
     Manager is specified in the event of a temporary request approver while a
     manager is on leave.
@@ -59,15 +67,21 @@ def send_employee_manager_acknowledged_timeoff_request_notification(tor, manager
         dates_str = f'from {tor.start_date} to {tor.end_date}'
     
     if tor.acknowledged:
-        message = f'{manager_name} has acknowledged your time off {dates_str}. View here: {url}',
+        message = (
+            f'{manager_name} has acknowledged your time off {dates_str}. View '
+            f'here: {url}'
+        )
     else:
-        message = f'{manager_name} has indicated a problem with your time off {dates_str}. View here: {url}',
+        message = (
+            f'{manager_name} has indicated a problem with your time off '
+            f'{dates_str}. View here: {url}'
+        )
 
     send_email(
         employee.user.email,
         f'Time off request response',
-        message[0],
-        message[0]
+        message,
+        message
     )
 
 
@@ -86,11 +100,21 @@ def send_team_timeoff_next_week_report(manager_username: str, team_name: str):
     next_thursday = next_weekday(next_monday, 3)
     next_friday = next_weekday(next_monday, 4)
     
-    monday_tors = tors.filter(start_date__lte=next_monday, end_date__gte=next_monday)
-    tuesday_tors = tors.filter(start_date__lte=next_tuesday, end_date__gte=next_tuesday)
-    wednesday_tors = tors.filter(start_date__lte=next_wednesday, end_date__gte=next_wednesday)
-    thursday_tors = tors.filter(start_date__lte=next_thursday, end_date__gte=next_thursday)
-    friday_tors = tors.filter(start_date__lte=next_friday, end_date__gte=next_friday)
+    monday_tors = tors.filter(
+        start_date__lte=next_monday, end_date__gte=next_monday
+    )
+    tuesday_tors = tors.filter(
+        start_date__lte=next_tuesday, end_date__gte=next_tuesday
+    )
+    wednesday_tors = tors.filter(
+        start_date__lte=next_wednesday, end_date__gte=next_wednesday
+    )
+    thursday_tors = tors.filter(
+        start_date__lte=next_thursday, end_date__gte=next_thursday
+    )
+    friday_tors = tors.filter(
+        start_date__lte=next_friday, end_date__gte=next_friday
+    )
 
     num_tors = sum([
         monday_tors.count(), tuesday_tors.count(), wednesday_tors.count(),
@@ -119,7 +143,9 @@ def send_team_timeoff_next_week_report(manager_username: str, team_name: str):
         if recipient.should_receive_email_of_type('timeoff', 'weekly'):
             send_email(
                 recipient.user.email,
-                f'{team_name} Time Off Next Week: {next_monday:%A} {next_monday:%B} {next_monday.day} - {next_friday:%A} {next_friday:%B} {next_friday.day}, {next_friday.year}',
+                f'{team_name} Time Off Next Week: {next_monday:%A} ' +
+                    f'{next_monday:%B} {next_monday.day} - {next_friday:%A} ' +
+                    f'{next_friday:%B} {next_friday.day}, {next_friday.year}',
                 plaintext_message,
                 html_message
             )
@@ -160,7 +186,8 @@ def send_daily_helpdesk_timeoff_today_report():
         if recipient.should_receive_email_of_type('timeoff', 'daily'):
             send_email(
                 recipient.user.email,
-                f'{team_name} Time Off Today: {today:%A} {today:%B} {today.day}, {today.year}',
+                f'{team_name} Time Off Today: {today:%A} {today:%B} ' +
+                    f'{today.day}, {today.year}',
                 plaintext_message,
                 html_message
             )

@@ -8,7 +8,7 @@
     </q-btn-group>
   </div>
   <q-spinner-grid
-    v-if="!calendarLoaded"
+    v-if="!calendarLoaded()"
     class="spinner q-mt-lg"
     color="primary"
     size="xl"
@@ -50,11 +50,20 @@ type TimeOffCalendarData = Array<{date: string, isToday: boolean, requests: Arra
 
 const timeOffStore = useTimeOffStore()
 
-let calendarLoaded = ref(false)
+let thisWeekLoaded = ref(false)
+let allDatesLoaded = ref(false)
 
 let today = ref(new Date())
 let thisWeekMonday = ref(new Date())
 let selectedMonday = ref(new Date())
+
+function viewingThisWeek() {
+  return selectedMonday.value.getTime() === thisWeekMonday.value.getTime()
+}
+
+function calendarLoaded() {
+  return (viewingThisWeek() && thisWeekLoaded.value) || allDatesLoaded.value
+}
 
 function teamTimeOff(): TimeOffCalendarData {
   const apiResults = timeOffStore.teamTimeOffRequests
@@ -89,11 +98,26 @@ function teamTimeOff(): TimeOffCalendarData {
   return sortedTimeOff
 }
 
-// TODO: This currently gets all time off; should probably just get for a period
+function retrieveThisWeekTeamTimeOff(): Promise<void> {
+  // Get all team time off for this week
+  return new Promise((resolve, reject) => {
+    timeOffStore.getTeamTimeOffRequests(thisWeekMonday.value)
+      .then(() => {
+        thisWeekLoaded.value = true
+        resolve()
+      })
+      .catch(e => {
+        console.error('Error retrieving team time off', e)
+        reject()
+      })
+  })
+}
+
 function retrieveTeamTimeOff(): void {
+  // Get all team time off plus and minus 1 year from today
   timeOffStore.getTeamTimeOffRequests()
     .then(() => {
-      calendarLoaded.value = true
+      allDatesLoaded.value = true
     })
     .catch(e => {
       console.error('Error retrieving team time off', e)
@@ -121,7 +145,9 @@ function weekForward() {
 
 onMounted(() => {
   setDates()
-  retrieveTeamTimeOff()
+  retrieveThisWeekTeamTimeOff().then(() => {
+    retrieveTeamTimeOff()
+  })
 })
 
 </script>

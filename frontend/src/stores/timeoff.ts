@@ -33,9 +33,28 @@ export const useTimeOffStore = defineStore('timeoff', {
           })
       })
     },
-    getTeamTimeOffRequests() {
+    getTeamTimeOffRequests(monday: Date | null = null) {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/timeoffrequest?team=True` })
+        let dateParam = ''
+        if (monday) {
+          const mondayDate = monday.toISOString().split('T')[0]
+          // Add four days to get Friday
+          const fridayDate = new Date(monday.getTime() + 4*86400000)
+            .toISOString().split('T')[0]
+          dateParam = `&start=${ mondayDate }&end=${ fridayDate }`
+        } else {
+          const today = new Date()
+          const oneYearAgo = new Date(
+            today.getFullYear() - 1, today.getMonth(), today.getDate()
+          )
+          const startParam = oneYearAgo.toISOString().split('T')[0]
+          const oneYearFromNow = new Date(
+            today.getFullYear() + 1, today.getMonth(), today.getDate()
+          )
+          const endParam = oneYearFromNow.toISOString().split('T')[0]
+          dateParam = `&start=${ startParam }&end=${ endParam }`
+        }
+        axios({ url: `${ apiURL }api/v1/timeoffrequest?team=True${ dateParam }` })
           .then(resp => {
             this.teamTimeOffRequests = resp.data.results
             resolve('Successfully got team time off requests')

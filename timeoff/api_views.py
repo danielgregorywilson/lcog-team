@@ -65,7 +65,17 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
                 # Show requests from everyone including and under your program manager
                 program_manager = user.employee.get_program_manager
                 program_manager_and_descendants = program_manager.get_descendants_of_employee(program_manager)
-                requests = TimeOffRequest.objects.filter(employee__in=program_manager_and_descendants)
+                start = self.request.GET.get('start', None)
+                end = self.request.GET.get('end', None)
+                if start and end:
+                    requests = TimeOffRequest.objects.filter(
+                        start_date__gte=start, end_date__lte=end,
+                        employee__in=program_manager_and_descendants
+                    )
+                else:
+                    requests = TimeOffRequest.objects.filter(
+                        employee__in=program_manager_and_descendants
+                    )
             else:
                 requests = TimeOffRequest.objects.filter(employee=user.employee)
             for request in requests:

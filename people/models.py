@@ -194,6 +194,14 @@ class Employee(models.Model):
     @property
     def is_program_manager(self):
         return self.manager and self.manager.is_division_director
+    
+    @property
+    def is_gs_employee(self):
+        return self.unit_or_program.division.name == "Government Services"
+    
+    @property
+    def is_admin_employee(self):
+        return self.unit_or_program.division.name == "Administrative Services"
 
     @property
     def has_program_manager(self):

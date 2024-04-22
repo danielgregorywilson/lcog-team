@@ -18,10 +18,10 @@ from timeoff.helpers import (
     send_manager_new_timeoff_request_notification
 )
 from workflows.helpers import (
-    create_process_instances, send_gas_pin_notification_email,
-    send_transition_fiscal_email, send_transition_hr_email,
-    send_transition_sds_hiring_leads_email, send_transition_stn_email,
-    send_transition_submitter_email
+    create_process_instances, send_early_hr_email,
+    send_gas_pin_notification_email, send_transition_fiscal_email,
+    send_transition_hr_email, send_transition_sds_hiring_leads_email,
+    send_transition_stn_email, send_transition_submitter_email
 )
 from workflows.models import (
     EmployeeTransition, Process, ProcessInstance, Role, Step, StepChoice,
@@ -501,6 +501,10 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
                     sender_email=request.data['senderEmail'],
                     url=request.data['transitionUrl']
                 )
+                send_early_hr_email(
+                    transition,
+                    url=request.data['transitionUrl']
+                )
             elif request.data['type'] == 'FI':
                 transition.assignee = EmployeeTransition.ASSIGNEE_FISCAL
                 transition.save()
@@ -511,6 +515,14 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
                     sender_email=request.data['senderEmail'],
                     url=request.data['transitionUrl']
                 )
+                submitter = Employee.objects.get(
+                    user__email=request.data['senderEmail']
+                )
+                if submitter.is_gs_employee or submitter.is_admin_employee:
+                    send_early_hr_email(
+                        transition,
+                        url=request.data['transitionUrl']
+                    )
             elif request.data['type'] == 'HR':
                 transition.assignee = EmployeeTransition.ASSIGNEE_HR
                 transition.save()

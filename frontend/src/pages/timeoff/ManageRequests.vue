@@ -24,14 +24,14 @@
           <q-btn 
             dense round color="red" icon="close"
             :outline="props.row.acknowledged == null || props.row.acknowledged == true"
-            :disable="props.row.acknowledged == false"
+            :disable="!canAcknowledge || props.row.acknowledged == false"
             class="q-mr-sm"
             @click="acknowledgeRequest(props.row.pk, false)"
           />
           <q-btn
             dense round color="green" icon="check"
             :outline="props.row.acknowledged == null || props.row.acknowledged == false"
-            :disable="props.row.acknowledged == true"
+            :disable="!canAcknowledge || props.row.acknowledged == true"
             @click="acknowledgeRequest(props.row.pk, true)"
           />
           <div v-if="props.row.conflicts.length != 0" class="q-ml-sm">
@@ -68,14 +68,14 @@
                     <q-btn 
                       dense round color="red" icon="close"
                       :outline="props.row.acknowledged == null || props.row.acknowledged == true"
-                      :disable="props.row.acknowledged == false"
+                      :disable="!canAcknowledge || props.row.acknowledged == false"
                       class="q-mr-sm"
                       @click="acknowledgeRequest(props.row.pk, false)"
                     />
                     <q-btn
                       dense round color="green" icon="check"
                       :outline="props.row.acknowledged == null || props.row.acknowledged == false"
-                      :disable="props.row.acknowledged == true"
+                      :disable="!canAcknowledge || props.row.acknowledged == true"
                       @click="acknowledgeRequest(props.row.pk, true)"
                     />
                     <div v-if="props.row.conflicts.length != 0" class="q-ml-sm">
@@ -111,6 +111,7 @@
 
 <script setup lang="ts">
 
+import { ref } from 'vue'
 import { QTableProps } from 'quasar'
 import { useTimeOffStore } from 'src/stores/timeoff'
 
@@ -129,6 +130,8 @@ const tablePagination = {
   rowsPerPage: 10
 }
 
+const canAcknowledge = ref(true)
+
 function managedTimeOffRequests() {
   return timeOffStore.managedTimeOffRequests
 }
@@ -141,6 +144,10 @@ function retrieveManagedTimeOffRequests(): void {
 }
 
 function acknowledgeRequest(pk: number, acknowledged: boolean): void {
+  canAcknowledge.value = false
+  setTimeout(() => {
+    canAcknowledge.value = true
+  }, 1500)
   timeOffStore.acknowledgeTimeOffRequest({pk, acknowledged})
     .then(() => {
       // TODO: Get just the one we changed, not all of them

@@ -100,27 +100,6 @@ function uploadFile() {
   })
 }
 
-// PerformanceReviewDataService.uploadSignedPositionDescription(fd)
-//   .then((response: FileUploadDescriptionUploadServerResponse) => {
-//     if (response.status == 200) {
-//       this.$refs.fileuploader.reset()
-//       this.uploadedPositionDescriptionUrl = response.data
-//       this.fileSuccessfullyUploaded = true
-//       setTimeout(() => this.fileSuccessfullyUploaded = false, 5000)
-//       this.updatePerformanceReview()
-//         .catch(e => {
-//           console.error(
-//             'Error updating PR after uploading signed position description:',
-//             e
-//           )
-//         })
-//     }
-//   })
-//   .catch(e => {
-//     console.error('Error uploading signed position description:', e)
-//   })
-// }
-
 function doUpload(data: FormData): Promise<any> {
   return new Promise((resolve, reject) => {
     axios({ url: `${ apiURL }api/v1/fileupload`, method: 'POST', data })

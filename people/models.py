@@ -110,6 +110,9 @@ class Employee(models.Model):
     email_opt_out_timeoff_all = models.BooleanField(default=False)
     email_opt_out_timeoff_weekly = models.BooleanField(default=False)
     email_opt_out_timeoff_daily = models.BooleanField(default=False)
+    workflow_options = models.ManyToManyField(
+        "workflows.Workflow", through="WorkflowOptions", 
+    )
 
     manager = models.ForeignKey(
         "self",
@@ -597,6 +600,19 @@ class Employee(models.Model):
             return True
         else:
             return False
+
+
+class WorkflowOptions(models.Model):
+    class Meta:
+        verbose_name = _("Workflow Option")
+        verbose_name_plural = _("Workflow Options")
+
+    employee = models.ForeignKey("Employee", on_delete=models.CASCADE)
+    workflow = models.ForeignKey(
+        "workflows.Workflow", on_delete=models.CASCADE
+    )
+    display = models.BooleanField(default=True)
+    order = models.IntegerField(default=0)
 
 
 class ManagerUpcomingReviewsManager(models.Manager):

@@ -55,6 +55,9 @@
           :disable="emailOptOutAll || emailOptOutTimeOffAll"
         />
       </div>
+
+      <p class="row text-h6 q-mt-lg q-mb-none">Workflow Display Order</p>
+
       <div class="row items-center q-gutter-sm q-mt-sm">
         <q-btn :disabled="!valuesAreChanged()" @click="submitProfileForm()">Submit</q-btn>
         <span class="success q-ml-sm q-mt-sm" :hidden="!submitted"><strong>Profile Updated.</strong></span>

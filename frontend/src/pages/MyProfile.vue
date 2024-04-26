@@ -57,6 +57,28 @@
       </div>
 
       <p class="row text-h6 q-mt-lg q-mb-none">Workflow Display Order</p>
+      <q-markup-table style="max-width: 500px;">
+        <thead>
+          <tr>
+            <th class="text-left">Workflow Type</th>
+            <th>Display</th>
+          </tr>
+        </thead>
+        <draggable 
+          v-model="workflows" 
+          tag="tbody"
+          group="people" 
+          @start="drag=true"
+          @end="onEndDrag()"
+          item-key="id">
+          <template #item="{element}">
+            <tr>
+              <td class="text-left">{{ element.name }}</td>
+              <td class="text-center"><q-checkbox v-model="element.display"/></td>
+            </tr>
+          </template>
+        </draggable>
+      </q-markup-table>
 
       <div class="row items-center q-gutter-sm q-mt-sm">
         <q-btn :disabled="!valuesAreChanged()" @click="submitProfileForm()">Submit</q-btn>
@@ -77,11 +99,12 @@
 </style>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, Ref, ref } from 'vue'
+import draggable from 'vuedraggable'
 
 import { useUserStore } from 'src/stores/user'
 import { usePeopleStore } from 'src/stores/people'
-import { EmployeeRetrieve } from 'src/types'
+import { EmployeeRetrieve, WorkflowOption } from 'src/types'
 
 const peopleStore = usePeopleStore()
 const userStore = useUserStore()
@@ -99,6 +122,10 @@ let emailOptOutTimeOffWeeklyCurrentVal = ref(false)
 let emailOptOutTimeOffWeekly = ref(false)
 let emailOptOutTimeOffDailyCurrentVal = ref(false)
 let emailOptOutTimeOffDaily = ref(false)
+
+let drag = ref(false)
+let workflows: Ref<Array<WorkflowOption>> = ref([])
+let workflowsCurrentVal: Ref<Array<WorkflowOption>> = ref([])
 
 let submitted = ref(false)
 
@@ -119,6 +146,13 @@ function retrieveProfile(): Promise<EmployeeRetrieve> {
         emailOptOutTimeOffWeeklyCurrentVal.value = emailOptOutTimeOffWeekly.value
         emailOptOutTimeOffDaily.value = employee.email_opt_out_timeoff_daily
         emailOptOutTimeOffDailyCurrentVal.value = emailOptOutTimeOffDaily.value
+        workflows.value = [
+          { name: 'Onboard', id: 1, display: true },
+          { name: 'Exit', id: 2, display: true },
+          { name: 'Change', id: 3, display: false },
+          { name: 'Custom', id: 4, display: true }
+        ]
+        workflowsCurrentVal.value = JSON.parse(JSON.stringify(workflows.value))
       })
       .catch(e => {
         console.error('Error getting user from API:', e)
@@ -133,12 +167,18 @@ function valuesAreChanged(): boolean {
     emailOptOutAll.value == emailOptOutAllCurrentVal.value &&
     emailOptOutTimeOffAll.value == emailOptOutTimeOffAllCurrentVal.value &&
     emailOptOutTimeOffWeekly.value == emailOptOutTimeOffWeeklyCurrentVal.value &&
-    emailOptOutTimeOffDaily.value == emailOptOutTimeOffDailyCurrentVal.value
+    emailOptOutTimeOffDaily.value == emailOptOutTimeOffDailyCurrentVal.value &&
+    JSON.stringify(workflows.value) == JSON.stringify(workflowsCurrentVal.value)
   ) {
     return false
   } else {
     return true
   }
+}
+
+function onEndDrag(): void {
+  drag.value = false
+  // updateServer(workflows)
 }
 
 function submitProfileForm(): void {

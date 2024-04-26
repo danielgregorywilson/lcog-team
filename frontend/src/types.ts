@@ -145,6 +145,8 @@ export interface EmployeeUpdatePartial {
   email_opt_out_timeoff_daily: boolean
 }
 
+export type WorkflowOption = { id: number, name: string, display: boolean }
+
 ////////////////////////////////////////////////
 // Meals Structure from Django Rest Framework //
 ////////////////////////////////////////////////

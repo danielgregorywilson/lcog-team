@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.contrib.auth.models import Group, User
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -20,7 +21,7 @@ from mainsite.serializers import FileUploadSerializer
 from people.models import (
     Employee, JobTitle, PerformanceReview, ReviewNote, Signature,
     TeleworkApplication, TeleworkSignature, UnitOrProgram,
-    ViewedSecurityMessage
+    ViewedSecurityMessage, WorkflowOptions
 )
 from people.serializers import (
     EmployeeSerializer, EmployeeEmailSerializer, GroupSerializer,
@@ -129,7 +130,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     
     def partial_update(self, request, pk=None):
         """
-        Updates the employee's display name and email preferences.
+        Updates the employee's display name and other preferences.
         """
         employee = Employee.objects.get(pk=pk)
         employee.display_name = request.data['display_name']
@@ -143,6 +144,29 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         employee.email_opt_out_timeoff_daily = request.data[
             'email_opt_out_timeoff_daily'
         ]
+        # Just set workflow options
+        new_wfos = request.data['workflow_display_options']
+        # All previously set workflow options
+        curr_wfos = WorkflowOptions.objects.filter(employee=employee)
+        # Get all the relevant workflows just once
+        workflows = apps.get_model('workflows.Workflow').objects\
+            .filter(name__in=map(lambda x: x['name'], new_wfos))
+        # Update or create workflow options for the employee
+        for idx, option in enumerate(new_wfos):
+            try:
+                wfo = curr_wfos.get(
+                    workflow=workflows.get(name=option['name'])
+                )
+                wfo.display = option['display']
+                wfo.order = idx+1
+                wfo.save()
+            except WorkflowOptions.DoesNotExist:
+                wfo = WorkflowOptions.objects.create(
+                    employee=employee,
+                    workflow=workflows.get(name=option['name']),
+                    display=option['display'],
+                    order=idx+1
+                )
         employee.save()
         serialized_employee = EmployeeSerializer(employee,
              context={'request': request})

@@ -119,6 +119,7 @@ export interface EmployeeRetrieve {
   can_view_expenses: boolean
   can_view_mow_routes: boolean
   can_manage_mow_stops: boolean
+  workflow_display_options: Array<WorkflowOption>
 }
 
 export interface SimpleEmployeeRetrieve {
@@ -143,9 +144,12 @@ export interface EmployeeUpdatePartial {
   email_opt_out_timeoff_all: boolean
   email_opt_out_timeoff_weekly: boolean
   email_opt_out_timeoff_daily: boolean
+  workflow_display_options: Array<WorkflowOption>
 }
 
-export type WorkflowOption = { id: number, name: string, display: boolean }
+export type WorkflowOption = {
+  id: number, name: string, display: boolean, order: number
+}
 
 ////////////////////////////////////////////////
 // Meals Structure from Django Rest Framework //

@@ -574,6 +574,8 @@ class Employee(models.Model):
 
     def admin_of_workflows(self):
         all_workflows = apps.get_model('workflows', 'Workflow').objects.all().select_related('role')
+        if self.is_all_workflows_admin:
+            return [workflow.id for workflow in all_workflows]
         return [workflow.id for workflow in list(all_workflows) if workflow.role and self in workflow.role.members.all()]
     
     def admin_of_processes(self):

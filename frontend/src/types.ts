@@ -699,7 +699,9 @@ export interface ViewedSecurityMessageRetrieve {
 export type Workflow = {
   pk: number
   name: string
+  type: string
   role: number
+  icon: string
   version: number
 }
 

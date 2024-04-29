@@ -71,7 +71,7 @@ class WorkflowSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Workflow
         fields = [
-            'url', 'pk', 'name', 'version', 'processes'
+            'url', 'pk', 'name', 'type', 'icon', 'version', 'processes'
         ]
 
 

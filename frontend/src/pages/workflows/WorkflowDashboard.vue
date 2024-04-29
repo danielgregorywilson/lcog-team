@@ -1,9 +1,30 @@
 <template>
   <div class="row q-mb-md">
     <q-btn-group push>
-      <q-btn name="workflows-active-button" push color="secondary" glossy label="Active" :to="{ name: 'workflow-dashboard' }" />
-      <q-btn name="workflows-complete-button" push color="primary" glossy label="Complete" :to="{ name: 'workflows-complete' }" />
-      <q-btn name="workflows-deleted-button" push color="primary" glossy label="Deleted" :to="{ name: 'workflows-archived' }"  />
+      <q-btn
+        name="workflows-active-button"
+        push
+        color="secondary"
+        glossy
+        label="Active"
+        :to="{ name: 'workflow-dashboard' }"
+      />
+      <q-btn
+        name="workflows-complete-button"
+        push
+        color="primary"
+        glossy
+        label="Complete"
+        :to="{ name: 'workflows-complete' }"
+      />
+      <q-btn
+        name="workflows-deleted-button"
+        push
+        color="primary"
+        glossy
+        label="Deleted"
+        :to="{ name: 'workflows-archived' }"
+      />
     </q-btn-group>
   </div>
   <div class="row items-center q-mb-sm">

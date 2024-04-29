@@ -1,295 +1,304 @@
 <template>
-  <div class="q-py-sm">
-    <q-spinner-grid
-        v-if="!workflowsLoaded"
-        class="spinner q-mt-lg"
-        color="primary"
-        size="xl"
-      />
-    <q-table
-      v-else
-      :rows="workflows()"
-      :columns="columns()"
-      :filter=tableFilter
-      :filter-method=tableFilterMethod
-      :grid="$q.screen.lt.md"
-      no-data-label="Nothing to show"
-      row-key="name"
-      :rows-per-page-options="[0]"
-      v-bind:class="'workflowtable-' + props.type"
-    >
-      <template v-slot:top-right>
-        <q-input
-          borderless
-          dense
-          clearable
-          debounce="300"
-          v-model="tableFilter"
-          placeholder="Search"
+<div class="q-py-sm">
+  <q-spinner-grid
+      v-if="!workflowsLoaded"
+      class="spinner q-mt-lg"
+      color="primary"
+      size="xl"
+    />
+  <q-table
+    v-else
+    :rows="workflows()"
+    :columns="columns()"
+    :filter=tableFilter
+    :filter-method=tableFilterMethod
+    :grid="$q.screen.lt.md"
+    no-data-label="Nothing to show"
+    row-key="name"
+    :rows-per-page-options="[0]"
+    v-bind:class="'workflowtable-' + props.type"
+  >
+    <template v-slot:top-right>
+      <q-input
+        borderless
+        dense
+        clearable
+        debounce="300"
+        v-model="tableFilter"
+        placeholder="Search"
+      >
+        <template v-slot:prepend>
+          <q-icon name="search">
+            <q-tooltip>
+              Type to search on Name, Description, Tag name, or Employee Name
+            </q-tooltip>
+          </q-icon>
+        </template>
+      </q-input>
+    </template>
+    <!-- Slots for header cells: Shrink the width when the screen is too small to see the whole table width -->
+    <!-- <template v-slot:header-cell-employeeName="props">
+      <th v-if="$q.screen.lt.lg" style="white-space: normal;">{{props.col.label}}</th>
+      <th v-else>{{props.col.label}}</th>
+    </template>
+    <template v-slot:header-cell-daysUntilReview="props">
+      <th v-if="$q.screen.lt.lg" style="white-space: normal;">{{props.col.label}}</th>
+      <th v-else>{{props.col.label}}</th>
+    </template> -->
+    <!-- Slots for body cells: Show dates in a familiar format; make sure status can wrap, and display action buttons -->
+    <template v-slot:body-cell-created="props">
+      <q-td key="created" :props="props">
+        {{ readableDate(props.row.transition_date_submitted) }} -
+        {{ props.row.transition_submitter }}
+      </q-td>
+    </template>
+    <template v-slot:body-cell-transitionDate="props">
+      <q-td key="transitionDate" :props="props">
+        {{ readableDate(props.row.transition_date) }}
+      </q-td>
+    </template>
+    <template v-slot:body-cell-completed="props">
+      <q-td key="completed" :props="props">
+        {{ readableDate(props.row.completed_at) }}
+      </q-td>
+    </template>
+    <template v-slot:body-cell-status="props">
+      <q-td key="status" :props="props">
+        <q-linear-progress
+          v-if="isInteger(props.row.status)"
+          rounded size="25px"
+          :value="props.row.percent_complete/100"
+          color="primary"
         >
-          <template v-slot:prepend>
-            <q-icon name="search">
-              <q-tooltip>
-                Type to search on Name, Description, Tag name, or Employee Name
-              </q-tooltip>
-            </q-icon>
-          </template>
-        </q-input>
-      </template>
-      <!-- Slots for header cells: Shrink the width when the screen is too small to see the whole table width -->
-      <!-- <template v-slot:header-cell-employeeName="props">
-        <th v-if="$q.screen.lt.lg" style="white-space: normal;">{{props.col.label}}</th>
-        <th v-else>{{props.col.label}}</th>
-      </template>
-      <template v-slot:header-cell-daysUntilReview="props">
-        <th v-if="$q.screen.lt.lg" style="white-space: normal;">{{props.col.label}}</th>
-        <th v-else>{{props.col.label}}</th>
-      </template> -->
-      <!-- Slots for body cells: Show dates in a familiar format; make sure status can wrap, and display action buttons -->
-      <template v-slot:body-cell-created="props">
-        <q-td key="created" :props="props">
-          {{ readableDate(props.row.transition_date_submitted) }} -
-          {{ props.row.transition_submitter }}
-        </q-td>
-      </template>
-      <template v-slot:body-cell-transitionDate="props">
-        <q-td key="transitionDate" :props="props">
-          {{ readableDate(props.row.transition_date) }}
-        </q-td>
-      </template>
-      <template v-slot:body-cell-completed="props">
-        <q-td key="completed" :props="props">
-          {{ readableDate(props.row.completed_at) }}
-        </q-td>
-      </template>
-      <template v-slot:body-cell-status="props">
-        <q-td key="status" :props="props">
-          <q-linear-progress
-            v-if="isInteger(props.row.status)"
-            rounded size="25px"
-            :value="props.row.percent_complete/100"
-            color="primary"
-          >
-            <div class="absolute-full flex flex-center">
-              <q-badge
-                color="white"
-                text-color="primary"
-                :label="`${props.row.percent_complete}%`"
-              />
-            </div>
-          </q-linear-progress>
-          <div v-else>Assigned to: {{ props.row.status }}</div>
-        </q-td>
-      </template>
-      <template v-slot:body-cell-actions="props">
-        <q-td key="actions" :props="props">
-          <q-btn
-            class="col"
-            dense
-            round
-            flat
-            color="grey"
-            @click="editWorkflowInstance(props.row)"
-            icon="play_arrow"
-          >
-            <q-tooltip :delay="400">
-              View progress
-            </q-tooltip>
-          </q-btn>
-          <q-btn
-            v-if="workflowHasTransition() && canViewTransition()"
-            class="col"
-            dense
-            round
-            flat
-            color="grey"
-            @click="editTransitionForm(props.row)"
-            icon="assignment"
-          >
-            <q-tooltip :delay="400">
-              View form
-            </q-tooltip>
-          </q-btn>
-          <q-btn
-            v-if="!archived && canArchiveWorkflowInstance(props.row)"
-            class="col"
-            dense
-            round
-            flat
-            color="grey"
-            @click="showArchiveDialog(props.row)"
-            icon="delete"
-          />
-          <q-btn
-            v-if="archived && canArchiveWorkflowInstance(props.row)"
-            class="col"
-            dense
-            round
-            flat
-            color="grey"
-            @click="showArchiveDialog(props.row)"
-            icon="restore_from_trash"
-          />
-          <q-icon
-            v-if="!archived && !complete && props.row.employee_action_required"
-            color="orange"
-            name="warning"
-            size="md"
-          >
-              <q-tooltip content-style="font-size: 16px">
-                <div>Your action is required</div>
-              </q-tooltip>
-            </q-icon>
-        </q-td>
-      </template>
-      <!-- <template v-slot:body-cell-status="props">
-        <q-td style="white-space: normal;" :props="props">{{ props.row.status }}</q-td>
-      </template> -->
-      <!-- <template v-slot:body-cell-actions="props">
-        <q-td :props="props">
-          <div class="row">
-            <q-btn class="col edit-button" dense round flat color="grey" @click="editEvaluation(props)" icon="edit"></q-btn>
-            <q-btn class="col print-button" dense round flat color="grey" @click="printEvaluation(props)" icon="print">
-              <q-tooltip content-style="font-size: 16px">Print Performance Review Form</q-tooltip>
-            </q-btn>
-            <q-btn v-if="props.row.signed_position_description" class="col print-button" dense round flat color="grey" @click="printEvaluationPositionDescription(props)" icon="print">
-              <q-tooltip content-style="font-size: 16px">Print Signed Position Description</q-tooltip>
-            </q-btn>
-          </div>
-        </q-td>
-      </template> -->
-      <!-- For grid mode, we need to specify everything in order for our action buttons to render -->
-      <template v-slot:item="props">
-        <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
-          <q-card class="q-py-sm">
-            <q-list dense>
-              <q-item v-for="col in props.cols" :key="col.name">
-                <div class="q-table__grid-item-row">
-                  <div class="q-table__grid-item-title">{{ col.label }}</div>
-                  <div
-                    class="q-table__grid-item-value row q-gutter-sm"
-                    v-if="col.label == 'Actions'"
-                  >
-                    <q-btn
-                      class="col"
-                      dense
-                      round
-                      flat
-                      color="grey"
-                      @click="editWorkflowInstance(props.row)"
-                      icon="play_arrow"
-                    >
-                      <q-tooltip>
-                        View progress
-                      </q-tooltip>
-                    </q-btn>
-                    <q-btn
-                      v-if="workflowHasTransition() && canViewTransition()"
-                      class="col"
-                      dense
-                      round
-                      flat
-                      color="grey"
-                      @click="editTransitionForm(props.row)"
-                      icon="assignment"
-                    >
-                      <q-tooltip :delay="400">
-                        View form
-                      </q-tooltip>
-                    </q-btn>
-                    <q-btn
-                      v-if="!archived && canArchiveWorkflowInstance(props.row)"
-                      class="col"
-                      dense
-                      round
-                      flat
-                      color="grey"
-                      @click="showArchiveDialog(props.row)"
-                      icon="delete"
-                    />
-                    <q-btn
-                      v-if="archived && canArchiveWorkflowInstance(props.row)"
-                      class="col"
-                      dense
-                      round
-                      flat
-                      color="grey"
-                      @click="showArchiveDialog(props.row)"
-                      icon="restore_from_trash"
-                    />
-                    <q-icon
-                      v-if="!archived && !complete && props.row.employee_action_required"
-                      color="orange"
-                      name="warning"
-                      size="md"
-                    >
-                      <q-tooltip content-style="font-size: 16px">
-                        <div>Your action is required</div>
-                      </q-tooltip>
-                    </q-icon>
-                  </div>
-                  <div class="q-table__grid-item-value" v-else-if="col.label.indexOf('Date') != -1">
-                    {{ readableDate(col.value) }}
-                  </div>
-                  <div class="q-table__grid-item-value" v-else>
-                    {{ col.value }}
-                  </div>
-                </div>
-              </q-item>
-            </q-list>
-          </q-card>
-        </div>
-      </template>
-      <template v-slot:bottom-row v-if="props.allowAddDelete">
-        <q-tr @click="clickAddWorkflow()" class="cursor-pointer row-add-new">
-          <q-td colspan="100%">
-            <q-icon name="add" size="md" class="q-pr-sm"/>New Workflow
-          </q-td>
-        </q-tr>
-      </template>
-    </q-table>
-
-    <q-dialog v-model="archiveDialogVisible">
-      <q-card>
-        <q-card-section>
-          <div class="row items-center">
-            <q-avatar
-              icon="insert_chart_outlined"
-              color="primary"
-              text-color="white"
+          <div class="absolute-full flex flex-center">
+            <q-badge
+              color="white"
+              text-color="primary"
+              :label="`${props.row.percent_complete}%`"
             />
-            <span class="q-ml-sm">Are you sure you want to <span v-if="!archived">delete</span><span v-else>restore</span> this workflow?</span>
           </div>
-          <div class="row justify-center text-center">
-            Position: {{ archiveDialogPositionName }}
-          </div>
-          <div class="row justify-center text-center">
-            {{ archiveDialogPercentComplete }}% Complete
-          </div>
-        </q-card-section>
+        </q-linear-progress>
+        <div v-else>Assigned to: {{ props.row.status }}</div>
+      </q-td>
+    </template>
+    <template v-slot:body-cell-actions="props">
+      <q-td key="actions" :props="props">
+        <q-btn
+          class="col"
+          dense
+          round
+          flat
+          color="grey"
+          @click="editWorkflowInstance(props.row)"
+          icon="play_arrow"
+        >
+          <q-tooltip :delay="400">
+            View progress
+          </q-tooltip>
+        </q-btn>
+        <q-btn
+          v-if="workflowHasTransition() && canViewTransition()"
+          class="col"
+          dense
+          round
+          flat
+          color="grey"
+          @click="editTransitionForm(props.row)"
+          icon="assignment"
+        >
+          <q-tooltip :delay="400">
+            View form
+          </q-tooltip>
+        </q-btn>
+        <q-btn
+          v-if="!archived && canArchiveWorkflowInstance(props.row)"
+          class="col"
+          dense
+          round
+          flat
+          color="grey"
+          @click="showArchiveDialog(props.row)"
+          icon="delete"
+        />
+        <q-btn
+          v-if="archived && canArchiveWorkflowInstance(props.row)"
+          class="col"
+          dense
+          round
+          flat
+          color="grey"
+          @click="showArchiveDialog(props.row)"
+          icon="restore_from_trash"
+        />
+        <q-icon
+          v-if="!archived && !complete && props.row.employee_action_required"
+          color="orange"
+          name="warning"
+          size="md"
+        >
+            <q-tooltip content-style="font-size: 16px">
+              <div>Your action is required</div>
+            </q-tooltip>
+          </q-icon>
+      </q-td>
+    </template>
+    <!-- <template v-slot:body-cell-status="props">
+      <q-td style="white-space: normal;" :props="props">{{ props.row.status }}</q-td>
+    </template> -->
+    <!-- <template v-slot:body-cell-actions="props">
+      <q-td :props="props">
+        <div class="row">
+          <q-btn class="col edit-button" dense round flat color="grey" @click="editEvaluation(props)" icon="edit"></q-btn>
+          <q-btn class="col print-button" dense round flat color="grey" @click="printEvaluation(props)" icon="print">
+            <q-tooltip content-style="font-size: 16px">Print Performance Review Form</q-tooltip>
+          </q-btn>
+          <q-btn v-if="props.row.signed_position_description" class="col print-button" dense round flat color="grey" @click="printEvaluationPositionDescription(props)" icon="print">
+            <q-tooltip content-style="font-size: 16px">Print Signed Position Description</q-tooltip>
+          </q-btn>
+        </div>
+      </q-td>
+    </template> -->
+    <!-- For grid mode, we need to specify everything in order for our action buttons to render -->
+    <template v-slot:item="props">
+      <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
+        <q-card class="q-py-sm">
+          <q-list dense>
+            <q-item v-for="col in props.cols" :key="col.name">
+              <div class="q-table__grid-item-row">
+                <div class="q-table__grid-item-title">{{ col.label }}</div>
+                <div
+                  class="q-table__grid-item-value row q-gutter-sm"
+                  v-if="col.label == 'Actions'"
+                >
+                  <q-btn
+                    class="col"
+                    dense
+                    round
+                    flat
+                    color="grey"
+                    @click="editWorkflowInstance(props.row)"
+                    icon="play_arrow"
+                  >
+                    <q-tooltip>
+                      View progress
+                    </q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    v-if="workflowHasTransition() && canViewTransition()"
+                    class="col"
+                    dense
+                    round
+                    flat
+                    color="grey"
+                    @click="editTransitionForm(props.row)"
+                    icon="assignment"
+                  >
+                    <q-tooltip :delay="400">
+                      View form
+                    </q-tooltip>
+                  </q-btn>
+                  <q-btn
+                    v-if="!archived && canArchiveWorkflowInstance(props.row)"
+                    class="col"
+                    dense
+                    round
+                    flat
+                    color="grey"
+                    @click="showArchiveDialog(props.row)"
+                    icon="delete"
+                  />
+                  <q-btn
+                    v-if="archived && canArchiveWorkflowInstance(props.row)"
+                    class="col"
+                    dense
+                    round
+                    flat
+                    color="grey"
+                    @click="showArchiveDialog(props.row)"
+                    icon="restore_from_trash"
+                  />
+                  <q-icon
+                    v-if="!archived && !complete &&
+                      props.row.employee_action_required"
+                    color="orange"
+                    name="warning"
+                    size="md"
+                  >
+                    <q-tooltip content-style="font-size: 16px">
+                      <div>Your action is required</div>
+                    </q-tooltip>
+                  </q-icon>
+                </div>
+                <div
+                  class="q-table__grid-item-value"
+                  v-else-if="col.label.indexOf('Date') != -1"
+                >
+                  {{ readableDate(col.value) }}
+                </div>
+                <div class="q-table__grid-item-value" v-else>
+                  {{ col.value }}
+                </div>
+              </div>
+            </q-item>
+          </q-list>
+        </q-card>
+      </div>
+    </template>
+    <template v-slot:bottom-row v-if="props.allowAddDelete">
+      <q-tr @click="clickAddWorkflow()" class="cursor-pointer row-add-new">
+        <q-td colspan="100%">
+          <q-icon name="add" size="md" class="q-pr-sm"/>New Workflow
+        </q-td>
+      </q-tr>
+    </template>
+  </q-table>
 
-        <q-card-actions class="row justify-around">
-          <q-btn flat label="Cancel" color="primary" v-close-popup />
-          <q-btn
-            v-if="!archived"
-            flat
-            label="Yes, delete it"
+  <q-dialog v-model="archiveDialogVisible">
+    <q-card>
+      <q-card-section>
+        <div class="row items-center">
+          <q-avatar
+            icon="insert_chart_outlined"
             color="primary"
-            @click="archiveRow()"
-            v-close-popup
+            text-color="white"
           />
-          <q-btn
-            v-else
-            flat
-            label="Yes, restore it"
-            color="primary"
-            @click="restoreRow()"
-            v-close-popup
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-  </div>
+          <span class="q-ml-sm">
+            Are you sure you want to
+            <span v-if="!archived">delete</span>
+            <span v-else>restore</span>
+            this workflow?
+          </span>
+        </div>
+        <div class="row justify-center text-center">
+          Position: {{ archiveDialogPositionName }}
+        </div>
+        <div class="row justify-center text-center">
+          {{ archiveDialogPercentComplete }}% Complete
+        </div>
+      </q-card-section>
+
+      <q-card-actions class="row justify-around">
+        <q-btn flat label="Cancel" color="primary" v-close-popup />
+        <q-btn
+          v-if="!archived"
+          flat
+          label="Yes, delete it"
+          color="primary"
+          @click="archiveRow()"
+          v-close-popup
+        />
+        <q-btn
+          v-else
+          flat
+          label="Yes, restore it"
+          color="primary"
+          @click="restoreRow()"
+          v-close-popup
+        />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
+</div>
 </template>
 
 <style lang="scss">
@@ -345,26 +354,74 @@ const emit = defineEmits<{
 const activeColumns: QTableProps['columns'] = [
   { name: 'position', label: 'Position', align: 'center', field: 'title_name' },
   { name: 'name', label: 'Name', align: 'center', field: 'employee_name' },
-  { name: 'created', align: 'center', label: 'Created', field: 'created', sortable: true },
-  { name: 'transitionDate', align: 'center', label: 'Transition Date', field: 'transition_date', sortable: true },
-  { name: 'status', align: 'center', label: 'Status', field: 'status', sortable: true },
+  { 
+    name: 'created',
+    align: 'center',
+    label: 'Created',
+    field: 'created',
+    sortable: true
+  },
+  {
+    name: 'transitionDate',
+    align: 'center',
+    label: 'Transition Date',
+    field: 'transition_date',
+    sortable: true
+  },
+  {
+    name: 'status',
+    align: 'center',
+    label: 'Status',
+    field: 'status',
+    sortable: true
+  },
   { name: 'actions', label: 'Actions', align: 'center', field: '' },
 ]
 
 const archivedColumns: QTableProps['columns'] = [
   { name: 'type', label: 'Type', align: 'center', field: 'transition_type'},
   { name: 'position', label: 'Position', align: 'center', field: 'title_name' },
-  { name: 'created', align: 'center', label: 'Created', field: 'created', sortable: true },
-  { name: 'status', align: 'center', label: 'Status', field: 'status', sortable: true },
+  {
+    name: 'created',
+    align: 'center',
+    label: 'Created',
+    field: 'created',
+    sortable: true
+  },
+  {
+    name: 'status',
+    align: 'center',
+    label: 'Status',
+    field: 'status',
+    sortable: true
+  },
   { name: 'actions', label: 'Actions', align: 'center', field: '' },
 ]
 
 const completedColumns: QTableProps['columns'] = [
   { name: 'type', label: 'Type', align: 'center', field: 'transition_type'},
   { name: 'position', label: 'Position', align: 'center', field: 'title_name' },
-  { name: 'created', align: 'center', label: 'Created', field: 'created', sortable: true },
-  { name: 'status', align: 'center', label: 'Status', field: 'status', sortable: true },
-  { name: 'completed', align: 'center', label: 'Completed', field: 'completed_at', sortable: true},
+  {
+    name: 'created',
+    align: 'center',
+    label: 'Created',
+    field: 'created',
+    sortable: true
+  },
+  {
+    name: 'status',
+    align: 'center',
+    label: 'Status',
+    field: 'status',
+    sortable: true
+  },
+  {
+    name: 'completed',
+    align: 'center',
+    label: 'Completed',
+    field: 'completed_at',
+    sortable: true
+  },
   { name: 'actions', label: 'Actions', align: 'center', field: '' },
 ]
 
@@ -391,12 +448,14 @@ function tableFilterMethod(rows: readonly any[], term: string) {
           const matchCriteria: Array<boolean> = []
           // Filter by name
           if (row.employee_name) {
-            const nameMatches = row.employee_name.toLowerCase().includes(searchTerm)
+            const nameMatches = row.employee_name.toLowerCase()
+              .includes(searchTerm)
             matchCriteria.push(nameMatches)
           }
           // Filter by position
           if (row.title_name) {
-            const positionMatches = row.title_name.toLowerCase().includes(searchTerm)
+            const positionMatches = row.title_name.toLowerCase()
+              .includes(searchTerm)
             matchCriteria.push(positionMatches)
           }
           if (matchCriteria.some(c => !!c)) {
@@ -474,7 +533,9 @@ function editTransitionForm(workflowInstance: WorkflowInstanceSimple) {
     })
 }
 
-function canArchiveWorkflowInstance(workflowInstance: WorkflowInstanceSimple): boolean {
+function canArchiveWorkflowInstance(
+  workflowInstance: WorkflowInstanceSimple
+): boolean {
   if (workflowInstance.complete || workflowInstance.completed_at) {
     return false
   }
@@ -483,7 +544,8 @@ function canArchiveWorkflowInstance(workflowInstance: WorkflowInstanceSimple): b
     return true
   } else if (workflowInstance.workflow_role_pk) {
     // If they are an admin of the workflow, allow archive
-    return userStore.getEmployeeProfile.workflow_roles.indexOf(workflowInstance.workflow_role_pk) != -1
+    return userStore.getEmployeeProfile.workflow_roles
+      .indexOf(workflowInstance.workflow_role_pk) != -1
   } else {
     // TODO: What should happen if no role assigned? Only admins? Everyone? Require all steps to have roles?
     return false
@@ -528,7 +590,9 @@ function clickAddWorkflow(): void {
           navigateToWorkflowTransitionForm(wfi.pk)
         })
         .catch(e => {
-          console.error('Error creating a new employee onboarding workflow instance', e)
+          console.error(
+            'Error creating a new employee onboarding workflow instance', e
+          )
         })
       break
     case 'return':
@@ -537,7 +601,9 @@ function clickAddWorkflow(): void {
           navigateToWorkflowTransitionForm(wfi.pk)
         })
         .catch(e => {
-          console.error('Error creating a new employee onboarding workflow instance', e)
+          console.error(
+            'Error creating a new employee onboarding workflow instance', e
+          )
         })
       break
     case 'change':
@@ -546,7 +612,9 @@ function clickAddWorkflow(): void {
           navigateToWorkflowTransitionForm(wfi.pk)
         })
         .catch(e => {
-          console.error('Error creating a new employee onboarding workflow instance', e)
+          console.error(
+            'Error creating a new employee onboarding workflow instance', e
+          )
         })
       break
     case 'exit':
@@ -555,7 +623,9 @@ function clickAddWorkflow(): void {
           navigateToWorkflowTransitionForm(wfi.pk)
         })
         .catch(e => {
-          console.error('Error creating a new employee onboarding workflow instance', e)
+          console.error(
+            'Error creating a new employee onboarding workflow instance', e
+          )
         })
       break
     default:

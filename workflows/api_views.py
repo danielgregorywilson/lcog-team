@@ -121,10 +121,17 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
         """
         user = self.request.user
         if user.is_authenticated:
+            wfs_can_view = filter(
+                lambda x: x['display'],
+                user.employee.workflow_display_options()
+            )
+            wfs_can_view_ids = list(map(lambda x: x['id'], wfs_can_view))
             archived = self.request.query_params.get('archived', None)
             if archived is not None and is_true_string(archived):
                 # Archived WFIs
-                return WorkflowInstance.inactive_objects.all().select_related(
+                return WorkflowInstance.inactive_objects.filter(
+                    workflow__id__in=wfs_can_view_ids
+                ).select_related(
                     'transition', 'workflow', 'workflow__role'
                 ).prefetch_related('processinstance_set')
             elif archived is not None and not is_true_string(archived):
@@ -132,14 +139,14 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
                 if complete is not None and is_true_string(complete):
                     # Complete WFIs
                     return WorkflowInstance.active_objects.filter(
-                        complete=True
+                        workflow__id__in=wfs_can_view_ids, complete=True
                     ).select_related(
                         'transition', 'workflow', 'workflow__role'
                     ).prefetch_related('processinstance_set')
                 elif complete is not None and not is_true_string(complete):
                     # Current active WFIs
                     return WorkflowInstance.active_objects.filter(
-                        complete=False
+                        workflow__id__in=wfs_can_view_ids, complete=False
                     ).select_related(
                         'transition', 'workflow', 'workflow__role'
                     ).prefetch_related('processinstance_set')
@@ -149,33 +156,32 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
 
 
     def create(self, request):
+        wf_type = request.data['type']
         wf = None
-        if request.data['type'] == 'employee_onboarding':
+        et = None
+        if wf_type == 'employee-new':
             et = EmployeeTransition.objects.create(
                 type=EmployeeTransition.TRANSITION_TYPE_NEW
             )
-            wf = Workflow.objects.get(name="Employee Onboarding")
-        elif request.data['type'] == 'employee_returning':
+        elif wf_type == 'employee-return':
             et = EmployeeTransition.objects.create(
                 type=EmployeeTransition.TRANSITION_TYPE_RETURN
             )
-            wf = Workflow.objects.get(name="Employee Returning")
-        elif request.data['type'] == 'employee_changing':
+        elif wf_type == 'employee-change':
             et = EmployeeTransition.objects.create(
                 type=EmployeeTransition.TRANSITION_TYPE_CHANGE
             )
-            wf = Workflow.objects.get(name="Employee Changing")
-        elif request.data['type'] == 'employee_exiting':
+        elif wf_type == 'employee-exit':
             et = EmployeeTransition.objects.create(
                 type=EmployeeTransition.TRANSITION_TYPE_EXIT
             )
-            wf = Workflow.objects.get(name="Employee Exiting")
-        else:
+        try:
+            wf = Workflow.objects.get(type=wf_type)
+        except Workflow.DoesNotExist:
             return Response(
                 data='Invalid workflow type',
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
         # Create workflow instance
         wfi = WorkflowInstance.objects.create(workflow=wf, transition=et)
         # Create process instances

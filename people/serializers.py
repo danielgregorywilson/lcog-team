@@ -200,29 +200,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
 
     @staticmethod
     def get_workflow_display_options(employee):
-        workflows = employee.admin_of_workflows()
-        wf_options = WorkflowOptions.objects\
-            .filter(employee=employee, workflow__in=workflows)
-        set_options = []
-        unset_options = []
-        for workflow_id in workflows:
-            try:
-                wf_option = wf_options.get(workflow__id=workflow_id)
-                set_options.append({
-                    'id': wf_option.id,
-                    'name': wf_option.workflow.name,
-                    'display': wf_option.display,
-                    'order': wf_option.order
-                })
-            except WorkflowOptions.DoesNotExist:
-                unset_options.append({
-                    'id': workflow_id,
-                    'name': apps.get_model('workflows.Workflow').objects\
-                        .get(id=workflow_id).name,
-                    'display': True,
-                    'order': 999
-                })
-        return sorted(set_options, key=lambda x: x['order']) + unset_options
+        return employee.workflow_display_options()
 
 
 class SimpleEmployeeSerializer(serializers.ModelSerializer):

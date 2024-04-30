@@ -97,7 +97,7 @@
           </q-tooltip>
         </q-btn>
         <q-btn
-          v-if="workflowHasTransition() && canViewTransition()"
+          v-if="workflowHasTransition(props.row) && canViewTransition()"
           class="col"
           dense
           round
@@ -184,7 +184,7 @@
                     </q-tooltip>
                   </q-btn>
                   <q-btn
-                    v-if="workflowHasTransition() && canViewTransition()"
+                    v-if="workflowHasTransition(props.row) && canViewTransition()"
                     class="col"
                     dense
                     round
@@ -340,7 +340,7 @@ let rowPkToArchive = ref('')
 const props = defineProps<{
   archived: boolean,
   complete: boolean,
-  type: 'all' | 'new' | 'return' | 'change' | 'exit'
+  type: string,
   allowAddDelete: boolean,
   workflowsLoaded: boolean,
   // TODO: Move action required into the table as a column
@@ -379,7 +379,7 @@ const activeColumns: QTableProps['columns'] = [
 ]
 
 const archivedColumns: QTableProps['columns'] = [
-  { name: 'type', label: 'Type', align: 'center', field: 'transition_type'},
+  { name: 'type', label: 'Type', align: 'center', field: 'workflow_type'},
   { name: 'position', label: 'Position', align: 'center', field: 'title_name' },
   {
     name: 'created',
@@ -399,7 +399,7 @@ const archivedColumns: QTableProps['columns'] = [
 ]
 
 const completedColumns: QTableProps['columns'] = [
-  { name: 'type', label: 'Type', align: 'center', field: 'transition_type'},
+  { name: 'type', label: 'Type', align: 'center', field: 'workflow_type'},
   { name: 'position', label: 'Position', align: 'center', field: 'title_name' },
   {
     name: 'created',
@@ -478,30 +478,17 @@ function workflows(): Array<WorkflowInstanceSimple> {
     workflows = workflowsStore.workflowsIncomplete
   }
   return workflows.filter(
-    (row) => {
+    (wf) => {
       if (props.type == 'all') {
         return true
       } else {
-        const matchCriteria: Array<boolean> = []
         // Filter by workflow type
-        if (props.type == 'new') {
-          const typeMatches = row.transition_type == 'New'
-          matchCriteria.push(typeMatches)
-        } else if (props.type == 'return') {
-          const typeMatches = row.transition_type == 'Return'
-          matchCriteria.push(typeMatches)
-        } else if (props.type == 'change') {
-          const typeMatches = row.transition_type == 'Change/Modify'
-          matchCriteria.push(typeMatches)
-        } else if (props.type == 'exit') {
-          const typeMatches = row.transition_type == 'Exit'
-          matchCriteria.push(typeMatches)
-        }
-        if (matchCriteria.some(c => !!c)) {
+        if (props.type == wf.workflow_type) {
           return true
+        } else {
+          // Assume workflow doesn't match
+          return false 
         }
-        // Assume row doesn't match
-        return false
       }
     }
   )
@@ -515,9 +502,12 @@ function editWorkflowInstance(workflowInstance: WorkflowInstanceSimple): void {
     })
 }
 
-// TODO
-function workflowHasTransition(): boolean {
-  return true
+function workflowHasTransition(workflowInstance: WorkflowInstanceSimple): boolean {
+  if (workflowInstance.transition_type) {
+    return true
+  } else {
+    return false
+  }
 }
 
 // TODO
@@ -582,61 +572,32 @@ function restoreRow(): void {
 }
 
 function clickAddWorkflow(): void {
-  switch (props.type) {
-    case 'all':
-    case 'new':
-      workflowsStore.createNewEmployeeOnboarding()
-        .then((wfi) => {
-          navigateToWorkflowTransitionForm(wfi.pk)
-        })
-        .catch(e => {
-          console.error(
-            'Error creating a new employee onboarding workflow instance', e
-          )
-        })
-      break
-    case 'return':
-      workflowsStore.createNewEmployeeReturning()
-        .then((wfi) => {
-          navigateToWorkflowTransitionForm(wfi.pk)
-        })
-        .catch(e => {
-          console.error(
-            'Error creating a new employee onboarding workflow instance', e
-          )
-        })
-      break
-    case 'change':
-      workflowsStore.createNewEmployeeChanging()
-        .then((wfi) => {
-          navigateToWorkflowTransitionForm(wfi.pk)
-        })
-        .catch(e => {
-          console.error(
-            'Error creating a new employee onboarding workflow instance', e
-          )
-        })
-      break
-    case 'exit':
-      workflowsStore.createNewEmployeeExiting()
-        .then((wfi) => {
-          navigateToWorkflowTransitionForm(wfi.pk)
-        })
-        .catch(e => {
-          console.error(
-            'Error creating a new employee onboarding workflow instance', e
-          )
-        })
-      break
-    default:
-      break
-  }
+  workflowsStore.createNewWorkflowInstance(props.type)
+    .then((wfi) => {
+      if (!!wfi.transition) {
+        navigateToWorkflowTransitionForm(wfi.pk)
+      } else {
+        navigateToWorkflowProcesses(wfi.pk)
+      }
+    })
+    .catch(e => {
+      console.error(
+        `Error creating a new ${ props.type } workflow instance`, e
+      )
+    })
 }
 
 function navigateToWorkflowTransitionForm(pk: number): void {
   router.push({name: 'workflow-transition-form', params: {pk: pk.toString()}})
     .catch(e => {
       console.error('Error navigating to workflow transition form:', e)
+    })
+}
+
+function navigateToWorkflowProcesses(pk: number): void {
+  router.push({name: 'workflow-processes', params: {pk: pk.toString()}})
+    .catch(e => {
+      console.error('Error navigating to workflow processes:', e)
     })
 }
 </script>

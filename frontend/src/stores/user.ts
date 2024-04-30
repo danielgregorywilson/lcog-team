@@ -5,7 +5,7 @@ import { useCookies } from 'vue3-cookies'
 import { apiURL, handlePromiseError } from 'src/stores/index'
 import { useSecurityMessageStore } from 'src/stores/securitymessage'
 import {
-  ClientError, EmployeeRetrieve, SimpleEmployeeRetrieve
+  ClientError, EmployeeRetrieve, SimpleEmployeeRetrieve, WorkflowOption
 } from 'src/types'
 
 const { cookies } = useCookies()
@@ -38,6 +38,7 @@ export const useUserStore = defineStore('user', {
       time_off_requests_can_view: [] as Array<number>,
       next_to_sign_prs: '',
       workflow_roles: [] as Array<number>,
+      workflow_display_options: [] as Array<WorkflowOption>,
       is_all_workflows_admin: false,
       can_view_expenses: false,
       can_view_mow_routes: false,
@@ -89,6 +90,7 @@ export const useUserStore = defineStore('user', {
             this.profile.time_off_requests_can_view = resp.data.time_off_requests_can_view
             this.profile.next_to_sign_prs = resp.data.next_to_sign_prs
             this.profile.workflow_roles = resp.data.workflow_roles
+            this.profile.workflow_display_options = resp.data.workflow_display_options
             this.profile.is_all_workflows_admin = resp.data.is_all_workflows_admin
             this.profile.can_view_expenses = resp.data.can_view_expenses
             this.profile.can_view_mow_routes = resp.data.can_view_mow_routes
@@ -108,6 +110,7 @@ export const useUserStore = defineStore('user', {
             cookies.set('telework_applications_can_view', resp.data.telework_applications_can_view.toString())
             cookies.set('time_off_requests_can_view', resp.data.time_off_requests_can_view.toString())
             cookies.set('workflow_roles', resp.data.workflow_roles.toString())
+            cookies.set('workflow_display_options', resp.data.workflow_display_options.toString())
             cookies.set('can_view_expenses', resp.data.can_view_expenses.toString())
             cookies.set('can_view_mow_routes', resp.data.can_view_mow_routes.toString())
             cookies.set('can_manage_mow_stops', resp.data.can_manage_mow_stops.toString())
@@ -157,6 +160,7 @@ export const useUserStore = defineStore('user', {
         cookies.remove('telework_applications_can_view')
         cookies.remove('time_off_requests_can_view')
         cookies.remove('workflow_roles')
+        cookies.remove('workflow_display_options')
         cookies.remove('can_view_expenses')
         cookies.remove('can_view_mow_routes')
         cookies.remove('can_manage_mow_stops')

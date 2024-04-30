@@ -148,7 +148,12 @@ export interface EmployeeUpdatePartial {
 }
 
 export type WorkflowOption = {
-  id: number, name: string, display: boolean, order: number
+  id: number
+  name: string
+  display: boolean
+  order: number
+  type?: string
+  icon?: string
 }
 
 ////////////////////////////////////////////////
@@ -780,6 +785,7 @@ export interface WorkflowInstanceSimple {
   transition_type: string
   transition_date: string
   workflow_role_pk: number
+  workflow_type: string
 }
 
 export interface WorkflowInstance {

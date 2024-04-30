@@ -1,5 +1,5 @@
 <template>
-  <div class="row q-mb-md">
+  <div class="row">
     <q-btn-group push>
       <q-btn
         name="workflows-active-button"
@@ -27,82 +27,28 @@
       />
     </q-btn-group>
   </div>
-  <div class="row items-center q-mb-sm">
-    <q-avatar
-      icon="person_add"
-      color="primary"
-      text-color="white"
-      font-size="22px"
-      class="q-mr-sm"
-      size="md"
+
+  <div v-for="type of userWorkflowTypes()" :key="type.id">
+    <div class="row items-center q-mb-sm q-mt-md">
+      <q-avatar
+        :icon="type.icon"
+        color="primary"
+        text-color="white"
+        font-size="22px"
+        class="q-mr-sm"
+        size="md"
+      />
+      <div class="text-h5">{{ type.name }}</div>
+    </div>
+    <WorkflowTable
+      :archived="false"
+      :complete="false"
+      :type="type.type ? type.type : ''"
+      :allowAddDelete="true"
+      :workflowsLoaded="workflowsLoaded"
+      v-on:retrieve="retrieveWorkflows"
     />
-    <div class="text-h5">Employees Onboarding</div>
   </div>
-  <WorkflowTable
-    :archived="false"
-    :complete="false"
-    type="new"
-    :allowAddDelete="true"
-    :workflowsLoaded="workflowsLoaded"
-    v-on:retrieve="retrieveWorkflows"
-  />
-  <div class="row items-center q-mb-sm q-mt-md">
-    <q-avatar
-      icon="hail"
-      color="primary"
-      text-color="white"
-      font-size="22px"
-      class="q-mr-sm"
-      size="md"
-    />
-    <div class="text-h5">Employees Returning</div>
-  </div>
-  <WorkflowTable
-    :archived="false"
-    :complete="false"
-    type="return"
-    :allowAddDelete="true"
-    :workflowsLoaded="workflowsLoaded"
-    v-on:retrieve="retrieveWorkflows"
-  />
-  <div class="row items-center q-mb-sm q-mt-md">
-    <q-avatar
-      icon="directions_bike"
-      color="primary"
-      text-color="white"
-      font-size="22px"
-      class="q-mr-sm"
-      size="md"
-    />
-    <div class="text-h5">Employees Changing</div>
-  </div>
-  <WorkflowTable
-    :archived="false"
-    :complete="false"
-    type="change"
-    :allowAddDelete="true"
-    :workflowsLoaded="workflowsLoaded"
-    v-on:retrieve="retrieveWorkflows()"
-  />
-  <div class="row items-center q-mb-sm q-mt-md">
-    <q-avatar
-      icon="person_remove"
-      color="primary"
-      text-color="white"
-      font-size="22px"
-      class="q-mr-sm"
-      size="md"
-    />
-    <div class="text-h5">Employees Exiting</div>
-  </div>
-  <WorkflowTable
-    :archived="false"
-    :complete="false"
-    type="exit"
-    :allowAddDelete="true"
-    :workflowsLoaded="workflowsLoaded"
-    v-on:retrieve="retrieveWorkflows"
-  />
 </template>
 
 <script setup lang="ts">
@@ -122,6 +68,12 @@ let workflowsLoaded = ref(false)
 
 function userHasWorkflowRoles() {
   return userStore.getEmployeeProfile.workflow_roles.length > 0
+}
+
+function userWorkflowTypes() {
+  return userStore.getEmployeeProfile.workflow_display_options.filter(
+    (option) => option.display
+  )
 }
 
 function retrieveWorkflows(): void {

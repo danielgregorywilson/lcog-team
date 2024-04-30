@@ -602,6 +602,35 @@ class Employee(models.Model):
             return True
         else:
             return False
+    
+    def workflow_display_options(employee):
+        workflows = employee.admin_of_workflows()
+        wf_options = WorkflowOptions.objects\
+            .filter(employee=employee, workflow__in=workflows)
+        set_options = []
+        unset_options = []
+        for wf_id in workflows:
+            try:
+                wf_option = wf_options.get(workflow__id=wf_id)
+                set_options.append({
+                    'id': wf_id,
+                    'name': wf_option.workflow.name,
+                    'type': wf_option.workflow.type,
+                    'icon': wf_option.workflow.icon,
+                    'display': wf_option.display,
+                    'order': wf_option.order
+                })
+            except WorkflowOptions.DoesNotExist:
+                wf = apps.get_model('workflows.Workflow').objects.get(id=wf_id)
+                unset_options.append({
+                    'id': wf_id,
+                    'name': wf.name,
+                    'type': wf.type,
+                    'icon': wf.icon,
+                    'display': True,
+                    'order': 999
+                })
+        return sorted(set_options, key=lambda x: x['order']) + unset_options
 
 
 class WorkflowOptions(models.Model):

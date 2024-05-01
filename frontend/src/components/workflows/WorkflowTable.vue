@@ -46,10 +46,14 @@
       <th v-else>{{props.col.label}}</th>
     </template> -->
     <!-- Slots for body cells: Show dates in a familiar format; make sure status can wrap, and display action buttons -->
-    <template v-slot:body-cell-created="props">
-      <q-td key="created" :props="props">
-        {{ readableDate(props.row.transition_date_submitted) }} -
-        {{ props.row.transition_submitter }}
+    <template v-slot:body-cell-createdAt="props">
+      <q-td key="createdAt" :props="props">
+        {{ readableDate(props.row.started_at) }}
+      </q-td>
+    </template>
+    <template v-slot:body-cell-submitted="props">
+      <q-td key="submitted" :props="props">
+        {{ submittedDisplay(props.row) }}
       </q-td>
     </template>
     <template v-slot:body-cell-transitionDate="props">
@@ -352,13 +356,77 @@ const emit = defineEmits<{
 }>()
 
 const activeColumns: QTableProps['columns'] = [
+  { name: 'created_by', label: 'Created By', align: 'center', field: 'created_by' },
+  { 
+    name: 'createdAt',
+    align: 'center',
+    label: 'Created',
+    field: 'created_at',
+    sortable: true
+  },
+  {
+    name: 'status',
+    align: 'center',
+    label: 'Status',
+    field: 'status',
+    sortable: true
+  },
+  { name: 'actions', label: 'Actions', align: 'center', field: '' },
+]
+
+const archivedColumns: QTableProps['columns'] = [
+  { name: 'type', label: 'Type', align: 'center', field: 'workflow_type'},
+  {
+    name: 'createdAt',
+    align: 'center',
+    label: 'Created',
+    field: 'created_at',
+    sortable: true
+  },
+  {
+    name: 'status',
+    align: 'center',
+    label: 'Status',
+    field: 'status',
+    sortable: true
+  },
+  { name: 'actions', label: 'Actions', align: 'center', field: '' },
+]
+
+const completedColumns: QTableProps['columns'] = [
+  { name: 'type', label: 'Type', align: 'center', field: 'workflow_type'},
+  {
+    name: 'createdAt',
+    align: 'center',
+    label: 'Created',
+    field: 'created_at',
+    sortable: true
+  },
+  {
+    name: 'status',
+    align: 'center',
+    label: 'Status',
+    field: 'status',
+    sortable: true
+  },
+  {
+    name: 'completed',
+    align: 'center',
+    label: 'Completed',
+    field: 'completed_at',
+    sortable: true
+  },
+  { name: 'actions', label: 'Actions', align: 'center', field: '' },
+]
+
+const activeTransitionColumns: QTableProps['columns'] = [
   { name: 'position', label: 'Position', align: 'center', field: 'title_name' },
   { name: 'name', label: 'Name', align: 'center', field: 'employee_name' },
   { 
-    name: 'created',
+    name: 'submitted',
     align: 'center',
-    label: 'Created',
-    field: 'created',
+    label: 'Submitted',
+    field: 'submitted',
     sortable: true
   },
   {
@@ -378,14 +446,14 @@ const activeColumns: QTableProps['columns'] = [
   { name: 'actions', label: 'Actions', align: 'center', field: '' },
 ]
 
-const archivedColumns: QTableProps['columns'] = [
+const archivedTransitionColumns: QTableProps['columns'] = [
   { name: 'type', label: 'Type', align: 'center', field: 'workflow_type'},
   { name: 'position', label: 'Position', align: 'center', field: 'title_name' },
   {
-    name: 'created',
+    name: 'submitted',
     align: 'center',
-    label: 'Created',
-    field: 'created',
+    label: 'Submitted',
+    field: 'submitted',
     sortable: true
   },
   {
@@ -398,14 +466,14 @@ const archivedColumns: QTableProps['columns'] = [
   { name: 'actions', label: 'Actions', align: 'center', field: '' },
 ]
 
-const completedColumns: QTableProps['columns'] = [
+const completedTransitionColumns: QTableProps['columns'] = [
   { name: 'type', label: 'Type', align: 'center', field: 'workflow_type'},
   { name: 'position', label: 'Position', align: 'center', field: 'title_name' },
   {
-    name: 'created',
+    name: 'submitted',
     align: 'center',
-    label: 'Created',
-    field: 'created',
+    label: 'Submitted',
+    field: 'submitted',
     sortable: true
   },
   {
@@ -426,12 +494,21 @@ const completedColumns: QTableProps['columns'] = [
 ]
 
 function columns() {
-  if (props.archived) {
-    return archivedColumns
-  } else if (props.complete) {
-    return completedColumns
+  if (['employee-new', 'employee-return', 'employee-change', 'employee-exit'].includes(props.type)) {
+    if (props.archived) {
+      return archivedTransitionColumns
+    } else if (props.complete) {
+      return completedTransitionColumns
+    }
+    return activeTransitionColumns 
+  } else {
+    if (props.archived) {
+      return archivedColumns
+    } else if (props.complete) {
+      return completedColumns
+    }
+    return activeColumns
   }
-  return activeColumns
 }
 
 let tableFilter = ref('')
@@ -492,6 +569,14 @@ function workflows(): Array<WorkflowInstanceSimple> {
       }
     }
   )
+}
+
+function submittedDisplay(row: WorkflowInstanceSimple): string {
+  if (row.transition_date_submitted) {
+    return `${ readableDate(row.transition_date_submitted) } - ${ row.transition_submitter }`
+  } else {
+    return 'Not submitted'
+  }
 }
 
 function editWorkflowInstance(workflowInstance: WorkflowInstanceSimple): void {

@@ -783,9 +783,12 @@ export interface WorkflowInstanceSimple {
   employee_name: string
   title_name: string
   transition_type: string
-  transition_date: string
+  transition_submitter: string
+  transition_date_submitted: Date
+  transition_date: Date
   workflow_role_pk: number
   workflow_type: string
+  employee_action_required: boolean
 }
 
 export interface WorkflowInstance {

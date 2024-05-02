@@ -50,7 +50,10 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
                 requests = TimeOffRequest.objects.all()
             elif 'managed' in self.request.GET and is_true_string(self.request.GET['managed']):
                 requests = TimeOffRequest.objects.filter(
-                    employee__manager=user.employee
+                    employee__manager=user.employee,
+                    # Only get requests that are less than 30 days old
+                    end_date__gte=\
+                        datetime.date.today() - datetime.timedelta(days=60)
                 )
                 # If this user is a temporary approver for someone else,
                 # also show their requests.
@@ -63,7 +66,10 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
                 for approver in temporary_approvers:
                     employee_on_leave = approver.employee_on_leave
                     employee_requests = TimeOffRequest.objects.filter(
-                        employee__manager=employee_on_leave
+                        employee__manager=employee_on_leave,
+                        # Only get requests that are less than 30 days old
+                        end_date__gte=\
+                            datetime.date.today() - datetime.timedelta(days=60)
                     )
                     requests = requests | employee_requests
             elif 'team' in self.request.GET and is_true_string(self.request.GET['team']):

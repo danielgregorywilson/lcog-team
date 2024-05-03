@@ -9,7 +9,7 @@ describe('New GS employee workflow check assignments', () => {
     // Create a new employee workflow
     loginUser(Cypress.env('users').gsmanager).then(() => {
       visitUrl(Cypress.env('workflows_dashboard_path'))
-      cy.get('.workflowtable-new .row-add-new').click()
+      cy.get('.workflowtable-employee-new .row-add-new').click()
       cy.wait(500) // Wait for the new transition form to load
       cy.url().then((url) => {
         const match = url.match(/wf\/(\d+)\/transition/)

@@ -4,6 +4,55 @@
 
 export const releases = [
   {
+    version: '0.27.0',
+    date: new Date(2024, 4, 2),
+    changes: [
+      {
+        type: 'new',
+        description: 'Support for custom workflows.'
+      },
+      {
+        type: 'new',
+        description: 'Add custom workflow dashboard display options to profile.'
+      },
+      {
+        type: 'new',
+        description: 'Send an early warning transition email to HR.'
+      },
+      {
+        type: 'improved',
+        description: 'Only show TORs for approval to manager that are less ' +
+          'than 30 days in the past.'
+      },
+      {
+        type: 'improved',
+        description: 'Credit card reconciliation demo features.'
+      },
+      {
+        type: 'improved',
+        description: 'Usability and speed improvements to time off app.'
+      },
+      {
+        type: 'improved',
+        description: 'Display public note in team time off email notifications.'
+      },
+      {
+        type: 'improved',
+        description: 'Updated Schaefers kiosk page.'
+      },
+      {
+        type: 'improved',
+        description: 'Allow decimals in cubicle number field in transition ' +
+          'forms.'
+      },
+      {
+        type: 'fix',
+        description: 'Fixed a bug where all workflows were getting shown to ' +
+          'everyone in their profile.'
+      }
+    ]
+  },
+  {
     version: '0.26.0',
     date: new Date(2024, 3, 18),
     changes: [

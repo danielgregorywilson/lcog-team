@@ -170,23 +170,6 @@ export default class TeleworkPolicy extends Vue{
     .catch(e => {
       console.error('Error', e)
     });
-
-    // PerformanceReviewDataService.uploadSignedPositionDescription(fd)
-    //   .then((response: SignedPositionDescriptionUploadServerResponse) => {
-    //     if (response.status == 200) {
-    //       this.$refs.fileuploader.reset() // eslint-disable-line
-    //       this.uploadedPositionDescriptionUrl = response.data // eslint-disable-line
-    //       this.fileSuccessfullyUploaded = true
-    //       setTimeout(() => this.fileSuccessfullyUploaded = false, 5000)
-    //       this.updatePerformanceReview()
-    //         .catch(e => {
-    //           console.error('Error updating PR after uploading signed position description:', e)
-    //         })
-    //     }
-    //   })
-    //   .catch(e => {
-    //     console.error('Error uploading signed position description:', e)
-    //   })
   }
 
   $refs!: {

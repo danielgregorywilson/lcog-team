@@ -122,8 +122,11 @@ function wfi(): WorkflowInstance {
 }
 
 function hasEmployeeTransition() {
-  // TODO: If not, then just show the processes and no subnav
-  return true
+  if (!wfi().transition) {
+    return false
+  } else {
+    return true
+  }
 }
 
 function isSelected(currentRouteName: string) {

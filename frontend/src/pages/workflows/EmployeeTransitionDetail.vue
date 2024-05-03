@@ -338,7 +338,7 @@
       <q-input
         name="cubicle-number"
         v-model="cubicleNumber"
-        mask="NNNNNNNNNN"
+        maxlength="10"
         label="Cubicle Number"
         class="q-mr-md"
         :readonly="!canEditOtherFields()"

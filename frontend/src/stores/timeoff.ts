@@ -15,7 +15,8 @@ export const useTimeOffStore = defineStore('timeoff', {
     currentTimeOffRequest: {} as TimeOffRequestRetrieve,
     teamTimeOffRequests: [] as Array<TimeOffRequestRetrieve>,
     managedTimeOffRequests: [] as Array<TimeOffRequestRetrieve>,
-    conflictingResponsibilities: [] as Array<EmployeeConflictingResponsibilities>
+    conflictingResponsibilities:
+      [] as Array<EmployeeConflictingResponsibilities>
   }),
 
   getters: {},
@@ -33,9 +34,30 @@ export const useTimeOffStore = defineStore('timeoff', {
           })
       })
     },
-    getTeamTimeOffRequests() {
+    getTeamTimeOffRequests(monday: Date | null = null) {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/timeoffrequest?team=True` })
+        let dateParam = ''
+        if (monday) {
+          const mondayDate = monday.toISOString().split('T')[0]
+          // Add four days to get Friday
+          const fridayDate = new Date(monday.getTime() + 4*86400000)
+            .toISOString().split('T')[0]
+          dateParam = `&start=${ mondayDate }&end=${ fridayDate }`
+        } else {
+          const today = new Date()
+          const oneYearAgo = new Date(
+            today.getFullYear() - 1, today.getMonth(), today.getDate()
+          )
+          const startParam = oneYearAgo.toISOString().split('T')[0]
+          const oneYearFromNow = new Date(
+            today.getFullYear() + 1, today.getMonth(), today.getDate()
+          )
+          const endParam = oneYearFromNow.toISOString().split('T')[0]
+          dateParam = `&start=${ startParam }&end=${ endParam }`
+        }
+        axios(
+          { url: `${ apiURL }api/v1/timeoffrequest?team=True${ dateParam }` }
+        )
           .then(resp => {
             this.teamTimeOffRequests = resp.data.results
             resolve('Successfully got team time off requests')
@@ -63,7 +85,11 @@ export const useTimeOffStore = defineStore('timeoff', {
     },
     getConflictingResponsibilites(data: { dates: TimeOffRequestDates}) {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/timeoffrequest/conflicting_responsibilities`, data: data, method: 'POST' })
+        axios({
+          url: `${ apiURL }api/v1/timeoffrequest/conflicting_responsibilities`,
+          data: data,
+          method: 'POST'
+        })
           .then(resp => {
             this.conflictingResponsibilities = resp.data
             resolve('Successfully got conflicting responsibilities')
@@ -91,7 +117,11 @@ export const useTimeOffStore = defineStore('timeoff', {
     },
     createTimeOffRequest(timeOffRequest: TimeOffRequestCreate) {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/timeoffrequest`, data: timeOffRequest, method: 'POST' })
+        axios({
+          url: `${ apiURL }api/v1/timeoffrequest`,
+          data: timeOffRequest,
+          method: 'POST'
+        })
           .then(() => {
             this.getMyTimeOffRequests()
             const userStore = useUserStore()
@@ -106,7 +136,11 @@ export const useTimeOffStore = defineStore('timeoff', {
     },
     updateTimeOffRequest(data: TimeOffRequestUpdate) {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/timeoffrequest/${ data.pk }`, data, method: 'PUT' })
+        axios({
+          url: `${ apiURL }api/v1/timeoffrequest/${ data.pk }`,
+          data,
+          method: 'PUT'
+        })
           .then(() => {
             this.getMyTimeOffRequests()
             const userStore = useUserStore()
@@ -121,7 +155,11 @@ export const useTimeOffStore = defineStore('timeoff', {
     },
     acknowledgeTimeOffRequest(data: TimeOffRequestAcknowledge) {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/timeoffrequest/${ data.pk }`, data, method: 'PATCH' })
+        axios({
+          url: `${ apiURL }api/v1/timeoffrequest/${ data.pk }`,
+          data,
+          method: 'PATCH'
+        })
           .then(() => {
             this.getMyTimeOffRequests()
             resolve('Successfully acknowledged time off request')
@@ -135,7 +173,9 @@ export const useTimeOffStore = defineStore('timeoff', {
     },
     deleteTimeOffRequest(pk: string) {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/timeoffrequest/${ pk }`, method: 'DELETE' })
+        axios({
+          url: `${ apiURL }api/v1/timeoffrequest/${ pk }`, method: 'DELETE'
+        })
           .then(() => {
             this.getMyTimeOffRequests()
             resolve('Successfully deleted time off request')

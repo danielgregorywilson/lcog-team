@@ -77,6 +77,17 @@ export const useWorkflowsStore = defineStore('workflows', {
           })
       })
     },
+    createNewWorkflowInstance(type: string): Promise<WorkflowInstance> {
+      return new Promise((resolve, reject) => {
+        axios({ url: `${ apiURL }api/v1/workflowinstance`, method: 'POST', data: { type } })
+          .then(resp => {
+            resolve(resp.data)
+          })
+          .catch(e => {
+            handlePromiseError(reject, `Error creating new ${ type } workflow instance`, e)
+          })
+      })
+    },
     getCurrentWorkflowInstance(pk: string) {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/workflowinstance/${ pk }` })

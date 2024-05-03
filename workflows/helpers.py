@@ -169,6 +169,48 @@ def send_transition_fiscal_email(
         to_addresses, cc_addresses, subject, plaintext_message, html_message
     )
 
+def send_early_hr_email(t, url=''):
+    current_site = Site.objects.get_current()
+    transition_url = current_site.domain + url
+    
+    first_name = t.employee_first_name if t.employee_first_name else ''
+    last_name = t.employee_last_name if t.employee_last_name else ''
+    name_string = f'{ first_name } { last_name }'
+    if t.type == EmployeeTransition.TRANSITION_TYPE_NEW:
+        type_verb = 'starting'
+    elif t.type == EmployeeTransition.TRANSITION_TYPE_CHANGE:
+        type_verb = 'changing'
+    elif t.type == EmployeeTransition.TRANSITION_TYPE_EXIT:
+        type_verb = 'terminating'
+    else:
+        type_verb = 'changing'
+    date_string = readable_date(t.transition_date) if t.transition_date else ''
+
+    subject = (
+        f'Just Submitted: { name_string } EIS { type_verb } { date_string }'
+    )
+
+    html_template = '../templates/email/employee-transition-fiscal-hr.html'
+    html_message = render_to_string(html_template, {
+        'name_string': name_string,
+        'type_verb': type_verb,
+        'date_string': date_string,
+        'extra_message': 'This is an early notification to HR. The form has ' +
+            'not been approved yet.',
+        'transition_url': transition_url,
+        'sender_name': ''
+    })
+    plaintext_message = strip_tags(html_message)
+
+    # Send to HR employees
+    to_addresses = Group.objects.get(name='HR Employee').user_set.all()\
+        .values_list('email', flat=True)
+    cc_addresses = []
+
+    send_email_multiple(
+        to_addresses, cc_addresses, subject, plaintext_message, html_message
+    )
+
 def send_transition_hr_email(
     t, extra_message=None, sender_name='', sender_email='', url='',
     reassigned=False

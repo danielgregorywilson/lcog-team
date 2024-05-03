@@ -110,6 +110,9 @@ class Employee(models.Model):
     email_opt_out_timeoff_all = models.BooleanField(default=False)
     email_opt_out_timeoff_weekly = models.BooleanField(default=False)
     email_opt_out_timeoff_daily = models.BooleanField(default=False)
+    workflow_options = models.ManyToManyField(
+        "workflows.Workflow", through="WorkflowOptions", 
+    )
 
     manager = models.ForeignKey(
         "self",
@@ -194,6 +197,14 @@ class Employee(models.Model):
     @property
     def is_program_manager(self):
         return self.manager and self.manager.is_division_director
+    
+    @property
+    def is_gs_employee(self):
+        return self.unit_or_program.division.name == "Government Services"
+    
+    @property
+    def is_admin_employee(self):
+        return self.unit_or_program.division.name == "Administrative Services"
 
     @property
     def has_program_manager(self):
@@ -202,17 +213,17 @@ class Employee(models.Model):
             return False
         if current_employee.is_division_director:
             return False
-        if all(
+        if all([
             current_employee.manager,
             current_employee.manager.is_division_director
-        ):
+        ]):
             # They *are* the program manager
             return False
         while True:
-            if all(
+            if all([
                 current_employee.manager,
                 current_employee.manager.is_division_director
-            ):
+            ]):
                 return True
             if current_employee.manager:
                 current_employee = current_employee.manager
@@ -398,28 +409,28 @@ class Employee(models.Model):
         reviews = []
         for review in self.signature_upcoming_reviews():
             if self.is_executive_director:
-                if all(
+                if all([
                     review.status == PerformanceReview.EVALUATION_HR_PROCESSED,
                     review.signature_set.filter(employee=self).count() == 0
-                ):
+                ]):
                     reviews.append(review)
             elif self.is_hr_manager:
-                if all(
+                if all([
                     review.status == PerformanceReview.EVALUATION_APPROVED,
                     review.signature_set.filter(employee=self).count() == 0
-                ):
+                ]):
                     reviews.append(review)
             else:
                 direct_report = review.employee
                 while direct_report.manager != self:
                     direct_report = direct_report.manager
-                if all(
+                if all([
                     review.status == PerformanceReview.EVALUATION_WRITTEN,
                     review.signature_set.filter(
                         employee=direct_report
                     ).count() == 1,
                     review.signature_set.filter(employee=self).count() == 0
-                ):
+                ]):
                     reviews.append(review)
         return reviews
     
@@ -563,6 +574,8 @@ class Employee(models.Model):
 
     def admin_of_workflows(self):
         all_workflows = apps.get_model('workflows', 'Workflow').objects.all().select_related('role')
+        if self.is_all_workflows_admin():
+            return [workflow.id for workflow in all_workflows]
         return [workflow.id for workflow in list(all_workflows) if workflow.role and self in workflow.role.members.all()]
     
     def admin_of_processes(self):
@@ -589,6 +602,48 @@ class Employee(models.Model):
             return True
         else:
             return False
+    
+    def workflow_display_options(employee):
+        workflows = employee.admin_of_workflows()
+        wf_options = WorkflowOptions.objects\
+            .filter(employee=employee, workflow__in=workflows)
+        set_options = []
+        unset_options = []
+        for wf_id in workflows:
+            try:
+                wf_option = wf_options.get(workflow__id=wf_id)
+                set_options.append({
+                    'id': wf_id,
+                    'name': wf_option.workflow.name,
+                    'type': wf_option.workflow.type,
+                    'icon': wf_option.workflow.icon,
+                    'display': wf_option.display,
+                    'order': wf_option.order
+                })
+            except WorkflowOptions.DoesNotExist:
+                wf = apps.get_model('workflows.Workflow').objects.get(id=wf_id)
+                unset_options.append({
+                    'id': wf_id,
+                    'name': wf.name,
+                    'type': wf.type,
+                    'icon': wf.icon,
+                    'display': True,
+                    'order': 999
+                })
+        return sorted(set_options, key=lambda x: x['order']) + unset_options
+
+
+class WorkflowOptions(models.Model):
+    class Meta:
+        verbose_name = _("Workflow Option")
+        verbose_name_plural = _("Workflow Options")
+
+    employee = models.ForeignKey("Employee", on_delete=models.CASCADE)
+    workflow = models.ForeignKey(
+        "workflows.Workflow", on_delete=models.CASCADE
+    )
+    display = models.BooleanField(default=True)
+    order = models.IntegerField(default=0)
 
 
 class ManagerUpcomingReviewsManager(models.Manager):

@@ -45,11 +45,17 @@ class JobTitleAdmin(admin.ModelAdmin):
     inlines = [EmployeeInline]
 
 
+class WorkflowOptionsInline(admin.TabularInline):
+    model = Employee.workflow_options.through
+    extra = 0
+
+
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
     list_display = ("number", "active", "username", "job_title", "unit_or_program", "manager",)
     list_filter = ("active", "unit_or_program__division", "unit_or_program",)
     search_fields = ("user__username", )
+    inlines = [WorkflowOptionsInline]
 
 
 # class SelfEvaluationInline(EditLinkToInlineObject, admin.StackedInline):

@@ -1,5 +1,6 @@
 import datetime
 
+from django.apps import apps
 from django.contrib.auth.models import Group, User
 
 from rest_framework import serializers
@@ -7,8 +8,10 @@ from rest_framework import serializers
 from people.models import (
     Employee, JobTitle, PerformanceReview, ReviewNote, Signature,
     TeleworkApplication, TeleworkSignature, UnitOrProgram,
-    ViewedSecurityMessage
+    ViewedSecurityMessage, WorkflowOptions
 )
+
+from workflows.models import Workflow
 
 
 class JobTitleSerializer(serializers.HyperlinkedModelSerializer):
@@ -74,6 +77,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     can_view_expenses = serializers.SerializerMethodField()
     can_view_mow_routes = serializers.SerializerMethodField()
     can_manage_mow_stops = serializers.SerializerMethodField()
+    workflow_display_options = serializers.SerializerMethodField()
     
     class Meta:
         model = Employee
@@ -91,7 +95,8 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             'email_opt_out_timeoff_all', 'email_opt_out_timeoff_weekly',
             'email_opt_out_timeoff_daily', 'is_all_workflows_admin',
             'admin_of_workflows', 'admin_of_processes', 'workflow_roles',
-            'can_view_expenses', 'can_view_mow_routes', 'can_manage_mow_stops'
+            'can_view_expenses', 'can_view_mow_routes', 'can_manage_mow_stops',
+            'workflow_display_options'
         ]
 
     @staticmethod
@@ -192,6 +197,10 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     @staticmethod
     def get_can_manage_mow_stops(employee):
         return employee.can_manage_mow_stops()
+
+    @staticmethod
+    def get_workflow_display_options(employee):
+        return employee.workflow_display_options()
 
 
 class SimpleEmployeeSerializer(serializers.ModelSerializer):

@@ -71,7 +71,7 @@ class WorkflowSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Workflow
         fields = [
-            'url', 'pk', 'name', 'version', 'processes'
+            'url', 'pk', 'name', 'type', 'icon', 'version', 'processes'
         ]
 
 
@@ -262,6 +262,7 @@ class EmployeeTransitionRedactedSerializer(EmployeeTransitionSerializer):
 class WorkflowInstanceBaseSerializer(serializers.ModelSerializer):
     title_name = serializers.SerializerMethodField()
     employee_action_required = serializers.SerializerMethodField()
+    workflow_type = serializers.CharField(source='workflow.type')
     workflow_role_pk = serializers.IntegerField(
         source='workflow.role.pk', required=False
     )
@@ -301,8 +302,8 @@ class WorkflowInstanceSimpleSerializer(WorkflowInstanceBaseSerializer):
             'url', 'pk', 'started_at', 'complete', 'completed_at',
             'percent_complete', 'status', 'employee_name', 'title_name',
             'transition_type', 'transition_submitter',
-            'transition_date_submitted', 'transition_date', 'workflow_role_pk',
-            'employee_action_required'
+            'transition_date_submitted', 'transition_date', 'workflow_type',
+            'workflow_role_pk', 'employee_action_required'
         ]
         depth = 1
     
@@ -342,6 +343,6 @@ class WorkflowInstanceSerializer(WorkflowInstanceBaseSerializer):
         fields = [
             'url', 'pk', 'workflow', 'process_instances', 'transition',
             'active', 'complete', 'percent_complete', 'title_name',
-            'employee_action_required', 'workflow_role_pk'
+            'employee_action_required', 'workflow_type', 'workflow_role_pk'
         ]
         depth = 1

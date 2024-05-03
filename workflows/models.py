@@ -331,12 +331,22 @@ class Workflow(models.Model):
     def __str__(self):
         return f"Workflow: {self.name}"
     
-    name = models.CharField(max_length=100)
+    name = models.CharField(
+        max_length=100, help_text=_("Display name of the workflow")
+    )
+    type = models.CharField(
+        max_length=100, blank=True,
+        help_text=_("Short name for the type of workflow, e.g. new, exit")
+    )
     role = models.ForeignKey(
         Role, blank=True, null=True, on_delete=models.SET_NULL,
         help_text=_(
             "The set of employees with full admin access to this workflow"
         )
+    )
+    icon = models.CharField(
+        max_length=50, blank=True,
+        help_text=_("The name of a Material Design icon")
     )
     version = models.IntegerField(default=1)
 

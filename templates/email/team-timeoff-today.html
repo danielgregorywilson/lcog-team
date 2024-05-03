@@ -10,7 +10,7 @@
         <p><strong>{{context.today|date:"l"}}, {{context.today|date:"F"}} {{context.today.day}}:</strong></p>
         <ul>
             {% for tor in context.today_tors %}
-                <li>{{tor.employee.name}}</li>
+                <li>{{tor.employee.name}}{% if tor.note %} - {{ tor.note }}{% endif %}</li>
             {% endfor %}
         </ul>
         <p>View the full calendar: <a href="{{context.calendar_url}}">{{context.calendar_url}}</a></p>

@@ -119,6 +119,7 @@ export interface EmployeeRetrieve {
   can_view_expenses: boolean
   can_view_mow_routes: boolean
   can_manage_mow_stops: boolean
+  workflow_display_options: Array<WorkflowOption>
 }
 
 export interface SimpleEmployeeRetrieve {
@@ -143,6 +144,16 @@ export interface EmployeeUpdatePartial {
   email_opt_out_timeoff_all: boolean
   email_opt_out_timeoff_weekly: boolean
   email_opt_out_timeoff_daily: boolean
+  workflow_display_options: Array<WorkflowOption>
+}
+
+export type WorkflowOption = {
+  id: number
+  name: string
+  display: boolean
+  order: number
+  type?: string
+  icon?: string
 }
 
 ////////////////////////////////////////////////
@@ -693,7 +704,9 @@ export interface ViewedSecurityMessageRetrieve {
 export type Workflow = {
   pk: number
   name: string
+  type: string
   role: number
+  icon: string
   version: number
 }
 
@@ -770,8 +783,12 @@ export interface WorkflowInstanceSimple {
   employee_name: string
   title_name: string
   transition_type: string
-  transition_date: string
+  transition_submitter: string
+  transition_date_submitted: Date
+  transition_date: Date
   workflow_role_pk: number
+  workflow_type: string
+  employee_action_required: boolean
 }
 
 export interface WorkflowInstance {

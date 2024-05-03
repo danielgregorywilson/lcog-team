@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { update } from 'cypress/types/lodash'
 import { defineStore } from 'pinia'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'

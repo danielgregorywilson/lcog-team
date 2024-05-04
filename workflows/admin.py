@@ -136,10 +136,10 @@ class ActionAdmin(admin.ModelAdmin):
 
 @admin.register(WorkflowInstance)
 class WorkflowInstanceAdmin(admin.ModelAdmin):
-    list_display = ("pk", "workflow", "started_at", "completed_at", "complete", "active")
+    list_display = ("pk", "workflow", "created_by", "started_at", "completed_at", "complete", "active")
     list_filter = ("workflow", "active", "complete")
     readonly_fields = ("started_at",)
-    fields = ("started_at", "completed_at", "workflow", "transition", "active", "complete")
+    fields = ("created_by", "started_at", "completed_at", "workflow", "transition", "active", "complete")
 
 
 @admin.register(ProcessInstance)

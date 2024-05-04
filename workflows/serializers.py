@@ -299,9 +299,9 @@ class WorkflowInstanceSimpleSerializer(WorkflowInstanceBaseSerializer):
     class Meta:
         model = WorkflowInstance
         fields = [
-            'url', 'pk', 'started_at', 'complete', 'completed_at',
-            'percent_complete', 'status', 'employee_name', 'title_name',
-            'transition_type', 'transition_submitter',
+            'url', 'pk', 'created_by', 'started_at', 'complete',
+            'completed_at', 'percent_complete', 'status', 'employee_name',
+            'title_name', 'transition_type', 'transition_submitter',
             'transition_date_submitted', 'transition_date', 'workflow_type',
             'workflow_role_pk', 'employee_action_required'
         ]

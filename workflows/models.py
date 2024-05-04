@@ -10,6 +10,37 @@ from people.middleware import get_current_employee
 from people.models import Employee, JobTitle, UnitOrProgram
 
 
+class HasTimeStampsMixin(models.Model):
+    class Meta:
+        abstract = True
+
+    started_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(blank=True, null=True)
+
+    @property
+    def duration(self):
+        if self.completed_at:
+            return self.completed_at - self.started_at
+        else:
+            return None
+
+
+class HasCreatorMixin(models.Model):
+    class Meta:
+        abstract = True
+
+    created_by = models.ForeignKey(
+        Employee, blank=True, null=True, on_delete=models.SET_NULL, auto_created=True
+    )
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if not self.created_by:
+            employee = get_current_employee()
+            self.created_by = employee
+            self.save()
+
+
 class Role(models.Model):
     def __str__(self):
         return self.name
@@ -303,7 +334,7 @@ class EmployeeTransition(models.Model):
         return False
 
 
-class TransitionChange(models.Model):
+class TransitionChange(HasCreatorMixin):
     """
     A change record for a transition.
     """
@@ -315,9 +346,6 @@ class TransitionChange(models.Model):
         related_name="changes"
     )
     date = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(
-        Employee, blank=True, null=True, on_delete=models.SET_NULL,
-    )
     changes = models.JSONField()
 
 
@@ -599,22 +627,7 @@ class StepChoice(models.Model):
     )
 
 
-class HasTimeStampsMixin(models.Model):
-    class Meta:
-        abstract = True
-
-    started_at = models.DateTimeField(auto_now_add=True)
-    completed_at = models.DateTimeField(blank=True, null=True)
-
-    @property
-    def duration(self):
-        if self.completed_at:
-            return self.completed_at - self.started_at
-        else:
-            return None
-
-
-class WorkflowInstance(HasTimeStampsMixin):
+class WorkflowInstance(HasTimeStampsMixin, HasCreatorMixin):
     class Meta:
         ordering = ["pk"]
 

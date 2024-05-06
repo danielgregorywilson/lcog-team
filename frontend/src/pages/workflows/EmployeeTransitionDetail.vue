@@ -815,6 +815,8 @@
     <q-dialog v-model="showAssigneeDialog">
       <q-card class="q-pa-md">
         <div class="text-h6">Reassign transition form?</div>
+        <div>Select a new assignee and include</div> 
+        <div>an explaination for this action.</div>
         <div class="text-red text-uppercase text-bold q-mt-sm q-mb-md">This action cannot be undone</div>
         <q-form
           @submit='onSubmitSendDialog("ASSIGN")'
@@ -845,7 +847,7 @@
             v-model="reassignDialogMessage"
             filled
             type="textarea"
-            label="Extra message to include"
+            label="Message - REQUIRED"
           />
           <div>
             <q-btn

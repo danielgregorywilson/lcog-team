@@ -648,10 +648,10 @@
         </div>
         <q-chip
           v-if="valuesAreChanged()"
-          color="warning"
+          color="negative"
           text-color="white"
           icon="warning"
-          label="Unsaved changes"
+          label="Unsaved changes - please save before sending"
         />
         <q-form
           @submit='onSubmitSendDialog("SDS")'
@@ -670,7 +670,7 @@
               icon-right="send"
               type="submit"
               color="primary"
-              :disable="formErrors()"
+              :disable="formErrors() || valuesAreChanged()"
             />
             <div
               v-if="formErrors()"
@@ -690,10 +690,10 @@
         <div class="text-h6">Send transition to Fiscal?</div>
         <q-chip
           v-if="valuesAreChanged()"
-          color="warning"
+          color="negative"
           text-color="white"
           icon="warning"
-          label="Unsaved changes"
+          label="Unsaved changes - please save before sending"
         />
         <q-form
           @submit='onSubmitSendDialog("FI")'
@@ -712,7 +712,7 @@
               icon-right="send"
               type="submit"
               color="primary"
-              :disable="formErrors()"
+              :disable="formErrors() || valuesAreChanged()"
             />
             <div
               v-if="formErrors()"
@@ -732,10 +732,10 @@
         <div class="text-h6">Send transition to HR?</div>
         <q-chip
           v-if="valuesAreChanged()"
-          color="warning"
+          color="negative"
           text-color="white"
           icon="warning"
-          label="Unsaved changes"
+          label="Unsaved changes - please save before sending"
         />
         <q-form
           @submit='onSubmitSendDialog("HR")'
@@ -754,7 +754,7 @@
               icon-right="send"
               type="submit"
               color="primary"
-              :disable="formErrors()"
+              :disable="formErrors() || valuesAreChanged()"
             />
             <div
               v-if="formErrors()"
@@ -774,10 +774,10 @@
         <div class="text-h6">Send message to staff transition news?</div>
         <q-chip
           v-if="valuesAreChanged()"
-          color="warning"
+          color="negative"
           text-color="white"
           icon="warning"
-          label="Unsaved changes"
+          label="Unsaved changes - please save before sending"
         />
         <q-form
           @submit='onSubmitSendDialog("STN")'
@@ -797,7 +797,7 @@
               icon-right="send"
               type="submit"
               color="primary"
-              :disable="formErrors()"
+              :disable="formErrors() || valuesAreChanged()"
             />
             <div
               v-if="formErrors()"
@@ -870,8 +870,8 @@
         <q-btn
           v-if="canEditOtherFields()"
           class="q-mr-sm"
-          color="white"
-          text-color="black"
+          :color="valuesAreChanged() ? 'positive' : 'white'"
+          :text-color="valuesAreChanged() ? 'white' : 'black'"
           label="Save"
           name="save-button"
           style="width: 86.33px; height: 36px;"

@@ -5,11 +5,11 @@ from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
-from mainsite.helpers import readable_date, send_email_multiple
+from mainsite.helpers import readable_date, send_email, send_email_multiple
 from people.models import JobTitle
 from workflows.models import EmployeeTransition, ProcessInstance
 
-STAFF_TRANSITION_NEWS_RECIPIENTS = os.environ.get('STAFF_TRANSITION_NEWS_RECIPIENTS')
+STAFF_TRANSITION_NEWS_EMAIL = os.environ.get('STAFF_TRANSITION_NEWS_EMAIL')
 
 def send_gas_pin_notification_email(
     t, sender_name='', sender_email='', url=''
@@ -290,9 +290,8 @@ def send_transition_stn_email(
     })
     plaintext_message = strip_tags(html_message)
 
-    recipients = STAFF_TRANSITION_NEWS_RECIPIENTS.split(",")
-    send_email_multiple(
-        recipients, [], subject, plaintext_message, html_message
+    send_email(
+        STAFF_TRANSITION_NEWS_EMAIL, subject, plaintext_message, html_message
     )
 
 def create_process_instances(transition):

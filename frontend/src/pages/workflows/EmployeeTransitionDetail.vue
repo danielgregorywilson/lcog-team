@@ -486,12 +486,24 @@
       />
     </div>
     <div v-if="['New', 'Return', 'Change/Modify'].indexOf(type) != -1">
-      <div class="text-h6 transition-form-section-heading">Gas PIN</div>
+      <div class="text-h6 transition-form-section-heading">Software/Access</div>
       <div class="row">
         <q-checkbox
           id="gas-pin-needed"
           v-model="gasPINNeeded"
           label="Gas PIN Needed"
+          :disable="!canEditOtherFields()"
+        />
+      </div>
+      <div class="row" v-if="employeeID != 'CLID'">
+        <q-select
+          name="oregon-access"
+          v-model="oregonAccess"
+          :options="[
+            'Not needed', 'Desktop', 'Remote'
+          ]"
+          label="Oregon Access"
+          style="width: 218px;"
           :disable="!canEditOtherFields()"
         />
       </div>
@@ -1138,6 +1150,8 @@ let reassignToCurrentVal = ref('')
 let reassignTo = ref('')
 let gasPINNeededCurrentVal = ref(false)
 let gasPINNeeded = ref(false)
+let oregonAccessCurrentVal = ref('')
+let oregonAccess = ref('')
 let businessCardsCurrentVal = ref(false)
 let businessCards = ref(false)
 let proxCardNeededCurrentVal = ref(false)
@@ -1324,6 +1338,8 @@ function retrieveEmployeeTransition() {
     reassignToCurrentVal.value = reassignTo.value
     gasPINNeeded.value = t.gas_pin_needed
     gasPINNeededCurrentVal.value = gasPINNeeded.value
+    oregonAccess.value = t.oregon_access
+    oregonAccessCurrentVal.value = oregonAccess.value
     businessCards.value = t.business_cards
     businessCardsCurrentVal.value = businessCards.value
     proxCardNeeded.value = t.prox_card_needed
@@ -1417,6 +1433,7 @@ function valuesAreChanged(): boolean {
     shouldDelete.value == shouldDeleteCurrentVal.value &&
     reassignTo.value == reassignToCurrentVal.value &&
     gasPINNeeded.value == gasPINNeededCurrentVal.value &&
+    oregonAccess.value == oregonAccessCurrentVal.value &&
     businessCards.value == businessCardsCurrentVal.value &&
     proxCardNeeded.value == proxCardNeededCurrentVal.value &&
     proxCardReturned.value == proxCardReturnedCurrentVal.value &&
@@ -1510,6 +1527,7 @@ function updateTransition() {
       should_delete: shouldDelete.value,
       reassign_to: reassignTo.value,
       gas_pin_needed: gasPINNeeded.value,
+      oregon_access: oregonAccess.value,
       business_cards: businessCards.value,
       prox_card_needed: proxCardNeeded.value,
       prox_card_returned: proxCardReturned.value,
@@ -1566,6 +1584,7 @@ function updateTransition() {
       shouldDeleteCurrentVal.value = t.should_delete
       reassignToCurrentVal.value = t.reassign_to
       gasPINNeededCurrentVal.value = t.gas_pin_needed
+      oregonAccessCurrentVal.value = t.oregon_access
       businessCardsCurrentVal.value = t.business_cards
       proxCardNeededCurrentVal.value = t.prox_card_needed
       proxCardReturnedCurrentVal.value = t.prox_card_returned

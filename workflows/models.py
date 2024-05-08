@@ -30,7 +30,7 @@ class HasCreatorMixin(models.Model):
         abstract = True
 
     created_by = models.ForeignKey(
-        Employee, blank=True, null=True, on_delete=models.SET_NULL, auto_created=True
+        Employee, blank=True, null=True, on_delete=models.SET_NULL
     )
 
     def save(self, *args, **kwargs):
@@ -133,6 +133,15 @@ class EmployeeTransition(models.Model):
         (PHONE_REQUEST_DELETE_VM, PHONE_REQUEST_DELETE_VM)
     ]
 
+    OREGON_ACCESS_NONE = 'Not needed'
+    OREGON_ACCESS_DESKTOP = 'Desktop'
+    OREGON_ACCESS_REMOTE = 'Remote'
+    OREGON_ACCESS_CHOICES = [
+        (OREGON_ACCESS_NONE, OREGON_ACCESS_NONE),
+        (OREGON_ACCESS_DESKTOP, OREGON_ACCESS_DESKTOP),
+        (OREGON_ACCESS_REMOTE, OREGON_ACCESS_REMOTE)
+    ]
+
     ASSIGNEE_NONE = 'None'
     ASSIGNEE_SUBMITTER = 'Submitter'
     ASSIGNEE_HIRING_LEAD = 'Hiring Lead'
@@ -231,6 +240,10 @@ class EmployeeTransition(models.Model):
     should_delete = models.BooleanField(default=False)
     reassign_to = models.CharField(max_length=50, blank=True)
     gas_pin_needed = models.BooleanField(_("Gas PIN needed"), default=False)
+    oregon_access = models.CharField(
+        default=OREGON_ACCESS_NONE, max_length=10,
+        choices=OREGON_ACCESS_CHOICES
+    )
     business_cards = models.BooleanField(default=False)
     prox_card_needed = models.BooleanField(default=False)
     prox_card_returned = models.BooleanField(default=False)

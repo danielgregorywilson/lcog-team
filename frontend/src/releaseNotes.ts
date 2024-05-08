@@ -4,6 +4,24 @@
 
 export const releases = [
   {
+    version: '0.28.0',
+    date: new Date(2024, 4, 8),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Improved support for custom workflows.'
+      },
+      {
+        type: 'improved',
+        description: 'Improved employee transition UI.'
+      },
+      {
+        type: 'improved',
+        description: 'Add "Oregon Access" field for onboarding S&DS employees.'
+      }
+    ]
+  },
+  {
     version: '0.27.0',
     date: new Date(2024, 4, 2),
     changes: [

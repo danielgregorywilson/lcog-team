@@ -167,10 +167,10 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
             'union_affiliation', 'teleworking', 'computer_type', 'computer_gl',
             'computer_description', 'phone_number', 'desk_phone',
             'phone_request', 'phone_request_data', 'load_code', 'cell_phone',
-            'should_delete', 'reassign_to', 'gas_pin_needed', 'business_cards',
-            'prox_card_needed', 'prox_card_returned', 'access_emails_pk',
-            'access_emails_name', 'special_instructions', 'fiscal_field',
-            'assignee', 'changes'
+            'should_delete', 'reassign_to', 'gas_pin_needed', 'oregon_access',
+            'business_cards', 'prox_card_needed', 'prox_card_returned',
+            'access_emails_pk', 'access_emails_name', 'special_instructions',
+            'fiscal_field', 'assignee', 'changes'
         ]
 
     @staticmethod
@@ -254,9 +254,10 @@ class EmployeeTransitionRedactedSerializer(EmployeeTransitionSerializer):
             'teleworking', 'computer_type', 'computer_gl',
             'computer_description', 'phone_number', 'desk_phone',
             'phone_request', 'phone_request_data', 'load_code', 'cell_phone',
-            'should_delete', 'reassign_to', 'gas_pin_needed', 'business_cards',
-            'prox_card_needed', 'prox_card_returned', 'access_emails_pk',
-            'access_emails_name', 'special_instructions', 'changes'
+            'should_delete', 'reassign_to', 'gas_pin_needed', 'oregon_access',
+            'business_cards', 'prox_card_needed', 'prox_card_returned',
+            'access_emails_pk', 'access_emails_name', 'special_instructions',
+            'changes'
         ]
 
 class WorkflowInstanceBaseSerializer(serializers.ModelSerializer):
@@ -299,9 +300,9 @@ class WorkflowInstanceSimpleSerializer(WorkflowInstanceBaseSerializer):
     class Meta:
         model = WorkflowInstance
         fields = [
-            'url', 'pk', 'started_at', 'complete', 'completed_at',
-            'percent_complete', 'status', 'employee_name', 'title_name',
-            'transition_type', 'transition_submitter',
+            'url', 'pk', 'created_by', 'started_at', 'complete',
+            'completed_at', 'percent_complete', 'status', 'employee_name',
+            'title_name', 'transition_type', 'transition_submitter',
             'transition_date_submitted', 'transition_date', 'workflow_type',
             'workflow_role_pk', 'employee_action_required'
         ]

@@ -486,12 +486,24 @@
       />
     </div>
     <div v-if="['New', 'Return', 'Change/Modify'].indexOf(type) != -1">
-      <div class="text-h6 transition-form-section-heading">Gas PIN</div>
+      <div class="text-h6 transition-form-section-heading">Software/Access</div>
       <div class="row">
         <q-checkbox
           id="gas-pin-needed"
           v-model="gasPINNeeded"
           label="Gas PIN Needed"
+          :disable="!canEditOtherFields()"
+        />
+      </div>
+      <div class="row" v-if="employeeID != 'CLID'">
+        <q-select
+          name="oregon-access"
+          v-model="oregonAccess"
+          :options="[
+            'Not needed', 'Desktop', 'Remote'
+          ]"
+          label="Oregon Access"
+          style="width: 218px;"
           :disable="!canEditOtherFields()"
         />
       </div>
@@ -648,10 +660,10 @@
         </div>
         <q-chip
           v-if="valuesAreChanged()"
-          color="warning"
+          color="negative"
           text-color="white"
           icon="warning"
-          label="Unsaved changes"
+          label="Unsaved changes - please save before sending"
         />
         <q-form
           @submit='onSubmitSendDialog("SDS")'
@@ -670,7 +682,7 @@
               icon-right="send"
               type="submit"
               color="primary"
-              :disable="formErrors()"
+              :disable="formErrors() || valuesAreChanged()"
             />
             <div
               v-if="formErrors()"
@@ -690,10 +702,10 @@
         <div class="text-h6">Send transition to Fiscal?</div>
         <q-chip
           v-if="valuesAreChanged()"
-          color="warning"
+          color="negative"
           text-color="white"
           icon="warning"
-          label="Unsaved changes"
+          label="Unsaved changes - please save before sending"
         />
         <q-form
           @submit='onSubmitSendDialog("FI")'
@@ -712,7 +724,7 @@
               icon-right="send"
               type="submit"
               color="primary"
-              :disable="formErrors()"
+              :disable="formErrors() || valuesAreChanged()"
             />
             <div
               v-if="formErrors()"
@@ -732,10 +744,10 @@
         <div class="text-h6">Send transition to HR?</div>
         <q-chip
           v-if="valuesAreChanged()"
-          color="warning"
+          color="negative"
           text-color="white"
           icon="warning"
-          label="Unsaved changes"
+          label="Unsaved changes - please save before sending"
         />
         <q-form
           @submit='onSubmitSendDialog("HR")'
@@ -754,7 +766,7 @@
               icon-right="send"
               type="submit"
               color="primary"
-              :disable="formErrors()"
+              :disable="formErrors() || valuesAreChanged()"
             />
             <div
               v-if="formErrors()"
@@ -774,10 +786,10 @@
         <div class="text-h6">Send message to staff transition news?</div>
         <q-chip
           v-if="valuesAreChanged()"
-          color="warning"
+          color="negative"
           text-color="white"
           icon="warning"
-          label="Unsaved changes"
+          label="Unsaved changes - please save before sending"
         />
         <q-form
           @submit='onSubmitSendDialog("STN")'
@@ -797,7 +809,7 @@
               icon-right="send"
               type="submit"
               color="primary"
-              :disable="formErrors()"
+              :disable="formErrors() || valuesAreChanged()"
             />
             <div
               v-if="formErrors()"
@@ -815,6 +827,8 @@
     <q-dialog v-model="showAssigneeDialog">
       <q-card class="q-pa-md">
         <div class="text-h6">Reassign transition form?</div>
+        <div>Select a new assignee and include</div> 
+        <div>an explaination for this action.</div>
         <div class="text-red text-uppercase text-bold q-mt-sm q-mb-md">This action cannot be undone</div>
         <q-form
           @submit='onSubmitSendDialog("ASSIGN")'
@@ -845,7 +859,7 @@
             v-model="reassignDialogMessage"
             filled
             type="textarea"
-            label="Extra message to include"
+            label="Message - REQUIRED"
           />
           <div>
             <q-btn
@@ -870,8 +884,8 @@
         <q-btn
           v-if="canEditOtherFields()"
           class="q-mr-sm"
-          color="white"
-          text-color="black"
+          :color="valuesAreChanged() ? 'positive' : 'white'"
+          :text-color="valuesAreChanged() ? 'white' : 'black'"
           label="Save"
           name="save-button"
           style="width: 86.33px; height: 36px;"
@@ -1136,6 +1150,8 @@ let reassignToCurrentVal = ref('')
 let reassignTo = ref('')
 let gasPINNeededCurrentVal = ref(false)
 let gasPINNeeded = ref(false)
+let oregonAccessCurrentVal = ref('Not needed')
+let oregonAccess = ref('Not needed')
 let businessCardsCurrentVal = ref(false)
 let businessCards = ref(false)
 let proxCardNeededCurrentVal = ref(false)
@@ -1322,6 +1338,8 @@ function retrieveEmployeeTransition() {
     reassignToCurrentVal.value = reassignTo.value
     gasPINNeeded.value = t.gas_pin_needed
     gasPINNeededCurrentVal.value = gasPINNeeded.value
+    oregonAccess.value = t.oregon_access
+    oregonAccessCurrentVal.value = oregonAccess.value
     businessCards.value = t.business_cards
     businessCardsCurrentVal.value = businessCards.value
     proxCardNeeded.value = t.prox_card_needed
@@ -1415,6 +1433,7 @@ function valuesAreChanged(): boolean {
     shouldDelete.value == shouldDeleteCurrentVal.value &&
     reassignTo.value == reassignToCurrentVal.value &&
     gasPINNeeded.value == gasPINNeededCurrentVal.value &&
+    oregonAccess.value == oregonAccessCurrentVal.value &&
     businessCards.value == businessCardsCurrentVal.value &&
     proxCardNeeded.value == proxCardNeededCurrentVal.value &&
     proxCardReturned.value == proxCardReturnedCurrentVal.value &&
@@ -1508,6 +1527,7 @@ function updateTransition() {
       should_delete: shouldDelete.value,
       reassign_to: reassignTo.value,
       gas_pin_needed: gasPINNeeded.value,
+      oregon_access: oregonAccess.value,
       business_cards: businessCards.value,
       prox_card_needed: proxCardNeeded.value,
       prox_card_returned: proxCardReturned.value,
@@ -1564,6 +1584,7 @@ function updateTransition() {
       shouldDeleteCurrentVal.value = t.should_delete
       reassignToCurrentVal.value = t.reassign_to
       gasPINNeededCurrentVal.value = t.gas_pin_needed
+      oregonAccessCurrentVal.value = t.oregon_access
       businessCardsCurrentVal.value = t.business_cards
       proxCardNeededCurrentVal.value = t.prox_card_needed
       proxCardReturnedCurrentVal.value = t.prox_card_returned

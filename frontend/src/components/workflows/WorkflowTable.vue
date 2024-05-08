@@ -46,6 +46,11 @@
       <th v-else>{{props.col.label}}</th>
     </template> -->
     <!-- Slots for body cells: Show dates in a familiar format; make sure status can wrap, and display action buttons -->
+    <template v-slot:body-cell-createdBy="props">
+      <q-td key="createdBy" :props="props">
+        {{ props.row.created_by.display_name }}
+      </q-td>
+    </template>
     <template v-slot:body-cell-createdAt="props">
       <q-td key="createdAt" :props="props">
         {{ readableDate(props.row.started_at) }}
@@ -356,7 +361,7 @@ const emit = defineEmits<{
 }>()
 
 const activeColumns: QTableProps['columns'] = [
-  { name: 'created_by', label: 'Created By', align: 'center', field: 'created_by' },
+  { name: 'createdBy', label: 'Created By', align: 'center', field: 'created_by' },
   { 
     name: 'createdAt',
     align: 'center',

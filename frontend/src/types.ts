@@ -775,6 +775,7 @@ export type ProcessInstance = {
 
 export interface WorkflowInstanceSimple {
   pk: number
+  created_by: string
   started_at: string
   complete: boolean
   completed_at: string
@@ -866,6 +867,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   should_delete: boolean
   reassign_to: string
   gas_pin_needed: boolean
+  oregon_access: string
   business_cards: boolean
   prox_card_needed: boolean
   prox_card_returned: boolean
@@ -914,6 +916,7 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   should_delete?: boolean
   reassign_to?: string
   gas_pin_needed?: boolean
+  oregon_access?: string
   business_cards?: boolean
   prox_card_needed?: boolean
   prox_card_returned?: boolean

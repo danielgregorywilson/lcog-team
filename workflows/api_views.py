@@ -159,21 +159,28 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
         wf_type = request.data['type']
         wf = None
         et = None
+        employeeID = EmployeeTransition.EMPLOYEE_ID_CLID
+        if request.user.employee.is_sds_employee:
+            employeeID = EmployeeTransition.EMPLOYEE_ID_CLSD
         if wf_type == 'employee-new':
             et = EmployeeTransition.objects.create(
-                type=EmployeeTransition.TRANSITION_TYPE_NEW
+                type=EmployeeTransition.TRANSITION_TYPE_NEW,
+                employee_id=employeeID
             )
         elif wf_type == 'employee-return':
             et = EmployeeTransition.objects.create(
-                type=EmployeeTransition.TRANSITION_TYPE_RETURN
+                type=EmployeeTransition.TRANSITION_TYPE_RETURN,
+                employee_id=employeeID
             )
         elif wf_type == 'employee-change':
             et = EmployeeTransition.objects.create(
-                type=EmployeeTransition.TRANSITION_TYPE_CHANGE
+                type=EmployeeTransition.TRANSITION_TYPE_CHANGE,
+                employee_id=employeeID
             )
         elif wf_type == 'employee-exit':
             et = EmployeeTransition.objects.create(
-                type=EmployeeTransition.TRANSITION_TYPE_EXIT
+                type=EmployeeTransition.TRANSITION_TYPE_EXIT,
+                employee_id=employeeID
             )
         try:
             wf = Workflow.objects.get(type=wf_type)
@@ -431,6 +438,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             t.should_delete = request.data['should_delete']
             t.reassign_to = request.data['reassign_to']
             t.gas_pin_needed = request.data['gas_pin_needed']
+            t.oregon_access = request.data['oregon_access']
             t.business_cards = request.data['business_cards']
             t.prox_card_needed = request.data['prox_card_needed']
             t.prox_card_returned = request.data['prox_card_returned']

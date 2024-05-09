@@ -86,7 +86,8 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
     @staticmethod
     def parseReportRequestData(data):
         """
-        Helper method to parse the start and end times in a desk reservation report request
+        Helper method to parse the start and end times in a desk reservation
+        report request.
         """
         start_date_time = data['startDateTime']
         end_date_time = data['endDateTime']
@@ -96,30 +97,49 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
             first_of_this_month = today.replace(day=1)
             last_of_last_month = first_of_this_month - timedelta(days=1)
             first_of_last_month = last_of_last_month.replace(day=1)
-            start_date_time = datetime.combine(first_of_last_month, datetime.min.time())
+            start_date_time = datetime.combine(
+                first_of_last_month, datetime.min.time()
+            )
         else:
-            start_date_time = datetime.strptime(start_date_time, '%Y-%m-%d %H:%M')
+            start_date_time = datetime.strptime(
+                start_date_time, '%Y-%m-%d %H:%M'
+            )
         if not end_date_time:
             today = date.today()
             first_of_this_month = today.replace(day=1)
-            end_date_time = datetime.combine(first_of_this_month, datetime.min.time())
+            end_date_time = datetime.combine(
+                first_of_this_month, datetime.min.time()
+            )
         else:
             end_date_time = datetime.strptime(end_date_time, '%Y-%m-%d %H:%M')
         start_date_time = timezone('US/Pacific').localize(start_date_time)
         end_date_time = timezone('US/Pacific').localize(end_date_time)
         return (start_date_time, end_date_time)
 
-    @action(detail=False, methods=['post'], url_path='desk-summary-report', url_name='desk-summary-report')
+    @action(
+        detail=False,
+        methods=['post'],
+        url_path='desk-summary-report',
+        url_name='desk-summary-report'
+    )
     def desk_summary_report(self, request):
-        start_date_time, end_date_time = self.parseReportRequestData(request.data)
-        # For each desk, and within the range, give the number of hours it was utilized and the number of days it was utilized at all.
+        """
+        For each desk, and within the range, give the number of hours it was
+        utilized and the number of days it was utilized at all.
+        """
+        start_date_time, end_date_time = \
+            self.parseReportRequestData(request.data)
         desk_stats = {}
         for desk in Desk.objects.all():
             total_hours = timedelta(0)
             days_utilized = []
             most_frequent_employee = '' 
             most_frequent_employee_time = timedelta(0)
-            reservations = DeskReservation.objects.filter(desk=desk, check_in__lte=end_date_time, check_out__gte=start_date_time)
+            reservations = DeskReservation.objects.filter(
+                desk=desk,
+                check_in__lte=end_date_time,
+                check_out__gte=start_date_time
+            )
             for reservation in reservations:
                 start = max(start_date_time, reservation.check_in)
                 end = min(end_date_time, reservation.check_out)
@@ -131,8 +151,12 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
                 if reservation_duration > most_frequent_employee_time:
                     most_frequent_employee_time = reservation_duration
                     most_frequent_employee = reservation.employee.username()
-            desk_stats[f'{desk.get_building_display()} {desk.floor}F {desk.number}'] = {
-                'total_hours': f'{total_hours.days * 24 + total_hours.seconds // 3600}h{(total_hours.seconds//60)%60}m',
+            desk_stats[
+                f'{desk.get_building_display()} {desk.floor}F {desk.number}'
+            ] = {
+                'total_hours': \
+                    f'{total_hours.days * 24 + total_hours.seconds // 3600}h' +
+                    f'{(total_hours.seconds//60)%60}m',
                 'days_utilized': len(days_utilized),
                 'most_frequent_employee': most_frequent_employee
             }
@@ -168,17 +192,30 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
             }
         return Response(reservation_data)
     
-    @action(detail=False, methods=['post'], url_path='employee-summary-report', url_name='employee-summary-report')
+    @action(
+        detail=False,
+        methods=['post'],
+        url_path='employee-summary-report',
+        url_name='employee-summary-report'
+    )
     def employee_summary_report(self, request):
-        start_date_time, end_date_time = self.parseReportRequestData(request.data)
-        # For each desk, and within the range, give the number of hours it was utilized and the number of days it was utilized at all.
+        """
+        For each desk, and within the range, give the number of hours it was
+        utilized and the number of days it was utilized at all.
+        """
+        start_date_time, end_date_time = \
+            self.parseReportRequestData(request.data)
         employee_stats = {}
         for employee in Employee.objects.all():
             total_hours = timedelta(0)
             days_utilized = []
             most_frequent_desk = '' 
             most_frequent_desk_time = timedelta(0)
-            reservations = DeskReservation.objects.filter(employee=employee, check_in__lte=end_date_time, check_out__gte=start_date_time)
+            reservations = DeskReservation.objects.filter(
+                employee=employee,
+                check_in__lte=end_date_time,
+                check_out__gte=start_date_time
+            )
             for reservation in reservations:
                 start = max(start_date_time, reservation.check_in)
                 end = min(end_date_time, reservation.check_out)
@@ -190,9 +227,12 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
                 if reservation_duration > most_frequent_desk_time:
                     most_frequent_desk_time = reservation_duration
                     desk = reservation.desk
-                    most_frequent_desk = f'{desk.get_building_display()} {desk.floor}F {desk.number}'
+                    most_frequent_desk = f'{desk.get_building_display()} ' +\
+                        f'{desk.floor}F {desk.number}'
             employee_stats[f'{employee.username()}'] = {
-                'total_hours': f'{total_hours.days * 24 + total_hours.seconds // 3600}h{(total_hours.seconds//60)%60}m',
+                'total_hours':
+                    f'{total_hours.days * 24 + total_hours.seconds // 3600}h' +
+                    f'{(total_hours.seconds//60)%60}m',
                 'days_utilized': len(days_utilized),
                 'most_frequent_desk': most_frequent_desk
             }

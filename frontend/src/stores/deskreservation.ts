@@ -19,7 +19,9 @@ export const useDeskReservationStore = defineStore('deskreservation', {
   actions: {
     createReservation(data: DeskReservationCreate): Promise<DeskReservation> {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/deskreservation`, method: 'POST', data })
+        axios(
+          { url: `${ apiURL }api/v1/deskreservation`, method: 'POST', data }
+        )
           .then((resp) => {
             resolve(resp.data)
           })
@@ -54,7 +56,10 @@ export const useDeskReservationStore = defineStore('deskreservation', {
     },
     cancelReservation(pk: number) {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/deskreservation/${pk}/cancel-reservation`, method: 'PUT' })
+        axios({
+          url: `${ apiURL }api/v1/deskreservation/${pk}/cancel-reservation`,
+          method: 'PUT'
+        })
           .then((resp) => {
             resolve(resp)
           })
@@ -63,9 +68,15 @@ export const useDeskReservationStore = defineStore('deskreservation', {
           })
       })
     },
-    getDeskSummaryReport(data: GetReservationReportData): Promise<GetDeskSummaryReportDataInterface> {
+    getDeskSummaryReport(
+      data: GetReservationReportData
+    ): Promise<GetDeskSummaryReportDataInterface> {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/deskreservation/desk-summary-report`, method: 'POST', data })
+        axios({
+          url: `${ apiURL }api/v1/deskreservation/desk-summary-report`,
+          method: 'POST',
+          data
+        })
           .then((resp) => {
             resolve(resp.data)
           })
@@ -91,14 +102,22 @@ export const useDeskReservationStore = defineStore('deskreservation', {
           })
       })
     },
-    getEmployeeSummaryReport(data: GetReservationReportData): Promise<GetEmployeeSummaryReportDataInterface> {
+    getEmployeeSummaryReport(
+      data: GetReservationReportData
+    ): Promise<GetEmployeeSummaryReportDataInterface> {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/deskreservation/employee-summary-report`, method: 'POST', data })
+        axios({
+          url: `${ apiURL }api/v1/deskreservation/employee-summary-report`,
+          method: 'POST',
+          data
+        })
           .then((resp) => {
             resolve(resp.data)
           })
           .catch(e => {
-            handlePromiseError(reject, 'Error creating employee summary report', e)
+            handlePromiseError(
+              reject, 'Error creating employee summary report', e
+            )
           })
       })
     },

@@ -204,7 +204,12 @@ function download_desk_summary_report(data: GetDeskSummaryReportDataInterface) {
 
   // Merge the data with CSV
   Object.keys(data).forEach((key) => {
-    var row = [key, data[key]['total_hours'], data[key]['days_utilized'], data[key]['most_frequent_employee']].join(',')
+    var row = [
+      key,
+      data[key]['total_hours'],
+      data[key]['days_utilized'],
+      data[key]['most_frequent_employee']
+    ].join(',')
     csv += row
     csv += '\n'
   })
@@ -214,8 +219,10 @@ function download_desk_summary_report(data: GetDeskSummaryReportDataInterface) {
   hiddenElement.target = '_blank'
 
   // Provide the name for the CSV file to be downloaded
-  let startString = startDateTime.value ? startDateTime.value.replace(' ','_') : 'beginning_of_last_month'
-  let endString = endDateTime.value ? endDateTime.value.replace(' ','_') : 'end_of_last_month'
+  let startString = startDateTime.value ?
+    startDateTime.value.replace(' ','_') : 'beginning_of_last_month'
+  let endString = endDateTime.value ? endDateTime.value.replace(' ','_') :
+    'end_of_last_month'
   hiddenElement.download = `desk_summary_${startString}_${endString}.csv`
   hiddenElement.click()
 }
@@ -249,13 +256,20 @@ function download_desk_detail_report(data: GetDetailReportDataInterface) {
   hiddenElement.click()
 }
 
-function download_employee_summary_report(data: GetEmployeeSummaryReportDataInterface) {
+function download_employee_summary_report(
+  data: GetEmployeeSummaryReportDataInterface
+) {
   // Define the heading for each row of the data
   var csv = 'Employee,Total Hours,Days Utilized,Most Frequent Desk\n'
 
   // Merge the data with CSV
   Object.keys(data).forEach((key) => {
-    var row = [key, data[key]['total_hours'], data[key]['days_utilized'], data[key]['most_frequent_desk']].join(',')
+    var row = [
+      key,
+      data[key]['total_hours'],
+      data[key]['days_utilized'],
+      data[key]['most_frequent_desk']
+    ].join(',')
     csv += row
     csv += '\n'
   })
@@ -265,8 +279,10 @@ function download_employee_summary_report(data: GetEmployeeSummaryReportDataInte
   hiddenElement.target = '_blank'
 
   // Provide the name for the CSV file to be downloaded
-  let startString = startDateTime.value ? startDateTime.value.replace(' ','_') : 'beginning_of_last_month'
-  let endString = endDateTime.value ? endDateTime.value.replace(' ','_') : 'end_of_last_month'
+  let startString = startDateTime.value ? startDateTime.value.replace(' ','_') :
+    'beginning_of_last_month'
+  let endString = endDateTime.value ? endDateTime.value.replace(' ','_') :
+    'end_of_last_month'
   hiddenElement.download = `employee_summary_${startString}_${endString}.csv`
   hiddenElement.click()
 }

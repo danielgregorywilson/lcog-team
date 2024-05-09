@@ -3,8 +3,9 @@ import { defineStore } from 'pinia'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
 import {
-  Desk, DeskReservation, DeskReservationCreate, GetDeskReservationDataInterface,
-  GetEmployeeDeskReservationDataInterface, GetReservationReportData
+  Desk, DeskReservation, DeskReservationCreate,
+  GetDeskSummaryReportDataInterface, GetDetailReportDataInterface,
+  GetEmployeeSummaryReportDataInterface, GetReservationReportData
 } from 'src/types'
 
 export const useDeskReservationStore = defineStore('deskreservation', {
@@ -62,25 +63,61 @@ export const useDeskReservationStore = defineStore('deskreservation', {
           })
       })
     },
-    getDeskUsageReport(data: GetReservationReportData): Promise<GetDeskReservationDataInterface> {
+    getDeskSummaryReport(data: GetReservationReportData): Promise<GetDeskSummaryReportDataInterface> {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/deskreservation/desk-usage-report`, method: 'POST', data })
+        axios({ url: `${ apiURL }api/v1/deskreservation/desk-summary-report`, method: 'POST', data })
           .then((resp) => {
             resolve(resp.data)
           })
           .catch(e => {
-            handlePromiseError(reject, 'Error creating desk reservation', e)
+            handlePromiseError(reject, 'Error creating desk summary report', e)
           })
       })
     },
-    getEmployeeDeskUsageReport(data: GetReservationReportData): Promise<GetEmployeeDeskReservationDataInterface> {
+    getDeskDetailReport(
+      data: GetReservationReportData
+    ): Promise<GetDetailReportDataInterface> {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/deskreservation/employee-desk-usage-report`, method: 'POST', data })
+        axios({
+          url: `${ apiURL }api/v1/deskreservation/desk-detail-report`,
+          method: 'POST',
+          data
+        })
           .then((resp) => {
             resolve(resp.data)
           })
           .catch(e => {
-            handlePromiseError(reject, 'Error creating desk reservation', e)
+            handlePromiseError(reject, 'Error creating desk detail report', e)
+          })
+      })
+    },
+    getEmployeeSummaryReport(data: GetReservationReportData): Promise<GetEmployeeSummaryReportDataInterface> {
+      return new Promise((resolve, reject) => {
+        axios({ url: `${ apiURL }api/v1/deskreservation/employee-summary-report`, method: 'POST', data })
+          .then((resp) => {
+            resolve(resp.data)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error creating employee summary report', e)
+          })
+      })
+    },
+    getEmployeeDetailReport(
+      data: GetReservationReportData
+    ): Promise<GetDetailReportDataInterface> {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/deskreservation/employee-detail-report`,
+          method: 'POST',
+          data
+        })
+          .then((resp) => {
+            resolve(resp.data)
+          })
+          .catch(e => {
+            handlePromiseError(
+              reject, 'Error creating employee detail report', e
+            )
           })
       })
     },

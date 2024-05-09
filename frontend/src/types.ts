@@ -56,9 +56,11 @@ export interface DeskReservationCreate {
 export interface GetReservationReportData {
   startDateTime: string
   endDateTime: string
+  desks?: Array<number>
+  employees?: Array<number>
 }
 
-export interface GetDeskReservationDataInterface {
+export interface GetDeskSummaryReportDataInterface {
   [key: string]: {
     'total_hours': string,
     'days_utilized': number,
@@ -66,11 +68,20 @@ export interface GetDeskReservationDataInterface {
   }
 }
 
-export interface GetEmployeeDeskReservationDataInterface {
+export interface GetEmployeeSummaryReportDataInterface {
   [key: string]: {
     'total_hours': string,
     'days_utilized': number,
     'most_frequent_desk': string
+  }
+}
+
+export interface GetDetailReportDataInterface {
+  [key: string]: {
+    'desk': string,
+    'employee': string
+    'day': string,
+    'total_hours': string,
   }
 }
 

@@ -109,8 +109,8 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
         end_date_time = timezone('US/Pacific').localize(end_date_time)
         return (start_date_time, end_date_time)
 
-    @action(detail=False, methods=['post'], url_path='desk-usage-report', url_name='desk-usage-report')
-    def desk_usage_report(self, request):
+    @action(detail=False, methods=['post'], url_path='desk-summary-report', url_name='desk-summary-report')
+    def desk_summary_report(self, request):
         start_date_time, end_date_time = self.parseReportRequestData(request.data)
         # For each desk, and within the range, give the number of hours it was utilized and the number of days it was utilized at all.
         desk_stats = {}
@@ -137,9 +137,39 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
                 'most_frequent_employee': most_frequent_employee
             }
         return Response(desk_stats)
+
+    @action(
+        detail=False,
+        methods=['post'],
+        url_path='desk-detail-report',
+        url_name='desk-detail-report'
+    )
+    def desk_detail_report(self, request):
+        start_dt, end_dt = self.parseReportRequestData(request.data)
+        # For each desk, and within the date range, give all reservations.
+        reservation_data = {}
+        reservations = DeskReservation.objects.filter(
+            check_in__lte=end_dt,
+            check_out__gte=start_dt,
+            desk__pk__in=request.data['desks']
+        )
+        for res in reservations:
+            start = max(start_dt, res.check_in)
+            end = min(end_dt, res.check_out)
+            duration = end - start
+            reservation_data[res.pk] = {
+                'employee': res.employee.username(),
+                'desk': f'{res.desk.get_building_display()} {res.desk.floor}' +
+                    f'F {res.desk.number}',
+                'day': res.check_in.strftime('%Y-%m-%d'),
+                'total_hours':
+                    f'{duration.days * 24 + duration.seconds // 3600}h' +
+                    f'{(duration.seconds//60)%60}m'
+            }
+        return Response(reservation_data)
     
-    @action(detail=False, methods=['post'], url_path='employee-desk-usage-report', url_name='employee-desk-usage-report')
-    def employee_desk_usage_report(self, request):
+    @action(detail=False, methods=['post'], url_path='employee-summary-report', url_name='employee-summary-report')
+    def employee_summary_report(self, request):
         start_date_time, end_date_time = self.parseReportRequestData(request.data)
         # For each desk, and within the range, give the number of hours it was utilized and the number of days it was utilized at all.
         employee_stats = {}

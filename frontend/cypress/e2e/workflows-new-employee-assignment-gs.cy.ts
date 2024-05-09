@@ -31,11 +31,11 @@ describe('New GS employee workflow check assignments', () => {
         managerInput.type('Hiring M')
         cy.wait(500) // Wait for the title to be selected
         managerInput.type('{downArrow}{enter}')
-        // Save the form
-        cy.get('button[name="save-button"]').click()
         // Cannot reassign
         cy.get('button[name="reassign-button"]').should('have.attr', 'disabled')
         cy.get('button[name="reassign-button"]').contains('Status: Not submitted')
+        // Save the form
+        cy.get('button[name="save-button"]').click()
         // Submit the form
         cy.get('button[name="send-fiscal-button"]').click()
         cy.get('button[name="send-fiscal-dialog-button"]').click()

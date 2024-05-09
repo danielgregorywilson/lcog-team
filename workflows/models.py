@@ -10,6 +10,37 @@ from people.middleware import get_current_employee
 from people.models import Employee, JobTitle, UnitOrProgram
 
 
+class HasTimeStampsMixin(models.Model):
+    class Meta:
+        abstract = True
+
+    started_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(blank=True, null=True)
+
+    @property
+    def duration(self):
+        if self.completed_at:
+            return self.completed_at - self.started_at
+        else:
+            return None
+
+
+class HasCreatorMixin(models.Model):
+    class Meta:
+        abstract = True
+
+    created_by = models.ForeignKey(
+        Employee, blank=True, null=True, on_delete=models.SET_NULL
+    )
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if not self.created_by:
+            employee = get_current_employee()
+            self.created_by = employee
+            self.save()
+
+
 class Role(models.Model):
     def __str__(self):
         return self.name
@@ -100,6 +131,15 @@ class EmployeeTransition(models.Model):
         (PHONE_REQUEST_REASSIGN, PHONE_REQUEST_REASSIGN),
         (PHONE_REQUEST_CHANGE, PHONE_REQUEST_CHANGE),
         (PHONE_REQUEST_DELETE_VM, PHONE_REQUEST_DELETE_VM)
+    ]
+
+    OREGON_ACCESS_NONE = 'Not needed'
+    OREGON_ACCESS_DESKTOP = 'Desktop'
+    OREGON_ACCESS_REMOTE = 'Remote'
+    OREGON_ACCESS_CHOICES = [
+        (OREGON_ACCESS_NONE, OREGON_ACCESS_NONE),
+        (OREGON_ACCESS_DESKTOP, OREGON_ACCESS_DESKTOP),
+        (OREGON_ACCESS_REMOTE, OREGON_ACCESS_REMOTE)
     ]
 
     ASSIGNEE_NONE = 'None'
@@ -200,6 +240,10 @@ class EmployeeTransition(models.Model):
     should_delete = models.BooleanField(default=False)
     reassign_to = models.CharField(max_length=50, blank=True)
     gas_pin_needed = models.BooleanField(_("Gas PIN needed"), default=False)
+    oregon_access = models.CharField(
+        default=OREGON_ACCESS_NONE, max_length=10,
+        choices=OREGON_ACCESS_CHOICES
+    )
     business_cards = models.BooleanField(default=False)
     prox_card_needed = models.BooleanField(default=False)
     prox_card_returned = models.BooleanField(default=False)
@@ -303,7 +347,7 @@ class EmployeeTransition(models.Model):
         return False
 
 
-class TransitionChange(models.Model):
+class TransitionChange(HasCreatorMixin):
     """
     A change record for a transition.
     """
@@ -315,9 +359,6 @@ class TransitionChange(models.Model):
         related_name="changes"
     )
     date = models.DateTimeField(auto_now_add=True)
-    created_by = models.ForeignKey(
-        Employee, blank=True, null=True, on_delete=models.SET_NULL,
-    )
     changes = models.JSONField()
 
 
@@ -599,22 +640,7 @@ class StepChoice(models.Model):
     )
 
 
-class HasTimeStampsMixin(models.Model):
-    class Meta:
-        abstract = True
-
-    started_at = models.DateTimeField(auto_now_add=True)
-    completed_at = models.DateTimeField(blank=True, null=True)
-
-    @property
-    def duration(self):
-        if self.completed_at:
-            return self.completed_at - self.started_at
-        else:
-            return None
-
-
-class WorkflowInstance(HasTimeStampsMixin):
+class WorkflowInstance(HasTimeStampsMixin, HasCreatorMixin):
     class Meta:
         ordering = ["pk"]
 

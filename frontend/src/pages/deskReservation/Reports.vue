@@ -152,7 +152,7 @@ function deskDetailFormSubmit () {
   })
     .then((reportData) => {
       download_desk_detail_report(reportData)
-      // formReset()
+      formReset()
       formSubmitted.value = false
     })
     .catch(e => {

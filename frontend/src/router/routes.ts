@@ -353,7 +353,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'reports',
         name: 'reports',
-        component: () => import('src/pages/deskReservation/Report.vue'),
+        component: () => import('src/pages/deskReservation/Reports.vue'),
         meta: { requiresAuth: true, requiresDeskReservationReportsPermission: true }
       }
     ]

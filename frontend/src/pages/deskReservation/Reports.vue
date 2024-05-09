@@ -46,6 +46,16 @@
         :inline="true"
       />
 
+      <q-option-group
+        v-if="showReport=='employee-detail'"
+        :options="employeeOptions"
+        v-model="selectedEmployees"
+        type="checkbox"
+        :inline="true"
+        dense
+        class="q-my-sm"
+      />
+
       <div class="row justify-center">
         Start Date/Time (defaults to midnight on the first day of last month)
       </div>
@@ -90,8 +100,10 @@ import {
   GetEmployeeSummaryReportDataInterface
 } from 'src/types'
 import { useDeskReservationStore } from 'src/stores/deskreservation'
+import { usePeopleStore } from 'src/stores/people'
 
 const deskReservationStore = useDeskReservationStore()
+const peopleStore = usePeopleStore()
 
 let showReport = ref('desk-summary')
 let startDateTime = ref('')
@@ -167,7 +179,7 @@ function employeeSummaryFormSubmit() {
 function employeeDetailFormSubmit() {
   formSubmitted.value = true
   deskReservationStore.getEmployeeDetailReport({
-    emplotees: selectedEmployees.value,
+    employees: selectedEmployees.value,
     startDateTime: startDateTime.value,
     endDateTime: endDateTime.value
   })
@@ -259,11 +271,46 @@ function download_employee_summary_report(data: GetEmployeeSummaryReportDataInte
   hiddenElement.click()
 }
 
+function download_employee_detail_report(data: GetDetailReportDataInterface) {
+  // Define the heading for each row of the data
+  var csv = 'Employee,Desk,Day,Total Hours\n'
+
+  // Merge the data with CSV
+  Object.keys(data).forEach((key) => {
+    var row = [
+      data[key]['employee'],  
+      data[key]['desk'],
+      data[key]['day'],
+      data[key]['total_hours']
+    ].join(',')
+    csv += row
+    csv += '\n'
+  })
+
+  var hiddenElement = document.createElement('a')
+  hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv)
+  hiddenElement.target = '_blank'
+
+  // Provide the name for the CSV file to be downloaded
+  let startString = startDateTime.value ? startDateTime.value.replace(' ','_') :
+    'beginning_of_last_month'
+  let endString = endDateTime.value ? endDateTime.value.replace(' ','_') :
+    'end_of_last_month'
+  hiddenElement.download = `employee_detail_${startString}_${endString}.csv`
+  hiddenElement.click()
+}
+
 onMounted(() => {
   deskReservationStore.getAllDesks()
     .then(() => {
       for (let desk of deskReservationStore.allDesks) {
         deskOptions.value.push({label: desk.number, value: desk.pk})
+      }
+    })
+  peopleStore.getSimpleEmployeeList()
+    .then(() => {
+      for (let employee of peopleStore.simpleEmployeeList) {
+        employeeOptions.value.push({label: employee.name, value: employee.pk})
       }
     })
 })

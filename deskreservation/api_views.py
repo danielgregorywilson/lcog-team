@@ -197,3 +197,33 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
                 'most_frequent_desk': most_frequent_desk
             }
         return Response(employee_stats)
+
+    @action(
+        detail=False,
+        methods=['post'],
+        url_path='employee-detail-report',
+        url_name='employee-detail-report'
+    )
+    def employee_detail_report(self, request):
+        start_dt, end_dt = self.parseReportRequestData(request.data)
+        # For each employee, and within the date range, give all reservations.
+        reservation_data = {}
+        reservations = DeskReservation.objects.filter(
+            check_in__lte=end_dt,
+            check_out__gte=start_dt,
+            employee__pk__in=request.data['employees']
+        )
+        for res in reservations:
+            start = max(start_dt, res.check_in)
+            end = min(end_dt, res.check_out)
+            duration = end - start
+            reservation_data[res.pk] = {
+                'employee': res.employee.username(),
+                'desk': f'{res.desk.get_building_display()} {res.desk.floor}' +
+                    f'F {res.desk.number}',
+                'day': res.check_in.strftime('%Y-%m-%d'),
+                'total_hours':
+                    f'{duration.days * 24 + duration.seconds // 3600}h' +
+                    f'{(duration.seconds//60)%60}m'
+            }
+        return Response(reservation_data)

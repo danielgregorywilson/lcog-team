@@ -1,12 +1,13 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
+import { date } from 'quasar'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
 import { Expense, ExpenseCreate } from 'src/types'
 
 export const usePurchaseStore = defineStore('purchase', {
   state: () => ({
-    allExpenses: [] as Array<Expense>,
+    myExpenses: [] as Array<Expense>,
   }),
 
   getters: {},
@@ -36,11 +37,19 @@ export const usePurchaseStore = defineStore('purchase', {
           })
       })
     },
-    getAllExpenses(): Promise<Array<Expense>> {
+    getMyExpenses(
+      yearInt: number | null = null, monthInt: number | null = null
+    ): Promise<Array<Expense>> {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/expense` })
+        let dateParam = ''
+        if (yearInt && monthInt) {
+          const firstDay = new Date(yearInt, monthInt, 1).toISOString().split('T')[0]
+          const lastDay = new Date(yearInt, monthInt + 1, 0).toISOString().split('T')[0]
+          dateParam = `?start=${ firstDay }&end=${ lastDay }`
+        }
+        axios({ url: `${ apiURL }api/v1/expense${ dateParam }` })
           .then(resp => {
-            this.allExpenses = resp.data.results
+            this.myExpenses = resp.data.results
             resolve(resp.data.results)
           })
           .catch(e => {

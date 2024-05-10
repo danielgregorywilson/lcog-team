@@ -15,7 +15,7 @@
       v-else
       flat bordered
       :title="tableTitleDisplay()"
-      :rows="expenses"
+      :rows="selectedMonthExpenses()"
       :columns="columns"
       row-key="name"
       binary-state-sort
@@ -164,7 +164,7 @@
                 v-on="{
                   'uploaded': (url: string) => {
                     updateReceipt(props.row.pk, url)
-                    retrieveExpenses()
+                    retrieveAllMyExpenses()
                   }
                 }"
               />
@@ -257,9 +257,11 @@
 <script setup lang="ts">
 import { onMounted, Ref, ref } from 'vue'
 import { useQuasar } from 'quasar'
+
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import FileUploader from 'src/components/FileUploader.vue'
 import { readableDateNEW } from 'src/filters'
+import { handlePromiseError } from 'src/stores'
 import { usePurchaseStore } from 'src/stores/purchase'
 import { emptyEmployee, Expense, GL, SimpleEmployeeRetrieve } from 'src/types'
 
@@ -268,17 +270,32 @@ const purchaseStore = usePurchaseStore()
 
 const props = defineProps<{
   monthDisplay: string
-  dayInt: string
-  monthInt: string
-  yearInt: string
+  dayInt: number
+  monthInt: number
+  yearInt: number
 }>()
 
-let expensesLoaded = ref(false)
+let thisMonthLoaded = ref(false)
+let allExpensesLoaded = ref(false)
+
 let expenses = ref([]) as Ref<Expense[]>
 let submitted = ref(false)
 let showSubmitToFiscalDialog = ref(false)
 let sendDialogMessage = ref('')
 let showUnsubmitDialog = ref(false)
+
+let firstOfThisMonth = ref(new Date())
+let firstOfSelectedMonth = ref(new Date())
+
+function viewingThisMonth() {
+  return firstOfSelectedMonth.value.getTime() ===
+    firstOfThisMonth.value.getTime()
+}
+
+function expensesLoaded() {
+  return (viewingThisMonth() && thisMonthLoaded.value) ||
+    allExpensesLoaded.value
+}
 
 const pagination = {
   rowsPerPage: '50'
@@ -307,96 +324,36 @@ const columns = [
   { name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' }
 ]
 
-// const rows = ref([
-//   {
-//     pk: 1,
-//     name: 'Frozen Yogurt',
-//     date: '2023-10-01',
-//     job: '',
-//     gls: [{gl: '43-45045-232', percent: 100}],
-//     approver: { 'pk': 5, 'name': 'Dan Wilson', 'legal_name': 'Daniel Wilson' },
-//     approvalNotes: 'Felicity feigned faintness so I fetched froyo. Follow?',
-//     receipt: ''
-//   },
-//   {
-//     name: 'Ice cream sandwich',
-//     date: '2023-10-04',
-//     job: '123',
-//     gls: [{gl: '55-55555-555', percent: 50}, {gl: '43-45045-232', percent: 50}],
-//     approver: {pk: -1, name: '', legal_name: ''},
-//     approvalNotes: '',
-//     receipt: 'file.txt'
-//   },
-//   {
-//     name: 'Eclair',
-//     date: '2023-10-07',
-//     job: '',
-//     gls: [{gl: '12-34567-890', percent: 100}],
-//     approver: {pk: -1, name: '', legal_name: ''},
-//     approvalNotes: '',
-//     receipt: 'file.txt'
-//   },
-//   {
-//     name: 'Cupcake',
-//     date: '2023-10-07',
-//     job: '',
-//     gls: [{gl: '43-45045-232', percent: 100}],
-//     approver: {pk: -1, name: '', legal_name: ''},
-//     approvalNotes: '',
-//     receipt: 'file.txt'
-//   }
-// ])
 
 function tableTitleDisplay(): string {
   const submittedText = submitted.value ? ' - Submitted' : ''
   return `${props.monthDisplay}${submittedText}`
 }
 
-// function monthExpenses(): Expense[] {
-//   return []
-//   const apiResults = timeOffStore.teamTimeOffRequests
-//   let sortedTimeOff: TimeOffCalendarData = []
-//   if (apiResults) {
-//     for (let i=0; i<5; i++) {
-//       let d = new Date(selectedMonday.value.getTime() + i*(1000 * 60 * 60 * 24))
-//       let isToday = d.setHours(0,0,0,0) === today.value.setHours(0,0,0,0)
-//       sortedTimeOff.push({
-//         date: d.toLocaleDateString('en-us', { weekday: 'long', month: 'long', day: 'numeric' }),
-//         isToday: isToday,
-//         requests: apiResults.filter(request => {
-//           const targetDateMS = d.setHours(0,0,0,0)
-
-//           const fromDate = new Date(request.start_date)
-//           const fromTZOffset = fromDate.getTimezoneOffset() * 60000
-//           const fromDateMS = new Date(fromDate.getTime() + fromTZOffset).setHours(0,0,0,0)
-
-//           const toDate = new Date(request.end_date)
-//           const toTZOffset = toDate.getTimezoneOffset() * 60000
-//           const toDateMS = new Date(toDate.getTime() + toTZOffset).setHours(0,0,0,0)
-
-//           if (fromDateMS <= targetDateMS && targetDateMS <= toDateMS) {
-//             return true
-//           } else {
-//             return false
-//           }
-//         })
-//       })
-//     }
-//   }
-//   return sortedTimeOff
-// }
+function selectedMonthExpenses(): Expense[] {
+  const apiResults = purchaseStore.myExpenses
+  let exps: Expense[] = []
+  if (apiResults) {
+    exps = apiResults.filter(exp => {
+      let [y, m] = exp.date.split('-').map(s => parseInt(s))
+      m -= 1 // JS months are 0-indexed
+      return m === props.monthInt && y === props.yearInt
+    })
+  }
+  return exps
+}
 
 function clickAddExpense(): void {
 
   purchaseStore.createExpense({
     name: '',
-    date: `${props.yearInt}-${props.monthInt}-${props.dayInt}`,
+    date: `${ props.yearInt }-${ props.monthInt + 1 }-${ props.dayInt }`,
     job: '',
     gls: [],
     approval_notes: '',
   })
     .then(() => {
-      retrieveExpenses()
+      retrieveAllMyExpenses()
     })
     .catch((error) => {
       console.log('Error adding expense', error)
@@ -447,11 +404,25 @@ function onUnsubmitDialog() {
   })
 }
 
-function retrieveExpenses() {
-  purchaseStore.getAllExpenses()
-    .then((results) => {
-      expenses.value = results
-      expensesLoaded.value = true
+function retrieveThisMonthExpenses(): Promise<void> {
+  // Get all my expenses for this month
+  return new Promise((resolve, reject) => {
+    purchaseStore.getMyExpenses(props.yearInt, props.monthInt)
+      .then(() => {
+        thisMonthLoaded.value = true
+        resolve()
+      })
+      .catch((error) => {
+        handlePromiseError(reject, 'Error retrieving expenses', error)
+        reject()
+      })
+  })
+}
+
+function retrieveAllMyExpenses() {
+  purchaseStore.getMyExpenses()
+    .then(() => {
+      allExpensesLoaded.value = true
     })
     .catch((error) => {
       console.log('Error retrieving expenses', error)
@@ -521,8 +492,19 @@ function updateReceipt(pk: number, val: string) {
   }
 }
 
+function setDates() {
+  let theFirst = new Date()
+  theFirst.setDate(1)
+  theFirst.setHours(0,0,0,0)
+  firstOfThisMonth.value = theFirst
+  firstOfSelectedMonth.value = theFirst
+}
+
 onMounted(() => {
-  retrieveExpenses()
+  setDates()
+  retrieveThisMonthExpenses().then(() => {
+    retrieveAllMyExpenses()
+  })
 })
 
 </script>

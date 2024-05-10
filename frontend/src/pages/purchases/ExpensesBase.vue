@@ -10,9 +10,9 @@
     <div>
       <router-view
         :monthDisplay="monthDisplay()"
-        :dayInt="new Date().getDate().toString()"
-        :monthInt="(firstOfSelectedMonth.getMonth() + 1).toString()"
-        :yearInt="firstOfSelectedMonth.getFullYear().toString()"
+        :dayInt="new Date().getDate()"
+        :monthInt="firstOfSelectedMonth.getMonth()"
+        :yearInt="firstOfSelectedMonth.getFullYear()"
       ></router-view>
     </div>
   </q-page>

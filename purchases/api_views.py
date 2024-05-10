@@ -1,3 +1,4 @@
+import datetime
 import traceback
 
 from rest_framework import status, viewsets
@@ -15,6 +16,19 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     """
     queryset = Expense.objects.all()
     serializer_class = ExpenseSerializer
+
+    def create(self, request, *args, **kwargs):
+        approver = None
+        if request.user.employee.manager is not None:
+            approver = request.user.employee.manager
+        expense = Expense.objects.create(
+            purchaser=request.user.employee,
+            date=datetime.date.today(),
+            approver=approver
+        )
+        serialized_expense = ExpenseSerializer(
+            expense, context={'request': request})
+        return Response(serialized_expense.data)
 
     def get_queryset(self):
         user = self.request.user

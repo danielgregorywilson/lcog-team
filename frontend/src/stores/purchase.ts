@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
-import { date } from 'quasar'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
 import { Expense, ExpenseCreate } from 'src/types'
@@ -43,8 +42,10 @@ export const usePurchaseStore = defineStore('purchase', {
       return new Promise((resolve, reject) => {
         let dateParam = ''
         if (yearInt && monthInt) {
-          const firstDay = new Date(yearInt, monthInt, 1).toISOString().split('T')[0]
-          const lastDay = new Date(yearInt, monthInt + 1, 0).toISOString().split('T')[0]
+          const firstDay =
+            new Date(yearInt, monthInt, 1).toISOString().split('T')[0]
+          const lastDay =
+            new Date(yearInt, monthInt + 1, 0).toISOString().split('T')[0]
           dateParam = `?start=${ firstDay }&end=${ lastDay }`
         }
         axios({ url: `${ apiURL }api/v1/expense${ dateParam }` })
@@ -54,6 +55,19 @@ export const usePurchaseStore = defineStore('purchase', {
           })
           .catch(e => {
             handlePromiseError(reject, 'Error getting all expenses', e)
+          })
+      })
+    },
+    submitExpenseMonth(yearInt: number, monthInt: number): Promise<null> {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/expense/submit/${ yearInt }/${ monthInt }`, method: 'POST'
+        })
+          .then(() => {
+            resolve(null)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error submitting expense month', e)
           })
       })
     },

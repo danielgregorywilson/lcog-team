@@ -344,7 +344,6 @@ export interface Expense {
   gls: Array<GL>
   purchaser: SimpleEmployeeRetrieve
   approver: SimpleEmployeeRetrieve
-  approval_notes: string
   receipt_link: string
   submitted: boolean
 }
@@ -355,7 +354,6 @@ export interface ExpenseCreate {
   job?: string
   gls?: Array<GL>
   approver?: SimpleEmployeeRetrieve
-  approval_notes?: string
   receipt_link?: string
 }
 
@@ -365,7 +363,6 @@ export interface ExpenseUpdate {
   job?: string
   gls?: Array<GL>
   approver?: SimpleEmployeeRetrieve
-  approval_notes?: string
   receipt_link?: string
 }
 

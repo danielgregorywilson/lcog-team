@@ -9,8 +9,9 @@ class ExpenseSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Expense
         fields = [
-            'url', 'pk', 'name', 'date', 'job', 'gls', 'purchaser', 'approver',
-            'approval_notes', 'receipt'
+            'url', 'pk', 'name', 'date', 'job', 'gls', 'purchaser', 'receipt',
+            'approver', 'approved_at'
+            
         ]
 
     purchaser = SimpleEmployeeSerializer(required=False)

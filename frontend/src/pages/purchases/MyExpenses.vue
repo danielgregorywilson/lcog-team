@@ -2,7 +2,9 @@
 <div class="q-mt-md">
   <div class="q-gutter-md">
     <q-btn v-if="submitted" @click="showUnsubmitDialog = true">Unsubmit</q-btn>
-    <q-btn v-else @click="showSubmitToFiscalDialog = true">Submit to Fiscal</q-btn>
+    <q-btn v-else @click="showSubmitToFiscalDialog = true">
+      Submit to Fiscal
+    </q-btn>
   </div>
   <div class="q-mt-md">
     <q-spinner-grid
@@ -133,18 +135,6 @@
                 v-on:clear="scope.value=emptyEmployee"
                 :readOnly=false
               />
-            </q-popup-edit>
-          </q-td>
-          <q-td key="approvalNotes" :props="props">
-            {{ props.row.approval_notes }}
-            <q-popup-edit
-              v-if="!submitted"
-              v-model="props.row.approval_notes"
-              buttons
-              v-slot="scope"
-              @save="(val) => updateApprovalNotes(props.row.pk, val)"
-            >
-              <q-input v-model="scope.value" dense autofocus />
             </q-popup-edit>
           </q-td>
           <q-td key="receipt" :props="props">
@@ -313,14 +303,10 @@ const columns = [
     name: 'job', field: 'job', label: 'Job #', align: 'center', sortable: true
   },
   {
-    name: 'gls', field: 'gls', label: 'GL Codes', align: 'center', sortable: true,
-    style: 'width: 10px'
+    name: 'gls', field: 'gls', label: 'GL Codes', align: 'center',
+    sortable: true, style: 'width: 10px'
   },
   { name: 'approver', field: 'approver', label: 'Approver', align: 'center' },
-  {
-    name: 'approvalNotes', field: 'approvalNotes', label: 'Approval Notes',
-    align: 'center', classes: 'approval-notes', headerClasses: 'approval-notes'
-  },
   { name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' }
 ]
 
@@ -350,7 +336,6 @@ function clickAddExpense(): void {
     date: `${ props.yearInt }-${ props.monthInt + 1 }-${ props.dayInt }`,
     job: '',
     gls: [],
-    approval_notes: '',
   })
     .then(() => {
       retrieveAllMyExpenses()
@@ -472,14 +457,6 @@ function updateApprover(pk: number, val: SimpleEmployeeRetrieve) {
   const exp = purchaseStore.myExpenses.find(exp => exp.pk === pk)
   if (exp) {
     exp.approver = val
-    updateExpense(exp)
-  }
-}
-
-function updateApprovalNotes(pk: number, val: string) {
-  const exp = purchaseStore.myExpenses.find(exp => exp.pk === pk)
-  if (exp) {
-    exp.approval_notes = val
     updateExpense(exp)
   }
 }

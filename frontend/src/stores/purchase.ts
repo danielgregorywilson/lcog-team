@@ -1,12 +1,14 @@
 import axios from 'axios'
+import exp from 'constants'
 import { defineStore } from 'pinia'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
-import { Expense, ExpenseCreate } from 'src/types'
+import { Expense, ExpenseCreate, ExpenseMonth } from 'src/types'
 
 export const usePurchaseStore = defineStore('purchase', {
   state: () => ({
-    myExpenses: [] as Array<Expense>,
+    expenseMonths: [] as Array<ExpenseMonth>,
+    myExpenses: [] as Array<Expense>
   }),
 
   getters: {},
@@ -36,38 +38,50 @@ export const usePurchaseStore = defineStore('purchase', {
           })
       })
     },
-    getMyExpenses(
+    getExpenseMonths(
       yearInt: number | null = null, monthInt: number | null = null
-    ): Promise<Array<Expense>> {
+    ): Promise<null> {
       return new Promise((resolve, reject) => {
         let dateParam = ''
-        if (yearInt && monthInt) {
-          const firstDay =
-            new Date(yearInt, monthInt, 1).toISOString().split('T')[0]
-          const lastDay =
-            new Date(yearInt, monthInt + 1, 0).toISOString().split('T')[0]
-          dateParam = `?start=${ firstDay }&end=${ lastDay }`
+        if (!!yearInt && !!monthInt) {
+          dateParam = `?year=${ yearInt }&month=${ monthInt }`
         }
-        axios({ url: `${ apiURL }api/v1/expense${ dateParam }` })
+        axios({
+          url: `${ apiURL }api/v1/expensemonth${ dateParam }`
+        })
           .then(resp => {
-            this.myExpenses = resp.data.results
+            const ems = resp.data.results
+            this.expenseMonths = ems
+            let expenses = [] as Array<Expense>
+            for (const em of ems) {
+              expenses = expenses.concat(em.expenses)
+            }
+            this.myExpenses = expenses
             resolve(resp.data.results)
           })
           .catch(e => {
-            handlePromiseError(reject, 'Error getting all expenses', e)
+            handlePromiseError(reject, 'Error getting expense months', e)
           })
       })
     },
-    submitExpenseMonth(yearInt: number, monthInt: number): Promise<null> {
+    submitExpenseMonth(
+      data: { yearInt: number, monthInt: number, unsubmit?: boolean }
+    ): Promise<null> {
       return new Promise((resolve, reject) => {
         axios({
-          url: `${ apiURL }api/v1/expense/submit/${ yearInt }/${ monthInt }`, method: 'POST'
+          url: `${ apiURL }api/v1/expensemonth/submit`,
+          data: data,
+          method: 'POST'
         })
           .then(() => {
             resolve(null)
           })
           .catch(e => {
-            handlePromiseError(reject, 'Error submitting expense month', e)
+            handlePromiseError(
+              reject,
+              `Error ${ data['unsubmit'] ? 'un' : ''}submitting expense month`,
+              e
+            )
           })
       })
     },

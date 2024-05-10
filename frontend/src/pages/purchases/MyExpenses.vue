@@ -1,9 +1,11 @@
 <template>
 <div class="q-mt-md">
   <div class="q-gutter-md">
-    <q-btn v-if="submitted" @click="showUnsubmitDialog = true">Unsubmit</q-btn>
-    <q-btn v-else @click="showSubmitToFiscalDialog = true">
-      Submit to Fiscal
+    <q-btn v-if="monthSubmitted()" @click="showUnsubmitDialog = true">
+      Unsubmit
+    </q-btn>
+    <q-btn v-else @click="showSubmitDialog = true">
+      Submit for Approval
     </q-btn>
   </div>
   <div class="q-mt-md">
@@ -25,11 +27,12 @@
       class="expense-table"
     >
       <template v-slot:body="props">
-        <q-tr :props="props" :class="submitted?'bg-grey':''">
+
+        <q-tr :props="props" :class="rowSubmitted(props.row)?'bg-grey':''">
           <q-td key="name" :props="props">
             {{ props.row.name }}
             <q-popup-edit
-              v-if="!submitted"
+              v-if="!rowSubmitted(props.row)"
               v-model="props.row.name"
               buttons
               v-slot="scope"
@@ -41,7 +44,7 @@
           <q-td key="date" :props="props">
             {{ readableDateNEW(props.row.date) }}
             <q-popup-edit
-              v-if="!submitted"
+              v-if="!rowSubmitted(props.row)"
               v-model="props.row.date"
               buttons
               v-slot="scope"
@@ -53,7 +56,7 @@
           <q-td key="job" :props="props">
             <div class="text-pre-wrap">{{ props.row.job }}</div>
             <q-popup-edit
-              v-if="!submitted"
+              v-if="!rowSubmitted(props.row)"
               v-model="props.row.job"
               buttons
               v-slot="scope"
@@ -71,7 +74,7 @@
               {{ gl.gl }}: {{ gl.percent }}%
             </div>
             <q-popup-edit
-              v-if="!submitted"
+              v-if="!rowSubmitted(props.row)"
               v-model="props.row.gls"
               buttons
               v-slot="scope"
@@ -120,7 +123,7 @@
           <q-td key="approver" :props="props">
             {{ props.row.approver?.name }}
             <q-popup-edit
-              v-if="!submitted"
+              v-if="!rowSubmitted(props.row)"
               v-model="props.row.approver"
               buttons
               v-slot="scope"
@@ -140,7 +143,7 @@
           <q-td key="receipt" :props="props">
             {{ props.row.receipt?.split('/').pop() }}
             <q-popup-edit
-              v-if="!submitted"
+              v-if="!rowSubmitted(props.row)"
               v-model="props.row.receipt"
               buttons
               v-slot="scope"
@@ -162,7 +165,7 @@
           </q-td>
         </q-tr>
       </template>
-      <template v-slot:bottom-row v-if="!submitted">
+      <template v-slot:bottom-row v-if="!monthSubmitted()">
         <q-tr @click="clickAddExpense()" class="cursor-pointer row-add-new">
           <q-td colspan="100%">
             <q-icon name="add" size="md" class="q-pr-sm"/>New Expense
@@ -173,11 +176,13 @@
   </div>
 
   <!-- Submit to Fiscal Dialog -->
-  <q-dialog v-model="showSubmitToFiscalDialog">
+  <q-dialog v-model="showSubmitDialog">
     <q-card class="q-pa-md" style="width: 400px">
-      <div class="text-h6">Submit {{ monthDisplay }} expenses to Fiscal?</div>
+      <div class="text-h6">
+        Submit {{ monthDisplay }} expenses for approval?
+      </div>
       <q-form
-        @submit='onSubmitFiscalDialog()'
+        @submit='onSubmitDialog()'
         class="q-gutter-md"
       >
         <q-input
@@ -245,7 +250,7 @@
 </style>
 
 <script setup lang="ts">
-import { onMounted, Ref, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useQuasar } from 'quasar'
 
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
@@ -268,9 +273,7 @@ const props = defineProps<{
 let thisMonthLoaded = ref(false)
 let allExpensesLoaded = ref(false)
 
-let expenses = ref([]) as Ref<Expense[]>
-let submitted = ref(false)
-let showSubmitToFiscalDialog = ref(false)
+let showSubmitDialog = ref(false)
 let sendDialogMessage = ref('')
 let showUnsubmitDialog = ref(false)
 
@@ -312,7 +315,7 @@ const columns = [
 
 
 function tableTitleDisplay(): string {
-  const submittedText = submitted.value ? ' - Submitted' : ''
+  const submittedText = monthSubmitted() ? ' - Submitted' : ''
   return `${props.monthDisplay}${submittedText}`
 }
 
@@ -327,6 +330,18 @@ function selectedMonthExpenses(): Expense[] {
     })
   }
   return exps
+}
+
+function monthSubmitted() {
+  const ems = purchaseStore.expenseMonths
+  return ems.some(em => {
+    return em.month === props.monthInt && em.year === props.yearInt &&
+      em.status !== 'draft'
+  })
+}
+
+function rowSubmitted(row) {
+  return row.status=='submitted'
 }
 
 function clickAddExpense(): void {
@@ -367,32 +382,46 @@ function formErrors() {
   return formErrorItems().length > 0
 }
 
-function onSubmitFiscalDialog() {
-  showSubmitToFiscalDialog.value = false
-  submitted.value = true
-  expenses.value.forEach(row => row.submitted = true)
-  quasar.notify({
-    message: 'Sent',
-    color: 'positive',
-    icon: 'send'
+function onSubmitDialog() {
+  purchaseStore.submitExpenseMonth({
+    yearInt: props.yearInt, monthInt: props.monthInt
   })
+    .then(() => {
+      showSubmitDialog.value = false
+      retrieveAllMyExpenses()
+      quasar.notify({
+        message: 'Sent',
+        color: 'positive',
+        icon: 'send'
+      })
+    })
+    .catch((error) => {
+      console.log('Error submitting expenses', error)
+    })
 }
 
 function onUnsubmitDialog() {
-  showUnsubmitDialog.value = false
-  submitted.value = false
-  expenses.value.forEach(row => row.submitted = false)
-  quasar.notify({
-    message: 'Unsubmitted',
-    color: 'positive',
-    icon: 'cancel'
+  purchaseStore.submitExpenseMonth({
+    yearInt: props.yearInt, monthInt: props.monthInt, unsubmit: true
   })
+    .then(() => {
+      showUnsubmitDialog.value = false
+      retrieveAllMyExpenses()
+      quasar.notify({
+        message: 'Unsubmitted',
+        color: 'positive',
+        icon: 'cancel'
+      })
+    })
+    .catch((error) => {
+      console.log('Error unsubmitting expenses', error)
+    })
 }
 
 function retrieveThisMonthExpenses(): Promise<void> {
   // Get all my expenses for this month
   return new Promise((resolve, reject) => {
-    purchaseStore.getMyExpenses(props.yearInt, props.monthInt)
+    purchaseStore.getExpenseMonths(props.yearInt, props.monthInt)
       .then(() => {
         thisMonthLoaded.value = true
         resolve()
@@ -405,7 +434,7 @@ function retrieveThisMonthExpenses(): Promise<void> {
 }
 
 function retrieveAllMyExpenses() {
-  purchaseStore.getMyExpenses()
+  purchaseStore.getExpenseMonths()
     .then(() => {
       allExpensesLoaded.value = true
     })

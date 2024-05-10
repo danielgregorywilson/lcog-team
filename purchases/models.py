@@ -90,8 +90,27 @@ class PurchaseRequest(models.Model):
         super().save(*args, **kwargs)
 
 
-class Expense(models.Model):
+class ExpenseBaseModel(models.Model):
+    class Meta:
+        abstract = True
 
+    STATUS_DRAFT = 'draft'
+    STATUS_SUBMITTED = 'submitted'
+    STATUS_APPROVER_APPROVED = 'approver_approved'
+    STATUS_FINANCE_APPROVED = 'finance_approved'
+    STATUS_CHOICES = (
+        (STATUS_DRAFT, 'Draft'),
+        (STATUS_SUBMITTED, 'Submitted'),
+        (STATUS_APPROVER_APPROVED, 'Approver Approved'),
+        (STATUS_FINANCE_APPROVED, 'Finance Approved')
+    )
+
+    status = models.CharField(
+        max_length=17, choices=STATUS_CHOICES, default=STATUS_DRAFT
+    )
+
+
+class Expense(ExpenseBaseModel):
     class Meta:
         ordering = ["pk",]
 
@@ -103,7 +122,9 @@ class Expense(models.Model):
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='expenses_purchased',
     )
-    receipt = models.FileField(_("receipt"), upload_to="uploads/expenses", blank=True, null=True)
+    receipt = models.FileField(
+        _("receipt"), upload_to="uploads/expenses", blank=True, null=True
+    )
     approver = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='approver_of_expenses',
@@ -111,21 +132,21 @@ class Expense(models.Model):
     approved_at = models.DateTimeField(blank=True, null=True)
 
 
-class ExpenseMonth(models.Model):
-    STATUS_SUBMITTED = 'submitted'
-    STATUS_MANAGER_APPROVED = 'manager_approved'
-    STATUS_FINANCE_APPROVED = 'finance_approved'
-    STATUS_CHOICES = (
-        (STATUS_SUBMITTED, 'Submitted'),
-        (STATUS_MANAGER_APPROVED, 'Manager Approved'),
-        (STATUS_FINANCE_APPROVED, 'Finance Approved')
-    )
+class ExpenseMonth(ExpenseBaseModel):
+    class Meta:
+        unique_together = ['employee', 'month', 'year']
     
     employee = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='expense_months',
     )
-    month = models.DateField(blank=True, null=True)
-    status = models.CharField(
-        max_length=16, blank=True, null=True, choices=STATUS_CHOICES
-    )
+    month = models.IntegerField()
+    year = models.IntegerField()
+
+    @property
+    def expenses(self):
+        return Expense.objects.filter(
+            purchaser=self.employee,
+            date__month=self.month+1,
+            date__year=self.year
+        )

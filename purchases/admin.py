@@ -1,7 +1,8 @@
 from django.contrib import admin
 
 from .models import (
-    Expense, PurchaseCategory, PurchaseObject, PurchaseRequest, Role
+    Expense, ExpenseMonth, PurchaseCategory, PurchaseObject, PurchaseRequest,
+    Role
 )
 
 
@@ -31,5 +32,13 @@ class PurchaseRequestAdmin(admin.ModelAdmin):
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'purchaser', 'date', 'name'
+        'id', 'purchaser', 'date', 'name', 'status'
     )
+
+
+@admin.register(ExpenseMonth)
+class ExpenseMonthAdmin(admin.ModelAdmin):
+    list_display = (
+        'id', 'employee', 'year', 'month', 'status'
+    )
+    list_filter = ('year', 'status',)

@@ -336,7 +336,18 @@ export interface FileUploadDescriptionUploadServerResponse {
 // Purchase Structure from Django Rest Framework //
 ///////////////////////////////////////////////////
 
-export interface Expense {
+interface ExpenseBase {
+  status: 'draft' | 'submitted' | 'approved' | 'rejected'
+}
+
+export interface ExpenseMonth extends ExpenseBase {
+  employee: SimpleEmployeeRetrieve
+  month: number
+  year: number
+  expenses: Array<Expense>
+}
+
+export interface Expense extends ExpenseBase {
   pk: number
   name: string
   date: string
@@ -357,7 +368,7 @@ export interface ExpenseCreate {
   receipt_link?: string
 }
 
-export interface ExpenseUpdate {
+export interface ExpenseUpdate extends ExpenseBase {
   name?: string
   date?: string
   job?: string

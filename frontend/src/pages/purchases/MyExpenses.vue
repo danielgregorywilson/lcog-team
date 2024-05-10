@@ -437,58 +437,58 @@ function updateExpense(row: Expense) {
 }
 
 function updateName(pk: number, val: string) {
-  const row = expenses.value.find(row => row.pk === pk)
-  if (row) {
-    row.name = val
-    updateExpense(row)
+  const exp = purchaseStore.myExpenses.find(exp => exp.pk === pk)
+  if (exp) {
+    exp.name = val
+    updateExpense(exp)
   }
 }
 
 function updateDate(pk: number, val: string) {
-  const row = expenses.value.find(row => row.pk === pk)
-  if (row) {
-    row.date = val
-    updateExpense(row)
+  const exp = purchaseStore.myExpenses.find(exp => exp.pk === pk)
+  if (exp) {
+    exp.date = val
+    updateExpense(exp)
   }
 }
 
 function updateJob(pk: number, val: string) {
-  const row = expenses.value.find(row => row.pk === pk)
-  if (row) {
-    row.job = val
-    updateExpense(row)
+  const exp = purchaseStore.myExpenses.find(exp => exp.pk === pk)
+  if (exp) {
+    exp.job = val
+    updateExpense(exp)
   }
 }
 
 function updateGLs(pk: number, val: Array<GL>) {
-  const row = expenses.value.find(row => row.pk === pk)
-  if (row) {
-    row.gls = val
-    updateExpense(row)
+  const exp = purchaseStore.myExpenses.find(exp => exp.pk === pk)
+  if (exp) {
+    exp.gls = val
+    updateExpense(exp)
   }
 }
 
 function updateApprover(pk: number, val: SimpleEmployeeRetrieve) {
-  const row = expenses.value.find(row => row.pk === pk)
-  if (row) {
-    row.approver = val
-    updateExpense(row)
+  const exp = purchaseStore.myExpenses.find(exp => exp.pk === pk)
+  if (exp) {
+    exp.approver = val
+    updateExpense(exp)
   }
 }
 
 function updateApprovalNotes(pk: number, val: string) {
-  const row = expenses.value.find(row => row.pk === pk)
-  if (row) {
-    row.approval_notes = val
-    updateExpense(row)
+  const exp = purchaseStore.myExpenses.find(exp => exp.pk === pk)
+  if (exp) {
+    exp.approval_notes = val
+    updateExpense(exp)
   }
 }
 
 function updateReceipt(pk: number, val: string) {
-  const row = expenses.value.find(row => row.pk === pk)
-  if (row) {
-    row.receipt_link = val
-    updateExpense(row)
+  const exp = purchaseStore.myExpenses.find(exp => exp.pk === pk)
+  if (exp) {
+    exp.receipt_link = val
+    updateExpense(exp)
   }
 }
 

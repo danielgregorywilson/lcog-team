@@ -41,7 +41,9 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = User
-        fields = ['pk', 'url', 'username', 'email', 'name', 'groups', 'is_staff']
+        fields = [
+            'pk', 'url', 'username', 'email', 'name', 'groups', 'is_staff'
+        ]
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
@@ -61,7 +63,9 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     username = serializers.EmailField(source='user.username')
     email = serializers.EmailField(source='user.email')
     title = serializers.CharField(source='job_title')
-    division = serializers.CharField(source='unit_or_program.division.name', default='')
+    division = serializers.CharField(
+        source='unit_or_program.division.name', default=''
+    )
     is_manager = serializers.SerializerMethodField()
     has_manager = serializers.SerializerMethodField()
     is_eligible_for_telework_application = serializers.SerializerMethodField()
@@ -114,12 +118,19 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             return False
         return all([ 
             not employee.is_executive_director, # Not the executive director
-            not employee.manager.is_executive_director, # Not anyone who reports to the executive director (e.g. finance manager)
-            employee.manager.manager and not employee.manager.manager.is_executive_director, # Not anyone who reports to the above (e.g. finance employees)
+            # Not anyone who reports to the executive director
+            # (e.g. finance manager)
+            not employee.manager.is_executive_director,
+            # Not anyone who reports to the above (e.g. finance employees)
+            all([
+                employee.manager.manager,
+                not employee.manager.manager.is_executive_director
+            ]),
             not employee.is_division_director, # No division directors
             not employee.manager.is_division_director, # No program managers
             not employee.is_hr_manager,  # Not the HR manager
-            not employee.manager.is_hr_manager  # Not anyone who reports to the HR manager
+            # Not anyone who reports to the HR manager
+            not employee.manager.is_hr_manager
         ])
     
     @staticmethod
@@ -162,7 +173,8 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
         if employee.is_executive_director:
             return ""
         elif employee.is_hr_manager:
-            return Employee.objects.filter(is_executive_director=True).first().name
+            return Employee.objects.filter(is_executive_director=True)\
+                .first().name
         elif employee.is_division_director:
             return Employee.objects.filter(is_hr_manager=True).first().name
         elif employee.manager:
@@ -172,7 +184,9 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     
     @staticmethod
     def get_workflow_roles(employee):
-        workflow_roles_ids = map(lambda role: role.id, employee.workflow_roles.all())
+        workflow_roles_ids = map(
+            lambda role: role.id, employee.workflow_roles.all()
+        )
         return list(workflow_roles_ids)
 
     @staticmethod
@@ -267,7 +281,10 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     
     @staticmethod
     def get_employee_division(pr):
-        if pr.employee.unit_or_program and pr.employee.unit_or_program.division:
+        if all([
+            pr.employee.unit_or_program,
+            pr.employee.unit_or_program.division
+        ]):
             return pr.employee.unit_or_program.division.name
         else:
             return ''
@@ -308,7 +325,9 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
         return pr.all_required_signatures()
 
 
-class PerformanceReviewFileUploadSerializer(serializers.HyperlinkedModelSerializer):
+class PerformanceReviewFileUploadSerializer(
+    serializers.HyperlinkedModelSerializer
+):
     signed_position_description = serializers.FileField()
 
     class Meta:
@@ -420,7 +439,9 @@ class TeleworkApplicationSerializer(serializers.HyperlinkedModelSerializer):
         return application.division_director_signature()
 
 
-class TeleworkApplicationFileUploadSerializer(serializers.HyperlinkedModelSerializer):
+class TeleworkApplicationFileUploadSerializer(
+    serializers.HyperlinkedModelSerializer
+):
     dependent_care_documentation = serializers.FileField()
 
     class Meta:

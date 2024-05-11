@@ -81,16 +81,25 @@ export default defineComponent({
   },
   methods: {
     isVisible (): boolean {
-      const shouldNotViewBecauseNotManager = this.isManager && !this.userStore.getEmployeeProfile.is_manager
-      const shouldNotViewBecauseNotISEmployee = this.isISEmployee && !this.userStore.getEmployeeProfile.is_is_employee
-      const shouldNotViewBecauseNotFiscalEmployee = this.isFiscalEmployee && !this.userStore.getEmployeeProfile.is_fiscal_employee
-      const shouldNotViewBecauseNotEligibleForTeleworkApplication = this.eligibleForTeleworkApplicationOnly && !this.userStore.getEmployeeProfile.is_eligible_for_telework_application
-      const shouldNotViewBecauseNoWorkflowRoles = this.hasWorkflowRoles && !this.userStore.hasWorkflowRoles
+      const shouldNotViewBecauseNotManager =
+        this.isManager && !this.userStore.getEmployeeProfile.is_manager
+      const shouldNotViewBecauseNotISEmployee =
+        this.isISEmployee && !this.userStore.getEmployeeProfile.is_is_employee
+      const shouldNotViewBecauseNotFiscalEmployee =
+        this.isFiscalEmployee &&
+        !this.userStore.getEmployeeProfile.is_fiscal_employee
+      const shouldNotViewBecauseNotEligibleForTeleworkApplication =
+        this.eligibleForTeleworkApplicationOnly &&
+        !this.userStore.getEmployeeProfile.is_eligible_for_telework_application
+      const shouldNotViewBecauseNoWorkflowRoles =
+        this.hasWorkflowRoles && !this.userStore.hasWorkflowRoles
       const shouldNotViewBecauseNoExpenseRoles = this.canViewExpenses && (
         !this.userStore.getEmployeeProfile.is_expense_manager &&
         !this.userStore.getEmployeeProfile.is_expense_approver
       )   
-      const cannotViewMealsOnWheelsRoutes = this.canViewMOWRoutes && !this.userStore.getEmployeeProfile.can_view_mow_routes
+      const cannotViewMealsOnWheelsRoutes =
+        this.canViewMOWRoutes &&
+        !this.userStore.getEmployeeProfile.can_view_mow_routes
       if (
         shouldNotViewBecauseNotManager ||
         shouldNotViewBecauseNotISEmployee ||

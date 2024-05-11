@@ -103,21 +103,51 @@ export const useUserStore = defineStore('user', {
             cookies.set('has_manager', resp.data.has_manager.toString())
             cookies.set('is_is_employee', resp.data.is_is_employee.toString())
             cookies.set('is_hr_employee', resp.data.is_hr_employee.toString())
-            cookies.set('is_sds_hiring_lead', resp.data.is_sds_hiring_lead.toString())
-            cookies.set('is_fiscal_employee', resp.data.is_fiscal_employee.toString())
-            cookies.set('is_eligible_for_telework_application', resp.data.is_eligible_for_telework_application.toString())
-            cookies.set('can_view_seating_charts', resp.data.can_view_seating_charts.toString())
-            cookies.set('can_edit_seating_charts', resp.data.can_edit_seating_charts.toString())
+            cookies.set(
+              'is_sds_hiring_lead', resp.data.is_sds_hiring_lead.toString()
+            )
+            cookies.set(
+              'is_fiscal_employee', resp.data.is_fiscal_employee.toString()
+            )
+            cookies.set(
+              'is_eligible_for_telework_application',
+              resp.data.is_eligible_for_telework_application.toString()
+            )
+            cookies.set(
+              'can_view_seating_charts',
+              resp.data.can_view_seating_charts.toString()
+            )
+            cookies.set(
+              'can_edit_seating_charts',
+              resp.data.can_edit_seating_charts.toString()
+            )
             cookies.set('prs_can_view', resp.data.prs_can_view.toString())
             cookies.set('notes_can_view', resp.data.notes_can_view.toString())
-            cookies.set('telework_applications_can_view', resp.data.telework_applications_can_view.toString())
-            cookies.set('time_off_requests_can_view', resp.data.time_off_requests_can_view.toString())
+            cookies.set(
+              'telework_applications_can_view',
+              resp.data.telework_applications_can_view.toString()
+            )
+            cookies.set(
+              'time_off_requests_can_view',
+              resp.data.time_off_requests_can_view.toString()
+            )
             cookies.set('workflow_roles', resp.data.workflow_roles.toString())
-            cookies.set('workflow_display_options', resp.data.workflow_display_options.toString())
-            cookies.set('is_expense_manager', resp.data.is_expense_manager.toString())
-            cookies.set('is_expense_approver', resp.data.is_expense_approver.toString())
-            cookies.set('can_view_mow_routes', resp.data.can_view_mow_routes.toString())
-            cookies.set('can_manage_mow_stops', resp.data.can_manage_mow_stops.toString())
+            cookies.set(
+              'workflow_display_options',
+              resp.data.workflow_display_options.toString()
+            )
+            cookies.set(
+              'is_expense_manager', resp.data.is_expense_manager.toString()
+            )
+            cookies.set(
+              'is_expense_approver', resp.data.is_expense_approver.toString()
+            )
+            cookies.set(
+              'can_view_mow_routes', resp.data.can_view_mow_routes.toString()
+            )
+            cookies.set(
+              'can_manage_mow_stops', resp.data.can_manage_mow_stops.toString()
+            )
 
             // TODO: Convert this
             // dispatch('performanceReviewModule/getNextPerformanceReview', {pk: resp.data.pk}, { root: true })

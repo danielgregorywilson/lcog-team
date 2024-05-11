@@ -86,7 +86,10 @@ export default defineComponent({
       const shouldNotViewBecauseNotFiscalEmployee = this.isFiscalEmployee && !this.userStore.getEmployeeProfile.is_fiscal_employee
       const shouldNotViewBecauseNotEligibleForTeleworkApplication = this.eligibleForTeleworkApplicationOnly && !this.userStore.getEmployeeProfile.is_eligible_for_telework_application
       const shouldNotViewBecauseNoWorkflowRoles = this.hasWorkflowRoles && !this.userStore.hasWorkflowRoles
-      const shouldNotViewBecauseNoExpenseRoles = this.canViewExpenses && !this.userStore.getEmployeeProfile.can_view_expenses
+      const shouldNotViewBecauseNoExpenseRoles = this.canViewExpenses && (
+        !this.userStore.getEmployeeProfile.is_expense_manager &&
+        !this.userStore.getEmployeeProfile.is_expense_approver
+      )   
       const cannotViewMealsOnWheelsRoutes = this.canViewMOWRoutes && !this.userStore.getEmployeeProfile.can_view_mow_routes
       if (
         shouldNotViewBecauseNotManager ||

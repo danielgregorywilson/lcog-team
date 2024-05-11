@@ -23,7 +23,7 @@ export function canViewDeskReservationReports(): Promise<boolean> {
 }
 
 export function canViewExpenses() {
-  if (cookies.get('can_view_expenses') == 'true') {
+  if (cookies.get('is_expense_manager') == 'true' || cookies.get('is_expense_approver') == 'true') {
     return true
   } else {
     console.info('User cannot view Expenses. Redirecting to dashboard.')

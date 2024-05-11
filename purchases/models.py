@@ -134,6 +134,7 @@ class Expense(ExpenseBaseModel):
 
 class ExpenseMonth(ExpenseBaseModel):
     class Meta:
+        ordering = ["pk",]
         unique_together = ['employee', 'month', 'year']
     
     employee = models.ForeignKey(

@@ -26,21 +26,27 @@ const routes: RouteRecordRaw[] = [
         component: () => import('src/pages/purchases/ExpensesBase.vue'),
         children: [
           {
-            path: 'my',
-            name: 'my-expenses',
-            component: () => import('src/pages/purchases/MyExpenses.vue'),
+            path: 'submit',
+            name: 'submit-expenses',
+            component: () => import('src/pages/purchases/SubmitExpenses.vue'),
             meta: { requiresAuth: true, requiresCanViewExpenses: true },
           },
           {
-            path: 'review',
-            name: 'expenses-review',
-            component: () => import('src/pages/purchases/ExpensesReview.vue'),
+            path: 'approve',
+            name: 'approve-expenses',
+            component: () => import('src/pages/purchases/ApproveExpenses.vue'),
             meta: { requiresAuth: true, requiresFiscal: true },
           },
           {
-            path: 'review/:employeePk/:year/:month',
-            name: 'expenses-review-detail',
-            component: () => import('src/pages/purchases/ExpensesReviewDetail.vue'),
+            path: 'fiscal',
+            name: 'fiscal-approve',
+            component: () => import('src/pages/purchases/FiscalApprove.vue'),
+            meta: { requiresAuth: true, requiresFiscal: true },
+          },
+          {
+            path: 'fiscal/:employeePk/:year/:month',
+            name: 'fiscal-approve-detail',
+            component: () => import('src/pages/purchases/FiscalApproveDetail.vue'),
             meta: { requiresAuth: true, requiresFiscal: true },
           },
         ]

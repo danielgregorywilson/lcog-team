@@ -3,13 +3,16 @@
     <div class="text-h4">Credit Card Expenses</div>
     <div class="q-my-md">
       <q-btn-group rounded>
-        <q-btn v-if="isExpenseManager()" :to="{ name: 'my-expenses' }" unelevated rounded color="primary" icon="calendar_today" :label="$q.screen.xs ? 'Requests' : 'My Requests'" />
-        <q-btn v-if="isExpenseApprover()" :to="{ name: 'timeoff-manage-requests' }" unelevated rounded color="primary" icon="book" :label="$q.screen.xs ? 'Manage' : 'Manage Requests'">
+        <q-btn v-if="isExpenseManager()" :to="{ name: 'submit-expenses' }" unelevated rounded color="primary" icon="book" :label="$q.screen.xs ? 'Submit' : 'Submit Expenses'" />
+        <q-btn v-if="isExpenseApprover()" :to="{ name: 'approve-expenses' }" unelevated rounded color="primary" icon="bookmark_added" :label="$q.screen.xs ? 'Approve' : 'Approve Expenses'">
+          <q-badge v-if="numExpensesToApprove()" rounded color="red" floating>{{ numExpensesToApprove() }}</q-badge>
+        </q-btn>
+        <q-btn v-if="isFiscal()" :to="{ name: 'fiscal-approve' }" unelevated rounded color="primary" icon="library_add_check" label="Fiscal Approve">
           <q-badge v-if="numExpensesToApprove()" rounded color="red" floating>{{ numExpensesToApprove() }}</q-badge>
         </q-btn>
       </q-btn-group>  
     </div>
-    <div class="q-gutter-md">
+    <div v-if="route.name != 'approve-expenses'" class="q-gutter-md">
       <q-btn @click="setThisMonth()">This Month</q-btn>
       <q-btn-group>
         <q-btn color="secondary" icon="west" @click="monthBackward()"/>
@@ -31,8 +34,10 @@
 
   <script setup lang="ts">
   import { onMounted, ref } from 'vue'
+  import { useRoute } from 'vue-router'
   import { useUserStore } from 'src/stores/user'
 
+  const route = useRoute()
   const userStore = useUserStore()
 
   let firstOfThisMonth = ref(new Date())
@@ -44,6 +49,10 @@
 
   function isExpenseApprover() {
     return userStore.isExpenseApprover
+  }
+
+  function isFiscal() {
+    return userStore.isFiscal
   }
 
   function monthDisplay(): string {

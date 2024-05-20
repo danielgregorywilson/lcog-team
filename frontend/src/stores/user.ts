@@ -53,6 +53,7 @@ export const useUserStore = defineStore('user', {
     getEmployeeProfile: state => state.profile,
     isProfileLoaded: state => !!state.profile.username,
     isManager: state => state.profile.is_manager,
+    isFiscal: state => state.profile.is_fiscal_employee,
     hasWorkflowRoles: state => !!state.profile.workflow_roles.length,
     isExpenseManager: state => state.profile.is_expense_manager,
     isExpenseApprover: state => state.profile.is_expense_approver,

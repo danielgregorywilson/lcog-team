@@ -339,7 +339,8 @@ export interface FileUploadDescriptionUploadServerResponse {
 ///////////////////////////////////////////////////
 
 interface ExpenseBase {
-  status: 'draft' | 'submitted' | 'approved' | 'rejected'
+  status: 'draft' | 'submitted' | 'approver_approved' | 'approver_denied' |
+    'fiscal_approved' | 'fiscal_denied'
 }
 
 export interface ExpenseMonth extends ExpenseBase {

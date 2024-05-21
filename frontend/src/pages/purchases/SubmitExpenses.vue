@@ -342,8 +342,9 @@ function monthSubmitted() {
   })
 }
 
-function rowSubmitted(row) {
-  return row.status=='submitted'
+function rowSubmitted(row: Expense) {
+  return ['submitted', 'approver_approved', 'fiscal_approved']
+    .includes(row.status)
 }
 
 function clickAddExpense(): void {

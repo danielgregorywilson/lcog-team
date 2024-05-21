@@ -36,6 +36,32 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         if user.is_authenticated: 
             if user.is_superuser:
                 return super().get_queryset()
+            
+            approve = self.request.query_params.get('approve', None)
+            if approve:
+                year = self.request.query_params.get('year', None)
+                month = self.request.query_params.get('month', None)
+                if year and month:
+                    return Expense.objects.filter(
+                        date__year=year,
+                        date__month=month,
+                        approver=user.employee,
+                        status__in=[
+                            Expense.STATUS_SUBMITTED,
+                            Expense.STATUS_APPROVER_APPROVED,
+                            Expense.STATUS_APPROVER_DENIED
+                        ]
+                    )
+                else:
+                    return Expense.objects.filter(
+                        approver=user.employee,
+                        status__in=[
+                            Expense.STATUS_SUBMITTED,
+                            Expense.STATUS_APPROVER_APPROVED,
+                            Expense.STATUS_APPROVER_DENIED
+                        ]
+                    )
+            
             start = self.request.query_params.get('start', None)
             end = self.request.query_params.get('end', None)
             if start and end:
@@ -91,15 +117,19 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['put'])
     def approve(self, request, pk=None):
         """
         Approve the expense with the given pk.
         """
         try:
             expense = Expense.objects.get(pk=pk)
-            expense.approver = request.user.employee
-            expense.approved_at = datetime.datetime.now()
+            approve = request.data.get('approve', True)
+            if approve:
+                expense.status = Expense.STATUS_APPROVER_APPROVED
+                expense.approved_at = datetime.datetime.now()
+            else:
+                expense.status = Expense.STATUS_APPROVER_DENIED
             expense.save()
             serialized_expense = ExpenseSerializer(
                 expense, context={'request': request}

@@ -3,16 +3,49 @@
     <div class="text-h4">Credit Card Expenses</div>
     <div class="q-my-md">
       <q-btn-group rounded>
-        <q-btn v-if="isExpenseManager()" :to="{ name: 'submit-expenses' }" unelevated rounded color="primary" icon="book" :label="$q.screen.xs ? 'Submit' : 'Submit Expenses'" />
-        <q-btn v-if="isExpenseApprover()" :to="{ name: 'approve-expenses' }" unelevated rounded color="primary" icon="bookmark_added" :label="$q.screen.xs ? 'Approve' : 'Approve Expenses'">
-          <q-badge v-if="numExpensesToApprove()" rounded color="red" floating>{{ numExpensesToApprove() }}</q-badge>
+        <q-btn
+          v-if="isExpenseManager()"
+          :to="{ name: 'submit-expenses' }"
+          unelevated
+          rounded
+          color="primary"
+          icon="book"
+          :label="$q.screen.xs ? 'Submit' : 'Submit Expenses'"
+        />
+        <q-btn
+          v-if="isExpenseApprover()"
+          :to="{ name: 'approve-expenses' }"
+          unelevated
+          rounded
+          color="primary"
+          icon="bookmark_added"
+          :label="$q.screen.xs ? 'Approve' : 'Approve Expenses'"
+        >
+          <q-badge v-if="numExpensesToApprove()" rounded color="red" floating>
+            {{ numExpensesToApprove() }}
+          </q-badge>
         </q-btn>
-        <q-btn v-if="isFiscal()" :to="{ name: 'fiscal-approve' }" unelevated rounded color="primary" icon="library_add_check" label="Fiscal Approve">
-          <q-badge v-if="numExpensesToApprove()" rounded color="red" floating>{{ numExpensesToApprove() }}</q-badge>
+        <q-btn
+          v-if="isFiscal()"
+          :to="{ name: 'fiscal-approve' }"
+          unelevated
+          rounded
+          color="primary"
+          icon="library_add_check"
+          label="Fiscal Approve"
+        >
+          <q-badge
+            v-if="numExpensesFiscalToApprove()"
+            rounded
+            color="red"
+            floating
+          >
+            {{ numExpensesFiscalToApprove() }}
+          </q-badge>
         </q-btn>
       </q-btn-group>  
     </div>
-    <div v-if="route.name != 'approve-expenses'" class="q-gutter-md">
+    <div class="q-gutter-md">
       <q-btn @click="setThisMonth()">This Month</q-btn>
       <q-btn-group>
         <q-btn color="secondary" icon="west" @click="monthBackward()"/>
@@ -34,10 +67,10 @@
 
   <script setup lang="ts">
   import { onMounted, ref } from 'vue'
-  import { useRoute } from 'vue-router'
+  import { usePurchaseStore } from 'src/stores/purchase'
   import { useUserStore } from 'src/stores/user'
 
-  const route = useRoute()
+  const purchaseStore = usePurchaseStore()
   const userStore = useUserStore()
 
   let firstOfThisMonth = ref(new Date())
@@ -56,7 +89,11 @@
   }
 
   function monthDisplay(): string {
-    return `${firstOfSelectedMonth.value.toLocaleDateString('en-us', { month: 'long' })} ${firstOfSelectedMonth.value.getFullYear()}`
+    const m = firstOfSelectedMonth.value.toLocaleDateString(
+      'en-us', { month: 'long' }
+    )
+    const y = firstOfSelectedMonth.value.getFullYear()
+    return `${m} ${y}`
   }
 
   function setDates() {
@@ -72,25 +109,27 @@
   }
 
   function monthBackward() {
-    firstOfSelectedMonth.value = firstOfSelectedMonth.value.getMonth() === 0
-      ? new Date(firstOfSelectedMonth.value.getFullYear() - 1, 11, 1)
-      : new Date(firstOfSelectedMonth.value.getFullYear(), firstOfSelectedMonth.value.getMonth() - 1, 1)
+    const m = firstOfSelectedMonth.value.getMonth()
+    const y = firstOfSelectedMonth.value.getFullYear()
+    firstOfSelectedMonth.value = m === 0
+      ? new Date(y - 1, 11, 1)
+      : new Date(y, m - 1, 1)
   }
 
   function monthForward() {
-    firstOfSelectedMonth.value = firstOfSelectedMonth.value.getMonth() === 11
-      ? new Date(firstOfSelectedMonth.value.getFullYear() + 1, 0, 1)
-      : new Date(firstOfSelectedMonth.value.getFullYear(), firstOfSelectedMonth.value.getMonth() + 1, 1)
+    const m = firstOfSelectedMonth.value.getMonth()
+    const y = firstOfSelectedMonth.value.getFullYear()
+    firstOfSelectedMonth.value = m === 11
+      ? new Date(y + 1, 0, 1)
+      : new Date(y, m + 1, 1)
   }
 
   function numExpensesToApprove(): number {
-    return 0
-    // const tors = managedTimeOffRequests()
-    // if (tors) {
-    //   return tors.filter(tor => tor.acknowledged == null).length
-    // } else {
-    //   return 0
-    // }
+    return purchaseStore.numExpensesToApprove
+  }
+
+  function numExpensesFiscalToApprove(): number {
+    return purchaseStore.numExpensesFiscalToApprove
   }
 
   onMounted(() => {

@@ -139,6 +139,7 @@ export interface SimpleEmployeeRetrieve {
   name: string
   legal_name: string
   title: string
+  is_expense_approver: boolean
 }
 
 export const emptyEmployee: SimpleEmployeeRetrieve = {

@@ -137,6 +137,9 @@
                 v-on:input="scope.value=$event"
                 v-on:clear="scope.value=emptyEmployee"
                 :readOnly=false
+                :employeeFilterFn="(employee: SimpleEmployeeRetrieve) => {
+                  return employee.is_expense_approver
+                }"
               />
             </q-popup-edit>
           </q-td>
@@ -236,10 +239,6 @@
 </template>
 
 <style scoped lang="scss">
-  .approval-notes {
-    white-space: normal;
-  }
-
   .gl-percent {
     max-width: 80px;
   }
@@ -419,7 +418,6 @@ function onUnsubmitDialog() {
 }
 
 function retrieveThisMonthExpenses(): Promise<void> {
-  // Get all my expenses for this month
   return new Promise((resolve, reject) => {
     purchaseStore.getExpenseMonths(props.yearInt, props.monthInt)
       .then(() => {

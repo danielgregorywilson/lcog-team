@@ -225,9 +225,14 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
 class SimpleEmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        fields = ['pk', 'name', 'legal_name', 'title']
+        fields = ['pk', 'name', 'legal_name', 'title', 'is_expense_approver']
 
     title = serializers.CharField(source='job_title')
+    is_expense_approver = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_is_expense_approver(employee):
+        return employee.is_expense_approver()
 
 
 class EmployeeEmailSerializer(serializers.ModelSerializer):

@@ -28,7 +28,10 @@
     >
       <template v-slot:body="props">
 
-        <q-tr :props="props" :class="rowSubmitted(props.row)?'bg-grey':''">
+        <q-tr
+          :props="props"
+          :class="rowSubmitted(props.row)?'bg-grey':'cursor-pointer'"
+        >
           <q-td key="name" :props="props">
             {{ props.row.name }}
             <q-popup-edit

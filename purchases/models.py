@@ -98,15 +98,15 @@ class ExpenseBaseModel(models.Model):
     STATUS_SUBMITTED = 'submitted'
     STATUS_APPROVER_APPROVED = 'approver_approved'
     STATUS_APPROVER_DENIED = 'approver_denied'
-    STATUS_FINANCE_APPROVED = 'finance_approved'
-    STATUS_FINANCE_DENIED = 'finance_denied'
+    STATUS_FISCAL_APPROVED = 'fiscal_approved'
+    STATUS_FISCAL_DENIED = 'fiscal_denied'
     STATUS_CHOICES = (
         (STATUS_DRAFT, 'Draft'),
         (STATUS_SUBMITTED, 'Submitted'),
         (STATUS_APPROVER_APPROVED, 'Approver Approved'),
         (STATUS_APPROVER_DENIED, 'Approver Denied'),
-        (STATUS_FINANCE_APPROVED, 'Finance Approved'),
-        (STATUS_FINANCE_DENIED, 'Finance Denied'),
+        (STATUS_FISCAL_APPROVED, 'Fiscal Approved'),
+        (STATUS_FISCAL_DENIED, 'Fiscal Denied'),
     )
 
     status = models.CharField(

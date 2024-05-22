@@ -19,17 +19,37 @@
         class="expense-table"
       >
         <template v-slot:body="props">
-          <q-tr :props="props" :no-hover="!expenseMonthManagerApproved(props.row)" @click="navigateToDetail(expenseMonthManagerApproved(props.row), props.row.employeePk)">
+          <q-tr
+            :props="props"
+            :no-hover="!expenseMonthManagerApproved(props.row)"
+            @click="navigateToDetail(
+              expenseMonthManagerApproved(props.row), props.row.employeePk
+            )"
+          >
             <q-td key="employee" :props="props">
               {{ props.row.employee.name }}
             </q-td>
             <q-td key="submitted" :props="props">
-              <q-icon v-if="expenseMonthManagerApproved(props.row)" name="check" size="lg" />
+              <q-icon
+                v-if="expenseMonthManagerApproved(props.row)"
+                name="check"
+                size="lg"
+              />
               <q-icon v-else color="red" name="cancel" size="lg" />
             </q-td>
             <q-td key="approved" :props="props">
-              <q-icon v-if="expenseMonthFiscalApproved(props.row)" color="green" name="check_circle" size="lg" />
-              <q-icon v-else-if="expenseMonthFiscalDenied(props.row)" color="red" name="cancel" size="lg" />
+              <q-icon
+                v-if="expenseMonthFiscalApproved(props.row)"
+                color="green"
+                name="check_circle"
+                size="lg"
+              />
+              <q-icon
+                v-else-if="expenseMonthFiscalDenied(props.row)"
+                color="red"
+                name="cancel"
+                size="lg"
+              />
             </q-td>
           </q-tr>
         </template>
@@ -47,8 +67,6 @@ import { useRouter } from 'vue-router'
 import { handlePromiseError } from 'src/stores'
 import { usePurchaseStore } from 'src/stores/purchase';
 import { ExpenseMonth } from 'src/types';
-
-// type Expense = {date: string, isToday: boolean}
 
 const router = useRouter()
 const purchaseStore = usePurchaseStore()
@@ -70,9 +88,18 @@ const pagination = {
 }
 
 const columns = [
-  { name: 'employee', required: true, label: 'Name', sortable: true, align: 'left'},
-  { name: 'submitted', label: 'Submitted', field: 'submitted', sortable: true, align: 'center'},
-  { name: 'approved', label: 'Approved', field: 'approved', sortable: true, align: 'center' }
+  {
+    name: 'employee', required: true, label: 'Name', sortable: true,
+    align: 'left'
+  },
+  {
+    name: 'submitted', label: 'Submitted', field: 'submitted', sortable: true,
+    align: 'center'
+  },
+  {
+    name: 'approved', label: 'Approved', field: 'approved', sortable: true,
+    align: 'center'
+  }
 ]
 
 function viewingThisMonth() {

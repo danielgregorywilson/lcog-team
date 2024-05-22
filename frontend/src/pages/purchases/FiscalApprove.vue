@@ -19,7 +19,7 @@
         class="expense-table"
       >
         <template v-slot:body="props">
-          <q-tr :props="props" :no-hover="!props.row.submitted" @click="navigateToDetail(props.row.submitted, props.row.employeePk)">
+          <q-tr :props="props" :no-hover="!expenseMonthManagerApproved(props.row)" @click="navigateToDetail(expenseMonthManagerApproved(props.row), props.row.employeePk)">
             <q-td key="employee" :props="props">
               {{ props.row.employee.name }}
             </q-td>

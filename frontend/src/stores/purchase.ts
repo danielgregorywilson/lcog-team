@@ -154,12 +154,16 @@ export const usePurchaseStore = defineStore('purchase', {
 
     getFiscalExpenseMonths(
       yearInt: number | null = null,
-      monthInt: number | null = null
+      monthInt: number | null = null,
+      employeePK: number | null = null 
     ): Promise<null> {
       return new Promise((resolve, reject) => {
         let params = '?fiscal=true'
         if (!!yearInt && !!monthInt) {
           params += `&year=${ yearInt }&month=${ monthInt }`
+        }
+        if (!!employeePK) {
+          params += `&employee=${ employeePK }`
         }
         axios({
           url: `${ apiURL }api/v1/expensemonth${ params }`
@@ -167,15 +171,26 @@ export const usePurchaseStore = defineStore('purchase', {
           .then(resp => {
             const ems = resp.data.results
             this.fiscalExpenseMonths = ems
-            // let expenses = [] as Array<Expense>
-            // for (const em of ems) {
-            //   expenses = expenses.concat(em.expenses)
-            // }
-            // this.myExpenses = expenses
             resolve(resp.data.results)
           })
           .catch(e => {
             handlePromiseError(reject, 'Error getting fiscal expense months', e)
+          })
+      })
+    },
+
+    approveExpenseMonth(pk: number, approve: boolean): Promise<ExpenseMonth> {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/expensemonth/${ pk }/approve`,
+          method: 'PUT',
+          data: { approve }
+        })
+          .then(resp => {
+            resolve(resp.data)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error approving expense month', e)
           })
       })
     },

@@ -1,18 +1,18 @@
 <template>
 <div class="q-mt-md">
   <div class="row q-gutter-md">
-    <div v-if="approved" class="row items-center">
+    <div v-if="selectedMonthApproved()" class="row items-center">
       <q-icon color="green" name="check_circle" size="lg" class="q-mr-sm" />
       <div>Approved</div>
     </div>
-    <div v-else-if="denied" class="row items-center">
+    <div v-else-if="selectedMonthDenied()" class="row items-center">
       <q-icon color="red" name="cancel" size="lg" class="q-mr-sm" />
       <div>Denied</div>
     </div>
   </div>
   <div class="q-mt-md">
     <q-spinner-grid
-      v-if="!calendarLoaded"
+      v-if="!expensesLoaded"
       class="spinner"
       color="primary"
       size="xl"
@@ -21,7 +21,7 @@
       <q-table
         flat bordered
         :title="tableTitleDisplay()"
-        :rows="rows"
+        :rows="selectedMonthExpenseMonthExpenses()"
         :columns="columns"
         row-key="name"
         binary-state-sort
@@ -55,8 +55,8 @@
         </template>
       </q-table>
       <div class="q-mt-sm q-gutter-md">
-        <q-btn :class="approved?'bg-green':''" @click="showApproveDialog = true">Approve Expenses</q-btn>
-        <q-btn :class="denied?'bg-red':''" @click="showDenyDialog = true">Deny Expenses</q-btn>
+        <q-btn :class="selectedMonthApproved()?'bg-green':''" @click="showApproveDialog = true">Approve Expenses</q-btn>
+        <q-btn :class="selectedMonthDenied()?'bg-red':''" @click="showDenyDialog = true">Deny Expenses</q-btn>
       </div>
     </div>
   </div>
@@ -122,25 +122,49 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
 import { readableDate } from 'src/filters'
+import { handlePromiseError } from 'src/stores'
+import { usePeopleStore } from 'src/stores/people'
+import { usePurchaseStore } from 'src/stores/purchase'
+import { Expense, ExpenseMonth } from 'src/types'
+import { getRouteParam } from 'src/utils'
 
+
+const route = useRoute()
 const quasar = useQuasar()
+const peopleStore = usePeopleStore()
+const purchaseStore = usePurchaseStore()
 
-let approved = ref(false)
-let denied = ref(false)
-let calendarLoaded = ref(true)
+const props = defineProps<{
+  monthDisplay: string
+  monthInt: number
+  yearInt: number
+}>()
+
 let showApproveDialog = ref(false)
 let showDenyDialog = ref(false)
 let denyDialogMessage = ref('')
 
-let employeeName = 'Dan Wilson'
+let employeeName = ref('')
+let employeePK = ref(0)
 
-const props = defineProps<{
-  monthDisplay: string
-  monthInt: string
-  yearInt: string
-}>()
+let thisMonthLoaded = ref(false)
+let allExpensesLoaded = ref(false)
+
+let firstOfThisMonth = ref(new Date())
+let firstOfSelectedMonth = ref(new Date())
+
+function viewingThisMonth() {
+  return firstOfSelectedMonth.value.getTime() ===
+    firstOfThisMonth.value.getTime()
+}
+
+function expensesLoaded() {
+  return (viewingThisMonth() && thisMonthLoaded.value) ||
+    allExpensesLoaded.value
+}
 
 const pagination = {
   rowsPerPage: '50'
@@ -169,156 +193,173 @@ const columns = [
   { name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' }
 ]
 
-const rows = ref([
-  {
-    name: 'Frozen Yogurt',
-    date: '2023-10-01',
-    job: '',
-    gl: '43-45045-232',
-    approver: { 'pk': 5, 'name': 'Dan Wilson', 'legal_name': 'Daniel Wilson' },
-    approvalNotes: 'Dan feigned faintness so I fetched froyo. Follow?',
-    receipt: 'file.txt'
-  },
-  {
-    name: 'Ice cream sandwich',
-    date: '2023-10-04',
-    job: '123',
-    gl: '55-55555-555',
-    approver: {pk: -1, name: '', legal_name: ''},
-    approvalNotes: '',
-    receipt: 'file.txt'
-  },
-  {
-    name: 'Eclair',
-    date: '2023-10-07',
-    job: '',
-    gl: '12-34567-890',
-    approver: {pk: -1, name: '', legal_name: ''},
-    approvalNotes: '',
-    receipt: 'file.txt'
-  },
-  {
-    name: 'Cupcake',
-    date: '2023-10-07',
-    job: '',
-    gl: '43-45045-232',
-    approver: {pk: -1, name: '', legal_name: ''},
-    approvalNotes: '',
-    receipt: 'file.txt'
-  }
-])
-
-// function monthExpenses(): Expense[] {
-//   return []
-//   // const apiResults = timeOffStore.teamTimeOffRequests
-//   // let sortedTimeOff: TimeOffCalendarData = []
-//   // if (apiResults) {
-//   //   for (let i=0; i<5; i++) {
-//   //     let d = new Date(selectedMonday.value.getTime() + i*(1000 * 60 * 60 * 24))
-//   //     let isToday = d.setHours(0,0,0,0) === today.value.setHours(0,0,0,0)
-//   //     sortedTimeOff.push({
-//   //       date: d.toLocaleDateString('en-us', { weekday: 'long', month: 'long', day: 'numeric' }),
-//   //       isToday: isToday,
-//   //       requests: apiResults.filter(request => {
-//   //         const targetDateMS = d.setHours(0,0,0,0)
-
-//   //         const fromDate = new Date(request.start_date)
-//   //         const fromTZOffset = fromDate.getTimezoneOffset() * 60000
-//   //         const fromDateMS = new Date(fromDate.getTime() + fromTZOffset).setHours(0,0,0,0)
-
-//   //         const toDate = new Date(request.end_date)
-//   //         const toTZOffset = toDate.getTimezoneOffset() * 60000
-//   //         const toDateMS = new Date(toDate.getTime() + toTZOffset).setHours(0,0,0,0)
-
-//   //         if (fromDateMS <= targetDateMS && targetDateMS <= toDateMS) {
-//   //           return true
-//   //         } else {
-//   //           return false
-//   //         }
-//   //       })
-//   //     })
-//   //   }
-//   // }
-//   // return sortedTimeOff
-// }
-
 function tableTitleDisplay(): string {
-  return `${props.monthDisplay} expenses for ${employeeName}`
+  return `${props.monthDisplay} expenses for ${employeeName.value}`
 }
 
-// TODO: This currently gets all time off; should probably just get for a period
-// function retrieveTeamTimeOff(): void {
-//   timeOffStore.getTeamTimeOffRequests()
-//     .then(() => {
-//       calendarLoaded.value = true
-//     })
-//     .catch(e => {
-//       console.error('Error retrieving team time off', e)
-//     })
-// }
+function selectedMonthExpenseMonth(): ExpenseMonth | null {
+  const ems = purchaseStore.fiscalExpenseMonths
+  let em: ExpenseMonth | null = null
+  if (ems.length) {
+    const currentExpenseMonths = ems.filter(em => {
+      return em.month === props.monthInt && em.year === props.yearInt
+    })
+    if (currentExpenseMonths.length) {
+      em = currentExpenseMonths[0]
+    }
+  }
+  return em
+}
+
+function selectedMonthExpenseMonthExpenses(): Expense[] {
+  const em = selectedMonthExpenseMonth()
+  if (em) return em.expenses
+  return []
+}
+
+function selectedMonthApproved(): boolean {
+  const em = selectedMonthExpenseMonth()
+  if (em) return em.status === 'fiscal_approved'
+  return false
+}
+
+function selectedMonthDenied(): boolean {
+  const em = selectedMonthExpenseMonth()
+  if (em) return em.status === 'fiscal_denied'
+  return false
+}
+
+function getEmployeeFromRoute() {
+  return new Promise((resolve, reject) => {
+    const PK = getRouteParam(route, 'employeePK')
+    if (PK) {
+      employeePK.value = parseInt(PK)
+      peopleStore.getSimpleEmployeeDetail({pk: parseInt(PK)})
+        .then((employee) => {
+          employeeName.value = employee.name
+          resolve(employee)
+        })
+        .catch((error) => {
+          reject(error)
+        })
+    } else {
+      reject()
+    }
+  }).catch(() => {
+    quasar.notify({
+      message: 'Couldn\'t get employee',
+      color: 'negative',
+      icon: 'cancel'
+    })
+  })
+}
+
+function retrieveThisMonthEmployeeExpenses(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    purchaseStore.getFiscalExpenseMonths(props.yearInt, props.monthInt)
+      .then(() => {
+        thisMonthLoaded.value = true
+        resolve()
+      })
+      .catch((error) => {
+        handlePromiseError(reject, 'Error retrieving expenses', error)
+        reject()
+      })
+  })
+}
+
+function retrieveAllEmployeeExpenses() {
+  const employeePK = getRouteParam(route, 'employeePK')
+  if (!employeePK) {
+    return
+  }
+  purchaseStore.getFiscalExpenseMonths(null, null, parseInt(employeePK))
+    .then(() => {
+      allExpensesLoaded.value = true
+    })
+    .catch((error) => {
+      console.log('Error retrieving expenses', error)
+    })
+}
 
 function onSubmitApproveDialog() {
-  // const extraMessage = type == 'ASSIGN' ? reassignDialogMessage.value : sendDialogMessage.value
-  // workflowsStore.sendTransitionToEmailList(transitionPk.value, {
-  //   type: type,
-  //   reassignTo: assignee.value,
-  //   update: sendDialogUpdate.value,
-  //   extraMessage,
-  //   senderName: userStore.getEmployeeProfile.name,
-  //   senderEmail: userStore.getEmployeeProfile.email,
-  //   transitionUrl: route.fullPath
-  // })
-  //   .then(() => {
-  //     quasar.notify({
-  //       message: 'Sent',
-  //       color: 'positive',
-  //       icon: 'send'
-  //     })
-  //     showSendToSDSHiringLeadsDialog.value = false
-  //     showSendToFiscalDialog.value = false
-  //     showSendToHRDialog.value = false
-  //     showSendToSTNDialog.value = false
-  //     showAssigneeDialog.value = false
-  //     sendDialogUpdate.value = false
-  //     sendDialogMessage.value = ''
-  //     reassignDialogMessage.value = ''
-  //     // Signal to WorkflowInstanceDetail that the transition was assigned or
-  //     // completed, in which case we need to get the newly created process
-  //     // instances.
-  //     bus.emit('transitionReassigned', Math.random())
-  //   })
-  //   .catch(e => {
-  //     console.error('Error sending email', e)
-  //     quasar.notify({
-  //       message: 'Error sending email',
-  //       color: 'negative',
-  //       icon: 'report_problem'
-  //     })
-  //   })
   showApproveDialog.value = false
-  approved.value = true
-  denied.value = false
-  quasar.notify({
-    message: 'Approved',
-    color: 'positive',
-    icon: 'send'
-  })
+  const pk = selectedMonthExpenseMonth()?.pk
+  if (!pk) {
+    quasar.notify({
+      message: 'No expenses to approve',
+      color: 'negative',
+      icon: 'cancel'
+    })
+    return
+  } else {
+    purchaseStore.approveExpenseMonth(pk, true)
+      .then(() => {
+        retrieveAllEmployeeExpenses()
+        quasar.notify({
+          message: 'Approved',
+          color: 'positive',
+          icon: 'send'
+        })
+      })
+      .catch(() => {
+        quasar.notify({
+          message: 'Error approving expenses',
+          color: 'negative',
+          icon: 'cancel'
+        })
+      })
+  }
 }
 
 function onSubmitDenyDialog() {
   showDenyDialog.value = false
-  approved.value = false
-  denied.value = true
-  denyDialogMessage.value = ''
-  quasar.notify({
-    message: 'Denied',
-    color: 'negative',
-    icon: 'cancel'
-  })
+  const pk = selectedMonthExpenseMonth()?.pk
+  if (!pk) {
+    quasar.notify({
+      message: 'No expenses to approve',
+      color: 'negative',
+      icon: 'cancel'
+    })
+    return
+  } else {
+    purchaseStore.approveExpenseMonth(pk, false)
+      .then(() => {
+        retrieveAllEmployeeExpenses()
+        denyDialogMessage.value = ''
+        quasar.notify({
+          message: 'Denied',
+          color: 'negative',
+          icon: 'cancel'
+        })
+      })
+      .catch(() => {
+        quasar.notify({
+          message: 'Error approving expenses',
+          color: 'negative',
+          icon: 'cancel'
+        })
+      })
+    }
+}
+
+function setDates() {
+  let theFirst = new Date()
+  theFirst.setDate(1)
+  theFirst.setHours(0,0,0,0)
+  firstOfThisMonth.value = theFirst
+  firstOfSelectedMonth.value = theFirst
 }
 
 onMounted(() => {
-  // retrieveTeamTimeOff()
+  setDates()
+  getEmployeeFromRoute().then(() => {
+    if (purchaseStore.fiscalExpenseMonths.length === 0) {
+      retrieveThisMonthEmployeeExpenses().then(() => {
+        retrieveAllEmployeeExpenses()
+      })
+    }
+  })
 })
 
 </script>

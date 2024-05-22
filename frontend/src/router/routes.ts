@@ -44,7 +44,7 @@ const routes: RouteRecordRaw[] = [
             meta: { requiresAuth: true, requiresFiscal: true },
           },
           {
-            path: 'fiscal/:employeePk/:year/:month',
+            path: 'fiscal/:employeePK/:year/:month',
             name: 'fiscal-approve-detail',
             component: () => import('src/pages/purchases/FiscalApproveDetail.vue'),
             meta: { requiresAuth: true, requiresFiscal: true },

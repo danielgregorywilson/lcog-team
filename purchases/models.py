@@ -147,6 +147,11 @@ class ExpenseMonth(ExpenseBaseModel):
     )
     month = models.IntegerField()
     year = models.IntegerField()
+    approver = models.ForeignKey(
+        Employee, blank=True, null=True, on_delete=models.SET_NULL,
+        related_name='approver_of_expense_month',
+    )
+    approved_at = models.DateTimeField(blank=True, null=True)
 
     @property
     def expenses(self):

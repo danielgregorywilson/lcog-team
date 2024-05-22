@@ -178,9 +178,27 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
             fiscal = self.request.query_params.get('fiscal', None)
             # Fiscal getting all expense months
             if fiscal:
+                employeePK = self.request.query_params.get('employeePK', None)
                 if year and month:
+                    if employeePK:
+                        return ExpenseMonth.objects.filter(
+                            employee__pk=employeePK, year=year, month=month,
+                            status__in=[
+                                ExpenseMonth.STATUS_APPROVER_APPROVED,
+                                ExpenseMonth.STATUS_FISCAL_APPROVED,
+                                ExpenseMonth.STATUS_FISCAL_DENIED
+                            ]
+                        )
                     return ExpenseMonth.objects.filter(
                         year=year, month=month, status__in=[
+                            ExpenseMonth.STATUS_APPROVER_APPROVED,
+                            ExpenseMonth.STATUS_FISCAL_APPROVED,
+                            ExpenseMonth.STATUS_FISCAL_DENIED
+                        ]
+                    )
+                if employeePK:
+                    return ExpenseMonth.objects.filter(
+                        employee__pk=employeePK, status__in=[
                             ExpenseMonth.STATUS_APPROVER_APPROVED,
                             ExpenseMonth.STATUS_FISCAL_APPROVED,
                             ExpenseMonth.STATUS_FISCAL_DENIED
@@ -231,6 +249,34 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
             return Response(serialized_expense_month.data)
         except Exception as e:
             message = 'Error submitting expense month'
+            record_error(message, e, request, traceback.format_exc())
+            return Response(
+                data=message,
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+    @action(detail=True, methods=['put'])
+    def approve(self, request, pk=None):
+        """
+        Approve the expense month with the given pk.
+        """
+        try:
+            em = ExpenseMonth.objects.get(pk=pk)
+            approve = request.data.get('approve', True)
+            if approve:
+                em.status = Expense.STATUS_FISCAL_APPROVED
+                em.approver = request.user.employee
+                em.approved_at = datetime.datetime.now()
+            else:
+                em.status = Expense.STATUS_FISCAL_DENIED
+            em.save()
+            serialized_em = ExpenseMonthSerializer(
+                em, context={'request': request}
+            )
+            return Response(serialized_em.data)
+
+        except Exception as e:
+            message = 'Error approving expense month.'
             record_error(message, e, request, traceback.format_exc())
             return Response(
                 data=message,

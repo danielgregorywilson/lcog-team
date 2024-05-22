@@ -23,7 +23,7 @@
             :props="props"
             :no-hover="!expenseMonthManagerApproved(props.row)"
             @click="navigateToDetail(
-              expenseMonthManagerApproved(props.row), props.row.employeePk
+              expenseMonthManagerApproved(props.row), props.row.employee.pk
             )"
           >
             <q-td key="employee" :props="props">
@@ -161,11 +161,11 @@ function retrieveAllExpenses(): Promise<void> {
 function navigateToDetail(submitted: boolean, employeePk: number) {
   if (submitted) {
     router.push({
-      name: 'expenses-review-detail',
+      name: 'fiscal-approve-detail',
       params: {
-        employeePk: employeePk.toString(),
-        month: props.monthInt,
-        year: props.yearInt
+        employeePK: employeePk.toString(),
+        year: props.yearInt,
+        month: props.monthInt
       }
     })
     .catch(e => {

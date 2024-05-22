@@ -1,6 +1,8 @@
 import datetime
 import traceback
 
+from django.utils import timezone
+
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -137,7 +139,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             approve = request.data.get('approve', True)
             if approve:
                 expense.status = Expense.STATUS_APPROVER_APPROVED
-                expense.approved_at = datetime.datetime.now()
+                expense.approved_at = timezone.now()
                 # If all expenses for the month are approved, approve the month
                 em = ExpenseMonth.objects.get_or_create(
                     employee=expense.purchaser, year=expense.date.year,
@@ -266,7 +268,7 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
             if approve:
                 em.status = Expense.STATUS_FISCAL_APPROVED
                 em.approver = request.user.employee
-                em.approved_at = datetime.datetime.now()
+                em.approved_at = timezone.now()
             else:
                 em.status = Expense.STATUS_FISCAL_DENIED
             em.save()

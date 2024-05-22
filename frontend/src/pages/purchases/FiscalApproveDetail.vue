@@ -28,35 +28,48 @@
         :pagination="pagination"
         class="expense-table"
       >
-        <template v-slot:body="props">
-          <q-tr :props="props" no-hover>
-            <q-td key="name" :props="props">
-              {{ props.row.name }}
-            </q-td>
-            <q-td key="date" :props="props">
-              {{ readableDate(props.row.date) }}
-            </q-td>
-            <q-td key="job" :props="props">
-              <div class="text-pre-wrap">{{ props.row.job }}</div>
-            </q-td>
-            <q-td key="gl" :props="props">
-              <div class="text-pre-wrap">{{ props.row.gl }}</div>
-            </q-td>
-            <q-td key="approver" :props="props">
-              {{ props.row.approver.name }}
-            </q-td>
-            <q-td key="approvalNotes" :props="props">
-              {{ props.row.approvalNotes }}
-            </q-td>
-            <q-td key="receipt" :props="props">
-              {{ props.row.receipt }}
-            </q-td>
-          </q-tr>
+        <template v-slot:body-cell-date="props">
+          <q-td key="date" :props="props">
+            {{ readableDateNEW(props.row.date) }}
+          </q-td>
+        </template>
+        <template v-slot:body-cell-gls="props">
+          <q-td key="gls" :props="props">
+            <div
+              class="text-pre-wrap"
+              v-for="gl in props.row.gls"
+              :key="props.row.gls.indexOf(gl)"
+            >
+              {{ gl.gl }}: {{ gl.percent }}%
+            </div>
+          </q-td>
+        </template>
+        <template v-slot:body-cell-approvedAt="props">
+          <q-td key="date" :props="props">
+            {{ readableDateNEW(props.row.approved_at) }}
+          </q-td>
+        </template>
+        <template v-slot:body-cell-receipt="props">
+          <q-td key="receipt" :props="props">
+            {{ props.row.receipt?.split('/').pop() }}
+          </q-td>
         </template>
       </q-table>
       <div class="q-mt-sm q-gutter-md">
-        <q-btn :class="selectedMonthApproved()?'bg-green':''" @click="showApproveDialog = true">Approve Expenses</q-btn>
-        <q-btn :class="selectedMonthDenied()?'bg-red':''" @click="showDenyDialog = true">Deny Expenses</q-btn>
+        <q-btn
+          :class="selectedMonthApproved()?'bg-green':''"
+          :disable="selectedMonthApproved()"
+          @click="showApproveDialog = true"
+        >
+          Approve Expenses
+        </q-btn>
+        <q-btn
+          :class="selectedMonthDenied()?'bg-red':''"
+          :disable="selectedMonthDenied()"
+          @click="showDenyDialog = true"
+        >
+          Deny Expenses
+        </q-btn>
       </div>
     </div>
   </div>
@@ -124,7 +137,7 @@
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
-import { readableDate } from 'src/filters'
+import { readableDateNEW } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
 import { usePeopleStore } from 'src/stores/people'
 import { usePurchaseStore } from 'src/stores/purchase'
@@ -186,6 +199,10 @@ const columns = [
     style: 'width: 10px'
   },
   { name: 'approver', field: 'approver', label: 'Approver', align: 'center' },
+  {
+    name: 'approvedAt', field: 'approved_at', label: 'Approved At',
+    align: 'center'
+  },
   {
     name: 'approvalNotes', field: 'approvalNotes', label: 'Approval Notes',
     align: 'center', classes: 'approval-notes', headerClasses: 'approval-notes'

@@ -44,9 +44,14 @@
             </div>
           </q-td>
         </template>
+        <template v-slot:body-cell-approver="props">
+          <q-td key="date" :props="props">
+            {{ props.row.approver.name }}
+          </q-td>
+        </template>
         <template v-slot:body-cell-approvedAt="props">
           <q-td key="date" :props="props">
-            {{ readableDateNEW(props.row.approved_at) }}
+            {{ readableDateTime(props.row.approved_at) }}
           </q-td>
         </template>
         <template v-slot:body-cell-receipt="props">
@@ -137,7 +142,7 @@
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
-import { readableDateNEW } from 'src/filters'
+import { readableDateNEW, readableDateTime } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
 import { usePeopleStore } from 'src/stores/people'
 import { usePurchaseStore } from 'src/stores/purchase'

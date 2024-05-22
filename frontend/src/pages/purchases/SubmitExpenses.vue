@@ -327,7 +327,6 @@ function selectedMonthExpenses(): Expense[] {
   if (apiResults) {
     exps = apiResults.filter(exp => {
       let [y, m] = exp.date.split('-').map(s => parseInt(s))
-      m -= 1 // JS months are 0-indexed
       return m === props.monthInt && y === props.yearInt
     })
   }

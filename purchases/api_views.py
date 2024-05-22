@@ -27,6 +27,11 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             date=datetime.date.today(),
             approver=approver
         )
+        ExpenseMonth.objects.get_or_create(
+            employee=request.user.employee,
+            year=expense.date.year,
+            month=expense.date.month
+        )
         serialized_expense = ExpenseSerializer(
             expense, context={'request': request})
         return Response(serialized_expense.data)
@@ -128,6 +133,13 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             if approve:
                 expense.status = Expense.STATUS_APPROVER_APPROVED
                 expense.approved_at = datetime.datetime.now()
+                # If all expenses for the month are approved, approve the month
+                em = ExpenseMonth.objects.get_or_create(
+                    employee=expense.purchaser, year=expense.date.year,
+                    month=expense.date.month
+                )[0]
+                em.status = ExpenseMonth.STATUS_APPROVER_APPROVED
+                em.save()
             else:
                 expense.status = Expense.STATUS_APPROVER_DENIED
             expense.save()
@@ -154,8 +166,29 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
         if user.is_authenticated: 
             if user.is_superuser:
                 return super().get_queryset()
+            
             year = self.request.query_params.get('year', None)
             month = self.request.query_params.get('month', None)
+
+            fiscal = self.request.query_params.get('fiscal', None)
+            # Fiscal getting all expense months
+            if fiscal:
+                if year and month:
+                    return ExpenseMonth.objects.filter(
+                        year=year, month=month, status__in=[
+                            ExpenseMonth.STATUS_APPROVER_APPROVED,
+                            ExpenseMonth.STATUS_FISCAL_APPROVED,
+                            ExpenseMonth.STATUS_FISCAL_DENIED
+                        ]
+                    )
+                return ExpenseMonth.objects.filter(
+                    status__in=[
+                        ExpenseMonth.STATUS_APPROVER_APPROVED,
+                        ExpenseMonth.STATUS_FISCAL_APPROVED,
+                        ExpenseMonth.STATUS_FISCAL_DENIED
+                    ]
+                )
+            # Employee getting own expense months
             if year and month:
                 return ExpenseMonth.objects.filter(
                     employee=user.employee, year=year, month=month

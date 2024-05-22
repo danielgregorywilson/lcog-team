@@ -2,7 +2,7 @@
 <div class="q-mt-md">
   <div class="q-mt-md">
     <q-spinner-grid
-      v-if="!calendarLoaded"
+      v-if="!expensesLoaded"
       class="spinner"
       color="primary"
       size="xl"
@@ -43,18 +43,25 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { handlePromiseError } from 'src/stores'
+import { usePurchaseStore } from 'src/stores/purchase';
 
 // type Expense = {date: string, isToday: boolean}
 
 const router = useRouter()
+const purchaseStore = usePurchaseStore()
 
 const props = defineProps<{
   monthDisplay: string
-  monthInt: string
-  yearInt: string
+  monthInt: number
+  yearInt: number
 }>()
 
-let calendarLoaded = ref(true)
+let thisMonthLoaded = ref(false)
+let allExpensesLoaded = ref(false)
+
+let firstOfThisMonth = ref(new Date())
+let firstOfSelectedMonth = ref(new Date())
 
 const pagination = {
   rowsPerPage: '50'
@@ -87,39 +94,43 @@ const rows = ref([
   }
 ])
 
-// function monthExpenses(): Expense[] {
-//   return []
-//   const apiResults = timeOffStore.teamTimeOffRequests
-//   let sortedTimeOff: TimeOffCalendarData = []
-//   if (apiResults) {
-//     for (let i=0; i<5; i++) {
-//       let d = new Date(selectedMonday.value.getTime() + i*(1000 * 60 * 60 * 24))
-//       let isToday = d.setHours(0,0,0,0) === today.value.setHours(0,0,0,0)
-//       sortedTimeOff.push({
-//         date: d.toLocaleDateString('en-us', { weekday: 'long', month: 'long', day: 'numeric' }),
-//         isToday: isToday,
-//         requests: apiResults.filter(request => {
-//           const targetDateMS = d.setHours(0,0,0,0)
+function viewingThisMonth() {
+  return firstOfSelectedMonth.value.getTime() ===
+    firstOfThisMonth.value.getTime()
+}
 
-//           const fromDate = new Date(request.start_date)
-//           const fromTZOffset = fromDate.getTimezoneOffset() * 60000
-//           const fromDateMS = new Date(fromDate.getTime() + fromTZOffset).setHours(0,0,0,0)
+function expensesLoaded() {
+  return (viewingThisMonth() && thisMonthLoaded.value) ||
+    allExpensesLoaded.value
+}
 
-//           const toDate = new Date(request.end_date)
-//           const toTZOffset = toDate.getTimezoneOffset() * 60000
-//           const toDateMS = new Date(toDate.getTime() + toTZOffset).setHours(0,0,0,0)
+function retrieveThisMonthExpenses(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    purchaseStore.getFiscalExpenseMonths(props.yearInt, props.monthInt)
+      .then(() => {
+        thisMonthLoaded.value = true
+        resolve()
+      })
+      .catch((error) => {
+        handlePromiseError(reject, 'Error retrieving fiscal expenses', error)
+        reject()
+      })
+  })
+}
 
-//           if (fromDateMS <= targetDateMS && targetDateMS <= toDateMS) {
-//             return true
-//           } else {
-//             return false
-//           }
-//         })
-//       })
-//     }
-//   }
-//   return sortedTimeOff
-// }
+function retrieveAllExpenses(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    purchaseStore.getFiscalExpenseMonths()
+      .then(() => {
+        allExpensesLoaded.value = true
+        resolve()
+      })
+      .catch((error) => {
+        handlePromiseError(reject, 'Error retrieving fiscal expenses', error)
+        reject()
+      })
+  })
+}
 
 function navigateToDetail(submitted: boolean, employeePk: number) {
   if (submitted) {
@@ -137,8 +148,19 @@ function navigateToDetail(submitted: boolean, employeePk: number) {
   }
 }
 
+function setDates() {
+  let theFirst = new Date()
+  theFirst.setDate(1)
+  theFirst.setHours(0,0,0,0)
+  firstOfThisMonth.value = theFirst
+  firstOfSelectedMonth.value = theFirst
+}
+
 onMounted(() => {
-  // retrieveTeamTimeOff()
+  setDates()
+  retrieveThisMonthExpenses().then(() => {
+    retrieveAllExpenses()
+  })
 })
 
 </script>

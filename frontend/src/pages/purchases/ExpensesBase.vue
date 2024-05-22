@@ -56,7 +56,7 @@
       <router-view
         :monthDisplay="monthDisplay()"
         :dayInt="new Date().getDate()"
-        :monthInt="firstOfSelectedMonth.getMonth()"
+        :monthInt="firstOfSelectedMonth.getMonth() + 1"
         :yearInt="firstOfSelectedMonth.getFullYear()"
       ></router-view>
     </div>

@@ -11,6 +11,7 @@ export const usePurchaseStore = defineStore('purchase', {
     expenseMonths: [] as Array<ExpenseMonth>,
     myExpenses: [] as Array<Expense>,
     approvalExpenses: [] as Array<Expense>,
+    fiscalExpenseMonths: [] as Array<ExpenseMonth>,
     numExpensesToApprove: 0,
     numExpensesFiscalToApprove: 0
   }),
@@ -51,12 +52,12 @@ export const usePurchaseStore = defineStore('purchase', {
       yearInt: number | null = null, monthInt: number | null = null
     ): Promise<null> {
       return new Promise((resolve, reject) => {
-        let dateParam = ''
+        let params = ''
         if (!!yearInt && !!monthInt) {
-          dateParam = `?year=${ yearInt }&month=${ monthInt }`
+          params = `?year=${ yearInt }&month=${ monthInt }`
         }
         axios({
-          url: `${ apiURL }api/v1/expensemonth${ dateParam }`
+          url: `${ apiURL }api/v1/expensemonth${ params }`
         })
           .then(resp => {
             const ems = resp.data.results
@@ -143,6 +144,38 @@ export const usePurchaseStore = defineStore('purchase', {
           })
           .catch(e => {
             handlePromiseError(reject, 'Error approving expense', e)
+          })
+      })
+    },
+
+    //////////////
+    /// Fiscal ///
+    //////////////
+
+    getFiscalExpenseMonths(
+      yearInt: number | null = null,
+      monthInt: number | null = null
+    ): Promise<null> {
+      return new Promise((resolve, reject) => {
+        let params = '?fiscal=true'
+        if (!!yearInt && !!monthInt) {
+          params += `&year=${ yearInt }&month=${ monthInt }`
+        }
+        axios({
+          url: `${ apiURL }api/v1/expensemonth${ params }`
+        })
+          .then(resp => {
+            const ems = resp.data.results
+            this.fiscalExpenseMonths = ems
+            // let expenses = [] as Array<Expense>
+            // for (const em of ems) {
+            //   expenses = expenses.concat(em.expenses)
+            // }
+            // this.myExpenses = expenses
+            resolve(resp.data.results)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error getting fiscal expense months', e)
           })
       })
     },

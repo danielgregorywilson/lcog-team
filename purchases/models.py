@@ -152,6 +152,6 @@ class ExpenseMonth(ExpenseBaseModel):
     def expenses(self):
         return Expense.objects.filter(
             purchaser=self.employee,
-            date__month=self.month+1,
+            date__month=self.month,
             date__year=self.year
         )

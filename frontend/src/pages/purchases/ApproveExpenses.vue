@@ -92,16 +92,6 @@ let firstOfSelectedMonth = ref(new Date())
 
 const canApprove = ref(true)
 
-function viewingThisMonth() {
-  return firstOfSelectedMonth.value.getTime() ===
-    firstOfThisMonth.value.getTime()
-}
-
-function expensesLoaded() {
-  return (viewingThisMonth() && thisMonthLoaded.value) ||
-    allExpensesLoaded.value
-}
-
 const pagination = {
   rowsPerPage: '50'
 }
@@ -125,6 +115,16 @@ const columns = [
   { name: 'approve', label: 'Approve?', field: 'approved', align: 'center' },
 ]
 
+function viewingThisMonth() {
+  return firstOfSelectedMonth.value.getTime() ===
+    firstOfThisMonth.value.getTime()
+}
+
+function expensesLoaded() {
+  return (viewingThisMonth() && thisMonthLoaded.value) ||
+    allExpensesLoaded.value
+}
+
 function tableTitleDisplay(): string {
   return `${props.monthDisplay} - Expenses to Approve`
 }
@@ -135,7 +135,6 @@ function selectedMonthExpenses(): Expense[] {
   if (apiResults) {
     exps = apiResults.filter(exp => {
       let [y, m] = exp.date.split('-').map(s => parseInt(s))
-      m -= 1 // JS months are 0-indexed
       return m === props.monthInt && y === props.yearInt
     })
   }

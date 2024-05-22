@@ -26,4 +26,5 @@ class ExpenseMonthSerializer(serializers.HyperlinkedModelSerializer):
             'url', 'pk', 'employee', 'month', 'year', 'status', 'expenses'
         ]
 
+    employee = SimpleEmployeeSerializer(required=False)
     expenses = ExpenseSerializer(many=True, read_only=True)

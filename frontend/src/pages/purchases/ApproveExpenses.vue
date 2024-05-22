@@ -18,6 +18,11 @@
       :pagination="pagination"
       class="expense-table"
     >
+      <template v-slot:body-cell-purchaser="props">
+        <q-td key="purchaser" :props="props">
+          {{ props.row.purchaser.name }}
+        </q-td>
+      </template>
       <template v-slot:body-cell-date="props">
         <q-td key="date" :props="props">
           {{ readableDateNEW(props.row.date) }}
@@ -97,6 +102,10 @@ const pagination = {
 }
 
 const columns = [
+  { 
+    name: 'purchaser', field: 'purchaser', label: 'Purchaser', required: true,
+    align: 'left', sortable: true
+  },
   {
     name: 'name', field: 'name', label: 'Name', required: true, align: 'left',
     sortable: true

@@ -350,7 +350,7 @@ function clickAddExpense(): void {
 
   purchaseStore.createExpense({
     name: '',
-    date: `${ props.yearInt }-${ props.monthInt + 1 }-${ props.dayInt }`,
+    date: `${ props.yearInt }-${ props.monthInt }-${ props.dayInt }`,
     job: '',
     gls: [],
   })

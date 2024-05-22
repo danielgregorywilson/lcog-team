@@ -22,9 +22,14 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         approver = None
         if request.user.employee.manager is not None:
             approver = request.user.employee.manager
+        date = request.data.get('date', None)
+        if date is not None:
+            date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+        else: 
+            date = datetime.date.today()
         expense = Expense.objects.create(
             purchaser=request.user.employee,
-            date=datetime.date.today(),
+            date=date,
             approver=approver
         )
         ExpenseMonth.objects.get_or_create(

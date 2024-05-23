@@ -1,7 +1,5 @@
 import axios from 'axios'
 import { defineStore } from 'pinia'
-import ApproveExpenses from 'src/pages/purchases/ApproveExpenses.vue'
-import ExpensesBase from 'src/pages/purchases/ExpensesBase.vue'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
 import { Expense, ExpenseCreate, ExpenseMonth } from 'src/types'
@@ -105,7 +103,7 @@ export const usePurchaseStore = defineStore('purchase', {
       monthInt: number | null = null
     ): Promise<null> {
       return new Promise((resolve, reject) => {
-        let params = `?approve=true`
+        let params = '?approve=true'
         if (!!yearInt && !!monthInt) {
           params = `?year=${ yearInt }&month=${ monthInt }&approve=true`
         }

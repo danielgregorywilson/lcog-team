@@ -9,8 +9,9 @@ import {
 import routes from 'src/router/routes'
 
 import {
-  canViewDeskReservationReports, canViewExpenses, canViewMealsOnWheelsRoutes,
-  canViewTimeOffRequest, isAuthenticated, isExpenseApprover, isExpenseManager, isFiscal, isManager
+  canViewDeskReservationReports, canViewMealsOnWheelsRoutes,
+  canViewTimeOffRequest, isAuthenticated, isExpenseApprover, isExpenseManager,
+  isFiscal, isManager
 } from './guards'
 
 /*

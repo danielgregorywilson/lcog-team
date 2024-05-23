@@ -4,8 +4,12 @@
     <q-btn v-if="monthSubmitted()" @click="showUnsubmitDialog = true">
       Unsubmit
     </q-btn>
-    <q-btn v-else @click="showSubmitDialog = true">
+    <q-btn v-else @click="showSubmitDialog = true" :disabled="formErrors()">
       Submit for Approval
+    </q-btn>
+    <q-btn v-if="formErrors()" @click="showErrorsDialog = true">
+      <div>Correct Errors</div>
+      <q-icon color="orange" name="warning" size="md" />
     </q-btn>
   </div>
   <div class="q-mt-md">
@@ -193,6 +197,21 @@
     </q-table>
   </div>
 
+  <!-- Errors Dialog -->
+  <q-dialog v-model="showErrorsDialog">
+      <q-card style="width: 350px">
+        <q-list bordered separator>
+          <q-item
+            v-for="(item, index) in formErrorItems()"
+            :key="index"
+            clickable
+          >
+            <q-item-label>{{item}}</q-item-label>
+          </q-item>
+        </q-list>
+      </q-card>
+    </q-dialog>
+
   <!-- Submit to Fiscal Dialog -->
   <q-dialog v-model="showSubmitDialog">
     <q-card class="q-pa-md" style="width: 400px">
@@ -288,6 +307,7 @@ const props = defineProps<{
 let thisMonthLoaded = ref(false)
 let allExpensesLoaded = ref(false)
 
+let showErrorsDialog = ref(false)
 let showSubmitDialog = ref(false)
 let sendDialogMessage = ref('')
 let showUnsubmitDialog = ref(false)
@@ -375,21 +395,36 @@ function clickAddExpense(): void {
     })
 }
 
-function formErrorItems(): Array<[string, string]> {
-  let errorItems: Array<[string, string]> = []
-  // if (computerTypeCurrentVal.value == 'New' && !computerGLCurrentVal.value) {
-  //   errorItems.push(
-  //     ['computer-type', 'Provide a valid GL code for computer purchase']
-  //   )
-  // }
-  // if (
-  //   computerTypeCurrentVal.value == 'Repurposed' &&
-  //   !computerDescriptionCurrentVal.value
-  // ) {
-  //   errorItems.push(
-  //     ['computer-type', 'Provide a description of existing computer']
-  //   )
-  // }
+function formErrorItems() {
+  let errorItems: string[] = []
+  for (let exp of selectedMonthExpenses()) {
+    if (!exp.name) {
+      errorItems.push(`Provide a name for the expense on ${exp.date}`)
+    }
+    if (!exp.job) {
+      errorItems.push(`Provide a job number for ${exp.name}`)
+    }
+    for (let gl of exp.gls) {
+      if (!gl.gl || gl.gl.length !== 12) {
+        errorItems.push(`Provide a valid GL code for each GL row in ${exp.name}`)
+      }
+      if (!gl.percent) {
+        errorItems.push(`Provide a GL percentage for each GL row in ${exp.name}`)
+      }
+    }
+    const GLsTotal = exp.gls.reduce((acc, gl) => acc + parseFloat(gl.percent), 0)
+    if (GLsTotal !== 100) {
+      errorItems.push(`GL percentages of ${exp.name} must add to 100`)
+    }
+    if (!exp.approver || exp.approver?.pk == -1) {
+      errorItems.push(`Provide an approver for ${exp.name}`)
+    }
+    if (!exp.receipt) {
+      errorItems.push(
+        `Provide a receipt or appropriate documentation for ${exp.name}`
+      )
+    }
+  }
   return errorItems
 }
 

@@ -359,7 +359,7 @@ export interface Expense extends ExpenseBase {
   gls: Array<GL>
   purchaser: SimpleEmployeeRetrieve
   approver: SimpleEmployeeRetrieve
-  receipt_link: string
+  receipt: string
   submitted: boolean
 }
 

@@ -56,7 +56,10 @@
         </template>
         <template v-slot:body-cell-receipt="props">
           <q-td key="receipt" :props="props">
-            {{ props.row.receipt?.split('/').pop() }}
+            <DocumentViewer
+              v-if="props.row.receipt"
+              :documentUrl="props.row.receipt"
+            />
           </q-td>
         </template>
       </q-table>
@@ -142,6 +145,8 @@
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useQuasar } from 'quasar'
+
+import DocumentViewer from 'src/components/DocumentViewer.vue'
 import { readableDateNEW, readableDateTime } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
 import { usePeopleStore } from 'src/stores/people'

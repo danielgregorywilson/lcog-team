@@ -41,7 +41,10 @@
       </template>
       <template v-slot:body-cell-receipt="props">
         <q-td key="receipt" :props="props">
-          {{ props.row.receipt?.split('/').pop() }}
+          <DocumentViewer
+            v-if="props.row.receipt"
+            :documentUrl="props.row.receipt"
+          />
         </q-td>
       </template>
       <template v-slot:body-cell-approve="props">
@@ -73,6 +76,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 
+import DocumentViewer from 'src/components/DocumentViewer.vue'
 import { readableDateNEW } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
 import { usePurchaseStore } from 'src/stores/purchase'

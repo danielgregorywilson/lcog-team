@@ -146,28 +146,40 @@
               />
             </q-popup-edit>
           </q-td>
-          <q-td key="receipt" :props="props">
-            {{ props.row.receipt?.split('/').pop() }}
-            <q-popup-edit
-              v-if="!rowSubmitted(props.row)"
-              v-model="props.row.receipt"
-              buttons
-              v-slot="scope"
+          <q-td key="receipt" :props="props" class="row justify-center">
+            <DocumentViewer
+              v-if="props.row.receipt"
+              :documentUrl="props.row.receipt"
+            />
+            <!-- Button to upload file -->
+            <q-btn icon="cloud_upload"
+              flat
+              :class="rowSubmitted(props.row) ? 'cursor-not-allowed' : ''"
             >
-              <FileUploader
-                :file="scope.value"
-                contentTypeAppLabel="purchases"
-                contentTypeModel="expense"
-                :objectPk="props.row.pk.toString()"
-                :readOnly=false
-                v-on="{
-                  'uploaded': (url: string) => {
-                    updateReceipt(props.row.pk, url)
-                    retrieveAllMyExpenses()
-                  }
-                }"
-              />
-            </q-popup-edit>
+              <q-popup-edit
+                v-if="!rowSubmitted(props.row)"
+                v-model="props.row.receipt"
+                buttons
+                v-slot="scope"
+              >
+                <FileUploader
+                  :file="scope.value"
+                  contentTypeAppLabel="purchases"
+                  contentTypeModel="expense"
+                  :objectPk="props.row.pk.toString()"
+                  :readOnly=false
+                  v-on="{
+                    'uploaded': (url: string) => {
+                      updateReceipt(props.row.pk, url)
+                      retrieveAllMyExpenses()
+                    }
+                  }"
+                />
+              </q-popup-edit>
+            </q-btn>
+
+
+            
           </q-td>
         </q-tr>
       </template>
@@ -255,6 +267,7 @@
 import { onMounted, ref } from 'vue'
 import { useQuasar } from 'quasar'
 
+import DocumentViewer from 'src/components/DocumentViewer.vue'
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import FileUploader from 'src/components/FileUploader.vue'
 import { readableDateNEW } from 'src/filters'

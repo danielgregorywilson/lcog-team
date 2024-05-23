@@ -151,12 +151,6 @@ const navLinks: Array<LinkData> = [
     canViewExpenses: true
   },
   {
-    title: 'Credit Card Expense Reports',
-    icon: 'request_quote',
-    link: '/expenses/review',
-    isFiscalEmployee: true
-  },
-  {
     title: 'Performance Reviews',
     icon: 'assignment_turned_in',
     link: '/reviews',

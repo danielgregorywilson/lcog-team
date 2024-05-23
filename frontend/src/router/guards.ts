@@ -25,11 +25,30 @@ export function canViewDeskReservationReports(): Promise<boolean> {
 export function canViewExpenses() {
   if (
     cookies.get('is_expense_manager') == 'true' ||
-    cookies.get('is_expense_approver') == 'true'
+    cookies.get('is_expense_approver') == 'true' ||
+    cookies.get('is_fiscal_employee') == 'true'
   ) {
     return true
   } else {
     console.info('User cannot view Expenses. Redirecting to dashboard.')
+    return false
+  }
+}
+
+export function isExpenseManager() {
+  if (cookies.get('is_expense_manager') == 'true') {
+    return true
+  } else {
+    console.info('User is not an expense manager. Redirecting to dashboard.')
+    return false
+  }
+}
+
+export function isExpenseApprover() {
+  if (cookies.get('is_expense_approver') == 'true') {
+    return true
+  } else {
+    console.info('User is not an expense approver. Redirecting to dashboard.')
     return false
   }
 }

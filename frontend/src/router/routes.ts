@@ -1,4 +1,5 @@
 import { RouteRecordRaw } from 'vue-router'
+import { isExpenseApprover, isExpenseManager, isFiscal } from './guards'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -24,18 +25,29 @@ const routes: RouteRecordRaw[] = [
         path: 'expenses',
         name: 'expenses',
         component: () => import('src/pages/purchases/ExpensesBase.vue'),
+        redirect: () => {
+          if (isFiscal()) {
+            return { name: 'fiscal-approve' }
+          } else if (isExpenseApprover()) {
+            return { name: 'approve-expenses' }
+          } else if (isExpenseManager()) {
+            return { name: 'submit-expenses' }
+          } else {
+            return { name: 'dashboard' }
+          }
+        },
         children: [
           {
             path: 'submit',
             name: 'submit-expenses',
             component: () => import('src/pages/purchases/SubmitExpenses.vue'),
-            meta: { requiresAuth: true, requiresCanViewExpenses: true },
+            meta: { requiresAuth: true, requiresExpenseManager: true },
           },
           {
             path: 'approve',
             name: 'approve-expenses',
             component: () => import('src/pages/purchases/ApproveExpenses.vue'),
-            meta: { requiresAuth: true, requiresFiscal: true },
+            meta: { requiresAuth: true, requiresExpenseApprover: true },
           },
           {
             path: 'fiscal',

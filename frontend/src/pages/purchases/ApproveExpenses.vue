@@ -80,11 +80,9 @@ import DocumentViewer from 'src/components/DocumentViewer.vue'
 import { readableDateNEW } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
 import { usePurchaseStore } from 'src/stores/purchase'
-import { useUserStore } from 'src/stores/user'
 import { Expense } from 'src/types'
 
 const purchaseStore = usePurchaseStore()
-const userStore = useUserStore()
 
 const props = defineProps<{
   monthDisplay: string

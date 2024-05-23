@@ -169,6 +169,7 @@ export const usePurchaseStore = defineStore('purchase', {
           .then(resp => {
             const ems = resp.data.results
             this.fiscalExpenseMonths = ems
+            this.numExpensesFiscalToApprove = ems.length
             resolve(resp.data.results)
           })
           .catch(e => {

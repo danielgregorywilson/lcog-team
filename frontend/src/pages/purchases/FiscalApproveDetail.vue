@@ -153,7 +153,7 @@
   </style>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 
@@ -451,6 +451,24 @@ onMounted(() => {
       })
     }
   })
+})
+
+watch(() => props.monthInt, (first, second) => {
+  if (first !== second) {
+    monthInt.value = props.monthInt
+  }
+})
+
+watch(() => props.yearInt, (first, second) => {
+  if (first !== second) {
+    yearInt.value = props.yearInt
+  }
+})
+
+watch(() => props.monthDisplay, (first, second) => {
+  if (first !== second) {
+    monthDisplay.value = props.monthDisplay
+  }
 })
 
 </script>

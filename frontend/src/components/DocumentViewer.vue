@@ -1,7 +1,8 @@
 <template>
 <div>
   <q-btn
-    :label="props.documentUrl.split('/').pop()"
+    :label="props.iconButton ? '' : props.documentUrl.split('/').pop()"
+    :icon="props.iconButton ? 'file_open' : ''"
     @click="showDialog = true"
     flat
   />
@@ -54,6 +55,7 @@ import { ref } from 'vue'
 import axios from 'axios'
 
 const props = defineProps<{
+  iconButton?: boolean
   documentUrl: string
 }>()
 

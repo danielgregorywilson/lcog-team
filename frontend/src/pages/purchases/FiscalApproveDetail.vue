@@ -23,6 +23,8 @@
         :title="tableTitleDisplay()"
         :rows="selectedMonthExpenseMonthExpenses()"
         :columns="props.print ? printColumns : columns"
+        :dense="$q.screen.lt.lg"
+        :grid="$q.screen.lt.md"
         row-key="name"
         binary-state-sort
         :pagination="pagination"
@@ -50,7 +52,7 @@
           </q-td>
         </template>
         <template v-slot:body-cell-approvedAt="props">
-          <q-td key="date" :props="props">
+          <q-td key="date" :props="props" style="white-space: normal;">
             {{ readableDateTime(props.row.approved_at) }}
           </q-td>
         </template>
@@ -59,8 +61,66 @@
             <DocumentViewer
               v-if="props.row.receipt"
               :documentUrl="props.row.receipt"
+              iconButton
             />
           </q-td>
+        </template>
+        <!-- For grid mode, we need to specify everything in order for our action buttons to render -->
+        <template v-slot:item="props">
+          <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
+            <q-card class="q-py-sm">
+              <q-list dense>
+                <q-item v-for="col in props.cols" :key="col.name">
+                  <div class="q-table__grid-item-row">
+                    <div class="q-table__grid-item-title">{{ col.label }}</div>
+                    <div
+                      class="q-table__grid-item-value"
+                      v-if="col.label == 'Date'"
+                    >
+                      {{ readableDateNEW(col.value) }}
+                    </div>
+                    <div
+                      class="q-table__grid-item-value"
+                      v-else-if="col.label == 'GL Codes'"
+                    >
+                      <div
+                        class="text-pre-wrap"
+                        v-for="gl in props.row.gls"
+                        :key="props.row.gls.indexOf(gl)"
+                      >
+                        {{ gl.gl }}: {{ gl.percent }}%
+                      </div>
+                    </div>
+                    <div
+                      class="q-table__grid-item-value"
+                      v-else-if="col.label == 'Approver'"
+                    >
+                      {{ col.value.name }}
+                    </div>
+                    <div
+                      class="q-table__grid-item-value"
+                      v-else-if="col.label == 'Approved At'"
+                    >
+                      {{ readableDateTime(col.value) }}
+                    </div>
+                    <div
+                      class="q-table__grid-item-value"
+                      v-else-if="col.label == 'Receipt'"
+                    >
+                      <DocumentViewer
+                        v-if="col.value"
+                        :documentUrl="col.value"
+                        iconButton
+                      />
+                    </div>
+                    <div class="q-table__grid-item-value" v-else>
+                      {{ col.value }}
+                    </div>
+                  </div>
+                </q-item>
+              </q-list>
+            </q-card>
+          </div>
         </template>
       </q-table>
       <div v-if="!props.print" class="q-mt-sm q-gutter-md row justify-between">
@@ -222,7 +282,7 @@ const printColumns = [
     name: 'job', field: 'job', label: 'Job #', align: 'center', sortable: true
   },
   {
-    name: 'gl', field: 'gl', label: 'GL Code', align: 'center', sortable: true,
+    name: 'gls', field: 'gls', label: 'GL Codes', align: 'center', sortable: true,
     style: 'width: 10px'
   },
   { name: 'approver', field: 'approver', label: 'Approver', align: 'center' },

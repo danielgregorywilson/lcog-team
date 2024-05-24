@@ -480,9 +480,6 @@ function formErrorItems() {
     if (!exp.name) {
       errorItems.push(`Provide a name for the expense on ${exp.date}`)
     }
-    if (!exp.job) {
-      errorItems.push(`Provide a job number for ${exp.name}`)
-    }
     for (let gl of exp.gls) {
       if (!gl.gl || gl.gl.length !== 12) {
         errorItems.push(`Provide a valid GL code for each GL row in ${exp.name}`)

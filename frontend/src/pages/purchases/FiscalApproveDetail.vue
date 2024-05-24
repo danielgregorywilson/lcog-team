@@ -22,7 +22,7 @@
         flat bordered
         :title="tableTitleDisplay()"
         :rows="selectedMonthExpenseMonthExpenses()"
-        :columns="columns"
+        :columns="props.print ? printColumns : columns"
         row-key="name"
         binary-state-sort
         :pagination="pagination"
@@ -83,6 +83,13 @@
         </div>
         <q-btn @click="navigateToPrintView()" label="Print" />
       </div>
+    </div>
+  </div>
+
+  <!-- Display Receipts for Print View -->
+  <div v-if="props.print">
+    <div v-for="expense in selectedMonthExpenseMonthExpenses()" :key="expense.pk">
+      <q-img :src="expense.receipt" />
     </div>
   </div>
 
@@ -203,7 +210,7 @@ const pagination = {
   rowsPerPage: '50'
 }
 
-const columns = [
+const printColumns = [
 {
     name: 'name', field: 'name', label: 'Name', required: true, align: 'left',
     sortable: true
@@ -223,12 +230,11 @@ const columns = [
     name: 'approvedAt', field: 'approved_at', label: 'Approved At',
     align: 'center'
   },
-  {
-    name: 'approvalNotes', field: 'approvalNotes', label: 'Approval Notes',
-    align: 'center', classes: 'approval-notes', headerClasses: 'approval-notes'
-  },
-  { name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' }
 ]
+
+const columns = printColumns.concat(
+  [{ name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' }]
+)
 
 function tableTitleDisplay(): string {
   return `${monthDisplay.value} expenses for ${employeeName.value}`

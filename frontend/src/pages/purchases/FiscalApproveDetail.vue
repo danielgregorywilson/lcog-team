@@ -420,11 +420,11 @@ function handlePrint() {
   } else {
     monthInt.value = parseInt(monthParam)
     yearInt.value = parseInt(yearParam)
-    const m = firstOfSelectedMonth.value.toLocaleDateString(
-      'en-us', { month: 'long' }
-    )
-    const y = firstOfSelectedMonth.value.getFullYear()
-    monthDisplay.value = `${m} ${y}`
+    var months = [
+      'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+      'September', 'October', 'November', 'December'
+    ]
+    monthDisplay.value = `${months[monthInt.value - 1]} ${yearInt.value}`
   }
   getEmployeeFromRoute().then(() => {
     if (purchaseStore.fiscalExpenseMonths.length === 0) {
@@ -438,10 +438,10 @@ function handlePrint() {
 }
 
 onMounted(() => {
-  setDates().then(() => {
-    if (props.print) {
-      handlePrint()
-    } else {
+  if (props.print) {
+    handlePrint()
+  } else {
+    setDates().then(() => {
       getEmployeeFromRoute().then(() => {
         if (purchaseStore.fiscalExpenseMonths.length === 0) {
           retrieveThisMonthEmployeeExpenses().then(() => {
@@ -449,8 +449,8 @@ onMounted(() => {
           })
         }
       })
-    }
-  })
+    })
+  }
 })
 
 watch(() => props.monthInt, (first, second) => {

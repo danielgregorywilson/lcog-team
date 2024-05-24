@@ -167,9 +167,11 @@ export const usePurchaseStore = defineStore('purchase', {
           url: `${ apiURL }api/v1/expensemonth${ params }`
         })
           .then(resp => {
-            const ems = resp.data.results
+            const ems: ExpenseMonth[] = resp.data.results
             this.fiscalExpenseMonths = ems
-            this.numExpensesFiscalToApprove = ems.length
+            this.numExpensesFiscalToApprove = ems.filter(
+              em => em.status == 'approver_approved'
+            ).length
             resolve(resp.data.results)
           })
           .catch(e => {

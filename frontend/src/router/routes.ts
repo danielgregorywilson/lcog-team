@@ -445,6 +445,17 @@ const routes: RouteRecordRaw[] = [
         props: {
           print: true
         }
+      },
+      {
+        path: 'expenses/fiscal/:employeePK/:year/:month',
+        name: 'expense-month-print',
+        component: () => {
+          return import('src/pages/purchases/FiscalApproveDetail.vue')
+        },
+        meta: { requiresAuth: true, requiresFiscal: true },
+        props: {
+          print: true
+        }
       }
     ]
   },

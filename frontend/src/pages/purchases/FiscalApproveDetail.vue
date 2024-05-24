@@ -1,6 +1,6 @@
 <template>
 <div class="q-mt-md">
-  <div class="row q-gutter-md">
+  <div v-if="!props.print" class="row q-gutter-md">
     <div v-if="selectedMonthApproved()" class="row items-center">
       <q-icon color="green" name="check_circle" size="lg" class="q-mr-sm" />
       <div>Approved</div>
@@ -63,21 +63,25 @@
           </q-td>
         </template>
       </q-table>
-      <div class="q-mt-sm q-gutter-md">
-        <q-btn
-          :class="selectedMonthApproved()?'bg-green':''"
-          :disable="selectedMonthApproved()"
-          @click="showApproveDialog = true"
-        >
-          Approve Expenses
-        </q-btn>
-        <q-btn
-          :class="selectedMonthDenied()?'bg-red':''"
-          :disable="selectedMonthDenied()"
-          @click="showDenyDialog = true"
-        >
-          Deny Expenses
-        </q-btn>
+      <div v-if="!props.print" class="q-mt-sm q-gutter-md row justify-between">
+        <div>
+          <q-btn
+            :class="selectedMonthApproved()?'bg-green':''"
+            :disable="selectedMonthApproved()"
+            @click="showApproveDialog = true"
+            class="q-mr-md"
+          >
+            Approve Expenses
+          </q-btn>
+          <q-btn
+            :class="selectedMonthDenied()?'bg-red':''"
+            :disable="selectedMonthDenied()"
+            @click="showDenyDialog = true"
+          >
+            Deny Expenses
+          </q-btn>
+        </div>
+        <q-btn @click="navigateToPrintView()" label="Print" />
       </div>
     </div>
   </div>
@@ -143,7 +147,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useQuasar } from 'quasar'
 
 import DocumentViewer from 'src/components/DocumentViewer.vue'
@@ -156,19 +160,25 @@ import { getRouteParam } from 'src/utils'
 
 
 const route = useRoute()
+const router = useRouter()
 const quasar = useQuasar()
 const peopleStore = usePeopleStore()
 const purchaseStore = usePurchaseStore()
 
 const props = defineProps<{
-  monthDisplay: string
-  monthInt: number
-  yearInt: number
+  monthDisplay?: string
+  monthInt?: number
+  yearInt?: number
+  print?: boolean
 }>()
 
 let showApproveDialog = ref(false)
 let showDenyDialog = ref(false)
 let denyDialogMessage = ref('')
+
+let monthDisplay = ref(props.monthDisplay)
+let monthInt = ref(props.monthInt)
+let yearInt = ref(props.yearInt)
 
 let employeeName = ref('')
 let employeePK = ref(0)
@@ -221,7 +231,7 @@ const columns = [
 ]
 
 function tableTitleDisplay(): string {
-  return `${props.monthDisplay} expenses for ${employeeName.value}`
+  return `${monthDisplay.value} expenses for ${employeeName.value}`
 }
 
 function selectedMonthExpenseMonth(): ExpenseMonth | null {
@@ -229,7 +239,7 @@ function selectedMonthExpenseMonth(): ExpenseMonth | null {
   let em: ExpenseMonth | null = null
   if (ems.length) {
     const currentExpenseMonths = ems.filter(em => {
-      return em.month === props.monthInt && em.year === props.yearInt
+      return em.month === monthInt.value && em.year === yearInt.value
     })
     if (currentExpenseMonths.length) {
       em = currentExpenseMonths[0]
@@ -283,7 +293,7 @@ function getEmployeeFromRoute() {
 
 function retrieveThisMonthEmployeeExpenses(): Promise<void> {
   return new Promise((resolve, reject) => {
-    purchaseStore.getFiscalExpenseMonths(props.yearInt, props.monthInt)
+    purchaseStore.getFiscalExpenseMonths(yearInt.value, monthInt.value)
       .then(() => {
         thisMonthLoaded.value = true
         resolve()
@@ -371,19 +381,67 @@ function onSubmitDenyDialog() {
 }
 
 function setDates() {
-  let theFirst = new Date()
-  theFirst.setDate(1)
-  theFirst.setHours(0,0,0,0)
-  firstOfThisMonth.value = theFirst
-  firstOfSelectedMonth.value = theFirst
+  return new Promise((resolve, reject) => {
+    let theFirst = new Date()
+    theFirst.setDate(1)
+    theFirst.setHours(0,0,0,0)
+    firstOfThisMonth.value = theFirst
+    firstOfSelectedMonth.value = theFirst
+    resolve(null)
+  })
 }
 
-onMounted(() => {
-  setDates()
+function navigateToPrintView() {
+  const employeePK = getRouteParam(route, 'employeePK')
+  if (!employeePK) {
+    return
+  }
+  router.push({
+    name: 'expense-month-print',
+    params: {
+      employeePK: employeePK,
+      month: monthInt.value,
+      year: yearInt.value
+    }
+  })
+}
+
+function handlePrint() {
+  const monthParam = getRouteParam(route, 'month')
+  const yearParam = getRouteParam(route, 'year')
+  if (!monthParam || !yearParam) {
+    return
+  } else {
+    monthInt.value = parseInt(monthParam)
+    yearInt.value = parseInt(yearParam)
+    const m = firstOfSelectedMonth.value.toLocaleDateString(
+      'en-us', { month: 'long' }
+    )
+    const y = firstOfSelectedMonth.value.getFullYear()
+    monthDisplay.value = `${m} ${y}`
+  }
   getEmployeeFromRoute().then(() => {
     if (purchaseStore.fiscalExpenseMonths.length === 0) {
       retrieveThisMonthEmployeeExpenses().then(() => {
-        retrieveAllEmployeeExpenses()
+        window.print()
+      })
+    } else {
+      window.print()
+    }
+  })
+}
+
+onMounted(() => {
+  setDates().then(() => {
+    if (props.print) {
+      handlePrint()
+    } else {
+      getEmployeeFromRoute().then(() => {
+        if (purchaseStore.fiscalExpenseMonths.length === 0) {
+          retrieveThisMonthEmployeeExpenses().then(() => {
+            retrieveAllEmployeeExpenses()
+          })
+        }
       })
     }
   })

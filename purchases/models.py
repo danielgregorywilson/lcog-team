@@ -90,22 +90,73 @@ class PurchaseRequest(models.Model):
         super().save(*args, **kwargs)
 
 
-class Expense(models.Model):
+class ExpenseBaseModel(models.Model):
+    class Meta:
+        abstract = True
 
+    STATUS_DRAFT = 'draft'
+    STATUS_SUBMITTED = 'submitted'
+    STATUS_APPROVER_APPROVED = 'approver_approved'
+    STATUS_APPROVER_DENIED = 'approver_denied'
+    STATUS_FISCAL_APPROVED = 'fiscal_approved'
+    STATUS_FISCAL_DENIED = 'fiscal_denied'
+    STATUS_CHOICES = (
+        (STATUS_DRAFT, 'Draft'),
+        (STATUS_SUBMITTED, 'Submitted'),
+        (STATUS_APPROVER_APPROVED, 'Approver Approved'),
+        (STATUS_APPROVER_DENIED, 'Approver Denied'),
+        (STATUS_FISCAL_APPROVED, 'Fiscal Approved'),
+        (STATUS_FISCAL_DENIED, 'Fiscal Denied'),
+    )
+
+    status = models.CharField(
+        max_length=17, choices=STATUS_CHOICES, default=STATUS_DRAFT
+    )
+
+
+class Expense(ExpenseBaseModel):
     class Meta:
         ordering = ["pk",]
 
-    name = models.CharField(max_length=255, blank=True, null=True)
+    name = models.CharField(max_length=255, blank=True)
     date = models.DateField(blank=True, null=True)
-    job = models.CharField(max_length=255, blank=True, null=True)
-    gls = models.JSONField(_("GL Codes"), blank=True, null=True)
+    job = models.CharField(max_length=255, blank=True)
+    gls = models.JSONField(_("GL Codes"), blank=True, default=list)
     purchaser = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='expenses_purchased',
+    )
+    receipt = models.FileField(
+        _("receipt"), upload_to="uploads/expenses", blank=True, null=True
     )
     approver = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='approver_of_expenses',
     )
-    approval_notes = models.TextField(blank=True, null=True)
-    receipt = models.FileField(_("receipt"), upload_to="uploads/expenses", blank=True, null=True)
+    approved_at = models.DateTimeField(blank=True, null=True)
+
+
+class ExpenseMonth(ExpenseBaseModel):
+    class Meta:
+        ordering = ["pk",]
+        unique_together = ['employee', 'month', 'year']
+    
+    employee = models.ForeignKey(
+        Employee, blank=True, null=True, on_delete=models.SET_NULL,
+        related_name='expense_months',
+    )
+    month = models.IntegerField()
+    year = models.IntegerField()
+    approver = models.ForeignKey(
+        Employee, blank=True, null=True, on_delete=models.SET_NULL,
+        related_name='approver_of_expense_month',
+    )
+    approved_at = models.DateTimeField(blank=True, null=True)
+
+    @property
+    def expenses(self):
+        return Expense.objects.filter(
+            purchaser=self.employee,
+            date__month=self.month,
+            date__year=self.year
+        )

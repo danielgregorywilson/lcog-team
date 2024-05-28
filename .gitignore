@@ -1,6 +1,8 @@
 *.pyc
 .env
 
+.npmrc
+
 .DS_Store
 
 settings_local.py

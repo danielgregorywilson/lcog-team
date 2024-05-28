@@ -22,7 +22,19 @@
             <q-icon name="cancel" @click.stop="selectedEmployee = emptyEmployee" class="cursor-pointer" />
           </template>
         </q-select>
-        <q-btn color="primary" :disabled="selectedEmployee.pk == -1 || selectedDeskNumber == ''" @click="clickReserve()">Reserve</q-btn>
+        <q-btn
+          color="primary"
+          :disabled="!canReserve()"
+          @click="clickReserve()"
+        >
+          Reserve
+          <q-tooltip
+            v-if="!allowReservations"
+            class="bg-warning text-black text-body2"
+          >
+            Reservations only available between 6AM and 5PM
+          </q-tooltip>
+        </q-btn>
       </div>
       <div class="row q-pa-xs" id="legend">
         <div class="col">
@@ -174,6 +186,7 @@ let highlightedDeskNumberY = ref(0)
 
 const emptyEmployee = {name: '', pk: -1}
 
+let allowReservations = ref(true)
 let moveReservationDialogVisible = ref(false)
 let activeUserReservations = ref([]) as Ref<Array<DeskReservation>>
 let selectedEmployee = ref(emptyEmployee)
@@ -293,6 +306,11 @@ function deleteReservation(pk: number) {
     .catch(e => {
       console.error('Error cancelling desk reservation:' ,e)
     })
+}
+
+function canReserve() {
+  return selectedEmployee.value.pk != -1 && selectedDeskNumber.value != '' &&
+    allowReservations.value
 }
 
 function clickReserve() {
@@ -599,6 +617,11 @@ onMounted(() => {
   //   console.error('Desk Reservation socket closed unexpectedly')
   // }
   
+  const hourOfDay = new Date().getHours()
+  if (hourOfDay < 6 || hourOfDay >= 17) {
+    allowReservations.value = false
+  }
+
   initDesksAndReservations()
     .then(() => {
       handleSVG()

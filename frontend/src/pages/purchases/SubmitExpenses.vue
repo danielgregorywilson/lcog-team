@@ -176,7 +176,7 @@
                     contentTypeModel="expense"
                     :readOnly=false
                     :objectPk="props.row.pk.toString()"
-                    allowedFileTypes=".jpeg,.jpg,.gif,.png,.pdf"
+                    allowedFileTypes="image/*,.pdf"
                     v-on="{
                       'uploaded': (url: string) => {
                         updateReceipt(props.row.pk, url)
@@ -185,7 +185,7 @@
                     }"
                   />
                   <div class="q-mt-sm">
-                    Supported filetypes: .jpeg, .jpg, .gif, .png, .pdf
+                    Supported filetypes: Images and PDFs
                   </div>
                 </q-popup-edit>
               </q-btn>
@@ -251,7 +251,7 @@
                           contentTypeModel="expense"
                           :readOnly=false
                           :objectPk="props.row.pk.toString()"
-                          allowedFileTypes=".jpeg,.jpg,.gif,.png,.pdf"
+                          allowedFileTypes="image/*,.pdf"
                           v-on="{
                             'uploaded': (url: string) => {
                               updateReceipt(props.row.pk, url)
@@ -260,7 +260,7 @@
                           }"
                         />
                         <div class="q-mt-sm">
-                          Supported filetypes: .jpeg, .jpg, .gif, .png, .pdf
+                          Supported filetypes: Images and PDFs
                         </div>
                       </q-popup-edit>
                     </q-btn>

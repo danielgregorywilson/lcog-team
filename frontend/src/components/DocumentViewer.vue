@@ -9,13 +9,17 @@
 
   <q-dialog id="document-viewer-dialog" v-model="showDialog">
     <q-card class="file-viewer">
-      <q-img v-if="isImage()" :src="props.documentUrl" />
       <embed
-        v-else-if="isPDF()"
+        v-if="isPDF()"
         :src="props.documentUrl"
         type="application/pdf"
       >
-      <div v-else>Receipt filetype {{ fileExtension() }} not supported</div>
+      <div v-else>
+        <q-img :src="props.documentUrl" />
+        <div v-if="!isImage()" class="text-negative">
+          Document filetype {{ fileExtension() }} may not be supported
+        </div>
+      </div>
 
       <q-separator />
 

@@ -587,12 +587,11 @@ class Employee(models.Model):
         all_processes = apps.get_model('workflows', 'Process').objects.all().select_related('role')
         return [process.id for process in list(all_processes) if process.role and self in process.role.members.all()]
     
-    def can_view_expenses(self):
-        view_expenses = self.user.groups.filter(name='View Expenses').exists()
-        if view_expenses:
-            return True
-        else:
-            return False
+    def is_expense_manager(self):
+        return self.user.groups.filter(name='Expense Manager').exists()
+    
+    def is_expense_approver(self):
+        return self.user.groups.filter(name='Expense Approver').exists()
 
     def can_view_mow_routes(self):
         view_mow_routes = self.user.groups.filter(name='View Meals on Wheels Routes').exists()

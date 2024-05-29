@@ -21,7 +21,11 @@
     </q-item>
   </template>
   <template v-if="!readOnly && selectedEmployeeName()" v-slot:append>
-    <q-icon name="cancel" @click.stop="clearEmployee()" class="cursor-pointer" />
+    <q-icon
+      name="cancel"
+      @click.stop="clearEmployee()"
+      class="cursor-pointer"
+    />
   </template>
 </q-select>
 </template>
@@ -39,6 +43,7 @@ const props = defineProps<{
   employee?: SimpleEmployeeRetrieve,
   useLegalName: boolean
   readOnly: boolean
+  employeeFilterFn?: (employee: SimpleEmployeeRetrieve) => boolean
 }>()
 
 const emit = defineEmits<{
@@ -73,7 +78,10 @@ function retrieveSimpleEmployeeList(): void {
 }
 
 function employees() {    
-  const employeesList = peopleStore.simpleEmployeeList
+  let employeesList = peopleStore.simpleEmployeeList
+  if (props.employeeFilterFn) {
+    employeesList = employeesList.filter(props.employeeFilterFn)
+  }
   return employeesList.filter((employee) => {
     if (props.useLegalName) {
       return employee.legal_name.toLowerCase().indexOf(needle.value) != -1

@@ -23,10 +23,32 @@ export function canViewDeskReservationReports(): Promise<boolean> {
 }
 
 export function canViewExpenses() {
-  if (cookies.get('can_view_expenses') == 'true') {
+  if (
+    cookies.get('is_expense_manager') == 'true' ||
+    cookies.get('is_expense_approver') == 'true' ||
+    cookies.get('is_fiscal_employee') == 'true'
+  ) {
     return true
   } else {
     console.info('User cannot view Expenses. Redirecting to dashboard.')
+    return false
+  }
+}
+
+export function isExpenseManager() {
+  if (cookies.get('is_expense_manager') == 'true') {
+    return true
+  } else {
+    console.info('User is not an expense manager. Redirecting to dashboard.')
+    return false
+  }
+}
+
+export function isExpenseApprover() {
+  if (cookies.get('is_expense_approver') == 'true') {
+    return true
+  } else {
+    console.info('User is not an expense approver. Redirecting to dashboard.')
     return false
   }
 }
@@ -35,7 +57,9 @@ export function canViewMealsOnWheelsRoutes() {
   if (cookies.get('can_view_mow_routes') == 'true') {
     return true
   } else {
-    console.info('User cannot view Meals on Wheels routes. Redirecting to dashboard.')
+    console.info(
+      'User cannot view Meals on Wheels routes. Redirecting to dashboard.'
+    )
     return false
   }
 }
@@ -76,7 +100,9 @@ export function isAuthenticated() {
   if (authStore.isAuthenticated) {
     return true
   } else {
-    console.info('User cannot view Meals on Wheels routes. Redirecting to dashboard.')
+    console.info(
+      'User cannot view Meals on Wheels routes. Redirecting to dashboard.'
+    )
     return false
   }
 }

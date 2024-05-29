@@ -41,7 +41,9 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = User
-        fields = ['pk', 'url', 'username', 'email', 'name', 'groups', 'is_staff']
+        fields = [
+            'pk', 'url', 'username', 'email', 'name', 'groups', 'is_staff'
+        ]
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
@@ -61,7 +63,9 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     username = serializers.EmailField(source='user.username')
     email = serializers.EmailField(source='user.email')
     title = serializers.CharField(source='job_title')
-    division = serializers.CharField(source='unit_or_program.division.name', default='')
+    division = serializers.CharField(
+        source='unit_or_program.division.name', default=''
+    )
     is_manager = serializers.SerializerMethodField()
     has_manager = serializers.SerializerMethodField()
     is_eligible_for_telework_application = serializers.SerializerMethodField()
@@ -74,7 +78,8 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     time_off_requests_can_view = serializers.SerializerMethodField()
     next_to_sign_prs = serializers.SerializerMethodField()
     workflow_roles = serializers.SerializerMethodField()
-    can_view_expenses = serializers.SerializerMethodField()
+    is_expense_manager = serializers.SerializerMethodField()
+    is_expense_approver = serializers.SerializerMethodField()
     can_view_mow_routes = serializers.SerializerMethodField()
     can_manage_mow_stops = serializers.SerializerMethodField()
     workflow_display_options = serializers.SerializerMethodField()
@@ -95,8 +100,8 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             'email_opt_out_timeoff_all', 'email_opt_out_timeoff_weekly',
             'email_opt_out_timeoff_daily', 'is_all_workflows_admin',
             'admin_of_workflows', 'admin_of_processes', 'workflow_roles',
-            'can_view_expenses', 'can_view_mow_routes', 'can_manage_mow_stops',
-            'workflow_display_options'
+            'is_expense_manager', 'is_expense_approver', 'can_view_mow_routes',
+            'can_manage_mow_stops', 'workflow_display_options'
         ]
 
     @staticmethod
@@ -113,12 +118,17 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             return False
         return all([ 
             not employee.is_executive_director, # Not the executive director
-            not employee.manager.is_executive_director, # Not anyone who reports to the executive director (e.g. finance manager)
-            employee.manager.manager and not employee.manager.manager.is_executive_director, # Not anyone who reports to the above (e.g. finance employees)
+            # Not anyone who reports to the executive director
+            # (e.g. finance manager)
+            not employee.manager.is_executive_director,
+            # Not anyone who reports to the above (e.g. finance employees)
+            employee.manager.manager and \
+                not employee.manager.manager.is_executive_director,
             not employee.is_division_director, # No division directors
             not employee.manager.is_division_director, # No program managers
             not employee.is_hr_manager,  # Not the HR manager
-            not employee.manager.is_hr_manager  # Not anyone who reports to the HR manager
+            # Not anyone who reports to the HR manager
+            not employee.manager.is_hr_manager
         ])
     
     @staticmethod
@@ -161,7 +171,8 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
         if employee.is_executive_director:
             return ""
         elif employee.is_hr_manager:
-            return Employee.objects.filter(is_executive_director=True).first().name
+            return Employee.objects.filter(is_executive_director=True)\
+                .first().name
         elif employee.is_division_director:
             return Employee.objects.filter(is_hr_manager=True).first().name
         elif employee.manager:
@@ -171,7 +182,9 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     
     @staticmethod
     def get_workflow_roles(employee):
-        workflow_roles_ids = map(lambda role: role.id, employee.workflow_roles.all())
+        workflow_roles_ids = map(
+            lambda role: role.id, employee.workflow_roles.all()
+        )
         return list(workflow_roles_ids)
 
     @staticmethod
@@ -187,8 +200,12 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
         return employee.is_admin_of_processes
 
     @staticmethod
-    def get_can_view_expenses(employee):
-        return employee.can_view_expenses()
+    def get_is_expense_manager(employee):
+        return employee.is_expense_manager()
+    
+    @staticmethod
+    def get_is_expense_approver(employee):
+        return employee.is_expense_approver()
 
     @staticmethod
     def get_can_view_mow_routes(employee):
@@ -206,9 +223,14 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
 class SimpleEmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
-        fields = ['pk', 'name', 'legal_name', 'title']
+        fields = ['pk', 'name', 'legal_name', 'title', 'is_expense_approver']
 
     title = serializers.CharField(source='job_title')
+    is_expense_approver = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_is_expense_approver(employee):
+        return employee.is_expense_approver()
 
 
 class EmployeeEmailSerializer(serializers.ModelSerializer):
@@ -262,7 +284,10 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     
     @staticmethod
     def get_employee_division(pr):
-        if pr.employee.unit_or_program and pr.employee.unit_or_program.division:
+        if all([
+            pr.employee.unit_or_program,
+            pr.employee.unit_or_program.division
+        ]):
             return pr.employee.unit_or_program.division.name
         else:
             return ''
@@ -303,7 +328,9 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
         return pr.all_required_signatures()
 
 
-class PerformanceReviewFileUploadSerializer(serializers.HyperlinkedModelSerializer):
+class PerformanceReviewFileUploadSerializer(
+    serializers.HyperlinkedModelSerializer
+):
     signed_position_description = serializers.FileField()
 
     class Meta:
@@ -415,7 +442,9 @@ class TeleworkApplicationSerializer(serializers.HyperlinkedModelSerializer):
         return application.division_director_signature()
 
 
-class TeleworkApplicationFileUploadSerializer(serializers.HyperlinkedModelSerializer):
+class TeleworkApplicationFileUploadSerializer(
+    serializers.HyperlinkedModelSerializer
+):
     dependent_care_documentation = serializers.FileField()
 
     class Meta:

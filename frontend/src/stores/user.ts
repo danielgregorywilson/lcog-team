@@ -40,7 +40,8 @@ export const useUserStore = defineStore('user', {
       workflow_roles: [] as Array<number>,
       workflow_display_options: [] as Array<WorkflowOption>,
       is_all_workflows_admin: false,
-      can_view_expenses: false,
+      is_expense_manager: false,
+      is_expense_approver: false,
       can_view_mow_routes: false,
       can_manage_mow_stops: false
     },
@@ -52,8 +53,10 @@ export const useUserStore = defineStore('user', {
     getEmployeeProfile: state => state.profile,
     isProfileLoaded: state => !!state.profile.username,
     isManager: state => state.profile.is_manager,
+    isFiscal: state => state.profile.is_fiscal_employee,
     hasWorkflowRoles: state => !!state.profile.workflow_roles.length,
-    canViewExpenses: state => state.profile.can_view_expenses,
+    isExpenseManager: state => state.profile.is_expense_manager,
+    isExpenseApprover: state => state.profile.is_expense_approver,
     canViewMOWRoutes: state => state.profile.can_view_mow_routes,
     canManageMOWStops: state => state.profile.can_manage_mow_stops
   },
@@ -92,7 +95,8 @@ export const useUserStore = defineStore('user', {
             this.profile.workflow_roles = resp.data.workflow_roles
             this.profile.workflow_display_options = resp.data.workflow_display_options
             this.profile.is_all_workflows_admin = resp.data.is_all_workflows_admin
-            this.profile.can_view_expenses = resp.data.can_view_expenses
+            this.profile.is_expense_manager = resp.data.is_expense_manager
+            this.profile.is_expense_approver = resp.data.is_expense_approver
             this.profile.can_view_mow_routes = resp.data.can_view_mow_routes
             this.profile.can_manage_mow_stops = resp.data.can_manage_mow_stops
             cookies.set('division', resp.data.division.toString())
@@ -100,20 +104,51 @@ export const useUserStore = defineStore('user', {
             cookies.set('has_manager', resp.data.has_manager.toString())
             cookies.set('is_is_employee', resp.data.is_is_employee.toString())
             cookies.set('is_hr_employee', resp.data.is_hr_employee.toString())
-            cookies.set('is_sds_hiring_lead', resp.data.is_sds_hiring_lead.toString())
-            cookies.set('is_fiscal_employee', resp.data.is_fiscal_employee.toString())
-            cookies.set('is_eligible_for_telework_application', resp.data.is_eligible_for_telework_application.toString())
-            cookies.set('can_view_seating_charts', resp.data.can_view_seating_charts.toString())
-            cookies.set('can_edit_seating_charts', resp.data.can_edit_seating_charts.toString())
+            cookies.set(
+              'is_sds_hiring_lead', resp.data.is_sds_hiring_lead.toString()
+            )
+            cookies.set(
+              'is_fiscal_employee', resp.data.is_fiscal_employee.toString()
+            )
+            cookies.set(
+              'is_eligible_for_telework_application',
+              resp.data.is_eligible_for_telework_application.toString()
+            )
+            cookies.set(
+              'can_view_seating_charts',
+              resp.data.can_view_seating_charts.toString()
+            )
+            cookies.set(
+              'can_edit_seating_charts',
+              resp.data.can_edit_seating_charts.toString()
+            )
             cookies.set('prs_can_view', resp.data.prs_can_view.toString())
             cookies.set('notes_can_view', resp.data.notes_can_view.toString())
-            cookies.set('telework_applications_can_view', resp.data.telework_applications_can_view.toString())
-            cookies.set('time_off_requests_can_view', resp.data.time_off_requests_can_view.toString())
+            cookies.set(
+              'telework_applications_can_view',
+              resp.data.telework_applications_can_view.toString()
+            )
+            cookies.set(
+              'time_off_requests_can_view',
+              resp.data.time_off_requests_can_view.toString()
+            )
             cookies.set('workflow_roles', resp.data.workflow_roles.toString())
-            cookies.set('workflow_display_options', resp.data.workflow_display_options.toString())
-            cookies.set('can_view_expenses', resp.data.can_view_expenses.toString())
-            cookies.set('can_view_mow_routes', resp.data.can_view_mow_routes.toString())
-            cookies.set('can_manage_mow_stops', resp.data.can_manage_mow_stops.toString())
+            cookies.set(
+              'workflow_display_options',
+              resp.data.workflow_display_options.toString()
+            )
+            cookies.set(
+              'is_expense_manager', resp.data.is_expense_manager.toString()
+            )
+            cookies.set(
+              'is_expense_approver', resp.data.is_expense_approver.toString()
+            )
+            cookies.set(
+              'can_view_mow_routes', resp.data.can_view_mow_routes.toString()
+            )
+            cookies.set(
+              'can_manage_mow_stops', resp.data.can_manage_mow_stops.toString()
+            )
 
             // TODO: Convert this
             // dispatch('performanceReviewModule/getNextPerformanceReview', {pk: resp.data.pk}, { root: true })
@@ -161,7 +196,8 @@ export const useUserStore = defineStore('user', {
         cookies.remove('time_off_requests_can_view')
         cookies.remove('workflow_roles')
         cookies.remove('workflow_display_options')
-        cookies.remove('can_view_expenses')
+        cookies.remove('is_expense_manager')
+        cookies.remove('is_expense_approver')
         cookies.remove('can_view_mow_routes')
         cookies.remove('can_manage_mow_stops')
         resolve('Successfully triggered logout')

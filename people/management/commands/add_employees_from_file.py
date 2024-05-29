@@ -193,10 +193,17 @@ class Command(BaseCommand):
                 updated_department = employee.unit_or_program != unit_or_program
                 if updated_title or updated_department:
                     if updated_title:
+                        old_title = employee.job_title
                         employee.job_title = job_title
                         employee.save()
                         self.stdout.write(
-                            'Updated employee {} {} title'.format(employee.user.first_name, employee.user.last_name)
+                            'Updated employee {} {} title from {} to {}'
+                                .format(
+                                    employee.user.first_name,
+                                    employee.user.last_name,
+                                    old_title,
+                                    job_title
+                                )
                         )
                     if updated_department:
                         employee.unit_or_program = unit_or_program

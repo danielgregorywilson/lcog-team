@@ -56,9 +56,11 @@ export interface DeskReservationCreate {
 export interface GetReservationReportData {
   startDateTime: string
   endDateTime: string
+  desks?: Array<number>
+  employees?: Array<number>
 }
 
-export interface GetDeskReservationDataInterface {
+export interface GetDeskSummaryReportDataInterface {
   [key: string]: {
     'total_hours': string,
     'days_utilized': number,
@@ -66,11 +68,20 @@ export interface GetDeskReservationDataInterface {
   }
 }
 
-export interface GetEmployeeDeskReservationDataInterface {
+export interface GetEmployeeSummaryReportDataInterface {
   [key: string]: {
     'total_hours': string,
     'days_utilized': number,
     'most_frequent_desk': string
+  }
+}
+
+export interface GetDetailReportDataInterface {
+  [key: string]: {
+    'desk': string,
+    'employee': string
+    'day': string,
+    'total_hours': string,
   }
 }
 
@@ -116,7 +127,8 @@ export interface EmployeeRetrieve {
   admin_of_workflows: Array<number>
   admin_of_processes: Array<number>
   workflow_roles: Array<number>
-  can_view_expenses: boolean
+  is_expense_manager: boolean
+  is_expense_approver: boolean
   can_view_mow_routes: boolean
   can_manage_mow_stops: boolean
   workflow_display_options: Array<WorkflowOption>
@@ -127,6 +139,7 @@ export interface SimpleEmployeeRetrieve {
   name: string
   legal_name: string
   title: string
+  is_expense_approver: boolean
 }
 
 export const emptyEmployee: SimpleEmployeeRetrieve = {
@@ -325,7 +338,20 @@ export interface FileUploadDescriptionUploadServerResponse {
 // Purchase Structure from Django Rest Framework //
 ///////////////////////////////////////////////////
 
-export interface Expense {
+interface ExpenseBase {
+  status: 'draft' | 'submitted' | 'approver_approved' | 'approver_denied' |
+    'fiscal_approved' | 'fiscal_denied'
+}
+
+export interface ExpenseMonth extends ExpenseBase {
+  pk: number
+  employee: SimpleEmployeeRetrieve
+  month: number
+  year: number
+  expenses: Array<Expense>
+}
+
+export interface Expense extends ExpenseBase {
   pk: number
   name: string
   date: string
@@ -333,8 +359,7 @@ export interface Expense {
   gls: Array<GL>
   purchaser: SimpleEmployeeRetrieve
   approver: SimpleEmployeeRetrieve
-  approval_notes: string
-  receipt_link: string
+  receipt: string
   submitted: boolean
 }
 
@@ -344,17 +369,15 @@ export interface ExpenseCreate {
   job?: string
   gls?: Array<GL>
   approver?: SimpleEmployeeRetrieve
-  approval_notes?: string
   receipt_link?: string
 }
 
-export interface ExpenseUpdate {
+export interface ExpenseUpdate extends ExpenseBase {
   name?: string
   date?: string
   job?: string
   gls?: Array<GL>
   approver?: SimpleEmployeeRetrieve
-  approval_notes?: string
   receipt_link?: string
 }
 

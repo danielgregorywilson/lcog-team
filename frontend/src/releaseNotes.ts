@@ -4,6 +4,24 @@
 
 export const releases = [
   {
+    version: '0.29.0',
+    date: new Date(2024, 4, 8),
+    changes: [
+      {
+        type: 'new',
+        description: 'Credit card reconciliation app.'
+      },
+      {
+        type: 'improved',
+        description: 'Restrict desk reservations to 6AM-5PM.'
+      },
+      {
+        type: 'improved',
+        description: 'New desk reservation reports.'
+      },
+    ]
+  },
+  {
     version: '0.28.0',
     date: new Date(2024, 4, 8),
     changes: [

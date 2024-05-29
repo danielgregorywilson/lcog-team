@@ -258,14 +258,6 @@ function updateExpense(row: Expense) {
     })
 }
 
-function updateName(pk: number, val: string) {
-  const exp = purchaseStore.myExpenses.find(exp => exp.pk === pk)
-  if (exp) {
-    exp.name = val
-    updateExpense(exp)
-  }
-}
-
 function approveExpense(pk: number, approved: boolean) {
   canApprove.value = false
   setTimeout(() => {

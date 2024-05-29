@@ -447,7 +447,7 @@ function onSubmitDenyDialog() {
 }
 
 function setDates() {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     let theFirst = new Date()
     theFirst.setDate(1)
     theFirst.setHours(0,0,0,0)

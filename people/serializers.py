@@ -122,10 +122,8 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             # (e.g. finance manager)
             not employee.manager.is_executive_director,
             # Not anyone who reports to the above (e.g. finance employees)
-            all([
-                employee.manager.manager,
-                not employee.manager.manager.is_executive_director
-            ]),
+            employee.manager.manager and \
+                not employee.manager.manager.is_executive_director,
             not employee.is_division_director, # No division directors
             not employee.manager.is_division_director, # No program managers
             not employee.is_hr_manager,  # Not the HR manager

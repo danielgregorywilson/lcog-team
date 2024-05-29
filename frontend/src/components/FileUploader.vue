@@ -4,6 +4,7 @@
   max-file-size="20000000"
   @added="file_selected"
   @rejected="rejectFileTooLarge"
+  :accept="props.allowedFileTypes"
   style="max-width: 300px"
 >
   <template v-slot:header="scope">
@@ -69,8 +70,9 @@ const props = defineProps<{
   file: File,
   contentTypeAppLabel: string,
   contentTypeModel: string,
-  objectPk?: string,
   readOnly: boolean
+  objectPk?: string,
+  allowedFileTypes?: string // e.g. 'image/*,.pdf'
 }>()
 
 const emit = defineEmits<{

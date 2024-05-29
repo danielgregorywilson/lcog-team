@@ -2,11 +2,16 @@ import axios from 'axios'
 import { defineStore } from 'pinia'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
-import { Expense, ExpenseCreate } from 'src/types'
+import { Expense, ExpenseCreate, ExpenseMonth } from 'src/types'
 
 export const usePurchaseStore = defineStore('purchase', {
   state: () => ({
-    allExpenses: [] as Array<Expense>,
+    expenseMonths: [] as Array<ExpenseMonth>,
+    myExpenses: [] as Array<Expense>,
+    approvalExpenses: [] as Array<Expense>,
+    fiscalExpenseMonths: [] as Array<ExpenseMonth>,
+    numExpensesToApprove: 0,
+    numExpensesFiscalToApprove: 0
   }),
 
   getters: {},
@@ -36,18 +41,161 @@ export const usePurchaseStore = defineStore('purchase', {
           })
       })
     },
-    getAllExpenses(): Promise<Array<Expense>> {
+    
+    /////////////////
+    /// Submitter ///
+    /////////////////
+
+    getExpenseMonths(
+      yearInt: number | null = null, monthInt: number | null = null
+    ): Promise<null> {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/expense` })
+        let params = ''
+        if (!!yearInt && !!monthInt) {
+          params = `?year=${ yearInt }&month=${ monthInt }`
+        }
+        axios({
+          url: `${ apiURL }api/v1/expensemonth${ params }`
+        })
           .then(resp => {
-            this.allExpenses = resp.data.results
+            const ems = resp.data.results
+            this.expenseMonths = ems
+            let expenses = [] as Array<Expense>
+            for (const em of ems) {
+              expenses = expenses.concat(em.expenses)
+            }
+            this.myExpenses = expenses
             resolve(resp.data.results)
           })
           .catch(e => {
-            handlePromiseError(reject, 'Error getting all expenses', e)
+            handlePromiseError(reject, 'Error getting expense months', e)
           })
       })
     },
+    submitExpenseMonth(
+      data: { yearInt: number, monthInt: number, unsubmit?: boolean }
+    ): Promise<null> {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/expensemonth/submit`,
+          data: data,
+          method: 'POST'
+        })
+          .then(() => {
+            resolve(null)
+          })
+          .catch(e => {
+            handlePromiseError(
+              reject,
+              `Error ${ data['unsubmit'] ? 'un' : ''}submitting expense month`,
+              e
+            )
+          })
+      })
+    },
+
+    ////////////////
+    /// Approver ///
+    ////////////////
+
+    getApprovalExpenses(
+      yearInt: number | null = null,
+      monthInt: number | null = null
+    ): Promise<null> {
+      return new Promise((resolve, reject) => {
+        let params = '?approve=true'
+        if (!!yearInt && !!monthInt) {
+          params = `?year=${ yearInt }&month=${ monthInt }&approve=true`
+        }
+        axios({
+          url: `${ apiURL }api/v1/expense${ params }`
+        })
+          .then(resp => {
+            const exps = resp.data.results
+            let toApproveCount = 0
+            let expenses = [] as Array<Expense>
+            for (const exp of exps) {
+              if (exp.status == 'submitted') {
+                toApproveCount++
+              }
+              expenses = expenses.concat(exp)
+            }
+            this.approvalExpenses = expenses
+            this.numExpensesToApprove = toApproveCount
+            resolve(resp.data.results)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error getting approval expenses', e)
+          })
+      })
+    },
+
+    approveExpense(pk: number, approve: boolean): Promise<Expense> {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/expense/${ pk }/approve`,
+          method: 'PUT',
+          data: { approve }
+        })
+          .then(resp => {
+            resolve(resp.data)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error approving expense', e)
+          })
+      })
+    },
+
+    //////////////
+    /// Fiscal ///
+    //////////////
+
+    getFiscalExpenseMonths(
+      yearInt: number | null = null,
+      monthInt: number | null = null,
+      employeePK: number | null = null 
+    ): Promise<null> {
+      return new Promise((resolve, reject) => {
+        let params = '?fiscal=true'
+        if (!!yearInt && !!monthInt) {
+          params += `&year=${ yearInt }&month=${ monthInt }`
+        }
+        if (!!employeePK) {
+          params += `&employee=${ employeePK }`
+        }
+        axios({
+          url: `${ apiURL }api/v1/expensemonth${ params }`
+        })
+          .then(resp => {
+            const ems: ExpenseMonth[] = resp.data.results
+            this.fiscalExpenseMonths = ems
+            this.numExpensesFiscalToApprove = ems.filter(
+              em => em.status == 'approver_approved'
+            ).length
+            resolve(resp.data.results)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error getting fiscal expense months', e)
+          })
+      })
+    },
+
+    approveExpenseMonth(pk: number, approve: boolean): Promise<ExpenseMonth> {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/expensemonth/${ pk }/approve`,
+          method: 'PUT',
+          data: { approve }
+        })
+          .then(resp => {
+            resolve(resp.data)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error approving expense month', e)
+          })
+      })
+    },
+
     authLogout() {
       return new Promise((resolve) => {
         this.$reset()

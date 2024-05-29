@@ -47,7 +47,7 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_authenticated:
             if user.is_superuser:
-                requests = TimeOffRequest.objects.all()
+                return super().get_queryset()
             elif 'managed' in self.request.GET and is_true_string(self.request.GET['managed']):
                 requests = TimeOffRequest.objects.filter(
                     employee__manager=user.employee,
@@ -102,6 +102,8 @@ class TimeOffRequestViewSet(viewsets.ModelViewSet):
                     } for e in request.conflicting_responsibilities
                 ]
             return requests
+        else:
+            return TimeOffRequest.objects.none()
 
     def create(self, request):
         if 'from' in request.data['dates']:

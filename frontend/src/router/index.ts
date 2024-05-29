@@ -9,8 +9,9 @@ import {
 import routes from 'src/router/routes'
 
 import {
-  canViewDeskReservationReports, canViewExpenses, canViewMealsOnWheelsRoutes,
-  canViewTimeOffRequest, isAuthenticated, isFiscal, isManager
+  canViewDeskReservationReports, canViewMealsOnWheelsRoutes,
+  canViewTimeOffRequest, isAuthenticated, isExpenseApprover, isExpenseManager,
+  isFiscal, isManager
 } from './guards'
 
 /*
@@ -53,7 +54,13 @@ export default route(function (/* { store, ssrContext } */) {
     if (to.meta.requiresFiscal && !isFiscal()) {
       return '/dashboard'
     }
-    if (to.meta.requiresCanViewExpenses && !canViewExpenses()) {
+    if (to.meta.requiresExpenseManager && !isExpenseManager()) {
+      return '/dashboard'
+    }
+    if (to.meta.requiresExpenseApprover && !isExpenseApprover()) {
+      return '/dashboard'
+    }
+    if (to.meta.requiresFiscal && !isFiscal()) {
       return '/dashboard'
     }
     if (to.meta.requiresMealsOnWheelsPermission && !canViewMealsOnWheelsRoutes()) {

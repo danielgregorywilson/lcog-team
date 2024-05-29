@@ -7,9 +7,15 @@
     flat
   />
 
-  <q-dialog v-model="showDialog">
+  <q-dialog id="document-viewer-dialog" v-model="showDialog">
     <q-card class="file-viewer">
-      <q-img :src="props.documentUrl" />
+      <q-img v-if="isImage()" :src="props.documentUrl" />
+      <embed
+        v-else-if="isPDF()"
+        :src="props.documentUrl"
+        type="application/pdf"
+      >
+      <div v-else>Receipt filetype {{ fileExtension() }} not supported</div>
 
       <q-separator />
 
@@ -40,10 +46,16 @@
 </template>
   
 <style scoped lang="scss">
+
 .file-viewer {
   height: 100%;
   width: 100%;
   padding: 10px;
+
+  embed {
+    width: 100%;
+    height: 100%;
+  }
 }
 .dialog-button {
   margin: 0 10px;
@@ -60,6 +72,18 @@ const props = defineProps<{
 }>()
 
 let showDialog = ref(false)
+
+function isImage() {
+  return props.documentUrl.match(/\.(jpeg|jpg|gif|png)$/)
+}
+
+function isPDF() {
+  return props.documentUrl.match(/\.(pdf)$/)
+}
+
+function fileExtension() {
+  return props.documentUrl.split('.').pop()
+}
 
 function openDocument() {
   window.open(props.documentUrl, '_blank')

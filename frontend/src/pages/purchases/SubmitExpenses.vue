@@ -158,6 +158,7 @@
                 v-if="props.row.receipt"
                 :documentUrl="props.row.receipt"
                 iconButton
+                flat
               />
               <!-- Button to upload file -->
               <q-btn icon="cloud_upload"
@@ -233,6 +234,7 @@
                       v-if="col.value"
                       :documentUrl="col.value"
                       iconButton
+                      flat
                     />
                     <!-- Button to upload file -->
                     <q-btn icon="cloud_upload"

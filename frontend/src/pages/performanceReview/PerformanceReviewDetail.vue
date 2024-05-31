@@ -735,11 +735,12 @@
           Position Description has been reviewed and signed by employee and
           manager
         </div>
-        <div v-if="descriptionReviewedEmployee && uploadedPositionDescriptionUrl && !uploadingAnother">
-          <q-btn color="primary">
-            <q-icon name="description" class="q-mr-sm" />
-            <div @click="openUploadedDescription">View Signed Position Description</div>
-          </q-btn>
+        <div v-if="descriptionReviewedEmployee && uploadedPositionDescriptionUrl && !uploadingAnother" class="row">
+          <DocumentViewer
+            :documentUrl="uploadedPositionDescriptionUrl"
+            :buttonText="`View Signed Position Description`"
+            iconButton
+          />
           <q-btn class="q-ml-md">
             <q-icon name="restart_alt" class="q-mr-sm" />
             <div @click="uploadingAnother = true">Upload Another</div>
@@ -1156,6 +1157,7 @@ import { scroll, useQuasar } from 'quasar'
 import { onMounted, ref, Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import DocumentViewer from 'src/components/DocumentViewer.vue'
 import FileUploader from 'src/components/FileUploader.vue'
 import { readableDate } from 'src/filters'
 import { usePerformanceReviewStore } from 'src/stores/performancereview'

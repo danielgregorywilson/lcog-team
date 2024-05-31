@@ -1,10 +1,11 @@
 <template>
 <div>
   <q-btn
-    :label="props.iconButton ? '' : props.documentUrl.split('/').pop()"
+    :label="buttonLabel()"
     :icon="props.iconButton ? 'file_open' : ''"
     @click="showDialog = true"
-    flat
+    :flat="props.flat"
+    :color="props.flat ? '' : 'primary'"
   />
 
   <q-dialog id="document-viewer-dialog" v-model="showDialog">
@@ -71,8 +72,10 @@ import { ref } from 'vue'
 import axios from 'axios'
 
 const props = defineProps<{
-  iconButton?: boolean
   documentUrl: string
+  buttonText?: string
+  iconButton?: boolean
+  flat?: boolean
 }>()
 
 let showDialog = ref(false)
@@ -87,6 +90,16 @@ function isPDF() {
 
 function fileExtension() {
   return props.documentUrl.split('.').pop()
+}
+
+function buttonLabel() {
+  if (props.buttonText) {
+    return props.buttonText
+  } else if (props.iconButton) {
+    return ''
+  } else {
+    return props.documentUrl.split('/').pop()
+  }
 }
 
 function openDocument() {

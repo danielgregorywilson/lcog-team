@@ -124,7 +124,7 @@
                   class="cursor-pointer q-mt-sm q-ml-sm"
                 />
               </div>
-              <q-btn @click="scope.value.push({gl: '', percent: 0})">
+              <q-btn @click="scope.value.push({gl: '', percent: 100})">
                 Add a GL
               </q-btn>
             </q-popup-edit>

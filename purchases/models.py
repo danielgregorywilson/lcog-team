@@ -120,6 +120,8 @@ class Expense(ExpenseBaseModel):
 
     name = models.CharField(max_length=255, blank=True)
     date = models.DateField(blank=True, null=True)
+    description = models.CharField(max_length=511, blank=True)
+    vendor = models.CharField(max_length=255, blank=True)
     job = models.CharField(max_length=255, blank=True)
     gls = models.JSONField(_("GL Codes"), blank=True, default=list)
     purchaser = models.ForeignKey(

@@ -97,6 +97,10 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
             expense.name = request.data.get('name', expense.name)
             expense.date = request.data.get('date', expense.date)
+            expense.description = request.data.get(
+                'description', expense.description
+            )
+            expense.vendor = request.data.get('vendor', expense.vendor)
             expense.job = request.data.get('job', expense.job)
             expense.gls = request.data.get('gls', expense.gls)
 

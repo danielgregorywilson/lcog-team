@@ -45,7 +45,7 @@
               v-model="props.row.name"
               buttons
               v-slot="scope"
-              @save="(val) => updateName(props.row.pk, val)"
+              @save="(val) => updateExpense(props.row.pk, 'name', val)"
             >
               <q-input v-model="scope.value" dense autofocus />
             </q-popup-edit>
@@ -57,9 +57,33 @@
               v-model="props.row.date"
               buttons
               v-slot="scope"
-              @save="(val) => updateDate(props.row.pk, val)"
+              @save="(val) => updateExpense(props.row.pk, 'date', val)"
             >
               <q-input type="date" v-model="scope.value" dense autofocus />
+            </q-popup-edit>
+          </q-td>
+          <q-td key="description" :props="props">
+            <div class="text-pre-wrap">{{ props.row.description }}</div>
+            <q-popup-edit
+              v-if="!rowSubmitted(props.row)"
+              v-model="props.row.job"
+              buttons
+              v-slot="scope"
+              @save="(val) => updateExpense(props.row.pk, 'description', val)"
+            >
+              <q-input v-model="scope.value" dense autofocus />
+            </q-popup-edit>
+          </q-td>
+          <q-td key="vendor" :props="props">
+            <div class="text-pre-wrap">{{ props.row.vendor }}</div>
+            <q-popup-edit
+              v-if="!rowSubmitted(props.row)"
+              v-model="props.row.vendor"
+              buttons
+              v-slot="scope"
+              @save="(val) => updateExpense(props.row.pk, 'vendor', val)"
+            >
+              <q-input v-model="scope.value" dense autofocus />
             </q-popup-edit>
           </q-td>
           <q-td key="job" :props="props">
@@ -69,7 +93,7 @@
               v-model="props.row.job"
               buttons
               v-slot="scope"
-              @save="(val) => updateJob(props.row.pk, val)"
+              @save="(val) => updateExpense(props.row.pk, 'job', val)"
             >
               <q-input v-model="scope.value" dense autofocus />
             </q-popup-edit>
@@ -87,7 +111,7 @@
               v-model="props.row.gls"
               buttons
               v-slot="scope"
-              @save="(val) => updateGLs(props.row.pk, val)"
+              @save="(val) => updateExpense(props.row.pk, 'gls', val)"
             >
               <div
                 v-for="(gl, idx) in scope.value"
@@ -136,7 +160,7 @@
               v-model="props.row.approver"
               buttons
               v-slot="scope"
-              @save="(val) => updateApprover(props.row.pk, val)"
+              @save="(val) => updateExpense(props.row.pk, 'approver', val)"
             >
               <EmployeeSelect
                 name="approver"
@@ -180,7 +204,6 @@
                     allowedFileTypes="image/*,.pdf"
                     v-on="{
                       'uploaded': (url: string) => {
-                        updateReceipt(props.row.pk, url)
                         retrieveAllMyExpenses()
                       }
                     }"
@@ -256,7 +279,6 @@
                           allowedFileTypes="image/*,.pdf"
                           v-on="{
                             'uploaded': (url: string) => {
-                              updateReceipt(props.row.pk, url)
                               retrieveAllMyExpenses()
                             }
                           }"
@@ -427,6 +449,14 @@ const columns = [
     name: 'date', field: 'date', label: 'Date', align: 'center', sortable: true
   },
   {
+    name: 'description', field: 'description', label: 'Description',
+    align: 'center', sortable: true
+  },
+  {
+    name: 'vendor', field: 'vendor', label: 'Vendor', align: 'center',
+    sortable: true
+  },
+  {
     name: 'job', field: 'job', label: 'Job #', align: 'center', sortable: true
   },
   {
@@ -578,58 +608,25 @@ function retrieveAllMyExpenses() {
     })
 }
 
-function updateExpense(row: Expense) {
-  purchaseStore.updateExpense(row)
-    .catch((error) => {
-      console.log('Error updating expense', error)
-    })
-}
-
-function updateName(pk: number, val: string) {
+function updateExpense(
+  pk: number,
+  field:
+    'name' | 'date' | 'description' | 'vendor' | 'job' | 'gls' | 'approver',
+  val: string | Array<GL> | SimpleEmployeeRetrieve
+) {
   const exp = purchaseStore.myExpenses.find(exp => exp.pk === pk)
   if (exp) {
-    exp.name = val
-    updateExpense(exp)
-  }
-}
-
-function updateDate(pk: number, val: string) {
-  const exp = purchaseStore.myExpenses.find(exp => exp.pk === pk)
-  if (exp) {
-    exp.date = val
-    updateExpense(exp)
-  }
-}
-
-function updateJob(pk: number, val: string) {
-  const exp = purchaseStore.myExpenses.find(exp => exp.pk === pk)
-  if (exp) {
-    exp.job = val
-    updateExpense(exp)
-  }
-}
-
-function updateGLs(pk: number, val: Array<GL>) {
-  const exp = purchaseStore.myExpenses.find(exp => exp.pk === pk)
-  if (exp) {
-    exp.gls = val
-    updateExpense(exp)
-  }
-}
-
-function updateApprover(pk: number, val: SimpleEmployeeRetrieve) {
-  const exp = purchaseStore.myExpenses.find(exp => exp.pk === pk)
-  if (exp) {
-    exp.approver = val
-    updateExpense(exp)
-  }
-}
-
-function updateReceipt(pk: number, val: string) {
-  const exp = purchaseStore.myExpenses.find(exp => exp.pk === pk)
-  if (exp) {
-    exp.receipt_link = val
-    updateExpense(exp)
+    if (field === 'gls') {
+      exp.gls = val as Array<GL>
+    } else if (field === 'approver') {
+      exp.approver = val as SimpleEmployeeRetrieve
+    } else {
+      exp[field] = val as string
+    }
+    purchaseStore.updateExpense(exp)
+      .catch((error) => {
+        console.log('Error updating expense', error)
+      })
   }
 }
 

@@ -199,7 +199,7 @@ const columns = [
     name: 'job', field: 'job', label: 'Job #', align: 'center', sortable: true
   },
   {
-    name: 'gls', field: 'gls', label: 'GL Codes', align: 'center',
+    name: 'gl', field: 'gl', label: 'GL Code', align: 'center',
     sortable: true, style: 'width: 10px'
   },
   { name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' },

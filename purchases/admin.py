@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models import (
-    Expense, ExpenseMonth, PurchaseCategory, PurchaseObject, PurchaseRequest,
+    Expense, ExpenseGL, ExpenseMonth, PurchaseCategory, PurchaseObject, PurchaseRequest,
     Role
 )
 
@@ -29,11 +29,17 @@ class PurchaseRequestAdmin(admin.ModelAdmin):
     )
 
 
+class ExpenseGLInline(admin.TabularInline):
+    model = ExpenseGL
+    extra = 0
+
+
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'purchaser', 'date', 'name', 'status'
     )
+    inlines = (ExpenseGLInline,)
 
 
 @admin.register(ExpenseMonth)

@@ -1,7 +1,19 @@
 from rest_framework import serializers
 
-from .models import Expense, ExpenseMonth
+from .models import Expense, ExpenseGL, ExpenseMonth
 from people.serializers import SimpleEmployeeSerializer
+
+
+class ExpenseGLSerializer(serializers.HyperlinkedModelSerializer):
+
+        class Meta:
+            model = ExpenseGL
+            fields = [
+                'url', 'pk', 'code', 'percent', 'approver', 'approved',
+                'approved_at'
+            ]
+    
+        approver = SimpleEmployeeSerializer(required=False)
 
 
 class ExpenseSerializer(serializers.HyperlinkedModelSerializer):
@@ -16,6 +28,7 @@ class ExpenseSerializer(serializers.HyperlinkedModelSerializer):
 
     purchaser = SimpleEmployeeSerializer(required=False)
     approver = SimpleEmployeeSerializer(required=False)
+    gls = ExpenseGLSerializer(many=True, read_only=True)
 
 
 class ExpenseMonthSerializer(serializers.HyperlinkedModelSerializer):

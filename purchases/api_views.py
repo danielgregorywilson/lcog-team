@@ -9,8 +9,62 @@ from rest_framework.response import Response
 
 from mainsite.helpers import record_error
 from people.models import Employee
-from purchases.models import Expense, ExpenseMonth
-from purchases.serializers import ExpenseMonthSerializer, ExpenseSerializer
+from purchases.models import Expense, ExpenseGL, ExpenseMonth
+from purchases.serializers import (
+    ExpenseGLSerializer, ExpenseMonthSerializer, ExpenseSerializer
+)
+
+
+class ExpenseGLViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for credit card expense general ledger entries.
+    """
+    queryset = ExpenseGL.objects.all()
+    serializer_class = ExpenseGLSerializer
+
+    # def create(self, request, *args, **kwargs):
+    #     code = request.data.get('code', None)
+    #     percent = request.data.get('percent', None)
+    #     approver = request.data.get('approver', None)
+    #     if code is not None:
+    #         expense_gl = ExpenseGL.objects.create(
+    #             code=code, percent=percent, approver=approver
+    #         )
+    #         serialized_expense_gl = ExpenseGLSerializer(
+    #             expense_gl, context={'request': request}
+    #         )
+    #         return Response(serialized_expense_gl.data)
+    #     else:
+    #         return Response(
+    #             data='Error creating expense GL entry.',
+    #             status=status.HTTP_500_INTERNAL_SERVER_ERROR
+    #         )
+
+    # def update(self, request, pk=None):
+    #     """
+    #     Update the expense GL entry with the given pk.
+    #     """
+    #     try:
+    #         expense_gl = ExpenseGL.objects.get(pk=pk)
+    #         code = request.data.get('code', expense_gl.code)
+    #         percent = request.data.get('percent', expense_gl.percent)
+    #         approver = request.data.get('approver', expense_gl.approver)
+    #         expense_gl.code = code
+    #         expense_gl.percent = percent
+    #         expense_gl.approver = approver
+    #         expense_gl.save()
+    #         serialized_expense_gl = ExpenseGLSerializer(
+    #             expense_gl, context={'request': request}
+    #         )
+    #         return Response(serialized_expense_gl.data)
+
+    #     except Exception as e:
+    #         message = 'Error updating expense GL entry.'
+    #         record_error(message, e, request, traceback.format_exc())
+    #         return Response(
+    #             data=message,
+    #             status=status.HTTP_500_INTERNAL_SERVER_ERROR
+    #         )
 
 
 class ExpenseViewSet(viewsets.ModelViewSet):
@@ -102,22 +156,37 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             )
             expense.vendor = request.data.get('vendor', expense.vendor)
             expense.job = request.data.get('job', expense.job)
-            expense.gls = request.data.get('gls', expense.gls)
+            
+            gl_pks = []
 
-            current_approver = expense.approver
-            new_approver = request.data.get('approver')
-            if current_approver is None and new_approver is None:
-                pass
-            else:
-                current_pk = None
-                if current_approver is not None:
-                    current_pk = current_approver.pk
-                new_pk = new_approver.get('pk', None)
-                if current_pk != new_pk:
-                    if new_pk == -1:
-                        expense.approver = None
+            # Update all the GLs
+            for gl in request.data.get('gls'):
+                pk = gl.get('pk', None)
+                code = gl.get('code', None)
+                percent = gl.get('percent', None)
+                approver_obj = gl.get('approver')
+                if not approver_obj:
+                    approver_obj = {
+                        'pk': -1, 'name': '', 'legal_name': '', 'title': ''
+                    }
+                approver = None
+                if approver_obj['pk'] != -1:
+                    approver = Employee.objects.get(pk=approver_obj['pk'])
+                if code is not None:
+                    if pk is not None:
+                        expense_gl = ExpenseGL.objects.get(pk=pk)
                     else:
-                        expense.approver = Employee.objects.get(pk=new_pk)
+                        expense_gl = ExpenseGL.objects.create(expense=expense)
+                    expense_gl.code = code
+                    expense_gl.percent = percent
+                    expense_gl.approver = approver
+                    expense_gl.save()
+                    gl_pks.append(expense_gl.pk)
+            
+            # Delete any GLs that were removed
+            for gl in expense.gls.all():
+                if gl.pk not in gl_pks:
+                    gl.delete()
 
             expense.save()
             serialized_expense = ExpenseSerializer(

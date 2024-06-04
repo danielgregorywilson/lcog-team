@@ -114,6 +114,23 @@ class ExpenseBaseModel(models.Model):
     )
 
 
+class ExpenseGL(models.Model):
+    class Meta:
+        ordering = ["pk",]
+
+    expense = models.ForeignKey(
+        'Expense', on_delete=models.CASCADE, related_name='gls'
+    )
+    code = models.CharField(max_length=255, blank=True)
+    percent = models.FloatField(blank=True, null=True)
+    approver = models.ForeignKey(
+        Employee, blank=True, null=True, on_delete=models.SET_NULL,
+        related_name='expense_gls'
+    )
+    approved = models.BooleanField(default=False)
+    approved_at = models.DateTimeField(blank=True, null=True)
+
+
 class Expense(ExpenseBaseModel):
     class Meta:
         ordering = ["pk",]
@@ -123,17 +140,12 @@ class Expense(ExpenseBaseModel):
     description = models.CharField(max_length=511, blank=True)
     vendor = models.CharField(max_length=255, blank=True)
     job = models.CharField(max_length=255, blank=True)
-    gls = models.JSONField(_("GL Codes"), blank=True, default=list)
     purchaser = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='expenses_purchased',
     )
     receipt = models.FileField(
         _("receipt"), upload_to="uploads/expenses", blank=True, null=True
-    )
-    approver = models.ForeignKey(
-        Employee, blank=True, null=True, on_delete=models.SET_NULL,
-        related_name='approver_of_expenses',
     )
     approved_at = models.DateTimeField(blank=True, null=True)
 

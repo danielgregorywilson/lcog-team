@@ -104,7 +104,7 @@
               v-for="gl in props.row.gls"
               :key="props.row.gls.indexOf(gl)"
             >
-              {{ gl.gl }}: {{ gl.percent }}%
+              {{ gl.code }}: {{ gl.percent }}% – {{ gl.approver?.name }}
             </div>
             <q-popup-edit
               v-if="!rowSubmitted(props.row)"
@@ -116,22 +116,22 @@
               <div
                 v-for="(gl, idx) in scope.value"
                 :key="scope.value.indexOf(gl)"
-                class="row"
+                class="row items-center"
               >
                 <q-input
-                  v-model="gl.gl"
-                  class="q-mr-sm"
+                  v-model="gl.code"
+                  class="q-mr-sm q-pa-none"
                   outlined dense autofocus
                   mask="##-#####-###"
                   :rules="[
                     val => !!val || 'Required',
                   ]"
                 />
-                <div class="row">
+                <div class="row q-mr-sm">
                   <q-input
                     v-model="gl.percent"
                     type="number"
-                    class="gl-percent"
+                    class="gl-percent q-pa-none"
                     outlined dense autofocus
                     @keyup.enter="scope.set()"
                     :rules="[
@@ -141,39 +141,30 @@
                   />
                   <div class="gl-percent-symbol">%</div>
                 </div>
+                <EmployeeSelect
+                  name="approver"
+                  label="Approver"
+                  :employee="gl.approver"
+                  :useLegalName="true"
+                  v-on:input="gl.approver=$event"
+                  v-on:clear="gl.approver=emptyEmployee"
+                  :readOnly=false
+                  :employeeFilterFn="(employee: SimpleEmployeeRetrieve) => {
+                    return employee.is_expense_approver
+                  }"
+                />
                 <q-icon
                   name="cancel"
                   size="sm"
                   @click.stop="scope.value.splice(idx, 1)"
-                  class="cursor-pointer q-mt-sm q-ml-sm"
+                  class="cursor-pointer q-ml-sm"
                 />
               </div>
-              <q-btn @click="scope.value.push({gl: '', percent: 100})">
+              <q-btn @click="scope.value.push(
+                {code: '', percent: 100, approver: emptyEmployee}
+              )">
                 Add a GL
               </q-btn>
-            </q-popup-edit>
-          </q-td>
-          <q-td key="approver" :props="props">
-            {{ props.row.approver?.name }}
-            <q-popup-edit
-              v-if="!rowSubmitted(props.row)"
-              v-model="props.row.approver"
-              buttons
-              v-slot="scope"
-              @save="(val) => updateExpense(props.row.pk, 'approver', val)"
-            >
-              <EmployeeSelect
-                name="approver"
-                label="Approver"
-                :employee="scope.value"
-                :useLegalName="true"
-                v-on:input="scope.value=$event"
-                v-on:clear="scope.value=emptyEmployee"
-                :readOnly=false
-                :employeeFilterFn="(employee: SimpleEmployeeRetrieve) => {
-                  return employee.is_expense_approver
-                }"
-              />
             </q-popup-edit>
           </q-td>
           <q-td key="receipt" :props="props">
@@ -220,38 +211,35 @@
       <!-- For grid mode, we need to specify everything in order for our action buttons to render -->
       <template v-slot:item="props">
         <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
-          <q-card class="q-py-sm" :class="rowSubmitted(props.row)?'bg-grey':'cursor-pointer'">
+          <q-card
+            class="q-py-sm"
+            :class="rowSubmitted(props.row)?'bg-grey':'cursor-pointer'"
+          >
             <q-list dense>
               <q-item v-for="col in props.cols" :key="col.name">
                 <div class="q-table__grid-item-row">
                   <div class="q-table__grid-item-title">{{ col.label }}</div>
                   <div
                     class="q-table__grid-item-value"
-                    v-if="col.label == 'Date'"
+                    v-if="col.name == 'date'"
                   >
                     {{ readableDateNEW(col.value) }}
                   </div>
                   <div
                     class="q-table__grid-item-value"
-                    v-else-if="col.label == 'GL Codes'"
+                    v-else-if="col.name == 'gls'"
                   >
                     <div
                       class="text-pre-wrap"
                       v-for="gl in props.row.gls"
                       :key="props.row.gls.indexOf(gl)"
                     >
-                      {{ gl.gl }}: {{ gl.percent }}%
+                      {{ gl.code }}: {{ gl.percent }}% – {{ gl.approver?.name }}
                     </div>
                   </div>
                   <div
-                      class="q-table__grid-item-value"
-                      v-else-if="col.label == 'Approver'"
-                    >
-                      {{ col.value.name }}
-                    </div>
-                  <div
                     class="q-table__grid-item-value row"
-                    v-else-if="col.label == 'Receipt'"
+                    v-else-if="col.name == 'receipt'"
                   >
                     <DocumentViewer
                       v-if="col.value"
@@ -460,10 +448,9 @@ const columns = [
     name: 'job', field: 'job', label: 'Job #', align: 'center', sortable: true
   },
   {
-    name: 'gls', field: 'gls', label: 'GL Codes', align: 'center',
+    name: 'gls', field: 'gls', label: 'GL Codes – Approver', align: 'center',
     sortable: true, style: 'width: 10px'
   },
-  { name: 'approver', field: 'approver', label: 'Approver', align: 'center' },
   { name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' }
 ]
 
@@ -521,19 +508,25 @@ function formErrorItems() {
       errorItems.push(`Provide a name for the expense on ${exp.date}`)
     }
     for (let gl of exp.gls) {
-      if (!gl.gl || gl.gl.length !== 12) {
-        errorItems.push(`Provide a valid GL code for each GL row in ${exp.name}`)
+      if (!gl.code || gl.code.length !== 12) {
+        errorItems.push(
+          `Provide a valid GL code for each GL row in ${exp.name}`
+        )
       }
       if (!gl.percent) {
-        errorItems.push(`Provide a GL percentage for each GL row in ${exp.name}`)
+        errorItems.push(
+          `Provide a GL percentage for each GL row in ${exp.name}`
+        )
+      }
+      if (!gl.approver || gl.approver?.pk == -1) {
+        errorItems.push(`Provide an approver for each GL row in ${exp.name}`)
       }
     }
-    const GLsTotal = exp.gls.reduce((acc, gl) => acc + parseFloat(gl.percent), 0)
+    const GLsTotal = exp.gls.reduce(
+      (acc, gl) => acc + parseFloat(gl.percent), 0
+    )
     if (GLsTotal !== 100) {
       errorItems.push(`GL percentages of ${exp.name} must add to 100`)
-    }
-    if (!exp.approver || exp.approver?.pk == -1) {
-      errorItems.push(`Provide an approver for ${exp.name}`)
     }
     if (!exp.receipt) {
       errorItems.push(

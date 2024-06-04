@@ -11,7 +11,7 @@
       v-else
       flat bordered
       :title="tableTitleDisplay()"
-      :rows="selectedMonthExpenses()"
+      :rows="selectedMonthExpenseGLs()"
       :columns="columns"
       :dense="$q.screen.lt.lg"
       :grid="$q.screen.lt.md"
@@ -161,7 +161,7 @@ import DocumentViewer from 'src/components/DocumentViewer.vue'
 import { readableDateNEW } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
 import { usePurchaseStore } from 'src/stores/purchase'
-import { Expense } from 'src/types'
+import { Expense, GL } from 'src/types'
 
 const purchaseStore = usePurchaseStore()
 
@@ -186,32 +186,32 @@ const pagination = {
 
 const columns = [
   { 
-    name: 'purchaser', field: 'purchaser', label: 'Purchaser', required: true,
+    name: 'expense_purchaser', field: 'expense_purchaser', label: 'Purchaser', required: true,
     align: 'left', sortable: true
   },
   {
-    name: 'name', field: 'name', label: 'Name', required: true, align: 'left',
+    name: 'expense_name', field: 'expense_name', label: 'Name', required: true, align: 'left',
     sortable: true
   },
+  // {
+  //   name: 'date', field: 'date', label: 'Date', align: 'center', sortable: true
+  // },
+  // {
+  //   name: 'description', field: 'description', label: 'Description',
+  //   align: 'center', sortable: true
+  // },
+  // {
+  //   name: 'vendor', field: 'vendor', label: 'Vendor', align: 'center',
+  //   sortable: true
+  // },
+  // {
+  //   name: 'job', field: 'job', label: 'Job #', align: 'center', sortable: true
+  // },
   {
-    name: 'date', field: 'date', label: 'Date', align: 'center', sortable: true
-  },
-  {
-    name: 'description', field: 'description', label: 'Description',
-    align: 'center', sortable: true
-  },
-  {
-    name: 'vendor', field: 'vendor', label: 'Vendor', align: 'center',
-    sortable: true
-  },
-  {
-    name: 'job', field: 'job', label: 'Job #', align: 'center', sortable: true
-  },
-  {
-    name: 'gl', field: 'gl', label: 'GL Code', align: 'center',
+    name: 'code', field: 'code', label: 'GL Code', align: 'center',
     sortable: true, style: 'width: 10px'
   },
-  { name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' },
+  // { name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' },
   { name: 'approve', label: 'Approve?', field: 'approved', align: 'center' },
 ]
 
@@ -229,21 +229,21 @@ function tableTitleDisplay(): string {
   return `${props.monthDisplay} - Expenses to Approve`
 }
 
-function selectedMonthExpenses(): Expense[] {
-  const apiResults = purchaseStore.approvalExpenses
-  let exps: Expense[] = []
+function selectedMonthExpenseGLs(): Expense[] {
+  const apiResults = purchaseStore.approvalExpenseGLs
+  let gls: GL[] = []
   if (apiResults) {
-    exps = apiResults.filter(exp => {
-      let [y, m] = exp.date.split('-').map(s => parseInt(s))
+    gls = apiResults.filter(gl => {
+      let [y, m] = gl.expense_date.split('-').map(s => parseInt(s))
       return m === props.monthInt && y === props.yearInt
     })
   }
-  return exps
+  return gls
 }
 
 function retrieveThisMonthExpensesToApprove(): Promise<void> {
   return new Promise((resolve, reject) => {
-    purchaseStore.getApprovalExpenses(props.yearInt, props.monthInt)
+    purchaseStore.getApprovalGLs(props.yearInt, props.monthInt)
       .then(() => {
         thisMonthLoaded.value = true
         resolve()
@@ -257,7 +257,7 @@ function retrieveThisMonthExpensesToApprove(): Promise<void> {
 
 function retrieveAllExpensesToApprove(): Promise<void> {
   return new Promise((resolve, reject) => {
-    purchaseStore.getApprovalExpenses()
+    purchaseStore.getApprovalGLs()
       .then(() => {
         allExpensesLoaded.value = true
         resolve()

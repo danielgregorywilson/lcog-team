@@ -22,6 +22,50 @@ class ExpenseGLViewSet(viewsets.ModelViewSet):
     queryset = ExpenseGL.objects.all()
     serializer_class = ExpenseGLSerializer
 
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated: 
+            if user.is_superuser:
+                return super().get_queryset()
+            
+            approve = self.request.query_params.get('approve', None)
+            if approve:
+                year = self.request.query_params.get('year', None)
+                month = self.request.query_params.get('month', None)
+                if year and month:
+                    return ExpenseGL.objects.filter(
+                        approver=user.employee,
+                        expense__date__year=year,
+                        expense__date__month=month,
+                        expense__status__in=[
+                            Expense.STATUS_SUBMITTED,
+                            Expense.STATUS_APPROVER_APPROVED,
+                            Expense.STATUS_APPROVER_DENIED
+                        ]
+                    )
+                else:
+                    return ExpenseGL.objects.filter(
+                        approver=user.employee,
+                        expense__status__in=[
+                            Expense.STATUS_SUBMITTED,
+                            Expense.STATUS_APPROVER_APPROVED,
+                            Expense.STATUS_APPROVER_DENIED
+                        ]
+                    )
+            
+            # start = self.request.query_params.get('start', None)
+            # end = self.request.query_params.get('end', None)
+            # if start and end:
+            #     return Expense.objects.filter(
+            #         purchaser=self.request.user.employee,
+            #         date__range=[start, end]
+            #     )
+            return ExpenseGL.objects.filter(
+                expense__purchaser=self.request.user.employee
+            )
+        else:
+            return ExpenseGL.objects.none()
+
     # def create(self, request, *args, **kwargs):
     #     code = request.data.get('code', None)
     #     percent = request.data.get('percent', None)

@@ -8,9 +8,9 @@ export const usePurchaseStore = defineStore('purchase', {
   state: () => ({
     expenseMonths: [] as Array<ExpenseMonth>,
     myExpenses: [] as Array<Expense>,
-    approvalExpenses: [] as Array<Expense>,
+    approvalExpenseGLs: [] as Array<Expense>,
     fiscalExpenseMonths: [] as Array<ExpenseMonth>,
-    numExpensesToApprove: 0,
+    numExpenseGLsToApprove: 0,
     numExpensesFiscalToApprove: 0
   }),
 
@@ -98,7 +98,7 @@ export const usePurchaseStore = defineStore('purchase', {
     /// Approver ///
     ////////////////
 
-    getApprovalExpenses(
+    getApprovalGLs(
       yearInt: number | null = null,
       monthInt: number | null = null
     ): Promise<null> {
@@ -108,24 +108,24 @@ export const usePurchaseStore = defineStore('purchase', {
           params = `?year=${ yearInt }&month=${ monthInt }&approve=true`
         }
         axios({
-          url: `${ apiURL }api/v1/expense${ params }`
+          url: `${ apiURL }api/v1/expense-gl${ params }`
         })
           .then(resp => {
-            const exps = resp.data.results
+            const expGLs = resp.data.results
             let toApproveCount = 0
-            let expenses = [] as Array<Expense>
-            for (const exp of exps) {
-              if (exp.status == 'submitted') {
+            let expenseGLs = [] as Array<Expense>
+            for (const gl of expGLs) {
+              if (gl.expense_status == 'submitted') {
                 toApproveCount++
               }
-              expenses = expenses.concat(exp)
+              expenseGLs = expenseGLs.concat(gl)
             }
-            this.approvalExpenses = expenses
-            this.numExpensesToApprove = toApproveCount
+            this.approvalExpenseGLs = expenseGLs
+            this.numExpenseGLsToApprove = toApproveCount
             resolve(resp.data.results)
           })
           .catch(e => {
-            handlePromiseError(reject, 'Error getting approval expenses', e)
+            handlePromiseError(reject, 'Error getting approval expense GLs', e)
           })
       })
     },

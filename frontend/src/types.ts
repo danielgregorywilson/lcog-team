@@ -388,6 +388,8 @@ export interface GL {
   percent: string
   approver?: SimpleEmployeeRetrieve
   approved: boolean
+  expense_status: string
+  expense_date: string
 }
 
 /////////////////////////////////////////////////////////

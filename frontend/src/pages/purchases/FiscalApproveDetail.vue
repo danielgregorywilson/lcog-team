@@ -279,6 +279,14 @@ const printColumns = [
     name: 'date', field: 'date', label: 'Date', align: 'center', sortable: true
   },
   {
+    name: 'description', field: 'description', label: 'Description',
+    align: 'center', sortable: true
+  },
+  {
+    name: 'vendor', field: 'vendor', label: 'Vendor', align: 'center',
+    sortable: true
+  },
+  {
     name: 'job', field: 'job', label: 'Job #', align: 'center', sortable: true
   },
   {

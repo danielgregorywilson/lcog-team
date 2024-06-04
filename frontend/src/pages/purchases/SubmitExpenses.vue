@@ -66,7 +66,7 @@
             <div class="text-pre-wrap">{{ props.row.description }}</div>
             <q-popup-edit
               v-if="!rowSubmitted(props.row)"
-              v-model="props.row.job"
+              v-model="props.row.description"
               buttons
               v-slot="scope"
               @save="(val) => updateExpense(props.row.pk, 'description', val)"

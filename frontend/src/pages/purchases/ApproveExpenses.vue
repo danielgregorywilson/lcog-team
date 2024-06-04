@@ -56,21 +56,23 @@
           <div class="row justify-center">
             <q-btn 
               dense round color="red" icon="close"
-              :outline="['submitted', 'approver_approved'].indexOf(props.row.status) > -1"
+              :outline="['submitted', 'approver_approved']
+                .indexOf(props.row.status) > -1"
               :disable="!canApprove || props.row.status == 'approver_denied'"
               class="q-mr-sm"
               @click="approveExpense(props.row.pk, false)"
             />
             <q-btn
               dense round color="green" icon="check"
-              :outline="['submitted', 'approver_denied'].indexOf(props.row.status) > -1"
+              :outline="['submitted', 'approver_denied']
+                .indexOf(props.row.status) > -1"
               :disable="!canApprove || props.row.status == 'approver_approved'"
               @click="approveExpense(props.row.pk, true)"
             />
           </div>
         </q-td>
       </template>
-      <!-- For grid mode, we need to specify everything in order for our action buttons to render -->
+      <!-- GRID MODE -->
       <template v-slot:item="props">
         <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
           <q-card class="q-py-sm">
@@ -112,18 +114,25 @@
                       :iconButton="true"
                     />
                   </div>
-                  <div class="q-table__grid-item-value row q-gutter-sm" v-else-if="col.label == 'Approve?'">
+                  <div
+                    v-else-if="col.label == 'Approve?'"  
+                    class="q-table__grid-item-value row q-gutter-sm"  
+                  >
                     <q-btn 
                       dense round color="red" icon="close"
-                      :outline="['submitted', 'approver_approved'].indexOf(props.row.status) > -1"
-                      :disable="!canApprove || props.row.status == 'approver_denied'"
+                      :outline="['submitted', 'approver_approved']
+                        .indexOf(props.row.status) > -1"
+                      :disable="!canApprove ||
+                        props.row.status == 'approver_denied'"
                       class="q-mr-sm"
                       @click="approveExpense(props.row.pk, false)"
                     />
                     <q-btn
                       dense round color="green" icon="check"
-                      :outline="['submitted', 'approver_denied'].indexOf(props.row.status) > -1"
-                      :disable="!canApprove || props.row.status == 'approver_approved'"
+                      :outline="['submitted', 'approver_denied']
+                        .indexOf(props.row.status) > -1"
+                      :disable="!canApprove ||
+                        props.row.status == 'approver_approved'"
                       @click="approveExpense(props.row.pk, true)"
                     />
                   </div>

@@ -61,8 +61,6 @@ else:
 # Application definition
 
 INSTALLED_APPS = [
-    'django_extensions',
-    
     'api',
     'mainsite',
 

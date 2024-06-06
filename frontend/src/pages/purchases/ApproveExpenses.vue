@@ -20,18 +20,13 @@
       :pagination="pagination"
       class="expense-table"
     >
-      <template v-slot:body-cell-purchaser="props">
-        <q-td key="purchaser" :props="props">
-          {{ props.row.purchaser.name }}
+      <template v-slot:body-cell-expenseDate="props">
+        <q-td key="expenseDate" :props="props">
+          {{ readableDateNEW(props.row.expense_date) }}
         </q-td>
       </template>
-      <template v-slot:body-cell-date="props">
-        <q-td key="date" :props="props">
-          {{ readableDateNEW(props.row.date) }}
-        </q-td>
-      </template>
-      <template v-slot:body-cell-gls="props">
-        <q-td key="gls" :props="props">
+      <template v-slot:body-cell-gl="props">
+        <q-td key="gl" :props="props">
           <div
             class="text-pre-wrap"
             v-for="gl in props.row.gls"
@@ -40,7 +35,7 @@
             {{ gl.gl }}: {{ gl.percent }}%
           </div>
         </q-td>
-      </template>
+
       <template v-slot:body-cell-receipt="props">
         <q-td key="receipt" :props="props">
           <DocumentViewer
@@ -186,27 +181,29 @@ const pagination = {
 
 const columns = [
   { 
-    name: 'expense_purchaser', field: 'expense_purchaser', label: 'Purchaser', required: true,
+    name: 'expense_purchaser', field: 'expense_purchaser', label: 'Purchaser',
+    required: true, align: 'left', sortable: true
+  },
+  {
+    name: 'expense_name', field: 'expense_name', label: 'Name', required: true,
     align: 'left', sortable: true
   },
   {
-    name: 'expense_name', field: 'expense_name', label: 'Name', required: true, align: 'left',
+    name: 'expense_date', field: 'expense_date', label: 'Date', align: 'center',
     sortable: true
   },
-  // {
-  //   name: 'date', field: 'date', label: 'Date', align: 'center', sortable: true
-  // },
-  // {
-  //   name: 'description', field: 'description', label: 'Description',
-  //   align: 'center', sortable: true
-  // },
-  // {
-  //   name: 'vendor', field: 'vendor', label: 'Vendor', align: 'center',
-  //   sortable: true
-  // },
-  // {
-  //   name: 'job', field: 'job', label: 'Job #', align: 'center', sortable: true
-  // },
+  {
+    name: 'expense_description', field: 'expense_description',
+    label: 'Description', align: 'center', sortable: true
+  },
+  {
+    name: 'expense_vendor', field: 'expense_vendor', label: 'Vendor',
+    align: 'center', sortable: true
+  },
+  {
+    name: 'expense_job', field: 'expense_job', label: 'Job #', align: 'center',
+    sortable: true
+  },
   {
     name: 'code', field: 'code', label: 'GL Code', align: 'center',
     sortable: true, style: 'width: 10px'

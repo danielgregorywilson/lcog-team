@@ -119,9 +119,6 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     serializer_class = ExpenseSerializer
 
     def create(self, request, *args, **kwargs):
-        approver = None
-        if request.user.employee.manager is not None:
-            approver = request.user.employee.manager
         date = request.data.get('date', None)
         if date is not None:
             date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
@@ -130,7 +127,6 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         expense = Expense.objects.create(
             purchaser=request.user.employee,
             date=date,
-            approver=approver
         )
         ExpenseMonth.objects.get_or_create(
             employee=request.user.employee,

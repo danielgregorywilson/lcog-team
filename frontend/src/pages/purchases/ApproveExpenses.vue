@@ -20,27 +20,21 @@
       :pagination="pagination"
       class="expense-table"
     >
-      <template v-slot:body-cell-expenseDate="props">
-        <q-td key="expenseDate" :props="props">
+      <template v-slot:body-cell-expense_date="props">
+        <q-td key="expense_date" :props="props">
           {{ readableDateNEW(props.row.expense_date) }}
         </q-td>
       </template>
       <template v-slot:body-cell-gl="props">
         <q-td key="gl" :props="props">
-          <div
-            class="text-pre-wrap"
-            v-for="gl in props.row.gls"
-            :key="props.row.gls.indexOf(gl)"
-          >
-            {{ gl.gl }}: {{ gl.percent }}%
-          </div>
+          {{ props.row.code }}: {{ props.row.percent }}%{{ props.row.expense_receipt }}
         </q-td>
-
+      </template>
       <template v-slot:body-cell-receipt="props">
         <q-td key="receipt" :props="props">
           <DocumentViewer
-            v-if="props.row.receipt"
-            :documentUrl="props.row.receipt"
+            v-if="props.row.expense_receipt"
+            :documentUrl="props.row.expense_receipt"
             iconButton
             flat
           />
@@ -205,10 +199,10 @@ const columns = [
     sortable: true
   },
   {
-    name: 'code', field: 'code', label: 'GL Code', align: 'center',
+    name: 'gl', field: 'gl', label: 'GL Code', align: 'center',
     sortable: true, style: 'width: 10px'
   },
-  // { name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' },
+  { name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' },
   { name: 'approve', label: 'Approve?', field: 'approved', align: 'center' },
 ]
 

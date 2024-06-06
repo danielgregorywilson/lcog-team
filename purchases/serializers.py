@@ -12,7 +12,7 @@ class ExpenseGLSerializer(serializers.HyperlinkedModelSerializer):
                 'url', 'pk', 'code', 'percent', 'approver', 'approved',
                 'approved_at', 'expense_name', 'expense_date',
                 'expense_description', 'expense_vendor', 'expense_job',
-                'expense_purchaser', 'expense_status'
+                'expense_receipt', 'expense_purchaser', 'expense_status'
             ]
     
         approver = SimpleEmployeeSerializer(required=False)
@@ -30,6 +30,9 @@ class ExpenseGLSerializer(serializers.HyperlinkedModelSerializer):
         )
         expense_job = serializers.CharField(
             source='expense.job', read_only=True
+        )
+        expense_receipt = serializers.CharField(
+            source='expense.receipt', read_only=True
         )
         expense_purchaser = serializers.CharField(
             source='expense.purchaser.name', read_only=True

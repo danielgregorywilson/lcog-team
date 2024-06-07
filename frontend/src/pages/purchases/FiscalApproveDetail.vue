@@ -210,9 +210,9 @@
 </style>
 
 <script setup lang="ts">
+import { useQuasar } from 'quasar'
 import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useQuasar } from 'quasar'
 
 import DocumentViewer from 'src/components/DocumentViewer.vue'
 import { readableDateNEW, readableDateTime } from 'src/filters'

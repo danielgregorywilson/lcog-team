@@ -33,7 +33,6 @@
       class="expense-table"
     >
       <template v-slot:body="props">
-
         <q-tr
           :props="props"
           :class="rowSubmitted(props.row)?'bg-grey':'cursor-pointer'"
@@ -206,9 +205,20 @@
               </q-btn>
             </div>
           </q-td>
+          <q-td key="actions" :props="props">
+            <q-btn
+              v-if="!rowSubmitted(props.row)"
+              class="col"
+              dense
+              round
+              flat
+              @click="showDeleteDialog(props.row)"
+              icon="delete"
+            />
+          </q-td>
         </q-tr>
       </template>
-      <!-- For grid mode, we need to specify everything in order for our action buttons to render -->
+      <!-- GRID MODE -->
       <template v-slot:item="props">
         <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
           <q-card
@@ -298,18 +308,53 @@
 
   <!-- Errors Dialog -->
   <q-dialog v-model="showErrorsDialog">
-      <q-card style="width: 350px">
-        <q-list bordered separator>
-          <q-item
-            v-for="(item, index) in formErrorItems()"
-            :key="index"
-            clickable
-          >
-            <q-item-label>{{item}}</q-item-label>
-          </q-item>
-        </q-list>
-      </q-card>
-    </q-dialog>
+    <q-card style="width: 350px">
+      <q-list bordered separator>
+        <q-item
+          v-for="(item, index) in formErrorItems()"
+          :key="index"
+          clickable
+        >
+          <q-item-label>{{item}}</q-item-label>
+        </q-item>
+      </q-list>
+    </q-card>
+  </q-dialog>
+
+  <!-- Delete Expense Dialog -->
+  <q-dialog v-model="deleteDialogVisible">
+    <q-card>
+      <q-card-section>
+        <div class="row items-center">
+          <q-avatar
+            icon="book"
+            color="primary"
+            text-color="white"
+          />
+          <span class="q-ml-sm">
+            Are you sure you want to delete this expense?
+          </span>
+        </div>
+        <div v-if="deleteDialogExpenseName" class="row justify-center text-center">
+          Name: {{ deleteDialogExpenseName }}
+        </div>
+        <div v-if="deleteDialogExpenseDate" class="row justify-center text-center">
+          Date: {{ deleteDialogExpenseDate }}
+        </div>
+      </q-card-section>
+
+      <q-card-actions class="row justify-around">
+        <q-btn flat label="Cancel" color="primary" v-close-popup />
+        <q-btn
+          flat
+          label="Yes, delete it"
+          color="primary"
+          @click="deleteExpense()"
+          v-close-popup
+        />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 
   <!-- Submit to Fiscal Dialog -->
   <q-dialog v-model="showSubmitDialog">
@@ -403,6 +448,10 @@ const props = defineProps<{
   yearInt: number
 }>()
 
+const emit = defineEmits<{
+  (e: 'retrieve'): void
+}>()
+
 let thisMonthLoaded = ref(false)
 let allExpensesLoaded = ref(false)
 
@@ -413,6 +462,11 @@ let showUnsubmitDialog = ref(false)
 
 let firstOfThisMonth = ref(new Date())
 let firstOfSelectedMonth = ref(new Date())
+
+let deleteDialogVisible = ref(false)
+let expensePkToDelete = ref(-1)
+let deleteDialogExpenseName = ref('')
+let deleteDialogExpenseDate = ref('')
 
 function viewingThisMonth() {
   return firstOfSelectedMonth.value.getTime() ===
@@ -425,7 +479,7 @@ function expensesLoaded() {
 }
 
 const pagination = {
-  rowsPerPage: '50'
+  rowsPerPage: 50
 }
 
 const columns = [
@@ -451,7 +505,8 @@ const columns = [
     name: 'gls', field: 'gls', label: 'GL Codes – Approver', align: 'center',
     sortable: true, style: 'width: 10px'
   },
-  { name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' }
+  { name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' },
+  { name: 'actions', label: 'Actions', align: 'center', field: '' },
 ]
 
 
@@ -624,6 +679,24 @@ function updateExpense(
         console.log('Error updating expense', error)
       })
   }
+}
+
+function showDeleteDialog(expense: Expense): void {
+  expensePkToDelete.value = expense.pk
+  deleteDialogExpenseName.value = expense.name
+  deleteDialogExpenseDate.value = expense.date
+  deleteDialogVisible.value = true
+}
+
+function deleteExpense(): void {
+  purchaseStore.deleteExpense(expensePkToDelete.value)
+    .then(() => {
+      quasar.notify('Deleted an expense.')
+      retrieveAllMyExpenses()
+    })
+    .catch(e => {
+      console.error(e)
+    })
 }
 
 function setDates() {

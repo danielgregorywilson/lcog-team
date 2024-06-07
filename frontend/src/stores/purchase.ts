@@ -41,6 +41,19 @@ export const usePurchaseStore = defineStore('purchase', {
           })
       })
     },
+    deleteExpense(pk: number): Promise<null> {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/expense/${ pk }`, method: 'DELETE'
+        })
+          .then(() => {
+            resolve(null)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error deleting expense', e)
+          })
+      })
+    },
     
     /////////////////
     /// Submitter ///

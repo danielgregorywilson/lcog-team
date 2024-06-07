@@ -42,13 +42,8 @@
               v-for="gl in props.row.gls"
               :key="props.row.gls.indexOf(gl)"
             >
-              {{ gl.gl }}: {{ gl.percent }}%
+              {{ gl.code }}: {{ gl.percent }}% – {{ gl.approver.name }}
             </div>
-          </q-td>
-        </template>
-        <template v-slot:body-cell-approver="props">
-          <q-td key="date" :props="props">
-            {{ props.row.approver.name }}
           </q-td>
         </template>
         <template v-slot:body-cell-approvedAt="props">
@@ -65,7 +60,7 @@
             />
           </q-td>
         </template>
-        <!-- For grid mode, we need to specify everything in order for our action buttons to render -->
+        <!-- GRID MODE -->
         <template v-slot:item="props">
           <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
             <q-card class="q-py-sm">
@@ -88,14 +83,9 @@
                         v-for="gl in props.row.gls"
                         :key="props.row.gls.indexOf(gl)"
                       >
-                        {{ gl.gl }}: {{ gl.percent }}%
+                        {{ gl.code }}: {{ gl.percent }}% –
+                        {{ gl.approver.name }}
                       </div>
-                    </div>
-                    <div
-                      class="q-table__grid-item-value"
-                      v-else-if="col.label == 'Approver'"
-                    >
-                      {{ col.value.name }}
                     </div>
                     <div
                       class="q-table__grid-item-value"
@@ -148,7 +138,10 @@
 
   <!-- Display Receipts for Print View -->
   <div v-if="props.print">
-    <div v-for="expense in selectedMonthExpenseMonthExpenses()" :key="expense.pk">
+    <div
+      v-for="expense in selectedMonthExpenseMonthExpenses()"
+      :key="expense.pk"
+    >
       <q-img :src="expense.receipt" />
     </div>
   </div>
@@ -156,7 +149,9 @@
   <!-- Approve Dialog -->
   <q-dialog v-model="showApproveDialog">
     <q-card class="q-pa-md" style="width: 400px">
-      <div class="text-h6">Approve {{monthDisplay}} expenses for {{ employeeName }}?</div>
+      <div class="text-h6">
+        Approve {{monthDisplay}} expenses for {{ employeeName }}?
+      </div>
       <q-form
         @submit='onSubmitApproveDialog()'
         class="q-gutter-md"
@@ -177,7 +172,9 @@
   <!-- Deny Dialog -->
   <q-dialog v-model="showDenyDialog">
     <q-card class="q-pa-md" style="width: 400px">
-      <div class="text-h6">Deny {{monthDisplay}} expenses for {{ employeeName }}?</div>
+      <div class="text-h6">
+        Deny {{monthDisplay}} expenses for {{ employeeName }}?
+      </div>
       <q-form
         @submit='onSubmitDenyDialog()'
         class="q-gutter-md"
@@ -207,10 +204,10 @@
 </template>
 
 <style scoped lang="scss">
-  .approval-notes {
-    white-space: normal;
-  }
-  </style>
+.approval-notes {
+  white-space: normal;
+}
+</style>
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
@@ -290,10 +287,9 @@ const printColumns = [
     name: 'job', field: 'job', label: 'Job #', align: 'center', sortable: true
   },
   {
-    name: 'gls', field: 'gls', label: 'GL Codes', align: 'center', sortable: true,
-    style: 'width: 10px'
+    name: 'gls', field: 'gls', label: 'GL Codes', align: 'center',
+    sortable: true, style: 'width: 10px'
   },
-  { name: 'approver', field: 'approver', label: 'Approver', align: 'center' },
   {
     name: 'approvedAt', field: 'approved_at', label: 'Approved At',
     align: 'center'

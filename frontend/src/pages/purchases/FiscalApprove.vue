@@ -22,6 +22,7 @@
           <q-tr
             :props="props"
             :no-hover="!expenseMonthManagerApproved(props.row)"
+            :class="{'cursor-pointer': expenseMonthManagerApproved(props.row)}"
             @click="navigateToDetail(
               expenseMonthManagerApproved(props.row), props.row.employee.pk
             )"

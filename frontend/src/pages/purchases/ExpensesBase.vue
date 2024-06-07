@@ -21,8 +21,8 @@
           icon="bookmark_added"
           :label="$q.screen.xs ? 'Approve' : 'Approve Expenses'"
         >
-          <q-badge v-if="numExpensesToApprove()" rounded color="red" floating>
-            {{ numExpensesToApprove() }}
+          <q-badge v-if="numExpenseGLsToApprove()" rounded color="red" floating>
+            {{ numExpenseGLsToApprove() }}
           </q-badge>
         </q-btn>
         <q-btn
@@ -124,8 +124,8 @@
       : new Date(y, m + 1, 1)
   }
 
-  function numExpensesToApprove(): number {
-    return purchaseStore.numExpensesToApprove
+  function numExpenseGLsToApprove(): number {
+    return purchaseStore.numExpenseGLsToApprove
   }
 
   function numExpensesFiscalToApprove(): number {

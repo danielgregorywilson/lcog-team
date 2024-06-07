@@ -110,6 +110,58 @@ class ExpenseGLViewSet(viewsets.ModelViewSet):
     #             status=status.HTTP_500_INTERNAL_SERVER_ERROR
     #         )
 
+    @action(detail=True, methods=['put'])
+    def approve(self, request, pk=None):
+        """
+        Approve the expense GL with the given pk.
+        """
+        try:
+            gl = ExpenseGL.objects.get(pk=pk)
+            expense = gl.expense
+            approve = request.data.get('approve', True)
+            em = ExpenseMonth.objects.get_or_create(
+                employee=expense.purchaser, year=expense.date.year,
+                month=expense.date.month
+            )[0]
+            if approve:
+                gl.approved = True
+                gl.approved_at = timezone.now()
+                gl.save()
+                # If all GLs for the expense are approved, approve the expense
+                if all(gl.approved for gl in expense.gls.all()):
+                    expense.status = Expense.STATUS_APPROVER_APPROVED
+                    expense.save()
+                # If all expenses for the month are approved, approve the month
+                if all(
+                    expense.status == Expense.STATUS_APPROVER_APPROVED for
+                        expense in em.expenses
+                ):
+                    em.status = ExpenseMonth.STATUS_APPROVER_APPROVED
+                    em.save()
+            else:
+                gl.approved = False
+                gl.approved_at = timezone.now()
+                gl.save()
+                # Deny the expense
+                expense.status = Expense.STATUS_APPROVER_DENIED
+                expense.save()
+                # Deny the month
+                em.status = ExpenseMonth.STATUS_APPROVER_DENIED
+                em.save()
+            # Return the updated expense
+            serialized_gl = ExpenseGLSerializer(
+                gl, context={'request': request}
+            )
+            return Response(serialized_gl.data)
+
+        except Exception as e:
+            message = 'Error approving expense.'
+            record_error(message, e, request, traceback.format_exc())
+            return Response(
+                data=message,
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
 
 class ExpenseViewSet(viewsets.ModelViewSet):
     """
@@ -242,40 +294,6 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-    @action(detail=True, methods=['put'])
-    def approve(self, request, pk=None):
-        """
-        Approve the expense with the given pk.
-        """
-        try:
-            expense = Expense.objects.get(pk=pk)
-            approve = request.data.get('approve', True)
-            if approve:
-                expense.status = Expense.STATUS_APPROVER_APPROVED
-                expense.approved_at = timezone.now()
-                # If all expenses for the month are approved, approve the month
-                em = ExpenseMonth.objects.get_or_create(
-                    employee=expense.purchaser, year=expense.date.year,
-                    month=expense.date.month
-                )[0]
-                em.status = ExpenseMonth.STATUS_APPROVER_APPROVED
-                em.save()
-            else:
-                expense.status = Expense.STATUS_APPROVER_DENIED
-            expense.save()
-            serialized_expense = ExpenseSerializer(
-                expense, context={'request': request}
-            )
-            return Response(serialized_expense.data)
-
-        except Exception as e:
-            message = 'Error approving expense.'
-            record_error(message, e, request, traceback.format_exc())
-            return Response(
-                data=message,
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
 
 class ExpenseMonthViewSet(viewsets.ModelViewSet):
     queryset = ExpenseMonth.objects.all()
@@ -298,34 +316,11 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
                     if employeePK:
                         return ExpenseMonth.objects.filter(
                             employee__pk=employeePK, year=year, month=month,
-                            status__in=[
-                                ExpenseMonth.STATUS_APPROVER_APPROVED,
-                                ExpenseMonth.STATUS_FISCAL_APPROVED,
-                                ExpenseMonth.STATUS_FISCAL_DENIED
-                            ]
                         )
-                    return ExpenseMonth.objects.filter(
-                        year=year, month=month, status__in=[
-                            ExpenseMonth.STATUS_APPROVER_APPROVED,
-                            ExpenseMonth.STATUS_FISCAL_APPROVED,
-                            ExpenseMonth.STATUS_FISCAL_DENIED
-                        ]
-                    )
+                    return ExpenseMonth.objects.filter(year=year, month=month)
                 if employeePK:
-                    return ExpenseMonth.objects.filter(
-                        employee__pk=employeePK, status__in=[
-                            ExpenseMonth.STATUS_APPROVER_APPROVED,
-                            ExpenseMonth.STATUS_FISCAL_APPROVED,
-                            ExpenseMonth.STATUS_FISCAL_DENIED
-                        ]
-                    )
-                return ExpenseMonth.objects.filter(
-                    status__in=[
-                        ExpenseMonth.STATUS_APPROVER_APPROVED,
-                        ExpenseMonth.STATUS_FISCAL_APPROVED,
-                        ExpenseMonth.STATUS_FISCAL_DENIED
-                    ]
-                )
+                    return ExpenseMonth.objects.filter(employee__pk=employeePK)
+                return ExpenseMonth.objects.all()
             # Employee getting own expense months
             if year and month:
                 return ExpenseMonth.objects.filter(

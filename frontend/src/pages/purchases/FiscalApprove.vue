@@ -29,13 +29,21 @@
             <q-td key="employee" :props="props">
               {{ props.row.employee.name }}
             </q-td>
-            <q-td key="submitted" :props="props">
-              <q-icon
-                v-if="expenseMonthManagerApproved(props.row)"
-                name="check"
-                size="lg"
-              />
-              <q-icon v-else color="red" name="cancel" size="lg" />
+            <q-td key="status" :props="props">
+              <q-linear-progress
+                size="25px"
+                rounded
+                :value="progressBarSize(props.row.status)"
+                :color="progressBarColor(props.row.status)"
+              >
+                <div class="absolute-full flex flex-center">
+                  <q-badge
+                    color="white"
+                    :text-color="progressBarColor(props.row.status)"
+                    :label="progressBarLabel(props.row.status)"
+                  />
+                </div>
+              </q-linear-progress>
             </q-td>
             <q-td key="approved" :props="props">
               <q-icon
@@ -93,7 +101,7 @@ const columns = [
     align: 'left'
   },
   {
-    name: 'submitted', label: 'Submitted', field: 'submitted', sortable: true,
+    name: 'status', label: 'Status', field: 'status', sortable: true,
     align: 'center'
   },
   {
@@ -128,6 +136,51 @@ function expenseMonthFiscalApproved(expenseMonth: ExpenseMonth) {
 
 function expenseMonthFiscalDenied(expenseMonth: ExpenseMonth) {
   return expenseMonth.status == 'fiscal_denied'
+}
+
+function progressBarSize(status: string) {
+  switch (status) {
+    case 'draft':
+      return 0
+    case 'submitted':
+      return .5
+    case 'approver_denied':
+      return .5
+    case 'approver_approved':
+      return 1
+    default:
+      return 0
+  }
+}
+
+function progressBarLabel(status: string) {
+  switch (status) {
+    case 'draft':
+      return 'Not Submitted'
+    case 'submitted':
+      return 'Submitted by Employee'
+    case 'approver_denied':
+      return 'Denied by Manager'
+    case 'approver_approved':
+      return 'Approved by Manager'
+    default:
+      return 'Unknown'
+  }
+}
+
+function progressBarColor(status: string) {
+  switch (status) {
+    case 'draft':
+      return 'grey'
+    case 'submitted':
+      return 'blue'
+    case 'approver_denied':
+      return 'red'
+    case 'approver_approved':
+      return 'green'
+    default:
+      return 'grey'
+  }
 }
 
 function retrieveThisMonthExpenses(): Promise<void> {

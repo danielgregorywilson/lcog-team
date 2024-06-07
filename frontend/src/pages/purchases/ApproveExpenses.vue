@@ -27,7 +27,7 @@
       </template>
       <template v-slot:body-cell-gl="props">
         <q-td key="gl" :props="props">
-          {{ props.row.code }}: {{ props.row.percent }}%{{ props.row.expense_receipt }}
+          {{ props.row.code }}: {{ props.row.percent }}%
         </q-td>
       </template>
       <template v-slot:body-cell-receipt="props">
@@ -43,20 +43,23 @@
       <template v-slot:body-cell-approve="props">
         <q-td :props="props">
           <div class="row justify-center">
+            {{ props.row.status }}
             <q-btn 
               dense round color="red" icon="close"
-              :outline="['submitted', 'approver_approved']
-                .indexOf(props.row.status) > -1"
-              :disable="!canApprove || props.row.status == 'approver_denied'"
+              :outline="!props.row.approved_at ||
+                (props.row.approved_at && props.row.approved)"
+              :disable="!canApprove ||
+                (props.row.approved_at && !props.row.approved)"
               class="q-mr-sm"
-              @click="approveExpense(props.row.pk, false)"
+              @click="approveGL(props.row.pk, false)"
             />
             <q-btn
               dense round color="green" icon="check"
-              :outline="['submitted', 'approver_denied']
-                .indexOf(props.row.status) > -1"
-              :disable="!canApprove || props.row.status == 'approver_approved'"
-              @click="approveExpense(props.row.pk, true)"
+              :outline="!props.row.approved_at ||
+                (props.row.approved_at && !props.row.approved)"
+              :disable="!canApprove ||
+                (props.row.approved_at && props.row.approved)"
+              @click="approveGL(props.row.pk, true)"
             />
           </div>
         </q-td>
@@ -109,20 +112,20 @@
                   >
                     <q-btn 
                       dense round color="red" icon="close"
-                      :outline="['submitted', 'approver_approved']
-                        .indexOf(props.row.status) > -1"
+                      :outline="!props.row.approved_at ||
+                        (props.row.approved_at && props.row.approved)"
                       :disable="!canApprove ||
-                        props.row.status == 'approver_denied'"
+                        (props.row.approved_at && !props.row.approved)"
                       class="q-mr-sm"
-                      @click="approveExpense(props.row.pk, false)"
+                      @click="approveGL(props.row.pk, false)"
                     />
                     <q-btn
                       dense round color="green" icon="check"
-                      :outline="['submitted', 'approver_denied']
-                        .indexOf(props.row.status) > -1"
+                      :outline="!props.row.approved_at ||
+                        (props.row.approved_at && !props.row.approved)"
                       :disable="!canApprove ||
-                        props.row.status == 'approver_approved'"
-                      @click="approveExpense(props.row.pk, true)"
+                        (props.row.approved_at && props.row.approved)"
+                      @click="approveGL(props.row.pk, true)"
                     />
                   </div>
                   <div class="q-table__grid-item-value" v-else>
@@ -150,7 +153,7 @@ import DocumentViewer from 'src/components/DocumentViewer.vue'
 import { readableDateNEW } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
 import { usePurchaseStore } from 'src/stores/purchase'
-import { Expense, GL } from 'src/types'
+import { GL } from 'src/types'
 
 const purchaseStore = usePurchaseStore()
 
@@ -220,7 +223,7 @@ function tableTitleDisplay(): string {
   return `${props.monthDisplay} - Expenses to Approve`
 }
 
-function selectedMonthExpenseGLs(): Expense[] {
+function selectedMonthExpenseGLs(): GL[] {
   const apiResults = purchaseStore.approvalExpenseGLs
   let gls: GL[] = []
   if (apiResults) {
@@ -232,7 +235,7 @@ function selectedMonthExpenseGLs(): Expense[] {
   return gls
 }
 
-function retrieveThisMonthExpensesToApprove(): Promise<void> {
+function retrieveThisMonthExpenseGLsToApprove(): Promise<void> {
   return new Promise((resolve, reject) => {
     purchaseStore.getApprovalGLs(props.yearInt, props.monthInt)
       .then(() => {
@@ -246,7 +249,7 @@ function retrieveThisMonthExpensesToApprove(): Promise<void> {
   })
 }
 
-function retrieveAllExpensesToApprove(): Promise<void> {
+function retrieveAllExpenseGLsToApprove(): Promise<void> {
   return new Promise((resolve, reject) => {
     purchaseStore.getApprovalGLs()
       .then(() => {
@@ -260,17 +263,17 @@ function retrieveAllExpensesToApprove(): Promise<void> {
   })
 }
 
-function approveExpense(pk: number, approved: boolean) {
+function approveGL(pk: number, approved: boolean) {
   canApprove.value = false
   setTimeout(() => {
     canApprove.value = true
   }, 1500)
-  purchaseStore.approveExpense(pk, approved)
+  purchaseStore.approveGL(pk, approved)
     .then(() => {
-      retrieveAllExpensesToApprove()
+      retrieveAllExpenseGLsToApprove()
     })
     .catch((error) => {
-      console.log('Error approving expense', error)
+      console.log('Error approving GL', error)
     })
 }
 
@@ -284,8 +287,8 @@ function setDates() {
 
 onMounted(() => {
   setDates()
-  retrieveThisMonthExpensesToApprove().then(() => {
-    retrieveAllExpensesToApprove()
+  retrieveThisMonthExpenseGLsToApprove().then(() => {
+    retrieveAllExpenseGLsToApprove()
   })
 })
 

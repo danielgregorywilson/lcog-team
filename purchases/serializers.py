@@ -31,15 +31,19 @@ class ExpenseGLSerializer(serializers.HyperlinkedModelSerializer):
         expense_job = serializers.CharField(
             source='expense.job', read_only=True
         )
-        expense_receipt = serializers.CharField(
-            source='expense.receipt', read_only=True
-        )
+        expense_receipt = serializers.SerializerMethodField()
         expense_purchaser = serializers.CharField(
             source='expense.purchaser.name', read_only=True
         )
         expense_status = serializers.CharField(
             source='expense.status', read_only=True
         )
+
+        def get_expense_receipt(self, obj):
+            request = self.context.get('request')
+            if obj.expense.receipt:
+                return str(request.build_absolute_uri(obj.expense.receipt.url))
+            return None
 
 
 class ExpenseSerializer(serializers.HyperlinkedModelSerializer):

@@ -2,13 +2,13 @@ import axios from 'axios'
 import { defineStore } from 'pinia'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
-import { Expense, ExpenseCreate, ExpenseMonth } from 'src/types'
+import { Expense, ExpenseCreate, ExpenseMonth, GL } from 'src/types'
 
 export const usePurchaseStore = defineStore('purchase', {
   state: () => ({
     expenseMonths: [] as Array<ExpenseMonth>,
     myExpenses: [] as Array<Expense>,
-    approvalExpenseGLs: [] as Array<Expense>,
+    approvalExpenseGLs: [] as Array<GL>,
     fiscalExpenseMonths: [] as Array<ExpenseMonth>,
     numExpenseGLsToApprove: 0,
     numExpensesFiscalToApprove: 0
@@ -111,11 +111,11 @@ export const usePurchaseStore = defineStore('purchase', {
           url: `${ apiURL }api/v1/expense-gl${ params }`
         })
           .then(resp => {
-            const expGLs = resp.data.results
+            const expGLs = resp.data.results as Array<GL>
             let toApproveCount = 0
-            let expenseGLs = [] as Array<Expense>
+            let expenseGLs = [] as Array<GL>
             for (const gl of expGLs) {
-              if (gl.expense_status == 'submitted') {
+              if (!gl.approved_at) {
                 toApproveCount++
               }
               expenseGLs = expenseGLs.concat(gl)
@@ -130,10 +130,10 @@ export const usePurchaseStore = defineStore('purchase', {
       })
     },
 
-    approveExpense(pk: number, approve: boolean): Promise<Expense> {
+    approveGL(pk: number, approve: boolean): Promise<Expense> {
       return new Promise((resolve, reject) => {
         axios({
-          url: `${ apiURL }api/v1/expense/${ pk }/approve`,
+          url: `${ apiURL }api/v1/expense-gl/${ pk }/approve`,
           method: 'PUT',
           data: { approve }
         })

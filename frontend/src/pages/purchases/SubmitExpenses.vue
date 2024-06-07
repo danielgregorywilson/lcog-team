@@ -507,6 +507,9 @@ function formErrorItems() {
     if (!exp.name) {
       errorItems.push(`Provide a name for the expense on ${exp.date}`)
     }
+    if (!exp.job) {
+      errorItems.push(`Provide a job number for ${exp.name}, or enter 'None'`)
+    }
     for (let gl of exp.gls) {
       if (!gl.code || gl.code.length !== 12) {
         errorItems.push(

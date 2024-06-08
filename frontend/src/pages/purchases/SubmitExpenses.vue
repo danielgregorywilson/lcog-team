@@ -35,12 +35,12 @@
       <template v-slot:body="props">
         <q-tr
           :props="props"
-          :class="rowSubmitted(props.row)?'bg-grey':'cursor-pointer'"
+          :class="monthSubmitted()?'bg-grey':'cursor-pointer'"
         >
           <q-td key="name" :props="props">
             {{ props.row.name }}
             <q-popup-edit
-              v-if="!rowSubmitted(props.row)"
+              v-if="!monthSubmitted()"
               v-model="props.row.name"
               buttons
               v-slot="scope"
@@ -52,7 +52,7 @@
           <q-td key="date" :props="props">
             {{ readableDateNEW(props.row.date) }}
             <q-popup-edit
-              v-if="!rowSubmitted(props.row)"
+              v-if="!monthSubmitted()"
               v-model="props.row.date"
               buttons
               v-slot="scope"
@@ -64,7 +64,7 @@
           <q-td key="description" :props="props">
             <div class="text-pre-wrap">{{ props.row.description }}</div>
             <q-popup-edit
-              v-if="!rowSubmitted(props.row)"
+              v-if="!monthSubmitted()"
               v-model="props.row.description"
               buttons
               v-slot="scope"
@@ -76,7 +76,7 @@
           <q-td key="vendor" :props="props">
             <div class="text-pre-wrap">{{ props.row.vendor }}</div>
             <q-popup-edit
-              v-if="!rowSubmitted(props.row)"
+              v-if="!monthSubmitted()"
               v-model="props.row.vendor"
               buttons
               v-slot="scope"
@@ -88,7 +88,7 @@
           <q-td key="job" :props="props">
             <div class="text-pre-wrap">{{ props.row.job }}</div>
             <q-popup-edit
-              v-if="!rowSubmitted(props.row)"
+              v-if="!monthSubmitted()"
               v-model="props.row.job"
               buttons
               v-slot="scope"
@@ -106,7 +106,7 @@
               {{ gl.code }}: {{ gl.percent }}% – {{ gl.approver?.name }}
             </div>
             <q-popup-edit
-              v-if="!rowSubmitted(props.row)"
+              v-if="!monthSubmitted()"
               v-model="props.row.gls"
               buttons
               v-slot="scope"
@@ -177,10 +177,10 @@
               <!-- Button to upload file -->
               <q-btn icon="cloud_upload"
                 flat
-                :disable="rowSubmitted(props.row)"
+                :disable="monthSubmitted()"
               >
                 <q-popup-edit
-                  v-if="!rowSubmitted(props.row)"
+                  v-if="!monthSubmitted()"
                   v-model="props.row.receipt"
                   buttons
                   v-slot="scope"
@@ -207,7 +207,7 @@
           </q-td>
           <q-td key="actions" :props="props">
             <q-btn
-              v-if="!rowSubmitted(props.row)"
+              v-if="!monthSubmitted()"
               class="col"
               dense
               round
@@ -223,7 +223,7 @@
         <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
           <q-card
             class="q-py-sm"
-            :class="rowSubmitted(props.row)?'bg-grey':'cursor-pointer'"
+            :class="monthSubmitted()?'bg-grey':'cursor-pointer'"
           >
             <q-list dense>
               <q-item v-for="col in props.cols" :key="col.name">
@@ -260,10 +260,10 @@
                     <!-- Button to upload file -->
                     <q-btn icon="cloud_upload"
                       flat
-                      :disable="rowSubmitted(props.row)"
+                      :disable="monthSubmitted()"
                     >
                       <q-popup-edit
-                        v-if="!rowSubmitted(props.row)"
+                        v-if="!monthSubmitted()"
                         v-model="props.row.receipt"
                         buttons
                         v-slot="scope"
@@ -533,11 +533,6 @@ function monthSubmitted() {
     return em.month === props.monthInt && em.year === props.yearInt &&
       em.status !== 'draft'
   })
-}
-
-function rowSubmitted(row: Expense) {
-  return ['submitted', 'approver_approved', 'fiscal_approved']
-    .includes(row.status)
 }
 
 function clickAddExpense(): void {

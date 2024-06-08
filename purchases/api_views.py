@@ -14,6 +14,15 @@ from purchases.serializers import (
     ExpenseGLSerializer, ExpenseMonthSerializer, ExpenseSerializer
 )
 
+def all_month_expenses_approved(em):
+    """
+    Check if all expenses in the given expense month are approved.
+    """
+    return all(
+        expense.status == Expense.STATUS_APPROVER_APPROVED
+            for expense in em.expenses
+    )
+
 
 class ExpenseGLViewSet(viewsets.ModelViewSet):
     """
@@ -113,7 +122,7 @@ class ExpenseGLViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['put'])
     def approve(self, request, pk=None):
         """
-        Approve the expense GL with the given pk.
+        Approver approves an Expense GL.
         """
         try:
             gl = ExpenseGL.objects.get(pk=pk)
@@ -132,10 +141,7 @@ class ExpenseGLViewSet(viewsets.ModelViewSet):
                     expense.status = Expense.STATUS_APPROVER_APPROVED
                     expense.save()
                 # If all expenses for the month are approved, approve the month
-                if all(
-                    expense.status == Expense.STATUS_APPROVER_APPROVED for
-                        expense in em.expenses
-                ):
+                if all_month_expenses_approved(em):
                     em.status = ExpenseMonth.STATUS_APPROVER_APPROVED
                     em.save()
             else:
@@ -231,15 +237,12 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         else:
             return Expense.objects.none()
 
-    def update(self, request, pk=None):
+    def update(self, request, pk):
         """
-        Update the expense with the given pk.
+        Submitter updates an expense.
         """
         try:
             expense = Expense.objects.get(pk=pk)
-
-            if expense.purchaser is None:
-                expense.purchaser = request.user.employee
 
             expense.name = request.data.get('name', expense.name)
             expense.date = request.data.get('date', expense.date)
@@ -264,21 +267,37 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                 approver = None
                 if approver_obj['pk'] != -1:
                     approver = Employee.objects.get(pk=approver_obj['pk'])
-                if code is not None:
-                    if pk is not None:
-                        expense_gl = ExpenseGL.objects.get(pk=pk)
-                    else:
-                        expense_gl = ExpenseGL.objects.create(expense=expense)
-                    expense_gl.code = code
-                    expense_gl.percent = percent
-                    expense_gl.approver = approver
-                    expense_gl.save()
-                    gl_pks.append(expense_gl.pk)
+                
+                if pk is not None:
+                    expense_gl = ExpenseGL.objects.get(pk=pk)
+                    # If any of the fields have changed, unapprove the GL
+                    gl_changed = False
+                    if (
+                        expense_gl.code != code or
+                        expense_gl.percent != percent or
+                        expense_gl.approver != approver
+                    ):
+                        gl_changed = True
+                    if gl_changed:
+                        expense_gl.approved = False
+                        expense_gl.approved_at = None
+                else:
+                    expense_gl = ExpenseGL.objects.create(expense=expense)
+                expense_gl.code = code
+                expense_gl.percent = percent
+                expense_gl.approver = approver
+                
+                expense_gl.save()
+                gl_pks.append(expense_gl.pk)
             
             # Delete any GLs that were removed
             for gl in expense.gls.all():
                 if gl.pk not in gl_pks:
                     gl.delete()
+
+            # Set the expense to status draft for re-approval
+            # in case it was previously approved.
+            expense.status = Expense.STATUS_DRAFT
 
             expense.save()
             serialized_expense = ExpenseSerializer(
@@ -333,7 +352,7 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def submit(self, request):
         """
-        Submit a month of expenses.
+        Submitter submits a month of expenses.
         """
         year = request.data['yearInt']
         month = request.data['monthInt']
@@ -342,17 +361,25 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
             em = ExpenseMonth.objects.get_or_create(
                 employee=request.user.employee, year=year, month=month
             )[0]
+
+            # MONTH
             if unsubmit:
                 em.status = ExpenseMonth.STATUS_DRAFT
             else:
-                em.status = ExpenseMonth.STATUS_SUBMITTED
-            em.save()
-            for expense in em.expenses:
-                if unsubmit:
-                    expense.status = Expense.STATUS_DRAFT
+                if all_month_expenses_approved(em):
+                    em.status = ExpenseMonth.STATUS_APPROVER_APPROVED
                 else:
+                    em.status = ExpenseMonth.STATUS_SUBMITTED
+            em.save()
+            
+            # EXPENSES
+            # If we're submitting, submit all the expenses.
+            # If we're unsubmitting, leave them as is.
+            for expense in em.expenses:
+                if not unsubmit:
                     expense.status = Expense.STATUS_SUBMITTED
                 expense.save()
+            
             serialized_expense_month = ExpenseMonthSerializer(
                 em, context={'request': request}
             )
@@ -366,9 +393,9 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
             )
         
     @action(detail=True, methods=['put'])
-    def approve(self, request, pk=None):
+    def approve(self, request, pk):
         """
-        Approve the expense month with the given pk.
+        Fiscal approves a month of expenses.
         """
         try:
             em = ExpenseMonth.objects.get(pk=pk)

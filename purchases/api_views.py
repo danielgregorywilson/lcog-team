@@ -14,13 +14,19 @@ from purchases.serializers import (
     ExpenseGLSerializer, ExpenseMonthSerializer, ExpenseSerializer
 )
 
+def all_expense_gls_approved(expense):
+    """
+    Check if all GLs for the given expense are approved.
+    """
+    return all(gl.approved for gl in expense.gls.all())
+
 def all_month_expenses_approved(em):
     """
     Check if all expenses in the given expense month are approved.
     """
     return all(
         expense.status == Expense.STATUS_APPROVER_APPROVED
-            for expense in em.expenses
+            for expense in em.expenses.all()
     )
 
 
@@ -38,15 +44,16 @@ class ExpenseGLViewSet(viewsets.ModelViewSet):
                 return super().get_queryset()
             
             approve = self.request.query_params.get('approve', None)
+            # Approver getting all Expense GLs to approve
             if approve:
                 year = self.request.query_params.get('year', None)
                 month = self.request.query_params.get('month', None)
                 if year and month:
                     return ExpenseGL.objects.filter(
                         approver=user.employee,
-                        expense__date__year=year,
-                        expense__date__month=month,
-                        expense__status__in=[
+                        expense__month__year=year,
+                        expense__month__month=month,
+                        expense__month__status__in=[
                             Expense.STATUS_SUBMITTED,
                             Expense.STATUS_APPROVER_APPROVED,
                             Expense.STATUS_APPROVER_DENIED
@@ -55,7 +62,7 @@ class ExpenseGLViewSet(viewsets.ModelViewSet):
                 else:
                     return ExpenseGL.objects.filter(
                         approver=user.employee,
-                        expense__status__in=[
+                        expense__month__status__in=[
                             Expense.STATUS_SUBMITTED,
                             Expense.STATUS_APPROVER_APPROVED,
                             Expense.STATUS_APPROVER_DENIED
@@ -182,15 +189,12 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
         else: 
             date = datetime.date.today()
-        expense = Expense.objects.create(
+        em = ExpenseMonth.objects.get_or_create(
             purchaser=request.user.employee,
-            date=date,
-        )
-        ExpenseMonth.objects.get_or_create(
-            employee=request.user.employee,
-            year=expense.date.year,
-            month=expense.date.month
-        )
+            year=date.year,
+            month=date.month
+        )[0]
+        expense = Expense.objects.create(month=em, date=date)
         serialized_expense = ExpenseSerializer(
             expense, context={'request': request})
         return Response(serialized_expense.data)
@@ -230,10 +234,13 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             end = self.request.query_params.get('end', None)
             if start and end:
                 return Expense.objects.filter(
-                    purchaser=self.request.user.employee,
+                    month__purchaser=self.request.user.employee,
                     date__range=[start, end]
                 )
-            return Expense.objects.filter(purchaser=self.request.user.employee)
+            else:
+                return Expense.objects.filter(
+                    month__purchaser=self.request.user.employee
+                )
         else:
             return Expense.objects.none()
 
@@ -334,18 +341,20 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
                 if year and month:
                     if employeePK:
                         return ExpenseMonth.objects.filter(
-                            employee__pk=employeePK, year=year, month=month,
+                            purchaser__pk=employeePK, year=year, month=month,
                         )
                     return ExpenseMonth.objects.filter(year=year, month=month)
                 if employeePK:
-                    return ExpenseMonth.objects.filter(employee__pk=employeePK)
+                    return ExpenseMonth.objects.filter(
+                        purchaser__pk=employeePK
+                    )
                 return ExpenseMonth.objects.all()
             # Employee getting own expense months
             if year and month:
                 return ExpenseMonth.objects.filter(
-                    employee=user.employee, year=year, month=month
+                    purchaser=user.employee, year=year, month=month
                 )
-            return ExpenseMonth.objects.filter(employee=user.employee)
+            return ExpenseMonth.objects.filter(purchaser=user.employee)
         else:
             return Expense.objects.none()
 
@@ -359,7 +368,7 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
         unsubmit = request.data.get('unsubmit', False)
         try:
             em = ExpenseMonth.objects.get_or_create(
-                employee=request.user.employee, year=year, month=month
+                purchaser=request.user.employee, year=year, month=month
             )[0]
 
             # MONTH
@@ -377,8 +386,22 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
             # If we're unsubmitting, leave them as is.
             for expense in em.expenses:
                 if not unsubmit:
-                    expense.status = Expense.STATUS_SUBMITTED
+                    if all_expense_gls_approved(expense):
+                        expense.status = Expense.STATUS_APPROVER_APPROVED
+                    else:
+                        expense.status = Expense.STATUS_SUBMITTED
                 expense.save()
+
+                # GLS
+                # If we're submitting, and any GL is rejected, mark as draft.
+                for gl in expense.gls:
+                    if all([
+                        not unsubmit,
+                        not gl.approved,
+                        gl.approved_at is not None
+                    ]):
+                        gl.approved_at = None
+                        gl.save()
             
             serialized_expense_month = ExpenseMonthSerializer(
                 em, context={'request': request}

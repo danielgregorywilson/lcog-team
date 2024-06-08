@@ -320,7 +320,7 @@ function selectedMonthExpenseMonth(): ExpenseMonth | null {
 
 function selectedMonthExpenseMonthExpenses(): Expense[] {
   const em = selectedMonthExpenseMonth()
-  if (em) return em.expenses
+  if (em) return em.expenses.all()
   return []
 }
 

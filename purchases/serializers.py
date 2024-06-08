@@ -33,7 +33,7 @@ class ExpenseGLSerializer(serializers.HyperlinkedModelSerializer):
         )
         expense_receipt = serializers.SerializerMethodField()
         expense_purchaser = serializers.CharField(
-            source='expense.purchaser.name', read_only=True
+            source='expense.month.purchaser.name', read_only=True
         )
         expense_status = serializers.CharField(
             source='expense.status', read_only=True
@@ -52,11 +52,12 @@ class ExpenseSerializer(serializers.HyperlinkedModelSerializer):
         model = Expense
         fields = [
             'url', 'pk', 'name', 'date', 'description', 'vendor', 'job', 'gls',
-            'purchaser', 'receipt', 'approver', 'approved_at', 'status'
-            
+            'receipt', 'approver', 'approved_at', 'status', 'purchaser'
         ]
 
-    purchaser = SimpleEmployeeSerializer(required=False)
+    purchaser = serializers.CharField(
+        source='month.purchaser.name', read_only=True
+    )
     approver = SimpleEmployeeSerializer(required=False)
     gls = ExpenseGLSerializer(many=True, read_only=True)
 
@@ -66,8 +67,8 @@ class ExpenseMonthSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ExpenseMonth
         fields = [
-            'url', 'pk', 'employee', 'month', 'year', 'status', 'expenses'
+            'url', 'pk', 'purchaser', 'month', 'year', 'status', 'expenses'
         ]
 
-    employee = SimpleEmployeeSerializer(required=False)
+    purchaser = SimpleEmployeeSerializer(required=False)
     expenses = ExpenseSerializer(many=True, read_only=True)

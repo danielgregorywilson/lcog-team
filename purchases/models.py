@@ -135,15 +135,14 @@ class Expense(ExpenseBaseModel):
     class Meta:
         ordering = ["pk",]
 
+    month = models.ForeignKey(
+        'ExpenseMonth', on_delete=models.CASCADE, related_name='expenses'
+    )
     name = models.CharField(max_length=255, blank=True)
     date = models.DateField(blank=True, null=True)
     description = models.CharField(max_length=511, blank=True)
     vendor = models.CharField(max_length=255, blank=True)
     job = models.CharField(max_length=255, blank=True)
-    purchaser = models.ForeignKey(
-        Employee, blank=True, null=True, on_delete=models.SET_NULL,
-        related_name='expenses_purchased',
-    )
     receipt = models.FileField(
         _("receipt"), upload_to="uploads/expenses", blank=True, null=True
     )
@@ -153,9 +152,9 @@ class Expense(ExpenseBaseModel):
 class ExpenseMonth(ExpenseBaseModel):
     class Meta:
         ordering = ["pk",]
-        unique_together = ['employee', 'month', 'year']
+        unique_together = ['purchaser', 'month', 'year']
     
-    employee = models.ForeignKey(
+    purchaser = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='expense_months',
     )
@@ -166,11 +165,3 @@ class ExpenseMonth(ExpenseBaseModel):
         related_name='approver_of_expense_month',
     )
     approved_at = models.DateTimeField(blank=True, null=True)
-
-    @property
-    def expenses(self):
-        return Expense.objects.filter(
-            purchaser=self.employee,
-            date__month=self.month,
-            date__year=self.year
-        )

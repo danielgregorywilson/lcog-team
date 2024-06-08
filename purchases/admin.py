@@ -37,14 +37,18 @@ class ExpenseGLInline(admin.TabularInline):
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'purchaser', 'date', 'name', 'status'
+        'id', 'get_purchaser', 'date', 'name', 'status'
     )
     inlines = (ExpenseGLInline,)
+
+    @admin.display(ordering='month__purchaser', description='Purchaser')
+    def get_purchaser(self, expense):
+        return expense.month.purchaser
 
 
 @admin.register(ExpenseMonth)
 class ExpenseMonthAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'employee', 'year', 'month', 'status'
+        'id', 'purchaser', 'year', 'month', 'status'
     )
     list_filter = ('year', 'status',)

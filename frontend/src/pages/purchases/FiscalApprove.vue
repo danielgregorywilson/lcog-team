@@ -24,11 +24,11 @@
             :no-hover="!expenseMonthManagerApproved(props.row)"
             :class="{'cursor-pointer': expenseMonthManagerApproved(props.row)}"
             @click="navigateToDetail(
-              expenseMonthManagerApproved(props.row), props.row.employee.pk
+              expenseMonthManagerApproved(props.row), props.row.purchaser.pk
             )"
           >
             <q-td key="employee" :props="props">
-              {{ props.row.employee.name }}
+              {{ props.row.purchaser.name }}
             </q-td>
             <q-td key="status" :props="props">
               <q-linear-progress

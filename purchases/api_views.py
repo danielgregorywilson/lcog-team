@@ -136,7 +136,7 @@ class ExpenseGLViewSet(viewsets.ModelViewSet):
             expense = gl.expense
             approve = request.data.get('approve', True)
             em = ExpenseMonth.objects.get_or_create(
-                employee=expense.purchaser, year=expense.date.year,
+                purchaser=expense.month.purchaser, year=expense.date.year,
                 month=expense.date.month
             )[0]
             if approve:
@@ -384,7 +384,7 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
             # EXPENSES
             # If we're submitting, submit all the expenses.
             # If we're unsubmitting, leave them as is.
-            for expense in em.expenses:
+            for expense in em.expenses.all():
                 if not unsubmit:
                     if all_expense_gls_approved(expense):
                         expense.status = Expense.STATUS_APPROVER_APPROVED
@@ -394,7 +394,7 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
 
                 # GLS
                 # If we're submitting, and any GL is rejected, mark as draft.
-                for gl in expense.gls:
+                for gl in expense.gls.all():
                     if all([
                         not unsubmit,
                         not gl.approved,

@@ -131,7 +131,7 @@
                     v-model="gl.percent"
                     type="number"
                     class="gl-percent q-pa-none"
-                    outlined dense autofocus
+                    outlined dense
                     @keyup.enter="scope.set()"
                     :rules="[
                       val => !!val || '* Required',

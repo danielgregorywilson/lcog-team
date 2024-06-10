@@ -112,58 +112,62 @@
               v-slot="scope"
               @save="(val) => updateExpense(props.row.pk, 'gls', val)"
             >
-              <div
-                v-for="(gl, idx) in scope.value"
-                :key="scope.value.indexOf(gl)"
-                class="row items-center"
-              >
-                <q-input
-                  v-model="gl.code"
-                  class="q-mr-sm q-pa-none"
-                  outlined dense autofocus
-                  mask="##-#####-###"
-                  :rules="[
-                    val => !!val || 'Required',
-                  ]"
-                />
-                <div class="row q-mr-sm">
+              <div class="gl-popup-edit">
+                <div
+                  v-for="(gl, idx) in scope.value"
+                  :key="scope.value.indexOf(gl)"
+                  class="row items-center"
+                >
                   <q-input
-                    v-model="gl.percent"
-                    type="number"
-                    class="gl-percent q-pa-none"
-                    outlined dense
-                    @keyup.enter="scope.set()"
+                    v-model="gl.code"
+                    class="q-mr-sm q-pa-none"
+                    outlined dense autofocus
+                    mask="##-#####-###"
                     :rules="[
-                      val => !!val || '* Required',
-                      val => val <= 100 || 'Please use a number less than 100',
+                      val => !!val || 'Required',
                     ]"
                   />
-                  <div class="gl-percent-symbol">%</div>
+                  <div class="row q-mr-sm">
+                    <q-input
+                      v-model="gl.percent"
+                      type="number"
+                      class="gl-percent q-pa-none"
+                      outlined dense
+                      @keyup.enter="scope.set()"
+                      :rules="[
+                        val => !!val || '* Required',
+                        val => val <= 100 || 'Please use a number less than 100',
+                      ]"
+                    />
+                    <div class="gl-percent-symbol">%</div>
+                  </div>
+                  <EmployeeSelect
+                    name="approver"
+                    label="Approver"
+                    :employee="gl.approver"
+                    :useLegalName="true"
+                    v-on:input="gl.approver=$event"
+                    v-on:clear="gl.approver=emptyEmployee"
+                    :readOnly=false
+                    :employeeFilterFn="(employee: SimpleEmployeeRetrieve) => {
+                      return employee.is_expense_approver
+                    }"
+                  />
+                  <q-icon
+                    name="cancel"
+                    size="sm"
+                    @click.stop="scope.value.splice(idx, 1)"
+                    class="cursor-pointer q-ml-sm"
+                  />
                 </div>
-                <EmployeeSelect
-                  name="approver"
-                  label="Approver"
-                  :employee="gl.approver"
-                  :useLegalName="true"
-                  v-on:input="gl.approver=$event"
-                  v-on:clear="gl.approver=emptyEmployee"
-                  :readOnly=false
-                  :employeeFilterFn="(employee: SimpleEmployeeRetrieve) => {
-                    return employee.is_expense_approver
-                  }"
-                />
-                <q-icon
-                  name="cancel"
-                  size="sm"
-                  @click.stop="scope.value.splice(idx, 1)"
-                  class="cursor-pointer q-ml-sm"
-                />
+                <div class="row justify-center q-mt-sm">
+                  <q-btn class="col-6" @click="scope.value.push(
+                    {code: '', percent: 100, approver: emptyEmployee}
+                  )">
+                    Add a GL
+                  </q-btn>
+                </div>
               </div>
-              <q-btn @click="scope.value.push(
-                {code: '', percent: 100, approver: emptyEmployee}
-              )">
-                Add a GL
-              </q-btn>
             </q-popup-edit>
           </q-td>
           <q-td key="receipt" :props="props">
@@ -417,6 +421,10 @@
 </template>
 
 <style scoped lang="scss">
+  .gl-popup-edit {
+    min-width: 500px;
+  }
+  
   .gl-percent {
     max-width: 80px;
   }

@@ -175,7 +175,7 @@
     </q-card>
   </q-dialog>
 
-  <!-- Deny Dialog -->
+  <!-- Deny ExpenseMonth Dialog -->
   <q-dialog v-model="showDenyDialog">
     <q-card class="q-pa-md" style="width: 400px">
       <div class="text-h6">

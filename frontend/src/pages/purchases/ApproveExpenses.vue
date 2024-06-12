@@ -60,7 +60,11 @@
               :disable="!canApprove ||
                 (props.row.approved_at && !props.row.approved)"
               class="q-mr-sm"
-              @click="approveGL(props.row.pk, false)"
+              @click="openDenyGLDialog(
+                props.row.pk,
+                props.row.expense_name,
+                props.row.expense_purchaser
+              )"
             />
             <q-btn
               dense round color="green" icon="check"
@@ -126,7 +130,11 @@
                       :disable="!canApprove ||
                         (props.row.approved_at && !props.row.approved)"
                       class="q-mr-sm"
-                      @click="approveGL(props.row.pk, false)"
+                      @click="openDenyGLDialog(
+                        props.row.pk,
+                        props.row.expense_name,
+                        props.row.expense_purchaser
+                      )"
                     />
                     <q-btn
                       dense round color="green" icon="check"
@@ -148,6 +156,36 @@
       </template>
     </q-table>
   </div>
+
+  <!-- Deny ExpenseGL Dialog -->
+  <q-dialog v-model="showDenyDialog">
+    <q-card class="q-pa-md" style="width: 400px">
+      <div class="text-h6">
+        Deny {{ deniedGLPurchaserName }}'s purchase of {{deniedGLExpenseName}}?
+      </div>
+      <q-form
+        @submit='approveGL(deniedGLPK, false)'
+        class="q-gutter-md"
+      >
+        <q-input
+          v-model="denyDialogMessage"
+          filled
+          type="textarea"
+          label="Message to include"
+          :rules="[ val => val && val.length > 0 || 'Must include a message']"
+        />
+        <div class="row justify-between">
+          <q-btn
+            name="deny-dialog-button"
+            label="Send"
+            icon-right="cancel"
+            type="submit"
+            color="primary"
+          />
+        </div>
+      </q-form>
+    </q-card>
+  </q-dialog>
 </div>
 </template>
 
@@ -175,6 +213,12 @@ const props = defineProps<{
 
 let thisMonthLoaded = ref(false)
 let allExpensesLoaded = ref(false)
+
+let showDenyDialog = ref(false)
+let deniedGLPK = ref(0)
+let deniedGLExpenseName = ref('')
+let deniedGLPurchaserName = ref('')
+let denyDialogMessage = ref('')
 
 let firstOfThisMonth = ref(new Date())
 let firstOfSelectedMonth = ref(new Date())
@@ -278,13 +322,23 @@ function approveGL(pk: number, approved: boolean) {
   setTimeout(() => {
     canApprove.value = true
   }, 1500)
-  purchaseStore.approveGL(pk, approved)
+  purchaseStore.approveGL(pk, approved, denyDialogMessage.value)
     .then(() => {
       retrieveAllExpenseGLsToApprove()
+      showDenyDialog.value = false
     })
     .catch((error) => {
       console.log('Error approving GL', error)
     })
+}
+
+function  openDenyGLDialog(
+  pk: number, expenseName: string, purchaserName: string
+) {
+  deniedGLPK.value = pk
+  deniedGLExpenseName.value = expenseName
+  deniedGLPurchaserName.value = purchaserName
+  showDenyDialog.value = true
 }
 
 function setDates() {

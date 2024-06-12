@@ -12,6 +12,19 @@
       <q-icon color="orange" name="warning" size="md" />
     </q-btn>
   </div>
+  <div v-if="selectedMonthNotes()">
+    <ul id="denial-notes" class="q-mt-md q-pa-sm q-pl-lg bg-info font-bold">
+      <li
+        v-for="note of selectedMonthNotes()"
+        :key="selectedMonthNotes().indexOf(note)"
+      >
+        From <span class="text-bold">{{ note.approver }}</span>
+        <span v-if="note.expense">
+          about <span class="text-bold">{{ note.expense }}</span>
+        </span>: {{ note.note }}
+      </li>
+    </ul>
+  </div>
   <div class="q-mt-md">
     <q-spinner-grid
       v-if="!expensesLoaded"
@@ -35,7 +48,7 @@
       <template v-slot:body="props">
         <q-tr
           :props="props"
-          :class="monthSubmitted()?'bg-grey':'cursor-pointer'"
+          :class="expenseClass(props.row)"
         >
           <q-td key="name" :props="props">
             {{ props.row.name }}
@@ -428,17 +441,21 @@
 </template>
 
 <style scoped lang="scss">
-  .gl-popup-edit {
-    min-width: 500px;
-  }
-  
-  .gl-percent {
-    max-width: 80px;
-  }
+#denial-notes {
+  font-size: 1.2em;
+}
 
-  .gl-percent-symbol {
-    margin: 9px 0 0 3px;
-  }
+.gl-popup-edit {
+  min-width: 500px;
+}
+
+.gl-percent {
+  max-width: 80px;
+}
+
+.gl-percent-symbol {
+  margin: 9px 0 0 3px;
+}
 </style>
 
 <script setup lang="ts">
@@ -448,10 +465,10 @@ import { useQuasar } from 'quasar'
 import DocumentViewer from 'src/components/DocumentViewer.vue'
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import FileUploader from 'src/components/FileUploader.vue'
-import { readableDateNEW } from 'src/filters'
+import { readableDateNEW, readableDateTime } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
 import { usePurchaseStore } from 'src/stores/purchase'
-import { emptyEmployee, Expense, GL, SimpleEmployeeRetrieve } from 'src/types'
+import { emptyEmployee, Expense, ExpenseMonth, GL, SimpleEmployeeRetrieve } from 'src/types'
 
 const quasar = useQuasar()
 const purchaseStore = usePurchaseStore()
@@ -530,16 +547,54 @@ function tableTitleDisplay(): string {
   return `${props.monthDisplay}${submittedText}`
 }
 
+function selectedExpenseMonth(): ExpenseMonth | undefined {
+  return purchaseStore.expenseMonths.find(em => {
+    return em.month === props.monthInt && em.year === props.yearInt
+  })
+}
+
 function selectedMonthExpenses(): Expense[] {
-  const apiResults = purchaseStore.myExpenses
-  let exps: Expense[] = []
-  if (apiResults) {
-    exps = apiResults.filter(exp => {
-      let [y, m] = exp.date.split('-').map(s => parseInt(s))
-      return m === props.monthInt && y === props.yearInt
+  const month = selectedExpenseMonth()
+  if (month !== undefined) {
+    return month.expenses
+  } else {
+    return []
+  }
+}
+
+function selectedMonthNotes(): Array<{
+  type: string, approver: string, date: string, expense?: string, note: string
+}> {
+  let notes = []
+  let em = selectedExpenseMonth()
+  if (!em) {
+    return []
+  }
+  let fiscalNote = em?.fiscal_note
+  let date = em ? readableDateTime(em?.approved_at) : ''
+  if (fiscalNote) {
+    notes.push({
+      type: 'fiscal',
+      approver: em.approver.name,
+      date,
+      note: fiscalNote
     })
   }
-  return exps
+  for (let exp of selectedMonthExpenses()) {
+    for (let gl of exp.gls) {
+      let date = readableDateTime(gl.approved_at)
+      if (gl.approver && gl.approved_at && !gl.approved) {
+        notes.push({
+          type: 'approver',
+          approver: gl.approver.name,
+          date,
+          expense: exp.name,
+          note: gl.approver_note
+        })
+      }
+    }
+  }
+  return notes
 }
 
 function monthSubmitted() {
@@ -548,6 +603,31 @@ function monthSubmitted() {
     return em.month === props.monthInt && em.year === props.yearInt &&
       em.status !== 'draft'
   })
+}
+
+function expenseApproved(expense: Expense) {
+  return expense.status === 'approver_approved'
+}
+
+function expenseDenied(expense: Expense) {
+  return expense.status === 'approver_denied'
+}
+
+function expenseClass(expense: Expense) {
+  if (!expense) {
+    return ''
+  }
+  if (expenseApproved(expense)) {
+    return 'bg-green'
+  } else if (expenseDenied(expense)) {
+    return 'bg-red'
+  } else {
+    if (monthSubmitted()) {
+      return 'bg-grey'
+    } else {
+      return 'cursor-pointer'
+    }
+  }
 }
 
 function clickAddExpense(): void {

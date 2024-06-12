@@ -154,6 +154,7 @@ class ExpenseGLViewSet(viewsets.ModelViewSet):
             else:
                 gl.approved = False
                 gl.approved_at = timezone.now()
+                gl.approver_note = request.data.get('deny_note', '')
                 gl.save()
                 # Deny the expense
                 expense.status = Expense.STATUS_APPROVER_DENIED

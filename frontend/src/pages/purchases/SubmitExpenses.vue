@@ -199,7 +199,7 @@
                     allowedFileTypes="image/*"
                     v-on="{
                       'uploaded': (url: string) => {
-                        retrieveAllMyExpenses()
+                        uploadedReceipt(props.row.pk)
                       }
                     }"
                   />
@@ -689,6 +689,13 @@ function updateExpense(
         console.log('Error updating expense', error)
       })
   }
+}
+
+function uploadedReceipt(pk: number) {
+  purchaseStore.clearExpenseGLApprovals(pk)
+    .then(() => {
+      retrieveAllMyExpenses()
+    })
 }
 
 function showDeleteDialog(expense: Expense): void {

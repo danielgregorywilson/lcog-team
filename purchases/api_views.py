@@ -251,6 +251,16 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         try:
             expense = Expense.objects.get(pk=pk)
 
+            expense_fields_changed = False
+            if (
+                expense.name != request.data.get('name') or
+                expense.date != request.data.get('date') or
+                expense.description != request.data.get('description') or
+                expense.vendor != request.data.get('vendor') or
+                expense.job != request.data.get('job')
+            ):
+                expense_fields_changed = True
+            
             expense.name = request.data.get('name', expense.name)
             expense.date = request.data.get('date', expense.date)
             expense.description = request.data.get(
@@ -285,7 +295,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                         expense_gl.approver != approver
                     ):
                         gl_changed = True
-                    if gl_changed:
+                    if gl_changed or expense_fields_changed:
                         expense_gl.approved = False
                         expense_gl.approved_at = None
                 else:
@@ -314,6 +324,31 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
         except Exception as e:
             message = 'Error updating expense.'
+            record_error(message, e, request, traceback.format_exc())
+            return Response(
+                data=message,
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    @action(detail=True, methods=['put'])
+    def clear_approvals(self, request, pk):
+        """
+        Submitter clears approvals for an expense when uploading a new receipt.
+        """
+        try:
+            expense = Expense.objects.get(pk=pk)
+            expense.status = Expense.STATUS_DRAFT
+            expense.save()
+            for gl in expense.gls.all():
+                gl.approved = False
+                gl.approved_at = None
+                gl.save()
+            serialized_expense = ExpenseSerializer(
+                expense, context={'request': request}
+            )
+            return Response(serialized_expense.data)
+        except Exception as e:
+            message = 'Error clearing approvals for expense.'
             record_error(message, e, request, traceback.format_exc())
             return Response(
                 data=message,

@@ -85,6 +85,20 @@ export const usePurchaseStore = defineStore('purchase', {
           })
       })
     },
+    clearExpenseGLApprovals(pk: number): Promise<null> {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/expense/${ pk }/clear_approvals`,
+          method: 'PUT'
+        })
+          .then(() => {
+            resolve(null)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error clearing GL approvals', e)
+          })
+      })
+    },
     submitExpenseMonth(
       data: { yearInt: number, monthInt: number, unsubmit?: boolean }
     ): Promise<null> {

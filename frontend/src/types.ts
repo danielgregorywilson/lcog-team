@@ -348,6 +348,10 @@ export interface ExpenseMonth extends ExpenseBase {
   employee: SimpleEmployeeRetrieve
   month: number
   year: number
+  approver: SimpleEmployeeRetrieve
+  approved_at: string
+  submitter_note: string
+  fiscal_note: string
   expenses: Array<Expense>
 }
 
@@ -389,8 +393,10 @@ export interface GL {
   approver?: SimpleEmployeeRetrieve
   approved: boolean
   approved_at: string
+  approver_note: string
   expense_status: string
   expense_date: string
+  em_note: string
 }
 
 /////////////////////////////////////////////////////////

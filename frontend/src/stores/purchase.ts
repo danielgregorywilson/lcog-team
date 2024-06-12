@@ -100,7 +100,9 @@ export const usePurchaseStore = defineStore('purchase', {
       })
     },
     submitExpenseMonth(
-      data: { yearInt: number, monthInt: number, unsubmit?: boolean }
+      data: {
+        yearInt: number, monthInt: number, note?: string, unsubmit?: boolean
+      }
     ): Promise<null> {
       return new Promise((resolve, reject) => {
         axios({

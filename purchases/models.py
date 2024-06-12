@@ -129,6 +129,7 @@ class ExpenseGL(models.Model):
     )
     approved = models.BooleanField(default=False)
     approved_at = models.DateTimeField(blank=True, null=True)
+    approver_note = models.TextField(blank=True)
 
 
 class Expense(ExpenseBaseModel):
@@ -168,3 +169,5 @@ class ExpenseMonth(ExpenseBaseModel):
         related_name='approver_of_expense_month',
     )
     approved_at = models.DateTimeField(blank=True, null=True)
+    submitter_note = models.TextField(blank=True)
+    fiscal_note = models.TextField(blank=True)

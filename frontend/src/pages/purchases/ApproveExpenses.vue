@@ -40,6 +40,15 @@
           />
         </q-td>
       </template>
+      <template v-slot:body-cell-note="props">
+        <q-td key="em_note" :props="props">
+          <q-icon name="note" size="md">
+            <q-tooltip class="text-body2 bg-info text-black">
+              {{ props.row.em_note }}
+            </q-tooltip>
+          </q-icon>
+        </q-td>
+      </template>
       <template v-slot:body-cell-approve="props">
         <q-td :props="props">
           <div class="row justify-center">
@@ -206,6 +215,7 @@ const columns = [
     sortable: true, style: 'width: 10px'
   },
   { name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' },
+  { name: 'note', field: 'em_note', label: 'Note', align: 'center' },
   { name: 'approve', label: 'Approve?', field: 'approved', align: 'center' },
 ]
 

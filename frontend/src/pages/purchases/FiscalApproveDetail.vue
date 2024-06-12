@@ -10,6 +10,12 @@
       <div>Denied</div>
     </div>
   </div>
+  <div v-if="selectedMonthExpenseMonthNote()">
+    <div id="submitter-note" class="q-mt-md q-pa-sm bg-info font-bold">
+      <div>Submitter Note:</div>
+      <div>{{ selectedMonthExpenseMonthNote() }}</div>
+    </div>
+  </div>
   <div class="q-mt-md">
     <q-spinner-grid
       v-if="!expensesLoaded"
@@ -204,8 +210,9 @@
 </template>
 
 <style scoped lang="scss">
-.approval-notes {
-  white-space: normal;
+#submitter-note {
+  font-size: 1.2em;
+  font-weight: bold;
 }
 </style>
 
@@ -322,6 +329,12 @@ function selectedMonthExpenseMonthExpenses(): Expense[] {
   const em = selectedMonthExpenseMonth()
   if (em) return em.expenses
   return []
+}
+
+function selectedMonthExpenseMonthNote(): string {
+  const em = selectedMonthExpenseMonth()
+  if (em) return em.submitter_note
+  return ''
 }
 
 function selectedMonthApproved(): boolean {

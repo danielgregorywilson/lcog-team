@@ -367,7 +367,7 @@
     </q-card>
   </q-dialog>
 
-  <!-- Submit to Fiscal Dialog -->
+  <!-- Submit for approval Dialog -->
   <q-dialog v-model="showSubmitDialog">
     <q-card class="q-pa-md" style="width: 400px">
       <div class="text-h6">
@@ -378,10 +378,10 @@
         class="q-gutter-md"
       >
         <q-input
-          v-model="sendDialogMessage"
+          v-model="submitterNote"
           filled
           type="textarea"
-          label="Extra message to include"
+          label="Extra message for approver and fiscal"
         />
         <div class="row justify-between">
           <q-btn
@@ -472,7 +472,7 @@ let allExpensesLoaded = ref(false)
 
 let showErrorsDialog = ref(false)
 let showSubmitDialog = ref(false)
-let sendDialogMessage = ref('')
+let submitterNote = ref('')
 let showUnsubmitDialog = ref(false)
 
 let firstOfThisMonth = ref(new Date())
@@ -611,7 +611,7 @@ function formErrors() {
 
 function onSubmitDialog() {
   purchaseStore.submitExpenseMonth({
-    yearInt: props.yearInt, monthInt: props.monthInt
+    yearInt: props.yearInt, monthInt: props.monthInt, note: submitterNote.value
   })
     .then(() => {
       showSubmitDialog.value = false

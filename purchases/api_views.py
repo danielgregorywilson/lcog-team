@@ -416,6 +416,7 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
         """
         year = request.data['yearInt']
         month = request.data['monthInt']
+        note = request.data.get('note', '')
         unsubmit = request.data.get('unsubmit', False)
         try:
             em = ExpenseMonth.objects.get_or_create(
@@ -430,6 +431,7 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
                     em.status = ExpenseMonth.STATUS_APPROVER_APPROVED
                 else:
                     em.status = ExpenseMonth.STATUS_SUBMITTED
+                em.submitter_note = note
             em.save()
             
             # EXPENSES

@@ -136,7 +136,8 @@
                       @keyup.enter="scope.set()"
                       :rules="[
                         val => !!val || '* Required',
-                        val => val <= 100 || 'Please use a number less than 100',
+                        val => val <= 100 ||
+                          'Please use a number less than 100',
                       ]"
                     />
                     <div class="gl-percent-symbol">%</div>
@@ -339,10 +340,16 @@
             Are you sure you want to delete this expense?
           </span>
         </div>
-        <div v-if="deleteDialogExpenseName" class="row justify-center text-center">
+        <div
+          v-if="deleteDialogExpenseName"
+          class="row justify-center text-center"
+        >
           Name: {{ deleteDialogExpenseName }}
         </div>
-        <div v-if="deleteDialogExpenseDate" class="row justify-center text-center">
+        <div
+          v-if="deleteDialogExpenseDate"
+          class="row justify-center text-center"
+        >
           Date: {{ deleteDialogExpenseDate }}
         </div>
       </q-card-section>

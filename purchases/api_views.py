@@ -336,13 +336,16 @@ class ExpenseViewSet(viewsets.ModelViewSet):
         Submitter clears approvals for an expense when uploading a new receipt.
         """
         try:
+            # Clear Expense approval
             expense = Expense.objects.get(pk=pk)
             expense.status = Expense.STATUS_DRAFT
             expense.save()
+            # Clear GL approvals
             for gl in expense.gls.all():
                 gl.approved = False
                 gl.approved_at = None
                 gl.save()
+            # Return the updated expense
             serialized_expense = ExpenseSerializer(
                 expense, context={'request': request}
             )

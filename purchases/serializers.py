@@ -71,9 +71,11 @@ class ExpenseMonthSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ExpenseMonth
         fields = [
-            'url', 'pk', 'purchaser', 'month', 'year', 'status', 'expenses',
-            'submitter_note', 'fiscal_note'
+            'url', 'pk', 'purchaser', 'month', 'year', 'approver',
+            'approved_at', 'submitter_note', 'fiscal_note', 'status',
+            'expenses'
         ]
 
     purchaser = SimpleEmployeeSerializer(required=False)
+    approver = SimpleEmployeeSerializer(required=False)
     expenses = ExpenseSerializer(many=True, read_only=True)

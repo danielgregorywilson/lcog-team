@@ -159,7 +159,9 @@ export const usePurchaseStore = defineStore('purchase', {
       })
     },
 
-    approveGL(pk: number, approve: boolean, deny_note: string): Promise<Expense> {
+    approveGL(
+      pk: number, approve: boolean, deny_note: string
+    ): Promise<Expense> {
       return new Promise((resolve, reject) => {
         axios({
           url: `${ apiURL }api/v1/expense-gl/${ pk }/approve`,
@@ -209,12 +211,14 @@ export const usePurchaseStore = defineStore('purchase', {
       })
     },
 
-    approveExpenseMonth(pk: number, approve: boolean): Promise<ExpenseMonth> {
+    approveExpenseMonth(
+      pk: number, approve: boolean, deny_note: string
+    ): Promise<ExpenseMonth> {
       return new Promise((resolve, reject) => {
         axios({
           url: `${ apiURL }api/v1/expensemonth/${ pk }/approve`,
           method: 'PUT',
-          data: { approve }
+          data: { approve, deny_note }
         })
           .then(resp => {
             resolve(resp.data)

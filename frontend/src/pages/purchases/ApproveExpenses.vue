@@ -42,7 +42,7 @@
       </template>
       <template v-slot:body-cell-note="props">
         <q-td key="em_note" :props="props">
-          <q-icon name="note" size="md">
+          <q-icon v-if="props.row.em_note" name="note" size="md">
             <q-tooltip class="text-body2 bg-info text-black">
               {{ props.row.em_note }}
             </q-tooltip>
@@ -326,6 +326,7 @@ function approveGL(pk: number, approved: boolean) {
     .then(() => {
       retrieveAllExpenseGLsToApprove()
       showDenyDialog.value = false
+      denyDialogMessage.value = ''
     })
     .catch((error) => {
       console.log('Error approving GL', error)

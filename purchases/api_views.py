@@ -139,9 +139,9 @@ class ExpenseGLViewSet(viewsets.ModelViewSet):
                 purchaser=expense.month.purchaser, year=expense.date.year,
                 month=expense.date.month
             )[0]
+            gl.approved_at = timezone.now()
             if approve:
                 gl.approved = True
-                gl.approved_at = timezone.now()
                 gl.save()
                 # If all GLs for the expense are approved, approve the expense
                 if all(gl.approved for gl in expense.gls.all()):
@@ -153,7 +153,6 @@ class ExpenseGLViewSet(viewsets.ModelViewSet):
                     em.save()
             else:
                 gl.approved = False
-                gl.approved_at = timezone.now()
                 gl.approver_note = request.data.get('deny_note', '')
                 gl.save()
                 # Deny the expense
@@ -477,11 +476,13 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
         try:
             em = ExpenseMonth.objects.get(pk=pk)
             approve = request.data.get('approve', True)
+            em.approver = request.user.employee
+            em.approved_at = timezone.now()
             if approve:
+                em.fiscal_note = ''
                 em.status = Expense.STATUS_FISCAL_APPROVED
-                em.approver = request.user.employee
-                em.approved_at = timezone.now()
             else:
+                em.fiscal_note = request.data.get('deny_note', '')
                 em.status = Expense.STATUS_FISCAL_DENIED
             em.save()
             serialized_em = ExpenseMonthSerializer(

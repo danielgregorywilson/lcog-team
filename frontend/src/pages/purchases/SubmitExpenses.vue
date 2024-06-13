@@ -12,7 +12,7 @@
       <q-icon color="orange" name="warning" size="md" />
     </q-btn>
   </div>
-  <div v-if="selectedMonthNotes()">
+  <div v-if="selectedMonthNotes().length">
     <ul id="denial-notes" class="q-mt-md q-pa-sm q-pl-lg bg-info font-bold">
       <li
         v-for="note of selectedMonthNotes()"
@@ -543,8 +543,19 @@ const columns = [
 
 
 function tableTitleDisplay(): string {
-  const submittedText = monthSubmitted() ? ' - Submitted' : ''
-  return `${props.monthDisplay}${submittedText}`
+  let statusText = 'Draft'
+  if (selectedExpenseMonth()?.status === 'fiscal_denied') {
+    statusText = 'Fiscal Denied - Correct and Resubmit'
+  } else if (selectedExpenseMonth()?.status === 'fiscal_approved') {
+    statusText = 'Fiscal Approved - You\'re All Set!'
+  } else if (selectedExpenseMonth()?.status === 'approver_denied') {
+    statusText = 'Approver(s) Denied - Correct and Resubmit'
+  } else if (selectedExpenseMonth()?.status === 'approver_approved') {
+    statusText = 'Approver(s) Approved - Waiting on Fiscal'
+  } else if (selectedExpenseMonth()?.status === 'submitted') {
+    statusText = 'Submitted - Waiting on Approver(s)'
+  }
+  return `${ props.monthDisplay } - ${ statusText }`
 }
 
 function selectedExpenseMonth(): ExpenseMonth | undefined {
@@ -613,20 +624,26 @@ function expenseDenied(expense: Expense) {
   return expense.status === 'approver_denied'
 }
 
+function monthApproved() {
+  return selectedExpenseMonth()?.status === 'fiscal_approved'
+}
+
+function monthDenied() {
+  return selectedExpenseMonth()?.status === 'fiscal_denied'
+}
+
 function expenseClass(expense: Expense) {
   if (!expense) {
     return ''
   }
-  if (expenseApproved(expense)) {
+  if (monthApproved()) {
     return 'bg-green'
-  } else if (expenseDenied(expense)) {
+  } else if (monthDenied() || expenseDenied(expense)) {
     return 'bg-red'
+  } else if (expenseApproved(expense) || monthSubmitted()) {
+    return 'bg-grey'
   } else {
-    if (monthSubmitted()) {
-      return 'bg-grey'
-    } else {
-      return 'cursor-pointer'
-    }
+    return 'cursor-pointer'
   }
 }
 

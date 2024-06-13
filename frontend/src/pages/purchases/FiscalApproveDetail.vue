@@ -433,7 +433,6 @@ function onSubmitApproveDialog() {
 }
 
 function onSubmitDenyDialog() {
-  showDenyDialog.value = false
   const pk = selectedMonthExpenseMonth()?.pk
   if (!pk) {
     quasar.notify({
@@ -443,9 +442,10 @@ function onSubmitDenyDialog() {
     })
     return
   } else {
-    purchaseStore.approveExpenseMonth(pk, false)
+    purchaseStore.approveExpenseMonth(pk, false, denyDialogMessage.value)
       .then(() => {
         retrieveAllEmployeeExpenses()
+        showDenyDialog.value = false
         denyDialogMessage.value = ''
         quasar.notify({
           message: 'Denied',

@@ -193,7 +193,8 @@
                     </q-tooltip>
                   </q-btn>
                   <q-btn
-                    v-if="workflowHasTransition(props.row) && canViewTransition()"
+                    v-if="workflowHasTransition(props.row) &&
+                      canViewTransition()"
                     class="col"
                     dense
                     round
@@ -361,7 +362,12 @@ const emit = defineEmits<{
 }>()
 
 const activeColumns: QTableProps['columns'] = [
-  { name: 'createdBy', label: 'Created By', align: 'center', field: 'created_by' },
+  {
+    name: 'createdBy',
+    label: 'Created By',
+    align: 'center',
+    field: 'created_by'
+  },
   { 
     name: 'createdAt',
     align: 'center',
@@ -499,7 +505,9 @@ const completedTransitionColumns: QTableProps['columns'] = [
 ]
 
 function columns() {
-  if (['employee-new', 'employee-return', 'employee-change', 'employee-exit'].includes(props.type)) {
+  if ([
+    'employee-new', 'employee-return', 'employee-change', 'employee-exit'
+  ].includes(props.type)) {
     if (props.archived) {
       return archivedTransitionColumns
     } else if (props.complete) {
@@ -578,7 +586,8 @@ function workflows(): Array<WorkflowInstanceSimple> {
 
 function submittedDisplay(row: WorkflowInstanceSimple): string {
   if (row.transition_date_submitted) {
-    return `${ readableDate(row.transition_date_submitted) } - ${ row.transition_submitter }`
+    return `${ readableDate(row.transition_date_submitted) } - 
+      ${ row.transition_submitter }`
   } else {
     return 'Not submitted'
   }
@@ -592,7 +601,9 @@ function editWorkflowInstance(workflowInstance: WorkflowInstanceSimple): void {
     })
 }
 
-function workflowHasTransition(workflowInstance: WorkflowInstanceSimple): boolean {
+function workflowHasTransition(
+  workflowInstance: WorkflowInstanceSimple
+): boolean {
   if (workflowInstance.transition_type) {
     return true
   } else {
@@ -627,7 +638,8 @@ function canArchiveWorkflowInstance(
     return userStore.getEmployeeProfile.workflow_roles
       .indexOf(workflowInstance.workflow_role_pk) != -1
   } else {
-    // TODO: What should happen if no role assigned? Only admins? Everyone? Require all steps to have roles?
+    // TODO: What should happen if no role assigned?
+    // Only admins? Everyone? Require all steps to have roles?
     return false
   }
 }

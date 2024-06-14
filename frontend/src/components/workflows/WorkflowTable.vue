@@ -36,16 +36,6 @@
         </template>
       </q-input>
     </template>
-    <!-- Slots for header cells: Shrink the width when the screen is too small to see the whole table width -->
-    <!-- <template v-slot:header-cell-employeeName="props">
-      <th v-if="$q.screen.lt.lg" style="white-space: normal;">{{props.col.label}}</th>
-      <th v-else>{{props.col.label}}</th>
-    </template>
-    <template v-slot:header-cell-daysUntilReview="props">
-      <th v-if="$q.screen.lt.lg" style="white-space: normal;">{{props.col.label}}</th>
-      <th v-else>{{props.col.label}}</th>
-    </template> -->
-    <!-- Slots for body cells: Show dates in a familiar format; make sure status can wrap, and display action buttons -->
     <template v-slot:body-cell-createdBy="props">
       <q-td key="createdBy" :props="props">
         {{ props.row.created_by.display_name }}
@@ -151,23 +141,7 @@
           </q-icon>
       </q-td>
     </template>
-    <!-- <template v-slot:body-cell-status="props">
-      <q-td style="white-space: normal;" :props="props">{{ props.row.status }}</q-td>
-    </template> -->
-    <!-- <template v-slot:body-cell-actions="props">
-      <q-td :props="props">
-        <div class="row">
-          <q-btn class="col edit-button" dense round flat color="grey" @click="editEvaluation(props)" icon="edit"></q-btn>
-          <q-btn class="col print-button" dense round flat color="grey" @click="printEvaluation(props)" icon="print">
-            <q-tooltip content-style="font-size: 16px">Print Performance Review Form</q-tooltip>
-          </q-btn>
-          <q-btn v-if="props.row.signed_position_description" class="col print-button" dense round flat color="grey" @click="printEvaluationPositionDescription(props)" icon="print">
-            <q-tooltip content-style="font-size: 16px">Print Signed Position Description</q-tooltip>
-          </q-btn>
-        </div>
-      </q-td>
-    </template> -->
-    <!-- For grid mode, we need to specify everything in order for our action buttons to render -->
+    <!-- GRID MODE -->
     <template v-slot:item="props">
       <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
         <q-card class="q-py-sm">
@@ -176,8 +150,52 @@
               <div class="q-table__grid-item-row">
                 <div class="q-table__grid-item-title">{{ col.label }}</div>
                 <div
-                  class="q-table__grid-item-value row q-gutter-sm"
-                  v-if="col.label == 'Actions'"
+                  class="q-table__grid-item-value"
+                  v-if="col.name == 'createdBy'"
+                >
+                  {{ col.value.display_name }}
+                </div>
+                <div
+                  class="q-table__grid-item-value"
+                  v-else-if="col.name == 'transitionDate'"
+                >
+                  {{ readableDate(props.row.transition_date) }}
+                </div>
+                <div
+                  class="q-table__grid-item-value"
+                  v-else-if="col.name == 'createdAt'"
+                >
+                  {{ readableDate(props.row.started_at) }}
+                </div>
+                <div
+                  class="q-table__grid-item-value"
+                  v-else-if="col.name == 'submitted'"
+                >
+                  {{ submittedDisplay(props.row) }}
+                </div>
+                <div
+                  class="q-table__grid-item-value"
+                  v-else-if="col.name == 'status'"
+                >
+                  <q-linear-progress
+                    v-if="isInteger(props.row.status)"
+                    rounded size="25px"
+                    :value="props.row.percent_complete/100"
+                    color="primary"
+                  >
+                    <div class="absolute-full flex flex-center">
+                      <q-badge
+                        color="white"
+                        text-color="primary"
+                        :label="`${props.row.percent_complete}%`"
+                      />
+                    </div>
+                  </q-linear-progress>
+                  <div v-else>Assigned to: {{ props.row.status }}</div>
+                </div>
+                <div
+                  class="q-table__grid-item-value row q-gutter-sm items-center"
+                  v-else-if="col.label == 'Actions'"
                 >
                   <q-btn
                     class="col"
@@ -239,12 +257,7 @@
                     </q-tooltip>
                   </q-icon>
                 </div>
-                <div
-                  class="q-table__grid-item-value"
-                  v-else-if="col.label.indexOf('Date') != -1"
-                >
-                  {{ readableDate(col.value) }}
-                </div>
+                
                 <div class="q-table__grid-item-value" v-else>
                   {{ col.value }}
                 </div>
@@ -322,6 +335,10 @@
 }
 .q-table__bottom {
   display: none !important;
+}
+.q-table__grid-item-row {
+  width: 100%;
+
 }
 </style>
 

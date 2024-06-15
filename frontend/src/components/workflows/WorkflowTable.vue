@@ -194,6 +194,12 @@
                   <div v-else>Assigned to: {{ props.row.status }}</div>
                 </div>
                 <div
+                  class="q-table__grid-item-value"
+                  v-else-if="col.name == 'completed'"
+                >
+                  {{ readableDate(props.row.completed_at) }}
+                </div>
+                <div
                   class="q-table__grid-item-value row q-gutter-sm items-center"
                   v-else-if="col.label == 'Actions'"
                 >
@@ -403,7 +409,7 @@ const activeColumns: QTableProps['columns'] = [
 ]
 
 const archivedColumns: QTableProps['columns'] = [
-  { name: 'type', label: 'Type', align: 'center', field: 'workflow_type'},
+  { name: 'type', label: 'Type', align: 'center', field: 'workflow_name'},
   {
     name: 'createdAt',
     align: 'center',
@@ -422,7 +428,7 @@ const archivedColumns: QTableProps['columns'] = [
 ]
 
 const completedColumns: QTableProps['columns'] = [
-  { name: 'type', label: 'Type', align: 'center', field: 'workflow_type'},
+  { name: 'type', label: 'Type', align: 'center', field: 'workflow_name'},
   {
     name: 'createdAt',
     align: 'center',
@@ -475,7 +481,7 @@ const activeTransitionColumns: QTableProps['columns'] = [
 ]
 
 const archivedTransitionColumns: QTableProps['columns'] = [
-  { name: 'type', label: 'Type', align: 'center', field: 'workflow_type'},
+  { name: 'type', label: 'Type', align: 'center', field: 'workflow_name'},
   { name: 'position', label: 'Position', align: 'center', field: 'title_name' },
   {
     name: 'submitted',
@@ -495,7 +501,7 @@ const archivedTransitionColumns: QTableProps['columns'] = [
 ]
 
 const completedTransitionColumns: QTableProps['columns'] = [
-  { name: 'type', label: 'Type', align: 'center', field: 'workflow_type'},
+  { name: 'type', label: 'Type', align: 'center', field: 'workflow_name'},
   { name: 'position', label: 'Position', align: 'center', field: 'title_name' },
   {
     name: 'submitted',
@@ -565,6 +571,15 @@ function tableFilterMethod(rows: readonly any[], term: string) {
               .includes(searchTerm)
             matchCriteria.push(positionMatches)
           }
+          // Filter by workflow name if we're searching complete or deleted workflows
+          if (props.complete || props.archived) {
+            if (row.workflow_name) {
+              const workflowNameMatches = row.workflow_name.toLowerCase()
+                .includes(searchTerm)
+              matchCriteria.push(workflowNameMatches)
+            }
+          }
+          // If any criteria match, return the row
           if (matchCriteria.some(c => !!c)) {
               return true
           }

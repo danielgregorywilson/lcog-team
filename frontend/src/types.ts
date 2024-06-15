@@ -825,6 +825,7 @@ export interface WorkflowInstanceSimple {
   transition_date: Date
   workflow_role_pk: number
   workflow_type: string
+  workflow_name: string
   employee_action_required: boolean
 }
 

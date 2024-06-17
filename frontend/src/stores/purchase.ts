@@ -229,6 +229,29 @@ export const usePurchaseStore = defineStore('purchase', {
       })
     },
 
+    uploadExpenseStatement(
+      yearInt: number, monthInt: number, file: File
+    ): Promise<null> {
+      return new Promise((resolve, reject) => {
+        const formData = new FormData()
+        formData.append('year', yearInt.toString())
+        formData.append('month', monthInt.toString())
+        formData.append('statement', file)
+        axios({
+          url: `${ apiURL }api/v1/expense-statement`,
+          method: 'POST',
+          data: formData,
+          headers: { 'Content-Type': 'multipart/form-data' }
+        })
+          .then(() => {
+            resolve(null)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error uploading expense statements', e)
+          })
+      })
+    },
+
     authLogout() {
       return new Promise((resolve) => {
         this.$reset()

@@ -1,7 +1,8 @@
 from django.contrib import admin
 
 from .models import (
-    Expense, ExpenseGL, ExpenseMonth, PurchaseCategory, PurchaseObject, PurchaseRequest,
+    Expense, ExpenseCard, ExpenseGL, ExpenseMonth, ExpenseStatement,
+    ExpenseStatementItem, PurchaseCategory, PurchaseObject, PurchaseRequest,
     Role
 )
 
@@ -52,3 +53,20 @@ class ExpenseMonthAdmin(admin.ModelAdmin):
         'id', 'purchaser', 'year', 'month', 'status'
     )
     list_filter = ('year', 'status',)
+
+
+@admin.register(ExpenseCard)
+class ExpenseCardAdmin(admin.ModelAdmin):
+    list_display = ('last4',)
+
+
+class ExpenseStatementItemInline(admin.TabularInline):
+    model = ExpenseStatementItem
+    extra = 0
+
+
+@admin.register(ExpenseStatement)
+class ExpenseStatementAdmin(admin.ModelAdmin):
+    list_display = ('id', 'card', 'month', 'year')
+    list_filter = ('card', 'year', 'month')
+    inlines = (ExpenseStatementItemInline,)

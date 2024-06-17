@@ -1,6 +1,7 @@
 <template>
 <q-uploader
   ref="fileuploader"
+  :multiple=multiple
   max-file-size="20000000"
   @added="file_selected"
   @rejected="rejectFileTooLarge"
@@ -62,16 +63,18 @@ import axios from 'axios'
 import { onMounted, onUpdated, ref } from 'vue'
 import { apiURL, handlePromiseError } from 'src/stores/index'
 
-let selectedFile = ref(new File([''], ''))
+let selectedFiles = ref([new File([''], '')])
 let fileTooLarge = ref(false)
 let fileSuccessfullyUploaded = ref(false)
 
 const props = defineProps<{
-  file: File,
-  contentTypeAppLabel: string,
-  contentTypeModel: string,
+  file: File
+  contentTypeAppLabel: string
+  contentTypeModel: string
   readOnly: boolean
-  objectPk?: string,
+  objectPk?: string
+  multiple?: boolean
+  data?: { [key: string]: any } // e.g. { month: 6, year: 2024 }
   allowedFileTypes?: string // e.g. 'image/*,.pdf'
 }>()
 
@@ -80,7 +83,7 @@ const emit = defineEmits<{
 }>()
 
 function file_selected(files: Array<File>) {
-  selectedFile.value = files[0];
+  selectedFiles.value = files;
   uploadFile()
 }
 
@@ -94,7 +97,13 @@ function uploadFile() {
   fd.append('content_type_app_label', props.contentTypeAppLabel)
   fd.append('content_type_model', props.contentTypeModel)
   fd.append('object_pk', props.objectPk || '')
-  fd.append('file', selectedFile.value)
+  if (props.data) {
+    fd.append('data', JSON.stringify(props.data))
+  }
+  const files = selectedFiles.value
+  for (let i = 0; i < files.length; i++) {
+    fd.append(files[i].name, files[i])
+  }
   doUpload(fd).then((url) => {
     fileSuccessfullyUploaded.value = true
     setTimeout(() => fileSuccessfullyUploaded.value = false, 5000)

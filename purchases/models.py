@@ -171,3 +171,36 @@ class ExpenseMonth(ExpenseBaseModel):
     approved_at = models.DateTimeField(blank=True, null=True)
     submitter_note = models.TextField(blank=True)
     fiscal_note = models.TextField(blank=True)
+
+
+class ExpenseCard(models.Model):
+    class Meta:
+        ordering = ["pk",]
+    
+    def __str__(self):
+        return f'*{self.last4}'
+
+    last4 = models.IntegerField()
+
+
+class ExpenseStatement(models.Model):
+    class Meta:
+        ordering = ["pk",]
+    
+    card = models.ForeignKey(
+        ExpenseCard, on_delete=models.CASCADE, related_name='statements'
+    )
+    month = models.IntegerField()
+    year = models.IntegerField()
+
+
+class ExpenseStatementItem(models.Model):
+    class Meta:
+        ordering = ["pk",]
+
+    statement = models.ForeignKey(
+        ExpenseStatement, on_delete=models.CASCADE, related_name='items'
+    )
+    date = models.DateField(_("Transaction Date"))
+    description = models.CharField(max_length=255)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)

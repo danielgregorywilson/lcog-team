@@ -64,6 +64,27 @@
         </template>
       </q-table>
     </div>
+    <div class="q-mt-sm">
+      <div class="text-h6">
+        Upload Expense Statements for {{ monthDisplay }}
+      </div>
+      <FileUploader
+          :file=selectedFiles
+          multiple
+          contentTypeAppLabel="purchases"
+          contentTypeModel="expensestatement"
+          :data="{
+            'year': props.yearInt,
+            'month': props.monthInt
+          }"
+          :readOnly=false
+          v-on="{
+            'uploaded': (url: string) => {
+              console.log('uploaded', url)
+            }
+          }"
+        />
+    </div>
   </div>
 </div>
 </template>
@@ -73,6 +94,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import FileUploader from 'src/components/FileUploader.vue'
 import { handlePromiseError } from 'src/stores'
 import { usePurchaseStore } from 'src/stores/purchase';
 import { ExpenseMonth } from 'src/types';
@@ -91,6 +113,8 @@ let allExpensesLoaded = ref(false)
 
 let firstOfThisMonth = ref(new Date())
 let firstOfSelectedMonth = ref(new Date())
+
+let selectedFiles = ref(new File([''], ''))
 
 const pagination = {
   rowsPerPage: '50'

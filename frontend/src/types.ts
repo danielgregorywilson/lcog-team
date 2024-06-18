@@ -399,6 +399,26 @@ export interface GL {
   em_note: string
 }
 
+export interface ExpenseCard {
+  pk: number
+  last4: number
+}
+
+interface ExpenseStatementItem {
+  pk: number
+  date: string
+  description: string
+  amount: number
+}
+
+export interface ExpenseStatement {
+  pk: number
+  card: ExpenseCard
+  month: number
+  year: number
+  items: Array<ExpenseStatementItem>
+}
+
 /////////////////////////////////////////////////////////
 // Responsibility Structure from Django Rest Framework //
 /////////////////////////////////////////////////////////

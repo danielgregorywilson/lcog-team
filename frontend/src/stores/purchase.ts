@@ -2,7 +2,9 @@ import axios from 'axios'
 import { defineStore } from 'pinia'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
-import { Expense, ExpenseCreate, ExpenseMonth, GL } from 'src/types'
+import {
+  Expense, ExpenseCreate, ExpenseMonth, ExpenseStatement, GL
+} from 'src/types'
 
 export const usePurchaseStore = defineStore('purchase', {
   state: () => ({
@@ -10,6 +12,7 @@ export const usePurchaseStore = defineStore('purchase', {
     myExpenses: [] as Array<Expense>,
     approvalExpenseGLs: [] as Array<GL>,
     fiscalExpenseMonths: [] as Array<ExpenseMonth>,
+    expenseStatements: [] as Array<ExpenseStatement>,
     numExpenseGLsToApprove: 0,
     numExpensesFiscalToApprove: 0
   }),
@@ -51,6 +54,45 @@ export const usePurchaseStore = defineStore('purchase', {
           })
           .catch(e => {
             handlePromiseError(reject, 'Error deleting expense', e)
+          })
+      })
+    },
+
+    //////////////////
+    /// Statements ///
+    //////////////////
+
+    getExpenseStatements(
+      yearInt: number | null = null, monthInt: number | null = null
+    ): Promise<null> {
+      return new Promise((resolve, reject) => {
+        let params = ''
+        if (!!yearInt && !!monthInt) {
+          params = `?year=${ yearInt }&month=${ monthInt }`
+        }
+        axios({
+          url: `${ apiURL }api/v1/expense-statement${ params }`
+        })
+          .then(resp => {
+            this.expenseStatements = resp.data.results
+            resolve(resp.data.results)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error getting expense statements', e)
+          })
+      })
+    },
+
+    deleteExpenseStatement(pk: number): Promise<null> {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/expense-statement/${ pk }`, method: 'DELETE'
+        })
+          .then(() => {
+            resolve(null)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error deleting expense statement', e)
           })
       })
     },

@@ -9,9 +9,10 @@ from rest_framework.response import Response
 
 from mainsite.helpers import record_error
 from people.models import Employee
-from purchases.models import Expense, ExpenseGL, ExpenseMonth
+from purchases.models import Expense, ExpenseGL, ExpenseMonth, ExpenseStatement
 from purchases.serializers import (
-    ExpenseGLSerializer, ExpenseMonthSerializer, ExpenseSerializer
+    ExpenseGLSerializer, ExpenseMonthSerializer, ExpenseSerializer,
+    ExpenseStatementSerializer
 )
 
 def all_expense_gls_approved(expense):
@@ -497,3 +498,29 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
                 data=message,
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+class ExpenseStatementViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for credit card expense statements.
+    """
+    queryset = ExpenseStatement.objects.all()
+    serializer_class = ExpenseStatementSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated: 
+            if user.is_superuser:
+                return super().get_queryset()
+            year = self.request.query_params.get('year', None)
+            month = self.request.query_params.get('month', None)
+            card = self.request.query_params.get('card', None)
+            if year and month:
+                if card:
+                    return ExpenseStatement.objects.filter(
+                        card__last4=card, year=year, month=month
+                    )
+                return ExpenseStatement.objects.filter(year=year, month=month)
+            return ExpenseStatement.objects.all()
+        else:
+            return Expense.objects.none()

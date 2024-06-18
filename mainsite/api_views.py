@@ -118,7 +118,6 @@ class FileUploadViewSet(viewsets.ViewSet):
         object_pk = request.data.get('object_pk')
         data = {}
         if request.data.get('data'):
-            import pdb; pdb.set_trace()
             data = json.loads(request.data.get('data'))
         
         if model == 'performancereview':

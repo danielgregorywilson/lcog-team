@@ -1,53 +1,55 @@
 from rest_framework import serializers
 
-from .models import Expense, ExpenseGL, ExpenseMonth
+from .models import (
+    Expense, ExpenseGL, ExpenseMonth, ExpenseStatement, ExpenseStatementItem
+)
 from people.serializers import SimpleEmployeeSerializer
 
 
 class ExpenseGLSerializer(serializers.HyperlinkedModelSerializer):
 
-        class Meta:
-            model = ExpenseGL
-            fields = [
-                'url', 'pk', 'code', 'percent', 'approver', 'approved',
-                'approved_at', 'approver_note', 'expense_name', 'expense_date',
-                'expense_description', 'expense_vendor', 'expense_job',
-                'expense_receipt', 'expense_purchaser', 'expense_status',
-                'em_note'
-            ]
-    
-        approver = SimpleEmployeeSerializer(required=False)
-        expense_name = serializers.CharField(
-            source='expense.name', read_only=True
-        )
-        expense_date = serializers.DateField(
-            source='expense.date', read_only=True
-        )
-        expense_description = serializers.DateField(
-            source='expense.description', read_only=True
-        )
-        expense_vendor = serializers.CharField(
-            source='expense.vendor', read_only=True
-        )
-        expense_job = serializers.CharField(
-            source='expense.job', read_only=True
-        )
-        expense_receipt = serializers.SerializerMethodField()
-        expense_purchaser = serializers.CharField(
-            source='expense.month.purchaser.name', read_only=True
-        )
-        expense_status = serializers.CharField(
-            source='expense.status', read_only=True
-        )
-        em_note = serializers.CharField(
-            source='expense.month.submitter_note', read_only=True
-        )
+    class Meta:
+        model = ExpenseGL
+        fields = [
+            'url', 'pk', 'code', 'percent', 'approver', 'approved',
+            'approved_at', 'approver_note', 'expense_name', 'expense_date',
+            'expense_description', 'expense_vendor', 'expense_job',
+            'expense_receipt', 'expense_purchaser', 'expense_status',
+            'em_note'
+        ]
 
-        def get_expense_receipt(self, obj):
-            request = self.context.get('request')
-            if obj.expense.receipt:
-                return str(request.build_absolute_uri(obj.expense.receipt.url))
-            return None
+    approver = SimpleEmployeeSerializer(required=False)
+    expense_name = serializers.CharField(
+        source='expense.name', read_only=True
+    )
+    expense_date = serializers.DateField(
+        source='expense.date', read_only=True
+    )
+    expense_description = serializers.DateField(
+        source='expense.description', read_only=True
+    )
+    expense_vendor = serializers.CharField(
+        source='expense.vendor', read_only=True
+    )
+    expense_job = serializers.CharField(
+        source='expense.job', read_only=True
+    )
+    expense_receipt = serializers.SerializerMethodField()
+    expense_purchaser = serializers.CharField(
+        source='expense.month.purchaser.name', read_only=True
+    )
+    expense_status = serializers.CharField(
+        source='expense.status', read_only=True
+    )
+    em_note = serializers.CharField(
+        source='expense.month.submitter_note', read_only=True
+    )
+
+    def get_expense_receipt(self, obj):
+        request = self.context.get('request')
+        if obj.expense.receipt:
+            return str(request.build_absolute_uri(obj.expense.receipt.url))
+        return None
 
 
 class ExpenseSerializer(serializers.HyperlinkedModelSerializer):
@@ -79,3 +81,22 @@ class ExpenseMonthSerializer(serializers.HyperlinkedModelSerializer):
     purchaser = SimpleEmployeeSerializer(required=False)
     approver = SimpleEmployeeSerializer(required=False)
     expenses = ExpenseSerializer(many=True, read_only=True)
+
+
+class ExpenseStatementItemSerializer(serializers.HyperlinkedModelSerializer):
+    
+    class Meta:
+        model = ExpenseStatementItem
+        fields = ['pk', 'date', 'description', 'amount']
+
+
+class ExpenseStatementSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = ExpenseStatement
+        fields = [
+            'pk', 'card', 'month', 'year', 'items'
+        ]
+
+    card = serializers.CharField(source='card.last4', read_only=True)
+    items = ExpenseStatementItemSerializer(many=True, read_only=True)

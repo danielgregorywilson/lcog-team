@@ -65,33 +65,114 @@
       </q-table>
     </div>
     <div class="q-mt-sm">
-      <div class="text-h6">
-        Upload Expense Statements for {{ monthDisplay }}
+      <div class="text-h5 text-center">Expense Statements</div>
+      <div class="row justify-between q-gutter-md q-mt-none">
+        <div class="col">
+          <q-spinner-grid
+            v-if="!statementsLoaded"
+            class="spinner"
+            color="primary"
+            size="xl"
+          />
+          <div v-else>
+            <q-table
+              flat bordered dense
+              :rows="selectedMonthStatements()"
+              :columns="statementCols"
+              row-key="name"
+              binary-state-sort
+              :pagination="pagination"
+              class="expense-table"
+            >
+              <template v-slot:body-cell-actions="props">
+                <q-td key="actions" :props="props">
+                  <!-- <q-btn
+                    icon="visibility"  
+                    round
+                    flat    
+                    @click="showStatmentDialog(props.row)"
+                  /> -->
+                  <q-btn
+                    icon="delete"
+                    round
+                    flat
+                    @click="showDeleteStatementDialog(props.row)"  
+                  />
+                </q-td>
+              </template>
+            </q-table>
+          </div>
+        </div>
+        <div class="col row justify-center">
+          <div class="text-h6">
+            Upload Statements for {{ monthDisplay }}
+          </div>
+          <FileUploader
+              :file=selectedFiles
+              multiple
+              contentTypeAppLabel="purchases"
+              contentTypeModel="expensestatement"
+              :data="{
+                'year': props.yearInt,
+                'month': props.monthInt
+              }"
+              :readOnly=false
+              v-on="{
+                'uploaded': (url: string) => {
+                  retrieveAllStatements()
+                }
+              }"
+            />
+        </div>
       </div>
-      <FileUploader
-          :file=selectedFiles
-          multiple
-          contentTypeAppLabel="purchases"
-          contentTypeModel="expensestatement"
-          :data="{
-            'year': props.yearInt,
-            'month': props.monthInt
-          }"
-          :readOnly=false
-          v-on="{
-            'uploaded': (url: string) => {
-              console.log('uploaded', url)
-            }
-          }"
-        />
     </div>
   </div>
+
+  <!-- Delete Statement Dialog -->
+  <q-dialog v-model="deleteDialogVisible">
+    <q-card>
+      <q-card-section>
+        <div class="row items-center">
+          <q-avatar
+            icon="book"
+            color="primary"
+            text-color="white"
+          />
+          <span class="q-ml-sm">
+            Are you sure you want to delete this statement?
+          </span>
+        </div>
+        <div
+          v-if="deleteDialogStatementNumber"
+          class="row justify-center text-center"
+        >
+          Number: {{ deleteDialogStatementNumber }}
+        </div>
+        <div class="row justify-center text-center">
+          Month: {{ monthDisplay }}
+        </div>
+      </q-card-section>
+
+      <q-card-actions class="row justify-around">
+        <q-btn flat label="Cancel" color="primary" v-close-popup />
+        <q-btn
+          flat
+          label="Yes, delete it"
+          color="primary"
+          @click="deleteStatement()"
+          v-close-popup
+        />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
+
 </div>
 </template>
 
 <style scoped lang="scss"></style>
 
 <script setup lang="ts">
+import { useQuasar } from 'quasar'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import FileUploader from 'src/components/FileUploader.vue'
@@ -99,6 +180,7 @@ import { handlePromiseError } from 'src/stores'
 import { usePurchaseStore } from 'src/stores/purchase';
 import { ExpenseMonth } from 'src/types';
 
+const quasar = useQuasar()
 const router = useRouter()
 const purchaseStore = usePurchaseStore()
 
@@ -108,11 +190,17 @@ const props = defineProps<{
   yearInt: number
 }>()
 
-let thisMonthLoaded = ref(false)
+let thisMonthExpensesLoaded = ref(false)
 let allExpensesLoaded = ref(false)
+let thisMonthStatementsLoaded = ref(false)
+let allStatementsLoaded = ref(false)
 
 let firstOfThisMonth = ref(new Date())
 let firstOfSelectedMonth = ref(new Date())
+
+let deleteDialogVisible = ref(false)
+let statementPkToDelete = ref(-1)
+let deleteDialogStatementNumber = ref('')
 
 let selectedFiles = ref(new File([''], ''))
 
@@ -135,19 +223,37 @@ const columns = [
   }
 ]
 
+const statementCols = [
+  {
+    name: 'card', required: true, label: 'Card', field: 'card', sortable: true,
+    align: 'left'
+  },
+  { name: 'actions', label: 'Actions', field: 'actions', align: 'center' }
+]
+
 function viewingThisMonth() {
   return firstOfSelectedMonth.value.getTime() ===
     firstOfThisMonth.value.getTime()
 }
 
 function expensesLoaded() {
-  return (viewingThisMonth() && thisMonthLoaded.value) ||
+  return (viewingThisMonth() && thisMonthExpensesLoaded.value) ||
     allExpensesLoaded.value
+}
+
+function statementsLoaded() {
+  return (viewingThisMonth() && thisMonthStatementsLoaded.value) ||
+    allStatementsLoaded.value
 }
 
 function selectedMonthExpenseMonths() {
   return purchaseStore.fiscalExpenseMonths
     .filter(em => em.month === props.monthInt && em.year === props.yearInt)
+}
+
+function selectedMonthStatements() {
+  return purchaseStore.expenseStatements
+    .filter(s => s.month === props.monthInt && s.year === props.yearInt)
 }
 
 function expenseMonthManagerApproved(expenseMonth: ExpenseMonth) {
@@ -172,6 +278,8 @@ function progressBarSize(status: string) {
     case 'approver_denied':
       return .5
     case 'approver_approved':
+    case 'fiscal_denied':
+    case 'fiscal_approved':
       return 1
     default:
       return 0
@@ -187,6 +295,8 @@ function progressBarLabel(status: string) {
     case 'approver_denied':
       return 'Denied by Manager'
     case 'approver_approved':
+    case 'fiscal_denied':
+    case 'fiscal_approved':
       return 'Approved by Manager'
     default:
       return 'Unknown'
@@ -202,6 +312,8 @@ function progressBarColor(status: string) {
     case 'approver_denied':
       return 'red'
     case 'approver_approved':
+    case 'fiscal_denied':
+    case 'fiscal_approved':
       return 'green'
     default:
       return 'grey'
@@ -212,7 +324,7 @@ function retrieveThisMonthExpenses(): Promise<void> {
   return new Promise((resolve, reject) => {
     purchaseStore.getFiscalExpenseMonths(props.yearInt, props.monthInt)
       .then(() => {
-        thisMonthLoaded.value = true
+        thisMonthExpensesLoaded.value = true
         resolve()
       })
       .catch((error) => {
@@ -236,6 +348,34 @@ function retrieveAllExpenses(): Promise<void> {
   })
 }
 
+function retrieveThisMonthStatements(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    purchaseStore.getExpenseStatements(props.yearInt, props.monthInt)
+      .then(() => {
+        thisMonthStatementsLoaded.value = true
+        resolve()
+      })
+      .catch((error) => {
+        handlePromiseError(reject, 'Error retrieving expense statements', error)
+        reject()
+      })
+  })
+}
+
+function retrieveAllStatements(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    purchaseStore.getExpenseStatements()
+      .then(() => {
+        allStatementsLoaded.value = true
+        resolve()
+      })
+      .catch((error) => {
+        handlePromiseError(reject, 'Error retrieving expense statements', error)
+        reject()
+      })
+  })
+}
+
 function navigateToDetail(submitted: boolean, employeePk: number) {
   if (submitted) {
     router.push({
@@ -252,6 +392,23 @@ function navigateToDetail(submitted: boolean, employeePk: number) {
   }
 }
 
+function showDeleteStatementDialog(statement: any) {
+  deleteDialogStatementNumber.value = statement.card
+  statementPkToDelete.value = statement.pk
+  deleteDialogVisible.value = true
+}
+
+function deleteStatement(): void {
+  purchaseStore.deleteExpenseStatement(statementPkToDelete.value)
+    .then(() => {
+      quasar.notify('Deleted a statement.')
+      retrieveAllStatements()
+    })
+    .catch(e => {
+      console.error(e)
+    })
+}
+
 function setDates() {
   let theFirst = new Date()
   theFirst.setDate(1)
@@ -264,6 +421,9 @@ onMounted(() => {
   setDates()
   retrieveThisMonthExpenses().then(() => {
     retrieveAllExpenses()
+  })
+  retrieveThisMonthStatements().then(() => {
+    retrieveAllStatements()
   })
 })
 

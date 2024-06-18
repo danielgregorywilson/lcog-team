@@ -324,6 +324,18 @@
     </q-table>
   </div>
 
+  <!-- Statements -->
+  <q-select
+    v-if="thisMonthStatementsLoaded"
+    v-model="selectedStatement"
+    :options="statementChoices()"
+    label="Select your card"
+    dense
+    outlined
+    class="q-mt-md"
+  /> 
+  <StatementTable :statement="selectedStatement?.value" />
+
   <!-- Errors Dialog -->
   <q-dialog v-model="showErrorsDialog">
     <q-card style="width: 350px">
@@ -459,16 +471,20 @@
 </style>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, Ref, ref } from 'vue'
 import { useQuasar } from 'quasar'
 
 import DocumentViewer from 'src/components/DocumentViewer.vue'
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import FileUploader from 'src/components/FileUploader.vue'
+import StatementTable from 'src/components/purchases/StatementTable.vue'
 import { readableDateNEW, readableDateTime } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
 import { usePurchaseStore } from 'src/stores/purchase'
-import { emptyEmployee, Expense, ExpenseMonth, GL, SimpleEmployeeRetrieve } from 'src/types'
+import {
+  emptyEmployee, Expense, ExpenseMonth, ExpenseStatement, GL,
+  SimpleEmployeeRetrieve 
+} from 'src/types'
 
 const quasar = useQuasar()
 const purchaseStore = usePurchaseStore()
@@ -486,6 +502,11 @@ const emit = defineEmits<{
 
 let thisMonthLoaded = ref(false)
 let allExpensesLoaded = ref(false)
+
+let thisMonthStatementsLoaded = ref(false)
+let allStatementsLoaded = ref(false)
+let selectedStatement = ref(null) as 
+  Ref<{label: string, value: ExpenseStatement} | null>
 
 let showErrorsDialog = ref(false)
 let showSubmitDialog = ref(false)
@@ -821,10 +842,56 @@ function setDates() {
   firstOfSelectedMonth.value = theFirst
 }
 
+function retrieveThisMonthStatements(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    purchaseStore.getExpenseStatements(props.yearInt, props.monthInt)
+      .then(() => {
+        thisMonthStatementsLoaded.value = true
+        resolve()
+      })
+      .catch((error) => {
+        handlePromiseError(reject, 'Error retrieving expense statements', error)
+        reject()
+      })
+  })
+}
+
+function retrieveAllStatements(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    purchaseStore.getExpenseStatements()
+      .then(() => {
+        allStatementsLoaded.value = true
+        resolve()
+      })
+      .catch((error) => {
+        handlePromiseError(reject, 'Error retrieving expense statements', error)
+        reject()
+      })
+  })
+}
+
+function thisMonthStatements(): Array<ExpenseStatement> {
+  return purchaseStore.expenseStatements.filter(es => {
+    return es.month === props.monthInt && es.year === props.yearInt
+  })
+}
+
+function statementChoices(): Array<{label: string, value: ExpenseStatement}> {
+  return thisMonthStatements().map(es => {
+    return {
+      label: `*${es.card}`,
+      value: es
+    }
+  })
+}
+
 onMounted(() => {
   setDates()
   retrieveThisMonthExpenses().then(() => {
     retrieveAllMyExpenses()
+  })
+  retrieveThisMonthStatements().then(() => {
+    retrieveAllStatements()
   })
 })
 

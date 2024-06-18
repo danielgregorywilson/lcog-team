@@ -86,12 +86,12 @@
             >
               <template v-slot:body-cell-actions="props">
                 <q-td key="actions" :props="props">
-                  <!-- <q-btn
+                  <q-btn
                     icon="visibility"  
                     round
                     flat    
                     @click="showStatmentDialog(props.row)"
-                  /> -->
+                  />
                   <q-btn
                     icon="delete"
                     round
@@ -127,6 +127,51 @@
       </div>
     </div>
   </div>
+
+  <!-- Statement Dialog -->
+  <q-dialog v-model="statementDialogVisible">
+    <q-card>
+      <q-card-section>
+        <div class="row items-center">
+          <q-avatar
+            icon="book"
+            color="primary"
+            text-color="white"
+          />
+          <span class="q-ml-sm">
+            Card Number:
+            <span class="text-bold">{{ statementDialogStatement.card }}</span>
+          </span>
+        </div>
+        <q-markup-table class="q-mt-md">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Item</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in statementDialogStatement.items" :key="item.pk">
+              <td>{{ readableDateNEW(item.date) }}</td>
+              <td>{{ item.description }}</td>
+              <td>${{ item.amount }}</td>
+            </tr>
+          </tbody>
+        </q-markup-table>
+      </q-card-section>
+
+      <q-card-actions class="row justify-around">
+        <q-btn flat label="Close" color="primary" v-close-popup />
+        <q-btn
+          flat
+          label="Delete"
+          color="primary"
+          @click="showDeleteStatementDialog(statementDialogStatement)"
+        />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 
   <!-- Delete Statement Dialog -->
   <q-dialog v-model="deleteDialogVisible">
@@ -173,12 +218,13 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
-import { onMounted, ref } from 'vue'
+import { onMounted, Ref, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import FileUploader from 'src/components/FileUploader.vue'
+import { readableDateNEW } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
 import { usePurchaseStore } from 'src/stores/purchase';
-import { ExpenseMonth } from 'src/types';
+import { ExpenseMonth, ExpenseStatement } from 'src/types';
 
 const quasar = useQuasar()
 const router = useRouter()
@@ -197,6 +243,9 @@ let allStatementsLoaded = ref(false)
 
 let firstOfThisMonth = ref(new Date())
 let firstOfSelectedMonth = ref(new Date())
+
+let statementDialogVisible = ref(false)
+let statementDialogStatement = ref({}) as Ref<ExpenseStatement>
 
 let deleteDialogVisible = ref(false)
 let statementPkToDelete = ref(-1)
@@ -226,7 +275,7 @@ const columns = [
 const statementCols = [
   {
     name: 'card', required: true, label: 'Card', field: 'card', sortable: true,
-    align: 'left'
+    align: 'center'
   },
   { name: 'actions', label: 'Actions', field: 'actions', align: 'center' }
 ]
@@ -392,6 +441,11 @@ function navigateToDetail(submitted: boolean, employeePk: number) {
   }
 }
 
+function showStatmentDialog(statement: any) {
+  statementDialogStatement.value = statement
+  statementDialogVisible.value = true
+}
+
 function showDeleteStatementDialog(statement: any) {
   deleteDialogStatementNumber.value = statement.card
   statementPkToDelete.value = statement.pk
@@ -401,6 +455,7 @@ function showDeleteStatementDialog(statement: any) {
 function deleteStatement(): void {
   purchaseStore.deleteExpenseStatement(statementPkToDelete.value)
     .then(() => {
+      statementDialogVisible.value = false
       quasar.notify('Deleted a statement.')
       retrieveAllStatements()
     })

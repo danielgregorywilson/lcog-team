@@ -16,7 +16,7 @@
       </tr>
     </tbody>
   </q-markup-table>
-  <div v-else class="q-mt-md text-h6">No statement available</div>
+  <div v-else class="q-mt-md text-h6">No statement selected</div>
 </div>
 </template>
 

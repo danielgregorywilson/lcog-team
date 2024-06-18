@@ -1,14 +1,26 @@
 <template>
 <div class="q-mt-md">
-  <div class="q-gutter-md">
+  <div class="row q-gutter-md">
     <q-btn v-if="monthSubmitted()" @click="showUnsubmitDialog = true">
       Unsubmit
     </q-btn>
-    <q-btn v-else @click="showSubmitDialog = true" :disabled="formErrors()">
+    <q-btn
+      v-else
+      @click="showSubmitDialog = true"
+      :disabled="formErrors() || !statementSelected()"
+    >
       Submit for Approval
     </q-btn>
     <q-btn v-if="formErrors()" @click="showErrorsDialog = true">
       <div>Correct Errors</div>
+      <q-icon color="orange" name="warning" size="md" />
+    </q-btn>
+    <q-btn v-if="!statementSelected()" flat class="no-pointer-events">
+      <div>Select a CC statement</div>
+      <q-icon color="orange" name="warning" size="md" />
+    </q-btn>
+    <q-btn v-else-if="!expensesMatchStatment()" flat class="no-pointer-events" >
+      <div>Entered expenses do not match statement</div>
       <q-icon color="orange" name="warning" size="md" />
     </q-btn>
   </div>
@@ -398,6 +410,17 @@
       <div class="text-h6">
         Submit {{ monthDisplay }} expenses for approval?
       </div>
+      <div
+        v-if="!expensesMatchStatment()"
+        class="row items-center q-gutter-sm q-mb-md"
+      >
+        <q-icon color="orange" name="warning" size="md" />  
+        <div class="col text-red text-body1 text-bold">
+          WARNING! Selected statement has
+          {{ selectedStatement?.value.items.length }} items, and you entered
+          {{ selectedMonthExpenses().length }}. Enter explanation below.
+        </div>
+      </div>
       <q-form
         @submit='onSubmitDialog()'
         class="q-gutter-md"
@@ -415,7 +438,7 @@
             icon-right="send"
             type="submit"
             color="primary"
-            :disable="formErrors()"
+            :disable="!expensesMatchStatment() && !submitterNote"
           />
           <!-- <div
             v-if="formErrors()"
@@ -883,6 +906,19 @@ function statementChoices(): Array<{label: string, value: ExpenseStatement}> {
       value: es
     }
   })
+}
+
+function statementSelected(): boolean {
+  return selectedStatement.value !== null
+}
+
+function expensesMatchStatment(): boolean {
+  if (!selectedStatement.value) {
+    return false
+  }
+  const statement = selectedStatement.value.value
+  const expenses = selectedMonthExpenses()
+  return expenses.length === statement.items.length
 }
 
 onMounted(() => {

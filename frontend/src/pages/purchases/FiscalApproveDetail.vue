@@ -306,6 +306,10 @@ const printColumns = [
     sortable: true
   },
   {
+    name: 'amount', field: 'amount', label: 'Amount', align: 'center',
+    sortable: true
+  },
+  {
     name: 'job', field: 'job', label: 'Job #', align: 'center', sortable: true
   },
   {

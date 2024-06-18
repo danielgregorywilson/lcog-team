@@ -110,6 +110,25 @@
               <q-input v-model="scope.value" dense autofocus />
             </q-popup-edit>
           </q-td>
+          <q-td key="amount" :props="props">
+            {{ props.row.amount }}
+            <q-popup-edit
+              v-if="!monthSubmitted()"
+              v-model="props.row.amount"
+              buttons
+              v-slot="scope"
+              @save="(val) => updateExpense(props.row.pk, 'amount', val)"
+            >
+              <q-input
+                v-model="scope.value"
+                mask="#.##"
+                fill-mask="#"
+                reverse-fill-mask
+                dense
+                autofocus
+              />
+            </q-popup-edit>
+          </q-td>
           <q-td key="job" :props="props">
             <div class="text-pre-wrap">{{ props.row.job }}</div>
             <q-popup-edit
@@ -583,6 +602,7 @@ const columns = [
     name: 'vendor', field: 'vendor', label: 'Vendor', align: 'center',
     sortable: true
   },
+  { name: 'amount', field: 'amount', label: 'Amount', align: 'center' },
   {
     name: 'job', field: 'job', label: 'Job #', align: 'center', sortable: true
   },
@@ -722,6 +742,11 @@ function formErrorItems() {
     if (!exp.name) {
       errorItems.push(`Provide a name for the expense on ${exp.date}`)
     }
+    if (parseFloat(exp.amount) <= 0) {
+      errorItems.push(
+        `Provide an amount for ${exp.name} ${typeof parseFloat(exp.amount)}`
+      )
+    }
     if (!exp.job) {
       errorItems.push(`Provide a job number for ${exp.name}, or enter 'None'`)
     }
@@ -822,7 +847,8 @@ function retrieveAllMyExpenses() {
 function updateExpense(
   pk: number,
   field:
-    'name' | 'date' | 'description' | 'vendor' | 'job' | 'gls' | 'approver',
+    'name' | 'date' | 'amount' | 'description' | 'vendor' | 'job' | 'gls' |
+    'approver',
   val: string | Array<GL> | SimpleEmployeeRetrieve
 ) {
   const exp = purchaseStore.myExpenses.find(exp => exp.pk === pk)

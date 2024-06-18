@@ -258,6 +258,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             if (
                 expense.name != request.data.get('name') or
                 expense.date != request.data.get('date') or
+                expense.amount != request.data.get('amount') or
                 expense.description != request.data.get('description') or
                 expense.vendor != request.data.get('vendor') or
                 expense.job != request.data.get('job')
@@ -279,6 +280,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                 )[0]
                 if current_em != new_em:
                     expense.month = new_em
+            expense.amount = request.data.get('amount', expense.amount)
             expense.description = request.data.get(
                 'description', expense.description
             )

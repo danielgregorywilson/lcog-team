@@ -363,6 +363,7 @@ export interface Expense extends ExpenseBase {
   date: string
   description: string
   vendor: string
+  amount: string
   job: string
   gls: Array<GL>
   purchaser: SimpleEmployeeRetrieve

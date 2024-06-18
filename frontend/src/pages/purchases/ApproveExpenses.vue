@@ -201,6 +201,7 @@ import { readableDateNEW } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
 import { usePurchaseStore } from 'src/stores/purchase'
 import { GL } from 'src/types'
+import { name } from 'msal/lib-commonjs/packageMetadata'
 
 const purchaseStore = usePurchaseStore()
 
@@ -249,6 +250,10 @@ const columns = [
   {
     name: 'expense_vendor', field: 'expense_vendor', label: 'Vendor',
     align: 'center', sortable: true
+  },
+  {
+    name: 'expense_amount', field: 'expense_amount', label: 'Amount',
+    align: 'center'
   },
   {
     name: 'expense_job', field: 'expense_job', label: 'Job #', align: 'center',

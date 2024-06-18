@@ -171,6 +171,10 @@ class ExpenseMonth(ExpenseBaseModel):
     approved_at = models.DateTimeField(blank=True, null=True)
     submitter_note = models.TextField(blank=True)
     fiscal_note = models.TextField(blank=True)
+    card = models.ForeignKey(
+        'ExpenseCard', blank=True, null=True, on_delete=models.SET_NULL,
+        related_name='expense_months'
+    )
 
 
 class ExpenseCard(models.Model):
@@ -181,6 +185,10 @@ class ExpenseCard(models.Model):
         return f'*{self.last4}'
 
     last4 = models.IntegerField()
+    assignee = models.ForeignKey(
+        Employee, blank=True, null=True, on_delete=models.SET_NULL,
+        related_name='expense_cards'
+    )
 
 
 class ExpenseStatement(models.Model):

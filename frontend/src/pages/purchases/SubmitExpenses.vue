@@ -339,13 +339,22 @@
   <!-- Statements -->
   <q-select
     v-if="thisMonthStatementsLoaded"
+    :disable="monthSubmitted()"
     v-model="selectedStatement"
     :options="statementChoices()"
     label="Select your card"
     dense
     outlined
     class="q-mt-md"
-  /> 
+    @update:model-value="() => {
+      const month = selectedExpenseMonth()
+      if (month && selectedStatement) {
+        purchaseStore.setExpenseMonthCard(
+          month.pk, selectedStatement?.value.card.pk
+        )
+      }
+    }"
+  />
   <StatementTable :statement="selectedStatement?.value" />
 
   <!-- Errors Dialog -->
@@ -902,7 +911,7 @@ function thisMonthStatements(): Array<ExpenseStatement> {
 function statementChoices(): Array<{label: string, value: ExpenseStatement}> {
   return thisMonthStatements().map(es => {
     return {
-      label: `*${es.card}`,
+      label: `*${es.card.last4}`,
       value: es
     }
   })
@@ -925,10 +934,17 @@ onMounted(() => {
   setDates()
   retrieveThisMonthExpenses().then(() => {
     retrieveAllMyExpenses()
+    // Don't retrieve statements until we've gotten expenses
+    // so we can set selected expense card.
+    retrieveThisMonthStatements().then(() => {
+      retrieveAllStatements()
+      // Set selected card
+      selectedStatement.value = statementChoices().find(
+        sc => sc.value.card.pk === selectedExpenseMonth()?.card.pk
+      ) || null
+    })
   })
-  retrieveThisMonthStatements().then(() => {
-    retrieveAllStatements()
-  })
+  
 })
 
 </script>

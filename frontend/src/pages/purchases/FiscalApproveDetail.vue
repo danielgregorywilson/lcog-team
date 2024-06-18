@@ -9,6 +9,10 @@
       <q-icon color="red" name="cancel" size="lg" class="q-mr-sm" />
       <div>Denied</div>
     </div>
+    <q-btn v-else-if="!expensesMatchStatment()" flat class="no-pointer-events" >
+      <div>Entered expenses do not match statement</div>
+      <q-icon color="orange" name="warning" size="md" />
+    </q-btn>
   </div>
   <div v-if="selectedMonthExpenseMonthNote()">
     <div id="submitter-note" class="q-mt-md q-pa-sm bg-info font-bold">
@@ -119,6 +123,14 @@
           </div>
         </template>
       </q-table>
+
+      <!-- Statement -->
+      <div class="text-h5 q-mt-md">
+        Statement for {{ selectedMonthExpenseMonth()?.card.display }} in
+        {{ monthDisplay }}
+      </div>
+      <StatementTable :statement="selectedMonthExpenseMonth()?.statement" />
+
       <div v-if="!props.print" class="q-mt-sm q-gutter-md row justify-between">
         <div>
           <q-btn
@@ -222,11 +234,12 @@ import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import DocumentViewer from 'src/components/DocumentViewer.vue'
+import StatementTable from 'src/components/purchases/StatementTable.vue'
 import { readableDateNEW, readableDateTime } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
 import { usePeopleStore } from 'src/stores/people'
 import { usePurchaseStore } from 'src/stores/purchase'
-import { Expense, ExpenseMonth } from 'src/types'
+import { Expense, ExpenseMonth, ExpenseStatement } from 'src/types'
 import { getRouteParam } from 'src/utils'
 
 
@@ -259,6 +272,8 @@ let allExpensesLoaded = ref(false)
 
 let firstOfThisMonth = ref(new Date())
 let firstOfSelectedMonth = ref(new Date())
+
+let statement = {} as ExpenseStatement
 
 function viewingThisMonth() {
   return firstOfSelectedMonth.value.getTime() ===
@@ -487,6 +502,12 @@ function navigateToPrintView() {
       year: yearInt.value
     }
   })
+}
+
+function expensesMatchStatment(): boolean {
+  const statement = selectedMonthExpenseMonth()?.statement
+  const expenses = selectedMonthExpenseMonthExpenses()
+  return expenses.length === statement?.items.length
 }
 
 function handlePrint() {

@@ -84,6 +84,11 @@
               :pagination="pagination"
               class="expense-table"
             >
+              <template v-slot:body-cell-card="props">
+                <q-td key="card" :props="props">
+                  {{ props.row.card.display }}
+                </q-td>
+              </template>
               <template v-slot:body-cell-actions="props">
                 <q-td key="actions" :props="props">
                   <q-btn
@@ -140,7 +145,7 @@
           />
           <span class="q-ml-sm">
             Card Number:
-            <span class="text-bold">{{ statementDialogStatement.card }}</span>
+            <span class="text-bold">{{ statementDialogStatement.card.display }}</span>
           </span>
         </div>
         <q-markup-table class="q-mt-md">

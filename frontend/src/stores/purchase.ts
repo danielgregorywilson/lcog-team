@@ -141,6 +141,23 @@ export const usePurchaseStore = defineStore('purchase', {
           })
       })
     },
+    setExpenseMonthCard(
+      pk: number, cardPk: number
+    ): Promise<ExpenseMonth> {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/expensemonth/${ pk }/set_card`,
+          method: 'PUT',
+          data: { cardPk: cardPk }
+        })
+          .then(resp => {
+            resolve(resp.data)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error setting expense month card', e)
+          })
+      })
+    },
     submitExpenseMonth(
       data: {
         yearInt: number, monthInt: number, note?: string, unsubmit?: boolean

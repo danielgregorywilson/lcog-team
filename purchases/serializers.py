@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
 from .models import (
-    Expense, ExpenseGL, ExpenseMonth, ExpenseStatement, ExpenseStatementItem
+    Expense, ExpenseCard, ExpenseGL, ExpenseMonth, ExpenseStatement,
+    ExpenseStatementItem
 )
 from people.serializers import SimpleEmployeeSerializer
 
@@ -68,19 +69,17 @@ class ExpenseSerializer(serializers.HyperlinkedModelSerializer):
     gls = ExpenseGLSerializer(many=True, read_only=True)
 
 
-class ExpenseMonthSerializer(serializers.HyperlinkedModelSerializer):
+class ExpenseCardSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
-        model = ExpenseMonth
-        fields = [
-            'url', 'pk', 'purchaser', 'month', 'year', 'approver',
-            'approved_at', 'submitter_note', 'fiscal_note', 'status',
-            'expenses'
-        ]
+        model = ExpenseCard
+        fields = ['pk', 'last4', 'assignee', 'display']
 
-    purchaser = SimpleEmployeeSerializer(required=False)
-    approver = SimpleEmployeeSerializer(required=False)
-    expenses = ExpenseSerializer(many=True, read_only=True)
+    display = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_display(obj):
+        return f'*{ obj.last4 }'
 
 
 class ExpenseStatementItemSerializer(serializers.HyperlinkedModelSerializer):
@@ -98,5 +97,31 @@ class ExpenseStatementSerializer(serializers.HyperlinkedModelSerializer):
             'pk', 'card', 'month', 'year', 'items'
         ]
 
-    card = serializers.CharField(source='card.last4', read_only=True)
+    card = ExpenseCardSerializer(required=False)
     items = ExpenseStatementItemSerializer(many=True, read_only=True)
+
+
+class ExpenseMonthSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = ExpenseMonth
+        fields = [
+            'url', 'pk', 'purchaser', 'month', 'year', 'approver',
+            'approved_at', 'submitter_note', 'fiscal_note', 'status',
+            'expenses', 'card', 'statement'
+        ]
+
+    purchaser = SimpleEmployeeSerializer(required=False)
+    approver = SimpleEmployeeSerializer(required=False)
+    expenses = ExpenseSerializer(many=True, read_only=True)
+    card = ExpenseCardSerializer(required=False)
+    statement = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_statement(obj):
+        if obj.card:
+            return ExpenseStatementSerializer(
+                obj.card.statements.filter(
+                    month=obj.month, year=obj.year
+                ).first()
+            ).data

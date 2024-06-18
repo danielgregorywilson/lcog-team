@@ -9,7 +9,9 @@ from rest_framework.response import Response
 
 from mainsite.helpers import record_error
 from people.models import Employee
-from purchases.models import Expense, ExpenseGL, ExpenseMonth, ExpenseStatement
+from purchases.models import (
+    Expense, ExpenseCard, ExpenseGL, ExpenseMonth, ExpenseStatement
+)
 from purchases.serializers import (
     ExpenseGLSerializer, ExpenseMonthSerializer, ExpenseSerializer,
     ExpenseStatementSerializer
@@ -469,6 +471,37 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
+    @action(detail=True, methods=['put'])
+    def set_card(self, request, pk):
+        """
+        Set the expense card for an expense month.
+        """
+        try:
+            em = ExpenseMonth.objects.get(pk=pk)
+            card_pk = request.data.get('cardPk', None)
+            if card_pk is not None:
+                card = ExpenseCard.objects.get(pk=card_pk)
+                em.card = card
+                em.save()
+                serialized_em = ExpenseMonthSerializer(
+                    em, context={'request': request}
+                )
+                return Response(serialized_em.data)
+            else:
+                message = 'Didn\'t get a card PK. Cannot set card for EM'
+                record_error(message, e, request, traceback.format_exc())
+                return Response(
+                    data=message,
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        except Exception as e:
+            message = 'Error setting card for expense month.'
+            record_error(message, e, request, traceback.format_exc())
+            return Response(
+                data=message,
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
     @action(detail=True, methods=['put'])
     def approve(self, request, pk):
         """

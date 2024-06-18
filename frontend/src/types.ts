@@ -353,6 +353,8 @@ export interface ExpenseMonth extends ExpenseBase {
   submitter_note: string
   fiscal_note: string
   expenses: Array<Expense>
+  card: ExpenseCard
+  statement: ExpenseStatement
 }
 
 export interface Expense extends ExpenseBase {
@@ -402,6 +404,7 @@ export interface GL {
 export interface ExpenseCard {
   pk: number
   last4: number
+  assignee: SimpleEmployeeRetrieve
 }
 
 interface ExpenseStatementItem {

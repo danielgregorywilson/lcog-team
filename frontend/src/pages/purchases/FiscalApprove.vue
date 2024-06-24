@@ -452,7 +452,7 @@ function showStatmentDialog(statement: any) {
 }
 
 function showDeleteStatementDialog(statement: any) {
-  deleteDialogStatementNumber.value = statement.card
+  deleteDialogStatementNumber.value = statement.card.display
   statementPkToDelete.value = statement.pk
   deleteDialogVisible.value = true
 }

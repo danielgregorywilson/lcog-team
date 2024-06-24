@@ -356,25 +356,35 @@
   </div>
 
   <!-- Statements -->
-  <q-select
-    v-if="thisMonthStatementsLoaded"
-    :disable="monthSubmitted()"
-    v-model="selectedStatement"
-    :options="statementChoices()"
-    label="Select your card"
-    dense
-    outlined
-    class="q-mt-md"
-    @update:model-value="() => {
-      const month = selectedExpenseMonth()
-      if (month && selectedStatement) {
-        purchaseStore.setExpenseMonthCard(
-          month.pk, selectedStatement?.value.card.pk
-        )
-      }
-    }"
-  />
-  <StatementTable :statement="selectedStatement?.value" />
+  <div v-if="thisMonthStatementsLoaded" class="q-mt-md">
+    <div v-if="statementChoices().length">
+      <q-select
+        v-if="thisMonthStatementsLoaded"
+        :disable="monthSubmitted()"
+        v-model="selectedStatement"
+        :options="statementChoices()"
+        label="Select your card"
+        dense
+        outlined
+        @update:model-value="() => {
+          const month = selectedExpenseMonth()
+          if (month && selectedStatement) {
+            purchaseStore.setExpenseMonthCard(
+              month.pk, selectedStatement?.value.card.pk
+            )
+          }
+        }"
+      />
+      <StatementTable :statement="selectedStatement?.value" />
+    </div>
+    <div v-else>
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">No statements uploaded for this month</div>
+        </q-card-section>
+      </q-card>
+    </div> 
+  </div>
 
   <!-- Errors Dialog -->
   <q-dialog v-model="showErrorsDialog">

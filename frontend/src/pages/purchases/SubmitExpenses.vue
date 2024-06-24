@@ -536,6 +536,7 @@ import {
   emptyEmployee, Expense, ExpenseMonth, ExpenseStatement, GL,
   SimpleEmployeeRetrieve 
 } from 'src/types'
+import state from 'src/stores/archived/telework/state'
 
 const quasar = useQuasar()
 const purchaseStore = usePurchaseStore()
@@ -953,7 +954,15 @@ function expensesMatchStatment(): boolean {
   }
   const statement = selectedStatement.value.value
   const expenses = selectedMonthExpenses()
-  return expenses.length === statement.items.length
+  const numExpensesMatch = expenses.length == statement.items.length
+  const statementTotal = statement.items.reduce(
+    (acc, item) => acc + parseFloat(item.amount), 0
+  )
+  const expensesTotal = expenses.reduce(
+    (acc, exp) => acc + parseFloat(exp.amount), 0
+  )
+  const totalsMatch = statementTotal == expensesTotal
+  return numExpensesMatch && totalsMatch
 }
 
 onMounted(() => {

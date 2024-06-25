@@ -412,7 +412,7 @@ interface ExpenseStatementItem {
   pk: number
   date: string
   description: string
-  amount: number
+  amount: string
 }
 
 export interface ExpenseStatement {

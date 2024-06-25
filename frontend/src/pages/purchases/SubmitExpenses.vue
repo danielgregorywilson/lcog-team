@@ -454,9 +454,17 @@
       >
         <q-icon color="orange" name="warning" size="md" />  
         <div class="col text-red text-body1 text-bold">
-          WARNING! Selected statement has
-          {{ selectedStatement?.value.items.length }} items, and you entered
-          {{ selectedMonthExpenses().length }}. Enter explanation below.
+          <span v-if="!totalsMatch()">
+            WARNING! Selected statement has a total of
+            ${{ selectedStatementTotal() }}, and you entered
+            ${{ expensesTotal() }}.
+          </span>
+          <span v-if="!numExpensesMatch()">
+            WARNING! Selected statement has
+            {{ selectedStatement?.value.items.length }} items, and you entered
+            {{ selectedMonthExpenses().length }}.
+          </span>
+          Enter explanation below.
         </div>
       </div>
       <q-form
@@ -690,6 +698,34 @@ function selectedMonthNotes(): Array<{
     }
   }
   return notes
+}
+
+function expensesTotal() {
+  return selectedMonthExpenses().reduce(
+    (acc, exp) => acc + parseFloat(exp.amount), 0
+  )
+}
+
+function selectedStatementTotal() {
+  if (!selectedStatement.value) {
+    return 0
+  }
+  return selectedStatement?.value.value.items.reduce(
+    (acc, item) => acc + parseFloat(item.amount), 0
+  )
+}
+
+function totalsMatch() {
+  return selectedStatementTotal() == expensesTotal()
+}
+
+function numExpensesMatch() {
+  if (!selectedStatement.value) {
+    return true
+  }
+  return selectedStatement?.value.value.items.length ==
+    selectedMonthExpenses().length
+
 }
 
 function monthSubmitted() {
@@ -959,20 +995,7 @@ function statementSelected(): boolean {
 }
 
 function expensesMatchStatment(): boolean {
-  if (!selectedStatement.value) {
-    return false
-  }
-  const statement = selectedStatement.value.value
-  const expenses = selectedMonthExpenses()
-  const numExpensesMatch = expenses.length == statement.items.length
-  const statementTotal = statement.items.reduce(
-    (acc, item) => acc + parseFloat(item.amount), 0
-  )
-  const expensesTotal = expenses.reduce(
-    (acc, exp) => acc + parseFloat(exp.amount), 0
-  )
-  const totalsMatch = statementTotal == expensesTotal
-  return numExpensesMatch && totalsMatch
+  return numExpensesMatch() && totalsMatch()
 }
 
 onMounted(() => {

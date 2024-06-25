@@ -259,7 +259,7 @@ let deleteDialogStatementNumber = ref('')
 let selectedFiles = ref(new File([''], ''))
 
 const pagination = {
-  rowsPerPage: '50'
+  rowsPerPage: 50
 }
 
 const columns = [

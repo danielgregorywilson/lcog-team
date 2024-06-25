@@ -122,11 +122,11 @@ class ExpenseMonthSerializer(serializers.HyperlinkedModelSerializer):
     card = ExpenseCardSerializer(required=False)
     statement = serializers.SerializerMethodField()
 
-    @staticmethod
-    def get_statement(obj):
+    def get_statement(self, obj):
         if obj.card:
             return ExpenseStatementSerializer(
                 obj.card.statements.filter(
                     month=obj.month, year=obj.year
-                ).first()
+                ).first(),
+                context=self.context
             ).data

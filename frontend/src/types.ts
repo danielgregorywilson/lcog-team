@@ -143,7 +143,7 @@ export interface SimpleEmployeeRetrieve {
 }
 
 export const emptyEmployee: SimpleEmployeeRetrieve = {
-  pk: -1, name: '', legal_name: '', title: ''
+  pk: -1, name: '', legal_name: '', title: '', is_expense_approver: false
 }
 
 export interface EmployeeEmailRetrieve {

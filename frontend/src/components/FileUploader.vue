@@ -3,8 +3,8 @@
   ref="fileuploader"
   :multiple=multiple
   max-file-size="20000000"
-  @added="file_selected"
-  @rejected="rejectFileTooLarge"
+  @added="fileSelected"
+  @rejected="rejectFile"
   :accept="props.allowedFileTypes"
   style="max-width: 300px"
 >
@@ -55,7 +55,7 @@
 <div v-if="fileSuccessfullyUploaded" class="text-green">
   Successfully uploaded
 </div>
-<div v-if="fileTooLarge" class="text-red">File is too large</div>
+<div v-if="fileRejected" class="text-red">{{ fileRejectReason }}</div>
 </template>
 
 <script setup lang="ts">
@@ -64,7 +64,8 @@ import { onMounted, onUpdated, ref } from 'vue'
 import { apiURL, handlePromiseError } from 'src/stores/index'
 
 let selectedFiles = ref([new File([''], '')])
-let fileTooLarge = ref(false)
+let fileRejected = ref(false)
+let fileRejectReason = ref('')
 let fileSuccessfullyUploaded = ref(false)
 
 const props = defineProps<{
@@ -82,14 +83,15 @@ const emit = defineEmits<{
   (e: 'uploaded', arg: URL): void
 }>()
 
-function file_selected(files: Array<File>) {
+function fileSelected(files: Array<File>) {
   selectedFiles.value = files;
   uploadFile()
 }
 
-function rejectFileTooLarge() {
-  fileTooLarge.value = true
-  setTimeout(() => fileTooLarge.value = false, 5000)
+function rejectFile(entries: Array<{ failedPropValidation: string; file: File}>) {
+  fileRejectReason.value = entries.map(e => e.failedPropValidation).join(', ')
+  fileRejected.value = true
+  setTimeout(() => fileRejected.value = false, 5000)
 }
 
 function uploadFile() {

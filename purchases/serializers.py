@@ -78,13 +78,23 @@ class ExpenseCardSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = ExpenseCard
-        fields = ['pk', 'last4', 'assignee', 'display']
+        fields = ['pk', 'last4', 'assignee', 'display', 'shared']
 
     display = serializers.SerializerMethodField()
+    shared = serializers.SerializerMethodField()
 
     @staticmethod
     def get_display(obj):
-        return f'*{ obj.last4 }'
+        display = f'*{ obj.last4 }'
+        if obj.assignee:
+            display += f' - { obj.assignee.name }'
+        else:
+            display += ' - Shared'
+        return display
+    
+    @staticmethod
+    def get_shared(obj):
+        return bool(not obj.assignee)
 
 
 class ExpenseStatementItemSerializer(serializers.HyperlinkedModelSerializer):

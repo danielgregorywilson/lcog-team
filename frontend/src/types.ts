@@ -406,6 +406,8 @@ export interface ExpenseCard {
   pk: number
   last4: number
   assignee: SimpleEmployeeRetrieve
+  display: string
+  shared: boolean
 }
 
 interface ExpenseStatementItem {

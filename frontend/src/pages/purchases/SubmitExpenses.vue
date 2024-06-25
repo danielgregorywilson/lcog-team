@@ -984,7 +984,7 @@ function thisMonthStatements(): Array<ExpenseStatement> {
 function statementChoices(): Array<{label: string, value: ExpenseStatement}> {
   return thisMonthStatements().map(es => {
     return {
-      label: `*${es.card.last4}`,
+      label: es.card.display,
       value: es
     }
   })

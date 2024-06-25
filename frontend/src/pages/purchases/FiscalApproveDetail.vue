@@ -81,7 +81,9 @@
                 <q-list dense>
                   <q-item v-for="col in props.cols" :key="col.name">
                     <div class="q-table__grid-item-row">
-                      <div class="q-table__grid-item-title">{{ col.label }}</div>
+                      <div class="q-table__grid-item-title">
+                        {{ col.label }}
+                      </div>
                       <div
                         class="q-table__grid-item-value"
                         v-if="col.label == 'Date'"
@@ -135,7 +137,10 @@
           </div>
         </div>
         
-        <div v-if="!props.print" class="q-mt-sm q-gutter-md row justify-between">
+        <div
+          v-if="!props.print"
+          class="q-mt-sm q-gutter-md row justify-between"
+        >
           <div>
             <q-btn
               :class="EMApproved(em)?'bg-green':''"
@@ -443,7 +448,9 @@ function onSubmitDenyDialog() {
     })
     return
   } else {
-    purchaseStore.approveExpenseMonth(emToApprovePK.value, false, denyDialogMessage.value)
+    purchaseStore.approveExpenseMonth(
+      emToApprovePK.value, false, denyDialogMessage.value
+    )
       .then(() => {
         retrieveAllEmployeeExpenses()
         showDenyDialog.value = false

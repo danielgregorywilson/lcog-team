@@ -159,6 +159,18 @@ class ExpenseMonth(ExpenseBaseModel):
     def __str__(self):
         return f'{self.month}/{self.year} for {self.purchaser}'
     
+    def save(self, *args, **kwargs):
+        set_card = False
+        if not self.pk:
+            set_card = True
+        super().save(*args, **kwargs)
+        # If this is a new month, set the card to the submitter's default card
+        if set_card:
+            card = self.purchaser.expense_cards.first()
+            if card:
+                self.card = card
+                self.save()
+
     purchaser = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='expense_months',

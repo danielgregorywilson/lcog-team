@@ -203,6 +203,11 @@ class ExpenseCard(models.Model):
         related_name='expense_cards'
     )
     shared = models.BooleanField(default=False)
+    requires_director_approval = models.BooleanField(default=False)
+    director = models.ForeignKey(
+        Employee, blank=True, null=True, on_delete=models.SET_NULL,
+        related_name='approver_of_cards'
+    )
 
 
 class ExpenseStatement(models.Model):

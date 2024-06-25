@@ -1007,7 +1007,7 @@ onMounted(() => {
       retrieveAllStatements()
       // Set selected card
       selectedStatement.value = statementChoices().find(
-        sc => sc.value.card.pk === selectedExpenseMonth()?.card.pk
+        sc => sc.value.card.pk === selectedExpenseMonth()?.card?.pk
       ) || null
     })
   })

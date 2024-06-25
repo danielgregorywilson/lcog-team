@@ -58,7 +58,7 @@ class ExpenseMonthAdmin(admin.ModelAdmin):
 
 @admin.register(ExpenseCard)
 class ExpenseCardAdmin(admin.ModelAdmin):
-    list_display = ('last4', 'assignee')
+    list_display = ('last4', 'assignee', 'shared')
 
 
 class ExpenseStatementItemInline(admin.TabularInline):

@@ -1,6 +1,7 @@
 import datetime
 import traceback
 
+from django.db.models import Q
 from django.utils import timezone
 
 from rest_framework import status, viewsets
@@ -550,12 +551,35 @@ class ExpenseStatementViewSet(viewsets.ModelViewSet):
             year = self.request.query_params.get('year', None)
             month = self.request.query_params.get('month', None)
             card = self.request.query_params.get('card', None)
+            can_charge_to_card = Q(card__assignee=user.employee) | \
+                Q(card__shared=True)
             if year and month:
                 if card:
+                    if user.employee.is_fiscal_employee:
+                        return ExpenseStatement.objects.filter(
+                            card__last4=card,
+                            year=year,
+                            month=month
+                        )
+                    else:
+                        return ExpenseStatement.objects.filter(
+                            can_charge_to_card,
+                            card__last4=card,
+                            year=year,
+                            month=month
+                        )
+                else:
+                    if user.employee.is_fiscal_employee:
+                        return ExpenseStatement.objects.filter(
+                            year=year, month=month
+                        )
                     return ExpenseStatement.objects.filter(
-                        card__last4=card, year=year, month=month
+                        can_charge_to_card, year=year, month=month
                     )
-                return ExpenseStatement.objects.filter(year=year, month=month)
-            return ExpenseStatement.objects.all()
+            else:
+                if user.employee.is_fiscal_employee:
+                    return ExpenseStatement.objects.all()
+                else:
+                    return ExpenseStatement.objects.filter(can_charge_to_card)
         else:
             return Expense.objects.none()

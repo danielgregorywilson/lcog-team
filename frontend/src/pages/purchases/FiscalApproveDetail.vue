@@ -6,19 +6,21 @@
       Statement for {{ card.display }}
       in {{ monthDisplay }}
     </div>
-    <q-btn v-if="!totalsMatch()" flat class="no-pointer-events">
-      <div>Expenses total does not match statement</div>
-      <q-icon color="orange" name="warning" size="md" />
-    </q-btn>
-    <q-btn v-if="!numExpensesMatch()" flat class="no-pointer-events">
-      <div>Number of expenses does not match statement</div>
-      <q-icon color="orange" name="warning" size="md" />
-    </q-btn>
-    <q-btn v-if="expensesMatchStatment()" flat class="no-pointer-events">
-      <div>Statement and expenses seem to match</div>
-      <q-icon color="green" name="check" size="md" />
-    </q-btn>
-    <q-btn @click="navigateToPrintView()" label="Print" />
+    <div v-if="!props.print">
+      <q-btn v-if="!totalsMatch()" flat class="no-pointer-events">
+        <div>Expenses total does not match statement</div>
+        <q-icon color="orange" name="warning" size="md" />
+      </q-btn>
+      <q-btn v-if="!numExpensesMatch()" flat class="no-pointer-events">
+        <div>Number of expenses does not match statement</div>
+        <q-icon color="orange" name="warning" size="md" />
+      </q-btn>
+      <q-btn v-if="expensesMatchStatment()" flat class="no-pointer-events">
+        <div>Statement and expenses seem to match</div>
+        <q-icon color="green" name="check" size="md" />
+      </q-btn>
+      <q-btn @click="navigateToPrintView()" label="Print" />
+    </div>
   </div>
   <StatementTable :statement="statement" />
   
@@ -130,7 +132,7 @@
           </template>
         </q-table>
 
-        <div v-if="em.submitter_note">
+        <div v-if="em.submitter_note && !props.print">
           <div id="submitter-note" class="q-mt-md q-pa-sm bg-info font-bold">
             <div>Submitter Note:</div>
             <div>{{ em.submitter_note }}</div>

@@ -190,6 +190,7 @@ class ExpenseCard(models.Model):
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='expense_cards'
     )
+    shared = models.BooleanField(default=False)
 
 
 class ExpenseStatement(models.Model):

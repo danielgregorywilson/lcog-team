@@ -542,12 +542,14 @@ function handlePrint() {
     ]
     monthDisplay.value = `${months[monthInt.value - 1]} ${yearInt.value}`
   }
-  if (purchaseStore.fiscalExpenseMonths.length === 0) {
+  if (purchaseStore.fiscalExpenseMonths.length == 0) {
     retrieveThisMonthEmployeeExpenses().then(() => {
-      window.print()
+      // TODO: Load all receipts, then print
+      // window.print()
     })
   } else {
-    window.print()
+    // TODO: Load all receipts, then print
+    // window.print()
   }
 }
 

@@ -272,7 +272,7 @@ const columns = [
     align: 'center'
   },
   {
-    name: 'approved', label: 'Approved', field: 'approved', sortable: true,
+    name: 'approved', label: 'Fiscal Approved', field: 'approved', sortable: true,
     align: 'center'
   }
 ]

@@ -1,166 +1,171 @@
 <template>
 <div class="q-mt-md">
-  <div v-if="!props.print" class="row q-gutter-md">
-    <div v-if="selectedMonthApproved()" class="row items-center">
-      <q-icon color="green" name="check_circle" size="lg" class="q-mr-sm" />
-      <div>Approved</div>
+  <!-- Statement -->
+  <div class="row items-center justify-between q-mt-md">
+    <div class="text-h5">
+      Statement for {{ card.display }}
+      in {{ monthDisplay }}
     </div>
-    <div v-else-if="selectedMonthDenied()" class="row items-center">
-      <q-icon color="red" name="cancel" size="lg" class="q-mr-sm" />
-      <div>Denied</div>
-    </div>
-    <q-btn v-else-if="!expensesMatchStatment()" flat class="no-pointer-events" >
-      <div>Entered expenses do not match statement</div>
+    <q-btn v-if="!totalsMatch()" flat class="no-pointer-events">
+      <div>Expenses total does not match statement</div>
       <q-icon color="orange" name="warning" size="md" />
     </q-btn>
+    <q-btn v-if="!numExpensesMatch()" flat class="no-pointer-events">
+      <div>Number of expenses does not match statement</div>
+      <q-icon color="orange" name="warning" size="md" />
+    </q-btn>
+    <q-btn v-if="expensesMatchStatment()" flat class="no-pointer-events">
+      <div>Statement and expenses seem to match</div>
+      <q-icon color="green" name="check" size="md" />
+    </q-btn>
+    <q-btn @click="navigateToPrintView()" label="Print" />
   </div>
-  <div v-if="selectedMonthExpenseMonthNote()">
-    <div id="submitter-note" class="q-mt-md q-pa-sm bg-info font-bold">
-      <div>Submitter Note:</div>
-      <div>{{ selectedMonthExpenseMonthNote() }}</div>
-    </div>
-  </div>
-  <div class="q-mt-md">
-    <q-spinner-grid
-      v-if="!expensesLoaded"
-      class="spinner"
-      color="primary"
-      size="xl"
-    />
-    <div v-else>
-      <q-table
-        flat bordered
-        :title="tableTitleDisplay()"
-        :rows="selectedMonthExpenseMonthExpenses()"
-        :columns="props.print ? printColumns : columns"
-        :dense="$q.screen.lt.lg"
-        :grid="$q.screen.lt.md"
-        row-key="name"
-        binary-state-sort
-        :pagination="pagination"
-        class="expense-table"
-      >
-        <template v-slot:body-cell-date="props">
-          <q-td key="date" :props="props">
-            {{ readableDateNEW(props.row.date) }}
-          </q-td>
-        </template>
-        <template v-slot:body-cell-gls="props">
-          <q-td key="gls" :props="props">
-            <div
-              class="text-pre-wrap"
-              v-for="gl in props.row.gls"
-              :key="props.row.gls.indexOf(gl)"
-            >
-              {{ gl.code }}: {{ gl.percent }}% – {{ gl.approver.name }}
-            </div>
-          </q-td>
-        </template>
-        <template v-slot:body-cell-approvedAt="props">
-          <q-td key="date" :props="props" style="white-space: normal;">
-            {{ readableDateTime(props.row.approved_at) }}
-          </q-td>
-        </template>
-        <template v-slot:body-cell-receipt="props">
-          <q-td key="receipt" :props="props">
-            <DocumentViewer
-              v-if="props.row.receipt"
-              :documentUrl="props.row.receipt"
-              iconButton
-            />
-          </q-td>
-        </template>
-        <!-- GRID MODE -->
-        <template v-slot:item="props">
-          <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
-            <q-card class="q-py-sm">
-              <q-list dense>
-                <q-item v-for="col in props.cols" :key="col.name">
-                  <div class="q-table__grid-item-row">
-                    <div class="q-table__grid-item-title">{{ col.label }}</div>
-                    <div
-                      class="q-table__grid-item-value"
-                      v-if="col.label == 'Date'"
-                    >
-                      {{ readableDateNEW(col.value) }}
-                    </div>
-                    <div
-                      class="q-table__grid-item-value"
-                      v-else-if="col.label == 'GL Codes'"
-                    >
+  <StatementTable :statement="statement" />
+  
+  <!-- Expense Months -->
+  <q-spinner-grid
+    v-if="!expensesLoaded"
+    class="spinner"
+    color="primary"
+    size="xl"
+  />
+  <div v-else>
+    <div v-for="em of selectedMonthCardExpenseMonths()" :key="em.pk">
+      <div class="q-mt-lg">
+        <q-table
+          flat bordered
+          :title="tableTitleDisplay(em)"
+          :rows="em.expenses"
+          :columns="props.print ? printColumns : columns"
+          :dense="$q.screen.lt.lg"
+          :grid="$q.screen.lt.md"
+          row-key="name"
+          binary-state-sort
+          :pagination="pagination"
+          class="expense-table"
+        >
+          <template v-slot:body-cell-date="props">
+            <q-td key="date" :props="props">
+              {{ readableDateNEW(props.row.date) }}
+            </q-td>
+          </template>
+          <template v-slot:body-cell-gls="props">
+            <q-td key="gls" :props="props">
+              <div
+                class="text-pre-wrap"
+                v-for="gl in props.row.gls"
+                :key="props.row.gls.indexOf(gl)"
+              >
+                {{ gl.code }}: {{ gl.percent }}% – {{ gl.approver.name }}
+              </div>
+            </q-td>
+          </template>
+          <template v-slot:body-cell-approvedAt="props">
+            <q-td key="date" :props="props" style="white-space: normal;">
+              {{ readableDateTime(props.row.approved_at) }}
+            </q-td>
+          </template>
+          <template v-slot:body-cell-receipt="props">
+            <q-td key="receipt" :props="props">
+              <DocumentViewer
+                v-if="props.row.receipt"
+                :documentUrl="props.row.receipt"
+                iconButton
+              />
+            </q-td>
+          </template>
+          <!-- GRID MODE -->
+          <template v-slot:item="props">
+            <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
+              <q-card class="q-py-sm">
+                <q-list dense>
+                  <q-item v-for="col in props.cols" :key="col.name">
+                    <div class="q-table__grid-item-row">
+                      <div class="q-table__grid-item-title">{{ col.label }}</div>
                       <div
-                        class="text-pre-wrap"
-                        v-for="gl in props.row.gls"
-                        :key="props.row.gls.indexOf(gl)"
+                        class="q-table__grid-item-value"
+                        v-if="col.label == 'Date'"
                       >
-                        {{ gl.code }}: {{ gl.percent }}% –
-                        {{ gl.approver.name }}
+                        {{ readableDateNEW(col.value) }}
+                      </div>
+                      <div
+                        class="q-table__grid-item-value"
+                        v-else-if="col.label == 'GL Codes'"
+                      >
+                        <div
+                          class="text-pre-wrap"
+                          v-for="gl in props.row.gls"
+                          :key="props.row.gls.indexOf(gl)"
+                        >
+                          {{ gl.code }}: {{ gl.percent }}% –
+                          {{ gl.approver.name }}
+                        </div>
+                      </div>
+                      <div
+                        class="q-table__grid-item-value"
+                        v-else-if="col.label == 'Approved At'"
+                      >
+                        {{ readableDateTime(col.value) }}
+                      </div>
+                      <div
+                        class="q-table__grid-item-value"
+                        v-else-if="col.label == 'Receipt'"
+                      >
+                        <DocumentViewer
+                          v-if="col.value"
+                          :documentUrl="col.value"
+                          iconButton
+                        />
+                      </div>
+                      <div class="q-table__grid-item-value" v-else>
+                        {{ col.value }}
                       </div>
                     </div>
-                    <div
-                      class="q-table__grid-item-value"
-                      v-else-if="col.label == 'Approved At'"
-                    >
-                      {{ readableDateTime(col.value) }}
-                    </div>
-                    <div
-                      class="q-table__grid-item-value"
-                      v-else-if="col.label == 'Receipt'"
-                    >
-                      <DocumentViewer
-                        v-if="col.value"
-                        :documentUrl="col.value"
-                        iconButton
-                      />
-                    </div>
-                    <div class="q-table__grid-item-value" v-else>
-                      {{ col.value }}
-                    </div>
-                  </div>
-                </q-item>
-              </q-list>
-            </q-card>
+                  </q-item>
+                </q-list>
+              </q-card>
+            </div>
+          </template>
+        </q-table>
+
+        <div v-if="em.submitter_note">
+          <div id="submitter-note" class="q-mt-md q-pa-sm bg-info font-bold">
+            <div>Submitter Note:</div>
+            <div>{{ em.submitter_note }}</div>
           </div>
-        </template>
-      </q-table>
-
-      <!-- Statement -->
-      <div class="text-h5 q-mt-md">
-        Statement for {{ selectedMonthExpenseMonth()?.card.display }} in
-        {{ monthDisplay }}
-      </div>
-      <StatementTable :statement="selectedMonthExpenseMonth()?.statement" />
-
-      <div v-if="!props.print" class="q-mt-sm q-gutter-md row justify-between">
-        <div>
-          <q-btn
-            :class="selectedMonthApproved()?'bg-green':''"
-            :disable="selectedMonthApproved()"
-            @click="showApproveDialog = true"
-            class="q-mr-md"
-          >
-            Approve Expenses
-          </q-btn>
-          <q-btn
-            :class="selectedMonthDenied()?'bg-red':''"
-            :disable="selectedMonthDenied()"
-            @click="showDenyDialog = true"
-          >
-            Deny Expenses
-          </q-btn>
         </div>
-        <q-btn @click="navigateToPrintView()" label="Print" />
+        
+        <div v-if="!props.print" class="q-mt-sm q-gutter-md row justify-between">
+          <div>
+            <q-btn
+              :class="EMApproved(em)?'bg-green':''"
+              :disable="EMApproved(em)"
+              @click="onShowApproveDialog(em)"
+              class="q-mr-md"
+            >
+              Approve Expenses
+            </q-btn>
+            <q-btn
+              :class="EMDenied(em)?'bg-red':''"
+              :disable="EMDenied(em)"
+              @click="onShowDenyDialog(em)"
+            >
+              Deny Expenses
+            </q-btn>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Display Receipts for Print View -->
-  <div v-if="props.print">
-    <div
-      v-for="expense in selectedMonthExpenseMonthExpenses()"
-      :key="expense.pk"
-    >
-      <q-img :src="expense.receipt" />
+      <!-- Display Receipts for Print View -->
+      <div v-if="props.print">
+        <div
+          v-for="expense in em.expenses"
+          :key="expense.pk"
+        >
+          <q-img :src="expense.receipt" />
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -168,7 +173,7 @@
   <q-dialog v-model="showApproveDialog">
     <q-card class="q-pa-md" style="width: 400px">
       <div class="text-h6">
-        Approve {{monthDisplay}} expenses for {{ employeeName }}?
+        Approve {{monthDisplay}} expenses for {{ emToApproveEmployeeName }}?
       </div>
       <q-form
         @submit='onSubmitApproveDialog()'
@@ -191,7 +196,7 @@
   <q-dialog v-model="showDenyDialog">
     <q-card class="q-pa-md" style="width: 400px">
       <div class="text-h6">
-        Deny {{monthDisplay}} expenses for {{ employeeName }}?
+        Deny {{ monthDisplay }} expenses for {{ emToApproveEmployeeName }}?
       </div>
       <q-form
         @submit='onSubmitDenyDialog()'
@@ -217,7 +222,6 @@
     </q-card>
   </q-dialog>
 
-
 </div>
 </template>
 
@@ -230,7 +234,7 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, Ref, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import DocumentViewer from 'src/components/DocumentViewer.vue'
@@ -239,7 +243,7 @@ import { readableDateNEW, readableDateTime } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
 import { usePeopleStore } from 'src/stores/people'
 import { usePurchaseStore } from 'src/stores/purchase'
-import { Expense, ExpenseMonth, ExpenseStatement } from 'src/types'
+import { ExpenseCard, ExpenseMonth, ExpenseStatement } from 'src/types'
 import { getRouteParam } from 'src/utils'
 
 
@@ -256,6 +260,8 @@ const props = defineProps<{
   print?: boolean
 }>()
 
+let emToApprovePK = ref(-1)
+let emToApproveEmployeeName = ref('')
 let showApproveDialog = ref(false)
 let showDenyDialog = ref(false)
 let denyDialogMessage = ref('')
@@ -264,16 +270,16 @@ let monthDisplay = ref(props.monthDisplay)
 let monthInt = ref(props.monthInt)
 let yearInt = ref(props.yearInt)
 
-let employeeName = ref('')
-let employeePK = ref(0)
+let card = ref({}) as Ref<ExpenseCard>
+let statement = ref({}) as Ref<ExpenseStatement>
+
+let routeEmployeePK = ref(-1)
 
 let thisMonthLoaded = ref(false)
 let allExpensesLoaded = ref(false)
 
 let firstOfThisMonth = ref(new Date())
 let firstOfSelectedMonth = ref(new Date())
-
-let statement = {} as ExpenseStatement
 
 function viewingThisMonth() {
   return firstOfSelectedMonth.value.getTime() ===
@@ -326,71 +332,37 @@ const columns = printColumns.concat(
   [{ name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' }]
 )
 
-function tableTitleDisplay(): string {
-  return `${monthDisplay.value} expenses for ${employeeName.value}`
+function tableTitleDisplay(em: ExpenseMonth): string {
+  return `${ monthDisplay.value } expenses for ${ em.purchaser.name }`
 }
 
-function selectedMonthExpenseMonth(): ExpenseMonth | null {
-  const ems = purchaseStore.fiscalExpenseMonths
-  let em: ExpenseMonth | null = null
-  if (ems.length) {
-    const currentExpenseMonths = ems.filter(em => {
-      return em.month === monthInt.value && em.year === yearInt.value
-    })
-    if (currentExpenseMonths.length) {
-      em = currentExpenseMonths[0]
-    }
-  }
-  return em
-}
-
-function selectedMonthExpenseMonthExpenses(): Expense[] {
-  const em = selectedMonthExpenseMonth()
-  if (em) return em.expenses
-  return []
-}
-
-function selectedMonthExpenseMonthNote(): string {
-  const em = selectedMonthExpenseMonth()
-  if (em) return em.submitter_note
-  return ''
-}
-
-function selectedMonthApproved(): boolean {
-  const em = selectedMonthExpenseMonth()
-  if (em) return em.status === 'fiscal_approved'
-  return false
-}
-
-function selectedMonthDenied(): boolean {
-  const em = selectedMonthExpenseMonth()
-  if (em) return em.status === 'fiscal_denied'
-  return false
-}
-
-function getEmployeeFromRoute() {
-  return new Promise((resolve, reject) => {
-    const PK = getRouteParam(route, 'employeePK')
-    if (PK) {
-      employeePK.value = parseInt(PK)
-      peopleStore.getSimpleEmployeeDetail({pk: parseInt(PK)})
-        .then((employee) => {
-          employeeName.value = employee.name
-          resolve(employee)
-        })
-        .catch((error) => {
-          reject(error)
-        })
-    } else {
-      reject()
-    }
-  }).catch(() => {
-    quasar.notify({
-      message: 'Couldn\'t get employee',
-      color: 'negative',
-      icon: 'cancel'
-    })
+function selectedMonthCardExpenseMonths(): Array<ExpenseMonth> {
+  const allEMs = purchaseStore.fiscalExpenseMonths.filter(em => {
+    return em.month === monthInt.value && em.year === yearInt.value
   })
+  let ems: Array<ExpenseMonth> = []
+  if (allEMs.length) {
+    const selectedEmployeeEM = allEMs.filter(em => {
+      return em.purchaser.pk === routeEmployeePK.value
+    })[0]
+    if (!selectedEmployeeEM) {
+      return []
+    }
+    card.value = selectedEmployeeEM.card
+    statement.value = selectedEmployeeEM.statement
+    ems = allEMs.filter(em => {
+      return em.card.pk == selectedEmployeeEM.card.pk
+    })
+  }
+  return ems
+}
+
+function EMApproved(em: ExpenseMonth): boolean {
+  return em.status === 'fiscal_approved'
+}
+
+function EMDenied(em: ExpenseMonth): boolean {
+  return em.status === 'fiscal_denied'
 }
 
 function retrieveThisMonthEmployeeExpenses(): Promise<void> {
@@ -408,11 +380,11 @@ function retrieveThisMonthEmployeeExpenses(): Promise<void> {
 }
 
 function retrieveAllEmployeeExpenses() {
-  const employeePK = getRouteParam(route, 'employeePK')
+  const employeePK = routeEmployeePK.value
   if (!employeePK) {
     return
   }
-  purchaseStore.getFiscalExpenseMonths(null, null, parseInt(employeePK))
+  purchaseStore.getFiscalExpenseMonths(null, null, employeePK)
     .then(() => {
       allExpensesLoaded.value = true
     })
@@ -421,10 +393,20 @@ function retrieveAllEmployeeExpenses() {
     })
 }
 
+function onShowApproveDialog(em: ExpenseMonth) {
+  emToApprovePK.value = em.pk
+  emToApproveEmployeeName.value = em.purchaser.name
+  showApproveDialog.value = true
+}
+
+function onShowDenyDialog(em: ExpenseMonth) {
+  emToApprovePK.value = em.pk
+  emToApproveEmployeeName.value = em.purchaser.name
+  showDenyDialog.value = true
+}
+
 function onSubmitApproveDialog() {
-  showApproveDialog.value = false
-  const pk = selectedMonthExpenseMonth()?.pk
-  if (!pk) {
+  if (emToApprovePK.value == -1) {
     quasar.notify({
       message: 'No expenses to approve',
       color: 'negative',
@@ -432,9 +414,10 @@ function onSubmitApproveDialog() {
     })
     return
   } else {
-    purchaseStore.approveExpenseMonth(pk, true)
+    purchaseStore.approveExpenseMonth(emToApprovePK.value, true)
       .then(() => {
         retrieveAllEmployeeExpenses()
+        showApproveDialog.value = false
         quasar.notify({
           message: 'Approved',
           color: 'positive',
@@ -452,8 +435,7 @@ function onSubmitApproveDialog() {
 }
 
 function onSubmitDenyDialog() {
-  const pk = selectedMonthExpenseMonth()?.pk
-  if (!pk) {
+  if (emToApprovePK.value == -1) {
     quasar.notify({
       message: 'No expenses to approve',
       color: 'negative',
@@ -461,7 +443,7 @@ function onSubmitDenyDialog() {
     })
     return
   } else {
-    purchaseStore.approveExpenseMonth(pk, false, denyDialogMessage.value)
+    purchaseStore.approveExpenseMonth(emToApprovePK.value, false, denyDialogMessage.value)
       .then(() => {
         retrieveAllEmployeeExpenses()
         showDenyDialog.value = false
@@ -494,7 +476,7 @@ function setDates() {
 }
 
 function navigateToPrintView() {
-  const employeePK = getRouteParam(route, 'employeePK')
+  const employeePK = routeEmployeePK.value
   if (!employeePK) {
     return
   }
@@ -508,10 +490,33 @@ function navigateToPrintView() {
   })
 }
 
+function expensesTotal() {
+  let total = 0
+  for (let em of selectedMonthCardExpenseMonths()) {
+    total += em.expenses.reduce(
+      (acc, expense) => acc + parseFloat(expense.amount), 0
+    )
+  }
+  return total
+}
+
+function totalsMatch() {
+  const statementTotal = statement.value?.items?.reduce(
+    (acc, item) => acc + parseFloat(item.amount), 0
+  )
+  return statementTotal == expensesTotal()
+}
+
+function numExpensesMatch() {
+  const expenses = []
+  for (let em of selectedMonthCardExpenseMonths()) {
+    expenses.push(...em.expenses)
+  }
+  return expenses.length == statement.value?.items?.length
+}
+
 function expensesMatchStatment(): boolean {
-  const statement = selectedMonthExpenseMonth()?.statement
-  const expenses = selectedMonthExpenseMonthExpenses()
-  return expenses.length === statement?.items.length
+  return totalsMatch() && numExpensesMatch()
 }
 
 function handlePrint() {
@@ -528,29 +533,27 @@ function handlePrint() {
     ]
     monthDisplay.value = `${months[monthInt.value - 1]} ${yearInt.value}`
   }
-  getEmployeeFromRoute().then(() => {
-    if (purchaseStore.fiscalExpenseMonths.length === 0) {
-      retrieveThisMonthEmployeeExpenses().then(() => {
-        window.print()
-      })
-    } else {
+  if (purchaseStore.fiscalExpenseMonths.length === 0) {
+    retrieveThisMonthEmployeeExpenses().then(() => {
       window.print()
-    }
-  })
+    })
+  } else {
+    window.print()
+  }
 }
 
 onMounted(() => {
+  const employeePK = getRouteParam(route, 'employeePK')
+  routeEmployeePK.value = parseInt(employeePK ? employeePK : '-1')
   if (props.print) {
     handlePrint()
   } else {
     setDates().then(() => {
-      getEmployeeFromRoute().then(() => {
-        if (purchaseStore.fiscalExpenseMonths.length === 0) {
-          retrieveThisMonthEmployeeExpenses().then(() => {
-            retrieveAllEmployeeExpenses()
-          })
-        }
-      })
+      if (purchaseStore.fiscalExpenseMonths.length === 0) {
+        retrieveThisMonthEmployeeExpenses().then(() => {
+          retrieveAllEmployeeExpenses()
+        })
+      }
     })
   }
 })

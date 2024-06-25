@@ -345,7 +345,7 @@ interface ExpenseBase {
 
 export interface ExpenseMonth extends ExpenseBase {
   pk: number
-  employee: SimpleEmployeeRetrieve
+  purchaser: SimpleEmployeeRetrieve
   month: number
   year: number
   approver: SimpleEmployeeRetrieve

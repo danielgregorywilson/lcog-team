@@ -271,7 +271,7 @@ export const usePurchaseStore = defineStore('purchase', {
     },
 
     approveExpenseMonth(
-      pk: number, approve: boolean, deny_note: string
+      pk: number, approve: boolean, deny_note?: string
     ): Promise<ExpenseMonth> {
       return new Promise((resolve, reject) => {
         axios({

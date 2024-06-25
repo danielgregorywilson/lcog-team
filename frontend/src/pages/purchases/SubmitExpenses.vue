@@ -725,7 +725,10 @@ function numExpensesMatch() {
   }
   return selectedStatement?.value.value.items.length ==
     selectedMonthExpenses().length
+}
 
+function expensesMatchStatment(): boolean {
+  return numExpensesMatch() && totalsMatch()
 }
 
 function monthSubmitted() {
@@ -992,10 +995,6 @@ function statementChoices(): Array<{label: string, value: ExpenseStatement}> {
 
 function statementSelected(): boolean {
   return selectedStatement.value !== null
-}
-
-function expensesMatchStatment(): boolean {
-  return numExpensesMatch() && totalsMatch()
 }
 
 onMounted(() => {

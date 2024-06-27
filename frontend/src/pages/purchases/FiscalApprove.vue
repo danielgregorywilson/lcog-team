@@ -17,6 +17,7 @@
         binary-state-sort
         :pagination="pagination"
         class="expense-table"
+        no-data-label="No expenses entered this month"
       >
         <template v-slot:body="props">
           <q-tr

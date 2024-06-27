@@ -357,6 +357,11 @@ export interface ExpenseMonth extends ExpenseBase {
   statement: ExpenseStatement
 }
 
+export interface ExpenseMonthCreate {
+  month: number
+  year: number
+}
+
 export interface Expense extends ExpenseBase {
   pk: number
   name: string

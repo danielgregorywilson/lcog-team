@@ -56,6 +56,7 @@
       binary-state-sort
       :pagination="pagination"
       class="expense-table"
+      no-data-label="No expenses entered this month"
     >
       <template v-slot:body="props">
         <q-tr
@@ -367,10 +368,19 @@
         dense
         outlined
         @update:model-value="() => {
-          const month = selectedExpenseMonth()
-          if (month && selectedStatement) {
+          const em = selectedExpenseMonth()
+          if (!em) {
+            createExpenseMonth().then((newEM) => {
+              if (selectedStatement) {
+                purchaseStore.setExpenseMonthCard(
+                  newEM.pk, selectedStatement?.value.card.pk
+                )
+              }
+            })
+          }
+          if (em && selectedStatement) {
             purchaseStore.setExpenseMonthCard(
-              month.pk, selectedStatement?.value.card.pk
+              em.pk, selectedStatement?.value.card.pk
             )
           }
         }"
@@ -540,7 +550,7 @@
 </style>
 
 <script setup lang="ts">
-import { onMounted, Ref, ref } from 'vue'
+import { onMounted, Ref, ref, watch } from 'vue'
 import { useQuasar } from 'quasar'
 
 import DocumentViewer from 'src/components/DocumentViewer.vue'
@@ -550,14 +560,16 @@ import StatementTable from 'src/components/purchases/StatementTable.vue'
 import { readableDateNEW, readableDateTime } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
 import { usePurchaseStore } from 'src/stores/purchase'
+import { useUserStore } from 'src/stores/user'
 import {
   emptyEmployee, Expense, ExpenseMonth, ExpenseStatement, GL,
   SimpleEmployeeRetrieve 
 } from 'src/types'
-import state from 'src/stores/archived/telework/state'
+
 
 const quasar = useQuasar()
 const purchaseStore = usePurchaseStore()
+const userStore = useUserStore()
 
 const props = defineProps<{
   monthDisplay: string
@@ -997,6 +1009,28 @@ function statementSelected(): boolean {
   return selectedStatement.value !== null
 }
 
+function setSelectedStatement() {
+  selectedStatement.value = statementChoices().find(
+    sc => sc.value.card.pk === selectedExpenseMonth()?.card?.pk
+  ) || null
+}
+
+function createExpenseMonth(): Promise<ExpenseMonth> {
+  return new Promise ((resolve, reject) => {
+    purchaseStore.createExpenseMonth({
+      month: props.monthInt,
+      year: props.yearInt
+    })
+      .then((em) => {
+        resolve(em)
+      })
+      .catch((error) => {
+        handlePromiseError(reject, 'Error creating expense month', error)
+        reject()
+      })
+  })
+}
+
 onMounted(() => {
   setDates()
   retrieveThisMonthExpenses().then(() => {
@@ -1004,14 +1038,17 @@ onMounted(() => {
     // Don't retrieve statements until we've gotten expenses
     // so we can set selected expense card.
     retrieveThisMonthStatements().then(() => {
-      retrieveAllStatements()
-      // Set selected card
-      selectedStatement.value = statementChoices().find(
-        sc => sc.value.card.pk === selectedExpenseMonth()?.card?.pk
-      ) || null
+      retrieveAllStatements().then(() => {
+        setSelectedStatement()
+      })
     })
   })
-  
+})
+
+watch(() => props.monthInt, (first, second) => {
+  if (first !== second) {
+    setSelectedStatement()
+  }
 })
 
 </script>

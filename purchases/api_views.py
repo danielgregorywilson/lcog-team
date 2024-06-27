@@ -415,6 +415,19 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
         else:
             return Expense.objects.none()
 
+    def create(self, request, *args, **kwargs):
+        month = request.data.get('month', None)
+        year = request.data.get('year', None)
+        if month is not None and year is not None:
+            em = ExpenseMonth.objects.get_or_create(
+                purchaser=request.user.employee,
+                year=year,
+                month=month
+            )[0]
+        serialized_em = ExpenseMonthSerializer(
+            em, context={'request': request})
+        return Response(serialized_em.data)
+
     @action(detail=False, methods=['post'])
     def submit(self, request):
         """

@@ -62,7 +62,7 @@ router.register('v1/deskreservation', DeskReservationViewSet)
 # Expenses
 router.register('v1/expense-gl', ExpenseGLViewSet)
 router.register('v1/expense', ExpenseViewSet)
-router.register('v1/expensemonth', ExpenseMonthViewSet)
+router.register('v1/expense-month', ExpenseMonthViewSet)
 router.register('v1/expense-statement', ExpenseStatementViewSet)
 # Performance Reviews
 router.register('v1/performancereview', PerformanceReviewViewSet)

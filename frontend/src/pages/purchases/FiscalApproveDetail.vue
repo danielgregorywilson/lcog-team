@@ -45,6 +45,7 @@
           binary-state-sort
           :pagination="pagination"
           class="expense-table"
+          no-data-label="No expenses entered this month"
         >
           <template v-slot:body-cell-date="props">
             <q-td key="date" :props="props">
@@ -248,7 +249,6 @@ import DocumentViewer from 'src/components/DocumentViewer.vue'
 import StatementTable from 'src/components/purchases/StatementTable.vue'
 import { readableDateNEW, readableDateTime } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
-import { usePeopleStore } from 'src/stores/people'
 import { usePurchaseStore } from 'src/stores/purchase'
 import { ExpenseCard, ExpenseMonth, ExpenseStatement } from 'src/types'
 import { getRouteParam } from 'src/utils'
@@ -257,7 +257,6 @@ import { getRouteParam } from 'src/utils'
 const route = useRoute()
 const router = useRouter()
 const quasar = useQuasar()
-const peopleStore = usePeopleStore()
 const purchaseStore = usePurchaseStore()
 
 const props = defineProps<{

@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
 import {
-  Expense, ExpenseCreate, ExpenseMonth, ExpenseStatement, GL
+  Expense, ExpenseCreate, ExpenseMonth, ExpenseMonthCreate, ExpenseStatement, GL
 } from 'src/types'
 
 export const usePurchaseStore = defineStore('purchase', {
@@ -54,6 +54,17 @@ export const usePurchaseStore = defineStore('purchase', {
           })
           .catch(e => {
             handlePromiseError(reject, 'Error deleting expense', e)
+          })
+      })
+    },
+    createExpenseMonth(data: ExpenseMonthCreate): Promise<ExpenseMonth> {
+      return new Promise((resolve, reject) => {
+        axios({ url: `${ apiURL }api/v1/expense-month`, method: 'POST', data })
+          .then((resp) => {
+            resolve(resp.data)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error creating expense month', e)
           })
       })
     },
@@ -110,7 +121,7 @@ export const usePurchaseStore = defineStore('purchase', {
           params = `?year=${ yearInt }&month=${ monthInt }`
         }
         axios({
-          url: `${ apiURL }api/v1/expensemonth${ params }`
+          url: `${ apiURL }api/v1/expense-month${ params }`
         })
           .then(resp => {
             const ems = resp.data.results
@@ -146,7 +157,7 @@ export const usePurchaseStore = defineStore('purchase', {
     ): Promise<ExpenseMonth> {
       return new Promise((resolve, reject) => {
         axios({
-          url: `${ apiURL }api/v1/expensemonth/${ pk }/set_card`,
+          url: `${ apiURL }api/v1/expense-month/${ pk }/set_card`,
           method: 'PUT',
           data: { cardPk: cardPk }
         })
@@ -165,7 +176,7 @@ export const usePurchaseStore = defineStore('purchase', {
     ): Promise<null> {
       return new Promise((resolve, reject) => {
         axios({
-          url: `${ apiURL }api/v1/expensemonth/submit`,
+          url: `${ apiURL }api/v1/expense-month/submit`,
           data: data,
           method: 'POST'
         })
@@ -254,7 +265,7 @@ export const usePurchaseStore = defineStore('purchase', {
           params += `&employee=${ employeePK }`
         }
         axios({
-          url: `${ apiURL }api/v1/expensemonth${ params }`
+          url: `${ apiURL }api/v1/expense-month${ params }`
         })
           .then(resp => {
             const ems: ExpenseMonth[] = resp.data.results
@@ -275,7 +286,7 @@ export const usePurchaseStore = defineStore('purchase', {
     ): Promise<ExpenseMonth> {
       return new Promise((resolve, reject) => {
         axios({
-          url: `${ apiURL }api/v1/expensemonth/${ pk }/approve`,
+          url: `${ apiURL }api/v1/expense-month/${ pk }/approve`,
           method: 'PUT',
           data: { approve, deny_note }
         })

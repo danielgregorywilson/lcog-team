@@ -559,11 +559,9 @@ onMounted(() => {
     handlePrint()
   } else {
     setDates().then(() => {
-      if (purchaseStore.fiscalExpenseMonths.length === 0) {
-        retrieveThisMonthEmployeeExpenses().then(() => {
-          retrieveAllEmployeeExpenses()
-        })
-      }
+      retrieveThisMonthEmployeeExpenses().then(() => {
+        retrieveAllEmployeeExpenses()
+      })
     })
   }
 })

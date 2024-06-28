@@ -22,10 +22,10 @@
         <template v-slot:body="props">
           <q-tr
             :props="props"
-            :no-hover="!expenseMonthManagerApproved(props.row)"
-            :class="{'cursor-pointer': expenseMonthManagerApproved(props.row)}"
+            :no-hover="!expenseMonthDirectorApproved(props.row)"
+            :class="{'cursor-pointer': expenseMonthDirectorApproved(props.row)}"
             @click="navigateToDetail(
-              expenseMonthManagerApproved(props.row), props.row.purchaser.pk
+              expenseMonthDirectorApproved(props.row), props.row.purchaser.pk
             )"
           >
             <q-td key="employee" :props="props">
@@ -303,16 +303,16 @@ function statementsLoaded() {
 
 function selectedMonthExpenseMonths() {
   return purchaseStore.fiscalExpenseMonths
-    .filter(em => em.month === props.monthInt && em.year === props.yearInt)
+    .filter(em => em.month == props.monthInt && em.year == props.yearInt)
 }
 
 function selectedMonthStatements() {
   return purchaseStore.expenseStatements
-    .filter(s => s.month === props.monthInt && s.year === props.yearInt)
+    .filter(s => s.month === props.monthInt && s.year == props.yearInt)
 }
 
-function expenseMonthManagerApproved(expenseMonth: ExpenseMonth) {
-  return ['approver_approved', 'fiscal_approved', 'fiscal_denied']
+function expenseMonthDirectorApproved(expenseMonth: ExpenseMonth) {
+  return ['director_approved', 'fiscal_approved', 'fiscal_denied']
     .includes(expenseMonth.status)
 }
 
@@ -329,11 +329,14 @@ function progressBarSize(status: string) {
     case 'draft':
       return 0
     case 'submitted':
-      return .5
     case 'approver_denied':
-      return .5
+      return .25
     case 'approver_approved':
+    case 'director_denied':
+      return .5
+    case 'director_approved':
     case 'fiscal_denied':
+      return .75
     case 'fiscal_approved':
       return 1
     default:
@@ -350,9 +353,15 @@ function progressBarLabel(status: string) {
     case 'approver_denied':
       return 'Denied by Manager'
     case 'approver_approved':
-    case 'fiscal_denied':
-    case 'fiscal_approved':
       return 'Approved by Manager'
+    case 'director_denied':
+      return 'Denied by Director'
+    case 'director_approved':
+      return 'Approved by Director'
+    case 'fiscal_denied':
+      return 'Denied by Fiscal'
+    case 'fiscal_approved':
+      return 'Approved by Fiscal'
     default:
       return 'Unknown'
   }
@@ -365,9 +374,11 @@ function progressBarColor(status: string) {
     case 'submitted':
       return 'blue'
     case 'approver_denied':
+    case 'director_denied':
+    case 'fiscal_denied':
       return 'red'
     case 'approver_approved':
-    case 'fiscal_denied':
+    case 'director_approved':
     case 'fiscal_approved':
       return 'green'
     default:

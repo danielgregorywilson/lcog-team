@@ -72,66 +72,14 @@ class ExpenseGLViewSet(viewsets.ModelViewSet):
                             Expense.STATUS_APPROVER_DENIED
                         ]
                     )
-            
-            # start = self.request.query_params.get('start', None)
-            # end = self.request.query_params.get('end', None)
-            # if start and end:
-            #     return Expense.objects.filter(
-            #         purchaser=self.request.user.employee,
-            #         date__range=[start, end]
-            #     )
             return ExpenseGL.objects.filter(
                 expense__purchaser=self.request.user.employee
             )
         else:
             return ExpenseGL.objects.none()
 
-    # def create(self, request, *args, **kwargs):
-    #     code = request.data.get('code', None)
-    #     percent = request.data.get('percent', None)
-    #     approver = request.data.get('approver', None)
-    #     if code is not None:
-    #         expense_gl = ExpenseGL.objects.create(
-    #             code=code, percent=percent, approver=approver
-    #         )
-    #         serialized_expense_gl = ExpenseGLSerializer(
-    #             expense_gl, context={'request': request}
-    #         )
-    #         return Response(serialized_expense_gl.data)
-    #     else:
-    #         return Response(
-    #             data='Error creating expense GL entry.',
-    #             status=status.HTTP_500_INTERNAL_SERVER_ERROR
-    #         )
-
-    # def update(self, request, pk=None):
-    #     """
-    #     Update the expense GL entry with the given pk.
-    #     """
-    #     try:
-    #         expense_gl = ExpenseGL.objects.get(pk=pk)
-    #         code = request.data.get('code', expense_gl.code)
-    #         percent = request.data.get('percent', expense_gl.percent)
-    #         approver = request.data.get('approver', expense_gl.approver)
-    #         expense_gl.code = code
-    #         expense_gl.percent = percent
-    #         expense_gl.approver = approver
-    #         expense_gl.save()
-    #         serialized_expense_gl = ExpenseGLSerializer(
-    #             expense_gl, context={'request': request}
-    #         )
-    #         return Response(serialized_expense_gl.data)
-
-    #     except Exception as e:
-    #         message = 'Error updating expense GL entry.'
-    #         record_error(message, e, request, traceback.format_exc())
-    #         return Response(
-    #             data=message,
-    #             status=status.HTTP_500_INTERNAL_SERVER_ERROR
-    #         )
-
     @action(detail=True, methods=['put'])
-    def approve(self, request, pk=None):
+    def approver_approve(self, request, pk=None):
         """
         Approver approves an Expense GL.
         """
@@ -392,8 +340,10 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
             month = self.request.query_params.get('month', None)
 
             fiscal = self.request.query_params.get('fiscal', None)
-            # Fiscal getting all expense months
-            if fiscal:
+            director = self.request.query_params.get('director', None)
+            
+            # Fiscal or Division Director getting all expense months
+            if fiscal or director:
                 employeePK = self.request.query_params.get('employeePK', None)
                 if year and month:
                     if employeePK:
@@ -406,6 +356,7 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
                         purchaser__pk=employeePK
                     )
                 return ExpenseMonth.objects.all()
+
             # Employee getting own expense months
             if year and month:
                 return ExpenseMonth.objects.filter(
@@ -447,7 +398,20 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
                 em.status = ExpenseMonth.STATUS_DRAFT
             else:
                 if all_month_expenses_approved(em):
-                    em.status = ExpenseMonth.STATUS_APPROVER_APPROVED
+                    if all([
+                        em.director_approved,
+                        em.director_approved_at is not None
+                    ]):
+                        # If expense month has been approved by director,
+                        # mark as such.
+                        em.status = ExpenseMonth.STATUS_DIRECTOR_APPROVED
+                        em.approved_at = None # Reset fiscal approval
+                    else:
+                        # If all expenses are approved by approver,
+                        # mark as such.
+                        em.status = ExpenseMonth.STATUS_APPROVER_APPROVED
+                        # Reset director approval
+                        em.director_approved_at = None
                 else:
                     em.status = ExpenseMonth.STATUS_SUBMITTED
                 em.submitter_note = note
@@ -519,7 +483,37 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
             )
 
     @action(detail=True, methods=['put'])
-    def approve(self, request, pk):
+    def director_approve(self, request, pk):
+        """
+        Director approves a month of expenses.
+        """
+        try:
+            em = ExpenseMonth.objects.get(pk=pk)
+            approve = request.data.get('approve', True)
+            em.director_approved = approve
+            em.director_approved_at = timezone.now()
+            if approve:
+                em.director_note = ''
+                em.status = Expense.STATUS_DIRECTOR_APPROVED
+            else:
+                em.director_note = request.data.get('deny_note', '')
+                em.status = Expense.STATUS_DIRECTOR_DENIED
+            em.save()
+            serialized_em = ExpenseMonthSerializer(
+                em, context={'request': request}
+            )
+            return Response(serialized_em.data)
+
+        except Exception as e:
+            message = 'Error director approving expense month.'
+            record_error(message, e, request, traceback.format_exc())
+            return Response(
+                data=message,
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    @action(detail=True, methods=['put'])
+    def fiscal_approve(self, request, pk):
         """
         Fiscal approves a month of expenses.
         """
@@ -534,36 +528,6 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
             else:
                 em.fiscal_note = request.data.get('deny_note', '')
                 em.status = Expense.STATUS_FISCAL_DENIED
-            em.save()
-            serialized_em = ExpenseMonthSerializer(
-                em, context={'request': request}
-            )
-            return Response(serialized_em.data)
-
-        except Exception as e:
-            message = 'Error approving expense month.'
-            record_error(message, e, request, traceback.format_exc())
-            return Response(
-                data=message,
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-    
-    @action(detail=True, methods=['put'])
-    def director_approve(self, request, pk):
-        """
-        Director approves a month of expenses.
-        """
-        try:
-            em = ExpenseMonth.objects.get(pk=pk)
-            approve = request.data.get('approve', True)
-            em.director_approved = approve
-            em.director_approved_at = timezone.now()
-            if approve:
-                em.director_note = ''
-            else:
-                em.director_note = request.data.get('deny_note', '')
-                em.status = Expense.STATUS_DIRECTOR_DENIED
-                # TODO: Maybe I do need this to be a STATUS AFTER ALL?????
             em.save()
             serialized_em = ExpenseMonthSerializer(
                 em, context={'request': request}

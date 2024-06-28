@@ -98,6 +98,8 @@ class ExpenseBaseModel(models.Model):
     STATUS_SUBMITTED = 'submitted'
     STATUS_APPROVER_APPROVED = 'approver_approved'
     STATUS_APPROVER_DENIED = 'approver_denied'
+    STATUS_DIRECTOR_APPROVED = 'director_approved'
+    STATUS_DIRECTOR_DENIED = 'director_denied'
     STATUS_FISCAL_APPROVED = 'fiscal_approved'
     STATUS_FISCAL_DENIED = 'fiscal_denied'
     STATUS_CHOICES = (
@@ -105,6 +107,8 @@ class ExpenseBaseModel(models.Model):
         (STATUS_SUBMITTED, 'Submitted'),
         (STATUS_APPROVER_APPROVED, 'Approver Approved'),
         (STATUS_APPROVER_DENIED, 'Approver Denied'),
+        (STATUS_DIRECTOR_APPROVED, 'Director Approved'),
+        (STATUS_DIRECTOR_DENIED, 'Director Denied'),
         (STATUS_FISCAL_APPROVED, 'Fiscal Approved'),
         (STATUS_FISCAL_DENIED, 'Fiscal Denied'),
     )

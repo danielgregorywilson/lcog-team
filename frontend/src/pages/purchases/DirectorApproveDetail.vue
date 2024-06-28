@@ -230,7 +230,7 @@
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
 import { onMounted, Ref, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 
 import DocumentViewer from 'src/components/DocumentViewer.vue'
 import StatementTable from 'src/components/purchases/StatementTable.vue'
@@ -242,7 +242,6 @@ import { getRouteParam } from 'src/utils'
 
 
 const route = useRoute()
-const router = useRouter()
 const quasar = useQuasar()
 const purchaseStore = usePurchaseStore()
 
@@ -327,7 +326,7 @@ function tableTitleDisplay(em: ExpenseMonth): string {
 }
 
 function selectedMonthCardExpenseMonths(): Array<ExpenseMonth> {
-  const allEMs = purchaseStore.fiscalExpenseMonths.filter(em => {
+  const allEMs = purchaseStore.directorExpenseMonths.filter(em => {
     return em.month === monthInt.value && em.year === yearInt.value
   })
   let ems: Array<ExpenseMonth> = []
@@ -348,7 +347,7 @@ function selectedMonthCardExpenseMonths(): Array<ExpenseMonth> {
 }
 
 function EMApproved(em: ExpenseMonth): boolean {
-  return em.director_approved
+  return em.director_approved && em.director_approved_at != null
 }
 
 function EMDenied(em: ExpenseMonth): boolean {
@@ -357,7 +356,7 @@ function EMDenied(em: ExpenseMonth): boolean {
 
 function retrieveThisMonthEmployeeExpenses(): Promise<void> {
   return new Promise((resolve, reject) => {
-    purchaseStore.getFiscalExpenseMonths(yearInt.value, monthInt.value)
+    purchaseStore.getDirectorExpenseMonths(yearInt.value, monthInt.value)
       .then(() => {
         thisMonthLoaded.value = true
         resolve()
@@ -374,7 +373,7 @@ function retrieveAllEmployeeExpenses() {
   if (!employeePK) {
     return
   }
-  purchaseStore.getFiscalExpenseMonths(null, null, employeePK)
+  purchaseStore.getDirectorExpenseMonths(null, null, employeePK)
     .then(() => {
       allExpensesLoaded.value = true
     })
@@ -467,21 +466,6 @@ function setDates() {
   })
 }
 
-function navigateToPrintView() {
-  const employeePK = routeEmployeePK.value
-  if (!employeePK) {
-    return
-  }
-  router.push({
-    name: 'expense-month-print',
-    params: {
-      employeePK: employeePK,
-      month: monthInt.value,
-      year: yearInt.value
-    }
-  })
-}
-
 function expensesTotal() {
   let total = 0
   for (let em of selectedMonthCardExpenseMonths()) {
@@ -515,11 +499,9 @@ onMounted(() => {
   const employeePK = getRouteParam(route, 'employeePK')
   routeEmployeePK.value = parseInt(employeePK ? employeePK : '-1')
   setDates().then(() => {
-    if (purchaseStore.fiscalExpenseMonths.length === 0) {
-      retrieveThisMonthEmployeeExpenses().then(() => {
-        retrieveAllEmployeeExpenses()
-      })
-    }
+    retrieveThisMonthEmployeeExpenses().then(() => {
+      retrieveAllEmployeeExpenses()
+    })
   })
 })
 

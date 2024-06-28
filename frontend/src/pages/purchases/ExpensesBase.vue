@@ -26,6 +26,24 @@
         </q-badge>
       </q-btn>
       <q-btn
+        v-if="isDirector()"
+        :to="{ name: 'director-approve-expenses' }"
+        unelevated
+        rounded
+        color="primary"
+        icon="library_add_check"
+        label="Director Approve"
+      >
+        <q-badge
+          v-if="numExpensesDirectorToApprove()"
+          rounded
+          color="red"
+          floating
+        >
+          {{ numExpensesDirectorToApprove() }}
+        </q-badge>
+      </q-btn>
+      <q-btn
         v-if="isFiscal()"
         :to="{ name: 'fiscal-approve-expenses' }"
         unelevated
@@ -84,6 +102,10 @@ function isExpenseApprover() {
   return userStore.isExpenseApprover
 }
 
+function isDirector() {
+  return userStore.isDivisionDirector
+}
+
 function isFiscal() {
   return userStore.isFiscal
 }
@@ -126,6 +148,10 @@ function monthForward() {
 
 function numExpenseGLsToApprove(): number {
   return purchaseStore.numExpenseGLsToApprove
+}
+
+function numExpensesDirectorToApprove(): number {
+  return purchaseStore.numExpensesDirectorToApprove
 }
 
 function numExpensesFiscalToApprove(): number {

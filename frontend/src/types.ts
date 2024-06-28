@@ -341,23 +341,25 @@ export interface FileUploadDescriptionUploadServerResponse {
 
 interface ExpenseBase {
   status: 'draft' | 'submitted' | 'approver_approved' | 'approver_denied' |
-    'fiscal_approved' | 'fiscal_denied'
+    'director_approved' | 'director_denied' | 'fiscal_approved' |
+    'fiscal_denied'
 }
 
 export interface ExpenseMonth extends ExpenseBase {
   pk: number
-  purchaser: SimpleEmployeeRetrieve
   month: number
   year: number
-  director_approved: boolean
-  director_approved_at: string
-  approver: SimpleEmployeeRetrieve
-  approved_at: string
-  submitter_note: string
-  fiscal_note: string
-  expenses: Array<Expense>
+  purchaser: SimpleEmployeeRetrieve
   card: ExpenseCard
   statement: ExpenseStatement
+  expenses: Array<Expense>
+  submitter_note: string
+  director_approved: boolean
+  director_approved_at: string
+  director_note: string
+  approver: SimpleEmployeeRetrieve
+  approved_at: string
+  fiscal_note: string
 }
 
 export interface ExpenseMonthCreate {
@@ -416,6 +418,8 @@ export interface ExpenseCard {
   assignee: SimpleEmployeeRetrieve
   display: string
   shared: boolean
+  requires_director_approval: boolean
+  director: SimpleEmployeeRetrieve
 }
 
 interface ExpenseStatementItem {

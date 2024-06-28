@@ -113,31 +113,33 @@ const columns = [
 ]
 
 function viewingThisMonth() {
-  return firstOfSelectedMonth.value.getTime() ===
+  return firstOfSelectedMonth.value.getTime() ==
     firstOfThisMonth.value.getTime()
 }
 
 function EMsLoaded() {
-  return (viewingThisMonth() && thisMonthEMsLoaded.value) ||
-    allEMsLoaded.value
+  return (viewingThisMonth() && thisMonthEMsLoaded.value) || allEMsLoaded.value
 }
 
 function selectedMonthExpenseMonths() {
-  return purchaseStore.fiscalExpenseMonths
-    .filter(em => em.month === props.monthInt && em.year === props.yearInt)
+  return purchaseStore.directorExpenseMonths
+    .filter(em => em.month == props.monthInt && em.year == props.yearInt)
 }
 
 function expenseMonthManagerApproved(expenseMonth: ExpenseMonth) {
-  return ['approver_approved', 'fiscal_approved', 'fiscal_denied']
+  return [
+    'approver_approved', 'director_approved', 'director_denied',
+    'fiscal_approved', 'fiscal_denied'
+  ]
     .includes(expenseMonth.status)
 }
 
-function expenseMonthDirectorApproved(expenseMonth: ExpenseMonth) {
-  return expenseMonth.director_approved
+function expenseMonthDirectorApproved(em: ExpenseMonth) {
+  return em.director_approved && em.director_approved_at != null
 }
 
 function expenseMonthDirectorDenied(em: ExpenseMonth) {
-  return !em.director_approved && em.director_approved_at !== null
+  return !em.director_approved && em.director_approved_at != null
 }
 
 function progressBarSize(status: string) {
@@ -145,11 +147,14 @@ function progressBarSize(status: string) {
     case 'draft':
       return 0
     case 'submitted':
-      return .5
     case 'approver_denied':
-      return .5
+      return .25
     case 'approver_approved':
+    case 'director_denied':
+      return .5
+    case 'director_approved':
     case 'fiscal_denied':
+      return .75
     case 'fiscal_approved':
       return 1
     default:
@@ -166,9 +171,15 @@ function progressBarLabel(status: string) {
     case 'approver_denied':
       return 'Denied by Manager'
     case 'approver_approved':
-    case 'fiscal_denied':
-    case 'fiscal_approved':
       return 'Approved by Manager'
+    case 'director_denied':
+      return 'Denied by Director'
+    case 'director_approved':
+      return 'Approved by Director'
+    case 'fiscal_denied':
+      return 'Denied by Fiscal'
+    case 'fiscal_approved':
+      return 'Approved by Fiscal'
     default:
       return 'Unknown'
   }
@@ -181,9 +192,11 @@ function progressBarColor(status: string) {
     case 'submitted':
       return 'blue'
     case 'approver_denied':
+    case 'director_denied':
+    case 'fiscal_denied':
       return 'red'
     case 'approver_approved':
-    case 'fiscal_denied':
+    case 'director_approved':
     case 'fiscal_approved':
       return 'green'
     default:
@@ -193,13 +206,13 @@ function progressBarColor(status: string) {
 
 function retrieveThisMonthEMs(): Promise<void> {
   return new Promise((resolve, reject) => {
-    purchaseStore.getFiscalExpenseMonths(props.yearInt, props.monthInt)
+    purchaseStore.getDirectorExpenseMonths(props.yearInt, props.monthInt)
       .then(() => {
         thisMonthEMsLoaded.value = true
         resolve()
       })
       .catch((error) => {
-        handlePromiseError(reject, 'Error retrieving fiscal expenses', error)
+        handlePromiseError(reject, 'Error retrieving director expenses', error)
         reject()
       })
   })
@@ -213,7 +226,7 @@ function retrieveAllEMs(): Promise<void> {
         resolve()
       })
       .catch((error) => {
-        handlePromiseError(reject, 'Error retrieving fiscal expenses', error)
+        handlePromiseError(reject, 'Error retrieving director expenses', error)
         reject()
       })
   })

@@ -78,9 +78,15 @@ class ExpenseCardSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = ExpenseCard
-        fields = ['pk', 'last4', 'assignee', 'shared', 'display']
+        fields = [
+            'pk', 'last4', 'assignee', 'shared', 'display',
+            'requires_director_approval', 'director_name'
+        ]
 
     display = serializers.SerializerMethodField()
+    director_name = serializers.CharField(
+        source='director.name', read_only=True
+    )
 
     @staticmethod
     def get_display(obj):
@@ -116,17 +122,18 @@ class ExpenseMonthSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ExpenseMonth
         fields = [
-            'url', 'pk', 'purchaser', 'month', 'year', 'approver',
-            'approved_at', 'submitter_note', 'fiscal_note', 'status',
-            'expenses', 'card', 'statement'
+            'url', 'pk', 'purchaser', 'month', 'year', 'card', 'statement',
+            'expenses', 'submitter_note', 'approver', 'approved_at',
+            'director_approved', 'director_approved_at', 'director_note',
+            'fiscal_note', 'status'
         ]
 
     purchaser = SimpleEmployeeSerializer(required=False)
-    approver = SimpleEmployeeSerializer(required=False)
-    expenses = ExpenseSerializer(many=True, read_only=True)
     card = ExpenseCardSerializer(required=False)
     statement = serializers.SerializerMethodField()
-
+    expenses = ExpenseSerializer(many=True, read_only=True)
+    approver = SimpleEmployeeSerializer(required=False)
+    
     def get_statement(self, obj):
         if obj.card:
             return ExpenseStatementSerializer(

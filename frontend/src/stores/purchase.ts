@@ -236,7 +236,7 @@ export const usePurchaseStore = defineStore('purchase', {
     ): Promise<Expense> {
       return new Promise((resolve, reject) => {
         axios({
-          url: `${ apiURL }api/v1/expense-gl/${ pk }/approve`,
+          url: `${ apiURL }api/v1/expense-gl/${ pk }/approver_approve`,
           method: 'PUT',
           data: { approve, deny_note }
         })
@@ -259,7 +259,7 @@ export const usePurchaseStore = defineStore('purchase', {
       employeePK: number | null = null
     ): Promise<null> {
       return new Promise((resolve, reject) => {
-        let params = '?division_director=true'
+        let params = '?director=true'
         if (!!yearInt && !!monthInt) {
           params += `&year=${ yearInt }&month=${ monthInt }`
         }
@@ -273,7 +273,12 @@ export const usePurchaseStore = defineStore('purchase', {
             const ems: ExpenseMonth[] = resp.data.results
             this.directorExpenseMonths = ems
             this.numExpensesDirectorToApprove = ems.filter(
-              em => !em.director_approved
+              em => {
+                // If director approval required, count if not 
+                
+                
+                !em.director_approved
+              }
             ).length
             resolve(resp.data.results)
           })
@@ -303,7 +308,7 @@ export const usePurchaseStore = defineStore('purchase', {
             )
           })
       })
-    }
+    },
 
     //////////////
     /// Fiscal ///
@@ -329,7 +334,16 @@ export const usePurchaseStore = defineStore('purchase', {
             const ems: ExpenseMonth[] = resp.data.results
             this.fiscalExpenseMonths = ems
             this.numExpensesFiscalToApprove = ems.filter(
-              em => em.status == 'approver_approved'
+              em => {
+                if (em.card.requires_director_approval) {
+                  // If director approval required, count if approved
+                  return em.director_approved &&
+                    !['fiscal_approved', 'fiscal_denied'].includes(em.status)
+                } else {
+                  // Otherwise, count if approver approved
+                  return em.status == 'approver_approved'
+                }
+              }
             ).length
             resolve(resp.data.results)
           })
@@ -344,7 +358,7 @@ export const usePurchaseStore = defineStore('purchase', {
     ): Promise<ExpenseMonth> {
       return new Promise((resolve, reject) => {
         axios({
-          url: `${ apiURL }api/v1/expense-month/${ pk }/approve`,
+          url: `${ apiURL }api/v1/expense-month/${ pk }/fiscal_approve`,
           method: 'PUT',
           data: { approve, deny_note }
         })

@@ -560,7 +560,6 @@ import StatementTable from 'src/components/purchases/StatementTable.vue'
 import { readableDateNEW, readableDateTime } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
 import { usePurchaseStore } from 'src/stores/purchase'
-import { useUserStore } from 'src/stores/user'
 import {
   emptyEmployee, Expense, ExpenseMonth, ExpenseStatement, GL,
   SimpleEmployeeRetrieve 
@@ -569,17 +568,12 @@ import {
 
 const quasar = useQuasar()
 const purchaseStore = usePurchaseStore()
-const userStore = useUserStore()
 
 const props = defineProps<{
   monthDisplay: string
   dayInt: number
   monthInt: number
   yearInt: number
-}>()
-
-const emit = defineEmits<{
-  (e: 'retrieve'): void
 }>()
 
 let thisMonthLoaded = ref(false)
@@ -648,15 +642,23 @@ const columns = [
 
 function tableTitleDisplay(): string {
   let statusText = 'Draft'
-  if (selectedExpenseMonth()?.status === 'fiscal_denied') {
-    statusText = 'Fiscal Denied - Correct and Resubmit'
-  } else if (selectedExpenseMonth()?.status === 'fiscal_approved') {
+  if (selectedExpenseMonth()?.status == 'fiscal_approved') {
     statusText = 'Fiscal Approved - You\'re All Set!'
-  } else if (selectedExpenseMonth()?.status === 'approver_denied') {
+  } else if (selectedExpenseMonth()?.status == 'fiscal_denied') {
+    statusText = 'Fiscal Denied - Correct and Resubmit'
+  } else if (selectedExpenseMonth()?.status == 'director_approved') {
+    statusText = 'Director Approved - Waiting on Fiscal'
+  } else if (selectedExpenseMonth()?.status == 'director_denied') {
+    statusText = 'Director Denied - Correct and Resubmit'
+  } else if (selectedExpenseMonth()?.status == 'approver_approved') {
+    if (selectedExpenseMonth()?.card.requires_director_approval) {
+      statusText = 'Approver(s) Approved - Waiting on Director'
+    } else {
+      statusText = 'Approver(s) Approved - Waiting on Fiscal'
+    }
+  } else if (selectedExpenseMonth()?.status == 'approver_denied') {
     statusText = 'Approver(s) Denied - Correct and Resubmit'
-  } else if (selectedExpenseMonth()?.status === 'approver_approved') {
-    statusText = 'Approver(s) Approved - Waiting on Fiscal'
-  } else if (selectedExpenseMonth()?.status === 'submitted') {
+  } else if (selectedExpenseMonth()?.status == 'submitted') {
     statusText = 'Submitted - Waiting on Approver(s)'
   }
   return `${ props.monthDisplay } - ${ statusText }`
@@ -693,6 +695,16 @@ function selectedMonthNotes(): Array<{
       approver: em.approver.name,
       date,
       note: fiscalNote
+    })
+  }
+  let directorNote = em?.director_note
+  let directorDate = em ? readableDateTime(em?.director_approved_at) : ''
+  if (directorNote) {
+    notes.push({
+      type: 'director',
+      approver: em.card.director_name,
+      date: directorDate,
+      note: directorNote
     })
   }
   for (let exp of selectedMonthExpenses()) {

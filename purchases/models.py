@@ -171,23 +171,30 @@ class ExpenseMonth(ExpenseBaseModel):
                 self.card = card
                 self.save()
 
+    year = models.IntegerField()
+    month = models.IntegerField()
     purchaser = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='expense_months',
     )
-    month = models.IntegerField()
-    year = models.IntegerField()
+    card = models.ForeignKey(
+        'ExpenseCard', blank=True, null=True, on_delete=models.SET_NULL,
+        related_name='expense_months'
+    )
+    submitter_note = models.TextField(blank=True)
+    
+    # Division Director approval
+    director_approved = models.BooleanField(default=False)
+    director_approved_at = models.DateTimeField(blank=True, null=True)
+    director_note = models.TextField(blank=True)
+
+    # Fiscal approval
     approver = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='approver_of_expense_month',
     )
     approved_at = models.DateTimeField(blank=True, null=True)
-    submitter_note = models.TextField(blank=True)
     fiscal_note = models.TextField(blank=True)
-    card = models.ForeignKey(
-        'ExpenseCard', blank=True, null=True, on_delete=models.SET_NULL,
-        related_name='expense_months'
-    )
 
 
 class ExpenseCard(models.Model):

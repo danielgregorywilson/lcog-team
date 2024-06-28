@@ -547,6 +547,36 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
                 data=message,
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+    
+    @action(detail=True, methods=['put'])
+    def director_approve(self, request, pk):
+        """
+        Director approves a month of expenses.
+        """
+        try:
+            em = ExpenseMonth.objects.get(pk=pk)
+            approve = request.data.get('approve', True)
+            em.director_approved = approve
+            em.director_approved_at = timezone.now()
+            if approve:
+                em.director_note = ''
+            else:
+                em.director_note = request.data.get('deny_note', '')
+                em.status = Expense.STATUS_DIRECTOR_DENIED
+                # TODO: Maybe I do need this to be a STATUS AFTER ALL?????
+            em.save()
+            serialized_em = ExpenseMonthSerializer(
+                em, context={'request': request}
+            )
+            return Response(serialized_em.data)
+
+        except Exception as e:
+            message = 'Error approving expense month.'
+            record_error(message, e, request, traceback.format_exc())
+            return Response(
+                data=message,
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class ExpenseStatementViewSet(viewsets.ModelViewSet):

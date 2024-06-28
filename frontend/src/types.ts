@@ -108,6 +108,7 @@ export interface EmployeeRetrieve {
   is_fiscal_employee: boolean
   is_upper_manager: boolean
   is_hr_manager: boolean
+  is_division_director: boolean
   is_executive_director: boolean
   viewed_security_message: boolean
   is_eligible_for_telework_application: boolean
@@ -348,6 +349,8 @@ export interface ExpenseMonth extends ExpenseBase {
   purchaser: SimpleEmployeeRetrieve
   month: number
   year: number
+  director_approved: boolean
+  director_approved_at: string
   approver: SimpleEmployeeRetrieve
   approved_at: string
   submitter_note: string

@@ -6,7 +6,7 @@
       Statement for {{ card.display }}
       in {{ monthDisplay }}
     </div>
-    <div v-if="!props.print">
+    <div>
       <q-btn v-if="!totalsMatch()" flat class="no-pointer-events">
         <div>Expenses total does not match statement</div>
         <q-icon color="orange" name="warning" size="md" />
@@ -19,7 +19,6 @@
         <div>Statement and expenses seem to match</div>
         <q-icon color="green" name="check" size="md" />
       </q-btn>
-      <q-btn @click="navigateToPrintView()" label="Print" />
     </div>
   </div>
   <StatementTable :statement="statement" />
@@ -38,7 +37,7 @@
           flat bordered
           :title="tableTitleDisplay(em)"
           :rows="em.expenses"
-          :columns="props.print ? printColumns : columns"
+          :columns="columns"
           :dense="$q.screen.lt.lg"
           :grid="$q.screen.lt.md"
           row-key="name"
@@ -133,7 +132,7 @@
           </template>
         </q-table>
 
-        <div v-if="em.submitter_note && !props.print">
+        <div v-if="em.submitter_note">
           <div id="submitter-note" class="q-mt-md q-pa-sm bg-info font-bold">
             <div>Submitter Note:</div>
             <div>{{ em.submitter_note }}</div>
@@ -141,7 +140,6 @@
         </div>
         
         <div
-          v-if="!props.print"
           class="q-mt-sm q-gutter-md row justify-between"
         >
           <div>
@@ -163,17 +161,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Display Receipts for Print View -->
-      <div v-if="props.print">
-        <div
-          v-for="expense in em.expenses"
-          :key="expense.pk"
-        >
-          <q-img :src="expense.receipt" />
-        </div>
-      </div>
-
     </div>
   </div>
 
@@ -301,7 +288,7 @@ const pagination = {
   rowsPerPage: '50'
 }
 
-const printColumns = [
+const columns = [
   {
     name: 'name', field: 'name', label: 'Name', required: true, align: 'left',
     sortable: true
@@ -332,11 +319,8 @@ const printColumns = [
     name: 'approvedAt', field: 'approved_at', label: 'Approved At',
     align: 'center'
   },
+  { name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' }
 ]
-
-const columns = printColumns.concat([{
-  name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center'
-}])
 
 function tableTitleDisplay(em: ExpenseMonth): string {
   return `${ monthDisplay.value } expenses for ${ em.purchaser.name }`
@@ -364,11 +348,11 @@ function selectedMonthCardExpenseMonths(): Array<ExpenseMonth> {
 }
 
 function EMApproved(em: ExpenseMonth): boolean {
-  return em.status === 'fiscal_approved'
+  return em.director_approved
 }
 
 function EMDenied(em: ExpenseMonth): boolean {
-  return em.status === 'fiscal_denied'
+  return !em.director_approved && em.director_approved_at != null
 }
 
 function retrieveThisMonthEmployeeExpenses(): Promise<void> {
@@ -420,7 +404,7 @@ function onSubmitApproveDialog() {
     })
     return
   } else {
-    purchaseStore.approveExpenseMonth(emToApprovePK.value, true)
+    purchaseStore.directorApproveExpenseMonth(emToApprovePK.value, true)
       .then(() => {
         retrieveAllEmployeeExpenses()
         showApproveDialog.value = false
@@ -449,7 +433,7 @@ function onSubmitDenyDialog() {
     })
     return
   } else {
-    purchaseStore.approveExpenseMonth(
+    purchaseStore.directorApproveExpenseMonth(
       emToApprovePK.value, false, denyDialogMessage.value
     )
       .then(() => {
@@ -527,45 +511,16 @@ function expensesMatchStatment(): boolean {
   return totalsMatch() && numExpensesMatch()
 }
 
-function handlePrint() {
-  const monthParam = getRouteParam(route, 'month')
-  const yearParam = getRouteParam(route, 'year')
-  if (!monthParam || !yearParam) {
-    return
-  } else {
-    monthInt.value = parseInt(monthParam)
-    yearInt.value = parseInt(yearParam)
-    var months = [
-      'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
-      'September', 'October', 'November', 'December'
-    ]
-    monthDisplay.value = `${months[monthInt.value - 1]} ${yearInt.value}`
-  }
-  if (purchaseStore.fiscalExpenseMonths.length == 0) {
-    retrieveThisMonthEmployeeExpenses().then(() => {
-      // TODO: Load all receipts, then print
-      // window.print()
-    })
-  } else {
-    // TODO: Load all receipts, then print
-    // window.print()
-  }
-}
-
 onMounted(() => {
   const employeePK = getRouteParam(route, 'employeePK')
   routeEmployeePK.value = parseInt(employeePK ? employeePK : '-1')
-  if (props.print) {
-    handlePrint()
-  } else {
-    setDates().then(() => {
-      if (purchaseStore.fiscalExpenseMonths.length === 0) {
-        retrieveThisMonthEmployeeExpenses().then(() => {
-          retrieveAllEmployeeExpenses()
-        })
-      }
-    })
-  }
+  setDates().then(() => {
+    if (purchaseStore.fiscalExpenseMonths.length === 0) {
+      retrieveThisMonthEmployeeExpenses().then(() => {
+        retrieveAllEmployeeExpenses()
+      })
+    }
+  })
 })
 
 watch(() => props.monthInt, (first, second) => {

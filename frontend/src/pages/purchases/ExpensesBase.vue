@@ -27,7 +27,7 @@
       </q-btn>
       <q-btn
         v-if="isFiscal()"
-        :to="{ name: 'fiscal-approve' }"
+        :to="{ name: 'fiscal-approve-expenses' }"
         unelevated
         rounded
         color="primary"

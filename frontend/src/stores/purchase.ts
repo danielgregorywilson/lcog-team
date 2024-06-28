@@ -11,9 +11,11 @@ export const usePurchaseStore = defineStore('purchase', {
     expenseMonths: [] as Array<ExpenseMonth>,
     myExpenses: [] as Array<Expense>,
     approvalExpenseGLs: [] as Array<GL>,
+    directorExpenseMonths: [] as Array<ExpenseMonth>,
     fiscalExpenseMonths: [] as Array<ExpenseMonth>,
     expenseStatements: [] as Array<ExpenseStatement>,
     numExpenseGLsToApprove: 0,
+    numExpensesDirectorToApprove: 0,
     numExpensesFiscalToApprove: 0
   }),
 
@@ -246,6 +248,62 @@ export const usePurchaseStore = defineStore('purchase', {
           })
       })
     },
+
+    /////////////////////////
+    /// Division Director ///
+    /////////////////////////
+
+    getDirectorExpenseMonths(
+      yearInt: number | null = null,
+      monthInt: number | null = null,
+      employeePK: number | null = null
+    ): Promise<null> {
+      return new Promise((resolve, reject) => {
+        let params = '?division_director=true'
+        if (!!yearInt && !!monthInt) {
+          params += `&year=${ yearInt }&month=${ monthInt }`
+        }
+        if (!!employeePK) {
+          params += `&employee=${ employeePK }`
+        }
+        axios({
+          url: `${ apiURL }api/v1/expense-month${ params }`
+        })
+          .then(resp => {
+            const ems: ExpenseMonth[] = resp.data.results
+            this.directorExpenseMonths = ems
+            this.numExpensesDirectorToApprove = ems.filter(
+              em => !em.director_approved
+            ).length
+            resolve(resp.data.results)
+          })
+          .catch(e => {
+            handlePromiseError(
+              reject, 'Error getting division director expense months', e
+            )
+          })
+      })
+    },
+
+    directorApproveExpenseMonth(
+      pk: number, approve: boolean, deny_note?: string
+    ): Promise<ExpenseMonth> {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/expense-month/${ pk }/director_approve`,
+          method: 'PUT',
+          data: { approve, deny_note }
+        })
+          .then(resp => {
+            resolve(resp.data)
+          })
+          .catch(e => {
+            handlePromiseError(
+              reject, 'Error director approving expense month', e
+            )
+          })
+      })
+    }
 
     //////////////
     /// Fiscal ///

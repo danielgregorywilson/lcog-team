@@ -2,7 +2,7 @@
 <div class="q-mt-md">
   <div class="q-mt-md">
     <q-spinner-grid
-      v-if="!expensesLoaded"
+      v-if="!expensesLoaded()"
       class="spinner"
       color="primary"
       size="xl"
@@ -375,7 +375,7 @@ function progressBarColor(status: string) {
   }
 }
 
-function retrieveThisMonthExpenses(): Promise<void> {
+function retrieveThisMonthEMs(): Promise<void> {
   return new Promise((resolve, reject) => {
     purchaseStore.getFiscalExpenseMonths(props.yearInt, props.monthInt)
       .then(() => {
@@ -389,7 +389,7 @@ function retrieveThisMonthExpenses(): Promise<void> {
   })
 }
 
-function retrieveAllExpenses(): Promise<void> {
+function retrieveAllEMs(): Promise<void> {
   return new Promise((resolve, reject) => {
     purchaseStore.getFiscalExpenseMonths()
       .then(() => {
@@ -434,7 +434,7 @@ function retrieveAllStatements(): Promise<void> {
 function navigateToDetail(submitted: boolean, employeePk: number) {
   if (submitted) {
     router.push({
-      name: 'fiscal-approve-detail',
+      name: 'fiscal-approve-expenses-detail',
       params: {
         employeePK: employeePk.toString(),
         year: props.yearInt,
@@ -480,8 +480,8 @@ function setDates() {
 
 onMounted(() => {
   setDates()
-  retrieveThisMonthExpenses().then(() => {
-    retrieveAllExpenses()
+  retrieveThisMonthEMs().then(() => {
+    retrieveAllEMs()
   })
   retrieveThisMonthStatements().then(() => {
     retrieveAllStatements()

@@ -405,7 +405,7 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
                         # If expense month has been approved by director,
                         # mark as such.
                         em.status = ExpenseMonth.STATUS_DIRECTOR_APPROVED
-                        em.approved_at = None # Reset fiscal approval
+                        em.fiscal_approved_at = None # Reset fiscal approval
                     else:
                         # If all expenses are approved by approver,
                         # mark as such.
@@ -520,14 +520,17 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
         try:
             em = ExpenseMonth.objects.get(pk=pk)
             approve = request.data.get('approve', True)
-            em.approver = request.user.employee
-            em.approved_at = timezone.now()
+            em.fiscal_approver = request.user.employee
+            em.fiscal_approved_at = timezone.now()
             if approve:
                 em.fiscal_note = ''
                 em.status = Expense.STATUS_FISCAL_APPROVED
             else:
                 em.fiscal_note = request.data.get('deny_note', '')
                 em.status = Expense.STATUS_FISCAL_DENIED
+                # Reset director approval
+                em.director_approved = False
+                em.director_approved_at = None
             em.save()
             serialized_em = ExpenseMonthSerializer(
                 em, context={'request': request}

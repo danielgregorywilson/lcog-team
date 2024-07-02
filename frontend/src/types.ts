@@ -357,8 +357,8 @@ export interface ExpenseMonth extends ExpenseBase {
   director_approved: boolean
   director_approved_at: string
   director_note: string
-  approver: SimpleEmployeeRetrieve
-  approved_at: string
+  fiscal_approver: SimpleEmployeeRetrieve
+  fiscal_approved_at: string
   fiscal_note: string
 }
 
@@ -419,7 +419,7 @@ export interface ExpenseCard {
   display: string
   shared: boolean
   requires_director_approval: boolean
-  director: SimpleEmployeeRetrieve
+  director_name: string
 }
 
 interface ExpenseStatementItem {

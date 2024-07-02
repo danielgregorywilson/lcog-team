@@ -688,11 +688,11 @@ function selectedMonthNotes(): Array<{
     return []
   }
   let fiscalNote = em?.fiscal_note
-  let date = em ? readableDateTime(em?.approved_at) : ''
+  let date = em ? readableDateTime(em?.fiscal_approved_at) : ''
   if (fiscalNote) {
     notes.push({
       type: 'fiscal',
-      approver: em.approver.name,
+      approver: em.fiscal_approver.name,
       date,
       note: fiscalNote
     })

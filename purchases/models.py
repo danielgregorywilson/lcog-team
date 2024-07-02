@@ -193,11 +193,11 @@ class ExpenseMonth(ExpenseBaseModel):
     director_note = models.TextField(blank=True)
 
     # Fiscal approval
-    approver = models.ForeignKey(
+    fiscal_approver = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='approver_of_expense_month',
     )
-    approved_at = models.DateTimeField(blank=True, null=True)
+    fiscal_approved_at = models.DateTimeField(blank=True, null=True)
     fiscal_note = models.TextField(blank=True)
 
 

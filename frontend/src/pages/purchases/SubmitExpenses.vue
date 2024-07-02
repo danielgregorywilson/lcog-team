@@ -1,15 +1,15 @@
 <template>
 <div class="q-mt-md">
   <div class="row q-gutter-md">
-    <q-btn v-if="monthSubmitted()" @click="showUnsubmitDialog = true">
-      Unsubmit
-    </q-btn>
     <q-btn
-      v-else
+      v-if="!monthSubmitted()"
       @click="showSubmitDialog = true"
       :disabled="formErrors() || !statementSelected()"
     >
       Submit for Approval
+    </q-btn>
+    <q-btn v-if="canUnsubmitMonth()" @click="showUnsubmitDialog = true">
+      Unsubmit
     </q-btn>
     <q-btn v-if="formErrors()" @click="showErrorsDialog = true">
       <div>Correct Errors</div>
@@ -776,7 +776,8 @@ function monthApproved() {
 }
 
 function monthDenied() {
-  return selectedExpenseMonth()?.status === 'fiscal_denied'
+  return selectedExpenseMonth()?.status === 'fiscal_denied' || 
+    selectedExpenseMonth()?.status === 'director_denied'
 }
 
 function expenseClass(expense: Expense) {
@@ -856,6 +857,10 @@ function formErrorItems() {
 
 function formErrors() {
   return formErrorItems().length > 0
+}
+
+function canUnsubmitMonth() {
+  return monthSubmitted() && !monthApproved()
 }
 
 function onSubmitDialog() {

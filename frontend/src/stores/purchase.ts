@@ -274,10 +274,10 @@ export const usePurchaseStore = defineStore('purchase', {
             this.directorExpenseMonths = ems
             this.numExpensesDirectorToApprove = ems.filter(
               em => {
-                // If director approval required, count if not 
-                
-                
-                !em.director_approved
+                // Count if director approval required and not approved yet
+                return em.card.requires_director_approval &&
+                  em.status == 'approver_approved' &&
+                  !em.director_approved_at
               }
             ).length
             resolve(resp.data.results)

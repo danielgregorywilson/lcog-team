@@ -342,8 +342,8 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
             fiscal = self.request.query_params.get('fiscal', None)
             director = self.request.query_params.get('director', None)
             
-            # Fiscal or Division Director getting all expense months
-            if fiscal or director:
+            # Fiscal getting all expense months
+            if fiscal:
                 employeePK = self.request.query_params.get('employeePK', None)
                 if year and month:
                     if employeePK:
@@ -356,6 +356,30 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
                         purchaser__pk=employeePK
                     )
                 return ExpenseMonth.objects.all()
+            
+            # Division Director getting all expense months
+            if director:
+                employeePK = self.request.query_params.get('employeePK', None)
+                if year and month:
+                    if employeePK:
+                        return ExpenseMonth.objects.filter(
+                            card__requires_director_approval=True,
+                            card__director=user.employee,
+                            purchaser__pk=employeePK, year=year, month=month
+                        )
+                    return ExpenseMonth.objects.filter(
+                        card__requires_director_approval=True,
+                        card__director=user.employee, year=year, month=month
+                    )
+                if employeePK:
+                    return ExpenseMonth.objects.filter(
+                        card__requires_director_approval=True,
+                        card__director=user.employee, purchaser__pk=employeePK
+                    )
+                return ExpenseMonth.objects.filter(
+                    card__requires_director_approval=True,
+                    card__director=user.employee
+                )
 
             # Employee getting own expense months
             if year and month:

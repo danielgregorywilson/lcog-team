@@ -22,10 +22,10 @@
         <template v-slot:body="props">
           <q-tr
             :props="props"
-            :no-hover="!expenseMonthDirectorApproved(props.row)"
-            :class="{'cursor-pointer': expenseMonthDirectorApproved(props.row)}"
+            :no-hover="!fiscalCanApprove(props.row)"
+            :class="{'cursor-pointer': fiscalCanApprove(props.row)}"
             @click="navigateToDetail(
-              expenseMonthDirectorApproved(props.row), props.row.purchaser.pk
+              fiscalCanApprove(props.row), props.row.purchaser.pk
             )"
           >
             <q-td key="employee" :props="props">
@@ -311,9 +311,14 @@ function selectedMonthStatements() {
     .filter(s => s.month === props.monthInt && s.year == props.yearInt)
 }
 
-function expenseMonthDirectorApproved(expenseMonth: ExpenseMonth) {
-  return ['director_approved', 'fiscal_approved', 'fiscal_denied']
-    .includes(expenseMonth.status)
+function fiscalCanApprove(expenseMonth: ExpenseMonth) {
+  if (expenseMonth.card.requires_director_approval) {
+    return ['director_approved', 'fiscal_approved', 'fiscal_denied']
+      .includes(expenseMonth.status)
+  } else {
+    return ['approver_approved', 'fiscal_approved', 'fiscal_denied']
+      .includes(expenseMonth.status)
+  }
 }
 
 function expenseMonthFiscalApproved(expenseMonth: ExpenseMonth) {
@@ -442,8 +447,8 @@ function retrieveAllStatements(): Promise<void> {
   })
 }
 
-function navigateToDetail(submitted: boolean, employeePk: number) {
-  if (submitted) {
+function navigateToDetail(canApprove: boolean, employeePk: number) {
+  if (canApprove) {
     router.push({
       name: 'fiscal-approve-expenses-detail',
       params: {

@@ -541,14 +541,11 @@ function handlePrint() {
     ]
     monthDisplay.value = `${months[monthInt.value - 1]} ${yearInt.value}`
   }
+  // Load expense month if not already loaded; otherwise mark as loaded
   if (purchaseStore.fiscalExpenseMonths.length == 0) {
-    retrieveThisMonthEmployeeExpenses().then(() => {
-      // TODO: Load all receipts, then print
-      // window.print()
-    })
+    retrieveThisMonthEmployeeExpenses()
   } else {
-    // TODO: Load all receipts, then print
-    // window.print()
+    thisMonthLoaded.value = true
   }
 }
 

@@ -123,7 +123,7 @@
               <q-input
                 v-model="scope.value"
                 mask="#.##"
-                fill-mask="#"
+                fill-mask="0"
                 reverse-fill-mask
                 dense
                 autofocus

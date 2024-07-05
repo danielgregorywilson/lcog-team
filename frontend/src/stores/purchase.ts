@@ -335,7 +335,7 @@ export const usePurchaseStore = defineStore('purchase', {
             this.fiscalExpenseMonths = ems
             this.numExpensesFiscalToApprove = ems.filter(
               em => {
-                if (em.card.requires_director_approval) {
+                if (em.card?.requires_director_approval) {
                   // If director approval required, count if approved
                   return em.director_approved &&
                     !['fiscal_approved', 'fiscal_denied'].includes(em.status)

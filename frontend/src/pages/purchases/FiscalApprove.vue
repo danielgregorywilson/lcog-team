@@ -312,7 +312,7 @@ function selectedMonthStatements() {
 }
 
 function fiscalCanApprove(expenseMonth: ExpenseMonth) {
-  if (expenseMonth.card.requires_director_approval) {
+  if (expenseMonth.card?.requires_director_approval) {
     return ['director_approved', 'fiscal_approved', 'fiscal_denied']
       .includes(expenseMonth.status)
   } else {

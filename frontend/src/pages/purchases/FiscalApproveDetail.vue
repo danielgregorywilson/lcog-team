@@ -187,7 +187,7 @@
 
     </div>
   </div>
-  <div class="text-h5" v-else>
+  <div v-else class="text-h5">
     No expenses entered by {{ routeEmployeeName }} in {{ monthDisplay }}
   </div>
 

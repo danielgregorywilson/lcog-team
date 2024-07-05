@@ -23,10 +23,8 @@
           <q-tr
             :props="props"
             :no-hover="!expenseMonthManagerApproved(props.row)"
-            :class="{'cursor-pointer': expenseMonthManagerApproved(props.row)}"
-            @click="navigateToDetail(
-              expenseMonthManagerApproved(props.row), props.row.purchaser.pk
-            )"
+            class="cursor-pointer"
+            @click="navigateToDetail(props.row.purchaser.pk)"
           >
             <q-td key="employee" :props="props">
               {{ props.row.purchaser.name }}
@@ -232,20 +230,18 @@ function retrieveAllEMs(): Promise<void> {
   })
 }
 
-function navigateToDetail(submitted: boolean, employeePk: number) {
-  if (submitted) {
-    router.push({
-      name: 'director-approve-expenses-detail',
-      params: {
-        employeePK: employeePk.toString(),
-        year: props.yearInt,
-        month: props.monthInt
-      }
-    })
-    .catch(e => {
-      console.error('Error navigating to time off request detail:', e)
-    })
-  }
+function navigateToDetail(employeePk: number) {
+  router.push({
+    name: 'director-approve-expenses-detail',
+    params: {
+      employeePK: employeePk.toString(),
+      year: props.yearInt,
+      month: props.monthInt
+    }
+  })
+  .catch(e => {
+    console.error('Error navigating to time off request detail:', e)
+  })
 }
 
 function setDates() {

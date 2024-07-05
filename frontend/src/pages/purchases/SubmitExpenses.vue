@@ -367,23 +367,7 @@
         label="Select your card"
         dense
         outlined
-        @update:model-value="() => {
-          const em = selectedExpenseMonth()
-          if (!em) {
-            createExpenseMonth().then((newEM) => {
-              if (selectedStatement) {
-                purchaseStore.setExpenseMonthCard(
-                  newEM.pk, selectedStatement?.value.card.pk
-                )
-              }
-            })
-          }
-          if (em && selectedStatement) {
-            purchaseStore.setExpenseMonthCard(
-              em.pk, selectedStatement?.value.card.pk
-            )
-          }
-        }"
+        @update:model-value="updateSelectedStatement()"
       />
       <StatementTable :statement="selectedStatement?.value" />
     </div>
@@ -581,6 +565,7 @@ let allExpensesLoaded = ref(false)
 
 let thisMonthStatementsLoaded = ref(false)
 let allStatementsLoaded = ref(false)
+// SelectedStatement is a q-select option, so it has a label and a value.
 let selectedStatement = ref(null) as 
   Ref<{label: string, value: ExpenseStatement} | null>
 
@@ -1019,6 +1004,32 @@ function statementChoices(): Array<{label: string, value: ExpenseStatement}> {
       label: es.card.display,
       value: es
     }
+  })
+}
+
+function updateSelectedStatement() {
+  new Promise((resolve) => {
+    const em = selectedExpenseMonth()
+    if (!em) {
+      createExpenseMonth().then((newEM) => {
+        if (selectedStatement.value) {
+          purchaseStore.setExpenseMonthCard(
+            newEM.pk, selectedStatement.value.value.card.pk
+          ).then(() => {
+            resolve(newEM)
+          })
+        }
+      })
+    }
+    if (em && selectedStatement.value) {
+      purchaseStore.setExpenseMonthCard(
+        em.pk, selectedStatement.value.value.card.pk
+      ).then(() => {
+        resolve(em)
+      })
+    }
+  }).then(() => {
+    retrieveAllMyExpenses()
   })
 }
 

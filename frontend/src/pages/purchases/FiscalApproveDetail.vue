@@ -1,28 +1,33 @@
 <template>
 <div class="q-mt-md">
   <!-- Statement -->
-  <div class="row items-center justify-between q-mt-md">
-    <div class="text-h5">
-      Statement for {{ card.display }}
-      in {{ monthDisplay }}
+  <div v-if="statement">
+    <div class="row items-center justify-between q-mt-md">
+      <div class="text-h5">
+        Statement for {{ card?.display }}
+        in {{ monthDisplay }}
+      </div>
+      <div v-if="!props.print">
+        <q-btn v-if="!totalsMatch()" flat class="no-pointer-events">
+          <div>Expenses total does not match statement</div>
+          <q-icon color="orange" name="warning" size="md" />
+        </q-btn>
+        <q-btn v-if="!numExpensesMatch()" flat class="no-pointer-events">
+          <div>Number of expenses does not match statement</div>
+          <q-icon color="orange" name="warning" size="md" />
+        </q-btn>
+        <q-btn v-if="expensesMatchStatment()" flat class="no-pointer-events">
+          <div>Statement and expenses seem to match</div>
+          <q-icon color="green" name="check" size="md" />
+        </q-btn>
+        <q-btn @click="navigateToPrintView()" label="Print" />
+      </div>
     </div>
-    <div v-if="!props.print">
-      <q-btn v-if="!totalsMatch()" flat class="no-pointer-events">
-        <div>Expenses total does not match statement</div>
-        <q-icon color="orange" name="warning" size="md" />
-      </q-btn>
-      <q-btn v-if="!numExpensesMatch()" flat class="no-pointer-events">
-        <div>Number of expenses does not match statement</div>
-        <q-icon color="orange" name="warning" size="md" />
-      </q-btn>
-      <q-btn v-if="expensesMatchStatment()" flat class="no-pointer-events">
-        <div>Statement and expenses seem to match</div>
-        <q-icon color="green" name="check" size="md" />
-      </q-btn>
-      <q-btn @click="navigateToPrintView()" label="Print" />
-    </div>
+    <StatementTable :statement="statement" />
   </div>
-  <StatementTable :statement="statement" />
+  <div v-else>
+    <div class = "text-h5">No card selected in {{ monthDisplay }}</div>
+  </div>
   
   <!-- Expense Months -->
   <q-spinner-grid
@@ -31,7 +36,7 @@
     color="primary"
     size="xl"
   />
-  <div v-else>
+  <div v-else-if="selectedMonthCardExpenseMonths().length">
     <div v-for="em of selectedMonthCardExpenseMonths()" :key="em.pk">
       <div class="q-mt-lg">
         <q-table
@@ -147,18 +152,24 @@
           <div>
             <q-btn
               :class="EMApproved(em)?'bg-green':''"
-              :disable="EMApproved(em)"
+              :disable="!fiscalCanApprove(em) || EMApproved(em)"
               @click="onShowApproveDialog(em)"
               class="q-mr-md"
             >
               Approve Expenses
+              <q-tooltip v-if="!fiscalCanApprove(em)">
+                Month not yet submitted
+              </q-tooltip>
             </q-btn>
             <q-btn
               :class="EMDenied(em)?'bg-red':''"
-              :disable="EMDenied(em)"
+              :disable="!fiscalCanApprove(em) || EMDenied(em)"
               @click="onShowDenyDialog(em)"
             >
               Deny Expenses
+              <q-tooltip v-if="!fiscalCanApprove(em)">
+                Month not yet submitted
+              </q-tooltip>
             </q-btn>
           </div>
         </div>
@@ -175,6 +186,9 @@
       </div>
 
     </div>
+  </div>
+  <div class="text-h5" v-else>
+    No expenses entered by {{ routeEmployeeName }} in {{ monthDisplay }}
   </div>
 
   <!-- Approve Dialog -->
@@ -249,6 +263,7 @@ import DocumentViewer from 'src/components/DocumentViewer.vue'
 import StatementTable from 'src/components/purchases/StatementTable.vue'
 import { readableDateNEW, readableDateTime } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
+import { usePeopleStore } from 'src/stores/people'
 import { usePurchaseStore } from 'src/stores/purchase'
 import { ExpenseCard, ExpenseMonth, ExpenseStatement } from 'src/types'
 import { getRouteParam } from 'src/utils'
@@ -257,6 +272,7 @@ import { getRouteParam } from 'src/utils'
 const route = useRoute()
 const router = useRouter()
 const quasar = useQuasar()
+const peopleStore = usePeopleStore()
 const purchaseStore = usePurchaseStore()
 
 const props = defineProps<{
@@ -276,10 +292,11 @@ let monthDisplay = ref(props.monthDisplay)
 let monthInt = ref(props.monthInt)
 let yearInt = ref(props.yearInt)
 
-let card = ref({}) as Ref<ExpenseCard>
-let statement = ref({}) as Ref<ExpenseStatement>
+let card = ref(null) as Ref<ExpenseCard | null>
+let statement = ref(null) as Ref<ExpenseStatement | null>
 
 let routeEmployeePK = ref(-1)
+let routeEmployeeName = ref('')
 
 let thisMonthLoaded = ref(false)
 let allExpensesLoaded = ref(false)
@@ -343,6 +360,8 @@ function tableTitleDisplay(em: ExpenseMonth): string {
 }
 
 function selectedMonthCardExpenseMonths(): Array<ExpenseMonth> {
+  let currentCard = null
+  let currentStatement = null
   const allEMs = purchaseStore.fiscalExpenseMonths.filter(em => {
     return em.month === monthInt.value && em.year === yearInt.value
   })
@@ -351,16 +370,38 @@ function selectedMonthCardExpenseMonths(): Array<ExpenseMonth> {
     const selectedEmployeeEM = allEMs.filter(em => {
       return em.purchaser.pk === routeEmployeePK.value
     })[0]
-    if (!selectedEmployeeEM) {
-      return []
+    if (selectedEmployeeEM) {
+      currentCard = selectedEmployeeEM.card
+      currentStatement = selectedEmployeeEM.statement
+      ems = allEMs.filter(em => {
+        return em.card?.pk === selectedEmployeeEM.card?.pk
+      })
     }
-    card.value = selectedEmployeeEM.card
-    statement.value = selectedEmployeeEM.statement
-    ems = allEMs.filter(em => {
-      return em.card.pk == selectedEmployeeEM.card.pk
-    })
+  }
+  card.value = currentCard
+  statement.value = currentStatement
+  if (!ems.length) {
+    setEmployeeName()
   }
   return ems
+}
+
+function setEmployeeName() {
+  peopleStore.getSimpleEmployeeDetail(
+    { pk: routeEmployeePK.value }
+  ).then((employee) => {
+    routeEmployeeName.value = employee.name
+  })
+}
+
+function fiscalCanApprove(expenseMonth: ExpenseMonth) {
+  if (expenseMonth.card?.requires_director_approval) {
+    return ['director_approved', 'fiscal_approved', 'fiscal_denied']
+      .includes(expenseMonth.status)
+  } else {
+    return ['approver_approved', 'fiscal_approved', 'fiscal_denied']
+      .includes(expenseMonth.status)
+  }
 }
 
 function EMApproved(em: ExpenseMonth): boolean {
@@ -373,7 +414,13 @@ function EMDenied(em: ExpenseMonth): boolean {
 
 function retrieveThisMonthEmployeeExpenses(): Promise<void> {
   return new Promise((resolve, reject) => {
-    purchaseStore.getFiscalExpenseMonths(yearInt.value, monthInt.value)
+    const employeePK = routeEmployeePK.value
+    if (!employeePK) {
+      return
+    }
+    purchaseStore.getFiscalExpenseMonths(
+      yearInt.value, monthInt.value, employeePK
+    )
       .then(() => {
         thisMonthLoaded.value = true
         resolve()

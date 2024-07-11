@@ -1,15 +1,26 @@
 <template>
 <div>
   <q-btn
-    :label="props.iconButton ? '' : props.documentUrl.split('/').pop()"
+    :label="buttonLabel()"
     :icon="props.iconButton ? 'file_open' : ''"
     @click="showDialog = true"
-    flat
+    :flat="props.flat"
+    :color="props.flat ? '' : 'primary'"
   />
 
-  <q-dialog v-model="showDialog">
+  <q-dialog id="document-viewer-dialog" v-model="showDialog">
     <q-card class="file-viewer">
-      <q-img :src="props.documentUrl" />
+      <embed
+        v-if="isPDF()"
+        :src="props.documentUrl"
+        type="application/pdf"
+      >
+      <div v-else>
+        <q-img :src="props.documentUrl" />
+        <div v-if="!isImage()" class="text-negative">
+          Document filetype {{ fileExtension() }} may not be supported
+        </div>
+      </div>
 
       <q-separator />
 
@@ -40,10 +51,16 @@
 </template>
   
 <style scoped lang="scss">
+
 .file-viewer {
   height: 100%;
   width: 100%;
   padding: 10px;
+
+  embed {
+    width: 100%;
+    height: 100%;
+  }
 }
 .dialog-button {
   margin: 0 10px;
@@ -55,11 +72,35 @@ import { ref } from 'vue'
 import axios from 'axios'
 
 const props = defineProps<{
-  iconButton?: boolean
   documentUrl: string
+  buttonText?: string
+  iconButton?: boolean
+  flat?: boolean
 }>()
 
 let showDialog = ref(false)
+
+function isImage() {
+  return props.documentUrl.match(/\.(jpeg|jpg|gif|png)$/)
+}
+
+function isPDF() {
+  return props.documentUrl.match(/\.(pdf)$/)
+}
+
+function fileExtension() {
+  return props.documentUrl.split('.').pop()
+}
+
+function buttonLabel() {
+  if (props.buttonText) {
+    return props.buttonText
+  } else if (props.iconButton) {
+    return ''
+  } else {
+    return props.documentUrl.split('/').pop()
+  }
+}
 
 function openDocument() {
   window.open(props.documentUrl, '_blank')

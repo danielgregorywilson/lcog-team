@@ -96,6 +96,7 @@ export default defineComponent({
       const shouldNotViewBecauseNoExpenseRoles = this.canViewExpenses && (
         !this.userStore.getEmployeeProfile.is_expense_manager &&
         !this.userStore.getEmployeeProfile.is_expense_approver &&
+        !this.userStore.getEmployeeProfile.is_division_director &&
         !this.userStore.getEmployeeProfile.is_fiscal_employee
       )   
       const cannotViewMealsOnWheelsRoutes =

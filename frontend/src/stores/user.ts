@@ -30,6 +30,7 @@ export const useUserStore = defineStore('user', {
       can_edit_seating_charts: false,
       is_upper_manager: false,
       is_hr_manager: false,
+      is_division_director: false,
       is_executive_director: false,
       viewed_security_message: false,
       prs_can_view: [] as Array<number>,
@@ -54,6 +55,7 @@ export const useUserStore = defineStore('user', {
     isProfileLoaded: state => !!state.profile.username,
     isManager: state => state.profile.is_manager,
     isFiscal: state => state.profile.is_fiscal_employee,
+    isDivisionDirector: state => state.profile.is_division_director,
     hasWorkflowRoles: state => !!state.profile.workflow_roles.length,
     isExpenseManager: state => state.profile.is_expense_manager,
     isExpenseApprover: state => state.profile.is_expense_approver,
@@ -85,6 +87,7 @@ export const useUserStore = defineStore('user', {
             this.profile.can_edit_seating_charts = resp.data.can_edit_seating_charts
             this.profile.is_upper_manager = resp.data.is_upper_manager
             this.profile.is_hr_manager = resp.data.is_hr_manager
+            this.profile.is_division_director = resp.data.is_division_director
             this.profile.is_executive_director = resp.data.is_executive_director
             this.profile.viewed_security_message = resp.data.viewed_security_message
             this.profile.prs_can_view = resp.data.prs_can_view
@@ -109,6 +112,9 @@ export const useUserStore = defineStore('user', {
             )
             cookies.set(
               'is_fiscal_employee', resp.data.is_fiscal_employee.toString()
+            )
+            cookies.set(
+              'is_division_director', resp.data.is_division_director.toString()
             )
             cookies.set(
               'is_eligible_for_telework_application',
@@ -187,6 +193,7 @@ export const useUserStore = defineStore('user', {
         cookies.remove('is_hr_employee')
         cookies.remove('is_sds_hiring_lead')
         cookies.remove('is_fiscal_employee')
+        cookies.remove('is_division_director')
         cookies.remove('is_eligible_for_telework_application')
         cookies.remove('can_view_seating_charts')
         cookies.remove('can_edit_seating_charts')

@@ -2,7 +2,7 @@
 
 A Quasar Project
 
-Node 18.15.0
+Node 22.2.0
 Vue 3
 Quasar 2
 Pinia 

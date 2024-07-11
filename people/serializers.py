@@ -93,7 +93,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             'is_fiscal_employee', 'is_eligible_for_telework_application',
             'can_view_seating_charts', 'can_edit_seating_charts',
             'can_view_desk_reservation_reports', 'is_upper_manager',
-            'is_hr_manager', 'is_executive_director',
+            'is_hr_manager', 'is_division_director', 'is_executive_director',
             'viewed_security_message', 'prs_can_view', 'notes_can_view',
             'telework_applications_can_view', 'time_off_requests_can_view',
             'next_to_sign_prs', 'email_opt_out_all',
@@ -122,10 +122,8 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             # (e.g. finance manager)
             not employee.manager.is_executive_director,
             # Not anyone who reports to the above (e.g. finance employees)
-            all([
-                employee.manager.manager,
-                not employee.manager.manager.is_executive_director
-            ]),
+            employee.manager.manager and \
+                not employee.manager.manager.is_executive_director,
             not employee.is_division_director, # No division directors
             not employee.manager.is_division_director, # No program managers
             not employee.is_hr_manager,  # Not the HR manager

@@ -264,6 +264,7 @@ class WorkflowInstanceBaseSerializer(serializers.ModelSerializer):
     title_name = serializers.SerializerMethodField()
     employee_action_required = serializers.SerializerMethodField()
     workflow_type = serializers.CharField(source='workflow.type')
+    workflow_name = serializers.SerializerMethodField()
     workflow_role_pk = serializers.IntegerField(
         source='workflow.role.pk', required=False
     )
@@ -285,6 +286,17 @@ class WorkflowInstanceBaseSerializer(serializers.ModelSerializer):
             return wfi.employee_action_required(user.employee)
         return False
 
+    @staticmethod
+    def get_workflow_name(wfi):
+        display_value = wfi.workflow.name
+        t = wfi.transition
+        if t:
+            employee_name = f'{t.employee_first_name} {t.employee_last_name}'
+            if employee_name == ' ':
+                employee_name = 'No Name'
+            display_value += f' - {employee_name}'
+        return display_value
+
 
 class WorkflowInstanceSimpleSerializer(WorkflowInstanceBaseSerializer):
     """
@@ -304,7 +316,7 @@ class WorkflowInstanceSimpleSerializer(WorkflowInstanceBaseSerializer):
             'completed_at', 'percent_complete', 'status', 'employee_name',
             'title_name', 'transition_type', 'transition_submitter',
             'transition_date_submitted', 'transition_date', 'workflow_type',
-            'workflow_role_pk', 'employee_action_required'
+            'workflow_name', 'workflow_role_pk', 'employee_action_required'
         ]
         depth = 1
     

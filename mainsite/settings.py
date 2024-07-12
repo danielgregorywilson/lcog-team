@@ -264,6 +264,8 @@ AWS_S3_OBJECT_PARAMETERS = {
 # LOGIN_REDIRECT_URL = '/dashboard'
 # LOGOUT_REDIRECT_URL = '/dashboard'
 
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
 #########
 # Email #
 #########

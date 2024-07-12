@@ -1,5 +1,7 @@
 import { RouteRecordRaw } from 'vue-router'
-import { isExpenseApprover, isExpenseManager, isFiscal } from './guards'
+import {
+  isDivisionDirector, isExpenseApprover, isExpenseManager, isFiscal
+} from './guards'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -27,7 +29,9 @@ const routes: RouteRecordRaw[] = [
         component: () => import('src/pages/purchases/ExpensesBase.vue'),
         redirect: () => {
           if (isFiscal()) {
-            return { name: 'fiscal-approve' }
+            return { name: 'fiscal-approve-expenses' }
+          } else if (isDivisionDirector()) {
+            return { name: 'director-approve-expenses' }
           } else if (isExpenseApprover()) {
             return { name: 'approve-expenses' }
           } else if (isExpenseManager()) {
@@ -50,15 +54,31 @@ const routes: RouteRecordRaw[] = [
             meta: { requiresAuth: true, requiresExpenseApprover: true },
           },
           {
+            path: 'director',
+            name: 'director-approve-expenses',
+            component: () => import('src/pages/purchases/DirectorApprove.vue'),
+            meta: { requiresAuth: true, requiresDivisionDirector: true },
+          },
+          {
+            path: 'director/:employeePK/:year/:month',
+            name: 'director-approve-expenses-detail',
+            component: () => {
+              return import('src/pages/purchases/DirectorApproveDetail.vue')
+            },
+            meta: { requiresAuth: true, requiresDivisionDirector: true },
+          },
+          {
             path: 'fiscal',
-            name: 'fiscal-approve',
+            name: 'fiscal-approve-expenses',
             component: () => import('src/pages/purchases/FiscalApprove.vue'),
             meta: { requiresAuth: true, requiresFiscal: true },
           },
           {
             path: 'fiscal/:employeePK/:year/:month',
-            name: 'fiscal-approve-detail',
-            component: () => import('src/pages/purchases/FiscalApproveDetail.vue'),
+            name: 'fiscal-approve-expenses-detail',
+            component: () => {
+              return import('src/pages/purchases/FiscalApproveDetail.vue')
+            },
             meta: { requiresAuth: true, requiresFiscal: true },
           },
         ]

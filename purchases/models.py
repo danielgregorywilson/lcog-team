@@ -98,6 +98,8 @@ class ExpenseBaseModel(models.Model):
     STATUS_SUBMITTED = 'submitted'
     STATUS_APPROVER_APPROVED = 'approver_approved'
     STATUS_APPROVER_DENIED = 'approver_denied'
+    STATUS_DIRECTOR_APPROVED = 'director_approved'
+    STATUS_DIRECTOR_DENIED = 'director_denied'
     STATUS_FISCAL_APPROVED = 'fiscal_approved'
     STATUS_FISCAL_DENIED = 'fiscal_denied'
     STATUS_CHOICES = (
@@ -105,6 +107,8 @@ class ExpenseBaseModel(models.Model):
         (STATUS_SUBMITTED, 'Submitted'),
         (STATUS_APPROVER_APPROVED, 'Approver Approved'),
         (STATUS_APPROVER_DENIED, 'Approver Denied'),
+        (STATUS_DIRECTOR_APPROVED, 'Director Approved'),
+        (STATUS_DIRECTOR_DENIED, 'Director Denied'),
         (STATUS_FISCAL_APPROVED, 'Fiscal Approved'),
         (STATUS_FISCAL_DENIED, 'Fiscal Denied'),
     )
@@ -114,24 +118,39 @@ class ExpenseBaseModel(models.Model):
     )
 
 
+class ExpenseGL(models.Model):
+    class Meta:
+        ordering = ["pk",]
+
+    expense = models.ForeignKey(
+        'Expense', on_delete=models.CASCADE, related_name='gls'
+    )
+    code = models.CharField(max_length=255, blank=True)
+    percent = models.FloatField(blank=True, null=True)
+    approver = models.ForeignKey(
+        Employee, blank=True, null=True, on_delete=models.SET_NULL,
+        related_name='expense_gls'
+    )
+    approved = models.BooleanField(default=False)
+    approved_at = models.DateTimeField(blank=True, null=True)
+    approver_note = models.TextField(blank=True)
+
+
 class Expense(ExpenseBaseModel):
     class Meta:
         ordering = ["pk",]
 
+    month = models.ForeignKey(
+        'ExpenseMonth', on_delete=models.CASCADE, related_name='expenses'
+    )
     name = models.CharField(max_length=255, blank=True)
     date = models.DateField(blank=True, null=True)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    description = models.CharField(max_length=511, blank=True)
+    vendor = models.CharField(max_length=255, blank=True)
     job = models.CharField(max_length=255, blank=True)
-    gls = models.JSONField(_("GL Codes"), blank=True, default=list)
-    purchaser = models.ForeignKey(
-        Employee, blank=True, null=True, on_delete=models.SET_NULL,
-        related_name='expenses_purchased',
-    )
     receipt = models.FileField(
         _("receipt"), upload_to="uploads/expenses", blank=True, null=True
-    )
-    approver = models.ForeignKey(
-        Employee, blank=True, null=True, on_delete=models.SET_NULL,
-        related_name='approver_of_expenses',
     )
     approved_at = models.DateTimeField(blank=True, null=True)
 
@@ -139,24 +158,87 @@ class Expense(ExpenseBaseModel):
 class ExpenseMonth(ExpenseBaseModel):
     class Meta:
         ordering = ["pk",]
-        unique_together = ['employee', 'month', 'year']
+        unique_together = ['purchaser', 'month', 'year']
+
+    def __str__(self):
+        return f'{self.month}/{self.year} for {self.purchaser}'
     
-    employee = models.ForeignKey(
+    def save(self, *args, **kwargs):
+        set_card = False
+        if not self.pk:
+            set_card = True
+        super().save(*args, **kwargs)
+        # If this is a new month, set the card to the submitter's default card
+        if set_card:
+            card = self.purchaser.expense_cards.first()
+            if card:
+                self.card = card
+                self.save()
+
+    year = models.IntegerField()
+    month = models.IntegerField()
+    purchaser = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='expense_months',
     )
-    month = models.IntegerField()
-    year = models.IntegerField()
-    approver = models.ForeignKey(
+    card = models.ForeignKey(
+        'ExpenseCard', blank=True, null=True, on_delete=models.SET_NULL,
+        related_name='expense_months'
+    )
+    submitter_note = models.TextField(blank=True)
+    
+    # Division Director approval
+    director_approved = models.BooleanField(default=False)
+    director_approved_at = models.DateTimeField(blank=True, null=True)
+    director_note = models.TextField(blank=True)
+
+    # Fiscal approval
+    fiscal_approver = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='approver_of_expense_month',
     )
-    approved_at = models.DateTimeField(blank=True, null=True)
+    fiscal_approved_at = models.DateTimeField(blank=True, null=True)
+    fiscal_note = models.TextField(blank=True)
 
-    @property
-    def expenses(self):
-        return Expense.objects.filter(
-            purchaser=self.employee,
-            date__month=self.month,
-            date__year=self.year
-        )
+
+class ExpenseCard(models.Model):
+    class Meta:
+        ordering = ["pk",]
+    
+    def __str__(self):
+        return f'*{self.last4}'
+
+    last4 = models.IntegerField()
+    assignee = models.ForeignKey(
+        Employee, blank=True, null=True, on_delete=models.SET_NULL,
+        related_name='expense_cards'
+    )
+    shared = models.BooleanField(default=False)
+    requires_director_approval = models.BooleanField(default=False)
+    director = models.ForeignKey(
+        Employee, blank=True, null=True, on_delete=models.SET_NULL,
+        related_name='approver_of_cards'
+    )
+
+
+class ExpenseStatement(models.Model):
+    class Meta:
+        ordering = ["pk",]
+    
+    card = models.ForeignKey(
+        ExpenseCard, on_delete=models.CASCADE, related_name='statements'
+    )
+    month = models.IntegerField()
+    year = models.IntegerField()
+
+
+class ExpenseStatementItem(models.Model):
+    class Meta:
+        ordering = ["pk",]
+
+    statement = models.ForeignKey(
+        ExpenseStatement, on_delete=models.CASCADE, related_name='items'
+    )
+    date = models.DateField(_("Transaction Date"))
+    description = models.CharField(max_length=255)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)

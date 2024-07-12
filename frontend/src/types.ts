@@ -108,6 +108,7 @@ export interface EmployeeRetrieve {
   is_fiscal_employee: boolean
   is_upper_manager: boolean
   is_hr_manager: boolean
+  is_division_director: boolean
   is_executive_director: boolean
   viewed_security_message: boolean
   is_eligible_for_telework_application: boolean
@@ -143,7 +144,7 @@ export interface SimpleEmployeeRetrieve {
 }
 
 export const emptyEmployee: SimpleEmployeeRetrieve = {
-  pk: -1, name: '', legal_name: '', title: ''
+  pk: -1, name: '', legal_name: '', title: '', is_expense_approver: false
 }
 
 export interface EmployeeEmailRetrieve {
@@ -340,21 +341,39 @@ export interface FileUploadDescriptionUploadServerResponse {
 
 interface ExpenseBase {
   status: 'draft' | 'submitted' | 'approver_approved' | 'approver_denied' |
-    'fiscal_approved' | 'fiscal_denied'
+    'director_approved' | 'director_denied' | 'fiscal_approved' |
+    'fiscal_denied'
 }
 
 export interface ExpenseMonth extends ExpenseBase {
   pk: number
-  employee: SimpleEmployeeRetrieve
   month: number
   year: number
+  purchaser: SimpleEmployeeRetrieve
+  card: ExpenseCard
+  statement: ExpenseStatement
   expenses: Array<Expense>
+  submitter_note: string
+  director_approved: boolean
+  director_approved_at: string
+  director_note: string
+  fiscal_approver: SimpleEmployeeRetrieve
+  fiscal_approved_at: string
+  fiscal_note: string
+}
+
+export interface ExpenseMonthCreate {
+  month: number
+  year: number
 }
 
 export interface Expense extends ExpenseBase {
   pk: number
   name: string
   date: string
+  description: string
+  vendor: string
+  amount: string
   job: string
   gls: Array<GL>
   purchaser: SimpleEmployeeRetrieve
@@ -382,8 +401,40 @@ export interface ExpenseUpdate extends ExpenseBase {
 }
 
 export interface GL {
-  gl: string
+  code: string
   percent: string
+  approver?: SimpleEmployeeRetrieve
+  approved: boolean
+  approved_at: string
+  approver_note: string
+  expense_status: string
+  expense_date: string
+  em_note: string
+}
+
+export interface ExpenseCard {
+  pk: number
+  last4: number
+  assignee: SimpleEmployeeRetrieve
+  display: string
+  shared: boolean
+  requires_director_approval: boolean
+  director_name: string
+}
+
+interface ExpenseStatementItem {
+  pk: number
+  date: string
+  description: string
+  amount: string
+}
+
+export interface ExpenseStatement {
+  pk: number
+  card: ExpenseCard
+  month: number
+  year: number
+  items: Array<ExpenseStatementItem>
 }
 
 /////////////////////////////////////////////////////////
@@ -812,6 +863,7 @@ export interface WorkflowInstanceSimple {
   transition_date: Date
   workflow_role_pk: number
   workflow_type: string
+  workflow_name: string
   employee_action_required: boolean
 }
 

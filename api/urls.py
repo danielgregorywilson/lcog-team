@@ -18,7 +18,10 @@ from people.api_views import (
     TeleworkApplicationViewSet, TeleworkSignatureViewSet, UnitViewSet,
     UserViewSet, ViewedSecurityMessageViewSet
 )
-from purchases.api_views import ExpenseViewSet, ExpenseMonthViewSet
+from purchases.api_views import (
+    ExpenseGLViewSet, ExpenseMonthViewSet, ExpenseStatementViewSet,
+    ExpenseViewSet
+)
 from responsibilities.api_views import (
     ResponsibilityViewSet, TagViewSet as ResponsibilityTagViewSet
 )
@@ -44,26 +47,39 @@ urlpatterns = [
 ]
 
 router = routers.DefaultRouter(trailing_slash=False)
+# People
 router.register('v1/user', UserViewSet)
 router.register('v1/groups', GroupViewSet)
 router.register('v1/employee', EmployeeViewSet)
+router.register('v1/jobtitle', JobTitleViewSet)
+router.register('v1/unit', UnitViewSet)
+# Responsibilities
 router.register('v1/responsibilities', ResponsibilityViewSet)
 router.register('v1/responsibilitytags', ResponsibilityTagViewSet)
+# Desk Reservation
 router.register('v1/desk', DeskViewSet)
 router.register('v1/deskreservation', DeskReservationViewSet)
+# Expenses
+router.register('v1/expense-gl', ExpenseGLViewSet)
 router.register('v1/expense', ExpenseViewSet)
-router.register('v1/expensemonth', ExpenseMonthViewSet)
+router.register('v1/expense-month', ExpenseMonthViewSet)
+router.register('v1/expense-statement', ExpenseStatementViewSet)
+# Performance Reviews
 router.register('v1/performancereview', PerformanceReviewViewSet)
-router.register('v1/fileupload', FileUploadViewSet, basename='fileupload')
-router.register('v1/telework-fileupload', TeleworkApplicationFileUploadViewSet, basename='telework-fileupload')
 router.register('v1/signature', SignatureViewSet)
 router.register('v1/reviewnote', ReviewNoteViewSet)
-router.register('v1/securitymessage', SecurityMessageViewSet)
-router.register('v1/viewedsecuritymessage', ViewedSecurityMessageViewSet)
+# Telework
+router.register(
+    'v1/telework-fileupload', TeleworkApplicationFileUploadViewSet,
+    basename='telework-fileupload'
+)
 router.register('v1/teleworkapplication', TeleworkApplicationViewSet)
 router.register('v1/teleworksignature', TeleworkSignatureViewSet)
+# Security Messages
+router.register('v1/securitymessage', SecurityMessageViewSet)
+router.register('v1/viewedsecuritymessage', ViewedSecurityMessageViewSet)
+# Time Off
 router.register('v1/timeoffrequest', TimeOffRequestViewSet)
-router.register('v1/trustedip', TrustedIPViewSet, basename='trustedip')
 # Workflow
 router.register('v1/process', ProcessViewSet)
 router.register('v1/processinstance', ProcessInstanceViewSet)
@@ -71,8 +87,6 @@ router.register('v1/role', RoleViewSet)
 router.register('v1/step', StepViewSet)
 router.register('v1/stepchoice', StepChoiceViewSet)
 router.register('v1/stepinstance', StepInstanceViewSet)
-router.register('v1/jobtitle', JobTitleViewSet)
-router.register('v1/unit', UnitViewSet)
 router.register('v1/workflow', WorkflowViewSet)
 router.register('v1/workflowinstance', WorkflowInstanceViewSet)
 router.register('v1/employeetransition', EmployeeTransitionViewSet)
@@ -81,6 +95,7 @@ router.register('v1/transitionchange', TransitionChangeViewSet)
 router.register('v1/mealstop', MealStopViewSet)
 # Utilities
 router.register('v1/log-error', LogErrorView, basename='log-error')
-
+router.register('v1/fileupload', FileUploadViewSet, basename='fileupload')
+router.register('v1/trustedip', TrustedIPViewSet, basename='trustedip')
 
 urlpatterns = router.urls + urlpatterns

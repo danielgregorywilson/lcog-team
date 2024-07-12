@@ -7,7 +7,7 @@
         Statement for {{ card?.display }}
         in {{ monthDisplay }}
       </div>
-      <div v-if="!props.print">
+      <div>
         <q-btn v-if="!totalsMatch()" flat class="no-pointer-events">
           <div>Expenses total does not match statement</div>
           <q-icon color="orange" name="warning" size="md" />
@@ -20,7 +20,6 @@
           <div>Statement and expenses seem to match</div>
           <q-icon color="green" name="check" size="md" />
         </q-btn>
-        <q-btn @click="navigateToPrintView()" label="Print" />
       </div>
     </div>
     <StatementTable :statement="statement" />
@@ -43,7 +42,7 @@
           flat bordered
           :title="tableTitleDisplay(em)"
           :rows="em.expenses"
-          :columns="props.print ? printColumns : columns"
+          :columns="columns"
           :dense="$q.screen.lt.lg"
           :grid="$q.screen.lt.md"
           row-key="name"
@@ -138,7 +137,7 @@
           </template>
         </q-table>
 
-        <div v-if="em.submitter_note && !props.print">
+        <div v-if="em.submitter_note">
           <div id="submitter-note" class="q-mt-md q-pa-sm bg-info font-bold">
             <div>Submitter Note:</div>
             <div>{{ em.submitter_note }}</div>
@@ -146,45 +145,33 @@
         </div>
         
         <div
-          v-if="!props.print"
           class="q-mt-sm q-gutter-md row justify-between"
         >
           <div>
             <q-btn
               :class="EMApproved(em)?'bg-green':''"
-              :disable="!fiscalCanApprove(em) || EMApproved(em)"
+              :disable="!directorCanApprove() || EMApproved(em)"
               @click="onShowApproveDialog(em)"
               class="q-mr-md"
             >
               Approve Expenses
-              <q-tooltip v-if="!fiscalCanApprove(em)">
+              <q-tooltip v-if="!directorCanApprove(em)">
                 Month not yet submitted
               </q-tooltip>
             </q-btn>
             <q-btn
               :class="EMDenied(em)?'bg-red':''"
-              :disable="!fiscalCanApprove(em) || EMDenied(em)"
+              :disable="!directorCanApprove() || EMDenied(em)"
               @click="onShowDenyDialog(em)"
             >
               Deny Expenses
-              <q-tooltip v-if="!fiscalCanApprove(em)">
+              <q-tooltip v-if="!directorCanApprove(em)">
                 Month not yet submitted
               </q-tooltip>
             </q-btn>
           </div>
         </div>
       </div>
-
-      <!-- Display Receipts for Print View -->
-      <div v-if="props.print">
-        <div
-          v-for="expense in em.expenses"
-          :key="expense.pk"
-        >
-          <q-img :src="expense.receipt" />
-        </div>
-      </div>
-
     </div>
   </div>
   <div v-else class="text-h5">
@@ -257,7 +244,7 @@
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
 import { onMounted, Ref, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 
 import DocumentViewer from 'src/components/DocumentViewer.vue'
 import StatementTable from 'src/components/purchases/StatementTable.vue'
@@ -270,7 +257,6 @@ import { getRouteParam } from 'src/utils'
 
 
 const route = useRoute()
-const router = useRouter()
 const quasar = useQuasar()
 const peopleStore = usePeopleStore()
 const purchaseStore = usePurchaseStore()
@@ -318,7 +304,7 @@ const pagination = {
   rowsPerPage: '50'
 }
 
-const printColumns = [
+const columns = [
   {
     name: 'name', field: 'name', label: 'Name', required: true, align: 'left',
     sortable: true
@@ -349,11 +335,8 @@ const printColumns = [
     name: 'approvedAt', field: 'approved_at', label: 'Approved At',
     align: 'center'
   },
+  { name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center' }
 ]
-
-const columns = printColumns.concat([{
-  name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center'
-}])
 
 function tableTitleDisplay(em: ExpenseMonth): string {
   return `${ monthDisplay.value } expenses for ${ em.purchaser.name }`
@@ -362,7 +345,7 @@ function tableTitleDisplay(em: ExpenseMonth): string {
 function selectedMonthCardExpenseMonths(): Array<ExpenseMonth> {
   let currentCard = null
   let currentStatement = null
-  const allEMs = purchaseStore.fiscalExpenseMonths.filter(em => {
+  const allEMs = purchaseStore.directorExpenseMonths.filter(em => {
     return em.month === monthInt.value && em.year === yearInt.value
   })
   let ems: Array<ExpenseMonth> = []
@@ -374,7 +357,7 @@ function selectedMonthCardExpenseMonths(): Array<ExpenseMonth> {
       currentCard = selectedEmployeeEM.card
       currentStatement = selectedEmployeeEM.statement
       ems = allEMs.filter(em => {
-        return em.card?.pk === selectedEmployeeEM.card?.pk
+        return em.card.pk === selectedEmployeeEM.card.pk
       })
     }
   }
@@ -387,6 +370,9 @@ function selectedMonthCardExpenseMonths(): Array<ExpenseMonth> {
 }
 
 function setEmployeeName() {
+  if (routeEmployeePK.value == -1) {
+    return
+  }
   peopleStore.getSimpleEmployeeDetail(
     { pk: routeEmployeePK.value }
   ).then((employee) => {
@@ -394,22 +380,20 @@ function setEmployeeName() {
   })
 }
 
-function fiscalCanApprove(expenseMonth: ExpenseMonth) {
-  if (expenseMonth.card?.requires_director_approval) {
-    return ['director_approved', 'fiscal_approved', 'fiscal_denied']
-      .includes(expenseMonth.status)
-  } else {
-    return ['approver_approved', 'fiscal_approved', 'fiscal_denied']
-      .includes(expenseMonth.status)
-  }
+function directorCanApprove(expenseMonth: ExpenseMonth) {
+  return expenseMonth?.card?.requires_director_approval && 
+    [
+      'approver_approved', 'director_approved', 'director_denied',
+      'fiscal_approved', 'fiscal_denied'
+    ].includes(expenseMonth.status)
 }
 
 function EMApproved(em: ExpenseMonth): boolean {
-  return em.status === 'fiscal_approved'
+  return em.director_approved && em.director_approved_at != null
 }
 
 function EMDenied(em: ExpenseMonth): boolean {
-  return em.status === 'fiscal_denied'
+  return !em.director_approved && em.director_approved_at != null
 }
 
 function retrieveThisMonthEmployeeExpenses(): Promise<void> {
@@ -418,7 +402,7 @@ function retrieveThisMonthEmployeeExpenses(): Promise<void> {
     if (!employeePK) {
       return
     }
-    purchaseStore.getFiscalExpenseMonths(
+    purchaseStore.getDirectorExpenseMonths(
       yearInt.value, monthInt.value, employeePK
     )
       .then(() => {
@@ -437,7 +421,7 @@ function retrieveAllEmployeeExpenses() {
   if (!employeePK) {
     return
   }
-  purchaseStore.getFiscalExpenseMonths(null, null, employeePK)
+  purchaseStore.getDirectorExpenseMonths(null, null, employeePK)
     .then(() => {
       allExpensesLoaded.value = true
     })
@@ -467,7 +451,7 @@ function onSubmitApproveDialog() {
     })
     return
   } else {
-    purchaseStore.approveExpenseMonth(emToApprovePK.value, true)
+    purchaseStore.directorApproveExpenseMonth(emToApprovePK.value, true)
       .then(() => {
         retrieveAllEmployeeExpenses()
         showApproveDialog.value = false
@@ -496,7 +480,7 @@ function onSubmitDenyDialog() {
     })
     return
   } else {
-    purchaseStore.approveExpenseMonth(
+    purchaseStore.directorApproveExpenseMonth(
       emToApprovePK.value, false, denyDialogMessage.value
     )
       .then(() => {
@@ -530,21 +514,6 @@ function setDates() {
   })
 }
 
-function navigateToPrintView() {
-  const employeePK = routeEmployeePK.value
-  if (!employeePK) {
-    return
-  }
-  router.push({
-    name: 'expense-month-print',
-    params: {
-      employeePK: employeePK,
-      month: monthInt.value,
-      year: yearInt.value
-    }
-  })
-}
-
 function expensesTotal() {
   let total = 0
   for (let em of selectedMonthCardExpenseMonths()) {
@@ -574,40 +543,14 @@ function expensesMatchStatment(): boolean {
   return totalsMatch() && numExpensesMatch()
 }
 
-function handlePrint() {
-  const monthParam = getRouteParam(route, 'month')
-  const yearParam = getRouteParam(route, 'year')
-  if (!monthParam || !yearParam) {
-    return
-  } else {
-    monthInt.value = parseInt(monthParam)
-    yearInt.value = parseInt(yearParam)
-    var months = [
-      'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
-      'September', 'October', 'November', 'December'
-    ]
-    monthDisplay.value = `${months[monthInt.value - 1]} ${yearInt.value}`
-  }
-  // Load expense month if not already loaded; otherwise mark as loaded
-  if (purchaseStore.fiscalExpenseMonths.length == 0) {
-    retrieveThisMonthEmployeeExpenses()
-  } else {
-    thisMonthLoaded.value = true
-  }
-}
-
 onMounted(() => {
   const employeePK = getRouteParam(route, 'employeePK')
   routeEmployeePK.value = parseInt(employeePK ? employeePK : '-1')
-  if (props.print) {
-    handlePrint()
-  } else {
-    setDates().then(() => {
-      retrieveThisMonthEmployeeExpenses().then(() => {
-        retrieveAllEmployeeExpenses()
-      })
+  setDates().then(() => {
+    retrieveThisMonthEmployeeExpenses().then(() => {
+      retrieveAllEmployeeExpenses()
     })
-  }
+  })
 })
 
 watch(() => props.monthInt, (first, second) => {

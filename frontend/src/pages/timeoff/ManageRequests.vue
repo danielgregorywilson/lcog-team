@@ -14,33 +14,57 @@
       </template>
       <template v-slot:body-cell-notes="props">
         <q-td key="notes" :props="props">
-          <span v-if="props.row.note && !props.row.private_note">{{ props.row.note }}</span>
-          <span v-if="!props.row.note && props.row.private_note"><span class="text-bold">Private:</span> {{ props.row.private_note }}</span>
-          <span v-if="props.row.note && props.row.private_note"><span class="text-bold">Public:</span> {{ props.row.note }} / <span class="text-bold">Private:</span> {{ props.row.private_note }}</span>
+          <span v-if="props.row.note && !props.row.private_note">
+            {{ props.row.note }}
+          </span>
+          <span v-if="!props.row.note && props.row.private_note">
+            <span class="text-bold">Private:</span> {{ props.row.private_note }}
+          </span>
+          <span v-if="props.row.note && props.row.private_note">
+            <span class="text-bold">Public:</span>
+            {{ props.row.note }} /
+            <span class="text-bold">Private:</span>
+            {{ props.row.private_note }}
+          </span>
         </q-td>
       </template>
       <template v-slot:body-cell-acknowledge="props">
         <q-td :props="props" class="row justify-center items-center">
           <q-btn 
             dense round color="red" icon="close"
-            :outline="props.row.acknowledged == null || props.row.acknowledged == true"
+            :outline="props.row.acknowledged == null ||
+              props.row.acknowledged == true"
             :disable="!canAcknowledge || props.row.acknowledged == false"
             class="q-mr-sm"
             @click="acknowledgeRequest(props.row.pk, false)"
           />
           <q-btn
             dense round color="green" icon="check"
-            :outline="props.row.acknowledged == null || props.row.acknowledged == false"
+            :outline="props.row.acknowledged == null ||
+              props.row.acknowledged == false"
             :disable="!canAcknowledge || props.row.acknowledged == true"
             @click="acknowledgeRequest(props.row.pk, true)"
           />
           <div v-if="props.row.conflicts.length != 0" class="q-ml-sm">
             <q-icon color="orange" name="warning" size="md">
               <q-tooltip content-style="font-size: 16px">
-                <div>One or more team members with shared responsibilities will also be unavailable:</div>
+                <div>
+                  One or more team members with shared responsibilities will
+                  also be unavailable:
+                </div>
                 <ul>
-                  <li v-for="employee of props.row.conflicts" :key="employee.pk">
-                    {{ employee.name }}: <span v-for="(name, idx) of employee.responsibility_names" :key="idx"><span v-if="idx==0">{{ name }}</span><span v-else>, {{ name }}</span></span>
+                  <li
+                    v-for="employee of props.row.conflicts"
+                    :key="employee.pk"
+                  >
+                    {{ employee.name }}:
+                    <span
+                      v-for="(name, idx) of employee.responsibility_names"
+                      :key="idx"
+                    >
+                      <span v-if="idx==0">{{ name }}</span>
+                      <span v-else>, {{ name }}</span>
+                    </span>
                   </li>
                 </ul>
               </q-tooltip>
@@ -48,43 +72,80 @@
           </div>
         </q-td>
       </template>
-      <!-- For grid mode, we need to specify everything in order for our action buttons to render -->
+      <!-- GRID MODE -->
       <template v-slot:item="props">
-        <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
+        <div
+          class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3
+            grid-style-transition"
+        >
           <q-card class="q-py-sm">
             <q-list dense>
               <q-item v-for="col in props.cols" :key="col.name">
                 <div class="q-table__grid-item-row">
                   <div class="q-table__grid-item-title">{{ col.label }}</div>
-                  <div class="q-table__grid-item-value" v-if="col.name == 'notes'">
-                    <span v-if="props.row.note && !props.row.private_note">{{ props.row.note }}</span>
-                    <span v-if="!props.row.note && props.row.private_note"><span class="text-bold">Private:</span> {{ props.row.private_note }}</span>
-                    <span v-if="props.row.note && props.row.private_note"><span class="text-bold">Public:</span> {{ props.row.note }} / <span class="text-bold">Private:</span> {{ props.row.private_note }}</span>
+                  <div
+                    v-if="col.name == 'notes'"  
+                    class="q-table__grid-item-value"
+                  >
+                    <span v-if="props.row.note && !props.row.private_note">
+                      {{ props.row.note }}
+                    </span>
+                    <span v-if="!props.row.note && props.row.private_note">
+                      <span class="text-bold">Private:</span>
+                      {{ props.row.private_note }}
+                    </span>
+                    <span v-if="props.row.note && props.row.private_note">
+                      <span class="text-bold">Public:</span>
+                      {{ props.row.note }} /
+                      <span class="text-bold">Private:</span>
+                      {{ props.row.private_note }}
+                    </span>
                   </div>
-                  <div class="q-table__grid-item-value" v-else-if="col.name != 'acknowledge'">
+                  <div
+                    v-else-if="col.name != 'acknowledge'"  
+                    class="q-table__grid-item-value"
+                  >
                     {{ col.value }}
                   </div>
                   <div class="q-table__grid-item-value row q-gutter-sm" v-else>
                     <q-btn 
                       dense round color="red" icon="close"
-                      :outline="props.row.acknowledged == null || props.row.acknowledged == true"
-                      :disable="!canAcknowledge || props.row.acknowledged == false"
+                      :outline="props.row.acknowledged == null ||
+                        props.row.acknowledged == true"
+                      :disable="!canAcknowledge ||
+                        props.row.acknowledged == false"
                       class="q-mr-sm"
                       @click="acknowledgeRequest(props.row.pk, false)"
                     />
                     <q-btn
                       dense round color="green" icon="check"
-                      :outline="props.row.acknowledged == null || props.row.acknowledged == false"
-                      :disable="!canAcknowledge || props.row.acknowledged == true"
+                      :outline="props.row.acknowledged == null ||
+                        props.row.acknowledged == false"
+                      :disable="!canAcknowledge ||
+                        props.row.acknowledged == true"
                       @click="acknowledgeRequest(props.row.pk, true)"
                     />
                     <div v-if="props.row.conflicts.length != 0" class="q-ml-sm">
                       <q-icon color="orange" name="warning" size="md">
                         <q-tooltip content-style="font-size: 16px">
-                          <div>One or more team members with shared responsibilities will also be unavailable:</div>
+                          <div>
+                            One or more team members with shared
+                            responsibilities will also be unavailable:
+                          </div>
                           <ul>
-                            <li v-for="employee of props.row.conflicts" :key="employee.pk">
-                              {{ employee.name }}: <span v-for="(name, idx) of employee.responsibility_names" :key="idx"><span v-if="idx==0">{{ name }}</span><span v-else>, {{ name }}</span></span>
+                            <li
+                              v-for="employee of props.row.conflicts"
+                              :key="employee.pk"
+                            >
+                              {{ employee.name }}:
+                              <span
+                                v-for="(name, idx) of
+                                  employee.responsibility_names"
+                                :key="idx"
+                              >
+                                <span v-if="idx==0">{{ name }}</span>
+                                <span v-else>, {{ name }}</span>
+                              </span>
                             </li>
                           </ul>
                         </q-tooltip>
@@ -118,10 +179,19 @@ import { useTimeOffStore } from 'src/stores/timeoff'
 const timeOffStore = useTimeOffStore()
 
 const columns: QTableProps['columns'] = [
-  { name: 'employee', label: 'Employee', field: 'employee_name', sortable: true, align: 'center' },
-  { name: 'dates', label: 'Dates', field: 'start_date', sortable: true, align: 'center' },
+  {
+    name: 'employee', label: 'Employee', field: 'employee_name', sortable: true,
+    align: 'center'
+  },
+  {
+    name: 'dates', label: 'Dates', field: 'start_date', sortable: true,
+    align: 'center'
+  },
   { name: 'notes', label: 'Notes', field: 'notes', align: 'center' },
-  { name: 'acknowledge', label: 'Acknowledge?', field: 'acknowledged', align: 'center' },
+  {
+    name: 'acknowledge', label: 'Acknowledge?', field: 'acknowledged',
+    align: 'center'
+  },
 ]
 
 const tablePagination = {

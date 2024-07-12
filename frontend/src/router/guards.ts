@@ -35,6 +35,15 @@ export function canViewExpenses() {
   }
 }
 
+export function isDivisionDirector() {
+  if (cookies.get('is_division_director') == 'true') {
+    return true
+  } else {
+    console.info('User is not a division director. Redirecting to dashboard.')
+    return false
+  }
+}
+
 export function isExpenseManager() {
   if (cookies.get('is_expense_manager') == 'true') {
     return true

@@ -1,7 +1,8 @@
 from django.contrib import admin
 
 from .models import (
-    Expense, ExpenseMonth, PurchaseCategory, PurchaseObject, PurchaseRequest,
+    Expense, ExpenseCard, ExpenseGL, ExpenseMonth, ExpenseStatement,
+    ExpenseStatementItem, PurchaseCategory, PurchaseObject, PurchaseRequest,
     Role
 )
 
@@ -29,16 +30,46 @@ class PurchaseRequestAdmin(admin.ModelAdmin):
     )
 
 
+class ExpenseGLInline(admin.TabularInline):
+    model = ExpenseGL
+    extra = 0
+
+
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'purchaser', 'date', 'name', 'status'
+        'id', 'get_purchaser', 'date', 'name', 'amount', 'status'
     )
+    inlines = (ExpenseGLInline,)
+    list_filter = ('status',)
+
+    @admin.display(ordering='month__purchaser', description='Purchaser')
+    def get_purchaser(self, expense):
+        return expense.month.purchaser
 
 
 @admin.register(ExpenseMonth)
 class ExpenseMonthAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'employee', 'year', 'month', 'status'
+        'id', 'purchaser', 'year', 'month', 'status'
     )
     list_filter = ('year', 'status',)
+
+
+@admin.register(ExpenseCard)
+class ExpenseCardAdmin(admin.ModelAdmin):
+    list_display = (
+        'last4', 'assignee', 'shared', 'requires_director_approval', 'director'
+    )
+
+
+class ExpenseStatementItemInline(admin.TabularInline):
+    model = ExpenseStatementItem
+    extra = 0
+
+
+@admin.register(ExpenseStatement)
+class ExpenseStatementAdmin(admin.ModelAdmin):
+    list_display = ('id', 'card', 'month', 'year')
+    list_filter = ('card', 'year', 'month')
+    inlines = (ExpenseStatementItemInline,)

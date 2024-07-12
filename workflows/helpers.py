@@ -275,8 +275,8 @@ def send_transition_stn_email(
     updated_body_string = 'updated ' if update else ''
     exit_body_string = 'Exit ' if t.type == EmployeeTransition.TRANSITION_TYPE_EXIT else ''
     title_name = JobTitle.objects.get(pk=t.title_id).name if t.title_id else ''
-    title_string = f'{ title_name} '
-    type_body_description = 'Their last day was ' if t.type == EmployeeTransition.TRANSITION_TYPE_EXIT else 'starting '
+    title_string = f'{ title_name}'
+    type_body_description = '. Their last day was' if t.type == EmployeeTransition.TRANSITION_TYPE_EXIT else ' starting'
 
     html_template = '../templates/email/employee-transition-stn.html'
     html_message = render_to_string(html_template, {

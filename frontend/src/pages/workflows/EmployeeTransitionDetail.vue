@@ -121,7 +121,7 @@
         v-model="employeeID"
         name="employee-id"
         id="employee-id"
-        :options="['CLSD', 'CLID']"
+        :options="['CLSD', 'CLID', 'None/Non-Employee']"
         label="Employee ID"
         class="q-mr-sm"
         style="width: 130px;"
@@ -329,7 +329,7 @@
       <q-checkbox
         id="preliminary-hire"
         v-model="preliminaryHire"
-        v-if="employeeID != 'CLID'"
+        v-if="employeeID == 'CLSD'"
         label="Preliminary Hire"
         :disable="!canEditOtherFields()"
       />
@@ -496,7 +496,7 @@
       <q-input
         name="load-code"
         v-model="loadCode"
-        v-if="employeeID != 'CLID'"
+        v-if="employeeID == 'CLSD'"
         label="Load Code"
         :readonly="!canEditOtherFields()"
       />
@@ -536,7 +536,7 @@
           :disable="!canEditOtherFields()"
         />
       </div>
-      <div class="row" v-if="employeeID != 'CLID'">
+      <div class="row" v-if="employeeID == 'CLSD'">
         <q-select
           name="oregon-access"
           v-model="oregonAccess"

@@ -1,6 +1,6 @@
 <template>
   <div class="q-pt-md">
-    <div class="text-h6 transition-form-section-heading">Type</div>
+    <div class="text-h6 transition-form-section-heading">Transition Type</div>
     <div class="row items-center">
       <q-radio
         v-model="type"
@@ -30,6 +30,44 @@
         :disable="!canEditOtherFields()"
       />
       <div>Exit</div>
+    </div>
+    <div class="text-h6 transition-form-section-heading">Worker Type</div>
+    <div class="row items-center">
+      <q-radio
+        v-model="workerType"
+        val="Employee"
+        id="worker-type-employee"
+        :disable="!canEditOtherFields()"
+      />
+      <div>Employee</div>
+      <q-radio
+        v-model="workerType"
+        val="Intern"
+        id="worker-type-intern"
+        :disable="!canEditOtherFields()"
+      />
+      <div>Intern</div>
+      <q-radio
+        v-model="workerType"
+        val="Volunteer"
+        id="worker-type-volunteer"
+        :disable="!canEditOtherFields()"
+      />
+      <div>Volunteer</div>
+      <q-radio
+        v-model="workerType"
+        val="Temp Agency"
+        id="worker-type-temp-agency"
+        :disable="!canEditOtherFields()"
+      />
+      <div>Temp Agency</div>
+      <q-radio
+        v-model="workerType"
+        val="Temp Non-Agency"
+        id="worker-type-temp-non-agency"
+        :disable="!canEditOtherFields()"
+      />
+      <div>Temp Non-Agency</div>
     </div>
     <div class="text-h6 transition-form-section-heading">Submission Info</div>
     <div class="row items-center">
@@ -1071,6 +1109,8 @@ let transitionPk = ref('')
 
 let typeCurrentVal = ref('')
 let type = ref('')
+let workerTypeCurrentVal = ref('')
+let workerType = ref('')
 let dateSubmitted = ref(new Date())
 let submitterPk = ref(-1)
 let submitterName = ref('')
@@ -1249,6 +1289,8 @@ function retrieveEmployeeTransition() {
 
     type.value = t.type
     typeCurrentVal.value = type.value
+    workerType.value = t.worker_type
+    workerTypeCurrentVal.value = workerType.value
 
     dateSubmitted.value = t.date_submitted
     submitterPk.value = t.submitter_pk
@@ -1373,6 +1415,7 @@ function retrieveEmployeeTransition() {
 function valuesAreChanged(): boolean {
   if (
     type.value == typeCurrentVal.value &&
+    workerType.value == workerTypeCurrentVal.value &&
     employeeFirstName.value == employeeFirstNameCurrentVal.value &&
     employeeMiddleInitial.value == employeeMiddleInitialCurrentVal.value &&
     employeeLastName.value == employeeLastNameCurrentVal.value &&
@@ -1489,6 +1532,7 @@ function updateTransition() {
     // Update the DB
     workflowsStore.updateEmployeeTransition(transitionPk.value, {
       type: type.value,
+      worker_type: workerType.value,
       submitter_pk: userStore.getEmployeeProfile.employee_pk,
       employee_first_name: employeeFirstName.value,
       employee_middle_initial: employeeMiddleInitial.value,
@@ -1537,6 +1581,7 @@ function updateTransition() {
     })
     .then((t) => {
       typeCurrentVal.value = t.type
+      workerTypeCurrentVal.value = t.worker_type
 
       dateSubmitted.value = t.date_submitted
       submitterPk.value = t.submitter_pk

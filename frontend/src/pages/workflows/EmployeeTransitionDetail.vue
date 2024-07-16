@@ -80,7 +80,9 @@
       </div>
       <div><span class="text-bold">Submitter:</span> {{ submitterName }}</div>
     </div>
-    <div class="text-h6 transition-form-section-heading">Employee</div>
+    <div class="text-h6 transition-form-section-heading">
+      {{ workerLabel() }} Details
+    </div>
     <div class="row">
       <q-input
         stack-label
@@ -141,7 +143,7 @@
       <q-input
         v-model="employeeNumber"
         type="number"
-        label="Employee Number"
+        :label=workerNumberLabel()
         name="employee-number"
         mask="####"
         class="q-mr-md"
@@ -1269,6 +1271,18 @@ function assigneeLabel(assigneeType: 'CURRENT' | 'DB') {
   } else {
     return ''
   }
+}
+
+function workerLabel() {
+  if (['Temp Agency', 'Temp Non-Agency'].includes(workerType.value)) {
+    return 'Temp Worker'
+  } else {
+    return workerType.value
+  }
+}
+
+function workerNumberLabel() {
+  return workerLabel() + ' Number'
 }
 
 let changes = ref(null) as Ref<TransitionChange[] | null>

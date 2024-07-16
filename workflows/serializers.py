@@ -155,7 +155,7 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmployeeTransition
         fields = [
-            'url', 'pk', 'type', 'date_submitted', 'submitter_pk',
+            'url', 'pk', 'type', 'worker_type', 'date_submitted', 'submitter_pk',
             'submitter_name', 'submitter_division', 'employee_first_name',
             'employee_middle_initial', 'employee_last_name',
             'employee_preferred_name', 'employee_number', 'employee_id',

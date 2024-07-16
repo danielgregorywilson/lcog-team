@@ -135,6 +135,14 @@ export interface EmployeeRetrieve {
   workflow_display_options: Array<WorkflowOption>
 }
 
+export interface SimpleEmployee {
+  pk: number
+  name: string
+  legal_name: string
+  title?: string
+  is_expense_approver?: boolean
+}
+
 export interface SimpleEmployeeRetrieve {
   pk: number
   name: string
@@ -900,6 +908,7 @@ export interface TransitionChange {
 export interface EmployeeTransition extends EmployeeTransitionBase {
   pk: number
   type: string
+  worker_type: string
   date_submitted: Date
   submitter_pk: number
   submitter_name: string
@@ -956,6 +965,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
 
 export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   type?: string
+  worker_type?: string
   submitter_pk: number
   employee_first_name?: string
   employee_middle_initial?: string

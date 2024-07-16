@@ -34,21 +34,21 @@
 import { onMounted, onUpdated, ref } from 'vue'
 
 import { usePeopleStore } from 'src/stores/people'
-import { emptyEmployee, SimpleEmployeeRetrieve } from 'src/types'
+import { emptyEmployee, SimpleEmployee } from 'src/types'
 
 const peopleStore = usePeopleStore()
 
 const props = defineProps<{
   label: string,
-  employee?: SimpleEmployeeRetrieve,
+  employee?: SimpleEmployee,
   useLegalName: boolean
   readOnly: boolean
-  employeeFilterFn?: (employee: SimpleEmployeeRetrieve) => boolean
+  employeeFilterFn?: (employee: SimpleEmployee) => boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'clear'): void
-  (e: 'input', arg: SimpleEmployeeRetrieve): void
+  (e: 'input', arg: SimpleEmployee): void
 }>()
 
 let needle = ref('') // For filtering employee list

@@ -320,6 +320,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
                 t.assignee = EmployeeTransition.ASSIGNEE_SUBMITTER
 
             t.type = request.data['type']
+            t.worker_type = request.data['worker_type']
             t.employee_first_name = request.data['employee_first_name']
             t.employee_middle_initial = request.data['employee_middle_initial']
             t.employee_last_name = request.data['employee_last_name']

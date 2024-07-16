@@ -31,7 +31,10 @@
       />
       <div>Exit</div>
     </div>
-    <div class="text-h6 transition-form-section-heading">Worker Type</div>
+    <div class="text-h6 transition-form-section-heading row">
+      <div>Worker Type</div>
+      <InfoTooltip :text="workerTypeTooltipText" />
+    </div>
     <div class="row items-center">
       <q-radio
         v-model="workerType"
@@ -1063,6 +1066,7 @@ import {
 } from 'src/types'
 import Avatar from 'src/components/Avatar.vue'
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
+import InfoTooltip from 'src/components/InfoTooltip.vue'
 import JobTitleSelect from 'src/components/JobTitleSelect.vue'
 // import LanguageSelect from 'src/components/LanguageSelect.vue'
 import UnitSelect from 'src/components/UnitSelect.vue'
@@ -1096,6 +1100,16 @@ const languageOptions = [
 ]
 
 const decimalNumberRegex = /^[+-]?(([1-9][0-9]*)?[0-9](\.[0-9]*)?|\.[0-9]+)$/
+
+const workerTypeTooltipText = `
+  <div>
+    <span style="text-decoration: underline;">Employee</span>: This person is being hired as an full- or part-time employee of LCOG. They will provide us a W-4 and LCOG will provide them a W-2.<br />
+    <span style="text-decoration: underline;">Intern</span>: This person is coming on as an intern as defined by the Department of Labor. They may or may not receive a stipend (please refer to Department of Labor rules regarding interns and stipends).<br />
+    <span style="text-decoration: underline;">Volunteer</span>: This person is volunteering their unpaid time with the agency (please refer to Department of Labor rules regarding volunteers).<br />
+    <span style="text-decoration: underline;">Temp Agency</span>: This person is a temporary employee hired through an agency. LCOG pays the agency for their time instead of directly paying the employee.<br />
+    <span style="text-decoration: underline;">Temp Non-Agency</span>: This person is a temporary employee hired directly by LCOG. LCOG directly pays the employee for their time.
+  </div>
+`
 
 const props = defineProps<{
   print?: boolean

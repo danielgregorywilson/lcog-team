@@ -63,15 +63,27 @@ class ExpenseSerializer(serializers.HyperlinkedModelSerializer):
         model = Expense
         fields = [
             'url', 'pk', 'name', 'date', 'amount', 'description', 'vendor',
-            'job', 'gls', 'receipt', 'approver', 'approved_at', 'status',
-            'purchaser'
+            'job', 'gls', 'receipt', 'receipt_type', 'approver', 'approved_at',
+            'status', 'purchaser'
         ]
 
+    gls = ExpenseGLSerializer(many=True, read_only=True)
+    receipt_type = serializers.SerializerMethodField()
+    approver = SimpleEmployeeSerializer(required=False)
     purchaser = serializers.CharField(
         source='month.purchaser.name', read_only=True
     )
-    approver = SimpleEmployeeSerializer(required=False)
-    gls = ExpenseGLSerializer(many=True, read_only=True)
+
+    @staticmethod
+    def get_receipt_type(obj):
+        # Returns 'image' or 'pdf' based on the file extension
+        if obj.receipt:
+            extension = obj.receipt.name.split('.')[-1]
+            if extension in ['jpg', 'jpeg', 'png']:
+                return 'image'
+            elif extension == 'pdf':
+                return 'pdf'
+        return None
 
 
 class ExpenseCardSerializer(serializers.HyperlinkedModelSerializer):

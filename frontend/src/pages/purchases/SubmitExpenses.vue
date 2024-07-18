@@ -241,7 +241,7 @@
                     contentTypeModel="expense"
                     :readOnly=false
                     :objectPk="props.row.pk.toString()"
-                    allowedFileTypes="image/*"
+                    allowedFileTypes="image/jpeg,image/png,.pdf"
                     v-on="{
                       'uploaded': (url: string) => {
                         uploadedReceipt(props.row.pk)
@@ -249,7 +249,7 @@
                     }"
                   />
                   <div class="q-mt-sm">
-                    Supported filetypes: Images only
+                    Supported filetypes: JPEG, PNG, PDF
                   </div>
                 </q-popup-edit>
               </q-btn>
@@ -324,7 +324,7 @@
                           contentTypeModel="expense"
                           :readOnly=false
                           :objectPk="props.row.pk.toString()"
-                          allowedFileTypes="image/*"
+                          allowedFileTypes="image/jpeg,image/png,.pdf"
                           v-on="{
                             'uploaded': (url: string) => {
                               retrieveAllMyExpenses()
@@ -332,7 +332,7 @@
                           }"
                         />
                         <div class="q-mt-sm">
-                          Supported filetypes: Images only
+                          Supported filetypes: JPEG, PNG, PDF
                         </div>
                       </q-popup-edit>
                     </q-btn>

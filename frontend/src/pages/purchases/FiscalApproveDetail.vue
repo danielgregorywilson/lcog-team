@@ -181,7 +181,17 @@
           v-for="expense in em.expenses"
           :key="expense.pk"
         >
-          <q-img :src="expense.receipt" />
+          <q-img v-if="expense.receipt_type == 'image'" :src="expense.receipt" />
+          <iframe
+            v-else-if="expense.receipt_type == 'pdf'"  
+            :src="expense.receipt"
+            width="100%"
+            height="950px"
+          />
+          <div class="text-h4 text-negative" v-else>
+            Receipt is of filetype {{ expense.receipt_type }} and cannot be
+            displayed. <a href="expense.receipt">Click here to download.</a>
+          </div>
         </div>
       </div>
 

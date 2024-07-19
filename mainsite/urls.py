@@ -28,7 +28,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     path('favicon.ico', RedirectView.as_view(url='%sfavicon.ico' % settings.STATIC_URL)),
-    path('health', health_check_view, name='health_check_view')
+    # Elastic beanstalk ELB requires trailing slash for health check
+    path('health/', health_check_view, name='health_check_view')
 ]
 
 if settings.DEBUG:

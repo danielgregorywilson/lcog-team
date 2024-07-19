@@ -150,7 +150,7 @@
           <div>
             <q-btn
               :class="EMApproved(em)?'bg-green':''"
-              :disable="!directorCanApprove() || EMApproved(em)"
+              :disable="!directorCanApprove(em) || EMApproved(em)"
               @click="onShowApproveDialog(em)"
               class="q-mr-md"
             >
@@ -161,7 +161,7 @@
             </q-btn>
             <q-btn
               :class="EMDenied(em)?'bg-red':''"
-              :disable="!directorCanApprove() || EMDenied(em)"
+              :disable="!directorCanApprove(em) || EMDenied(em)"
               @click="onShowDenyDialog(em)"
             >
               Deny Expenses

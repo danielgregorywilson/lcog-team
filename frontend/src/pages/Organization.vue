@@ -37,7 +37,6 @@ function retrieveProfile(): Promise<EmployeeRetrieve> {
     userStore.simpleUserRequest()
       .then((employee) => {
         employeePk.value = employee.pk
-        // Now that we have the user's pk, get or create a Telework Application for that user
         displayName.value = employee.name
         displayNameCurrentVal.value = displayName.value
       })

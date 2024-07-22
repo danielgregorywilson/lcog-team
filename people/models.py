@@ -110,6 +110,9 @@ class Employee(models.Model):
     email_opt_out_timeoff_all = models.BooleanField(default=False)
     email_opt_out_timeoff_weekly = models.BooleanField(default=False)
     email_opt_out_timeoff_daily = models.BooleanField(default=False)
+    email_opt_out_workflows_all = models.BooleanField(default=False)
+    email_opt_out_workflows_transitions = models.BooleanField(default=False)
+    email_opt_out_expenses_all = models.BooleanField(default=False)
     workflow_options = models.ManyToManyField(
         "workflows.Workflow", through="WorkflowOptions", 
     )
@@ -304,6 +307,14 @@ class Employee(models.Model):
             if subtype == 'weekly' and self.email_opt_out_timeoff_weekly:
                 return False
             if subtype == 'daily' and self.email_opt_out_timeoff_daily:
+                return False
+        if type == 'workflows':
+            if self.email_opt_out_workflows_all:
+                return False
+            if subtype == 'transitions' and self.email_opt_out_workflows_transitions:
+                return False
+        if type == 'expenses':
+            if self.email_opt_out_expenses_all:
                 return False
         return True
 

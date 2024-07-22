@@ -69,7 +69,8 @@ def send_transition_submitter_email(
         type_verb = 'changing'
     date_string = readable_date(t.transition_date) if t.transition_date else ''
 
-    subject = f'{ reassigned_subject_string }{ title_string } EIS { type_verb } { date_string }'
+    subject = f'{ reassigned_subject_string }{ title_string } EIS \
+        { type_verb } { date_string }'
 
     html_template = '../templates/email/employee-transition-sds.html'
     html_message = render_to_string(html_template, {
@@ -113,7 +114,8 @@ def send_transition_sds_hiring_leads_email(
         type_verb = 'changing'
     date_string = readable_date(t.transition_date) if t.transition_date else ''
 
-    subject = f'{ reassigned_subject_string }{ title_string } EIS { type_verb } { date_string }'
+    subject = f'{ reassigned_subject_string }{ title_string } EIS \
+        { type_verb } { date_string }'
 
     html_template = '../templates/email/employee-transition-sds.html'
     html_message = render_to_string(html_template, {
@@ -160,7 +162,8 @@ def send_transition_fiscal_email(
         type_verb = 'changing'
     date_string = readable_date(t.transition_date) if t.transition_date else ''
 
-    subject = f'{ reassigned_subject_string }{ name_string } EIS { type_verb } { date_string }'
+    subject = f'{ reassigned_subject_string }{ name_string } EIS { type_verb }\
+         { date_string }'
 
     html_template = '../templates/email/employee-transition-fiscal-hr.html'
     html_message = render_to_string(html_template, {
@@ -179,7 +182,9 @@ def send_transition_fiscal_email(
     cc_addresses = []
     if t.manager and t.manager.user.email:
         cc_addresses.append(t.manager.user.email)
-    sds_hiring_leads_users = Group.objects.get(name='SDS Hiring Lead').user_set.all()
+    sds_hiring_leads_users = Group.objects.get(
+        name='SDS Hiring Lead'
+    ).user_set.all()
     sds_hiring_leads_emails = [
         user.email for user in sds_hiring_leads_users if \
         user.employee.should_receive_email_of_type('workflows', 'transitions')
@@ -257,7 +262,8 @@ def send_transition_hr_email(
         type_verb = 'changing'
     date_string = readable_date(t.transition_date) if t.transition_date else ''
 
-    subject = f'{ reassigned_subject_string }{ name_string } EIS { type_verb } { date_string }'
+    subject = f'{ reassigned_subject_string }{ name_string } EIS { type_verb }\
+         { date_string }'
 
     html_template = '../templates/email/employee-transition-fiscal-hr.html'
     html_message = render_to_string(html_template, {
@@ -300,16 +306,20 @@ def send_transition_stn_email(
     first_name = t.employee_first_name if t.employee_first_name else ''
     last_name = t.employee_last_name if t.employee_last_name else ''
     name_string = f'{ first_name } { last_name }'
-    exit_subject_string = 'EXIT: ' if t.type == EmployeeTransition.TRANSITION_TYPE_EXIT else ''
+    exit_subject_string = 'EXIT: ' if \
+        t.type == EmployeeTransition.TRANSITION_TYPE_EXIT else ''
     date_string = readable_date(t.transition_date) if t.transition_date else ''
 
-    subject = f'{ reassigned_subject_string }{ updated_subject_string }{ name_string } { exit_subject_string }EIS { date_string }'
+    subject = f'{ reassigned_subject_string }{ updated_subject_string }\
+        { name_string } { exit_subject_string }EIS { date_string }'
     
     updated_body_string = 'updated ' if update else ''
-    exit_body_string = 'Exit ' if t.type == EmployeeTransition.TRANSITION_TYPE_EXIT else ''
+    exit_body_string = 'Exit ' if \
+        t.type == EmployeeTransition.TRANSITION_TYPE_EXIT else ''
     title_name = JobTitle.objects.get(pk=t.title_id).name if t.title_id else ''
     title_string = f'{ title_name}'
-    type_body_description = '. Their last day was' if t.type == EmployeeTransition.TRANSITION_TYPE_EXIT else ' starting'
+    type_body_description = '. Their last day was' if \
+        t.type == EmployeeTransition.TRANSITION_TYPE_EXIT else ' starting'
 
     html_template = '../templates/email/employee-transition-stn.html'
     html_message = render_to_string(html_template, {
@@ -350,7 +360,11 @@ def create_process_instances(transition):
     elif (transition.type == EmployeeTransition.TRANSITION_TYPE_EXIT):
         transition_process_names = exiting_processes_start
     # Create process instances for each process in the list
-    for process in wfi.workflow.processes.filter(name__in=transition_process_names):
-        existing_pis = ProcessInstance.objects.filter(process=process, workflow_instance=wfi)
+    for process in wfi.workflow.processes.filter(
+        name__in=transition_process_names
+    ):
+        existing_pis = ProcessInstance.objects.filter(
+            process=process, workflow_instance=wfi
+        )
         if existing_pis.count() == 0:
             process.create_process_instance(wfi)

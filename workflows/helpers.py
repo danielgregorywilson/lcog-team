@@ -41,8 +41,11 @@ def send_gas_pin_notification_email(
     plaintext_message = strip_tags(html_message)
 
     # Send to Gas PIN admins
-    to_addresses = Group.objects.get(name='Gas PIN Admins').user_set.all().values_list('email', flat=True)
-
+    to_users = Group.objects.get(name='Gas PIN Admins').user_set.all()
+    to_addresses = [
+        user.email for user in to_users if \
+        user.employee.should_receive_email_of_type('workflows', 'transitions')
+    ]
     send_email_multiple(
         to_addresses, [], subject, plaintext_message, html_message
     )
@@ -77,7 +80,14 @@ def send_transition_submitter_email(
     plaintext_message = strip_tags(html_message)
 
     # Send to submitter and copy sender
-    to_addresses = [t.submitter.user.email if t.submitter and t.submitter.user.email else '']
+    to_addresses = [
+        t.submitter.user.email if (
+            t.submitter and \
+            t.submitter.should_receive_email_of_type(
+                'workflows', 'transitions'
+            ) and t.submitter.user.email
+        ) else ''
+    ]
     cc_addresses = [sender_email]
 
     send_email_multiple(
@@ -113,8 +123,12 @@ def send_transition_sds_hiring_leads_email(
     })
     plaintext_message = strip_tags(html_message)
 
-    # Send to tammy/lori and copy hiring manager and sender
-    to_addresses = Group.objects.get(name='SDS Hiring Lead').user_set.all().values_list('email', flat=True)
+    # Send to S&DS hiring leads and copy hiring manager and sender
+    to_users = Group.objects.get(name='SDS Hiring Lead').user_set.all()
+    to_addresses = [
+        user.email for user in to_users if \
+        user.employee.should_receive_email_of_type('workflows', 'transitions')
+    ]
     cc_addresses = []
     if t.manager and t.manager.user.email:
         cc_addresses.append(t.manager.user.email)
@@ -157,12 +171,20 @@ def send_transition_fiscal_email(
     plaintext_message = strip_tags(html_message)
 
     # Send to fiscal employees and copy hiring manager and tammy/lori
-    to_addresses = Group.objects.get(name='Fiscal Employee').user_set.all().values_list('email', flat=True)
+    to_users = Group.objects.get(name='Fiscal Employee').user_set.all()
+    to_addresses = [
+        user.email for user in to_users if \
+        user.employee.should_receive_email_of_type('workflows', 'transitions')
+    ]
     cc_addresses = []
     if t.manager and t.manager.user.email:
         cc_addresses.append(t.manager.user.email)
-    sds_hiring_leads = Group.objects.get(name='SDS Hiring Lead').user_set.all().values_list('email', flat=True)
-    for email in sds_hiring_leads:
+    sds_hiring_leads_users = Group.objects.get(name='SDS Hiring Lead').user_set.all()
+    sds_hiring_leads_emails = [
+        user.email for user in sds_hiring_leads_users if \
+        user.employee.should_receive_email_of_type('workflows', 'transitions')
+    ]
+    for email in sds_hiring_leads_emails:
         cc_addresses.append(email)
 
     send_email_multiple(
@@ -203,8 +225,11 @@ def send_early_hr_email(t, url=''):
     plaintext_message = strip_tags(html_message)
 
     # Send to HR employees
-    to_addresses = Group.objects.get(name='HR Employee').user_set.all()\
-        .values_list('email', flat=True)
+    to_users = Group.objects.get(name='HR Employee').user_set.all()
+    to_addresses = [
+        user.email for user in to_users if \
+        user.employee.should_receive_email_of_type('workflows', 'transitions')
+    ]
     cc_addresses = []
 
     send_email_multiple(
@@ -243,12 +268,20 @@ def send_transition_hr_email(
     plaintext_message = strip_tags(html_message)
 
     # Send to HR employees and copy hiring manager and fiscal employees
-    to_addresses = Group.objects.get(name='HR Employee').user_set.all().values_list('email', flat=True)
+    to_users = Group.objects.get(name='HR Employee').user_set.all()
+    to_addresses = [
+        user.email for user in to_users if \
+        user.employee.should_receive_email_of_type('workflows', 'transitions')
+    ]
     cc_addresses = []
     if t.manager and t.manager.user.email:
         cc_addresses.append(t.manager.user.email)
-    fiscal_employees = Group.objects.get(name='Fiscal Employee').user_set.all().values_list('email', flat=True)
-    for email in fiscal_employees:
+    fiscal_users = Group.objects.get(name='Fiscal Employee').user_set.all()
+    fiscal_addresses = [
+        user.email for user in fiscal_users if \
+        user.employee.should_receive_email_of_type('workflows', 'transitions')
+    ]
+    for email in fiscal_addresses:
         cc_addresses.append(email)
 
     send_email_multiple(

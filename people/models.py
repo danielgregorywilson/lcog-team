@@ -599,7 +599,7 @@ class Employee(models.Model):
         return [process.id for process in list(all_processes) if process.role and self in process.role.members.all()]
     
     def is_expense_manager(self):
-        return self.user.groups.filter(name='Expense Manager').exists()
+        return self.user.groups.filter(name='Expense Submitter').exists()
     
     def is_expense_approver(self):
         return self.user.groups.filter(name='Expense Approver').exists()

@@ -9,21 +9,9 @@ from mainsite.helpers import send_email
 from people.models import Employee
 from purchases.models import ExpenseMonth
 
-    
-# Every week
-# Submitter needs to revise and resubmit
-# Approver has GLs to approve
-# Director has expensemonths to approve
-# Fiscal has expensemonths to approve
-
-# Direct notifications
-# Approver denied, alert submitter
-# Director denied, alert submitter
-# Fiscal denied, alert submitter
-
 
 def send_submitter_monthly_expenses_reminders():
-    # After end of month (when statements have come in)
+    # After end of month on the 1st of the next month at 3PM
     # Submitter submitted last month and there's no draft for this month.
     # Submitter has an unsubmitted draft for this month.
     current_site = Site.objects.get_current()
@@ -88,3 +76,55 @@ def send_submitter_monthly_expenses_reminders():
         )
     
     return len(recipients)
+
+
+def send_submitter_weekly_revise_reminders():
+    # Every week on Friday at 3PM
+    # Submitter needs to revise and resubmit
+    current_site = Site.objects.get_current()
+    expenses_url = current_site.domain + '/expenses/submit'
+    profile_url = current_site.domain + '/profile'
+    
+    html_template = \
+        '../templates/email/expenses/submitter-weekly-revise-reminder.html'
+
+    recipients = []
+    subs = Employee.objects.filter(user__groups__name='Expense Submitter')
+    for sub in subs:
+        if sub.should_receive_email_of_type('expenses', ''):
+            # Do they need to revise and resubmit?
+            em = ExpenseMonth.objects.filter(
+                purchaser=sub, status__in=[
+                    ExpenseMonth.STATUS_APPROVER_DENIED,
+                    ExpenseMonth.STATUS_DIRECTOR_DENIED,
+                    ExpenseMonth.STATUS_FISCAL_DENIED
+                ]
+            ).exists()
+            if em:
+                recipients.append(sub.user.email)
+    for recipient in recipients:
+        html_message = render_to_string(html_template, { 'context': {
+            'expenses_url': expenses_url,
+            'profile_url': profile_url,
+            'from_email': os.environ.get('FROM_EMAIL')
+        }, })
+        plaintext_message = strip_tags(html_message)
+        send_email(
+            recipient,
+            f'Revise and resubmit expenses',
+            plaintext_message,
+            html_message
+        )
+    
+    return len(recipients)
+
+
+# Approver has GLs to approve
+# Director has expensemonths to approve
+# Fiscal has expensemonths to approve
+
+
+# Direct notifications
+# Approver denied, alert submitter
+# Director denied, alert submitter
+# Fiscal denied, alert submitter

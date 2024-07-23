@@ -1,7 +1,6 @@
 from datetime import date, datetime
 import os
 
-from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags

@@ -57,7 +57,9 @@ def send_submitter_monthly_expenses_reminders():
                     purchaser=sub, year=curr_month_date.year,
                     month=curr_month_date.month
                 ).exists()
-                if (em_last_month or em_month_before_that) and not em_this_month:
+                if (
+                    em_last_month or em_month_before_that
+                ) and not em_this_month:
                     recipients.append([sub.user.email, 'last_month'])
     for recipient in recipients:
         html_message = render_to_string(html_template, { 'context': {

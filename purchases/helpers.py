@@ -121,7 +121,46 @@ def send_submitter_weekly_revise_reminders():
     return len(recipients)
 
 
-# Approver has GLs to approve
+def send_approver_weekly_approve_reminders():
+    # Every week on Friday at 3PM
+    # Approver has GLs to approve
+    current_site = Site.objects.get_current()
+    expenses_url = current_site.domain + '/expenses/approve'
+    profile_url = current_site.domain + '/profile'
+    
+    html_template = \
+        '../templates/email/expenses/approver-weekly-approve-reminder.html'
+
+    recipients = []
+    approvers = Employee.objects.filter(user__groups__name='Expense Approver')
+    for approver in approvers:
+        if approver.should_receive_email_of_type('expenses', ''):
+            # Do they have GLs to approve?
+            gls = approver.expense_gls.filter(
+                expense__month__status=ExpenseMonth.STATUS_SUBMITTED,
+                approved_at__isnull=True
+            ).exists()
+            if gls:
+                recipients.append(approver.user.email)
+    for recipient in recipients:
+        html_message = render_to_string(html_template, { 'context': {
+            'expenses_url': expenses_url,
+            'profile_url': profile_url,
+            'from_email': os.environ.get('FROM_EMAIL')
+        }, })
+        plaintext_message = strip_tags(html_message)
+        send_email(
+            recipient,
+            f'Revise and resubmit expenses',
+            plaintext_message,
+            html_message
+        )
+    
+    return len(recipients)
+
+
+
+
 # Director has expensemonths to approve
 # Fiscal has expensemonths to approve
 

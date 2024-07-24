@@ -122,6 +122,36 @@ def send_submitter_weekly_revise_reminders():
     return len(recipients)
 
 
+def send_submitter_denial_notification(submitter: Employee):
+    # Direct notifications
+    # Approver denied, alert submitter
+    # Director denied, alert submitter
+    # Fiscal denied, alert submitter
+    current_site = Site.objects.get_current()
+    expenses_url = current_site.domain + '/expenses/submit'
+    profile_url = current_site.domain + '/profile'
+    
+    html_template = \
+        '../templates/email/expenses/submitter-denial-notification.html'
+    
+    if submitter.should_receive_email_of_type('expenses', ''):
+        html_message = render_to_string(html_template, { 'context': {
+            'expenses_url': expenses_url,
+            'profile_url': profile_url,
+            'from_email': os.environ.get('FROM_EMAIL')
+        }, })
+        plaintext_message = strip_tags(html_message)
+        send_email(
+            submitter.user.email,
+            f'Expense submission denied',
+            plaintext_message,
+            html_message
+        )
+        return 1
+    else:
+        return 0
+
+
 def send_approver_weekly_approve_reminders():
     # Every week on Friday at 3PM
     # Approver has GLs to approve
@@ -241,11 +271,3 @@ def send_fiscal_weekly_approve_reminders():
     
     return len(recipients)
 
-
-
-
-
-# Direct notifications
-# Approver denied, alert submitter
-# Director denied, alert submitter
-# Fiscal denied, alert submitter

@@ -151,7 +151,46 @@ def send_approver_weekly_approve_reminders():
         plaintext_message = strip_tags(html_message)
         send_email(
             recipient,
-            f'Revise and resubmit expenses',
+            f'Expenses to approve',
+            plaintext_message,
+            html_message
+        )
+    
+    return len(recipients)
+
+
+def send_director_weekly_approve_reminders():
+    # Every week on Friday at 3PM
+    # Director has expensemonths to approve
+    current_site = Site.objects.get_current()
+    expenses_url = current_site.domain + '/expenses/director'
+    profile_url = current_site.domain + '/profile'
+    
+    html_template = \
+        '../templates/email/expenses/director-weekly-approve-reminder.html'
+
+    recipients = []
+    directors = Employee.objects.filter(is_division_director=True)
+    for director in directors:
+        if director.should_receive_email_of_type('expenses', ''):
+            # Do they have ExpenseMonths to approve?
+            ems = ExpenseMonth.objects.filter(
+                status=ExpenseMonth.STATUS_APPROVER_APPROVED,
+                card__requires_director_approval=True,
+                card__director=director,
+            ).exists()
+            if ems:
+                recipients.append(director.user.email)
+    for recipient in recipients:
+        html_message = render_to_string(html_template, { 'context': {
+            'expenses_url': expenses_url,
+            'profile_url': profile_url,
+            'from_email': os.environ.get('FROM_EMAIL')
+        }, })
+        plaintext_message = strip_tags(html_message)
+        send_email(
+            recipient,
+            f'Expenses to approve',
             plaintext_message,
             html_message
         )
@@ -160,8 +199,6 @@ def send_approver_weekly_approve_reminders():
 
 
 
-
-# Director has expensemonths to approve
 # Fiscal has expensemonths to approve
 
 

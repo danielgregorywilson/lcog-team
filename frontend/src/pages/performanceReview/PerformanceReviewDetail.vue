@@ -1639,10 +1639,6 @@ function updateEmployeeComments(): void {
     })
 }
 
-function openUploadedDescription(): void {
-  window.open(uploadedPositionDescriptionUrl.value, '_blank')
-}
-
 function userCanSign(
   employeePk: number, employeeIsReadyToSign: boolean
 ): boolean {

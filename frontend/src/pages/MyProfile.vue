@@ -17,7 +17,10 @@
           color="negative"
           checked-icon="clear"
           unchecked-icon="mail"
-          :label="emailOptOutAll ? 'Opt out of all email notifications' : 'Receive email notifications'"
+          :label="
+            emailOptOutAll ? 'Opt out of all email notifications' :
+            'Receive email notifications'
+          "
           class="text-bold"
         />
       </div>
@@ -30,7 +33,11 @@
           color="negative"
           checked-icon="clear"
           unchecked-icon="mail"
-          :label="emailOptOutTimeOffAll ? 'Opt out of all time off email notifications' : 'Receive time off email notifications'"
+          :label="
+            emailOptOutTimeOffAll ?
+            'Opt out of all time off email notifications' :
+            'Receive time off email notifications'
+          "
           class="text-bold"
           :disable="emailOptOutAll"
         />
@@ -41,7 +48,11 @@
           color="negative"
           checked-icon="clear"
           unchecked-icon="mail"
-          :label="emailOptOutTimeOffWeekly ? 'Opt out of weekly time off email notifications' : 'Receive weekly time off email notifications'"
+          :label="
+            emailOptOutTimeOffWeekly ?
+            'Opt out of weekly time off email notifications' :
+            'Receive weekly time off email notifications'
+          "
           :disable="emailOptOutAll || emailOptOutTimeOffAll"
         />
       </div>
@@ -51,8 +62,59 @@
           color="negative"
           checked-icon="clear"
           unchecked-icon="mail"
-          :label="emailOptOutTimeOffDaily ? 'Opt out of daily time off email notifications' : 'Receive daily time off email notifications'"
+          :label="
+            emailOptOutTimeOffDaily ?
+            'Opt out of daily time off email notifications' :
+            'Receive daily time off email notifications'
+          "
           :disable="emailOptOutAll || emailOptOutTimeOffAll"
+        />
+      </div>
+      <!-- WORKFLOW EMAILS -->
+      <p class="row q-mb-none text-bold">Workflows</p>
+      <div class="row items-center q-gutter-sm">
+        <q-toggle
+          v-model="emailOptOutWorkflowsAll"
+          color="negative"
+          checked-icon="clear"
+          unchecked-icon="mail"
+          :label="
+            emailOptOutWorkflowsAll ?
+            'Opt out of all workflow email notifications' :
+            'Receive workflow email notifications'
+          "
+          class="text-bold"
+          :disable="emailOptOutAll"
+        />
+      </div>
+      <div class="row items-center q-gutter-sm">
+        <q-toggle
+          v-model="emailOptOutWorkflowsTransitions"
+          color="negative"
+          checked-icon="clear"
+          unchecked-icon="mail"
+          :label="
+            emailOptOutWorkflowsTransitions ?
+            'Opt out of employee transition email notifications' :
+            'Receive employee transition email notifications'"
+          :disable="emailOptOutAll || emailOptOutWorkflowsAll"
+        />
+      </div>
+      <!-- CREDIT CARD EXPENSE EMAILS -->
+      <p class="row q-mb-none text-bold">Credit Card Expenses</p>
+      <div class="row items-center q-gutter-sm">
+        <q-toggle
+          v-model="emailOptOutExpensesAll"
+          color="negative"
+          checked-icon="clear"
+          unchecked-icon="mail"
+          :label="
+            emailOptOutExpensesAll ?
+            'Opt out of all expense email notifications' :
+            'Receive expense email notifications'
+          "
+          class="text-bold"
+          :disable="emailOptOutAll"
         />
       </div>
 
@@ -74,15 +136,21 @@
           <template #item="{element}">
             <tr>
               <td class="text-left">{{ element.name }}</td>
-              <td class="text-center"><q-checkbox v-model="element.display"/></td>
+              <td class="text-center">
+                <q-checkbox v-model="element.display"/>
+              </td>
             </tr>
           </template>
         </draggable>
       </q-markup-table>
 
       <div class="row items-center q-gutter-sm q-mt-sm">
-        <q-btn :disabled="!valuesAreChanged()" @click="submitProfileForm()">Submit</q-btn>
-        <span class="success q-ml-sm q-mt-sm" :hidden="!submitted"><strong>Profile Updated.</strong></span>
+        <q-btn :disabled="!valuesAreChanged()" @click="submitProfileForm()">
+          Submit
+        </q-btn>
+        <span class="success q-ml-sm q-mt-sm" :hidden="!submitted">
+          <strong>Profile Updated.</strong>
+        </span>
       </div>
     </form>
   </q-page>
@@ -116,12 +184,21 @@ let displayName = ref('')
 
 let emailOptOutAllCurrentVal = ref(false)
 let emailOptOutAll = ref(false)
+
 let emailOptOutTimeOffAllCurrentVal = ref(false)
 let emailOptOutTimeOffAll = ref(false)
 let emailOptOutTimeOffWeeklyCurrentVal = ref(false)
 let emailOptOutTimeOffWeekly = ref(false)
 let emailOptOutTimeOffDailyCurrentVal = ref(false)
 let emailOptOutTimeOffDaily = ref(false)
+
+let emailOptOutWorkflowsAllCurrentVal = ref(false)
+let emailOptOutWorkflowsAll = ref(false)
+let emailOptOutWorkflowsTransitionsCurrentVal = ref(false)
+let emailOptOutWorkflowsTransitions = ref(false)
+
+let emailOptOutExpensesAllCurrentVal = ref(false)
+let emailOptOutExpensesAll = ref(false)
 
 let drag = ref(false)
 let workflows: Ref<Array<WorkflowOption>> = ref([])
@@ -131,11 +208,11 @@ let submitted = ref(false)
 
 function retrieveProfile(): Promise<EmployeeRetrieve> {
   return new Promise((resolve, reject) => {
-    // We cannot guarantee the user has arrived in vuex state immediately, so request it again here
+    // We cannot guarantee the user has arrived in vuex state immediately,
+    // so request it again here
     userStore.simpleUserRequest()
       .then((employee) => {
         employeePk.value = employee.pk.toString()
-        // Now that we have the user's pk, get or create a Telework Application for that user
         displayName.value = employee.name
         displayNameCurrentVal.value = displayName.value
         emailOptOutAll.value = employee.email_opt_out_all
@@ -146,6 +223,15 @@ function retrieveProfile(): Promise<EmployeeRetrieve> {
         emailOptOutTimeOffWeeklyCurrentVal.value = emailOptOutTimeOffWeekly.value
         emailOptOutTimeOffDaily.value = employee.email_opt_out_timeoff_daily
         emailOptOutTimeOffDailyCurrentVal.value = emailOptOutTimeOffDaily.value
+        emailOptOutWorkflowsAll.value =
+          employee.email_opt_out_workflows_all
+        emailOptOutWorkflowsAllCurrentVal.value = emailOptOutWorkflowsAll.value
+        emailOptOutWorkflowsTransitions.value =
+          employee.email_opt_out_workflows_transitions
+        emailOptOutWorkflowsTransitionsCurrentVal.value =
+          emailOptOutWorkflowsTransitions.value
+        emailOptOutExpensesAll.value = employee.email_opt_out_expenses_all
+        emailOptOutExpensesAllCurrentVal.value = emailOptOutExpensesAll.value
         workflows.value = employee.workflow_display_options
         workflowsCurrentVal.value = JSON.parse(JSON.stringify(workflows.value))
       })
@@ -182,8 +268,13 @@ function valuesAreChanged(): boolean {
     displayName.value == displayNameCurrentVal.value &&
     emailOptOutAll.value == emailOptOutAllCurrentVal.value &&
     emailOptOutTimeOffAll.value == emailOptOutTimeOffAllCurrentVal.value &&
-    emailOptOutTimeOffWeekly.value == emailOptOutTimeOffWeeklyCurrentVal.value &&
+    emailOptOutTimeOffWeekly.value ==
+      emailOptOutTimeOffWeeklyCurrentVal.value &&
     emailOptOutTimeOffDaily.value == emailOptOutTimeOffDailyCurrentVal.value &&
+    emailOptOutWorkflowsAll.value == emailOptOutWorkflowsAllCurrentVal.value &&
+    emailOptOutWorkflowsTransitions.value ==
+      emailOptOutWorkflowsTransitionsCurrentVal.value &&
+    emailOptOutExpensesAll.value == emailOptOutExpensesAllCurrentVal.value &&
     !workflowOptionsAreChanged()
   ) {
     return false
@@ -204,6 +295,9 @@ function submitProfileForm(): void {
     email_opt_out_timeoff_all: emailOptOutTimeOffAll.value,
     email_opt_out_timeoff_weekly: emailOptOutTimeOffWeekly.value,
     email_opt_out_timeoff_daily: emailOptOutTimeOffDaily.value,
+    email_opt_out_workflows_all: emailOptOutWorkflowsAll.value,
+    email_opt_out_workflows_transitions: emailOptOutWorkflowsTransitions.value,
+    email_opt_out_expenses_all: emailOptOutExpensesAll.value,
     workflow_display_options: workflows.value
   })
     .then((p) => {
@@ -212,6 +306,10 @@ function submitProfileForm(): void {
       emailOptOutTimeOffAllCurrentVal.value = p.email_opt_out_timeoff_all
       emailOptOutTimeOffWeeklyCurrentVal.value = p.email_opt_out_timeoff_weekly
       emailOptOutTimeOffDailyCurrentVal.value = p.email_opt_out_timeoff_daily
+      emailOptOutWorkflowsAllCurrentVal.value = p.email_opt_out_workflows_all
+      emailOptOutWorkflowsTransitionsCurrentVal.value =
+        p.email_opt_out_workflows_transitions
+      emailOptOutExpensesAllCurrentVal.value = p.email_opt_out_expenses_all
       workflows.value = JSON.parse(JSON.stringify(
         p.workflow_display_options
       ))

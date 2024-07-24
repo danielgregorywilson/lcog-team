@@ -202,7 +202,6 @@ import { readableDateNEW } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
 import { usePurchaseStore } from 'src/stores/purchase'
 import { GL } from 'src/types'
-import { name } from 'msal/lib-commonjs/packageMetadata'
 
 const purchaseStore = usePurchaseStore()
 

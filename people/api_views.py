@@ -25,11 +25,11 @@ from people.models import (
 )
 from people.serializers import (
     EmployeeSerializer, EmployeeEmailSerializer, GroupSerializer,
-    JobTitleSerializer, PerformanceReviewFileUploadSerializer,
-    PerformanceReviewSerializer, ReviewNoteSerializer, SignatureSerializer,
-    SimpleEmployeeSerializer, TeleworkApplicationFileUploadSerializer,
-    TeleworkApplicationSerializer, TeleworkSignatureSerializer, UnitSerializer,
-    UserSerializer, ViewedSecurityMessageSerializer
+    JobTitleSerializer, PerformanceReviewSerializer, ReviewNoteSerializer,
+    SignatureSerializer, SimpleEmployeeSerializer,
+    TeleworkApplicationFileUploadSerializer, TeleworkApplicationSerializer,
+    TeleworkSignatureSerializer, UnitSerializer, UserSerializer,
+    ViewedSecurityMessageSerializer
 )
 
 
@@ -143,6 +143,15 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         ]
         employee.email_opt_out_timeoff_daily = request.data[
             'email_opt_out_timeoff_daily'
+        ]
+        employee.email_opt_out_workflows_all = request.data[
+            'email_opt_out_workflows_all'
+        ]
+        employee.email_opt_out_workflows_transitions = request.data[
+            'email_opt_out_workflows_transitions'
+        ]
+        employee.email_opt_out_expenses_all = request.data[
+            'email_opt_out_expenses_all'
         ]
         # Just set workflow options
         new_wfos = request.data['workflow_display_options']

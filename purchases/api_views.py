@@ -10,6 +10,7 @@ from rest_framework.response import Response
 
 from mainsite.helpers import record_error
 from people.models import Employee
+from purchases.helpers import send_submitter_denial_notification
 from purchases.models import (
     Expense, ExpenseCard, ExpenseGL, ExpenseMonth, ExpenseStatement
 )
@@ -113,6 +114,7 @@ class ExpenseGLViewSet(viewsets.ModelViewSet):
                 # Deny the month
                 em.status = ExpenseMonth.STATUS_APPROVER_DENIED
                 em.save()
+                send_submitter_denial_notification(em.purchaser)
             # Return the updated expense
             serialized_gl = ExpenseGLSerializer(
                 gl, context={'request': request}
@@ -522,6 +524,7 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
             else:
                 em.director_note = request.data.get('deny_note', '')
                 em.status = Expense.STATUS_DIRECTOR_DENIED
+                send_submitter_denial_notification(em.purchaser)
             em.save()
             serialized_em = ExpenseMonthSerializer(
                 em, context={'request': request}
@@ -555,6 +558,7 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
                 # Reset director approval
                 em.director_approved = False
                 em.director_approved_at = None
+                send_submitter_denial_notification(em.purchaser)
             em.save()
             serialized_em = ExpenseMonthSerializer(
                 em, context={'request': request}

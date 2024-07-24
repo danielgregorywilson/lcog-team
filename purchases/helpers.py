@@ -2,6 +2,7 @@ from datetime import date, datetime, timedelta
 import os
 
 from django.contrib.sites.models import Site
+from django.db.models import Q
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
@@ -159,7 +160,7 @@ def send_approver_weekly_approve_reminders():
     return len(recipients)
 
 
-def send_director_weekly_approve_reminders():
+def send_directors_weekly_approve_reminders():
     # Every week on Friday at 3PM
     # Director has expensemonths to approve
     current_site = Site.objects.get_current()
@@ -167,7 +168,8 @@ def send_director_weekly_approve_reminders():
     profile_url = current_site.domain + '/profile'
     
     html_template = \
-        '../templates/email/expenses/director-weekly-approve-reminder.html'
+        '../templates/email/expenses/' + \
+        'directors-fiscal-weekly-approve-reminder.html'
 
     recipients = []
     directors = Employee.objects.filter(is_division_director=True)
@@ -198,8 +200,49 @@ def send_director_weekly_approve_reminders():
     return len(recipients)
 
 
+def send_fiscal_weekly_approve_reminders():
+    # Every week on Friday at 3PM
+    # Fiscal has expensemonths to approve
+    current_site = Site.objects.get_current()
+    expenses_url = current_site.domain + '/expenses/fiscal'
+    profile_url = current_site.domain + '/profile'
+    
+    html_template = \
+        '../templates/email/expenses/' + \
+        'directors-fiscal-weekly-approve-reminder.html'
 
-# Fiscal has expensemonths to approve
+    recipients = []
+    fiscals = Employee.objects.filter(user__groups__name='Fiscal Employee')
+    for fiscal in fiscals:
+        if fiscal.should_receive_email_of_type('expenses', ''):
+            # Do they have ExpenseMonths to approve?
+            ems = ExpenseMonth.objects.filter(
+                Q(status=ExpenseMonth.STATUS_DIRECTOR_APPROVED) |
+                Q(
+                    status=ExpenseMonth.STATUS_APPROVER_APPROVED,
+                    card__requires_director_approval=False
+                )
+            ).exists()
+            if ems:
+                recipients.append(fiscal.user.email)
+    for recipient in recipients:
+        html_message = render_to_string(html_template, { 'context': {
+            'expenses_url': expenses_url,
+            'profile_url': profile_url,
+            'from_email': os.environ.get('FROM_EMAIL')
+        }, })
+        plaintext_message = strip_tags(html_message)
+        send_email(
+            recipient,
+            f'Expenses to approve',
+            plaintext_message,
+            html_message
+        )
+    
+    return len(recipients)
+
+
+
 
 
 # Direct notifications

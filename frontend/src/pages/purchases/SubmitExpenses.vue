@@ -167,7 +167,7 @@
                     v-model="gl.code"
                     class="q-mr-sm q-pa-none"
                     outlined dense autofocus
-                    mask="##-#####-###"
+                    mask="###-##-####-#####"
                     :rules="[
                       val => !!val || 'Required',
                     ]"

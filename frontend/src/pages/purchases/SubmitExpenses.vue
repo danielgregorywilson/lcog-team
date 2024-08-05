@@ -167,7 +167,7 @@
                     v-model="gl.code"
                     class="q-mr-sm q-pa-none"
                     outlined dense autofocus
-                    mask="##-#####-###"
+                    mask="###-##-####-#####"
                     :rules="[
                       val => !!val || 'Required',
                     ]"
@@ -811,7 +811,7 @@ function formErrorItems() {
       errorItems.push(`Provide a job number for ${exp.name}, or enter 'None'`)
     }
     for (let gl of exp.gls) {
-      if (!gl.code || gl.code.length !== 12) {
+      if (!gl.code || gl.code.length !== 17) {
         errorItems.push(
           `Provide a valid GL code for each GL row in ${exp.name}`
         )

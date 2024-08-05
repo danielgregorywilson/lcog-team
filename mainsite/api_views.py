@@ -148,12 +148,12 @@ class FileUploadViewSet(viewsets.ViewSet):
                 for row in rows[1:]:
                     try: 
                         row_items = row.split(',')
-                        acct = row_items[0]
+                        acct = row_items[0].replace('\"','')
                         t_date = row_items[2]
                         desc = row_items[4]
                         amt = row_items[5]
                         items.append({
-                            'card': int(acct[-5:-1]),
+                            'card': int(acct[-4:]),
                             'date':
                                 datetime.strptime(t_date, '%m/%d/%Y').date(),
                             'description': desc[1:-1],

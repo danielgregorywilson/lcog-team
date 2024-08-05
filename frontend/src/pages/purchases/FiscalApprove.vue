@@ -104,6 +104,14 @@
                 </q-td>
               </template>
             </q-table>
+            <div class="row justify-center q-mt-md">
+              <q-btn
+                :disabled="selectedMonthStatements().length === 0"  
+                label="Send notification to card holders"
+                color="primary"
+                @click="sendNotificationDialogVisible = true"
+              ></q-btn>
+            </div>  
           </div>
         </div>
         <div class="col row justify-center">
@@ -130,6 +138,38 @@
       </div>
     </div>
   </div>
+
+  <!-- Send Notification Dialog -->
+  <q-dialog v-model="sendNotificationDialogVisible">
+    <q-card>
+      <q-card-section>
+        <div class="row items-center">
+          <q-avatar
+            icon="send"
+            color="primary"
+            text-color="white"
+          />
+          <span class="q-ml-md col">
+            Notification will be sent to all card holders. Please do not send multiple notifications unless you really need to.
+          </span>
+        </div>
+        <div class="row justify-center text-center q-mt-sm">
+          Month: {{ monthDisplay }}
+        </div>
+      </q-card-section>
+
+      <q-card-actions class="row justify-around">
+        <q-btn flat label="Cancel" color="primary" v-close-popup />
+        <q-btn
+          flat
+          label="Yes, send them!"
+          color="primary"
+          @click="sendNotifications()"
+          v-close-popup
+        />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 
   <!-- Statement Dialog -->
   <q-dialog v-model="statementDialogVisible">
@@ -246,6 +286,8 @@ let allStatementsLoaded = ref(false)
 
 let firstOfThisMonth = ref(new Date())
 let firstOfSelectedMonth = ref(new Date())
+
+let sendNotificationDialogVisible = ref(false)
 
 let statementDialogVisible = ref(false)
 let statementDialogStatement = ref({}) as Ref<ExpenseStatement>
@@ -446,6 +488,16 @@ function navigateToDetail(employeePk: number) {
   .catch(e => {
     console.error('Error navigating to time off request detail:', e)
   })
+}
+
+function sendNotifications() {
+  purchaseStore.sendExpenseStatementNotifications()
+    .then(() => {
+      quasar.notify('Sent notifications to card holders.')
+    })
+    .catch(e => {
+      console.error(e)
+    })
 }
 
 function showStatmentDialog(statement: any) {

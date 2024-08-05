@@ -10,7 +10,10 @@ from rest_framework.response import Response
 
 from mainsite.helpers import record_error
 from people.models import Employee
-from purchases.helpers import send_submitter_denial_notification
+from purchases.helpers import (
+    send_submitter_denial_notification,
+    send_submitter_monthly_expenses_reminders
+)
 from purchases.models import (
     Expense, ExpenseCard, ExpenseGL, ExpenseMonth, ExpenseStatement
 )
@@ -621,3 +624,21 @@ class ExpenseStatementViewSet(viewsets.ModelViewSet):
                     return ExpenseStatement.objects.filter(can_charge_to_card)
         else:
             return Expense.objects.none()
+
+    @action(detail=False, methods=['get'])
+    def send_notifications(self, request):
+        """
+        Send notifications to cardholders that statements have been uploaded.
+        """
+        try:
+            num_recipients = send_submitter_monthly_expenses_reminders()
+            return Response(
+                f'Sent notifications to {num_recipients} cardholders.'
+            )
+        except Exception as e:
+            message = 'Error sending notifications for expense statements.'
+            record_error(message, e, request, traceback.format_exc())
+            return Response(
+                data=message,
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

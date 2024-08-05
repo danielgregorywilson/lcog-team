@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 import os
 
 from django.contrib.sites.models import Site
@@ -12,7 +12,7 @@ from purchases.models import ExpenseMonth
 
 
 def send_submitter_monthly_expenses_reminders():
-    # After end of month on the 1st of the next month at 3PM
+    # Once fiscal has uploaded the previous month's statements.
     # Submitter submitted last month and there's no draft for this month.
     # Submitter has an unsubmitted draft for this month.
     current_site = Site.objects.get_current()
@@ -77,7 +77,6 @@ def send_submitter_monthly_expenses_reminders():
             plaintext_message,
             html_message
         )
-    
     return len(recipients)
 
 

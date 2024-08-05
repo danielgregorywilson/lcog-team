@@ -394,6 +394,23 @@ export const usePurchaseStore = defineStore('purchase', {
       })
     },
 
+    sendExpenseStatementNotifications(): Promise<null> {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/expense-statement/send_notifications`,
+          method: 'GET'
+        })
+          .then(() => {
+            resolve(null)
+          })
+          .catch(e => {
+            handlePromiseError(
+              reject, 'Error sending expense statement notifications', e
+            )
+          })
+      })
+    },
+
     authLogout() {
       return new Promise((resolve) => {
         this.$reset()

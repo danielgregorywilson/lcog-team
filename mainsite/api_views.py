@@ -150,13 +150,13 @@ class FileUploadViewSet(viewsets.ViewSet):
                         row_items = row.split(',')
                         acct = row_items[0].replace('\"','')
                         t_date = row_items[2]
-                        desc = row_items[4]
+                        desc = row_items[4].replace('\"','').rstrip()
                         amt = row_items[5]
                         items.append({
                             'card': int(acct[-4:]),
                             'date':
                                 datetime.strptime(t_date, '%m/%d/%Y').date(),
-                            'description': desc[1:-1],
+                            'description': desc,
                             'amount': float(amt)
                         })
                     except IndexError:

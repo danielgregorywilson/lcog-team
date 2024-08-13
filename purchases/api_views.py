@@ -220,20 +220,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                 expense_fields_changed = True
             
             expense.name = request.data.get('name', expense.name)
-            request_date = request.data.get('date', None)
-            if request_date is not None and request_date != '':
-                expense.date = request.data.get('date')
-                # If the month has changed, update the ExpenseMonth
-                current_em = expense.month
-                new_year, new_month, new_date = \
-                    request.data.get('date', None).split('-')
-                new_em = ExpenseMonth.objects.get_or_create(
-                    purchaser=request.user.employee,
-                    year=new_year,
-                    month=new_month
-                )[0]
-                if current_em != new_em:
-                    expense.month = new_em
+            expense.date = request.data.get('date', expense.date)
             expense.amount = request.data.get('amount', expense.amount)
             expense.description = request.data.get(
                 'description', expense.description

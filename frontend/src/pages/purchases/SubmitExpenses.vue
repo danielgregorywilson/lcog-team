@@ -346,14 +346,19 @@
           </q-card>
         </div>
       </template>
-      <template v-slot:bottom-row v-if="!monthSubmitted()">
-        <q-tr @click="clickAddExpense()" class="cursor-pointer row-add-new">
-          <q-td colspan="100%">
-            <q-icon name="add" size="md" class="q-pr-sm"/>New Expense
-          </q-td>
-        </q-tr>
-      </template>
     </q-table>
+    <div class="row justify-center">
+      <q-btn
+        v-if="!monthSubmitted()"
+        color="primary"
+        class="q-mt-sm"
+        @click="clickAddExpense()"
+        icon="add"
+      >
+        New Expense
+      </q-btn>
+    </div>
+    
   </div>
 
   <!-- Statements -->

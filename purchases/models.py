@@ -1,3 +1,4 @@
+from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -208,7 +209,15 @@ class ExpenseCard(models.Model):
     def __str__(self):
         return f'*{self.last4}'
 
-    last4 = models.IntegerField()
+    last4 = models.CharField(
+        max_length=4,
+        validators=[
+            RegexValidator(
+                regex='^[0-9]{4}$',
+                message='Must be 4 digits'
+            ),
+        ]
+    )
     assignee = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='expense_cards'

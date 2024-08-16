@@ -72,7 +72,12 @@
               v-slot="scope"
               @save="(val) => updateExpense(props.row.pk, 'name', val)"
             >
-              <q-input v-model="scope.value" dense autofocus />
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                @keyup.enter="scope.set()"
+              />
             </q-popup-edit>
           </q-td>
           <q-td key="date" :props="props">
@@ -84,7 +89,13 @@
               v-slot="scope"
               @save="(val) => updateExpense(props.row.pk, 'date', val)"
             >
-              <q-input type="date" v-model="scope.value" dense autofocus />
+              <q-input
+                type="date"
+                v-model="scope.value"
+                dense
+                autofocus
+                @keyup.enter="scope.set()"
+              />
             </q-popup-edit>
           </q-td>
           <q-td key="vendor" :props="props">
@@ -96,7 +107,12 @@
               v-slot="scope"
               @save="(val) => updateExpense(props.row.pk, 'vendor', val)"
             >
-              <q-input v-model="scope.value" dense autofocus />
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                @keyup.enter="scope.set()"
+              />
             </q-popup-edit>
           </q-td>
           <q-td key="amount" :props="props">
@@ -115,6 +131,7 @@
                 reverse-fill-mask
                 dense
                 autofocus
+                @keyup.enter="scope.set()"
               />
             </q-popup-edit>
           </q-td>
@@ -127,7 +144,12 @@
               v-slot="scope"
               @save="(val) => updateExpense(props.row.pk, 'job', val)"
             >
-              <q-input v-model="scope.value" dense autofocus />
+              <q-input
+                v-model="scope.value"
+                dense
+                autofocus
+                @keyup.enter="scope.set()"
+              />
             </q-popup-edit>
           </q-td>
           <q-td key="gls" :props="props">

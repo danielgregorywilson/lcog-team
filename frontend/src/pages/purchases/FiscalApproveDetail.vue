@@ -64,7 +64,7 @@
                 v-for="gl in props.row.gls"
                 :key="props.row.gls.indexOf(gl)"
               >
-                {{ gl.code }}: {{ gl.percent }}% – {{ gl.approver.name }}
+                {{ gl.code }}: ${{ gl.amount }} – {{ gl.approver.name }}
               </div>
             </q-td>
           </template>
@@ -107,7 +107,7 @@
                           v-for="gl in props.row.gls"
                           :key="props.row.gls.indexOf(gl)"
                         >
-                          {{ gl.code }}: {{ gl.percent }}% –
+                          {{ gl.code }}: ${{ gl.amount }} –
                           {{ gl.approver.name }}
                         </div>
                       </div>

@@ -136,7 +136,7 @@
               v-for="gl in props.row.gls"
               :key="props.row.gls.indexOf(gl)"
             >
-              {{ gl.code }}: {{ gl.percent }}% – {{ gl.approver?.name }}
+              {{ gl.code }}: ${{ gl.amount }} – {{ gl.approver?.name }}
             </div>
             <q-popup-edit
               v-if="!monthSubmitted()"
@@ -156,24 +156,25 @@
                     class="q-mr-sm q-pa-none"
                     outlined dense autofocus
                     mask="###-##-####-#####"
+                    fill-mask="___-__-____-_____"
                     :rules="[
                       val => !!val || 'Required',
                     ]"
                   />
                   <div class="row q-mr-sm">
+                    <div class="gl-dollar-symbol">$</div>
                     <q-input
-                      v-model="gl.percent"
-                      type="number"
-                      class="gl-percent q-pa-none"
+                      v-model="gl.amount"
+                      class="gl-amount q-pa-none"
                       outlined dense
+                      mask="#.##"
+                      fill-mask="0"
+                      reverse-fill-mask
                       @keyup.enter="scope.set()"
                       :rules="[
                         val => !!val || '* Required',
-                        val => val <= 100 ||
-                          'Please use a number less than 100',
                       ]"
                     />
-                    <div class="gl-percent-symbol">%</div>
                   </div>
                   <EmployeeSelect
                     name="approver"
@@ -282,7 +283,7 @@
                       v-for="gl in props.row.gls"
                       :key="props.row.gls.indexOf(gl)"
                     >
-                      {{ gl.code }}: {{ gl.percent }}% – {{ gl.approver?.name }}
+                      {{ gl.code }}: ${{ gl.amount }} – {{ gl.approver?.name }}
                     </div>
                   </div>
                   <div
@@ -517,11 +518,11 @@
   min-width: 500px;
 }
 
-.gl-percent {
-  max-width: 80px;
+.gl-amount {
+  max-width: 180px;
 }
 
-.gl-percent-symbol {
+.gl-dollar-symbol {
   margin: 9px 0 0 3px;
 }
 </style>
@@ -805,7 +806,7 @@ function formErrorItems() {
           `Provide a valid GL code for each GL row in ${exp.name}`
         )
       }
-      if (!gl.percent) {
+      if (!gl.amount) {
         errorItems.push(
           `Provide a GL percentage for each GL row in ${exp.name}`
         )
@@ -815,10 +816,10 @@ function formErrorItems() {
       }
     }
     const GLsTotal = exp.gls.reduce(
-      (acc, gl) => acc + parseFloat(gl.percent), 0
+      (acc, gl) => acc + parseFloat(gl.amount), 0
     )
-    if (GLsTotal !== 100) {
-      errorItems.push(`GL percentages of ${exp.name} must add to 100`)
+    if (GLsTotal !== parseFloat(exp.amount)) {
+      errorItems.push(`GLs for ${exp.name} must add to ${exp.amount}`)
     }
     if (!exp.receipt) {
       errorItems.push(

@@ -36,8 +36,12 @@
     size="xl"
   />
   <div v-else-if="selectedMonthCardExpenseMonths().length">
+    <div class="text-h6 q-mt-lg">Submitted Total: ${{ expensesTotal() }}</div>
     <div v-for="em of selectedMonthCardExpenseMonths()" :key="em.pk">
-      <div class="q-mt-lg">
+      <div class="text-bold q-mt-sm">
+        Submitted Total: ${{ expenseMonthTotal(em) }}
+      </div>
+      <div class="q-mt-sm">
         <q-table
           flat bordered
           :title="tableTitleDisplay(em)"
@@ -508,6 +512,12 @@ function setDates() {
     firstOfSelectedMonth.value = theFirst
     resolve(null)
   })
+}
+
+function expenseMonthTotal(em: ExpenseMonth) {
+  return em.expenses.reduce(
+    (acc, expense) => acc + parseFloat(expense.amount), 0
+  )
 }
 
 function expensesTotal() {

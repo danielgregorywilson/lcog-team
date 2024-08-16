@@ -44,320 +44,322 @@
       color="primary"
       size="xl"
     />
-    <q-table
-      v-else
-      flat bordered
-      :title="tableTitleDisplay()"
-      :rows="selectedMonthExpenses()"
-      :columns="columns"
-      :dense="$q.screen.lt.lg"
-      :grid="$q.screen.lt.md"
-      row-key="name"
-      binary-state-sort
-      :pagination="pagination"
-      class="expense-table"
-      no-data-label="No expenses entered this month"
-    >
-      <template v-slot:body="props">
-        <q-tr
-          :props="props"
-          :class="expenseClass(props.row)"
-        >
-          <q-td key="name" :props="props">
-            {{ props.row.name }}
-            <q-popup-edit
-              v-if="!monthSubmitted()"
-              v-model="props.row.name"
-              buttons
-              v-slot="scope"
-              @save="(val) => updateExpense(props.row.pk, 'name', val)"
-            >
-              <q-input
-                v-model="scope.value"
-                dense
-                autofocus
-                @keyup.enter="scope.set()"
-              />
-            </q-popup-edit>
-          </q-td>
-          <q-td key="date" :props="props">
-            {{ readableDateNEW(props.row.date) }}
-            <q-popup-edit
-              v-if="!monthSubmitted()"
-              v-model="props.row.date"
-              buttons
-              v-slot="scope"
-              @save="(val) => updateExpense(props.row.pk, 'date', val)"
-            >
-              <q-input
-                type="date"
-                v-model="scope.value"
-                dense
-                autofocus
-                @keyup.enter="scope.set()"
-              />
-            </q-popup-edit>
-          </q-td>
-          <q-td key="vendor" :props="props">
-            <div class="text-pre-wrap">{{ props.row.vendor }}</div>
-            <q-popup-edit
-              v-if="!monthSubmitted()"
-              v-model="props.row.vendor"
-              buttons
-              v-slot="scope"
-              @save="(val) => updateExpense(props.row.pk, 'vendor', val)"
-            >
-              <q-input
-                v-model="scope.value"
-                dense
-                autofocus
-                @keyup.enter="scope.set()"
-              />
-            </q-popup-edit>
-          </q-td>
-          <q-td key="amount" :props="props">
-            {{ props.row.amount }}
-            <q-popup-edit
-              v-if="!monthSubmitted()"
-              v-model="props.row.amount"
-              buttons
-              v-slot="scope"
-              @save="(val) => updateExpense(props.row.pk, 'amount', val)"
-            >
-              <q-input
-                v-model="scope.value"
-                mask="#.##"
-                fill-mask="0"
-                reverse-fill-mask
-                dense
-                autofocus
-                @keyup.enter="scope.set()"
-              />
-            </q-popup-edit>
-          </q-td>
-          <q-td key="job" :props="props">
-            <div class="text-pre-wrap">{{ props.row.job }}</div>
-            <q-popup-edit
-              v-if="!monthSubmitted()"
-              v-model="props.row.job"
-              buttons
-              v-slot="scope"
-              @save="(val) => updateExpense(props.row.pk, 'job', val)"
-            >
-              <q-input
-                v-model="scope.value"
-                dense
-                autofocus
-                @keyup.enter="scope.set()"
-              />
-            </q-popup-edit>
-          </q-td>
-          <q-td key="gls" :props="props">
-            <div
-              class="text-pre-wrap"
-              v-for="gl in props.row.gls"
-              :key="props.row.gls.indexOf(gl)"
-            >
-              {{ gl.code }}: ${{ gl.amount }} – {{ gl.approver?.name }}
-            </div>
-            <q-popup-edit
-              v-if="!monthSubmitted()"
-              v-model="props.row.gls"
-              buttons
-              v-slot="scope"
-              @save="(val) => updateExpense(props.row.pk, 'gls', val)"
-            >
-              <div class="gl-popup-edit">
-                <div
-                  v-for="(gl, idx) in scope.value"
-                  :key="scope.value.indexOf(gl)"
-                  class="row items-center"
-                >
-                  <q-input
-                    v-model="gl.code"
-                    class="q-mr-sm q-pa-none"
-                    outlined dense autofocus
-                    mask="###-##-####-#####"
-                    fill-mask="___-__-____-_____"
-                    :rules="[
-                      val => !!val || 'Required',
-                    ]"
-                  />
-                  <div class="row q-mr-sm">
-                    <div class="gl-dollar-symbol">$</div>
+    <div v-else>
+      <div class="text-h6">Submitted Total: ${{ expensesTotal() }}</div>
+      <q-table
+        flat bordered
+        :title="tableTitleDisplay()"
+        :rows="selectedMonthExpenses()"
+        :columns="columns"
+        :dense="$q.screen.lt.lg"
+        :grid="$q.screen.lt.md"
+        row-key="name"
+        binary-state-sort
+        :pagination="pagination"
+        class="expense-table"
+        no-data-label="No expenses entered this month"
+      >
+        <template v-slot:body="props">
+          <q-tr
+            :props="props"
+            :class="expenseClass(props.row)"
+          >
+            <q-td key="name" :props="props">
+              {{ props.row.name }}
+              <q-popup-edit
+                v-if="!monthSubmitted()"
+                v-model="props.row.name"
+                buttons
+                v-slot="scope"
+                @save="(val) => updateExpense(props.row.pk, 'name', val)"
+              >
+                <q-input
+                  v-model="scope.value"
+                  dense
+                  autofocus
+                  @keyup.enter="scope.set()"
+                />
+              </q-popup-edit>
+            </q-td>
+            <q-td key="date" :props="props">
+              {{ readableDateNEW(props.row.date) }}
+              <q-popup-edit
+                v-if="!monthSubmitted()"
+                v-model="props.row.date"
+                buttons
+                v-slot="scope"
+                @save="(val) => updateExpense(props.row.pk, 'date', val)"
+              >
+                <q-input
+                  type="date"
+                  v-model="scope.value"
+                  dense
+                  autofocus
+                  @keyup.enter="scope.set()"
+                />
+              </q-popup-edit>
+            </q-td>
+            <q-td key="vendor" :props="props">
+              <div class="text-pre-wrap">{{ props.row.vendor }}</div>
+              <q-popup-edit
+                v-if="!monthSubmitted()"
+                v-model="props.row.vendor"
+                buttons
+                v-slot="scope"
+                @save="(val) => updateExpense(props.row.pk, 'vendor', val)"
+              >
+                <q-input
+                  v-model="scope.value"
+                  dense
+                  autofocus
+                  @keyup.enter="scope.set()"
+                />
+              </q-popup-edit>
+            </q-td>
+            <q-td key="amount" :props="props">
+              {{ props.row.amount }}
+              <q-popup-edit
+                v-if="!monthSubmitted()"
+                v-model="props.row.amount"
+                buttons
+                v-slot="scope"
+                @save="(val) => updateExpense(props.row.pk, 'amount', val)"
+              >
+                <q-input
+                  v-model="scope.value"
+                  mask="#.##"
+                  fill-mask="0"
+                  reverse-fill-mask
+                  dense
+                  autofocus
+                  @keyup.enter="scope.set()"
+                />
+              </q-popup-edit>
+            </q-td>
+            <q-td key="job" :props="props">
+              <div class="text-pre-wrap">{{ props.row.job }}</div>
+              <q-popup-edit
+                v-if="!monthSubmitted()"
+                v-model="props.row.job"
+                buttons
+                v-slot="scope"
+                @save="(val) => updateExpense(props.row.pk, 'job', val)"
+              >
+                <q-input
+                  v-model="scope.value"
+                  dense
+                  autofocus
+                  @keyup.enter="scope.set()"
+                />
+              </q-popup-edit>
+            </q-td>
+            <q-td key="gls" :props="props">
+              <div
+                class="text-pre-wrap"
+                v-for="gl in props.row.gls"
+                :key="props.row.gls.indexOf(gl)"
+              >
+                {{ gl.code }}: ${{ gl.amount }} – {{ gl.approver?.name }}
+              </div>
+              <q-popup-edit
+                v-if="!monthSubmitted()"
+                v-model="props.row.gls"
+                buttons
+                v-slot="scope"
+                @save="(val) => updateExpense(props.row.pk, 'gls', val)"
+              >
+                <div class="gl-popup-edit">
+                  <div
+                    v-for="(gl, idx) in scope.value"
+                    :key="scope.value.indexOf(gl)"
+                    class="row items-center"
+                  >
                     <q-input
-                      v-model="gl.amount"
-                      class="gl-amount q-pa-none"
-                      outlined dense
-                      mask="#.##"
-                      fill-mask="0"
-                      reverse-fill-mask
-                      @keyup.enter="scope.set()"
+                      v-model="gl.code"
+                      class="q-mr-sm q-pa-none"
+                      outlined dense autofocus
+                      mask="###-##-####-#####"
+                      fill-mask="___-__-____-_____"
                       :rules="[
-                        val => !!val || '* Required',
+                        val => !!val || 'Required',
                       ]"
                     />
-                  </div>
-                  <EmployeeSelect
-                    name="approver"
-                    label="Approver"
-                    :employee="gl.approver"
-                    :useLegalName="true"
-                    v-on:input="gl.approver=$event"
-                    v-on:clear="gl.approver=emptyEmployee"
-                    :readOnly=false
-                    :employeeFilterFn="(employee: SimpleEmployeeRetrieve) => {
-                      return employee.is_expense_approver
-                    }"
-                  />
-                  <q-icon
-                    name="cancel"
-                    size="sm"
-                    @click.stop="scope.value.splice(idx, 1)"
-                    class="cursor-pointer q-ml-sm"
-                  />
-                </div>
-                <div class="row justify-center q-mt-sm">
-                  <q-btn class="col-6" @click="scope.value.push(
-                    {code: '', percent: 100, approver: emptyEmployee}
-                  )">
-                    Add a GL
-                  </q-btn>
-                </div>
-              </div>
-            </q-popup-edit>
-          </q-td>
-          <q-td key="receipt" :props="props">
-            <div class="row justify-center">
-              <DocumentViewer
-                v-if="props.row.receipt"
-                :documentUrl="props.row.receipt"
-                iconButton
-                flat
-              />
-              <!-- Button to upload file -->
-              <q-btn icon="cloud_upload"
-                flat
-                :disable="monthSubmitted()"
-              >
-                <q-popup-edit
-                  v-if="!monthSubmitted()"
-                  v-model="props.row.receipt"
-                  buttons
-                  v-slot="scope"
-                >
-                  <FileUploader
-                    :file="scope.value"
-                    contentTypeAppLabel="purchases"
-                    contentTypeModel="expense"
-                    :readOnly=false
-                    :objectPk="props.row.pk.toString()"
-                    allowedFileTypes="image/jpeg,image/png,.pdf"
-                    v-on="{
-                      'uploaded': (url: string) => {
-                        uploadedReceipt(props.row.pk)
-                      }
-                    }"
-                  />
-                  <div class="q-mt-sm">
-                    Supported filetypes: JPEG, PNG, PDF
-                  </div>
-                </q-popup-edit>
-              </q-btn>
-            </div>
-          </q-td>
-          <q-td key="actions" :props="props">
-            <q-btn
-              v-if="!monthSubmitted()"
-              class="col"
-              dense
-              round
-              flat
-              @click="showDeleteDialog(props.row)"
-              icon="delete"
-            />
-          </q-td>
-        </q-tr>
-      </template>
-      <!-- GRID MODE -->
-      <template v-slot:item="props">
-        <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
-          <q-card
-            class="q-py-sm"
-            :class="monthSubmitted()?'bg-grey':'cursor-pointer'"
-          >
-            <q-list dense>
-              <q-item v-for="col in props.cols" :key="col.name">
-                <div class="q-table__grid-item-row">
-                  <div class="q-table__grid-item-title">{{ col.label }}</div>
-                  <div
-                    class="q-table__grid-item-value"
-                    v-if="col.name == 'date'"
-                  >
-                    {{ readableDateNEW(col.value) }}
-                  </div>
-                  <div
-                    class="q-table__grid-item-value"
-                    v-else-if="col.name == 'gls'"
-                  >
-                    <div
-                      class="text-pre-wrap"
-                      v-for="gl in props.row.gls"
-                      :key="props.row.gls.indexOf(gl)"
-                    >
-                      {{ gl.code }}: ${{ gl.amount }} – {{ gl.approver?.name }}
+                    <div class="row q-mr-sm">
+                      <div class="gl-dollar-symbol">$</div>
+                      <q-input
+                        v-model="gl.amount"
+                        class="gl-amount q-pa-none"
+                        outlined dense
+                        mask="#.##"
+                        fill-mask="0"
+                        reverse-fill-mask
+                        @keyup.enter="scope.set()"
+                        :rules="[
+                          val => !!val || '* Required',
+                        ]"
+                      />
                     </div>
-                  </div>
-                  <div
-                    class="q-table__grid-item-value row"
-                    v-else-if="col.name == 'receipt'"
-                  >
-                    <DocumentViewer
-                      v-if="col.value"
-                      :documentUrl="col.value"
-                      iconButton
-                      flat
+                    <EmployeeSelect
+                      name="approver"
+                      label="Approver"
+                      :employee="gl.approver"
+                      :useLegalName="true"
+                      v-on:input="gl.approver=$event"
+                      v-on:clear="gl.approver=emptyEmployee"
+                      :readOnly=false
+                      :employeeFilterFn="(employee: SimpleEmployeeRetrieve) => {
+                        return employee.is_expense_approver
+                      }"
                     />
-                    <!-- Button to upload file -->
-                    <q-btn icon="cloud_upload"
-                      flat
-                      :disable="monthSubmitted()"
-                    >
-                      <q-popup-edit
-                        v-if="!monthSubmitted()"
-                        v-model="props.row.receipt"
-                        buttons
-                        v-slot="scope"
-                      >
-                        <FileUploader
-                          :file="scope.value"
-                          contentTypeAppLabel="purchases"
-                          contentTypeModel="expense"
-                          :readOnly=false
-                          :objectPk="props.row.pk.toString()"
-                          allowedFileTypes="image/jpeg,image/png,.pdf"
-                          v-on="{
-                            'uploaded': (url: string) => {
-                              retrieveAllMyExpenses()
-                            }
-                          }"
-                        />
-                        <div class="q-mt-sm">
-                          Supported filetypes: JPEG, PNG, PDF
-                        </div>
-                      </q-popup-edit>
+                    <q-icon
+                      name="cancel"
+                      size="sm"
+                      @click.stop="scope.value.splice(idx, 1)"
+                      class="cursor-pointer q-ml-sm"
+                    />
+                  </div>
+                  <div class="row justify-center q-mt-sm">
+                    <q-btn class="col-6" @click="scope.value.push(
+                      {code: '', percent: 100, approver: emptyEmployee}
+                    )">
+                      Add a GL
                     </q-btn>
                   </div>
-                  <div class="q-table__grid-item-value" v-else>
-                    {{ col.value }}
-                  </div>
                 </div>
-              </q-item>
-            </q-list>
-          </q-card>
-        </div>
-      </template>
-    </q-table>
+              </q-popup-edit>
+            </q-td>
+            <q-td key="receipt" :props="props">
+              <div class="row justify-center">
+                <DocumentViewer
+                  v-if="props.row.receipt"
+                  :documentUrl="props.row.receipt"
+                  iconButton
+                  flat
+                />
+                <!-- Button to upload file -->
+                <q-btn icon="cloud_upload"
+                  flat
+                  :disable="monthSubmitted()"
+                >
+                  <q-popup-edit
+                    v-if="!monthSubmitted()"
+                    v-model="props.row.receipt"
+                    buttons
+                    v-slot="scope"
+                  >
+                    <FileUploader
+                      :file="scope.value"
+                      contentTypeAppLabel="purchases"
+                      contentTypeModel="expense"
+                      :readOnly=false
+                      :objectPk="props.row.pk.toString()"
+                      allowedFileTypes="image/jpeg,image/png,.pdf"
+                      v-on="{
+                        'uploaded': (url: string) => {
+                          uploadedReceipt(props.row.pk)
+                        }
+                      }"
+                    />
+                    <div class="q-mt-sm">
+                      Supported filetypes: JPEG, PNG, PDF
+                    </div>
+                  </q-popup-edit>
+                </q-btn>
+              </div>
+            </q-td>
+            <q-td key="actions" :props="props">
+              <q-btn
+                v-if="!monthSubmitted()"
+                class="col"
+                dense
+                round
+                flat
+                @click="showDeleteDialog(props.row)"
+                icon="delete"
+              />
+            </q-td>
+          </q-tr>
+        </template>
+        <!-- GRID MODE -->
+        <template v-slot:item="props">
+          <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
+            <q-card
+              class="q-py-sm"
+              :class="monthSubmitted()?'bg-grey':'cursor-pointer'"
+            >
+              <q-list dense>
+                <q-item v-for="col in props.cols" :key="col.name">
+                  <div class="q-table__grid-item-row">
+                    <div class="q-table__grid-item-title">{{ col.label }}</div>
+                    <div
+                      class="q-table__grid-item-value"
+                      v-if="col.name == 'date'"
+                    >
+                      {{ readableDateNEW(col.value) }}
+                    </div>
+                    <div
+                      class="q-table__grid-item-value"
+                      v-else-if="col.name == 'gls'"
+                    >
+                      <div
+                        class="text-pre-wrap"
+                        v-for="gl in props.row.gls"
+                        :key="props.row.gls.indexOf(gl)"
+                      >
+                        {{ gl.code }}: ${{ gl.amount }} – {{ gl.approver?.name }}
+                      </div>
+                    </div>
+                    <div
+                      class="q-table__grid-item-value row"
+                      v-else-if="col.name == 'receipt'"
+                    >
+                      <DocumentViewer
+                        v-if="col.value"
+                        :documentUrl="col.value"
+                        iconButton
+                        flat
+                      />
+                      <!-- Button to upload file -->
+                      <q-btn icon="cloud_upload"
+                        flat
+                        :disable="monthSubmitted()"
+                      >
+                        <q-popup-edit
+                          v-if="!monthSubmitted()"
+                          v-model="props.row.receipt"
+                          buttons
+                          v-slot="scope"
+                        >
+                          <FileUploader
+                            :file="scope.value"
+                            contentTypeAppLabel="purchases"
+                            contentTypeModel="expense"
+                            :readOnly=false
+                            :objectPk="props.row.pk.toString()"
+                            allowedFileTypes="image/jpeg,image/png,.pdf"
+                            v-on="{
+                              'uploaded': (url: string) => {
+                                retrieveAllMyExpenses()
+                              }
+                            }"
+                          />
+                          <div class="q-mt-sm">
+                            Supported filetypes: JPEG, PNG, PDF
+                          </div>
+                        </q-popup-edit>
+                      </q-btn>
+                    </div>
+                    <div class="q-table__grid-item-value" v-else>
+                      {{ col.value }}
+                    </div>
+                  </div>
+                </q-item>
+              </q-list>
+            </q-card>
+          </div>
+        </template>
+      </q-table>
+    </div>
     <div class="row justify-center">
       <q-btn
         v-if="!monthSubmitted()"

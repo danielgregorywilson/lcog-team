@@ -37,8 +37,12 @@
     size="xl"
   />
   <div v-else-if="selectedMonthCardExpenseMonths().length">
+    <div class="text-h6 q-mt-lg">Submitted Total: ${{ expensesTotal() }}</div>
     <div v-for="em of selectedMonthCardExpenseMonths()" :key="em.pk">
-      <div class="q-mt-lg">
+      <div class="text-bold q-mt-sm">
+        Submitted Total: ${{ expenseMonthTotal(em) }}
+      </div>
+      <div class="q-mt-sm">
         <q-table
           flat bordered
           :title="tableTitleDisplay(em)"
@@ -64,7 +68,7 @@
                 v-for="gl in props.row.gls"
                 :key="props.row.gls.indexOf(gl)"
               >
-                {{ gl.code }}: {{ gl.percent }}% – {{ gl.approver.name }}
+                {{ gl.code }}: ${{ gl.amount }} – {{ gl.approver.name }}
               </div>
             </q-td>
           </template>
@@ -107,7 +111,7 @@
                           v-for="gl in props.row.gls"
                           :key="props.row.gls.indexOf(gl)"
                         >
-                          {{ gl.code }}: {{ gl.percent }}% –
+                          {{ gl.code }}: ${{ gl.amount }} –
                           {{ gl.approver.name }}
                         </div>
                       </div>
@@ -330,15 +334,11 @@ const pagination = {
 
 const printColumns = [
   {
-    name: 'name', field: 'name', label: 'Name', required: true, align: 'left',
+    name: 'name', field: 'name', label: 'Item', required: true, align: 'left',
     sortable: true
   },
   {
     name: 'date', field: 'date', label: 'Date', align: 'center', sortable: true
-  },
-  {
-    name: 'description', field: 'description', label: 'Description',
-    align: 'center', sortable: true
   },
   {
     name: 'vendor', field: 'vendor', label: 'Vendor', align: 'center',
@@ -553,6 +553,12 @@ function navigateToPrintView() {
       year: yearInt.value
     }
   })
+}
+
+function expenseMonthTotal(em: ExpenseMonth) {
+  return em.expenses.reduce(
+    (acc, expense) => acc + parseFloat(expense.amount), 0
+  )
 }
 
 function expensesTotal() {

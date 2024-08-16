@@ -1,3 +1,4 @@
+from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -126,7 +127,12 @@ class ExpenseGL(models.Model):
         'Expense', on_delete=models.CASCADE, related_name='gls'
     )
     code = models.CharField(max_length=255, blank=True)
+    # TODO: Remove percent
     percent = models.FloatField(blank=True, null=True)
+    amount = models.DecimalField(
+        _("dollar amount"), max_digits=10, decimal_places=2, blank=True,
+        null=True
+    )
     approver = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='expense_gls'
@@ -146,7 +152,6 @@ class Expense(ExpenseBaseModel):
     name = models.CharField(max_length=255, blank=True)
     date = models.DateField(blank=True, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    description = models.CharField(max_length=511, blank=True)
     vendor = models.CharField(max_length=255, blank=True)
     job = models.CharField(max_length=255, blank=True)
     receipt = models.FileField(
@@ -208,7 +213,15 @@ class ExpenseCard(models.Model):
     def __str__(self):
         return f'*{self.last4}'
 
-    last4 = models.IntegerField()
+    last4 = models.CharField(
+        max_length=4,
+        validators=[
+            RegexValidator(
+                regex='^[0-9]{4}$',
+                message='Must be 4 digits'
+            ),
+        ]
+    )
     assignee = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='expense_cards'

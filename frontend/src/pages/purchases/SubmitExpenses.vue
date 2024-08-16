@@ -377,6 +377,8 @@
     <div v-if="statementChoices().length">
       <q-select
         v-if="thisMonthStatementsLoaded"
+        :bg-color="selectedStatement ? '': 'info'"
+        filled
         :disable="monthSubmitted()"
         v-model="selectedStatement"
         :options="statementChoices()"

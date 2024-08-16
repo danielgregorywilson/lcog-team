@@ -101,12 +101,12 @@ class ExpenseCardSerializer(serializers.HyperlinkedModelSerializer):
     )
 
     @staticmethod
-    def get_display(obj):
-        display = f'*{ obj.last4 }'
-        if obj.assignee:
-            display += f' ({ obj.assignee.name })'
-        else:
+    def get_display(card):
+        display = f'*{ card.last4 }'
+        if card.shared:
             display += ' (Shared)'
+        elif card.assignee:
+            display += f' ({ card.assignee.name })'
         return display
 
 

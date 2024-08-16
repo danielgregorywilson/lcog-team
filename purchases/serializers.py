@@ -12,7 +12,7 @@ class ExpenseGLSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ExpenseGL
         fields = [
-            'url', 'pk', 'code', 'percent', 'approver', 'approved',
+            'url', 'pk', 'code', 'percent', 'amount', 'approver', 'approved',
             'approved_at', 'approver_note', 'expense_name', 'expense_date',
             'expense_amount', 'expense_description', 'expense_vendor',
             'expense_job', 'expense_receipt', 'expense_purchaser',
@@ -62,9 +62,9 @@ class ExpenseSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Expense
         fields = [
-            'url', 'pk', 'name', 'date', 'amount', 'description', 'vendor',
-            'job', 'gls', 'receipt', 'receipt_type', 'approver', 'approved_at',
-            'status', 'purchaser'
+            'url', 'pk', 'name', 'date', 'amount', 'vendor', 'job', 'gls',
+            'receipt', 'receipt_type', 'approver', 'approved_at', 'status',
+            'purchaser'
         ]
 
     gls = ExpenseGLSerializer(many=True, read_only=True)
@@ -101,12 +101,12 @@ class ExpenseCardSerializer(serializers.HyperlinkedModelSerializer):
     )
 
     @staticmethod
-    def get_display(obj):
-        display = f'*{ obj.last4 }'
-        if obj.assignee:
-            display += f' ({ obj.assignee.name })'
-        else:
+    def get_display(card):
+        display = f'*{ card.last4 }'
+        if card.shared:
             display += ' (Shared)'
+        elif card.assignee:
+            display += f' ({ card.assignee.name })'
         return display
 
 

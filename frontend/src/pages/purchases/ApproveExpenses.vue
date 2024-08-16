@@ -28,7 +28,7 @@
       </template>
       <template v-slot:body-cell-gl="props">
         <q-td key="gl" :props="props">
-          {{ props.row.code }}: {{ props.row.percent }}%
+          {{ props.row.code }}: ${{ props.row.amount }}
         </q-td>
       </template>
       <template v-slot:body-cell-receipt="props">
@@ -107,7 +107,7 @@
                       v-for="gl in props.row.gls"
                       :key="props.row.gls.indexOf(gl)"
                     >
-                      {{ gl.gl }}: {{ gl.percent }}%
+                      {{ gl.gl }}: ${{ gl.amount }}
                     </div>
                   </div>
                   <div
@@ -236,16 +236,12 @@ const columns = [
     required: true, align: 'left', sortable: true
   },
   {
-    name: 'expense_name', field: 'expense_name', label: 'Name', required: true,
+    name: 'expense_name', field: 'expense_name', label: 'Item', required: true,
     align: 'left', sortable: true
   },
   {
     name: 'expense_date', field: 'expense_date', label: 'Date', align: 'center',
     sortable: true
-  },
-  {
-    name: 'expense_description', field: 'expense_description',
-    label: 'Description', align: 'center', sortable: true
   },
   {
     name: 'expense_vendor', field: 'expense_vendor', label: 'Vendor',

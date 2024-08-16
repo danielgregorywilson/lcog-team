@@ -213,31 +213,14 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                 expense.name != request.data.get('name') or
                 expense.date != request.data.get('date') or
                 expense.amount != request.data.get('amount') or
-                expense.description != request.data.get('description') or
                 expense.vendor != request.data.get('vendor') or
                 expense.job != request.data.get('job')
             ):
                 expense_fields_changed = True
             
             expense.name = request.data.get('name', expense.name)
-            request_date = request.data.get('date', None)
-            if request_date is not None and request_date != '':
-                expense.date = request.data.get('date')
-                # If the month has changed, update the ExpenseMonth
-                current_em = expense.month
-                new_year, new_month, new_date = \
-                    request.data.get('date', None).split('-')
-                new_em = ExpenseMonth.objects.get_or_create(
-                    purchaser=request.user.employee,
-                    year=new_year,
-                    month=new_month
-                )[0]
-                if current_em != new_em:
-                    expense.month = new_em
+            expense.date = request.data.get('date', expense.date)
             expense.amount = request.data.get('amount', expense.amount)
-            expense.description = request.data.get(
-                'description', expense.description
-            )
             expense.vendor = request.data.get('vendor', expense.vendor)
             expense.job = request.data.get('job', expense.job)
             
@@ -248,6 +231,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                 pk = gl.get('pk', None)
                 code = gl.get('code', None)
                 percent = gl.get('percent', None)
+                amount = gl.get('amount', None)
                 approver_obj = gl.get('approver')
                 if not approver_obj:
                     approver_obj = {
@@ -264,6 +248,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                     if (
                         expense_gl.code != code or
                         expense_gl.percent != percent or
+                        expense_gl.amount != amount or
                         expense_gl.approver != approver
                     ):
                         gl_changed = True
@@ -274,8 +259,9 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                     expense_gl = ExpenseGL.objects.create(expense=expense)
                 expense_gl.code = code
                 expense_gl.percent = percent
+                expense_gl.amount = amount
                 expense_gl.approver = approver
-                
+
                 expense_gl.save()
                 gl_pks.append(expense_gl.pk)
             

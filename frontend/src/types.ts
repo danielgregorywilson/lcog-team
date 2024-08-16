@@ -377,7 +377,6 @@ export interface Expense extends ExpenseBase {
   pk: number
   name: string
   date: string
-  description: string
   vendor: string
   amount: string
   job: string
@@ -410,6 +409,7 @@ export interface ExpenseUpdate extends ExpenseBase {
 export interface GL {
   code: string
   percent: string
+  amount: string
   approver?: SimpleEmployeeRetrieve
   approved: boolean
   approved_at: string

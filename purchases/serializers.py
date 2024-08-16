@@ -62,9 +62,9 @@ class ExpenseSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Expense
         fields = [
-            'url', 'pk', 'name', 'date', 'amount', 'description', 'vendor',
-            'job', 'gls', 'receipt', 'receipt_type', 'approver', 'approved_at',
-            'status', 'purchaser'
+            'url', 'pk', 'name', 'date', 'amount', 'vendor', 'job', 'gls',
+            'receipt', 'receipt_type', 'approver', 'approved_at', 'status',
+            'purchaser'
         ]
 
     gls = ExpenseGLSerializer(many=True, read_only=True)

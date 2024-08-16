@@ -330,15 +330,11 @@ const pagination = {
 
 const printColumns = [
   {
-    name: 'name', field: 'name', label: 'Name', required: true, align: 'left',
+    name: 'name', field: 'name', label: 'Item', required: true, align: 'left',
     sortable: true
   },
   {
     name: 'date', field: 'date', label: 'Date', align: 'center', sortable: true
-  },
-  {
-    name: 'description', field: 'description', label: 'Description',
-    align: 'center', sortable: true
   },
   {
     name: 'vendor', field: 'vendor', label: 'Vendor', align: 'center',

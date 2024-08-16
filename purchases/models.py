@@ -147,7 +147,6 @@ class Expense(ExpenseBaseModel):
     name = models.CharField(max_length=255, blank=True)
     date = models.DateField(blank=True, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    description = models.CharField(max_length=511, blank=True)
     vendor = models.CharField(max_length=255, blank=True)
     job = models.CharField(max_length=255, blank=True)
     receipt = models.FileField(

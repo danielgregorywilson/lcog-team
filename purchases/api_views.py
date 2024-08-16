@@ -213,7 +213,6 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                 expense.name != request.data.get('name') or
                 expense.date != request.data.get('date') or
                 expense.amount != request.data.get('amount') or
-                expense.description != request.data.get('description') or
                 expense.vendor != request.data.get('vendor') or
                 expense.job != request.data.get('job')
             ):
@@ -222,9 +221,6 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             expense.name = request.data.get('name', expense.name)
             expense.date = request.data.get('date', expense.date)
             expense.amount = request.data.get('amount', expense.amount)
-            expense.description = request.data.get(
-                'description', expense.description
-            )
             expense.vendor = request.data.get('vendor', expense.vendor)
             expense.job = request.data.get('job', expense.job)
             

@@ -377,7 +377,6 @@ export interface Expense extends ExpenseBase {
   pk: number
   name: string
   date: string
-  description: string
   vendor: string
   amount: string
   job: string

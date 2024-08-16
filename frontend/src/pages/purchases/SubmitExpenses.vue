@@ -87,18 +87,6 @@
               <q-input type="date" v-model="scope.value" dense autofocus />
             </q-popup-edit>
           </q-td>
-          <q-td key="description" :props="props">
-            <div class="text-pre-wrap">{{ props.row.description }}</div>
-            <q-popup-edit
-              v-if="!monthSubmitted()"
-              v-model="props.row.description"
-              buttons
-              v-slot="scope"
-              @save="(val) => updateExpense(props.row.pk, 'description', val)"
-            >
-              <q-input v-model="scope.value" dense autofocus />
-            </q-popup-edit>
-          </q-td>
           <q-td key="vendor" :props="props">
             <div class="text-pre-wrap">{{ props.row.vendor }}</div>
             <q-popup-edit
@@ -603,15 +591,11 @@ const pagination = {
 
 const columns = [
   {
-    name: 'name', field: 'name', label: 'Name', required: true, align: 'left',
+    name: 'name', field: 'name', label: 'Item', required: true, align: 'left',
     sortable: true
   },
   {
     name: 'date', field: 'date', label: 'Date', align: 'center', sortable: true
-  },
-  {
-    name: 'description', field: 'description', label: 'Description',
-    align: 'center', sortable: true
   },
   {
     name: 'vendor', field: 'vendor', label: 'Vendor', align: 'center',
@@ -915,9 +899,7 @@ function retrieveAllMyExpenses() {
 
 function updateExpense(
   pk: number,
-  field:
-    'name' | 'date' | 'amount' | 'description' | 'vendor' | 'job' | 'gls' |
-    'approver',
+  field: 'name' | 'date' | 'amount' | 'vendor' | 'job' | 'gls' | 'approver',
   val: string | Array<GL> | SimpleEmployeeRetrieve
 ) {
   const exp = purchaseStore.myExpenses.find(exp => exp.pk === pk)

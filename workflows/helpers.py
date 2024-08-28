@@ -16,6 +16,7 @@ def send_gas_pin_notification_email(
 ):
     current_site = Site.objects.get_current()
     transition_url = current_site.domain + url
+    profile_url = current_site.domain + '/profile'
 
     first_name = t.employee_first_name if t.employee_first_name else ''
     last_name = t.employee_last_name if t.employee_last_name else ''
@@ -36,7 +37,7 @@ def send_gas_pin_notification_email(
     html_message = render_to_string(html_template, {
         'name_string': name_string, 'type_verb': type_verb,
         'date_string': date_string, 'transition_url': transition_url,
-        'sender_name': sender_name
+        'sender_name': sender_name, 'profile_url': profile_url
     })
     plaintext_message = strip_tags(html_message)
 
@@ -56,6 +57,7 @@ def send_transition_submitter_email(
 ):
     current_site = Site.objects.get_current()
     transition_url = current_site.domain + url
+    profile_url = current_site.domain + '/profile'
     
     reassigned_subject = 'REASSIGNED: ' if reassigned else ''
     title = t.title.name if t.title else ''
@@ -73,9 +75,9 @@ def send_transition_submitter_email(
 
     html_template = '../templates/email/employee-transition-sds.html'
     html_message = render_to_string(html_template, {
-        'title': title, 'type_verb': type_verb,
-        'date': date, 'extra_message': extra_message,
-        'transition_url': transition_url, 'sender_name': sender_name
+        'title': title, 'type_verb': type_verb, 'date': date,
+        'extra_message': extra_message, 'transition_url': transition_url,
+        'sender_name': sender_name, 'profile_url': profile_url
     })
     plaintext_message = strip_tags(html_message)
 
@@ -100,6 +102,7 @@ def send_transition_sds_hiring_leads_email(
 ):
     current_site = Site.objects.get_current()
     transition_url = current_site.domain + url
+    profile_url = current_site.domain + '/profile'
     
     reassigned_subject = 'REASSIGNED: ' if reassigned else ''
     title = t.title.name if t.title else ''
@@ -117,9 +120,9 @@ def send_transition_sds_hiring_leads_email(
 
     html_template = '../templates/email/employee-transition-sds.html'
     html_message = render_to_string(html_template, {
-        'title': title, 'type_verb': type_verb,
-        'date': date, 'extra_message': extra_message,
-        'transition_url': transition_url, 'sender_name': sender_name
+        'title': title, 'type_verb': type_verb, 'date': date,
+        'extra_message': extra_message, 'transition_url': transition_url,
+        'sender_name': sender_name, 'profile_url': profile_url
     })
     plaintext_message = strip_tags(html_message)
 
@@ -145,6 +148,7 @@ def send_transition_fiscal_email(
 ):
     current_site = Site.objects.get_current()
     transition_url = current_site.domain + url
+    profile_url = current_site.domain + '/profile'
     
     reassigned_subject = 'REASSIGNED: ' if reassigned else ''
     first_name = t.employee_first_name if t.employee_first_name else ''
@@ -164,9 +168,9 @@ def send_transition_fiscal_email(
 
     html_template = '../templates/email/employee-transition-fiscal-hr.html'
     html_message = render_to_string(html_template, {
-        'name': name, 'type_verb': type_verb,
-        'date': date, 'extra_message': extra_message,
-        'transition_url': transition_url, 'sender_name': sender_name
+        'name': name, 'type_verb': type_verb, 'date': date,
+        'extra_message': extra_message, 'transition_url': transition_url,
+        'sender_name': sender_name, 'profile_url': profile_url
     })
     plaintext_message = strip_tags(html_message)
 
@@ -196,6 +200,7 @@ def send_transition_fiscal_email(
 def send_early_hr_email(t, url=''):
     current_site = Site.objects.get_current()
     transition_url = current_site.domain + url
+    profile_url = current_site.domain + '/profile'
     
     first_name = t.employee_first_name if t.employee_first_name else ''
     last_name = t.employee_last_name if t.employee_last_name else ''
@@ -222,7 +227,8 @@ def send_early_hr_email(t, url=''):
         'extra_message': 'This is an early notification to HR. The form has ' +
             'not been approved yet.',
         'transition_url': transition_url,
-        'sender_name': ''
+        'sender_name': '',
+        'profile_url': profile_url
     })
     plaintext_message = strip_tags(html_message)
 
@@ -244,6 +250,7 @@ def send_transition_hr_email(
 ):
     current_site = Site.objects.get_current()
     transition_url = current_site.domain + url
+    profile_url = current_site.domain + '/profile'
     
     reassigned_subject = 'REASSIGNED: ' if reassigned else ''
     first_name = t.employee_first_name if t.employee_first_name else ''
@@ -265,7 +272,7 @@ def send_transition_hr_email(
     html_message = render_to_string(html_template, {
         'name': name, 'type_verb': type_verb, 'date': date,
         'extra_message': extra_message, 'transition_url': transition_url,
-        'sender_name': sender_name
+        'sender_name': sender_name, 'profile_url': profile_url
     })
     plaintext_message = strip_tags(html_message)
 
@@ -296,6 +303,7 @@ def send_transition_stn_email(
     ):
     current_site = Site.objects.get_current()
     transition_url = current_site.domain + url
+    profile_url = current_site.domain + '/profile'
     
     updated = 'UPDATED: ' if update else ''
     reassigned = 'REASSIGNED: ' if reassigned else ''
@@ -321,10 +329,9 @@ def send_transition_stn_email(
         'updated_body_string': updated_body_string,
         'exit_body_string': exit_body_string, 'name': name,
         'title_string': title_string,
-        'type_body_description': type_body_description,
-        'date': date,
-        'extra_message': extra_message,
-        'transition_url': transition_url, 'sender_name': sender_name
+        'type_body_description': type_body_description, 'date': date,
+        'extra_message': extra_message, 'transition_url': transition_url,
+        'sender_name': sender_name, 'profile_url': profile_url
     })
     plaintext_message = strip_tags(html_message)
 

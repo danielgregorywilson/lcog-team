@@ -20,7 +20,11 @@
         <div>Select a CC statement</div>
         <q-icon color="orange" name="warning" size="md" />
       </q-btn>
-      <q-btn v-else-if="!expensesMatchStatment()" flat class="no-pointer-events" >
+      <q-btn
+        v-else-if="!expensesMatchStatment()"
+        flat
+        class="no-pointer-events"
+      >
         <div>Entered expenses do not match statement</div>
         <q-icon color="orange" name="warning" size="md" />
       </q-btn>
@@ -208,9 +212,11 @@
                         v-on:input="gl.approver=$event"
                         v-on:clear="gl.approver=emptyEmployee"
                         :readOnly=false
-                        :employeeFilterFn="(employee: SimpleEmployeeRetrieve) => {
-                          return employee.is_expense_approver
-                        }"
+                        :employeeFilterFn="
+                          (employee: SimpleEmployeeRetrieve) => {
+                            return employee.is_expense_approver
+                          }
+                        "
                       />
                       <q-icon
                         name="cancel"
@@ -309,7 +315,9 @@
                 <q-list dense>
                   <q-item v-for="col in props.cols" :key="col.name">
                     <div class="q-table__grid-item-row">
-                      <div class="q-table__grid-item-title">{{ col.label }}</div>
+                      <div class="q-table__grid-item-title">
+                        {{ col.label }}
+                      </div>
                       <div
                         class="q-table__grid-item-value"
                         v-if="col.name == 'date'"
@@ -325,7 +333,8 @@
                           v-for="gl in props.row.gls"
                           :key="props.row.gls.indexOf(gl)"
                         >
-                          {{ gl.code }}: ${{ gl.amount }} – {{ gl.approver?.name }}
+                          {{ gl.code }}: ${{ gl.amount }} –
+                          {{ gl.approver?.name }}
                         </div>
                       </div>
                       <div

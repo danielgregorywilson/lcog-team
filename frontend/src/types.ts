@@ -409,7 +409,6 @@ export interface ExpenseUpdate extends ExpenseBase {
 
 export interface GL {
   code: string
-  percent: string
   amount: string
   approver?: SimpleEmployeeRetrieve
   approved: boolean

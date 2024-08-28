@@ -231,7 +231,6 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             for gl in request.data.get('gls'):
                 pk = gl.get('pk', None)
                 code = gl.get('code', None)
-                percent = gl.get('percent', None)
                 amount = gl.get('amount', None)
                 approver_obj = gl.get('approver')
                 if not approver_obj:
@@ -248,7 +247,6 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                     gl_changed = False
                     if (
                         expense_gl.code != code or
-                        expense_gl.percent != percent or
                         expense_gl.amount != amount or
                         expense_gl.approver != approver
                     ):
@@ -259,7 +257,6 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                 else:
                     expense_gl = ExpenseGL.objects.create(expense=expense)
                 expense_gl.code = code
-                expense_gl.percent = percent
                 expense_gl.amount = amount
                 expense_gl.approver = approver
 

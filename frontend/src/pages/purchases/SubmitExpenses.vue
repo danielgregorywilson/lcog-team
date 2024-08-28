@@ -227,7 +227,7 @@
                     </div>
                     <div class="row justify-center q-mt-sm">
                       <q-btn class="col-6" @click="scope.value.push(
-                        {code: '', percent: 100, approver: emptyEmployee}
+                        {code: '', amount: 0, approver: emptyEmployee}
                       )">
                         Add a GL
                       </q-btn>
@@ -877,7 +877,7 @@ function formErrorItems() {
       }
       if (!gl.amount) {
         errorItems.push(
-          `Provide a GL percentage for each GL row in ${exp.name}`
+          `Provide a GL amount for each GL row in ${exp.name}`
         )
       }
       if (!gl.approver || gl.approver?.pk == -1) {

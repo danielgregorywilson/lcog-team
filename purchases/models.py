@@ -127,8 +127,6 @@ class ExpenseGL(models.Model):
         'Expense', on_delete=models.CASCADE, related_name='gls'
     )
     code = models.CharField(max_length=255, blank=True)
-    # TODO: Remove percent
-    percent = models.FloatField(blank=True, null=True)
     amount = models.DecimalField(
         _("dollar amount"), max_digits=10, decimal_places=2, blank=True,
         null=True

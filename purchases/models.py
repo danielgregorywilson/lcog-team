@@ -157,6 +157,7 @@ class Expense(ExpenseBaseModel):
     receipt = models.FileField(
         _("receipt"), upload_to="uploads/expenses", blank=True, null=True
     )
+    repeat = models.BooleanField(default=False)
     approved_at = models.DateTimeField(blank=True, null=True)
 
 

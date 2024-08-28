@@ -385,6 +385,7 @@ export interface Expense extends ExpenseBase {
   approver: SimpleEmployeeRetrieve
   receipt: string
   receipt_type: 'image' | 'pdf'
+  repeat: boolean
   submitted: boolean
 }
 

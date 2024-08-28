@@ -223,6 +223,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             expense.amount = request.data.get('amount', expense.amount)
             expense.vendor = request.data.get('vendor', expense.vendor)
             expense.job = request.data.get('job', expense.job)
+            expense.repeat = request.data.get('repeat', expense.repeat)
             
             gl_pks = []
 
@@ -390,6 +391,37 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
                 year=year,
                 month=month
             )[0]
+
+        # Create repeated expenses from last month
+        last_month = month - 1
+        last_year = year
+        if last_month == 0:
+            last_month = 12
+            last_year -= 1
+        last_em = ExpenseMonth.objects.filter(
+            purchaser=request.user.employee,
+            year=last_year,
+            month=last_month
+        ).first()
+        if last_em:
+            for expense in last_em.expenses.filter(repeat=True):
+                new_expense = Expense.objects.create(
+                    month=em,
+                    name=expense.name,
+                    date=expense.date.replace(year=year, month=month),
+                    amount=expense.amount,
+                    vendor=expense.vendor,
+                    job=expense.job,
+                    repeat=True
+                )
+                for gl in expense.gls.all():
+                    ExpenseGL.objects.create(
+                        expense=new_expense,
+                        code=gl.code,
+                        amount=gl.amount,
+                        approver=gl.approver
+                    )
+
         serialized_em = ExpenseMonthSerializer(
             em, context={'request': request})
         return Response(serialized_em.data)

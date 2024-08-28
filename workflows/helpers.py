@@ -16,6 +16,7 @@ def send_gas_pin_notification_email(
 ):
     current_site = Site.objects.get_current()
     transition_url = current_site.domain + url
+    profile_url = current_site.domain + '/profile'
 
     first_name = t.employee_first_name if t.employee_first_name else ''
     last_name = t.employee_last_name if t.employee_last_name else ''
@@ -36,7 +37,7 @@ def send_gas_pin_notification_email(
     html_message = render_to_string(html_template, {
         'name_string': name_string, 'type_verb': type_verb,
         'date_string': date_string, 'transition_url': transition_url,
-        'sender_name': sender_name
+        'sender_name': sender_name, 'profile_url': profile_url
     })
     plaintext_message = strip_tags(html_message)
 
@@ -56,9 +57,10 @@ def send_transition_submitter_email(
 ):
     current_site = Site.objects.get_current()
     transition_url = current_site.domain + url
+    profile_url = current_site.domain + '/profile'
     
-    reassigned_subject_string = 'REASSIGNED: ' if reassigned else ''
-    title_string = t.title.name if t.title else ''
+    reassigned_subject = 'REASSIGNED: ' if reassigned else ''
+    title = t.title.name if t.title else ''
     if t.type == EmployeeTransition.TRANSITION_TYPE_NEW:
         type_verb = 'starting'
     elif t.type == EmployeeTransition.TRANSITION_TYPE_CHANGE:
@@ -67,16 +69,15 @@ def send_transition_submitter_email(
         type_verb = 'terminating'
     else:
         type_verb = 'changing'
-    date_string = readable_date(t.transition_date) if t.transition_date else ''
+    date = readable_date(t.transition_date) if t.transition_date else ''
 
-    subject = f'{ reassigned_subject_string }{ title_string } EIS \
-        { type_verb } { date_string }'
+    subject = f'{ reassigned_subject }{ title } EIS { type_verb } { date }'
 
     html_template = '../templates/email/employee-transition-sds.html'
     html_message = render_to_string(html_template, {
-        'title_string': title_string, 'type_verb': type_verb,
-        'date_string': date_string, 'extra_message': extra_message,
-        'transition_url': transition_url, 'sender_name': sender_name
+        'title': title, 'type_verb': type_verb, 'date': date,
+        'extra_message': extra_message, 'transition_url': transition_url,
+        'sender_name': sender_name, 'profile_url': profile_url
     })
     plaintext_message = strip_tags(html_message)
 
@@ -101,9 +102,10 @@ def send_transition_sds_hiring_leads_email(
 ):
     current_site = Site.objects.get_current()
     transition_url = current_site.domain + url
+    profile_url = current_site.domain + '/profile'
     
-    reassigned_subject_string = 'REASSIGNED: ' if reassigned else ''
-    title_string = t.title.name if t.title else ''
+    reassigned_subject = 'REASSIGNED: ' if reassigned else ''
+    title = t.title.name if t.title else ''
     if t.type == EmployeeTransition.TRANSITION_TYPE_NEW:
         type_verb = 'starting'
     elif t.type == EmployeeTransition.TRANSITION_TYPE_CHANGE:
@@ -112,16 +114,15 @@ def send_transition_sds_hiring_leads_email(
         type_verb = 'terminating'
     else:
         type_verb = 'changing'
-    date_string = readable_date(t.transition_date) if t.transition_date else ''
+    date = readable_date(t.transition_date) if t.transition_date else ''
 
-    subject = f'{ reassigned_subject_string }{ title_string } EIS \
-        { type_verb } { date_string }'
+    subject = f'{ reassigned_subject }{ title } EIS { type_verb } { date }'
 
     html_template = '../templates/email/employee-transition-sds.html'
     html_message = render_to_string(html_template, {
-        'title_string': title_string, 'type_verb': type_verb,
-        'date_string': date_string, 'extra_message': extra_message,
-        'transition_url': transition_url, 'sender_name': sender_name
+        'title': title, 'type_verb': type_verb, 'date': date,
+        'extra_message': extra_message, 'transition_url': transition_url,
+        'sender_name': sender_name, 'profile_url': profile_url
     })
     plaintext_message = strip_tags(html_message)
 
@@ -147,11 +148,12 @@ def send_transition_fiscal_email(
 ):
     current_site = Site.objects.get_current()
     transition_url = current_site.domain + url
+    profile_url = current_site.domain + '/profile'
     
-    reassigned_subject_string = 'REASSIGNED: ' if reassigned else ''
+    reassigned_subject = 'REASSIGNED: ' if reassigned else ''
     first_name = t.employee_first_name if t.employee_first_name else ''
     last_name = t.employee_last_name if t.employee_last_name else ''
-    name_string = f'{ first_name } { last_name }'
+    name = f'{ first_name } { last_name }'
     if t.type == EmployeeTransition.TRANSITION_TYPE_NEW:
         type_verb = 'starting'
     elif t.type == EmployeeTransition.TRANSITION_TYPE_CHANGE:
@@ -160,16 +162,15 @@ def send_transition_fiscal_email(
         type_verb = 'terminating'
     else:
         type_verb = 'changing'
-    date_string = readable_date(t.transition_date) if t.transition_date else ''
+    date = readable_date(t.transition_date) if t.transition_date else ''
 
-    subject = f'{ reassigned_subject_string }{ name_string } EIS { type_verb }\
-         { date_string }'
+    subject = f'{ reassigned_subject }{ name } EIS { type_verb } { date }'
 
     html_template = '../templates/email/employee-transition-fiscal-hr.html'
     html_message = render_to_string(html_template, {
-        'name_string': name_string, 'type_verb': type_verb,
-        'date_string': date_string, 'extra_message': extra_message,
-        'transition_url': transition_url, 'sender_name': sender_name
+        'name': name, 'type_verb': type_verb, 'date': date,
+        'extra_message': extra_message, 'transition_url': transition_url,
+        'sender_name': sender_name, 'profile_url': profile_url
     })
     plaintext_message = strip_tags(html_message)
 
@@ -199,6 +200,7 @@ def send_transition_fiscal_email(
 def send_early_hr_email(t, url=''):
     current_site = Site.objects.get_current()
     transition_url = current_site.domain + url
+    profile_url = current_site.domain + '/profile'
     
     first_name = t.employee_first_name if t.employee_first_name else ''
     last_name = t.employee_last_name if t.employee_last_name else ''
@@ -225,7 +227,8 @@ def send_early_hr_email(t, url=''):
         'extra_message': 'This is an early notification to HR. The form has ' +
             'not been approved yet.',
         'transition_url': transition_url,
-        'sender_name': ''
+        'sender_name': '',
+        'profile_url': profile_url
     })
     plaintext_message = strip_tags(html_message)
 
@@ -247,11 +250,12 @@ def send_transition_hr_email(
 ):
     current_site = Site.objects.get_current()
     transition_url = current_site.domain + url
+    profile_url = current_site.domain + '/profile'
     
-    reassigned_subject_string = 'REASSIGNED: ' if reassigned else ''
+    reassigned_subject = 'REASSIGNED: ' if reassigned else ''
     first_name = t.employee_first_name if t.employee_first_name else ''
     last_name = t.employee_last_name if t.employee_last_name else ''
-    name_string = f'{ first_name } { last_name }'
+    name = f'{ first_name } { last_name }'
     if t.type == EmployeeTransition.TRANSITION_TYPE_NEW:
         type_verb = 'starting'
     elif t.type == EmployeeTransition.TRANSITION_TYPE_CHANGE:
@@ -260,16 +264,15 @@ def send_transition_hr_email(
         type_verb = 'terminating'
     else:
         type_verb = 'changing'
-    date_string = readable_date(t.transition_date) if t.transition_date else ''
+    date = readable_date(t.transition_date) if t.transition_date else ''
 
-    subject = f'{ reassigned_subject_string }{ name_string } EIS { type_verb }\
-         { date_string }'
+    subject = f'{ reassigned_subject }{ name } EIS { type_verb } { date }'
 
     html_template = '../templates/email/employee-transition-fiscal-hr.html'
     html_message = render_to_string(html_template, {
-        'name_string': name_string, 'type_verb': type_verb,
-        'date_string': date_string, 'extra_message': extra_message,
-        'transition_url': transition_url, 'sender_name': sender_name
+        'name': name, 'type_verb': type_verb, 'date': date,
+        'extra_message': extra_message, 'transition_url': transition_url,
+        'sender_name': sender_name, 'profile_url': profile_url
     })
     plaintext_message = strip_tags(html_message)
 
@@ -300,18 +303,18 @@ def send_transition_stn_email(
     ):
     current_site = Site.objects.get_current()
     transition_url = current_site.domain + url
+    profile_url = current_site.domain + '/profile'
     
-    updated_subject_string = 'UPDATED: ' if update else ''
-    reassigned_subject_string = 'REASSIGNED: ' if reassigned else ''
+    updated = 'UPDATED: ' if update else ''
+    reassigned = 'REASSIGNED: ' if reassigned else ''
     first_name = t.employee_first_name if t.employee_first_name else ''
     last_name = t.employee_last_name if t.employee_last_name else ''
-    name_string = f'{ first_name } { last_name }'
-    exit_subject_string = 'EXIT: ' if \
+    name = f'{ first_name } { last_name }'
+    exit = 'EXIT: ' if \
         t.type == EmployeeTransition.TRANSITION_TYPE_EXIT else ''
-    date_string = readable_date(t.transition_date) if t.transition_date else ''
+    date = readable_date(t.transition_date) if t.transition_date else ''
 
-    subject = f'{ reassigned_subject_string }{ updated_subject_string }\
-        { name_string } { exit_subject_string }EIS { date_string }'
+    subject = f'{ reassigned }{ updated }{ name } { exit }EIS { date }'
     
     updated_body_string = 'updated ' if update else ''
     exit_body_string = 'Exit ' if \
@@ -324,12 +327,11 @@ def send_transition_stn_email(
     html_template = '../templates/email/employee-transition-stn.html'
     html_message = render_to_string(html_template, {
         'updated_body_string': updated_body_string,
-        'exit_body_string': exit_body_string, 'name_string': name_string,
+        'exit_body_string': exit_body_string, 'name': name,
         'title_string': title_string,
-        'type_body_description': type_body_description,
-        'date_string': date_string,
-        'extra_message': extra_message,
-        'transition_url': transition_url, 'sender_name': sender_name
+        'type_body_description': type_body_description, 'date': date,
+        'extra_message': extra_message, 'transition_url': transition_url,
+        'sender_name': sender_name, 'profile_url': profile_url
     })
     plaintext_message = strip_tags(html_message)
 

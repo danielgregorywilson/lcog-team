@@ -4,6 +4,24 @@
 
 export const releases = [
   {
+    version: '0.33.0',
+    date: new Date(2024, 7, 28),
+    changes: [
+      {
+        type: 'new',
+        description: 'Expenses can be set to repeat from month to month.'
+      },
+      {
+        type: 'improved',
+        description: 'Minor improvements to the credit card expenses app.'
+      },
+      {
+        type: 'fix',
+        description: 'Add missing profile links to transition emails.'
+      },
+    ]
+  },
+  {
     version: '0.32.0',
     date: new Date(2024, 7, 16),
     changes: [

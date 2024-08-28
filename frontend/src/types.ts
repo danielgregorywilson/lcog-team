@@ -385,6 +385,7 @@ export interface Expense extends ExpenseBase {
   approver: SimpleEmployeeRetrieve
   receipt: string
   receipt_type: 'image' | 'pdf'
+  repeat: boolean
   submitted: boolean
 }
 
@@ -408,7 +409,6 @@ export interface ExpenseUpdate extends ExpenseBase {
 
 export interface GL {
   code: string
-  percent: string
   amount: string
   approver?: SimpleEmployeeRetrieve
   approved: boolean

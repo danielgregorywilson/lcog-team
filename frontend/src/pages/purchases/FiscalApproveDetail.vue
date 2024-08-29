@@ -56,9 +56,19 @@
           class="expense-table"
           no-data-label="No expenses entered this month"
         >
+          <template v-slot:body-cell-name="props">
+            <q-td key="name" :props="props" style="white-space: normal;">
+              {{ props.row.name }}
+            </q-td>
+          </template>
           <template v-slot:body-cell-date="props">
             <q-td key="date" :props="props">
               {{ readableDateNEW(props.row.date) }}
+            </q-td>
+          </template>
+          <template v-slot:body-cell-vendor="props">
+            <q-td key="vendor" :props="props" style="white-space: normal;">
+              {{ props.row.vendor }}
             </q-td>
           </template>
           <template v-slot:body-cell-gls="props">
@@ -68,13 +78,12 @@
                 v-for="gl in props.row.gls"
                 :key="props.row.gls.indexOf(gl)"
               >
-                {{ gl.code }}: ${{ gl.amount }} – {{ gl.approver.name }}
+                <div>{{ gl.code }}: ${{ gl.amount }}</div>
+                <div>
+                  Approved by {{ gl.approver.name }}
+                  ({{ readableDateTime(gl.approved_at) }})
+                </div>
               </div>
-            </q-td>
-          </template>
-          <template v-slot:body-cell-approvedAt="props">
-            <q-td key="date" :props="props" style="white-space: normal;">
-              {{ readableDateTime(props.row.approved_at) }}
             </q-td>
           </template>
           <template v-slot:body-cell-receipt="props">
@@ -354,15 +363,12 @@ const printColumns = [
   {
     name: 'gls', field: 'gls', label: 'GL Codes', align: 'center',
     sortable: true, style: 'width: 10px'
-  },
-  {
-    name: 'approvedAt', field: 'approved_at', label: 'Approved At',
-    align: 'center'
-  },
+  }
 ]
 
 const columns = printColumns.concat([{
-  name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center'
+  name: 'receipt', field: 'receipt', label: 'Receipt', align: 'center',
+  sortable: false
 }])
 
 function tableTitleDisplay(em: ExpenseMonth): string {

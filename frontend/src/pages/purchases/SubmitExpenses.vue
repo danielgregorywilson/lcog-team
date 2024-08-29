@@ -69,7 +69,7 @@
               :props="props"
               :class="expenseClass(props.row)"
             >
-              <q-td key="name" :props="props">
+              <q-td key="name" :props="props" style="white-space: normal;">
                 {{ props.row.name }}
                 <q-popup-edit
                   v-if="!monthSubmitted()"
@@ -104,7 +104,7 @@
                   />
                 </q-popup-edit>
               </q-td>
-              <q-td key="vendor" :props="props">
+              <q-td key="vendor" :props="props" style="white-space: normal;">
                 <div class="text-pre-wrap">{{ props.row.vendor }}</div>
                 <q-popup-edit
                   v-if="!monthSubmitted()"

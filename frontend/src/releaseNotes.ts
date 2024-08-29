@@ -4,6 +4,16 @@
 
 export const releases = [
   {
+    version: '0.34.0',
+    date: new Date(2024, 7, 29),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Improvements to the credit card expenses app.'
+      },
+    ]
+  },
+  {
     version: '0.33.0',
     date: new Date(2024, 7, 28),
     changes: [

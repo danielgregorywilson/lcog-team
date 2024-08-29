@@ -567,7 +567,7 @@ function navigateToPrintView() {
 function expenseMonthTotal(em: ExpenseMonth) {
   return em.expenses.reduce(
     (acc, expense) => acc + parseFloat(expense.amount), 0
-  )
+  ).toFixed(2)
 }
 
 function expensesTotal() {
@@ -577,7 +577,7 @@ function expensesTotal() {
       (acc, expense) => acc + parseFloat(expense.amount), 0
     )
   }
-  return total
+  return total.toFixed(2)
 }
 
 function totalsMatch() {

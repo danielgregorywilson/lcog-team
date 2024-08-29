@@ -77,7 +77,14 @@
                 v-for="gl in props.row.gls"
                 :key="props.row.gls.indexOf(gl)"
               >
-                {{ gl.code }}: ${{ gl.amount }} – {{ gl.approver.name }}
+                <div>{{ gl.code }}: ${{ gl.amount }}</div>
+                <div v-if="gl.approved_at">
+                  Approved by {{ gl.approver.name }}
+                  ({{ readableDateTime(gl.approved_at) }})
+                </div>
+                <div v-else class="text-bold">
+                  Not yet approved by {{ gl.approver.name }}
+                </div>
               </div>
             </q-td>
           </template>

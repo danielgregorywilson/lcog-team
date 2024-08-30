@@ -780,7 +780,7 @@ function selectedStatementTotal() {
   }
   return selectedStatement?.value.value.items.reduce(
     (acc, item) => acc + parseFloat(item.amount), 0
-  )
+  ).toFixed(2)
 }
 
 function totalsMatch() {

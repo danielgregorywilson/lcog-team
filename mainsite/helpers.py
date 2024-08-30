@@ -77,7 +77,9 @@ def send_email(to_address, subject, body, html_body):
     except Exception as e:
         record_error('Error sending email', e)
 
-def send_email_multiple(to_addresses=[], cc_addresses=[], subject='', text_body='', html_body=''):
+def send_email_multiple(
+    to_addresses=[], cc_addresses=[], subject='', text_body='', html_body=''
+):
     email = EmailMultiAlternatives(
         subject=subject, body=text_body,
         from_email=os.environ.get('FROM_EMAIL'), to=to_addresses,
@@ -432,7 +434,9 @@ def get_lat_long(address, city, state, zip):
         address = address[:address.index('#')] # Remove unit number
     if ' 1/2' in address:
         address = address.replace(' 1/2', '') # Remove the 1/2 designation
-    url = 'https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(f'${address}, ${city}, ${state}, ${zip}') +'?format=json'
+    url = 'https://nominatim.openstreetmap.org/search/' + \
+        urllib.parse.quote(f'${address}, ${city}, ${state}, ${zip}') + \
+        '?format=json'
     response = requests.get(url).json()
     if response:
         return response[0]["lat"], response[0]["lon"]

@@ -6,7 +6,7 @@ from django.db.models import Q
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
-from mainsite.helpers import send_email
+from mainsite.helpers import send_email, send_email_multiple
 from people.models import Employee
 from purchases.models import ExpenseMonth
 
@@ -71,8 +71,9 @@ def send_submitter_monthly_expenses_reminders():
             'from_email': os.environ.get('FROM_EMAIL')
         }, })
         plaintext_message = strip_tags(html_message)
-        send_email(
-            recipient[0],
+        send_email_multiple(
+            [recipient[0]],
+            ['payadmin@lcog.org'],
             f'Time to enter { curr_month_name } expenses',
             plaintext_message,
             html_message

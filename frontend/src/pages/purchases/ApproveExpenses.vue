@@ -21,9 +21,19 @@
       class="expense-table"
       no-data-label="No expenses entered this month"
     >
+      <template v-slot:body-cell-expense_name="props">
+        <q-td key="expense_name" :props="props" style="white-space: normal;">
+          {{ props.row.expense_name }}
+        </q-td>
+      </template>
       <template v-slot:body-cell-expense_date="props">
         <q-td key="expense_date" :props="props">
           {{ readableDateNEW(props.row.expense_date) }}
+        </q-td>
+      </template>
+      <template v-slot:body-cell-expense_vendor="props">
+        <q-td key="expense_vendor" :props="props" style="white-space: normal;">
+          {{ props.row.expense_vendor }}
         </q-td>
       </template>
       <template v-slot:body-cell-gl="props">
@@ -51,7 +61,7 @@
         </q-td>
       </template>
       <template v-slot:body-cell-approve="props">
-        <q-td :props="props">
+        <q-td :props="props" style="min-width: 100px;">
           <div class="row justify-center">
             {{ props.row.status }}
             <q-btn 

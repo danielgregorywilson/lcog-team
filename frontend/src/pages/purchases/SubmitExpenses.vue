@@ -80,6 +80,7 @@
                 >
                   <q-input
                     v-model="scope.value"
+                    maxlength="255"
                     dense
                     autofocus
                     @keyup.enter="scope.set()"
@@ -115,6 +116,7 @@
                 >
                   <q-input
                     v-model="scope.value"
+                    maxlength="255"
                     dense
                     autofocus
                     @keyup.enter="scope.set()"
@@ -152,6 +154,7 @@
                 >
                   <q-input
                     v-model="scope.value"
+                    maxlength="255"
                     dense
                     autofocus
                     @keyup.enter="scope.set()"

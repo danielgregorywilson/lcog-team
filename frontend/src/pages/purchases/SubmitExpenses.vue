@@ -80,6 +80,7 @@
                 >
                   <q-input
                     v-model="scope.value"
+                    maxlength="255"
                     dense
                     autofocus
                     @keyup.enter="scope.set()"
@@ -115,6 +116,7 @@
                 >
                   <q-input
                     v-model="scope.value"
+                    maxlength="255"
                     dense
                     autofocus
                     @keyup.enter="scope.set()"
@@ -152,6 +154,7 @@
                 >
                   <q-input
                     v-model="scope.value"
+                    maxlength="255"
                     dense
                     autofocus
                     @keyup.enter="scope.set()"
@@ -780,7 +783,7 @@ function selectedStatementTotal() {
   }
   return selectedStatement?.value.value.items.reduce(
     (acc, item) => acc + parseFloat(item.amount), 0
-  )
+  ).toFixed(2)
 }
 
 function totalsMatch() {

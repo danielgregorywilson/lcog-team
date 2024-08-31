@@ -31,6 +31,7 @@ class Command(BaseCommand):
                     '$2,187.68.\n06/26/2020 04:37 PM - clid1559',
                     '3/1/20.\n\n11/25/2020 06:22 PM - clid1559',
                     'step.\n\n03/04/2024 09:54 AM - clid1559',
+                    '11.3.\n\n05/10/2024 04:40 PM - clid1559',
                     'Report Criteria:',
                     'Include review notes',
                     'EA Range 25 Step 6 to EA Range 25 Step 7, and then a 1-step increase on 1/1/19 from EA Range 25 Step 7 to EA Range 25 Step 8.  So, I am putting her in for this pay period (as of 6/2/19) as a 2-step increase, and I am asking Payroll to process retroactive pay for her for the period of 1/1/18 to 12/31/18 (which includes a COLA at 7/1/18) at Step 6 and for the period 1/1/19 to 6/1/19 at Step 7.\n\n06/12/2019 05:57 PM - clid1559'

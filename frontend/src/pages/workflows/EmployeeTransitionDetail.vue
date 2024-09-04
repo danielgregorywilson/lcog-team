@@ -7,29 +7,29 @@
         val="New"
         id="type-new"
         :disable="!canEditOtherFields()"
+        label="New"
       />
-      <div>New</div>
       <q-radio
         v-model="type"
         val="Return"
         id="type-return"
         :disable="!canEditOtherFields()"
+        label="Return"
       />
-      <div>Return</div>
       <q-radio
         v-model="type"
         val="Change/Modify"
         id="type-change"
         :disable="!canEditOtherFields()"
+        label="Change/Modify"
       />
-      <div>Change/Modify</div>
       <q-radio
         v-model="type"
         val="Exit"
         id="type-exit"
         :disable="!canEditOtherFields()"
+        label="Exit"
       />
-      <div>Exit</div>
     </div>
     <div class="text-h6 transition-form-section-heading row">
       <div>Worker Type</div>
@@ -41,36 +41,36 @@
         val="Employee"
         id="worker-type-employee"
         :disable="!canEditOtherFields()"
+        label="Employee"
       />
-      <div>Employee</div>
       <q-radio
         v-model="workerType"
         val="Intern"
         id="worker-type-intern"
         :disable="!canEditOtherFields()"
+        label="Intern"
       />
-      <div>Intern</div>
       <q-radio
         v-model="workerType"
         val="Volunteer"
         id="worker-type-volunteer"
         :disable="!canEditOtherFields()"
+        label="Volunteer"
       />
-      <div>Volunteer</div>
       <q-radio
         v-model="workerType"
         val="Temp Agency"
         id="worker-type-temp-agency"
         :disable="!canEditOtherFields()"
+        label="Temp Agency"
       />
-      <div>Temp Agency</div>
       <q-radio
         v-model="workerType"
         val="Temp Non-Agency"
         id="worker-type-temp-non-agency"
         :disable="!canEditOtherFields()"
+        label="Temp Non-Agency"
       />
-      <div>Temp Non-Agency</div>
     </div>
     <div class="text-h6 transition-form-section-heading">Submission Info</div>
     <div class="row items-center">

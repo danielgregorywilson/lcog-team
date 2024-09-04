@@ -899,6 +899,7 @@ export type EmployeeID = 'CLSD' | 'CLID' | ''
 interface EmployeeTransitionBase {
   salary_range: number | null
   salary_step: number | null
+  stipend: string | null
   cubicle_number: number | null
 }
 
@@ -930,6 +931,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   title_pk: number
   title_name: string
   fte: string
+  hours_per_week: string
   bilingual: boolean
   second_language: string
   manager_pk: number
@@ -983,6 +985,7 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   employee_email?: string
   title_pk?: number
   fte?: string
+  hours_per_week?: string
   bilingual?: boolean
   second_language?: string
   manager_pk?: number

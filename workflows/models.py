@@ -212,13 +212,13 @@ class EmployeeTransition(models.Model):
         JobTitle, blank=True, null=True, on_delete=models.SET_NULL
     )
     fte = models.FloatField(blank=True, default=1.0)
+    hours_per_week = models.FloatField(blank=True, default=0)
     salary_range = models.DecimalField(
         blank=True, null=True, max_digits=10, decimal_places=2
     )
     salary_step = models.PositiveSmallIntegerField(blank=True, null=True)
-    hours_per_week = models.FloatField(blank=True, null=True)
-    stipend = models.DecimalField(
-        blank=True, null=True, max_digits=10, decimal_places=2
+    stipend = models.CharField(
+        blank=True, max_length=100, help_text=_("e.g. $500/month")
     )
     bilingual = models.BooleanField(default=False)
     second_language = models.CharField(

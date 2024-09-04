@@ -339,6 +339,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
                 t.title = None
 
             t.fte = request.data['fte']
+            t.hours_per_week = request.data['hours_per_week']
 
             # Only the submitter, hiring manager, HR, fiscal, and SDS hiring leads
             # can edit salary fields.
@@ -362,7 +363,10 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
                 'salary_step' in request.data,
                 request.data['salary_step'] != t.salary_step
             ])
-            editing_salary = editing_salary_range or editing_salary_step
+            editing_stipend = request.data['stipend'] != t.stipend
+            editing_salary = any([
+                editing_salary_range, editing_salary_step, editing_stipend
+            ])
             if editing_salary and not user_can_edit_salary:
                 message = 'Only the submitter, hiring manager, fiscal, HR, \
                     or hiring leads can edit salary fields.'
@@ -374,6 +378,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             if editing_salary and user_can_edit_salary:
                 t.salary_range = request.data['salary_range']
                 t.salary_step = request.data['salary_step']
+                t.stipend = request.data['stipend']
             
             t.bilingual = request.data['bilingual']
             t.second_language = request.data['second_language']

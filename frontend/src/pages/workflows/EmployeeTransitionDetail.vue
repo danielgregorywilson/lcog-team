@@ -169,15 +169,26 @@
         name="title"
         :disable="!canEditOtherFields()"
       />
-      <q-input
-        v-if="type!='Exit'"
-        v-model="fte"
-        name="fte"
-        label="FTE"
-        class="q-mr-md"
-        :readonly="!canEditOtherFields()"
-        :rules="[val => decimalNumberRegex.test(val) || 'Must be a number']"
-      />
+      <div v-if="type != 'Exit'">
+        <q-input
+          v-if="workerType == 'Employee'"
+          v-model="fte"
+          name="fte"
+          label="FTE"
+          class="q-mr-md"
+          :readonly="!canEditOtherFields()"
+          :rules="[val => decimalNumberRegex.test(val) || 'Must be a number']"
+        />
+        <q-input
+          v-else
+          v-model="hoursPerWeek"
+          name="hoursPerWeek"
+          label="Hours per week"
+          class="q-mr-md"
+          :readonly="!canEditOtherFields()"
+          :rules="[val => decimalNumberRegex.test(val) || 'Must be a number']"
+        />
+      </div>
       <q-checkbox
         v-model="bilingual"
         label="Bilingual"
@@ -211,7 +222,7 @@
         </template>
       </q-select>
     </div>
-    <div class="row">
+    <div v-if="workerType == 'Employee'" class="row">
       <q-input
         v-if="canViewSalaryFields()"
         v-model="salaryRange"
@@ -250,6 +261,16 @@
           />
         </template>
       </q-select>
+    </div>
+    <div v-else-if="['Intern', 'Volunteer'].indexOf(workerType) != -1">
+      <q-input
+        v-if="canViewSalaryFields()"
+        v-model="stipend"
+        name="stipend"
+        label="Stipend"
+        class="q-mr-md"
+        clearable
+      />
     </div>
     <div class="row items-center">
       <EmployeeSelect
@@ -1149,10 +1170,14 @@ let titleCurrentVal = ref(emptyTitle)
 let title = ref(emptyTitle)
 let fteCurrentVal = ref('')
 let fte = ref('')
+let hoursPerWeekCurrentVal = ref('')
+let hoursPerWeek = ref('')
 let salaryRangeCurrentVal = ref(null) as Ref<number | null>
 let salaryRange = ref(null) as Ref<number | null>
 let salaryStepCurrentVal = ref(null) as Ref<number | null>
 let salaryStep = ref(null) as Ref<number | null>
+let stipendCurrentVal = ref(null) as Ref<string | null>
+let stipend = ref(null) as Ref<string | null>
 let bilingualCurrentVal = ref(false)
 let bilingual = ref(false)
 let secondLanguageCurrentVal = ref('')
@@ -1343,10 +1368,14 @@ function retrieveEmployeeTransition() {
     titleCurrentVal.value = title.value
     fte.value = t.fte
     fteCurrentVal.value = fte.value
+    hoursPerWeek.value = t.hours_per_week
+    hoursPerWeekCurrentVal.value = hoursPerWeek.value
     salaryRange.value = t.salary_range
     salaryRangeCurrentVal.value = salaryRange.value
     salaryStep.value = t.salary_step
     salaryStepCurrentVal.value = salaryStep.value
+    stipend.value = t.stipend
+    stipendCurrentVal.value = stipend.value
     bilingual.value = t.bilingual
     bilingualCurrentVal.value = bilingual.value
     secondLanguage.value = t.second_language
@@ -1453,8 +1482,10 @@ function valuesAreChanged(): boolean {
     employeeEmail.value == employeeEmailCurrentVal.value &&
     title.value.pk == titleCurrentVal.value.pk &&
     fte.value == fteCurrentVal.value &&
+    hoursPerWeek.value == hoursPerWeekCurrentVal.value &&
     salaryRange.value == salaryRangeCurrentVal.value &&
     salaryStep.value == salaryStepCurrentVal.value &&
+    stipend.value == stipendCurrentVal.value &&
     bilingual.value == bilingualCurrentVal.value &&
     secondLanguage.value == secondLanguageCurrentVal.value &&
     manager.value.pk == managerCurrentVal.value.pk &&
@@ -1525,6 +1556,9 @@ function updateTransition() {
     if (!fte.value) {
       fte.value = '0'
     }
+    if (!hoursPerWeek.value) {
+      hoursPerWeek.value = '0'
+    }
     if (!bilingual.value) {
       secondLanguage.value = ''
     }
@@ -1571,8 +1605,10 @@ function updateTransition() {
       employee_email: employeeEmail.value,
       title_pk: title.value.pk,
       fte: fte.value,
+      hours_per_week: hoursPerWeek.value,
       salary_range: salaryRange.value,
       salary_step: salaryStep.value,
+      stipend: stipend.value,
       bilingual: bilingual.value,
       second_language: secondLanguage.value,
       manager_pk: manager.value.pk,
@@ -1625,10 +1661,12 @@ function updateTransition() {
       employeeEmailCurrentVal.value = t.employee_email
       titleCurrentVal.value = {pk: t.title_pk, name: t.title_name}
       fteCurrentVal.value = t.fte
+      hoursPerWeekCurrentVal.value = t.hours_per_week
       // We need to set salaryRange because integers are set as decimals
       salaryRange.value = t.salary_range
       salaryRangeCurrentVal.value = t.salary_range
       salaryStepCurrentVal.value = t.salary_step
+      stipendCurrentVal.value = t.stipend
       bilingualCurrentVal.value = t.bilingual
       secondLanguageCurrentVal.value = t.second_language
       managerCurrentVal.value = {

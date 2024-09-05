@@ -313,6 +313,17 @@
         :readonly="!canEditOtherFields()"
       />
     </div>
+    <div v-if="workerType != 'Employee'" class="row items-center">
+      <div class="q-mr-xs text-h6">Schedule</div>
+      <q-checkbox
+        v-for="(item, index) in scheduleOptions"
+        :key="index"
+        v-model="schedule"
+        :val="item[0]"
+        :label="item[1]"
+        :disable="!canEditOtherFields()"
+      />
+    </div>
     <div class="row q-my-sm" v-if="['Change/Modify'].indexOf(type) != -1">
       <q-checkbox
         id="system-change-date-different"
@@ -1122,6 +1133,11 @@ const languageOptions = [
   'Thai', 'Turkish', 'Urdu', 'Vietnamese', 'Welsh', 'Xhosa', 'Zulu',
 ]
 
+const scheduleOptions = [
+  ['M', 'Monday'], ['U', 'Tuesday'], ['W', 'Wednesday'], ['H', 'Thursday'],
+  ['F', 'Friday']
+]
+
 const decimalNumberRegex = /^[+-]?(([1-9][0-9]*)?[0-9](\.[0-9]*)?|\.[0-9]+)$/
 
 const workerTypeTooltipText = `
@@ -1191,6 +1207,8 @@ let transitionDate = ref(null) as Ref<string | null>
 let systemChangeDateDifferent = ref(false)
 let systemChangeDateCurrentVal = ref(null) as Ref<string | null>
 let systemChangeDate = ref(null) as Ref<string | null>
+let scheduleCurrentVal = ref([]) as Ref<string[]>
+let schedule = ref([]) as Ref<string[]>
 let lwopCurrentVal = ref(false)
 let lwop = ref(false)
 let lwopDetailsCurrentVal = ref('')
@@ -1397,6 +1415,8 @@ function retrieveEmployeeTransition() {
       systemChangeDateDifferent.value = true
     }
     systemChangeDateCurrentVal.value = systemChangeDate.value
+    schedule.value = t.schedule.split('')
+    scheduleCurrentVal.value = schedule.value
     lwop.value = t.lwop
     lwopCurrentVal.value = lwop.value
     lwopDetails.value = t.lwop_details
@@ -1515,6 +1535,8 @@ function valuesAreChanged(): boolean {
         Date.parse(systemChangeDateCurrentVal.value)
       )
     ) &&
+    schedule.value.sort().join('') == 
+      scheduleCurrentVal.value.sort().join('') &&
     lwop.value == lwopCurrentVal.value &&
     lwopDetails.value == lwopDetailsCurrentVal.value &&
     preliminaryHire.value == preliminaryHireCurrentVal.value &&
@@ -1615,6 +1637,7 @@ function updateTransition() {
       unit_pk: unit.value.pk,
       transition_date: transitionDateFromForm,
       system_change_date: systemChangeDateFromForm,
+      schedule: schedule.value.join(''),
       lwop: lwop.value,
       lwop_details: lwopDetails.value,
       preliminary_hire: preliminaryHire.value,
@@ -1675,6 +1698,7 @@ function updateTransition() {
       unitCurrentVal.value = {pk: t.unit_pk, name: t.unit_name}
       transitionDateCurrentVal.value = t.transition_date
       systemChangeDateCurrentVal.value = t.system_change_date
+      scheduleCurrentVal.value = t.schedule.split('')
       lwopCurrentVal.value = t.lwop
       lwopDetailsCurrentVal.value = t.lwop_details
       preliminaryHireCurrentVal.value = t.preliminary_hire

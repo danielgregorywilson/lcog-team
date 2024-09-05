@@ -940,6 +940,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   unit_name: string
   transition_date: string
   system_change_date: string
+  schedule: string
   lwop: boolean
   lwop_details: string
   preliminary_hire: boolean
@@ -992,6 +993,7 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   unit_pk?: number
   transition_date?: Date
   system_change_date?: Date
+  schedule?: string
   lwop?: boolean
   lwop_details?: string
   preliminary_hire?: boolean

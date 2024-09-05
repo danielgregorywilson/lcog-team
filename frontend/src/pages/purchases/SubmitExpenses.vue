@@ -890,7 +890,7 @@ function formErrorItems() {
     const GLsTotal = exp.gls.reduce(
       (acc, gl) => acc + parseFloat(gl.amount), 0
     )
-    if (GLsTotal !== parseFloat(exp.amount)) {
+    if (GLsTotal.toFixed(2) !== parseFloat(exp.amount).toFixed(2)) {
       errorItems.push(`GLs for ${exp.name} must add to ${exp.amount}`)
     }
     if (!exp.receipt) {

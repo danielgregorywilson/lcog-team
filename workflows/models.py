@@ -64,11 +64,26 @@ class EmployeeTransition(models.Model):
         (TRANSITION_TYPE_EXIT, TRANSITION_TYPE_EXIT)
     ]
 
+    WORKER_TYPE_EMPLOYEE = 'Employee'
+    WORKER_TYPE_INTERN = 'Intern'
+    WORKER_TYPE_VOLUNTEER = 'Volunteer'
+    WORKER_TYPE_TEMP_AGENCY = 'Temp Agency'
+    WORKER_TYPE_TEMP_NON_AGENCY = 'Temp Non-Agency'
+    WORKER_TYPE_CHOICES = [
+        (WORKER_TYPE_EMPLOYEE, WORKER_TYPE_EMPLOYEE),
+        (WORKER_TYPE_INTERN, WORKER_TYPE_INTERN),
+        (WORKER_TYPE_VOLUNTEER, WORKER_TYPE_VOLUNTEER),
+        (WORKER_TYPE_TEMP_AGENCY, WORKER_TYPE_TEMP_AGENCY),
+        (WORKER_TYPE_TEMP_NON_AGENCY, WORKER_TYPE_TEMP_NON_AGENCY)
+    ]
+
     EMPLOYEE_ID_CLSD = 'CLSD'
     EMPLOYEE_ID_CLID = 'CLID'
+    EMPLOYEE_ID_NONE = 'None/Non-Employee'
     EMPLOYEE_ID_CHOICES = [
         (EMPLOYEE_ID_CLSD, EMPLOYEE_ID_CLSD),
-        (EMPLOYEE_ID_CLID, EMPLOYEE_ID_CLID)
+        (EMPLOYEE_ID_CLID, EMPLOYEE_ID_CLID),
+        (EMPLOYEE_ID_NONE, EMPLOYEE_ID_NONE)
     ]
 
     LOCATION_COTTAGE_GROVE = 'Cottage Grove'
@@ -173,6 +188,10 @@ class EmployeeTransition(models.Model):
         _("transition type"), max_length=20, choices=TRANSITION_TYPE_CHOICES,
         blank=True, null=True
     )
+    worker_type = models.CharField(
+        _("worker type"), max_length=15, choices=WORKER_TYPE_CHOICES,
+        default=WORKER_TYPE_EMPLOYEE
+    )
     # TODO: What does this mean now? Currently submitter and date are set only
     # the first time the transition is saved.
     date_submitted = models.DateTimeField(blank=True, null=True)
@@ -186,17 +205,21 @@ class EmployeeTransition(models.Model):
     employee_preferred_name = models.CharField(blank=True, max_length=100)
     employee_number = models.PositiveSmallIntegerField(blank=True, null=True)
     employee_id = models.CharField(
-        blank=True, max_length=4, choices=EMPLOYEE_ID_CHOICES
+        blank=True, max_length=17, choices=EMPLOYEE_ID_CHOICES
     )
     employee_email = models.EmailField(blank=True)
     title = models.ForeignKey(
         JobTitle, blank=True, null=True, on_delete=models.SET_NULL
     )
     fte = models.FloatField(blank=True, default=1.0)
+    hours_per_week = models.FloatField(blank=True, default=0)
     salary_range = models.DecimalField(
         blank=True, null=True, max_digits=10, decimal_places=2
     )
     salary_step = models.PositiveSmallIntegerField(blank=True, null=True)
+    stipend = models.CharField(
+        blank=True, max_length=100, help_text=_("e.g. $500/month")
+    )
     bilingual = models.BooleanField(default=False)
     second_language = models.CharField(
         max_length=20, choices=LANGUAGE_CHOICES, blank=True
@@ -214,6 +237,8 @@ class EmployeeTransition(models.Model):
     lwop_details = models.TextField(blank=True, null=True)
     preliminary_hire = models.BooleanField(default=False)
     delete_profile = models.BooleanField(default=False)
+    # Weekly schedule string (U=Tuesday, H=Thursday) e.g. MUWF is no Thursdays
+    schedule = models.CharField(max_length=5, blank=True)
     office_location = models.CharField(
         max_length=30, choices=LOCATION_CHOICES, blank=True
     )

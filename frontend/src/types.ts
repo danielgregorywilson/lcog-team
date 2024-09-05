@@ -138,6 +138,14 @@ export interface EmployeeRetrieve {
   workflow_display_options: Array<WorkflowOption>
 }
 
+export interface SimpleEmployee {
+  pk: number
+  name: string
+  legal_name: string
+  title?: string
+  is_expense_approver?: boolean
+}
+
 export interface SimpleEmployeeRetrieve {
   pk: number
   name: string
@@ -891,6 +899,7 @@ export type EmployeeID = 'CLSD' | 'CLID' | ''
 interface EmployeeTransitionBase {
   salary_range: number | null
   salary_step: number | null
+  stipend: string | null
   cubicle_number: number | null
 }
 
@@ -907,6 +916,7 @@ export interface TransitionChange {
 export interface EmployeeTransition extends EmployeeTransitionBase {
   pk: number
   type: string
+  worker_type: string
   date_submitted: Date
   submitter_pk: number
   submitter_name: string
@@ -921,6 +931,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   title_pk: number
   title_name: string
   fte: string
+  hours_per_week: string
   bilingual: boolean
   second_language: string
   manager_pk: number
@@ -929,6 +940,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   unit_name: string
   transition_date: string
   system_change_date: string
+  schedule: string
   lwop: boolean
   lwop_details: string
   preliminary_hire: boolean
@@ -963,6 +975,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
 
 export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   type?: string
+  worker_type?: string
   submitter_pk: number
   employee_first_name?: string
   employee_middle_initial?: string
@@ -973,12 +986,14 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   employee_email?: string
   title_pk?: number
   fte?: string
+  hours_per_week?: string
   bilingual?: boolean
   second_language?: string
   manager_pk?: number
   unit_pk?: number
   transition_date?: Date
   system_change_date?: Date
+  schedule?: string
   lwop?: boolean
   lwop_details?: string
   preliminary_hire?: boolean

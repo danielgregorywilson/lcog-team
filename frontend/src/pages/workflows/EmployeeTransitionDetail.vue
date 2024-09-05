@@ -1,35 +1,76 @@
 <template>
   <div class="q-pt-md">
-    <div class="text-h6 transition-form-section-heading">Type</div>
+    <div class="text-h6 transition-form-section-heading">Transition Type</div>
     <div class="row items-center">
       <q-radio
         v-model="type"
         val="New"
         id="type-new"
         :disable="!canEditOtherFields()"
+        label="New"
       />
-      <div>New</div>
       <q-radio
         v-model="type"
         val="Return"
         id="type-return"
         :disable="!canEditOtherFields()"
+        label="Return"
       />
-      <div>Return</div>
       <q-radio
         v-model="type"
         val="Change/Modify"
         id="type-change"
         :disable="!canEditOtherFields()"
+        label="Change/Modify"
       />
-      <div>Change/Modify</div>
       <q-radio
         v-model="type"
         val="Exit"
         id="type-exit"
         :disable="!canEditOtherFields()"
+        label="Exit"
       />
-      <div>Exit</div>
+    </div>
+    <div class="text-h6 transition-form-section-heading row">
+      <div>Worker Type</div>
+      <InfoTooltip :text="workerTypeTooltipText" />
+    </div>
+    <div class="row items-center">
+      <q-radio
+        v-model="workerType"
+        val="Employee"
+        id="worker-type-employee"
+        :disable="!canEditOtherFields()"
+        label="Employee"
+      />
+      <q-radio
+        v-model="workerType"
+        val="Intern"
+        id="worker-type-intern"
+        :disable="!canEditOtherFields()"
+        label="Intern"
+      />
+      <q-radio
+        v-model="workerType"
+        val="Volunteer"
+        id="worker-type-volunteer"
+        :disable="!canEditOtherFields()"
+        label="Volunteer"
+      />
+      <q-radio
+        v-model="workerType"
+        val="Temp Agency"
+        id="worker-type-temp-agency"
+        :disable="!canEditOtherFields()"
+        label="Temp Agency"
+      />
+      <q-radio
+        v-model="workerType"
+        val="Temp Non-Agency"
+        id="worker-type-temp-non-agency"
+        :disable="!canEditOtherFields()"
+        label="Temp Non-Agency"
+      />
     </div>
     <div class="text-h6 transition-form-section-heading">Submission Info</div>
     <div class="row items-center">
@@ -39,7 +80,9 @@
       </div>
       <div><span class="text-bold">Submitter:</span> {{ submitterName }}</div>
     </div>
-    <div class="text-h6 transition-form-section-heading">Employee</div>
+    <div class="text-h6 transition-form-section-heading">
+      {{ workerLabel() }} Details
+    </div>
     <div class="row">
       <q-input
         stack-label
@@ -80,7 +123,7 @@
         v-model="employeeID"
         name="employee-id"
         id="employee-id"
-        :options="['CLSD', 'CLID']"
+        :options="['CLSD', 'CLID', 'None/Non-Employee']"
         label="Employee ID"
         class="q-mr-sm"
         style="width: 130px;"
@@ -100,7 +143,7 @@
       <q-input
         v-model="employeeNumber"
         type="number"
-        label="Employee Number"
+        :label=workerNumberLabel()
         name="employee-number"
         mask="####"
         class="q-mr-md"
@@ -126,15 +169,26 @@
         name="title"
         :disable="!canEditOtherFields()"
       />
-      <q-input
-        v-if="type!='Exit'"
-        v-model="fte"
-        name="fte"
-        label="FTE"
-        class="q-mr-md"
-        :readonly="!canEditOtherFields()"
-        :rules="[val => decimalNumberRegex.test(val) || 'Must be a number']"
-      />
+      <div v-if="type != 'Exit'">
+        <q-input
+          v-if="workerType == 'Employee'"
+          v-model="fte"
+          name="fte"
+          label="FTE"
+          class="q-mr-md"
+          :readonly="!canEditOtherFields()"
+          :rules="[val => decimalNumberRegex.test(val) || 'Must be a number']"
+        />
+        <q-input
+          v-else
+          v-model="hoursPerWeek"
+          name="hoursPerWeek"
+          label="Hours per week"
+          class="q-mr-md"
+          :readonly="!canEditOtherFields()"
+          :rules="[val => decimalNumberRegex.test(val) || 'Must be a number']"
+        />
+      </div>
       <q-checkbox
         v-model="bilingual"
         label="Bilingual"
@@ -168,7 +222,7 @@
         </template>
       </q-select>
     </div>
-    <div class="row">
+    <div v-if="workerType == 'Employee'" class="row">
       <q-input
         v-if="canViewSalaryFields()"
         v-model="salaryRange"
@@ -207,6 +261,16 @@
           />
         </template>
       </q-select>
+    </div>
+    <div v-else-if="['Intern', 'Volunteer'].indexOf(workerType) != -1">
+      <q-input
+        v-if="canViewSalaryFields()"
+        v-model="stipend"
+        name="stipend"
+        label="Stipend"
+        class="q-mr-md"
+        clearable
+      />
     </div>
     <div class="row items-center">
       <EmployeeSelect
@@ -249,6 +313,17 @@
         :readonly="!canEditOtherFields()"
       />
     </div>
+    <div v-if="workerType != 'Employee'" class="row items-center">
+      <div class="q-mr-xs text-h6">Schedule</div>
+      <q-checkbox
+        v-for="(item, index) in scheduleOptions"
+        :key="index"
+        v-model="schedule"
+        :val="item[0]"
+        :label="item[1]"
+        :disable="!canEditOtherFields()"
+      />
+    </div>
     <div class="row q-my-sm" v-if="['Change/Modify'].indexOf(type) != -1">
       <q-checkbox
         id="system-change-date-different"
@@ -288,7 +363,7 @@
       <q-checkbox
         id="preliminary-hire"
         v-model="preliminaryHire"
-        v-if="employeeID != 'CLID'"
+        v-if="employeeID == 'CLSD'"
         label="Preliminary Hire"
         :disable="!canEditOtherFields()"
       />
@@ -455,7 +530,7 @@
       <q-input
         name="load-code"
         v-model="loadCode"
-        v-if="employeeID != 'CLID'"
+        v-if="employeeID == 'CLSD'"
         label="Load Code"
         :readonly="!canEditOtherFields()"
       />
@@ -495,7 +570,7 @@
           :disable="!canEditOtherFields()"
         />
       </div>
-      <div class="row" v-if="employeeID != 'CLID'">
+      <div class="row" v-if="employeeID == 'CLSD'">
         <q-select
           name="oregon-access"
           v-model="oregonAccess"
@@ -1025,6 +1100,7 @@ import {
 } from 'src/types'
 import Avatar from 'src/components/Avatar.vue'
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
+import InfoTooltip from 'src/components/InfoTooltip.vue'
 import JobTitleSelect from 'src/components/JobTitleSelect.vue'
 // import LanguageSelect from 'src/components/LanguageSelect.vue'
 import UnitSelect from 'src/components/UnitSelect.vue'
@@ -1057,7 +1133,22 @@ const languageOptions = [
   'Thai', 'Turkish', 'Urdu', 'Vietnamese', 'Welsh', 'Xhosa', 'Zulu',
 ]
 
+const scheduleOptions = [
+  ['M', 'Monday'], ['U', 'Tuesday'], ['W', 'Wednesday'], ['H', 'Thursday'],
+  ['F', 'Friday']
+]
+
 const decimalNumberRegex = /^[+-]?(([1-9][0-9]*)?[0-9](\.[0-9]*)?|\.[0-9]+)$/
+
+const workerTypeTooltipText = `
+  <div>
+    <span style="text-decoration: underline;">Employee</span>: This person is being hired as an full- or part-time employee of LCOG. They will provide us a W-4 and LCOG will provide them a W-2.<br />
+    <span style="text-decoration: underline;">Intern</span>: This person is coming on as an intern as defined by the Department of Labor. They may or may not receive a stipend (please refer to Department of Labor rules regarding interns and stipends).<br />
+    <span style="text-decoration: underline;">Volunteer</span>: This person is volunteering their unpaid time with the agency (please refer to Department of Labor rules regarding volunteers).<br />
+    <span style="text-decoration: underline;">Temp Agency</span>: This person is a temporary employee hired through an agency. LCOG pays the agency for their time instead of directly paying the employee.<br />
+    <span style="text-decoration: underline;">Temp Non-Agency</span>: This person is a temporary employee hired directly by LCOG. LCOG directly pays the employee for their time.
+  </div>
+`
 
 const props = defineProps<{
   print?: boolean
@@ -1071,6 +1162,8 @@ let transitionPk = ref('')
 
 let typeCurrentVal = ref('')
 let type = ref('')
+let workerTypeCurrentVal = ref('')
+let workerType = ref('')
 let dateSubmitted = ref(new Date())
 let submitterPk = ref(-1)
 let submitterName = ref('')
@@ -1093,10 +1186,14 @@ let titleCurrentVal = ref(emptyTitle)
 let title = ref(emptyTitle)
 let fteCurrentVal = ref('')
 let fte = ref('')
+let hoursPerWeekCurrentVal = ref('')
+let hoursPerWeek = ref('')
 let salaryRangeCurrentVal = ref(null) as Ref<number | null>
 let salaryRange = ref(null) as Ref<number | null>
 let salaryStepCurrentVal = ref(null) as Ref<number | null>
 let salaryStep = ref(null) as Ref<number | null>
+let stipendCurrentVal = ref(null) as Ref<string | null>
+let stipend = ref(null) as Ref<string | null>
 let bilingualCurrentVal = ref(false)
 let bilingual = ref(false)
 let secondLanguageCurrentVal = ref('')
@@ -1110,6 +1207,8 @@ let transitionDate = ref(null) as Ref<string | null>
 let systemChangeDateDifferent = ref(false)
 let systemChangeDateCurrentVal = ref(null) as Ref<string | null>
 let systemChangeDate = ref(null) as Ref<string | null>
+let scheduleCurrentVal = ref([]) as Ref<string[]>
+let schedule = ref([]) as Ref<string[]>
 let lwopCurrentVal = ref(false)
 let lwop = ref(false)
 let lwopDetailsCurrentVal = ref('')
@@ -1217,6 +1316,18 @@ function assigneeLabel(assigneeType: 'CURRENT' | 'DB') {
   }
 }
 
+function workerLabel() {
+  if (['Temp Agency', 'Temp Non-Agency'].includes(workerType.value)) {
+    return 'Temp Worker'
+  } else {
+    return workerType.value
+  }
+}
+
+function workerNumberLabel() {
+  return workerLabel() + ' Number'
+}
+
 let changes = ref(null) as Ref<TransitionChange[] | null>
 
 let showErrorButton = ref(false)
@@ -1249,6 +1360,8 @@ function retrieveEmployeeTransition() {
 
     type.value = t.type
     typeCurrentVal.value = type.value
+    workerType.value = t.worker_type
+    workerTypeCurrentVal.value = workerType.value
 
     dateSubmitted.value = t.date_submitted
     submitterPk.value = t.submitter_pk
@@ -1273,10 +1386,14 @@ function retrieveEmployeeTransition() {
     titleCurrentVal.value = title.value
     fte.value = t.fte
     fteCurrentVal.value = fte.value
+    hoursPerWeek.value = t.hours_per_week
+    hoursPerWeekCurrentVal.value = hoursPerWeek.value
     salaryRange.value = t.salary_range
     salaryRangeCurrentVal.value = salaryRange.value
     salaryStep.value = t.salary_step
     salaryStepCurrentVal.value = salaryStep.value
+    stipend.value = t.stipend
+    stipendCurrentVal.value = stipend.value
     bilingual.value = t.bilingual
     bilingualCurrentVal.value = bilingual.value
     secondLanguage.value = t.second_language
@@ -1298,6 +1415,8 @@ function retrieveEmployeeTransition() {
       systemChangeDateDifferent.value = true
     }
     systemChangeDateCurrentVal.value = systemChangeDate.value
+    schedule.value = t.schedule.split('')
+    scheduleCurrentVal.value = schedule.value
     lwop.value = t.lwop
     lwopCurrentVal.value = lwop.value
     lwopDetails.value = t.lwop_details
@@ -1373,6 +1492,7 @@ function retrieveEmployeeTransition() {
 function valuesAreChanged(): boolean {
   if (
     type.value == typeCurrentVal.value &&
+    workerType.value == workerTypeCurrentVal.value &&
     employeeFirstName.value == employeeFirstNameCurrentVal.value &&
     employeeMiddleInitial.value == employeeMiddleInitialCurrentVal.value &&
     employeeLastName.value == employeeLastNameCurrentVal.value &&
@@ -1382,8 +1502,10 @@ function valuesAreChanged(): boolean {
     employeeEmail.value == employeeEmailCurrentVal.value &&
     title.value.pk == titleCurrentVal.value.pk &&
     fte.value == fteCurrentVal.value &&
+    hoursPerWeek.value == hoursPerWeekCurrentVal.value &&
     salaryRange.value == salaryRangeCurrentVal.value &&
     salaryStep.value == salaryStepCurrentVal.value &&
+    stipend.value == stipendCurrentVal.value &&
     bilingual.value == bilingualCurrentVal.value &&
     secondLanguage.value == secondLanguageCurrentVal.value &&
     manager.value.pk == managerCurrentVal.value.pk &&
@@ -1413,6 +1535,8 @@ function valuesAreChanged(): boolean {
         Date.parse(systemChangeDateCurrentVal.value)
       )
     ) &&
+    schedule.value.sort().join('') == 
+      scheduleCurrentVal.value.sort().join('') &&
     lwop.value == lwopCurrentVal.value &&
     lwopDetails.value == lwopDetailsCurrentVal.value &&
     preliminaryHire.value == preliminaryHireCurrentVal.value &&
@@ -1454,6 +1578,9 @@ function updateTransition() {
     if (!fte.value) {
       fte.value = '0'
     }
+    if (!hoursPerWeek.value) {
+      hoursPerWeek.value = '0'
+    }
     if (!bilingual.value) {
       secondLanguage.value = ''
     }
@@ -1489,6 +1616,7 @@ function updateTransition() {
     // Update the DB
     workflowsStore.updateEmployeeTransition(transitionPk.value, {
       type: type.value,
+      worker_type: workerType.value,
       submitter_pk: userStore.getEmployeeProfile.employee_pk,
       employee_first_name: employeeFirstName.value,
       employee_middle_initial: employeeMiddleInitial.value,
@@ -1499,14 +1627,17 @@ function updateTransition() {
       employee_email: employeeEmail.value,
       title_pk: title.value.pk,
       fte: fte.value,
+      hours_per_week: hoursPerWeek.value,
       salary_range: salaryRange.value,
       salary_step: salaryStep.value,
+      stipend: stipend.value,
       bilingual: bilingual.value,
       second_language: secondLanguage.value,
       manager_pk: manager.value.pk,
       unit_pk: unit.value.pk,
       transition_date: transitionDateFromForm,
       system_change_date: systemChangeDateFromForm,
+      schedule: schedule.value.join(''),
       lwop: lwop.value,
       lwop_details: lwopDetails.value,
       preliminary_hire: preliminaryHire.value,
@@ -1537,6 +1668,7 @@ function updateTransition() {
     })
     .then((t) => {
       typeCurrentVal.value = t.type
+      workerTypeCurrentVal.value = t.worker_type
 
       dateSubmitted.value = t.date_submitted
       submitterPk.value = t.submitter_pk
@@ -1552,10 +1684,12 @@ function updateTransition() {
       employeeEmailCurrentVal.value = t.employee_email
       titleCurrentVal.value = {pk: t.title_pk, name: t.title_name}
       fteCurrentVal.value = t.fte
+      hoursPerWeekCurrentVal.value = t.hours_per_week
       // We need to set salaryRange because integers are set as decimals
       salaryRange.value = t.salary_range
       salaryRangeCurrentVal.value = t.salary_range
       salaryStepCurrentVal.value = t.salary_step
+      stipendCurrentVal.value = t.stipend
       bilingualCurrentVal.value = t.bilingual
       secondLanguageCurrentVal.value = t.second_language
       managerCurrentVal.value = {
@@ -1564,6 +1698,7 @@ function updateTransition() {
       unitCurrentVal.value = {pk: t.unit_pk, name: t.unit_name}
       transitionDateCurrentVal.value = t.transition_date
       systemChangeDateCurrentVal.value = t.system_change_date
+      scheduleCurrentVal.value = t.schedule.split('')
       lwopCurrentVal.value = t.lwop
       lwopDetailsCurrentVal.value = t.lwop_details
       preliminaryHireCurrentVal.value = t.preliminary_hire

@@ -4,7 +4,7 @@
   <div class="q-my-md">
     <q-btn-group rounded>
       <q-btn
-        v-if="isExpenseManager()"
+        v-if="isExpenseSubmitter()"
         :to="{ name: 'submit-expenses' }"
         unelevated
         rounded
@@ -94,8 +94,8 @@ const userStore = useUserStore()
 let firstOfThisMonth = ref(new Date())
 let firstOfSelectedMonth = ref(new Date())
 
-function isExpenseManager() {
-  return userStore.isExpenseManager
+function isExpenseSubmitter() {
+  return userStore.isExpenseSubmitter
 }
 
 function isExpenseApprover() {

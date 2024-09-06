@@ -41,7 +41,7 @@ export const useUserStore = defineStore('user', {
       workflow_roles: [] as Array<number>,
       workflow_display_options: [] as Array<WorkflowOption>,
       is_all_workflows_admin: false,
-      is_expense_manager: false,
+      is_expense_submitter: false,
       is_expense_approver: false,
       can_view_mow_routes: false,
       can_manage_mow_stops: false
@@ -57,7 +57,7 @@ export const useUserStore = defineStore('user', {
     isFiscal: state => state.profile.is_fiscal_employee,
     isDivisionDirector: state => state.profile.is_division_director,
     hasWorkflowRoles: state => !!state.profile.workflow_roles.length,
-    isExpenseManager: state => state.profile.is_expense_manager,
+    isExpenseSubmitter: state => state.profile.is_expense_submitter,
     isExpenseApprover: state => state.profile.is_expense_approver,
     canViewMOWRoutes: state => state.profile.can_view_mow_routes,
     canManageMOWStops: state => state.profile.can_manage_mow_stops
@@ -98,7 +98,7 @@ export const useUserStore = defineStore('user', {
             this.profile.workflow_roles = resp.data.workflow_roles
             this.profile.workflow_display_options = resp.data.workflow_display_options
             this.profile.is_all_workflows_admin = resp.data.is_all_workflows_admin
-            this.profile.is_expense_manager = resp.data.is_expense_manager
+            this.profile.is_expense_submitter = resp.data.is_expense_submitter
             this.profile.is_expense_approver = resp.data.is_expense_approver
             this.profile.can_view_mow_routes = resp.data.can_view_mow_routes
             this.profile.can_manage_mow_stops = resp.data.can_manage_mow_stops
@@ -144,7 +144,7 @@ export const useUserStore = defineStore('user', {
               resp.data.workflow_display_options.toString()
             )
             cookies.set(
-              'is_expense_manager', resp.data.is_expense_manager.toString()
+              'is_expense_submitter', resp.data.is_expense_submitter.toString()
             )
             cookies.set(
               'is_expense_approver', resp.data.is_expense_approver.toString()
@@ -203,7 +203,7 @@ export const useUserStore = defineStore('user', {
         cookies.remove('time_off_requests_can_view')
         cookies.remove('workflow_roles')
         cookies.remove('workflow_display_options')
-        cookies.remove('is_expense_manager')
+        cookies.remove('is_expense_submitter')
         cookies.remove('is_expense_approver')
         cookies.remove('can_view_mow_routes')
         cookies.remove('can_manage_mow_stops')

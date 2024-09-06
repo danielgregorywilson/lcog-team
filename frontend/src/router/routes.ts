@@ -1,6 +1,6 @@
 import { RouteRecordRaw } from 'vue-router'
 import {
-  isDivisionDirector, isExpenseApprover, isExpenseManager, isFiscal
+  isDivisionDirector, isExpenseApprover, isExpenseSubmitter, isFiscal
 } from './guards'
 
 const routes: RouteRecordRaw[] = [
@@ -34,7 +34,7 @@ const routes: RouteRecordRaw[] = [
             return { name: 'director-approve-expenses' }
           } else if (isExpenseApprover()) {
             return { name: 'approve-expenses' }
-          } else if (isExpenseManager()) {
+          } else if (isExpenseSubmitter()) {
             return { name: 'submit-expenses' }
           } else {
             return { name: 'dashboard' }
@@ -45,7 +45,7 @@ const routes: RouteRecordRaw[] = [
             path: 'submit',
             name: 'submit-expenses',
             component: () => import('src/pages/purchases/SubmitExpenses.vue'),
-            meta: { requiresAuth: true, requiresExpenseManager: true },
+            meta: { requiresAuth: true, requiresExpenseSubmitter: true },
           },
           {
             path: 'approve',

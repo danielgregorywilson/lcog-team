@@ -598,7 +598,7 @@ class Employee(models.Model):
         all_processes = apps.get_model('workflows', 'Process').objects.all().select_related('role')
         return [process.id for process in list(all_processes) if process.role and self in process.role.members.all()]
     
-    def is_expense_manager(self):
+    def is_expense_submitter(self):
         return self.user.groups.filter(name='Expense Submitter').exists()
     
     def is_expense_approver(self):

@@ -88,9 +88,6 @@ const props = defineProps<{
 let thisMonthEMsLoaded = ref(false)
 let allEMsLoaded = ref(false)
 
-let firstOfThisMonth = ref(new Date())
-let firstOfSelectedMonth = ref(new Date())
-
 const pagination = {
   rowsPerPage: 50
 }
@@ -111,8 +108,8 @@ const columns = [
 ]
 
 function viewingThisMonth() {
-  return firstOfSelectedMonth.value.getTime() ==
-    firstOfThisMonth.value.getTime()
+  return purchaseStore.firstOfSelectedMonth.getTime() ==
+    purchaseStore.firstOfThisMonth.getTime()
 }
 
 function EMsLoaded() {
@@ -244,16 +241,7 @@ function navigateToDetail(employeePk: number) {
   })
 }
 
-function setDates() {
-  let theFirst = new Date()
-  theFirst.setDate(1)
-  theFirst.setHours(0,0,0,0)
-  firstOfThisMonth.value = theFirst
-  firstOfSelectedMonth.value = theFirst
-}
-
 onMounted(() => {
-  setDates()
   retrieveThisMonthEMs().then(() => {
     retrieveAllEMs()
   })

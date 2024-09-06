@@ -8,6 +8,8 @@ import {
 
 export const usePurchaseStore = defineStore('purchase', {
   state: () => ({
+    firstOfThisMonth: new Date(),
+    firstOfSelectedMonth: new Date(),
     expenseMonths: [] as Array<ExpenseMonth>,
     myExpenses: [] as Array<Expense>,
     approvalExpenseGLs: [] as Array<GL>,
@@ -22,6 +24,40 @@ export const usePurchaseStore = defineStore('purchase', {
   getters: {},
 
   actions: {
+    initializeDates() {
+      const theFirst = new Date()
+      theFirst.setDate(1)
+      theFirst.setHours(0, 0, 0, 0)
+      this.firstOfThisMonth = theFirst
+      this.firstOfSelectedMonth = theFirst
+    },
+    monthBackward() {
+      if (!this.firstOfSelectedMonth) return
+      const m = this.firstOfSelectedMonth.getMonth()
+      const y = this.firstOfSelectedMonth.getFullYear()
+      this.firstOfSelectedMonth = m === 0
+        ? new Date(y - 1, 11, 1)
+        : new Date(y, m - 1, 1)
+    },
+    monthForward() {
+      if (!this.firstOfSelectedMonth) return
+      const m = this.firstOfSelectedMonth.getMonth()
+      const y = this.firstOfSelectedMonth.getFullYear()
+      this.firstOfSelectedMonth = m === 11
+        ? new Date(y + 1, 0, 1)
+        : new Date(y, m + 1, 1)
+    },
+    setThisMonth() {
+      this.firstOfSelectedMonth = this.firstOfThisMonth
+    },
+    setMonth(month: number, year: number) {
+      this.firstOfSelectedMonth = new Date(year, month - 1, 1)
+    },
+
+    ////////////////
+    /// Expenses ///
+    ////////////////
+
     createExpense(data: ExpenseCreate): Promise<Expense> {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/expense`, method: 'POST', data })
@@ -126,8 +162,29 @@ export const usePurchaseStore = defineStore('purchase', {
           url: `${ apiURL }api/v1/expense-month${ params }`
         })
           .then(resp => {
-            const ems = resp.data.results
+            let ems = resp.data.results as Array<ExpenseMonth>
             this.expenseMonths = ems
+            
+            if (!!yearInt && !!monthInt) {
+              // Set active month: The first month that is not yet submitted
+              ems = ems.sort(
+                (a: ExpenseMonth, b: ExpenseMonth) => {
+                  if (a.year !== b.year) return a.year - b.year
+                  return a.month - b.month
+                }
+              ).reverse()
+              let activeMonth = ems[0]
+              for (const em of ems) {
+                if ([
+                    'draft', 'approver_denied', 'director_denied',
+                    'fiscal_denied'
+                  ].indexOf(em.status) != -1) {
+                  activeMonth = em
+                }
+              }
+              this.setMonth(activeMonth.month, activeMonth.year)
+            }
+
             let expenses = [] as Array<Expense>
             for (const em of ems) {
               expenses = expenses.concat(em.expenses)

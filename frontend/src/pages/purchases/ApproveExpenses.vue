@@ -231,9 +231,6 @@ let deniedGLExpenseName = ref('')
 let deniedGLPurchaserName = ref('')
 let denyDialogMessage = ref('')
 
-let firstOfThisMonth = ref(new Date())
-let firstOfSelectedMonth = ref(new Date())
-
 const canApprove = ref(true)
 
 const pagination = {
@@ -275,8 +272,8 @@ const columns = [
 ]
 
 function viewingThisMonth() {
-  return firstOfSelectedMonth.value.getTime() ===
-    firstOfThisMonth.value.getTime()
+  return purchaseStore.firstOfSelectedMonth.getTime() ===
+    purchaseStore.firstOfThisMonth.getTime()
 }
 
 function expensesLoaded() {
@@ -353,16 +350,7 @@ function  openDenyGLDialog(
   showDenyDialog.value = true
 }
 
-function setDates() {
-  let theFirst = new Date()
-  theFirst.setDate(1)
-  theFirst.setHours(0,0,0,0)
-  firstOfThisMonth.value = theFirst
-  firstOfSelectedMonth.value = theFirst
-}
-
 onMounted(() => {
-  setDates()
   retrieveThisMonthExpenseGLsToApprove().then(() => {
     retrieveAllExpenseGLsToApprove()
   })

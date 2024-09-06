@@ -80,8 +80,14 @@
               >
                 <div>{{ gl.code }}: ${{ gl.amount }}</div>
                 <div v-if="gl.approved_at">
-                  Approved by {{ gl.approver.name }}
-                  ({{ readableDateTime(gl.approved_at) }})
+                  <div v-if="gl.approved">
+                    Approved by {{ gl.approver.name }}
+                    ({{ readableDateTime(gl.approved_at) }})
+                  </div>
+                  <div v-else class="text-bold">
+                    Denied by {{ gl.approver.name }}
+                    ({{ readableDateTime(gl.approved_at) }})
+                  </div>
                 </div>
                 <div v-else class="text-bold">
                   Not yet approved by {{ gl.approver.name }}
@@ -327,12 +333,9 @@ let routeEmployeeName = ref('')
 let thisMonthLoaded = ref(false)
 let allExpensesLoaded = ref(false)
 
-let firstOfThisMonth = ref(new Date())
-let firstOfSelectedMonth = ref(new Date())
-
 function viewingThisMonth() {
-  return firstOfSelectedMonth.value.getTime() ===
-    firstOfThisMonth.value.getTime()
+  return purchaseStore.firstOfSelectedMonth.getTime() ===
+    purchaseStore.firstOfThisMonth.getTime()
 }
 
 function expensesLoaded() {
@@ -538,17 +541,6 @@ function onSubmitDenyDialog() {
     }
 }
 
-function setDates() {
-  return new Promise((resolve) => {
-    let theFirst = new Date()
-    theFirst.setDate(1)
-    theFirst.setHours(0,0,0,0)
-    firstOfThisMonth.value = theFirst
-    firstOfSelectedMonth.value = theFirst
-    resolve(null)
-  })
-}
-
 function navigateToPrintView() {
   const employeePK = routeEmployeePK.value
   if (!employeePK) {
@@ -583,7 +575,7 @@ function expensesTotal() {
 function totalsMatch() {
   const statementTotal = statement.value?.items?.reduce(
     (acc, item) => acc + parseFloat(item.amount), 0
-  )
+  ).toFixed(2)
   return statementTotal == expensesTotal()
 }
 
@@ -627,10 +619,8 @@ onMounted(() => {
   if (props.print) {
     handlePrint()
   } else {
-    setDates().then(() => {
-      retrieveThisMonthEmployeeExpenses().then(() => {
-        retrieveAllEmployeeExpenses()
-      })
+    retrieveThisMonthEmployeeExpenses().then(() => {
+      retrieveAllEmployeeExpenses()
     })
   }
 })

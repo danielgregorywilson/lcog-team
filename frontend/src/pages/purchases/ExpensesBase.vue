@@ -1,6 +1,7 @@
 <template>
 <q-page class="q-pa-md">
   <div class="text-h4">Credit Card Expenses</div>
+  {{ purchaseStore.firstOfSelectedMonth }}
   <div class="q-my-md">
     <q-btn-group rounded>
       <q-btn
@@ -64,18 +65,22 @@
     </q-btn-group>  
   </div>
   <div class="q-gutter-md">
-    <q-btn @click="setThisMonth()">This Month</q-btn>
+    <q-btn @click="purchaseStore.setThisMonth()">This Month</q-btn>
     <q-btn-group>
-      <q-btn color="secondary" icon="west" @click="monthBackward()"/>
-      <q-btn color="secondary" icon="east" @click="monthForward()"/>
+      <q-btn
+        color="secondary" icon="west" @click="purchaseStore.monthBackward()"
+      />
+      <q-btn
+        color="secondary" icon="east" @click="purchaseStore.monthForward()"
+      />
     </q-btn-group>
   </div>
   <div>
     <router-view
       :monthDisplay="monthDisplay()"
       :dayInt="new Date().getDate()"
-      :monthInt="firstOfSelectedMonth.getMonth() + 1"
-      :yearInt="firstOfSelectedMonth.getFullYear()"
+      :monthInt="purchaseStore.firstOfSelectedMonth.getMonth() + 1"
+      :yearInt="purchaseStore.firstOfSelectedMonth.getFullYear()"
     ></router-view>
   </div>
 </q-page>
@@ -90,9 +95,6 @@ import { useUserStore } from 'src/stores/user'
 
 const purchaseStore = usePurchaseStore()
 const userStore = useUserStore()
-
-let firstOfThisMonth = ref(new Date())
-let firstOfSelectedMonth = ref(new Date())
 
 function isExpenseSubmitter() {
   return userStore.isExpenseSubmitter
@@ -111,39 +113,11 @@ function isFiscal() {
 }
 
 function monthDisplay(): string {
-  const m = firstOfSelectedMonth.value.toLocaleDateString(
+  const m = purchaseStore.firstOfSelectedMonth.toLocaleDateString(
     'en-us', { month: 'long' }
   )
-  const y = firstOfSelectedMonth.value.getFullYear()
+  const y = purchaseStore.firstOfSelectedMonth.getFullYear()
   return `${m} ${y}`
-}
-
-function setDates() {
-  let theFirst = new Date()
-  theFirst.setDate(1)
-  theFirst.setHours(0,0,0,0)
-  firstOfThisMonth.value = theFirst
-  firstOfSelectedMonth.value = theFirst
-}
-
-function setThisMonth() {
-  firstOfSelectedMonth.value = firstOfThisMonth.value
-}
-
-function monthBackward() {
-  const m = firstOfSelectedMonth.value.getMonth()
-  const y = firstOfSelectedMonth.value.getFullYear()
-  firstOfSelectedMonth.value = m === 0
-    ? new Date(y - 1, 11, 1)
-    : new Date(y, m - 1, 1)
-}
-
-function monthForward() {
-  const m = firstOfSelectedMonth.value.getMonth()
-  const y = firstOfSelectedMonth.value.getFullYear()
-  firstOfSelectedMonth.value = m === 11
-    ? new Date(y + 1, 0, 1)
-    : new Date(y, m + 1, 1)
 }
 
 function numExpenseGLsToApprove(): number {
@@ -159,7 +133,7 @@ function numExpensesFiscalToApprove(): number {
 }
 
 onMounted(() => {
-  setDates()
+  purchaseStore.initializeDates()
 })
 
 </script>

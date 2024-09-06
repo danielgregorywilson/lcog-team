@@ -150,7 +150,8 @@
             text-color="white"
           />
           <span class="q-ml-md col">
-            Notification will be sent to all card holders. Please do not send multiple notifications unless you really need to.
+            Notification will be sent to all card holders. Please do not send
+            multiple notifications unless you really need to.
           </span>
         </div>
         <div class="row justify-center text-center q-mt-sm">
@@ -183,7 +184,9 @@
           />
           <span class="q-ml-sm">
             Card Number:
-            <span class="text-bold">{{ statementDialogStatement.card.display }}</span>
+            <span class="text-bold">
+              {{ statementDialogStatement.card.display }}
+            </span>
           </span>
         </div>
         <q-markup-table class="q-mt-md">
@@ -284,9 +287,6 @@ let allExpensesLoaded = ref(false)
 let thisMonthStatementsLoaded = ref(false)
 let allStatementsLoaded = ref(false)
 
-let firstOfThisMonth = ref(new Date())
-let firstOfSelectedMonth = ref(new Date())
-
 let sendNotificationDialogVisible = ref(false)
 
 let statementDialogVisible = ref(false)
@@ -312,8 +312,8 @@ const columns = [
     align: 'center'
   },
   {
-    name: 'approved', label: 'Fiscal Approved', field: 'approved', sortable: true,
-    align: 'center'
+    name: 'approved', label: 'Fiscal Approved', field: 'approved',
+    sortable: true, align: 'center'
   }
 ]
 
@@ -326,8 +326,8 @@ const statementCols = [
 ]
 
 function viewingThisMonth() {
-  return firstOfSelectedMonth.value.getTime() ===
-    firstOfThisMonth.value.getTime()
+  return purchaseStore.firstOfSelectedMonth.getTime() ===
+    purchaseStore.firstOfThisMonth.getTime()
 }
 
 function expensesLoaded() {
@@ -523,16 +523,7 @@ function deleteStatement(): void {
     })
 }
 
-function setDates() {
-  let theFirst = new Date()
-  theFirst.setDate(1)
-  theFirst.setHours(0,0,0,0)
-  firstOfThisMonth.value = theFirst
-  firstOfSelectedMonth.value = theFirst
-}
-
 onMounted(() => {
-  setDates()
   retrieveThisMonthEMs().then(() => {
     retrieveAllEMs()
   })

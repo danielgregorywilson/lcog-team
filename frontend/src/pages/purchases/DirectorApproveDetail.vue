@@ -303,12 +303,9 @@ let routeEmployeeName = ref('')
 let thisMonthLoaded = ref(false)
 let allExpensesLoaded = ref(false)
 
-let firstOfThisMonth = ref(new Date())
-let firstOfSelectedMonth = ref(new Date())
-
 function viewingThisMonth() {
-  return firstOfSelectedMonth.value.getTime() ===
-    firstOfThisMonth.value.getTime()
+  return purchaseStore.firstOfSelectedMonth.getTime() ===
+    purchaseStore.firstOfThisMonth.getTime()
 }
 
 function expensesLoaded() {
@@ -511,17 +508,6 @@ function onSubmitDenyDialog() {
     }
 }
 
-function setDates() {
-  return new Promise((resolve) => {
-    let theFirst = new Date()
-    theFirst.setDate(1)
-    theFirst.setHours(0,0,0,0)
-    firstOfThisMonth.value = theFirst
-    firstOfSelectedMonth.value = theFirst
-    resolve(null)
-  })
-}
-
 function expenseMonthTotal(em: ExpenseMonth) {
   return em.expenses.reduce(
     (acc, expense) => acc + parseFloat(expense.amount), 0
@@ -541,7 +527,7 @@ function expensesTotal() {
 function totalsMatch() {
   const statementTotal = statement.value?.items?.reduce(
     (acc, item) => acc + parseFloat(item.amount), 0
-  )
+  ).toFixed(2)
   return statementTotal == expensesTotal()
 }
 
@@ -560,10 +546,8 @@ function expensesMatchStatment(): boolean {
 onMounted(() => {
   const employeePK = getRouteParam(route, 'employeePK')
   routeEmployeePK.value = parseInt(employeePK ? employeePK : '-1')
-  setDates().then(() => {
-    retrieveThisMonthEmployeeExpenses().then(() => {
-      retrieveAllEmployeeExpenses()
-    })
+  retrieveThisMonthEmployeeExpenses().then(() => {
+    retrieveAllEmployeeExpenses()
   })
 })
 

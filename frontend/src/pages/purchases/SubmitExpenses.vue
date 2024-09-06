@@ -640,17 +640,14 @@ let showSubmitDialog = ref(false)
 let submitterNote = ref('')
 let showUnsubmitDialog = ref(false)
 
-let firstOfThisMonth = ref(new Date())
-let firstOfSelectedMonth = ref(new Date())
-
 let deleteDialogVisible = ref(false)
 let expensePkToDelete = ref(-1)
 let deleteDialogExpenseName = ref('')
 let deleteDialogExpenseDate = ref('')
 
 function viewingThisMonth() {
-  return firstOfSelectedMonth.value.getTime() ===
-    firstOfThisMonth.value.getTime()
+  return purchaseStore.firstOfSelectedMonth.getTime() ===
+    purchaseStore.firstOfThisMonth.getTime()
 }
 
 function expensesLoaded() {
@@ -946,9 +943,12 @@ function onUnsubmitDialog() {
     })
 }
 
-function retrieveThisMonthExpenses(): Promise<void> {
+function retrieveRecentExpenseMonths(): Promise<void> {
   return new Promise((resolve, reject) => {
-    purchaseStore.getExpenseMonths(props.yearInt, props.monthInt)
+    purchaseStore.getExpenseMonths(
+      purchaseStore.firstOfThisMonth.getFullYear(),
+      purchaseStore.firstOfThisMonth.getMonth() + 1
+    )
       .then(() => {
         thisMonthLoaded.value = true
         resolve()
@@ -1014,14 +1014,6 @@ function deleteExpense(): void {
     .catch(e => {
       console.error(e)
     })
-}
-
-function setDates() {
-  let theFirst = new Date()
-  theFirst.setDate(1)
-  theFirst.setHours(0,0,0,0)
-  firstOfThisMonth.value = theFirst
-  firstOfSelectedMonth.value = theFirst
 }
 
 function retrieveThisMonthStatements(): Promise<void> {
@@ -1120,8 +1112,7 @@ function createExpenseMonth(): Promise<ExpenseMonth> {
 }
 
 onMounted(() => {
-  setDates()
-  retrieveThisMonthExpenses().then(() => {
+  retrieveRecentExpenseMonths().then(() => {
     retrieveAllMyExpenses()
     // Don't retrieve statements until we've gotten expenses
     // so we can set selected expense card.

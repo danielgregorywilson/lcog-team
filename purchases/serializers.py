@@ -16,7 +16,7 @@ class ExpenseGLSerializer(serializers.HyperlinkedModelSerializer):
             'approved_at', 'approver_note', 'expense_name', 'expense_date',
             'expense_amount', 'expense_description', 'expense_vendor',
             'expense_job', 'expense_receipt', 'expense_purchaser',
-            'expense_status', 'em_note'
+            'expense_status', 'em_month', 'em_year', 'em_note'
         ]
 
     approver = SimpleEmployeeSerializer(required=False)
@@ -45,6 +45,12 @@ class ExpenseGLSerializer(serializers.HyperlinkedModelSerializer):
     )
     expense_status = serializers.CharField(
         source='expense.status', read_only=True
+    )
+    em_month = serializers.IntegerField(
+        source='expense.month.month', read_only=True
+    )
+    em_year = serializers.IntegerField(
+        source='expense.month.year', read_only=True
     )
     em_note = serializers.CharField(
         source='expense.month.submitter_note', read_only=True

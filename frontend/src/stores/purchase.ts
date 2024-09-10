@@ -286,16 +286,28 @@ export const usePurchaseStore = defineStore('purchase', {
         })
           .then(resp => {
             const expGLs = resp.data.results as Array<GL>
-            let toApproveCount = 0
-            let expenseGLs = [] as Array<GL>
+            const expenseGLs = [] as Array<GL>
+            let unapprovedGLs = [] as Array<GL>
             for (const gl of expGLs) {
               if (!gl.approved_at) {
-                toApproveCount++
+                unapprovedGLs.push(gl)
               }
-              expenseGLs = expenseGLs.concat(gl)
+              expenseGLs.push(gl)
             }
+            
+            // Set active month: The first month that has unapproved GLs
+            unapprovedGLs = unapprovedGLs.sort(
+              (a: GL, b: GL) => {
+                if (a.em_year !== b.em_year) return a.em_year - b.em_year
+                return a.em_month - b.em_month
+              }
+            )
+            if (unapprovedGLs.length > 0) {
+              this.setMonth(unapprovedGLs[0].em_month, unapprovedGLs[0].em_year)
+            }
+            
             this.approvalExpenseGLs = expenseGLs
-            this.numExpenseGLsToApprove = toApproveCount
+            this.numExpenseGLsToApprove = unapprovedGLs.length
             resolve(resp.data.results)
           })
           .catch(e => {

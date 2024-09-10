@@ -424,6 +424,8 @@ export interface GL {
   approver_note: string
   expense_status: string
   expense_date: string
+  em_month: number
+  em_year: number
   em_note: string
 }
 

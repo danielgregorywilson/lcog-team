@@ -10,7 +10,7 @@
     <div v-else>
       <q-table
         flat bordered
-        :title="monthDisplay"
+        :title="purchaseStore.monthDisplay"
         :rows="selectedMonthExpenseMonths()"
         :columns="columns"
         row-key="name"
@@ -116,7 +116,7 @@
         </div>
         <div class="col row justify-center">
           <div class="text-h6">
-            Upload Statements for {{ monthDisplay }}
+            Upload Statements for {{ purchaseStore.monthDisplay }}
           </div>
           <FileUploader
               :file=selectedFiles
@@ -124,8 +124,8 @@
               contentTypeAppLabel="purchases"
               contentTypeModel="expensestatement"
               :data="{
-                'year': props.yearInt,
-                'month': props.monthInt
+                'year': purchaseStore.yearInt,
+                'month': purchaseStore.monthInt
               }"
               :readOnly=false
               v-on="{
@@ -155,7 +155,7 @@
           </span>
         </div>
         <div class="row justify-center text-center q-mt-sm">
-          Month: {{ monthDisplay }}
+          Month: {{ purchaseStore.monthDisplay }}
         </div>
       </q-card-section>
 
@@ -240,7 +240,7 @@
           Number: {{ deleteDialogStatementNumber }}
         </div>
         <div class="row justify-center text-center">
-          Month: {{ monthDisplay }}
+          Month: {{ purchaseStore.monthDisplay }}
         </div>
       </q-card-section>
 
@@ -275,12 +275,6 @@ import { ExpenseMonth, ExpenseStatement } from 'src/types';
 const quasar = useQuasar()
 const router = useRouter()
 const purchaseStore = usePurchaseStore()
-
-const props = defineProps<{
-  monthDisplay: string
-  monthInt: number
-  yearInt: number
-}>()
 
 let thisMonthExpensesLoaded = ref(false)
 let allExpensesLoaded = ref(false)
@@ -342,12 +336,18 @@ function statementsLoaded() {
 
 function selectedMonthExpenseMonths() {
   return purchaseStore.fiscalExpenseMonths
-    .filter(em => em.month == props.monthInt && em.year == props.yearInt)
+    .filter(
+      em => em.month == purchaseStore.monthInt &&
+      em.year == purchaseStore.yearInt
+    )
 }
 
 function selectedMonthStatements() {
   return purchaseStore.expenseStatements
-    .filter(s => s.month === props.monthInt && s.year == props.yearInt)
+    .filter(
+      s => s.month === purchaseStore.monthInt &&
+      s.year == purchaseStore.yearInt
+    )
 }
 
 function expenseMonthFiscalApproved(expenseMonth: ExpenseMonth) {
@@ -422,7 +422,9 @@ function progressBarColor(status: string) {
 
 function retrieveThisMonthEMs(): Promise<void> {
   return new Promise((resolve, reject) => {
-    purchaseStore.getFiscalExpenseMonths(props.yearInt, props.monthInt)
+    purchaseStore.getFiscalExpenseMonths(
+      purchaseStore.yearInt, purchaseStore.monthInt
+    )
       .then(() => {
         thisMonthExpensesLoaded.value = true
         resolve()
@@ -450,7 +452,9 @@ function retrieveAllEMs(): Promise<void> {
 
 function retrieveThisMonthStatements(): Promise<void> {
   return new Promise((resolve, reject) => {
-    purchaseStore.getExpenseStatements(props.yearInt, props.monthInt)
+    purchaseStore.getExpenseStatements(
+      purchaseStore.yearInt, purchaseStore.monthInt
+    )
       .then(() => {
         thisMonthStatementsLoaded.value = true
         resolve()
@@ -480,9 +484,7 @@ function navigateToDetail(employeePk: number) {
   router.push({
     name: 'fiscal-approve-expenses-detail',
     params: {
-      employeePK: employeePk.toString(),
-      year: props.yearInt,
-      month: props.monthInt
+      employeePK: employeePk.toString()
     }
   })
   .catch(e => {

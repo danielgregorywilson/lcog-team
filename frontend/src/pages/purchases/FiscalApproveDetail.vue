@@ -5,7 +5,7 @@
     <div class="row items-center justify-between q-mt-md">
       <div class="text-h5">
         Statement for {{ card?.display }}
-        in {{ monthDisplay }}
+        in {{ purchaseStore.monthDisplay }}
       </div>
       <div v-if="!props.print">
         <q-btn v-if="!totalsMatch()" flat class="no-pointer-events">
@@ -26,7 +26,9 @@
     <StatementTable :statement="statement" />
   </div>
   <div v-else>
-    <div class = "text-h5">No card selected in {{ monthDisplay }}</div>
+    <div class = "text-h5">
+      No card selected in {{ purchaseStore.monthDisplay }}
+    </div>
   </div>
   
   <!-- Expense Months -->
@@ -220,14 +222,16 @@
     </div>
   </div>
   <div v-else class="text-h5">
-    No expenses entered by {{ routeEmployeeName }} in {{ monthDisplay }}
+    No expenses entered by {{ routeEmployeeName }} in
+    {{ purchaseStore.monthDisplay }}
   </div>
 
   <!-- Approve Dialog -->
   <q-dialog v-model="showApproveDialog">
     <q-card class="q-pa-md" style="width: 400px">
       <div class="text-h6">
-        Approve {{monthDisplay}} expenses for {{ emToApproveEmployeeName }}?
+        Approve {{ purchaseStore.monthDisplay }} expenses for
+        {{ emToApproveEmployeeName }}?
       </div>
       <q-form
         @submit='onSubmitApproveDialog()'
@@ -250,7 +254,8 @@
   <q-dialog v-model="showDenyDialog">
     <q-card class="q-pa-md" style="width: 400px">
       <div class="text-h6">
-        Deny {{ monthDisplay }} expenses for {{ emToApproveEmployeeName }}?
+        Deny {{ purchaseStore.monthDisplay }} expenses for
+        {{ emToApproveEmployeeName }}?
       </div>
       <q-form
         @submit='onSubmitDenyDialog()'
@@ -308,9 +313,6 @@ const peopleStore = usePeopleStore()
 const purchaseStore = usePurchaseStore()
 
 const props = defineProps<{
-  monthDisplay?: string
-  monthInt?: number
-  yearInt?: number
   print?: boolean
 }>()
 
@@ -319,10 +321,6 @@ let emToApproveEmployeeName = ref('')
 let showApproveDialog = ref(false)
 let showDenyDialog = ref(false)
 let denyDialogMessage = ref('')
-
-let monthDisplay = ref(props.monthDisplay)
-let monthInt = ref(props.monthInt)
-let yearInt = ref(props.yearInt)
 
 let card = ref(null) as Ref<ExpenseCard | null>
 let statement = ref(null) as Ref<ExpenseStatement | null>
@@ -378,14 +376,15 @@ const columns = printColumns.concat([{
 }])
 
 function tableTitleDisplay(em: ExpenseMonth): string {
-  return `${ monthDisplay.value } expenses for ${ em.purchaser.name }`
+  return `${ purchaseStore.monthDisplay } expenses for ${ em.purchaser.name }`
 }
 
 function selectedMonthCardExpenseMonths(): Array<ExpenseMonth> {
   let currentCard = null
   let currentStatement = null
   const allEMs = purchaseStore.fiscalExpenseMonths.filter(em => {
-    return em.month === monthInt.value && em.year === yearInt.value
+    return em.month === purchaseStore.monthInt &&
+    em.year === purchaseStore.yearInt
   })
   let ems: Array<ExpenseMonth> = []
   if (allEMs.length) {
@@ -441,7 +440,7 @@ function retrieveThisMonthEmployeeExpenses(): Promise<void> {
       return
     }
     purchaseStore.getFiscalExpenseMonths(
-      yearInt.value, monthInt.value, employeePK
+      purchaseStore.yearInt, purchaseStore.monthInt, employeePK
     )
       .then(() => {
         thisMonthLoaded.value = true
@@ -550,8 +549,6 @@ function navigateToPrintView() {
     name: 'expense-month-print',
     params: {
       employeePK: employeePK,
-      month: monthInt.value,
-      year: yearInt.value
     }
   })
 }
@@ -592,24 +589,14 @@ function expensesMatchStatment(): boolean {
 }
 
 function handlePrint() {
-  const monthParam = getRouteParam(route, 'month')
-  const yearParam = getRouteParam(route, 'year')
-  if (!monthParam || !yearParam) {
-    return
-  } else {
-    monthInt.value = parseInt(monthParam)
-    yearInt.value = parseInt(yearParam)
-    var months = [
-      'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
-      'September', 'October', 'November', 'December'
-    ]
-    monthDisplay.value = `${months[monthInt.value - 1]} ${yearInt.value}`
-  }
   // Load expense month if not already loaded; otherwise mark as loaded
-  if (purchaseStore.fiscalExpenseMonths.length == 0) {
+  if (purchaseStore.fiscalExpenseMonths.filter(em => {
+    return em.month === purchaseStore.monthInt &&
+    em.year === purchaseStore.yearInt
+  }).length == 0) {
     retrieveThisMonthEmployeeExpenses()
   } else {
-    thisMonthLoaded.value = true
+    allExpensesLoaded.value = true
   }
 }
 
@@ -622,24 +609,6 @@ onMounted(() => {
     retrieveThisMonthEmployeeExpenses().then(() => {
       retrieveAllEmployeeExpenses()
     })
-  }
-})
-
-watch(() => props.monthInt, (first, second) => {
-  if (first !== second) {
-    monthInt.value = props.monthInt
-  }
-})
-
-watch(() => props.yearInt, (first, second) => {
-  if (first !== second) {
-    yearInt.value = props.yearInt
-  }
-})
-
-watch(() => props.monthDisplay, (first, second) => {
-  if (first !== second) {
-    monthDisplay.value = props.monthDisplay
   }
 })
 

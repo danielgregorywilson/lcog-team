@@ -10,7 +10,7 @@
     <div v-else>
       <q-table
         flat bordered
-        :title="monthDisplay"
+        :title="purchaseStore.monthDisplay"
         :rows="selectedMonthExpenseMonths()"
         :columns="columns"
         row-key="name"
@@ -79,12 +79,6 @@ import { ExpenseMonth } from 'src/types';
 const router = useRouter()
 const purchaseStore = usePurchaseStore()
 
-const props = defineProps<{
-  monthDisplay: string
-  monthInt: number
-  yearInt: number
-}>()
-
 let thisMonthEMsLoaded = ref(false)
 let allEMsLoaded = ref(false)
 
@@ -118,7 +112,10 @@ function EMsLoaded() {
 
 function selectedMonthExpenseMonths() {
   return purchaseStore.directorExpenseMonths
-    .filter(em => em.month == props.monthInt && em.year == props.yearInt)
+    .filter(
+      em => em.month == purchaseStore.monthInt &&
+      em.year == purchaseStore.yearInt
+    )
 }
 
 function expenseMonthManagerApproved(expenseMonth: ExpenseMonth) {
@@ -201,7 +198,9 @@ function progressBarColor(status: string) {
 
 function retrieveThisMonthEMs(): Promise<void> {
   return new Promise((resolve, reject) => {
-    purchaseStore.getDirectorExpenseMonths(props.yearInt, props.monthInt)
+    purchaseStore.getDirectorExpenseMonths(
+      purchaseStore.yearInt, purchaseStore.monthInt
+    )
       .then(() => {
         thisMonthEMsLoaded.value = true
         resolve()
@@ -231,9 +230,7 @@ function navigateToDetail(employeePk: number) {
   router.push({
     name: 'director-approve-expenses-detail',
     params: {
-      employeePK: employeePk.toString(),
-      year: props.yearInt,
-      month: props.monthInt
+      employeePK: employeePk.toString()
     }
   })
   .catch(e => {

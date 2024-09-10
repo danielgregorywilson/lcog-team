@@ -215,13 +215,6 @@ import { GL } from 'src/types'
 
 const purchaseStore = usePurchaseStore()
 
-const props = defineProps<{
-  monthDisplay: string
-  dayInt: number
-  monthInt: number
-  yearInt: number
-}>()
-
 let thisMonthLoaded = ref(false)
 let allExpensesLoaded = ref(false)
 
@@ -282,7 +275,7 @@ function expensesLoaded() {
 }
 
 function tableTitleDisplay(): string {
-  return `${props.monthDisplay} - Expenses to Approve`
+  return `${purchaseStore.monthDisplay} - Expenses to Approve`
 }
 
 function selectedMonthExpenseGLs(): GL[] {
@@ -291,7 +284,7 @@ function selectedMonthExpenseGLs(): GL[] {
   if (apiResults) {
     gls = apiResults.filter(gl => {
       let [y, m] = gl.expense_date.split('-').map(s => parseInt(s))
-      return m === props.monthInt && y === props.yearInt
+      return m === purchaseStore.monthInt && y === purchaseStore.yearInt
     })
   }
   return gls
@@ -299,7 +292,7 @@ function selectedMonthExpenseGLs(): GL[] {
 
 function retrieveThisMonthExpenseGLsToApprove(): Promise<void> {
   return new Promise((resolve, reject) => {
-    purchaseStore.getApprovalGLs(props.yearInt, props.monthInt)
+    purchaseStore.getApprovalGLs(purchaseStore.yearInt, purchaseStore.monthInt)
       .then(() => {
         thisMonthLoaded.value = true
         resolve()

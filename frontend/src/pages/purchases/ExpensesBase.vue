@@ -1,7 +1,6 @@
 <template>
 <q-page class="q-pa-md">
   <div class="text-h4">Credit Card Expenses</div>
-  {{ purchaseStore.firstOfSelectedMonth }}
   <div class="q-my-md">
     <q-btn-group rounded>
       <q-btn
@@ -76,12 +75,7 @@
     </q-btn-group>
   </div>
   <div>
-    <router-view
-      :monthDisplay="monthDisplay()"
-      :dayInt="new Date().getDate()"
-      :monthInt="purchaseStore.firstOfSelectedMonth.getMonth() + 1"
-      :yearInt="purchaseStore.firstOfSelectedMonth.getFullYear()"
-    ></router-view>
+    <router-view />
   </div>
 </q-page>
 </template>
@@ -89,7 +83,7 @@
 <style scoped lang="scss"></style>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import { usePurchaseStore } from 'src/stores/purchase'
 import { useUserStore } from 'src/stores/user'
 
@@ -110,14 +104,6 @@ function isDirector() {
 
 function isFiscal() {
   return userStore.isFiscal
-}
-
-function monthDisplay(): string {
-  const m = purchaseStore.firstOfSelectedMonth.toLocaleDateString(
-    'en-us', { month: 'long' }
-  )
-  const y = purchaseStore.firstOfSelectedMonth.getFullYear()
-  return `${m} ${y}`
 }
 
 function numExpenseGLsToApprove(): number {

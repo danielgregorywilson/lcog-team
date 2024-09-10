@@ -21,7 +21,23 @@ export const usePurchaseStore = defineStore('purchase', {
     numExpensesFiscalToApprove: 0
   }),
 
-  getters: {},
+  getters: {
+    dayInt: () => new Date().getDate(),
+    monthInt: (state) => state.firstOfSelectedMonth.getMonth() + 1,
+    yearInt: (state) => state.firstOfSelectedMonth.getFullYear(),
+    monthDisplay: (state) => {
+      const m = state.firstOfSelectedMonth.toLocaleDateString(
+        'en-us', { month: 'long' }
+      )
+      const y = state.firstOfSelectedMonth.getFullYear()
+      return `${m} ${y}`
+    },
+    selectedExpenseMonth(): ExpenseMonth | undefined {
+      return this.expenseMonths.find(em => {
+        return em.month === this.monthInt && em.year === this.yearInt
+      })
+    }
+  },
 
   actions: {
     initializeDates() {

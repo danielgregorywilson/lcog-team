@@ -764,7 +764,7 @@ function selectedMonthNotes(): Array<{
 function expensesTotal() {
   return selectedMonthExpenses().reduce(
     (acc, exp) => acc + parseFloat(exp.amount), 0
-  )
+  ).toFixed(2)
 }
 
 function selectedStatementTotal() {

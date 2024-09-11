@@ -1,6 +1,6 @@
 <template>
 <div class="q-mt-md">
-  <div v-if="selectedExpenseMonth()">
+  <div v-if="purchaseStore.selectedExpenseMonth">
     <div class="row q-gutter-md">
       <q-btn
         v-if="!monthSubmitted()"
@@ -408,7 +408,7 @@
   <div v-else>
     <q-card>
       <q-card-section class="row items-center">
-        <div class="text-h6">{{ monthDisplay }} not started.</div>
+        <div class="text-h6">{{ purchaseStore.monthDisplay }} not started.</div>
         <q-btn
           color="primary"
           class="q-ml-sm"
@@ -421,7 +421,10 @@
   </div>
 
   <!-- Statements -->
-  <div v-if="thisMonthStatementsLoaded" class="q-mt-md">
+  <div
+    v-if="purchaseStore.selectedExpenseMonth && thisMonthStatementsLoaded"
+    class="q-mt-md"
+  >
     <div v-if="statementChoices().length">
       <q-select
         v-if="thisMonthStatementsLoaded"
@@ -506,7 +509,7 @@
   <q-dialog v-model="showSubmitDialog">
     <q-card class="q-pa-md" style="width: 400px">
       <div class="text-h6">
-        Submit {{ monthDisplay }} expenses for approval?
+        Submit {{ purchaseStore.monthDisplay }} expenses for approval?
       </div>
       <div
         v-if="!expensesMatchStatment()"
@@ -561,7 +564,9 @@
   <!-- Unsubmit Dialog -->
   <q-dialog v-model="showUnsubmitDialog">
     <q-card class="q-pa-md" style="width: 400px">
-      <div class="text-h6">Unsubmit {{ monthDisplay }} expenses?</div>
+      <div class="text-h6">
+        Unsubmit {{ purchaseStore.monthDisplay }} expenses?
+      </div>
       <q-form
         @submit='onUnsubmitDialog()'
         class="q-gutter-md"
@@ -619,13 +624,6 @@ import {
 const quasar = useQuasar()
 const purchaseStore = usePurchaseStore()
 
-const props = defineProps<{
-  monthDisplay: string
-  dayInt: number
-  monthInt: number
-  yearInt: number
-}>()
-
 let thisMonthLoaded = ref(false)
 let allExpensesLoaded = ref(false)
 
@@ -640,17 +638,14 @@ let showSubmitDialog = ref(false)
 let submitterNote = ref('')
 let showUnsubmitDialog = ref(false)
 
-let firstOfThisMonth = ref(new Date())
-let firstOfSelectedMonth = ref(new Date())
-
 let deleteDialogVisible = ref(false)
 let expensePkToDelete = ref(-1)
 let deleteDialogExpenseName = ref('')
 let deleteDialogExpenseDate = ref('')
 
 function viewingThisMonth() {
-  return firstOfSelectedMonth.value.getTime() ===
-    firstOfThisMonth.value.getTime()
+  return purchaseStore.firstOfSelectedMonth.getTime() ===
+    purchaseStore.firstOfThisMonth.getTime()
 }
 
 function expensesLoaded() {
@@ -689,36 +684,34 @@ const columns = [
 
 function tableTitleDisplay(): string {
   let statusText = 'Draft'
-  if (selectedExpenseMonth()?.status == 'fiscal_approved') {
+  if (purchaseStore.selectedExpenseMonth?.status == 'fiscal_approved') {
     statusText = 'Fiscal Approved - You\'re All Set!'
-  } else if (selectedExpenseMonth()?.status == 'fiscal_denied') {
+  } else if (purchaseStore.selectedExpenseMonth?.status == 'fiscal_denied') {
     statusText = 'Fiscal Denied - Correct and Resubmit'
-  } else if (selectedExpenseMonth()?.status == 'director_approved') {
+  } else if (
+    purchaseStore.selectedExpenseMonth?.status == 'director_approved'
+  ) {
     statusText = 'Director Approved - Waiting on Fiscal'
-  } else if (selectedExpenseMonth()?.status == 'director_denied') {
+  } else if (purchaseStore.selectedExpenseMonth?.status == 'director_denied') {
     statusText = 'Director Denied - Correct and Resubmit'
-  } else if (selectedExpenseMonth()?.status == 'approver_approved') {
-    if (selectedExpenseMonth()?.card.requires_director_approval) {
+  } else if (
+    purchaseStore.selectedExpenseMonth?.status == 'approver_approved'
+  ) {
+    if (purchaseStore.selectedExpenseMonth?.card.requires_director_approval) {
       statusText = 'Approver(s) Approved - Waiting on Director'
     } else {
       statusText = 'Approver(s) Approved - Waiting on Fiscal'
     }
-  } else if (selectedExpenseMonth()?.status == 'approver_denied') {
+  } else if (purchaseStore.selectedExpenseMonth?.status == 'approver_denied') {
     statusText = 'Approver(s) Denied - Correct and Resubmit'
-  } else if (selectedExpenseMonth()?.status == 'submitted') {
+  } else if (purchaseStore.selectedExpenseMonth?.status == 'submitted') {
     statusText = 'Submitted - Waiting on Approver(s)'
   }
-  return `${ props.monthDisplay } - ${ statusText }`
-}
-
-function selectedExpenseMonth(): ExpenseMonth | undefined {
-  return purchaseStore.expenseMonths.find(em => {
-    return em.month === props.monthInt && em.year === props.yearInt
-  })
+  return `${ purchaseStore.monthDisplay } - ${ statusText }`
 }
 
 function selectedMonthExpenses(): Expense[] {
-  const month = selectedExpenseMonth()
+  const month = purchaseStore.selectedExpenseMonth
   if (month !== undefined) {
     return month.expenses
   } else {
@@ -730,7 +723,7 @@ function selectedMonthNotes(): Array<{
   type: string, approver: string, date: string, expense?: string, note: string
 }> {
   let notes = []
-  let em = selectedExpenseMonth()
+  let em = purchaseStore.selectedExpenseMonth
   if (!em) {
     return []
   }
@@ -774,7 +767,7 @@ function selectedMonthNotes(): Array<{
 function expensesTotal() {
   return selectedMonthExpenses().reduce(
     (acc, exp) => acc + parseFloat(exp.amount), 0
-  )
+  ).toFixed(2)
 }
 
 function selectedStatementTotal() {
@@ -805,7 +798,8 @@ function expensesMatchStatment(): boolean {
 function monthSubmitted() {
   const ems = purchaseStore.expenseMonths
   return ems.some(em => {
-    return em.month === props.monthInt && em.year === props.yearInt &&
+    return em.month === purchaseStore.monthInt &&
+      em.year === purchaseStore.yearInt &&
       em.status !== 'draft'
   })
 }
@@ -819,12 +813,12 @@ function expenseDenied(expense: Expense) {
 }
 
 function monthApproved() {
-  return selectedExpenseMonth()?.status === 'fiscal_approved'
+  return purchaseStore.selectedExpenseMonth?.status === 'fiscal_approved'
 }
 
 function monthDenied() {
-  return selectedExpenseMonth()?.status === 'fiscal_denied' || 
-    selectedExpenseMonth()?.status === 'director_denied'
+  return purchaseStore.selectedExpenseMonth?.status === 'fiscal_denied' || 
+    purchaseStore.selectedExpenseMonth?.status === 'director_denied'
 }
 
 function expenseClass(expense: Expense) {
@@ -846,7 +840,8 @@ function clickAddExpense(): void {
 
   purchaseStore.createExpense({
     name: '',
-    date: `${ props.yearInt }-${ props.monthInt }-${ props.dayInt }`,
+    date: `${ purchaseStore.yearInt }-${ purchaseStore.monthInt }-` +
+      `${ purchaseStore.dayInt }`,
     job: '',
     gls: [],
   })
@@ -890,7 +885,7 @@ function formErrorItems() {
     const GLsTotal = exp.gls.reduce(
       (acc, gl) => acc + parseFloat(gl.amount), 0
     )
-    if (GLsTotal !== parseFloat(exp.amount)) {
+    if (GLsTotal.toFixed(2) !== parseFloat(exp.amount).toFixed(2)) {
       errorItems.push(`GLs for ${exp.name} must add to ${exp.amount}`)
     }
     if (!exp.receipt) {
@@ -912,7 +907,8 @@ function canUnsubmitMonth() {
 
 function onSubmitDialog() {
   purchaseStore.submitExpenseMonth({
-    yearInt: props.yearInt, monthInt: props.monthInt, note: submitterNote.value
+    yearInt: purchaseStore.yearInt, monthInt: purchaseStore.monthInt,
+    note: submitterNote.value
   })
     .then(() => {
       showSubmitDialog.value = false
@@ -930,7 +926,8 @@ function onSubmitDialog() {
 
 function onUnsubmitDialog() {
   purchaseStore.submitExpenseMonth({
-    yearInt: props.yearInt, monthInt: props.monthInt, unsubmit: true
+    yearInt: purchaseStore.yearInt, monthInt: purchaseStore.monthInt,
+    unsubmit: true
   })
     .then(() => {
       showUnsubmitDialog.value = false
@@ -946,9 +943,12 @@ function onUnsubmitDialog() {
     })
 }
 
-function retrieveThisMonthExpenses(): Promise<void> {
+function retrieveRecentExpenseMonths(): Promise<void> {
   return new Promise((resolve, reject) => {
-    purchaseStore.getExpenseMonths(props.yearInt, props.monthInt)
+    purchaseStore.getExpenseMonths(
+      purchaseStore.firstOfThisMonth.getFullYear(),
+      purchaseStore.firstOfThisMonth.getMonth() + 1
+    )
       .then(() => {
         thisMonthLoaded.value = true
         resolve()
@@ -1016,17 +1016,11 @@ function deleteExpense(): void {
     })
 }
 
-function setDates() {
-  let theFirst = new Date()
-  theFirst.setDate(1)
-  theFirst.setHours(0,0,0,0)
-  firstOfThisMonth.value = theFirst
-  firstOfSelectedMonth.value = theFirst
-}
-
 function retrieveThisMonthStatements(): Promise<void> {
   return new Promise((resolve, reject) => {
-    purchaseStore.getExpenseStatements(props.yearInt, props.monthInt)
+    purchaseStore.getExpenseStatements(
+      purchaseStore.yearInt, purchaseStore.monthInt
+    )
       .then(() => {
         thisMonthStatementsLoaded.value = true
         resolve()
@@ -1054,7 +1048,8 @@ function retrieveAllStatements(): Promise<void> {
 
 function thisMonthStatements(): Array<ExpenseStatement> {
   return purchaseStore.expenseStatements.filter(es => {
-    return es.month === props.monthInt && es.year === props.yearInt
+    return es.month === purchaseStore.monthInt &&
+      es.year === purchaseStore.yearInt
   })
 }
 
@@ -1069,7 +1064,7 @@ function statementChoices(): Array<{label: string, value: ExpenseStatement}> {
 
 function updateSelectedStatement() {
   new Promise((resolve) => {
-    const em = selectedExpenseMonth()
+    const em = purchaseStore.selectedExpenseMonth
     if (!em) {
       createExpenseMonth().then((newEM) => {
         if (selectedStatement.value) {
@@ -1099,15 +1094,15 @@ function statementSelected(): boolean {
 
 function setSelectedStatement() {
   selectedStatement.value = statementChoices().find(
-    sc => sc.value.card.pk === selectedExpenseMonth()?.card?.pk
+    sc => sc.value.card.pk === purchaseStore.selectedExpenseMonth?.card?.pk
   ) || null
 }
 
 function createExpenseMonth(): Promise<ExpenseMonth> {
   return new Promise ((resolve, reject) => {
     purchaseStore.createExpenseMonth({
-      month: props.monthInt,
-      year: props.yearInt
+      month: purchaseStore.monthInt,
+      year: purchaseStore.yearInt
     })
       .then((em) => {
         resolve(em)
@@ -1120,8 +1115,7 @@ function createExpenseMonth(): Promise<ExpenseMonth> {
 }
 
 onMounted(() => {
-  setDates()
-  retrieveThisMonthExpenses().then(() => {
+  retrieveRecentExpenseMonths().then(() => {
     retrieveAllMyExpenses()
     // Don't retrieve statements until we've gotten expenses
     // so we can set selected expense card.
@@ -1133,7 +1127,7 @@ onMounted(() => {
   })
 })
 
-watch(() => props.monthInt, (first, second) => {
+watch(() => purchaseStore.monthInt, (first, second) => {
   if (first !== second) {
     setSelectedStatement()
   }

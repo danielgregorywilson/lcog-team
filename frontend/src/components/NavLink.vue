@@ -94,7 +94,7 @@ export default defineComponent({
       const shouldNotViewBecauseNoWorkflowRoles =
         this.hasWorkflowRoles && !this.userStore.hasWorkflowRoles
       const shouldNotViewBecauseNoExpenseRoles = this.canViewExpenses && (
-        !this.userStore.getEmployeeProfile.is_expense_manager &&
+        !this.userStore.getEmployeeProfile.is_expense_submitter &&
         !this.userStore.getEmployeeProfile.is_expense_approver &&
         !this.userStore.getEmployeeProfile.is_division_director &&
         !this.userStore.getEmployeeProfile.is_fiscal_employee

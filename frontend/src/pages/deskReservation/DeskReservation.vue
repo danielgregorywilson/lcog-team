@@ -57,8 +57,8 @@ const { bus } = useEventBus()
 
 let showHelp = ref(false)
 
-// We trigger opening the edit and delete dialogs in AllResponsibilities,
-// EmployeeResponsibilites, or OrphanedResponsibilities
+// We trigger opening the help dialog in Schaefers1.vue, Schaefers2.vue,
+// and Schaefers3.vue.
 watch(() => bus.value.get('showReservationHelpDialog'), () => {
   showHelp.value = true
 })

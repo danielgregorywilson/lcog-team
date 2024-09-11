@@ -9,11 +9,12 @@ export const releases = [
     changes: [
       {
         type: 'new',
-        description: 'Interns and temporary employees in onboarding forms.'
+        description: 'Credit card expenses app help documentation.'
       },
       {
-        type: 'fix',
-        description: 'Minor fixes to CC expenses app.'
+        type: 'improved',
+        description: 'Behind-the-scenes improvements to the credit card ' +
+          'expenses app.'
       }
     ]
   },

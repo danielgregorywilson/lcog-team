@@ -90,6 +90,9 @@
   </q-layout>
 </template>
 
+<style scoped lang="scss">
+</style>
+
 <script setup lang="ts">
 import { Configuration } from 'electron-builder'
 import { UserAgentApplication } from 'msal'

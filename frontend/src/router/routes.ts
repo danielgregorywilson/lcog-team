@@ -19,6 +19,18 @@ const routes: RouteRecordRaw[] = [
         name: 'release-notes',
         component: () => import('src/pages/ReleaseNotes.vue')
       },
+      {
+        path: 'help',
+        name: 'help',
+        component: () => import('src/pages/help/HelpBase.vue'),
+        children: [
+          {
+            path: 'cc-expenses',
+            name: 'help-cc-expenses',
+            component: () => import('src/pages/help/CCExpenses.vue')
+          },
+        ]
+      },
 
       //////////////
       // EXPENSES //

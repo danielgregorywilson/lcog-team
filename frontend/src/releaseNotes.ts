@@ -4,6 +4,20 @@
 
 export const releases = [
   {
+    version: '0.35.1',
+    date: new Date(2024, 8, 11),
+    changes: [
+      {
+        type: 'new',
+        description: 'Interns and temporary employees in onboarding forms.'
+      },
+      {
+        type: 'fix',
+        description: 'Minor fixes to CC expenses app.'
+      }
+    ]
+  },
+  {
     version: '0.35.0',
     date: new Date(2024, 8, 5),
     changes: [

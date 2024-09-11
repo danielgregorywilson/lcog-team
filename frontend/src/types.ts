@@ -131,7 +131,7 @@ export interface EmployeeRetrieve {
   admin_of_workflows: Array<number>
   admin_of_processes: Array<number>
   workflow_roles: Array<number>
-  is_expense_manager: boolean
+  is_expense_submitter: boolean
   is_expense_approver: boolean
   can_view_mow_routes: boolean
   can_manage_mow_stops: boolean
@@ -424,6 +424,8 @@ export interface GL {
   approver_note: string
   expense_status: string
   expense_date: string
+  em_month: number
+  em_year: number
   em_note: string
 }
 

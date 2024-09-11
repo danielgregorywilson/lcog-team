@@ -189,16 +189,18 @@ export const usePurchaseStore = defineStore('purchase', {
                   return a.month - b.month
                 }
               ).reverse()
-              let activeMonth = ems[0]
-              for (const em of ems) {
-                if ([
-                    'draft', 'approver_denied', 'director_denied',
-                    'fiscal_denied'
-                  ].indexOf(em.status) != -1) {
-                  activeMonth = em
+              if (ems.length) {
+                let activeMonth = ems[0]
+                for (const em of ems) {
+                  if ([
+                      'draft', 'approver_denied', 'director_denied',
+                      'fiscal_denied'
+                    ].indexOf(em.status) != -1) {
+                    activeMonth = em
+                  }
                 }
+                this.setMonth(activeMonth.month, activeMonth.year)
               }
-              this.setMonth(activeMonth.month, activeMonth.year)
             }
 
             let expenses = [] as Array<Expense>
@@ -371,14 +373,9 @@ export const usePurchaseStore = defineStore('purchase', {
                 if (a.year !== b.year) return a.year - b.year
                 return a.month - b.month
               }
-            ).reverse()
+            )
             if (emsDirectorToApprove.length > 0) {
-              let activeMonth = ems[0]
-              for (const em of ems) {
-                if (em.status == 'approver_approved') {
-                  activeMonth = em
-                }
-              }
+              const activeMonth = ems[0]
               this.setMonth(activeMonth.month, activeMonth.year)
             }
             
@@ -436,8 +433,7 @@ export const usePurchaseStore = defineStore('purchase', {
         })
           .then(resp => {
             const ems: ExpenseMonth[] = resp.data.results
-            this.fiscalExpenseMonths = ems
-            this.numExpensesFiscalToApprove = ems.filter(
+            let emsFiscalToApprove = ems.filter(
               em => {
                 if (em.card?.requires_director_approval) {
                   // If director approval required, count if approved
@@ -448,7 +444,22 @@ export const usePurchaseStore = defineStore('purchase', {
                   return em.status == 'approver_approved'
                 }
               }
-            ).length
+            )
+            
+            // Set active month: The first month that is not yet approved
+            emsFiscalToApprove = emsFiscalToApprove.sort(
+              (a: ExpenseMonth, b: ExpenseMonth) => {
+                if (a.year !== b.year) return a.year - b.year
+                return a.month - b.month
+              }
+            )
+            if (emsFiscalToApprove.length > 0) {
+              const activeMonth = emsFiscalToApprove[0]
+              this.setMonth(activeMonth.month, activeMonth.year)
+            }
+            
+            this.fiscalExpenseMonths = ems
+            this.numExpensesFiscalToApprove = emsFiscalToApprove.length
             resolve(resp.data.results)
           })
           .catch(e => {

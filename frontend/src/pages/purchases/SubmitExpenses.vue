@@ -421,7 +421,10 @@
   </div>
 
   <!-- Statements -->
-  <div v-if="thisMonthStatementsLoaded" class="q-mt-md">
+  <div
+    v-if="purchaseStore.selectedExpenseMonth && thisMonthStatementsLoaded"
+    class="q-mt-md"
+  >
     <div v-if="statementChoices().length">
       <q-select
         v-if="thisMonthStatementsLoaded"

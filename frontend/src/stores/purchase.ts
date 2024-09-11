@@ -356,15 +356,34 @@ export const usePurchaseStore = defineStore('purchase', {
         })
           .then(resp => {
             const ems: ExpenseMonth[] = resp.data.results
-            this.directorExpenseMonths = ems
-            this.numExpensesDirectorToApprove = ems.filter(
+            let emsDirectorToApprove = ems.filter(
               em => {
                 // Count if director approval required and not approved yet
                 return em.card.requires_director_approval &&
                   em.status == 'approver_approved' &&
                   !em.director_approved_at
               }
-            ).length
+            )
+
+            // Set active month: The first month that is not yet approved
+            emsDirectorToApprove = emsDirectorToApprove.sort(
+              (a: ExpenseMonth, b: ExpenseMonth) => {
+                if (a.year !== b.year) return a.year - b.year
+                return a.month - b.month
+              }
+            ).reverse()
+            if (emsDirectorToApprove.length > 0) {
+              let activeMonth = ems[0]
+              for (const em of ems) {
+                if (em.status == 'approver_approved') {
+                  activeMonth = em
+                }
+              }
+              this.setMonth(activeMonth.month, activeMonth.year)
+            }
+            
+            this.directorExpenseMonths = ems
+            this.numExpensesDirectorToApprove = emsDirectorToApprove.length
             resolve(resp.data.results)
           })
           .catch(e => {

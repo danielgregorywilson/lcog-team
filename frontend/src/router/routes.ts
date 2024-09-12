@@ -1,6 +1,6 @@
 import { RouteRecordRaw } from 'vue-router'
 import {
-  isDivisionDirector, isExpenseApprover, isExpenseManager, isFiscal
+  isDivisionDirector, isExpenseApprover, isExpenseSubmitter, isFiscal
 } from './guards'
 
 const routes: RouteRecordRaw[] = [
@@ -19,6 +19,18 @@ const routes: RouteRecordRaw[] = [
         name: 'release-notes',
         component: () => import('src/pages/ReleaseNotes.vue')
       },
+      {
+        path: 'help',
+        name: 'help',
+        component: () => import('src/pages/help/HelpBase.vue'),
+        children: [
+          {
+            path: 'cc-expenses',
+            name: 'help-cc-expenses',
+            component: () => import('src/pages/help/CCExpenses.vue')
+          },
+        ]
+      },
 
       //////////////
       // EXPENSES //
@@ -34,7 +46,7 @@ const routes: RouteRecordRaw[] = [
             return { name: 'director-approve-expenses' }
           } else if (isExpenseApprover()) {
             return { name: 'approve-expenses' }
-          } else if (isExpenseManager()) {
+          } else if (isExpenseSubmitter()) {
             return { name: 'submit-expenses' }
           } else {
             return { name: 'dashboard' }
@@ -45,7 +57,7 @@ const routes: RouteRecordRaw[] = [
             path: 'submit',
             name: 'submit-expenses',
             component: () => import('src/pages/purchases/SubmitExpenses.vue'),
-            meta: { requiresAuth: true, requiresExpenseManager: true },
+            meta: { requiresAuth: true, requiresExpenseSubmitter: true },
           },
           {
             path: 'approve',
@@ -60,7 +72,7 @@ const routes: RouteRecordRaw[] = [
             meta: { requiresAuth: true, requiresDivisionDirector: true },
           },
           {
-            path: 'director/:employeePK/:year/:month',
+            path: 'director/:employeePK',
             name: 'director-approve-expenses-detail',
             component: () => {
               return import('src/pages/purchases/DirectorApproveDetail.vue')
@@ -74,7 +86,7 @@ const routes: RouteRecordRaw[] = [
             meta: { requiresAuth: true, requiresFiscal: true },
           },
           {
-            path: 'fiscal/:employeePK/:year/:month',
+            path: 'fiscal/:employeePK',
             name: 'fiscal-approve-expenses-detail',
             component: () => {
               return import('src/pages/purchases/FiscalApproveDetail.vue')
@@ -467,7 +479,7 @@ const routes: RouteRecordRaw[] = [
         }
       },
       {
-        path: 'expenses/fiscal/:employeePK/:year/:month',
+        path: 'expenses/fiscal/:employeePK',
         name: 'expense-month-print',
         component: () => {
           return import('src/pages/purchases/FiscalApproveDetail.vue')

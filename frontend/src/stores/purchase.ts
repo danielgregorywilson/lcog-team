@@ -8,6 +8,8 @@ import {
 
 export const usePurchaseStore = defineStore('purchase', {
   state: () => ({
+    firstOfThisMonth: new Date(),
+    firstOfSelectedMonth: new Date(),
     expenseMonths: [] as Array<ExpenseMonth>,
     myExpenses: [] as Array<Expense>,
     approvalExpenseGLs: [] as Array<GL>,
@@ -19,9 +21,59 @@ export const usePurchaseStore = defineStore('purchase', {
     numExpensesFiscalToApprove: 0
   }),
 
-  getters: {},
+  getters: {
+    dayInt: () => new Date().getDate(),
+    monthInt: (state) => state.firstOfSelectedMonth.getMonth() + 1,
+    yearInt: (state) => state.firstOfSelectedMonth.getFullYear(),
+    monthDisplay: (state) => {
+      const m = state.firstOfSelectedMonth.toLocaleDateString(
+        'en-us', { month: 'long' }
+      )
+      const y = state.firstOfSelectedMonth.getFullYear()
+      return `${m} ${y}`
+    },
+    selectedExpenseMonth(): ExpenseMonth | undefined {
+      return this.expenseMonths.find(em => {
+        return em.month === this.monthInt && em.year === this.yearInt
+      })
+    }
+  },
 
   actions: {
+    initializeDates() {
+      const theFirst = new Date()
+      theFirst.setDate(1)
+      theFirst.setHours(0, 0, 0, 0)
+      this.firstOfThisMonth = theFirst
+      this.firstOfSelectedMonth = theFirst
+    },
+    monthBackward() {
+      if (!this.firstOfSelectedMonth) return
+      const m = this.firstOfSelectedMonth.getMonth()
+      const y = this.firstOfSelectedMonth.getFullYear()
+      this.firstOfSelectedMonth = m === 0
+        ? new Date(y - 1, 11, 1)
+        : new Date(y, m - 1, 1)
+    },
+    monthForward() {
+      if (!this.firstOfSelectedMonth) return
+      const m = this.firstOfSelectedMonth.getMonth()
+      const y = this.firstOfSelectedMonth.getFullYear()
+      this.firstOfSelectedMonth = m === 11
+        ? new Date(y + 1, 0, 1)
+        : new Date(y, m + 1, 1)
+    },
+    setThisMonth() {
+      this.firstOfSelectedMonth = this.firstOfThisMonth
+    },
+    setMonth(month: number, year: number) {
+      this.firstOfSelectedMonth = new Date(year, month - 1, 1)
+    },
+
+    ////////////////
+    /// Expenses ///
+    ////////////////
+
     createExpense(data: ExpenseCreate): Promise<Expense> {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/expense`, method: 'POST', data })
@@ -126,8 +178,31 @@ export const usePurchaseStore = defineStore('purchase', {
           url: `${ apiURL }api/v1/expense-month${ params }`
         })
           .then(resp => {
-            const ems = resp.data.results
+            let ems = resp.data.results as Array<ExpenseMonth>
             this.expenseMonths = ems
+            
+            if (!!yearInt && !!monthInt) {
+              // Set active month: The first month that is not yet submitted
+              ems = ems.sort(
+                (a: ExpenseMonth, b: ExpenseMonth) => {
+                  if (a.year !== b.year) return a.year - b.year
+                  return a.month - b.month
+                }
+              ).reverse()
+              if (ems.length) {
+                let activeMonth = ems[0]
+                for (const em of ems) {
+                  if ([
+                      'draft', 'approver_denied', 'director_denied',
+                      'fiscal_denied'
+                    ].indexOf(em.status) != -1) {
+                    activeMonth = em
+                  }
+                }
+                this.setMonth(activeMonth.month, activeMonth.year)
+              }
+            }
+
             let expenses = [] as Array<Expense>
             for (const em of ems) {
               expenses = expenses.concat(em.expenses)
@@ -213,16 +288,28 @@ export const usePurchaseStore = defineStore('purchase', {
         })
           .then(resp => {
             const expGLs = resp.data.results as Array<GL>
-            let toApproveCount = 0
-            let expenseGLs = [] as Array<GL>
+            const expenseGLs = [] as Array<GL>
+            let unapprovedGLs = [] as Array<GL>
             for (const gl of expGLs) {
               if (!gl.approved_at) {
-                toApproveCount++
+                unapprovedGLs.push(gl)
               }
-              expenseGLs = expenseGLs.concat(gl)
+              expenseGLs.push(gl)
             }
+            
+            // Set active month: The first month that has unapproved GLs
+            unapprovedGLs = unapprovedGLs.sort(
+              (a: GL, b: GL) => {
+                if (a.em_year !== b.em_year) return a.em_year - b.em_year
+                return a.em_month - b.em_month
+              }
+            )
+            if (unapprovedGLs.length > 0) {
+              this.setMonth(unapprovedGLs[0].em_month, unapprovedGLs[0].em_year)
+            }
+            
             this.approvalExpenseGLs = expenseGLs
-            this.numExpenseGLsToApprove = toApproveCount
+            this.numExpenseGLsToApprove = unapprovedGLs.length
             resolve(resp.data.results)
           })
           .catch(e => {
@@ -271,15 +358,29 @@ export const usePurchaseStore = defineStore('purchase', {
         })
           .then(resp => {
             const ems: ExpenseMonth[] = resp.data.results
-            this.directorExpenseMonths = ems
-            this.numExpensesDirectorToApprove = ems.filter(
+            let emsDirectorToApprove = ems.filter(
               em => {
                 // Count if director approval required and not approved yet
                 return em.card.requires_director_approval &&
                   em.status == 'approver_approved' &&
                   !em.director_approved_at
               }
-            ).length
+            )
+
+            // Set active month: The first month that is not yet approved
+            emsDirectorToApprove = emsDirectorToApprove.sort(
+              (a: ExpenseMonth, b: ExpenseMonth) => {
+                if (a.year !== b.year) return a.year - b.year
+                return a.month - b.month
+              }
+            )
+            if (emsDirectorToApprove.length > 0) {
+              const activeMonth = ems[0]
+              this.setMonth(activeMonth.month, activeMonth.year)
+            }
+            
+            this.directorExpenseMonths = ems
+            this.numExpensesDirectorToApprove = emsDirectorToApprove.length
             resolve(resp.data.results)
           })
           .catch(e => {
@@ -332,8 +433,7 @@ export const usePurchaseStore = defineStore('purchase', {
         })
           .then(resp => {
             const ems: ExpenseMonth[] = resp.data.results
-            this.fiscalExpenseMonths = ems
-            this.numExpensesFiscalToApprove = ems.filter(
+            let emsFiscalToApprove = ems.filter(
               em => {
                 if (em.card?.requires_director_approval) {
                   // If director approval required, count if approved
@@ -344,7 +444,22 @@ export const usePurchaseStore = defineStore('purchase', {
                   return em.status == 'approver_approved'
                 }
               }
-            ).length
+            )
+            
+            // Set active month: The first month that is not yet approved
+            emsFiscalToApprove = emsFiscalToApprove.sort(
+              (a: ExpenseMonth, b: ExpenseMonth) => {
+                if (a.year !== b.year) return a.year - b.year
+                return a.month - b.month
+              }
+            )
+            if (emsFiscalToApprove.length > 0) {
+              const activeMonth = emsFiscalToApprove[0]
+              this.setMonth(activeMonth.month, activeMonth.year)
+            }
+            
+            this.fiscalExpenseMonths = ems
+            this.numExpensesFiscalToApprove = emsFiscalToApprove.length
             resolve(resp.data.results)
           })
           .catch(e => {

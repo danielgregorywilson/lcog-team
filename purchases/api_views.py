@@ -372,8 +372,26 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
 
             # Employee getting own expense months
             if year and month:
+                last_month = int(month) - 1
+                last_year = int(year)
+                if last_month == 0:
+                    last_month = 12
+                    last_year -= 1
+                next_last_month = last_month - 1
+                next_last_year = last_year
+                if next_last_month == 0:
+                    next_last_month = 12
+                    next_last_year -= 1
                 return ExpenseMonth.objects.filter(
-                    purchaser=user.employee, year=year, month=month
+                    Q(purchaser=user.employee, year=year, month=month) |
+                    Q(
+                        purchaser=user.employee, year=last_year,
+                        month=last_month
+                    ) |
+                    Q(
+                        purchaser=user.employee, year=next_last_year,
+                        month=next_last_month
+                    )
                 )
             return ExpenseMonth.objects.filter(purchaser=user.employee)
         else:

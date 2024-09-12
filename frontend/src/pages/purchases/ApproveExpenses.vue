@@ -215,13 +215,6 @@ import { GL } from 'src/types'
 
 const purchaseStore = usePurchaseStore()
 
-const props = defineProps<{
-  monthDisplay: string
-  dayInt: number
-  monthInt: number
-  yearInt: number
-}>()
-
 let thisMonthLoaded = ref(false)
 let allExpensesLoaded = ref(false)
 
@@ -230,9 +223,6 @@ let deniedGLPK = ref(0)
 let deniedGLExpenseName = ref('')
 let deniedGLPurchaserName = ref('')
 let denyDialogMessage = ref('')
-
-let firstOfThisMonth = ref(new Date())
-let firstOfSelectedMonth = ref(new Date())
 
 const canApprove = ref(true)
 
@@ -275,8 +265,8 @@ const columns = [
 ]
 
 function viewingThisMonth() {
-  return firstOfSelectedMonth.value.getTime() ===
-    firstOfThisMonth.value.getTime()
+  return purchaseStore.firstOfSelectedMonth.getTime() ===
+    purchaseStore.firstOfThisMonth.getTime()
 }
 
 function expensesLoaded() {
@@ -285,7 +275,7 @@ function expensesLoaded() {
 }
 
 function tableTitleDisplay(): string {
-  return `${props.monthDisplay} - Expenses to Approve`
+  return `${purchaseStore.monthDisplay} - Expenses to Approve`
 }
 
 function selectedMonthExpenseGLs(): GL[] {
@@ -294,7 +284,7 @@ function selectedMonthExpenseGLs(): GL[] {
   if (apiResults) {
     gls = apiResults.filter(gl => {
       let [y, m] = gl.expense_date.split('-').map(s => parseInt(s))
-      return m === props.monthInt && y === props.yearInt
+      return m === purchaseStore.monthInt && y === purchaseStore.yearInt
     })
   }
   return gls
@@ -302,7 +292,7 @@ function selectedMonthExpenseGLs(): GL[] {
 
 function retrieveThisMonthExpenseGLsToApprove(): Promise<void> {
   return new Promise((resolve, reject) => {
-    purchaseStore.getApprovalGLs(props.yearInt, props.monthInt)
+    purchaseStore.getApprovalGLs(purchaseStore.yearInt, purchaseStore.monthInt)
       .then(() => {
         thisMonthLoaded.value = true
         resolve()
@@ -353,16 +343,7 @@ function  openDenyGLDialog(
   showDenyDialog.value = true
 }
 
-function setDates() {
-  let theFirst = new Date()
-  theFirst.setDate(1)
-  theFirst.setHours(0,0,0,0)
-  firstOfThisMonth.value = theFirst
-  firstOfSelectedMonth.value = theFirst
-}
-
 onMounted(() => {
-  setDates()
   retrieveThisMonthExpenseGLsToApprove().then(() => {
     retrieveAllExpenseGLsToApprove()
   })

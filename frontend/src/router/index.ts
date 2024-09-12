@@ -11,7 +11,7 @@ import routes from 'src/router/routes'
 import {
   canViewDeskReservationReports, canViewMealsOnWheelsRoutes,
   canViewTimeOffRequest, isAuthenticated, isDivisionDirector, isExpenseApprover,
-  isExpenseManager, isFiscal, isManager
+  isExpenseSubmitter, isFiscal, isManager
 } from './guards'
 
 /*
@@ -57,7 +57,7 @@ export default route(function (/* { store, ssrContext } */) {
     if (to.meta.requiresDivisionDirector && !isDivisionDirector()) {
       return '/dashboard'
     }
-    if (to.meta.requiresExpenseManager && !isExpenseManager()) {
+    if (to.meta.requiresExpenseSubmitter && !isExpenseSubmitter()) {
       return '/dashboard'
     }
     if (to.meta.requiresExpenseApprover && !isExpenseApprover()) {

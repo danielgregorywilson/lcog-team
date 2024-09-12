@@ -6,7 +6,12 @@
       color="primary"
       size="xl"
     />
-    <div class="q-py-md">
+    <div else class="row justify-center">
+      <div class="text-h5">
+        Select a menu item to get started
+      </div>
+    </div>
+    <!-- <div class="q-py-md">
       <div class="text-h4 q-mb-md">Your Next Review</div>
       <div v-if="nextReview().employee_pk">
         <div class="q-mb-sm">
@@ -88,7 +93,7 @@
           :actionRequired="false"
           :pk="userStore.getEmployeeProfile.employee_pk"
         />
-    </div>
+    </div> -->
   </q-page>
 </template>
 

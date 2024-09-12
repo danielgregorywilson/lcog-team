@@ -101,11 +101,17 @@
             <div v-else-if="router.currentRoute.value.name == 'approve-expenses'">
               <div>1) Approve or deny all pending expenses.</div>
             </div>
-            <div v-else-if="router.currentRoute.value.name == 'director-approve-expenses'">
+            <div
+              v-else-if="router.currentRoute.value.name?.toString()
+                .indexOf('director-approve-expenses') != -1"
+            >
               <div>1) Approve or deny all pending expense months.</div>
               <div>Note: there may be multiple people using the same card!</div>
             </div>
-            <div v-else-if="router.currentRoute.value.name == 'fiscal-approve-expenses'">
+            <div
+              v-else-if="router.currentRoute.value.name?.toString()
+                .indexOf('fiscal-approve-expenses') != -1"
+            >
               <div>1) Each month, upload bank statements.</div>
               <div>2) Approve or deny all pending expense months.</div>
               <div>Note: there may be multiple people using the same card!</div>

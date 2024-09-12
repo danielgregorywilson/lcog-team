@@ -6,7 +6,12 @@
       color="primary"
       size="xl"
     />
-    <div class="q-py-md">
+    <div else class="row justify-center">
+      <div class="text-h5">
+        Select a menu item to get started
+      </div>
+    </div>
+    <!-- <div class="q-py-md">
       <div class="text-h4 q-mb-md">Your Next Review</div>
       <div v-if="nextReview().employee_pk">
         <div class="q-mb-sm">
@@ -88,7 +93,7 @@
           :actionRequired="false"
           :pk="userStore.getEmployeeProfile.employee_pk"
         />
-    </div>
+    </div> -->
   </q-page>
 </template>
 
@@ -96,9 +101,9 @@
 import { watch } from 'vue'
 import { useRouter } from 'vue-router'
 
-import PerformanceReviewTable from 'src/components/PerformanceReviewTable.vue'
+// import PerformanceReviewTable from 'src/components/PerformanceReviewTable.vue'
 import useEventBus from 'src/eventBus'
-import { readableDate } from 'src/filters'
+// import { readableDate } from 'src/filters'
 import { useAuthStore } from 'src/stores/auth'
 import { usePerformanceReviewStore } from 'src/stores/performancereview'
 import { useUserStore } from 'src/stores/user'
@@ -118,21 +123,21 @@ function isProfileLoaded(): boolean {
   return userStore.isProfileLoaded
 }
 
-function isManager(): boolean {
-  return userStore.getEmployeeProfile.is_manager
-}
+// function isManager(): boolean {
+//   return userStore.getEmployeeProfile.is_manager
+// }
 
-function isUpperManager(): boolean {
-  return userStore.getEmployeeProfile.is_upper_manager
-}
+// function isUpperManager(): boolean {
+//   return userStore.getEmployeeProfile.is_upper_manager
+// }
 
-function isTheHRManager(): boolean {
-  return userStore.getEmployeeProfile.is_hr_manager
-}
+// function isTheHRManager(): boolean {
+//   return userStore.getEmployeeProfile.is_hr_manager
+// }
 
-function isTheExecutiveDirector(): boolean {
-  return userStore.getEmployeeProfile.is_executive_director
-}
+// function isTheExecutiveDirector(): boolean {
+//   return userStore.getEmployeeProfile.is_executive_director
+// }
 
 function nextReview(): PerformanceReviewRetrieve {
   // return {} as PerformanceReviewRetrieve
@@ -141,28 +146,28 @@ function nextReview(): PerformanceReviewRetrieve {
   // return this.$store.getters['performanceReviewModule/nextPerformanceReview']
 }
 
-function nextReviewNeedsEvaluation(): boolean {
-  return nextReview().status == 'Needs evaluation'
-}
+// function nextReviewNeedsEvaluation(): boolean {
+//   return nextReview().status == 'Needs evaluation'
+// }
 
-function userSignedNextEvaluation(): boolean {
-  return false
-  // TODO
-  // Return if there is a date for the employee's signature on the review
-  // if (this.getNextReview().all_required_signatures) {
-  //   return !!this.getNextReview().all_required_signatures[0][2]
-  // } else {
-  //   return false
-  // }
-}
+// function userSignedNextEvaluation(): boolean {
+//   return false
+//   // TODO
+//   // Return if there is a date for the employee's signature on the review
+//   // if (this.getNextReview().all_required_signatures) {
+//   //   return !!this.getNextReview().all_required_signatures[0][2]
+//   // } else {
+//   //   return false
+//   // }
+// }
 
 
-function viewReview(pk: number): void {
-  router.push(`pr/${ pk }`)
-    .catch(e => {
-      console.error('Error navigating to PR detail', e)
-    })
-}
+// function viewReview(pk: number): void {
+//   router.push(`pr/${ pk }`)
+//     .catch(e => {
+//       console.error('Error navigating to PR detail', e)
+//     })
+// }
 
 watch(() => bus.value.get('gotUserProfile'), () => {
   performanceReviewStore.getNextPerformanceReview(

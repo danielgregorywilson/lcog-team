@@ -396,8 +396,9 @@ export const usePurchaseStore = defineStore('purchase', {
                 return a.month - b.month
               }
             )
+
             if (emsDirectorToApprove.length > 0) {
-              const activeMonth = ems[0]
+              const activeMonth = emsDirectorToApprove[0]
               this.setMonth(activeMonth.month, activeMonth.year)
             }
             

@@ -1128,9 +1128,6 @@ function statementSelected(): boolean {
 }
 
 function setSelectedStatement() {
-  if (monthLocked()) {
-    return
-  }
   selectedStatement.value = statementChoices().find(
     sc => sc.value.card.pk === purchaseStore.selectedExpenseMonth?.card?.pk
   ) || null

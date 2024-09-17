@@ -264,6 +264,8 @@ class EmployeeTransitionRedactedSerializer(EmployeeTransitionSerializer):
 class WorkflowInstanceBaseSerializer(serializers.ModelSerializer):
     title_name = serializers.SerializerMethodField()
     employee_action_required = serializers.SerializerMethodField()
+    pis_action_required = serializers.SerializerMethodField()
+    transition_action_required = serializers.SerializerMethodField()
     workflow_type = serializers.CharField(source='workflow.type')
     workflow_name = serializers.SerializerMethodField()
     workflow_role_pk = serializers.IntegerField(
@@ -285,6 +287,24 @@ class WorkflowInstanceBaseSerializer(serializers.ModelSerializer):
             user = request.user
         if user and hasattr(user, "employee"):
             return wfi.employee_action_required(user.employee)
+        return False
+    
+    def get_transition_action_required(self, wfi):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        if user and hasattr(user, "employee"):
+            return wfi.transition_action_required(user.employee)
+        return False
+    
+    def get_pis_action_required(self, wfi):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        if user and hasattr(user, "employee"):
+            return wfi.pis_action_required(user.employee)
         return False
 
     @staticmethod
@@ -317,7 +337,8 @@ class WorkflowInstanceSimpleSerializer(WorkflowInstanceBaseSerializer):
             'completed_at', 'percent_complete', 'status', 'employee_name',
             'title_name', 'transition_type', 'transition_submitter',
             'transition_date_submitted', 'transition_date', 'workflow_type',
-            'workflow_name', 'workflow_role_pk', 'employee_action_required'
+            'workflow_name', 'workflow_role_pk', 'employee_action_required',
+            'pis_action_required', 'transition_action_required'
         ]
         depth = 1
     

@@ -699,16 +699,21 @@ class WorkflowInstance(HasTimeStampsMixin, HasCreatorMixin):
         if self.transition:
             return self.transition.transition_date
         
+    def pis_action_required(self, employee):
+        # True if any of the process instances require action from the employee
+        return any(
+            pi.employee_action_required(employee) for
+            pi in self.processinstance_set.all()
+        )
+    
+    def transition_action_required(self, employee):
+        # True if the transition requires action from the employee
+        return self.transition.employee_action_required(employee) if \
+            self.transition else False
+
     def employee_action_required(self, employee):
-        # Return True if the employee is responsible for completing the current step of any of the process instances
-        pis_action_required = False
-        for pi in self.processinstance_set.all():
-            if pi.employee_action_required(employee):
-                pis_action_required = True
-        transition_action_required = False
-        if self.transition:
-            transition_action_required = self.transition.employee_action_required(employee)
-        return pis_action_required or transition_action_required
+        return self.pis_action_required(employee) or \
+            self.transition_action_required(employee)
     
     def delete(self, *args, **kwargs):
         # Delete any employee transitions
@@ -756,7 +761,7 @@ class ProcessInstance(HasTimeStampsMixin):
             return self.current_step_instance.step.num_steps_before
 
     def employee_action_required(self, employee):
-        # Return True if the employee is responsible for completing the current step
+        # True if the employee is responsible for completing the current step
         if not self.current_step_instance:
             # TODO: This should not happen; maybe log an error
             return False
@@ -775,7 +780,9 @@ class ProcessInstance(HasTimeStampsMixin):
             if total_steps == 0:
                 self.percent_complete = 0
             else:
-                self.percent_complete = int((num_steps_before / total_steps) * 100)
+                self.percent_complete = int(
+                    (num_steps_before / total_steps) * 100
+                )
         self.save()
 
 

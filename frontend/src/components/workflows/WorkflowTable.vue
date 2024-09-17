@@ -87,7 +87,7 @@
           dense
           round
           flat
-          color="grey"
+          :color="props.row.pis_action_required ? 'orange' : 'grey'"
           @click="editWorkflowInstance(props.row)"
           icon="play_arrow"
         >
@@ -101,7 +101,7 @@
           dense
           round
           flat
-          color="grey"
+          :color="props.row.transition_action_required ? 'orange' : 'grey'"
           @click="editTransitionForm(props.row)"
           icon="assignment"
         >
@@ -135,10 +135,10 @@
           name="warning"
           size="md"
         >
-            <q-tooltip content-style="font-size: 16px">
-              <div>Your action is required</div>
-            </q-tooltip>
-          </q-icon>
+          <q-tooltip content-style="font-size: 16px">
+            <div>Your action is required</div>
+          </q-tooltip>
+        </q-icon>
       </q-td>
     </template>
     <!-- GRID MODE -->
@@ -200,15 +200,15 @@
                   {{ readableDate(props.row.completed_at) }}
                 </div>
                 <div
-                  class="q-table__grid-item-value row q-gutter-sm items-center"
+                  class="q-table__grid-item-value row q-gutter-sm items-center
+                    justify-around"
                   v-else-if="col.label == 'Actions'"
                 >
                   <q-btn
-                    class="col"
                     dense
                     round
                     flat
-                    color="grey"
+                    :color="props.row.pis_action_required ? 'orange' : 'grey'"
                     @click="editWorkflowInstance(props.row)"
                     icon="play_arrow"
                   >
@@ -219,11 +219,12 @@
                   <q-btn
                     v-if="workflowHasTransition(props.row) &&
                       canViewTransition()"
-                    class="col"
                     dense
                     round
                     flat
-                    color="grey"
+                    :color="
+                      props.row.transition_action_required ? 'orange' : 'grey'
+                    "
                     @click="editTransitionForm(props.row)"
                     icon="assignment"
                   >
@@ -233,7 +234,6 @@
                   </q-btn>
                   <q-btn
                     v-if="!archived && canArchiveWorkflowInstance(props.row)"
-                    class="col"
                     dense
                     round
                     flat
@@ -243,7 +243,6 @@
                   />
                   <q-btn
                     v-if="archived && canArchiveWorkflowInstance(props.row)"
-                    class="col"
                     dense
                     round
                     flat
@@ -571,7 +570,7 @@ function tableFilterMethod(rows: readonly any[], term: string) {
               .includes(searchTerm)
             matchCriteria.push(positionMatches)
           }
-          // Filter by workflow name if we're searching complete or deleted workflows
+          // Filter by workflow name if we're searching complete or deleted WFs
           if (props.complete || props.archived) {
             if (row.workflow_name) {
               const workflowNameMatches = row.workflow_name.toLowerCase()

@@ -398,7 +398,7 @@
       </div>
       <div class="row justify-center">
         <q-btn
-          v-if="!monthLocked && !monthSubmitted()"
+          v-if="!monthLocked() && !monthSubmitted()"
           color="primary"
           class="q-mt-sm"
           @click="clickAddExpense()"

@@ -99,7 +99,7 @@
 
 <script setup lang="ts">
 import { watch } from 'vue'
-import { useRouter } from 'vue-router'
+// import { useRouter } from 'vue-router'
 
 // import PerformanceReviewTable from 'src/components/PerformanceReviewTable.vue'
 import useEventBus from 'src/eventBus'
@@ -107,9 +107,9 @@ import useEventBus from 'src/eventBus'
 import { useAuthStore } from 'src/stores/auth'
 import { usePerformanceReviewStore } from 'src/stores/performancereview'
 import { useUserStore } from 'src/stores/user'
-import { PerformanceReviewRetrieve } from 'src/types'
+// import { PerformanceReviewRetrieve } from 'src/types'
 
-const router = useRouter()
+// const router = useRouter()
 const { bus } = useEventBus()
 const authStore = useAuthStore()
 const userStore = useUserStore()
@@ -139,12 +139,12 @@ function isProfileLoaded(): boolean {
 //   return userStore.getEmployeeProfile.is_executive_director
 // }
 
-function nextReview(): PerformanceReviewRetrieve {
-  // return {} as PerformanceReviewRetrieve
-  // TODO
-  return performanceReviewStore.nextPerformanceReview
-  // return this.$store.getters['performanceReviewModule/nextPerformanceReview']
-}
+// function nextReview(): PerformanceReviewRetrieve {
+//   // return {} as PerformanceReviewRetrieve
+//   // TODO
+//   return performanceReviewStore.nextPerformanceReview
+//   // return this.$store.getters['performanceReviewModule/nextPerformanceReview']
+// }
 
 // function nextReviewNeedsEvaluation(): boolean {
 //   return nextReview().status == 'Needs evaluation'

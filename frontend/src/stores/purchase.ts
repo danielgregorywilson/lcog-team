@@ -3,7 +3,9 @@ import { defineStore } from 'pinia'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
 import {
-  Expense, ExpenseCreate, ExpenseMonth, ExpenseMonthCreate, ExpenseStatement, GL
+  Expense, ExpenseCreate, ExpenseMonth, ExpenseMonthCreate, ExpenseMonthLock,
+  ExpenseMonthLockCreate,
+  ExpenseStatement, GL
 } from 'src/types'
 
 export const usePurchaseStore = defineStore('purchase', {
@@ -11,6 +13,7 @@ export const usePurchaseStore = defineStore('purchase', {
     firstOfThisMonth: new Date(),
     firstOfSelectedMonth: new Date(),
     expenseMonths: [] as Array<ExpenseMonth>,
+    expenseMonthLocks: [] as Array<ExpenseMonthLock>,
     myExpenses: [] as Array<Expense>,
     approvalExpenseGLs: [] as Array<GL>,
     directorExpenseMonths: [] as Array<ExpenseMonth>,
@@ -35,6 +38,11 @@ export const usePurchaseStore = defineStore('purchase', {
     selectedExpenseMonth(): ExpenseMonth | undefined {
       return this.expenseMonths.find(em => {
         return em.month === this.monthInt && em.year === this.yearInt
+      })
+    },
+    expenseMonthLocked(): boolean {
+      return this.expenseMonthLocks.some(eml => {
+        return eml.month === this.monthInt && eml.year === this.yearInt
       })
     }
   },
@@ -68,6 +76,20 @@ export const usePurchaseStore = defineStore('purchase', {
     },
     setMonth(month: number, year: number) {
       this.firstOfSelectedMonth = new Date(year, month - 1, 1)
+    },
+    getExpenseMonthLocks(): Promise<null> {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/expense-month-lock`
+        })
+          .then(resp => {
+            this.expenseMonthLocks = resp.data.results
+            resolve(resp.data.results)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error getting expense month locks', e)
+          })
+      })
     },
 
     ////////////////
@@ -374,8 +396,9 @@ export const usePurchaseStore = defineStore('purchase', {
                 return a.month - b.month
               }
             )
+
             if (emsDirectorToApprove.length > 0) {
-              const activeMonth = ems[0]
+              const activeMonth = emsDirectorToApprove[0]
               this.setMonth(activeMonth.month, activeMonth.year)
             }
             
@@ -523,6 +546,40 @@ export const usePurchaseStore = defineStore('purchase', {
               reject, 'Error sending expense statement notifications', e
             )
           })
+      })
+    },
+
+    lockCurrentExpenseMonth(
+      lock: boolean, data?: ExpenseMonthLockCreate
+    ): Promise<null> {
+      return new Promise((resolve, reject) => {
+        if (lock) {
+          axios({
+            url: `${ apiURL }api/v1/expense-month-lock`,
+            method: 'POST',
+            data
+          })
+            .then(() => {
+              resolve(null)
+            })
+            .catch(e => {
+              handlePromiseError(reject, 'Error locking expense month', e)
+            })
+        } else {
+          axios({
+            url: `${ apiURL }api/v1/expense-month-lock/unlock`,
+            method: 'DELETE',
+            data
+          })
+            .then(() => {
+              resolve(null)
+            })
+            .catch(e => {
+              handlePromiseError(reject, 'Error unlocking expense month', e)
+            })
+        }
+        
+        
       })
     },
 

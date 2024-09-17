@@ -1,7 +1,7 @@
 <template>
 <div class="q-mt-md">
   <div v-if="purchaseStore.selectedExpenseMonth">
-    <div class="row q-gutter-md">
+    <div v-if="!monthLocked()" class="row q-gutter-md">
       <q-btn
         v-if="!monthSubmitted()"
         @click="showSubmitDialog = true"
@@ -50,7 +50,12 @@
         size="xl"
       />
       <div v-else>
-        <div class="text-h6">Submitted Total: ${{ expensesTotal() }}</div>
+        <div class="row justify-between">
+          <div class="text-h6">Submitted Total: ${{ expensesTotal() }}</div>
+          <div v-if="monthLocked()" class="text-h6 text-negative">
+            Month locked by fiscal
+          </div>
+        </div>
         <q-table
           flat bordered
           :title="tableTitleDisplay()"
@@ -72,7 +77,7 @@
               <q-td key="name" :props="props" style="white-space: normal;">
                 {{ props.row.name }}
                 <q-popup-edit
-                  v-if="!monthSubmitted()"
+                  v-if="!monthLocked() && !monthSubmitted()"
                   v-model="props.row.name"
                   buttons
                   v-slot="scope"
@@ -90,7 +95,7 @@
               <q-td key="date" :props="props">
                 {{ readableDateNEW(props.row.date) }}
                 <q-popup-edit
-                  v-if="!monthSubmitted()"
+                  v-if="!monthLocked() && !monthSubmitted()"
                   v-model="props.row.date"
                   buttons
                   v-slot="scope"
@@ -108,7 +113,7 @@
               <q-td key="vendor" :props="props" style="white-space: normal;">
                 <div class="text-pre-wrap">{{ props.row.vendor }}</div>
                 <q-popup-edit
-                  v-if="!monthSubmitted()"
+                  v-if="!monthLocked() && !monthSubmitted()"
                   v-model="props.row.vendor"
                   buttons
                   v-slot="scope"
@@ -126,7 +131,7 @@
               <q-td key="amount" :props="props">
                 {{ props.row.amount }}
                 <q-popup-edit
-                  v-if="!monthSubmitted()"
+                  v-if="!monthLocked() && !monthSubmitted()"
                   v-model="props.row.amount"
                   buttons
                   v-slot="scope"
@@ -146,7 +151,7 @@
               <q-td key="job" :props="props">
                 <div class="text-pre-wrap">{{ props.row.job }}</div>
                 <q-popup-edit
-                  v-if="!monthSubmitted()"
+                  v-if="!monthLocked() && !monthSubmitted()"
                   v-model="props.row.job"
                   buttons
                   v-slot="scope"
@@ -170,7 +175,7 @@
                   {{ gl.code }}: ${{ gl.amount }} – {{ gl.approver?.name }}
                 </div>
                 <q-popup-edit
-                  v-if="!monthSubmitted()"
+                  v-if="!monthLocked() && !monthSubmitted()"
                   v-model="props.row.gls"
                   buttons
                   v-slot="scope"
@@ -249,7 +254,7 @@
                   <!-- Button to upload file -->
                   <q-btn icon="cloud_upload"
                     flat
-                    :disable="monthSubmitted()"
+                    :disable="monthLocked() || monthSubmitted()"
                   >
                     <q-popup-edit
                       v-if="!monthSubmitted()"
@@ -297,7 +302,7 @@
                   </q-tooltip>
                 </q-btn>
                 <q-btn
-                  v-if="!monthSubmitted()"
+                  :disable="monthLocked() || monthSubmitted()"
                   class="col"
                   dense
                   round
@@ -353,7 +358,7 @@
                         <!-- Button to upload file -->
                         <q-btn icon="cloud_upload"
                           flat
-                          :disable="monthSubmitted()"
+                          :disable="monthLocked() || monthSubmitted()"
                         >
                           <q-popup-edit
                             v-if="!monthSubmitted()"
@@ -393,7 +398,7 @@
       </div>
       <div class="row justify-center">
         <q-btn
-          v-if="!monthSubmitted()"
+          v-if="!monthLocked() && !monthSubmitted()"
           color="primary"
           class="q-mt-sm"
           @click="clickAddExpense()"
@@ -407,15 +412,23 @@
   </div>
   <div v-else>
     <q-card>
-      <q-card-section class="row items-center">
-        <div class="text-h6">{{ purchaseStore.monthDisplay }} not started.</div>
-        <q-btn
-          color="primary"
-          class="q-ml-sm"
-          @click="createExpenseMonth().then(() => retrieveAllMyExpenses())"
-        >
-          Get started
-        </q-btn>
+      <q-card-section class="row justify-between">
+        <div class="row items-center">
+          <div class="text-h6">
+            {{ purchaseStore.monthDisplay }} not started.
+          </div>
+          <q-btn
+            color="primary"
+            v-if="!monthLocked()"
+            class="q-ml-sm"
+            @click="createExpenseMonth().then(() => retrieveAllMyExpenses())"
+          >
+            Get started
+          </q-btn>
+        </div>
+        <div v-if="monthLocked()" class="text-h6 text-negative">
+          Month locked by fiscal
+        </div>
       </q-card-section>
     </q-card>
   </div>
@@ -430,7 +443,7 @@
         v-if="thisMonthStatementsLoaded"
         :bg-color="selectedStatement ? '': 'info'"
         filled
-        :disable="monthSubmitted()"
+        :disable="monthLocked() || monthSubmitted()"
         v-model="selectedStatement"
         :options="statementChoices()"
         label="Select your card"
@@ -905,7 +918,14 @@ function canUnsubmitMonth() {
   return monthSubmitted() && !monthApproved()
 }
 
+function monthLocked() {
+  return purchaseStore.expenseMonthLocked
+}
+
 function onSubmitDialog() {
+  if (monthLocked()) {
+    return
+  }
   purchaseStore.submitExpenseMonth({
     yearInt: purchaseStore.yearInt, monthInt: purchaseStore.monthInt,
     note: submitterNote.value
@@ -925,6 +945,9 @@ function onSubmitDialog() {
 }
 
 function onUnsubmitDialog() {
+  if (monthLocked()) {
+    return
+  }
   purchaseStore.submitExpenseMonth({
     yearInt: purchaseStore.yearInt, monthInt: purchaseStore.monthInt,
     unsubmit: true
@@ -975,6 +998,9 @@ function updateExpense(
   field: 'name' | 'date' | 'amount' | 'vendor' | 'job' | 'gls' | 'repeat',
   val: string | Array<GL> | boolean
 ) {
+  if (monthLocked()) {
+    return
+  }
   const exp = purchaseStore.myExpenses.find(exp => exp.pk === pk)
   if (exp) {
     if (field === 'gls') {
@@ -992,6 +1018,9 @@ function updateExpense(
 }
 
 function uploadedReceipt(pk: number) {
+  if (monthLocked()) {
+    return
+  }
   purchaseStore.clearExpenseGLApprovals(pk)
     .then(() => {
       retrieveAllMyExpenses()
@@ -1006,6 +1035,9 @@ function showDeleteDialog(expense: Expense): void {
 }
 
 function deleteExpense(): void {
+  if (monthLocked()) {
+    return
+  }
   purchaseStore.deleteExpense(expensePkToDelete.value)
     .then(() => {
       quasar.notify('Deleted an expense.')
@@ -1063,6 +1095,9 @@ function statementChoices(): Array<{label: string, value: ExpenseStatement}> {
 }
 
 function updateSelectedStatement() {
+  if (monthLocked()) {
+    return
+  }
   new Promise((resolve) => {
     const em = purchaseStore.selectedExpenseMonth
     if (!em) {
@@ -1099,6 +1134,9 @@ function setSelectedStatement() {
 }
 
 function createExpenseMonth(): Promise<ExpenseMonth> {
+  if (monthLocked()) {
+    return Promise.reject()
+  }
   return new Promise ((resolve, reject) => {
     purchaseStore.createExpenseMonth({
       month: purchaseStore.monthInt,

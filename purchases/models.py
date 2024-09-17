@@ -253,3 +253,16 @@ class ExpenseStatementItem(models.Model):
     date = models.DateField(_("Transaction Date"))
     description = models.CharField(max_length=255)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
+
+
+class ExpenseMonthLock(models.Model):
+    class Meta:
+        ordering = ["pk",]
+
+    year = models.IntegerField()
+    month = models.IntegerField()
+    locked_at = models.DateTimeField(auto_now_add=True)
+    locked_by = models.ForeignKey(
+        Employee, blank=True, null=True, on_delete=models.SET_NULL,
+        related_name='expense_month_locks'
+    )

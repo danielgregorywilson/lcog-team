@@ -32,7 +32,9 @@
         label="Processes"
         :to="{name: 'workflow-processes', params: {pk: wfi().pk}}"
       >
-        <q-badge v-if="wfi().pis_action_required" color="orange" rounded floating />
+        <q-badge
+          v-if="wfi().pis_action_required" color="orange" rounded floating
+        />
       </q-btn>
       <q-btn
         push
@@ -41,7 +43,12 @@
         label="Employee Transition Form"
         :to="{name: 'workflow-transition-form', params: {pk: wfi().pk}}"
       >
-        <q-badge v-if="wfi().transition_action_required" color="orange" rounded floating />
+        <q-badge
+          v-if="wfi().transition_action_required"
+          color="orange"
+          rounded
+          floating
+        />
       </q-btn>
     </q-btn-group>
 

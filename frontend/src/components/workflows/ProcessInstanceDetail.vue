@@ -44,7 +44,11 @@
               @click="completeStep(si.pk)"
               color="primary"
               label="Mark as Complete"
-            />
+            >
+              <q-badge
+                v-if="pi.action_required" color="orange" rounded floating
+              />
+            </q-btn>
           </div>
           <div v-else>
             {{si.step.choices_prompt}}
@@ -56,7 +60,11 @@
               color="primary"
               :label="choice.choice_text"
               :disable="!canCompleteStepInstance(si) || disableCompletions"
-            />
+            >
+              <q-badge
+                v-if="pi.action_required" color="orange" rounded floating
+              />
+            </q-btn>
           </div>
         </q-stepper-navigation>
       </q-step>

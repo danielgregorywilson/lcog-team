@@ -98,14 +98,24 @@ class ProcessInstanceSerializer(serializers.ModelSerializer):
     step_instances = StepInstanceSerializer(source='stepinstance_set',
         many=True)
     current_step_instance = StepInstanceSerializer()
+    action_required = serializers.SerializerMethodField()
 
     class Meta:
         model = ProcessInstance
         fields = [
             'url', 'pk', 'process', 'step_instances', 'current_step_instance',
-            'completed_at', 'percent_complete'
+            'completed_at', 'percent_complete', 'action_required'
         ]
         depth = 1
+    
+    def get_action_required(self, pi):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        if user and hasattr(user, "employee"):
+            return pi.employee_action_required(user.employee)
+        return False
 
 
 class TransitionChangeSerializer(serializers.ModelSerializer):

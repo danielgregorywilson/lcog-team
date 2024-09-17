@@ -264,7 +264,7 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
-import { onMounted, Ref, ref, watch } from 'vue'
+import { onMounted, Ref, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 import DocumentViewer from 'src/components/DocumentViewer.vue'

@@ -895,6 +895,8 @@ export interface WorkflowInstanceSimple {
   workflow_type: string
   workflow_name: string
   employee_action_required: boolean
+  pis_action_required: boolean
+  transition_action_required: boolean
 }
 
 export interface WorkflowInstance {
@@ -907,6 +909,9 @@ export interface WorkflowInstance {
   percent_complete: number
   title_name: string
   workflow_role_pk: number
+  employee_action_required: boolean
+  pis_action_required: boolean
+  transition_action_required: boolean
 }
 
 export type EmployeeID = 'CLSD' | 'CLID' | ''

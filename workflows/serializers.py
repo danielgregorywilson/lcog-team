@@ -378,6 +378,7 @@ class WorkflowInstanceSerializer(WorkflowInstanceBaseSerializer):
         fields = [
             'url', 'pk', 'workflow', 'process_instances', 'transition',
             'active', 'complete', 'percent_complete', 'title_name',
-            'employee_action_required', 'workflow_type', 'workflow_role_pk'
+            'employee_action_required', 'pis_action_required',
+            'transition_action_required', 'workflow_type', 'workflow_role_pk'
         ]
         depth = 1

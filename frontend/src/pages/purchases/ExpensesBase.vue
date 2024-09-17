@@ -182,6 +182,7 @@ function numExpensesFiscalToApprove(): number {
 
 onMounted(() => {
   purchaseStore.initializeDates()
+  purchaseStore.getExpenseMonthLocks()
 })
 
 </script>

@@ -454,6 +454,19 @@ export interface ExpenseStatement {
   items: Array<ExpenseStatementItem>
 }
 
+export interface ExpenseMonthLock {
+  pk: number
+  year: number
+  month: number
+  locked_at: string
+  locked_by: SimpleEmployeeRetrieve
+}
+
+export interface ExpenseMonthLockCreate {
+  year: number
+  month: number
+}
+
 /////////////////////////////////////////////////////////
 // Responsibility Structure from Django Rest Framework //
 /////////////////////////////////////////////////////////

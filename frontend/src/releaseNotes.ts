@@ -4,6 +4,16 @@
 
 export const releases = [
   {
+    version: '0.36.0',
+    date: new Date(2024, 8, 17),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Fiscal can lock expense months'
+      }
+    ]
+  },
+  {
     version: '0.35.1',
     date: new Date(2024, 8, 11),
     changes: [

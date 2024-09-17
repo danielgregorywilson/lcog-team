@@ -8,6 +8,7 @@
       size="xl"
     />
     <div v-else>
+      <div class="text-h5 text-center">Submitted Expenses</div>
       <q-table
         flat bordered
         :title="purchaseStore.monthDisplay"
@@ -16,7 +17,7 @@
         row-key="name"
         binary-state-sort
         :pagination="pagination"
-        class="expense-table"
+        class="expense-table q-mt-sm"
         no-data-label="No expenses entered this month"
       >
         <template v-slot:body="props">
@@ -61,8 +62,28 @@
           </q-tr>
         </template>
       </q-table>
+      <div class="row items-center justify-center q-mt-sm">
+        <div class="text-bold">
+          Month is
+          <span v-if="purchaseStore.expenseMonthLocked">locked</span>
+          <span v-else>
+            <span class="text-uppercase">active</span> and available
+          </span>
+          for submission
+        </div>
+        <div class="row justify-center q-ml-md">
+          <q-btn 
+            :label="purchaseStore.expenseMonthLocked ?
+              'Unlock Month' : 'Lock Month'"
+            :color="purchaseStore.expenseMonthLocked ? 'white' : 'primary'"
+            :text-color="purchaseStore.expenseMonthLocked ? 'primary' : 'white'"
+            @click="lockMonthDialogVisible = true"
+          />
+        </div>
+      </div>
     </div>
-    <div class="q-mt-sm">
+    <div class="q-mt-md">
+      <hr />
       <div class="text-h5 text-center">Expense Statements</div>
       <div class="row justify-between q-gutter-md q-mt-none">
         <div class="col">
@@ -114,26 +135,28 @@
             </div>  
           </div>
         </div>
-        <div class="col row justify-center">
-          <div class="text-h6">
+        <div class="col">
+          <div class="row justify-center q-mb-sm text-h6">
             Upload Statements for {{ purchaseStore.monthDisplay }}
           </div>
-          <FileUploader
-              :file=selectedFiles
-              multiple
-              contentTypeAppLabel="purchases"
-              contentTypeModel="expensestatement"
-              :data="{
-                'year': purchaseStore.yearInt,
-                'month': purchaseStore.monthInt
-              }"
-              :readOnly=false
-              v-on="{
-                'uploaded': (url: string) => {
-                  retrieveAllStatements()
-                }
-              }"
-            />
+          <div class="row justify-center">
+            <FileUploader
+                :file=selectedFiles
+                multiple
+                contentTypeAppLabel="purchases"
+                contentTypeModel="expensestatement"
+                :data="{
+                  'year': purchaseStore.yearInt,
+                  'month': purchaseStore.monthInt
+                }"
+                :readOnly=false
+                v-on="{
+                  'uploaded': (url: string) => {
+                    retrieveAllStatements()
+                  }
+                }"
+              />
+          </div>
         </div>
       </div>
     </div>
@@ -166,6 +189,48 @@
           label="Yes, send them!"
           color="primary"
           @click="sendNotifications()"
+          v-close-popup
+        />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
+
+    <!-- Lock Month Dialog -->
+    <q-dialog v-model="lockMonthDialogVisible">
+    <q-card>
+      <q-card-section>
+        <div class="row items-center">
+          <q-avatar
+            icon="lock"
+            color="primary"
+            text-color="white"
+          />
+          <span class="q-ml-md col">
+            <span v-if="purchaseStore.expenseMonthLocked" class="text-bold">
+              Unlock
+            </span>
+            <span v-else class="text-bold">Lock</span>
+            expenses for
+            <span class="text-bold">{{ purchaseStore.monthDisplay }}</span>?
+            <span v-if="purchaseStore.expenseMonthLocked">
+              Submitters will once again be able to revise and submit new
+              expenses.
+            </span>
+            <span v-else>
+              No one will be able to revise or submit new expenses.
+            </span>
+          </span>
+        </div>
+      </q-card-section>
+
+      <q-card-actions class="row justify-around">
+        <q-btn flat label="Cancel" color="primary" v-close-popup />
+        <q-btn
+          flat
+          :label="purchaseStore.expenseMonthLocked ? 'Yes, unlock it' :
+            'Yes, lock it'"
+          color="primary"
+          @click="toggleLockCurrentExpenseMonth()"
           v-close-popup
         />
       </q-card-actions>
@@ -282,6 +347,7 @@ let thisMonthStatementsLoaded = ref(false)
 let allStatementsLoaded = ref(false)
 
 let sendNotificationDialogVisible = ref(false)
+let lockMonthDialogVisible = ref(false)
 
 let statementDialogVisible = ref(false)
 let statementDialogStatement = ref({}) as Ref<ExpenseStatement>
@@ -519,6 +585,20 @@ function deleteStatement(): void {
       statementDialogVisible.value = false
       quasar.notify('Deleted a statement.')
       retrieveAllStatements()
+    })
+    .catch(e => {
+      console.error(e)
+    })
+}
+
+function toggleLockCurrentExpenseMonth() {
+  const lock = !purchaseStore.expenseMonthLocked
+  purchaseStore.lockCurrentExpenseMonth(
+    lock, {'year': purchaseStore.yearInt, 'month': purchaseStore.monthInt}
+  )
+    .then(() => {
+      quasar.notify(lock ? 'Locked the month.' : 'Unlocked the month.')
+      purchaseStore.getExpenseMonthLocks()
     })
     .catch(e => {
       console.error(e)

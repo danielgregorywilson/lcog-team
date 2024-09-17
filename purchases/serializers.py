@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
 from .models import (
-    Expense, ExpenseCard, ExpenseGL, ExpenseMonth, ExpenseStatement,
-    ExpenseStatementItem
+    Expense, ExpenseCard, ExpenseGL, ExpenseMonth, ExpenseMonthLock,
+    ExpenseStatement, ExpenseStatementItem
 )
 from people.serializers import SimpleEmployeeSerializer
 
@@ -158,3 +158,10 @@ class ExpenseMonthSerializer(serializers.HyperlinkedModelSerializer):
                 ).first(),
                 context=self.context
             ).data
+
+
+class ExpenseMonthLockSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = ExpenseMonthLock
+        fields = ['pk', 'year', 'month', 'locked_at', 'locked_by']

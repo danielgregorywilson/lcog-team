@@ -1,9 +1,9 @@
 from django.contrib import admin
 
 from .models import (
-    Expense, ExpenseCard, ExpenseGL, ExpenseMonth, ExpenseStatement,
-    ExpenseStatementItem, PurchaseCategory, PurchaseObject, PurchaseRequest,
-    Role
+    Expense, ExpenseCard, ExpenseGL, ExpenseMonth, ExpenseMonthLock,
+    ExpenseStatement, ExpenseStatementItem, PurchaseCategory, PurchaseObject,
+    PurchaseRequest, Role
 )
 
 
@@ -73,3 +73,9 @@ class ExpenseStatementAdmin(admin.ModelAdmin):
     list_display = ('id', 'card', 'month', 'year')
     list_filter = ('card', 'year', 'month')
     inlines = (ExpenseStatementItemInline,)
+
+
+@admin.register(ExpenseMonthLock)
+class ExpenseMonthLockAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'year', 'month', 'locked_by')
+    list_filter = ('year',)

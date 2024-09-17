@@ -15,11 +15,12 @@ from purchases.helpers import (
     send_submitter_monthly_expenses_reminders
 )
 from purchases.models import (
-    Expense, ExpenseCard, ExpenseGL, ExpenseMonth, ExpenseStatement
+    Expense, ExpenseCard, ExpenseGL, ExpenseMonth, ExpenseMonthLock,
+    ExpenseStatement
 )
 from purchases.serializers import (
-    ExpenseGLSerializer, ExpenseMonthSerializer, ExpenseSerializer,
-    ExpenseStatementSerializer
+    ExpenseGLSerializer, ExpenseMonthSerializer, ExpenseMonthLockSerializer,
+    ExpenseSerializer, ExpenseStatementSerializer
 )
 
 def all_expense_gls_approved(expense):
@@ -608,6 +609,64 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
                 data=message,
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+class ExpenseMonthLockViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for locking expense months.
+    """
+    queryset = ExpenseMonthLock.objects.all()
+    serializer_class = ExpenseMonthLockSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated: 
+            if user.is_superuser:
+                return super().get_queryset()
+            year = self.request.query_params.get('year', None)
+            month = self.request.query_params.get('month', None)
+            if year and month:
+                return ExpenseMonthLock.objects.filter(year=year, month=month)
+            return ExpenseMonthLock.objects.all()
+        else:
+            return ExpenseMonthLock.objects.none()
+
+    def create(self, request, *args, **kwargs):
+        year = request.data.get('year', None)
+        month = request.data.get('month', None)
+        if year is not None and month is not None:
+            eml = ExpenseMonthLock.objects.get_or_create(
+                locked_by=request.user.employee, year=year, month=month
+            )[0]
+            eml.locked = True
+            eml.save()
+            serialized_eml = ExpenseMonthLockSerializer(
+                eml, context={'request': request}
+            )
+            return Response(serialized_eml.data)
+    
+    @action(detail=False, methods=['delete'])
+    def unlock(self, request):
+        """
+        Unlock an expense month.
+        """
+        year = request.data.get('year', None)
+        month = request.data.get('month', None)
+        if year is not None and month is not None:
+            try:
+                eml = ExpenseMonthLock.objects.get(year=year, month=month)
+                eml.delete()
+                serialized_eml = ExpenseMonthLockSerializer(
+                    eml, context={'request': request}
+                )
+                return Response(serialized_eml.data)
+            except Exception as e:
+                message = 'Error unlocking expense month.'
+                record_error(message, e, request, traceback.format_exc())
+                return Response(
+                    data=message,
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
 
 
 class ExpenseStatementViewSet(viewsets.ModelViewSet):

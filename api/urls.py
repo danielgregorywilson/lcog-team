@@ -19,8 +19,8 @@ from people.api_views import (
     UserViewSet, ViewedSecurityMessageViewSet
 )
 from purchases.api_views import (
-    ExpenseGLViewSet, ExpenseMonthViewSet, ExpenseStatementViewSet,
-    ExpenseViewSet
+    ExpenseGLViewSet, ExpenseMonthViewSet, ExpenseMonthLockViewSet,
+    ExpenseStatementViewSet, ExpenseViewSet
 )
 from responsibilities.api_views import (
     ResponsibilityViewSet, TagViewSet as ResponsibilityTagViewSet
@@ -63,6 +63,7 @@ router.register('v1/deskreservation', DeskReservationViewSet)
 router.register('v1/expense-gl', ExpenseGLViewSet)
 router.register('v1/expense', ExpenseViewSet)
 router.register('v1/expense-month', ExpenseMonthViewSet)
+router.register('v1/expense-month-lock', ExpenseMonthLockViewSet)
 router.register('v1/expense-statement', ExpenseStatementViewSet)
 # Performance Reviews
 router.register('v1/performancereview', PerformanceReviewViewSet)

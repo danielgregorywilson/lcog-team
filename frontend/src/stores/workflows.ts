@@ -2,7 +2,9 @@ import axios from 'axios'
 import { defineStore } from 'pinia'
 
 import { apiURL, handlePromiseError } from 'src/stores/index'
-import { EmployeeTransition, EmployeeTransitionUpdate, WorkflowInstance } from 'src/types'
+import {
+  EmployeeTransition, EmployeeTransitionUpdate, WorkflowInstance
+} from 'src/types'
 
 export const useWorkflowsStore = defineStore('workflows', {
   state: () => ({
@@ -14,7 +16,8 @@ export const useWorkflowsStore = defineStore('workflows', {
 
   getters: {
     currentEmployeeTransition(state): EmployeeTransition {
-      return state.currentWorkflowInstance.transition || {} as EmployeeTransition
+      return state.currentWorkflowInstance.transition ||
+        {} as EmployeeTransition
     },
     processInstanceCurrentStepPks: state => {
       const d: {[pk: number]: number} = {}
@@ -35,56 +38,94 @@ export const useWorkflowsStore = defineStore('workflows', {
   actions: {
     createNewEmployeeOnboarding(): Promise<WorkflowInstance> {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/workflowinstance`, method: 'POST', data: {type: 'employee_onboarding'} })
+        axios({
+          url: `${ apiURL }api/v1/workflowinstance`,
+          method: 'POST',
+          data: {type: 'employee_onboarding'}
+        })
           .then(resp => {
             resolve(resp.data)
           })
           .catch(e => {
-            handlePromiseError(reject, 'Error creating new employee onboarding workflow instance', e)
+            handlePromiseError(
+              reject,
+              'Error creating new employee onboarding workflow instance',
+              e
+            )
           })
       })
     },
     createNewEmployeeReturning(): Promise<WorkflowInstance> {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/workflowinstance`, method: 'POST', data: {type: 'employee_returning'} })
+        axios({
+          url: `${ apiURL }api/v1/workflowinstance`,
+          method: 'POST',
+          data: {type: 'employee_returning'}
+        })
           .then(resp => {
             resolve(resp.data)
           })
           .catch(e => {
-            handlePromiseError(reject, 'Error creating new employee returning workflow instance', e)
+            handlePromiseError(
+              reject,
+              'Error creating new employee returning workflow instance',
+              e
+            )
           })
       })
     },
     createNewEmployeeChanging(): Promise<WorkflowInstance> {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/workflowinstance`, method: 'POST', data: {type: 'employee_changing'} })
+        axios({
+          url: `${ apiURL }api/v1/workflowinstance`,
+          method: 'POST',
+          data: {type: 'employee_changing'}
+        })
           .then(resp => {
             resolve(resp.data)
           })
           .catch(e => {
-            handlePromiseError(reject, 'Error creating new employee changing workflow instance', e)
+            handlePromiseError(
+              reject,
+              'Error creating new employee changing workflow instance',
+              e
+            )
           })
       })
     },
     createNewEmployeeExiting(): Promise<WorkflowInstance> {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/workflowinstance`, method: 'POST', data: {type: 'employee_exiting'} })
+        axios({
+          url: `${ apiURL }api/v1/workflowinstance`,
+          method: 'POST',
+          data: {type: 'employee_exiting'}
+        })
           .then(resp => {
             resolve(resp.data)
           })
           .catch(e => {
-            handlePromiseError(reject, 'Error creating new employee exiting workflow instance', e)
+            handlePromiseError(
+              reject,
+              'Error creating new employee exiting workflow instance',
+              e
+            )
           })
       })
     },
     createNewWorkflowInstance(type: string): Promise<WorkflowInstance> {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/workflowinstance`, method: 'POST', data: { type } })
+        axios({
+          url: `${ apiURL }api/v1/workflowinstance`,
+          method: 'POST',
+          data: { type }
+        })
           .then(resp => {
             resolve(resp.data)
           })
           .catch(e => {
-            handlePromiseError(reject, `Error creating new ${ type } workflow instance`, e)
+            handlePromiseError(
+              reject, `Error creating new ${ type } workflow instance`, e
+            )
           })
       })
     },
@@ -96,22 +137,28 @@ export const useWorkflowsStore = defineStore('workflows', {
             resolve(resp)
           })
           .catch(e => {
-            handlePromiseError(reject, 'Error getting current workflow instance', e)
+            handlePromiseError(
+              reject, 'Error getting current workflow instance', e
+            )
           })
         })
     },
     // All workflow instances, optionally filtered to ongoing/completed
     getWorkflows(data: {archived: boolean, complete: boolean}) {
       let targetUrl: string
-      let workflowType: 'workflowsComplete' | 'workflowsIncomplete' | 'workflowsArchived'
+      let workflowType: 'workflowsComplete' | 'workflowsIncomplete' |
+        'workflowsArchived'
       if (data.archived) {
-        targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true&archived=true`
+        targetUrl =
+          `${ apiURL }api/v1/workflowinstance?simple=true&archived=true`
         workflowType = 'workflowsArchived'
       } else if (data.complete) {
-        targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true&archived=false&complete=true`
+        targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true` +
+          `&archived=false&complete=true`
         workflowType = 'workflowsComplete'
       } else {
-        targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true&archived=false&complete=false`
+        targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true` +
+          `&archived=false&complete=false`
         workflowType = 'workflowsIncomplete'
       }
       return new Promise((resolve, reject) => {
@@ -121,35 +168,57 @@ export const useWorkflowsStore = defineStore('workflows', {
           resolve(resp)
         })
         .catch(e => {
-          handlePromiseError(reject, `Error getting workflows of type ${ workflowType }`, e)
+          handlePromiseError(
+            reject, `Error getting workflows of type ${ workflowType }`, e
+          )
         })
       })
     },
     completeStepInstance(stepInstancePk: number, nextStepPk?: number) {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/stepinstance/${ stepInstancePk }`, data: {action: 'complete', stepInstancePk, nextStepPk}, method: 'PATCH' })
+        axios({
+          url: `${ apiURL }api/v1/stepinstance/${ stepInstancePk }`,
+          data: {action: 'complete', stepInstancePk, nextStepPk},
+          method: 'PATCH'
+        })
           .then(resp => {
             resolve(resp)
           })
           .catch(e => {
-            handlePromiseError(reject, 'Error completing current step instance', e)
+            handlePromiseError(
+              reject, 'Error completing current step instance', e
+            )
           })
       })
     },
-    undoStepInstanceCompletion(stepInstancePk: number, nextStepInstancePk?: number) {
+    undoStepInstanceCompletion(
+      stepInstancePk: number, nextStepInstancePk?: number
+    ) {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/stepinstance/${ stepInstancePk }`, data: {action: 'undo', stepInstancePk, nextStepInstancePk}, method: 'PATCH' })
+        axios({
+          url: `${ apiURL }api/v1/stepinstance/${ stepInstancePk }`,
+          data: {action: 'undo', stepInstancePk, nextStepInstancePk},
+          method: 'PATCH'
+        })
           .then(resp => {
             resolve(resp)
           })
           .catch(e => {
-            handlePromiseError(reject, 'Error undoing current step instance completion', e)
+            handlePromiseError(
+              reject, 'Error undoing current step instance completion', e
+            )
           })
       })
     },
-    updateEmployeeTransition(pk: string, data: EmployeeTransitionUpdate): Promise<EmployeeTransition> {
+    updateEmployeeTransition(
+      pk: string, data: EmployeeTransitionUpdate
+    ): Promise<EmployeeTransition> {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/employeetransition/${ pk }`, data, method: 'PUT' })
+        axios({
+          url: `${ apiURL }api/v1/employeetransition/${ pk }`,
+          data,
+          method: 'PUT'
+        })
           .then(resp => {
             resolve(resp.data)
           })
@@ -162,12 +231,19 @@ export const useWorkflowsStore = defineStore('workflows', {
       senderName: string, senderEmail: string, transitionUrl: string
     }): Promise<boolean> {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/employeetransition/${ pk }/send_gas_pin_notification_email`, data, method: 'POST' })
+        axios({
+          url: `${ apiURL }api/v1/employeetransition/${ pk }` +
+            `/send_gas_pin_notification_email`,
+          data,
+          method: 'POST'
+        })
           .then(() => {
             resolve(true)
           })
           .catch(e => {
-            handlePromiseError(reject, 'Error sending gas PIN notification email', e)
+            handlePromiseError(
+              reject, 'Error sending gas PIN notification email', e
+            )
           })
       })
     },
@@ -177,18 +253,29 @@ export const useWorkflowsStore = defineStore('workflows', {
       transitionUrl: string
     }): Promise<boolean> {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/employeetransition/${ pk }/send_transition_to_email_list`, data, method: 'POST' })
+        axios({
+          url: `${ apiURL }api/v1/employeetransition/${ pk }` +
+            `/send_transition_to_email_list`,
+          data,
+          method: 'POST'
+        })
           .then(() => {
             resolve(true)
           })
           .catch(e => {
-            handlePromiseError(reject, 'Error sending employee transition to email list', e)
+            handlePromiseError(
+              reject, 'Error sending employee transition to email list', e
+            )
           })
       })
     },
     archiveWorkflowInstance(workflowInstancePk: string) {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/workflowinstance/${ workflowInstancePk }`, data: {action: 'archive'}, method: 'PATCH' })
+        axios({
+          url: `${ apiURL }api/v1/workflowinstance/${ workflowInstancePk }`,
+          data: {action: 'archive'},
+          method: 'PATCH'
+        })
           .then(resp => {
             resolve(resp)
           })
@@ -199,7 +286,11 @@ export const useWorkflowsStore = defineStore('workflows', {
     },
     restoreWorkflowInstance(workflowInstancePk: string) {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/workflowinstance/${ workflowInstancePk }`, data: {action: 'restore'}, method: 'PATCH' })
+        axios({
+          url: `${ apiURL }api/v1/workflowinstance/${ workflowInstancePk }`,
+          data: {action: 'restore'},
+          method: 'PATCH'
+        })
           .then(resp => {
             resolve(resp)
           })
@@ -210,7 +301,11 @@ export const useWorkflowsStore = defineStore('workflows', {
     },
     completeWorkflowInstance(workflowInstancePk: string) {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/workflowinstance/${ workflowInstancePk }`, data: {action: 'complete'}, method: 'PATCH' })
+        axios({
+          url: `${ apiURL }api/v1/workflowinstance/${ workflowInstancePk }`,
+          data: {action: 'complete'},
+          method: 'PATCH'
+        })
           .then(resp => {
             resolve(resp)
           })
@@ -221,7 +316,11 @@ export const useWorkflowsStore = defineStore('workflows', {
     },
     reopenWorkflowInstance(workflowInstancePk: string) {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/workflowinstance/${ workflowInstancePk }`, data: {action: 'reopen'}, method: 'PATCH' })
+        axios({
+          url: `${ apiURL }api/v1/workflowinstance/${ workflowInstancePk }`,
+          data: {action: 'reopen'},
+          method: 'PATCH'
+        })
           .then(resp => {
             resolve(resp)
           })

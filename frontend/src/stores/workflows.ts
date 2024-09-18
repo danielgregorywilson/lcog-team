@@ -154,11 +154,11 @@ export const useWorkflowsStore = defineStore('workflows', {
         workflowType = 'workflowsArchived'
       } else if (data.complete) {
         targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true` +
-          `&archived=false&complete=true`
+          '&archived=false&complete=true'
         workflowType = 'workflowsComplete'
       } else {
         targetUrl = `${ apiURL }api/v1/workflowinstance?simple=true` +
-          `&archived=false&complete=false`
+          '&archived=false&complete=false'
         workflowType = 'workflowsIncomplete'
       }
       return new Promise((resolve, reject) => {
@@ -233,7 +233,7 @@ export const useWorkflowsStore = defineStore('workflows', {
       return new Promise((resolve, reject) => {
         axios({
           url: `${ apiURL }api/v1/employeetransition/${ pk }` +
-            `/send_gas_pin_notification_email`,
+            '/send_gas_pin_notification_email',
           data,
           method: 'POST'
         })
@@ -255,7 +255,7 @@ export const useWorkflowsStore = defineStore('workflows', {
       return new Promise((resolve, reject) => {
         axios({
           url: `${ apiURL }api/v1/employeetransition/${ pk }` +
-            `/send_transition_to_email_list`,
+            '/send_transition_to_email_list',
           data,
           method: 'POST'
         })

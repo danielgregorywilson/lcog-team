@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </head>
+    <body style="margin: 15px;">
+        <p>Hello,</p>
+        {% if completer %}
+          <p>{{ completer }} just completed {{ completed_step }} as part of {{ process }}.</p>
+          <p>Now it's your turn! Time to {{ step }}.</p>
+        {% else %}
+          <p>It's time to {{ step }} as part of {{ process }}.</p>
+        {% endif %}
+        <p><a href="{{ processes_url }}">{{ processes_url }}</a></p>
+        <p>View and update your email preferences: <a href="{{ profile_url }}">{{ profile_url }}</a></p>
+    </body>
+</html>

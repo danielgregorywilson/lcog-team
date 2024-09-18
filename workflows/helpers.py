@@ -339,6 +339,39 @@ def send_transition_stn_email(
         STAFF_TRANSITION_NEWS_EMAIL, subject, plaintext_message, html_message
     )
 
+def send_step_completion_email(si, old_si=None):
+    current_site = Site.objects.get_current()
+    url = f'/wf/{si.process_instance.workflow_instance.id}/processes'
+    processes_url = current_site.domain + url
+    profile_url = current_site.domain + '/profile'
+
+    subject = f'Time to { si.step.name }'
+
+    html_template = '../templates/email/workflows/complete-step.html'
+    html_message = render_to_string(html_template, {
+        'step': si.step.name,
+        'process': si.step.process.name,
+        'processes_url': processes_url,
+        'completer': old_si.completed_by.name if old_si else None,
+        'completed_step': old_si.step.name if old_si else None,
+        'profile_url': profile_url
+    })
+    plaintext_message = strip_tags(html_message)
+
+    # Send to HR employees and copy hiring manager and fiscal employees
+    role = si.step.role
+    if not role:
+        return
+    to_employees = role.members.all()
+    to_addresses = [
+        e.user.email for e in to_employees if \
+            e.should_receive_email_of_type('workflows', 'processes')
+    ]
+
+    send_email_multiple(
+        to_addresses, [], subject, plaintext_message, html_message
+    )
+
 def create_process_instances(transition):
     # Create process instances for staff transition workflows. Triggered when
     # a transition form is sent to Staff Transition News.

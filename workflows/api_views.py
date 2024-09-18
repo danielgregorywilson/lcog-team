@@ -19,9 +19,10 @@ from timeoff.helpers import (
 )
 from workflows.helpers import (
     create_process_instances, send_early_hr_email,
-    send_gas_pin_notification_email, send_transition_fiscal_email,
-    send_transition_hr_email, send_transition_sds_hiring_leads_email,
-    send_transition_stn_email, send_transition_submitter_email
+    send_gas_pin_notification_email, send_step_completion_email,
+    send_transition_fiscal_email, send_transition_hr_email,
+    send_transition_sds_hiring_leads_email, send_transition_stn_email,
+    send_transition_submitter_email
 )
 from workflows.models import (
     EmployeeTransition, Process, ProcessInstance, Role, Step, StepChoice,
@@ -760,9 +761,6 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
             stepinstance.completed_by = request.user.employee
             stepinstance.save()
             
-            # TODO: Do anything that needs to be done to prep the next step
-            # like email people
-            
             # Update the process instance
             processinstance = stepinstance.process_instance
             if stepinstance.step.end:
@@ -781,6 +779,11 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
                     process_instance=processinstance
                 )
                 processinstance.current_step_instance = new_stepinstance
+                # Notify responsible parties of the new step instance if
+                # they're different from the current step instance
+                if new_stepinstance.step.role != stepinstance.step.role:
+                    send_step_completion_email(new_stepinstance, stepinstance)
+
             processinstance.update_percent_complete()
             processinstance.save()
             workflowinstance = processinstance.workflow_instance

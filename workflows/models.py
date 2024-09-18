@@ -482,6 +482,8 @@ class Process(models.Model):
         )
         first_step = self.steps.filter(start=True)[0]
         si = StepInstance.objects.create(step=first_step, process_instance=pi)
+        from workflows.helpers import send_step_completion_email
+        send_step_completion_email(si)
         pi.current_step_instance = si
         pi.save()
 

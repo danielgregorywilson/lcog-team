@@ -126,6 +126,7 @@ export interface EmployeeRetrieve {
   email_opt_out_timeoff_daily: boolean
   email_opt_out_workflows_all: boolean
   email_opt_out_workflows_transitions: boolean
+  email_opt_out_workflows_processes: boolean
   email_opt_out_expenses_all: boolean
   is_all_workflows_admin: boolean
   admin_of_workflows: Array<number>
@@ -171,6 +172,7 @@ export interface EmployeeUpdatePartial {
   email_opt_out_timeoff_daily: boolean
   email_opt_out_workflows_all: boolean
   email_opt_out_workflows_transitions: boolean
+  email_opt_out_workflows_processes: boolean
   email_opt_out_expenses_all: boolean
   workflow_display_options: Array<WorkflowOption>
 }

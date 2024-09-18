@@ -1359,8 +1359,14 @@ function formErrors() {
 ////////////////////////////
 
 function retrieveEmployeeTransition() {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const t = currentEmployeeTransition()
+    if (!t.pk) {
+      // TODO: Load a workflow without a transition, and then load a transition
+      // and the transition will not have yet loaded. See watch and onMounted
+      // retrieveEmployeeTransition(). It should only be called once somehow.
+      reject('Transition not yet loaded')
+    }
     transitionPk.value = t.pk.toString()
 
     type.value = t.type

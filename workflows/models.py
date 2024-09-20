@@ -22,7 +22,7 @@ class HasTimeStampsMixin(models.Model):
         if self.completed_at:
             return self.completed_at - self.started_at
         else:
-            return None
+            return datetime.now(timezone.utc) - self.started_at
 
 
 class HasCreatorMixin(models.Model):
@@ -743,7 +743,7 @@ class ProcessInstance(HasTimeStampsMixin):
     
     process = models.ForeignKey("workflows.Process", on_delete=models.CASCADE)
     workflow_instance = models.ForeignKey(
-        WorkflowInstance, on_delete=models.CASCADE
+        WorkflowInstance, on_delete=models.CASCADE, related_name="pis"
     )
     current_step_instance = models.ForeignKey(
         "workflows.StepInstance", blank=True, null=True,

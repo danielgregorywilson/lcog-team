@@ -4,12 +4,31 @@
 
 export const releases = [
   {
+    version: '0.37.0',
+    date: new Date(2024, 8, 23),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Indicate when action is required on workflow processes.'
+      },
+      {
+        type: 'improved',
+        description: 'Notify responsible parties when action is required on ' +
+          'workflow processes. Digest email for managers.'
+      },
+      {
+        type: 'improved',
+        description: 'Minor changes to employee transition form.'
+      }
+    ]
+  },
+  {
     version: '0.36.0',
     date: new Date(2024, 8, 17),
     changes: [
       {
         type: 'improved',
-        description: 'Fiscal can lock expense months'
+        description: 'Fiscal can lock expense months.'
       }
     ]
   },

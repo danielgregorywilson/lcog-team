@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 import os
 
 from django.contrib.auth.models import Group
@@ -7,7 +8,9 @@ from django.utils.html import strip_tags
 
 from mainsite.helpers import readable_date, send_email, send_email_multiple
 from people.models import JobTitle
-from workflows.models import EmployeeTransition, ProcessInstance
+from workflows.models import (
+    EmployeeTransition, ProcessInstance, Role, WorkflowInstance
+)
 
 STAFF_TRANSITION_NEWS_EMAIL = os.environ.get('STAFF_TRANSITION_NEWS_EMAIL')
 
@@ -338,6 +341,101 @@ def send_transition_stn_email(
     send_email(
         STAFF_TRANSITION_NEWS_EMAIL, subject, plaintext_message, html_message
     )
+
+def send_step_completion_email(si, old_si=None):
+    current_site = Site.objects.get_current()
+    url = f'/wf/{si.process_instance.workflow_instance.id}/processes'
+    processes_url = current_site.domain + url
+    profile_url = current_site.domain + '/profile'
+
+    subject = f'Time to { si.step.name }'
+
+    html_template = '../templates/email/workflows/complete-step.html'
+    html_message = render_to_string(html_template, {
+        'step': si.step.name,
+        'process': si.step.process.name,
+        'processes_url': processes_url,
+        'completer': old_si.completed_by.name if old_si else None,
+        'completed_step': old_si.step.name if old_si else None,
+        'profile_url': profile_url
+    })
+    plaintext_message = strip_tags(html_message)
+
+    # Send to HR employees and copy hiring manager and fiscal employees
+    role = si.step.role
+    if not role:
+        return
+    to_employees = role.members.all()
+    to_addresses = [
+        e.user.email for e in to_employees if \
+            e.should_receive_email_of_type('workflows', 'processes')
+    ]
+
+    send_email_multiple(
+        to_addresses, [], subject, plaintext_message, html_message
+    )
+
+def send_employee_transition_report():
+    current_site = Site.objects.get_current()
+    workflows_url = current_site.domain + '/workflows/dashboard'
+    profile_url = current_site.domain + '/profile'
+    current_wfis = WorkflowInstance.objects.filter(
+        active=True,
+        complete=False,
+        workflow__type__in=[
+            'employee-new', 'employee-change', 'employee-return',
+            'employee-exit'
+        ]
+    ).prefetch_related('pis')
+    current_wfis = [
+        {
+            'wfi': wfi,
+            'pis': [
+                {
+                    'pi': pi,
+                    'assignees': [
+                        member.name for member in pi.process.role.members.all()
+                    ] if pi.process.role else ['No one!']
+                } for pi in wfi.pis.all()
+            ]
+        } for wfi in current_wfis
+    ]
+    last_week_wfis = WorkflowInstance.objects.filter(
+        active=True,
+        complete=True,
+        workflow__type__in=[
+            'employee-new', 'employee-change', 'employee-return',
+            'employee-exit'
+        ],
+        completed_at__gte=datetime.now() - timedelta(days=7),
+        completed_at__lt=datetime.now()
+    )
+    subject = 'Weekly Employee Transition Report'
+    html_template = \
+        '../templates/email/workflows/current-transitions-report.html'
+    html_message = render_to_string(html_template, {
+        'current_wfis': current_wfis, 'last_week_wfis': last_week_wfis,
+        'workflows_url': workflows_url, 'profile_url': profile_url,
+        'domain': current_site.domain
+    })
+    plaintext_message = strip_tags(html_message)
+
+    # Send to the appropriate workflow admins
+    aw_admins = Role.objects.get(name='All Workflows Admins').members.all()
+    et_admins = Role.objects.get(
+        name='Employee Transition Admins'
+    ).members.all()
+    to_employees = (aw_admins | et_admins).distinct()
+    to_addresses = [
+        e.user.email for e in to_employees if \
+        e.should_receive_email_of_type('workflows', 'transitions')
+    ]
+
+    send_email_multiple(
+        to_addresses, [], subject, plaintext_message, html_message
+    )
+    
+    return len(to_addresses)
 
 def create_process_instances(transition):
     # Create process instances for staff transition workflows. Triggered when

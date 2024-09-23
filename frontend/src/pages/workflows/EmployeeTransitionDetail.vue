@@ -222,6 +222,11 @@
         </template>
       </q-select>
     </div>
+    <div v-if="parseFloat(fte) < 0.5">
+      <span class="text-bold">NOTE:</span> Staff less than .5 FTE are not
+      benefits eligible and will not receive LCOG vacation. They will accrue the
+      state-mandated sick leave of 1 hour for every 30 hours worked.
+    </div>
     <div v-if="workerType == 'Employee'" class="row">
       <q-input
         v-if="canViewSalaryFields()"
@@ -507,7 +512,7 @@
         v-if="[
           'Reassign to:', 'Change name display to:'
         ].indexOf(phoneRequest) != -1"
-        label="To whom?"
+        :label="phoneRequest.indexOf('Reassig') != -1 ? 'To whom?' : 'To what?'"
         :readonly="!canEditOtherFields()"
       />
     </div>
@@ -1354,8 +1359,14 @@ function formErrors() {
 ////////////////////////////
 
 function retrieveEmployeeTransition() {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const t = currentEmployeeTransition()
+    if (!t.pk) {
+      // TODO: Load a workflow without a transition, and then load a transition
+      // and the transition will not have yet loaded. See watch and onMounted
+      // retrieveEmployeeTransition(). It should only be called once somehow.
+      reject('Transition not yet loaded')
+    }
     transitionPk.value = t.pk.toString()
 
     type.value = t.type

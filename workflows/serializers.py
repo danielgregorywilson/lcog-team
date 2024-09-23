@@ -379,8 +379,7 @@ class WorkflowInstanceSimpleSerializer(WorkflowInstanceBaseSerializer):
 
 
 class WorkflowInstanceSerializer(WorkflowInstanceBaseSerializer):
-    process_instances = ProcessInstanceSerializer(source='processinstance_set',
-        many=True)
+    process_instances = ProcessInstanceSerializer(source='pis', many=True)
     transition = EmployeeTransitionSerializer()
 
     class Meta:

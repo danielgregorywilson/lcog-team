@@ -134,7 +134,7 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
                     workflow__id__in=wfs_can_view_ids
                 ).select_related(
                     'transition', 'workflow', 'workflow__role'
-                ).prefetch_related('processinstance_set')
+                ).prefetch_related('pis')
             elif archived is not None and not is_true_string(archived):
                 complete = self.request.query_params.get('complete', None)
                 if complete is not None and is_true_string(complete):
@@ -143,14 +143,14 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
                         workflow__id__in=wfs_can_view_ids, complete=True
                     ).select_related(
                         'transition', 'workflow', 'workflow__role'
-                    ).prefetch_related('processinstance_set')
+                    ).prefetch_related('pis')
                 elif complete is not None and not is_true_string(complete):
                     # Current active WFIs
                     return WorkflowInstance.active_objects.filter(
                         workflow__id__in=wfs_can_view_ids, complete=False
                     ).select_related(
                         'transition', 'workflow', 'workflow__role'
-                    ).prefetch_related('processinstance_set')
+                    ).prefetch_related('pis')
             return WorkflowInstance.objects.all()
         else:
             return WorkflowInstance.objects.none()

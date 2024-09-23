@@ -705,7 +705,7 @@ class WorkflowInstance(HasTimeStampsMixin, HasCreatorMixin):
         # True if any of the process instances require action from the employee
         return any(
             pi.employee_action_required(employee) for
-            pi in self.processinstance_set.all()
+            pi in self.pis.all()
         )
     
     def transition_action_required(self, employee):
@@ -724,7 +724,7 @@ class WorkflowInstance(HasTimeStampsMixin, HasCreatorMixin):
         super().delete(*args, **kwargs)
     
     def update_percent_complete(self):
-        pis = self.processinstance_set.all()
+        pis = self.pis.all()
         total_steps = sum([pi.total_steps for pi in pis])
         if total_steps == 0:
             self.percent_complete = 0

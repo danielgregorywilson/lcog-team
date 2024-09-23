@@ -98,14 +98,24 @@ class ProcessInstanceSerializer(serializers.ModelSerializer):
     step_instances = StepInstanceSerializer(source='stepinstance_set',
         many=True)
     current_step_instance = StepInstanceSerializer()
+    action_required = serializers.SerializerMethodField()
 
     class Meta:
         model = ProcessInstance
         fields = [
             'url', 'pk', 'process', 'step_instances', 'current_step_instance',
-            'completed_at', 'percent_complete'
+            'completed_at', 'percent_complete', 'action_required'
         ]
         depth = 1
+    
+    def get_action_required(self, pi):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        if user and hasattr(user, "employee"):
+            return pi.employee_action_required(user.employee)
+        return False
 
 
 class TransitionChangeSerializer(serializers.ModelSerializer):
@@ -264,6 +274,8 @@ class EmployeeTransitionRedactedSerializer(EmployeeTransitionSerializer):
 class WorkflowInstanceBaseSerializer(serializers.ModelSerializer):
     title_name = serializers.SerializerMethodField()
     employee_action_required = serializers.SerializerMethodField()
+    pis_action_required = serializers.SerializerMethodField()
+    transition_action_required = serializers.SerializerMethodField()
     workflow_type = serializers.CharField(source='workflow.type')
     workflow_name = serializers.SerializerMethodField()
     workflow_role_pk = serializers.IntegerField(
@@ -285,6 +297,24 @@ class WorkflowInstanceBaseSerializer(serializers.ModelSerializer):
             user = request.user
         if user and hasattr(user, "employee"):
             return wfi.employee_action_required(user.employee)
+        return False
+    
+    def get_transition_action_required(self, wfi):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        if user and hasattr(user, "employee"):
+            return wfi.transition_action_required(user.employee)
+        return False
+    
+    def get_pis_action_required(self, wfi):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        if user and hasattr(user, "employee"):
+            return wfi.pis_action_required(user.employee)
         return False
 
     @staticmethod
@@ -317,7 +347,8 @@ class WorkflowInstanceSimpleSerializer(WorkflowInstanceBaseSerializer):
             'completed_at', 'percent_complete', 'status', 'employee_name',
             'title_name', 'transition_type', 'transition_submitter',
             'transition_date_submitted', 'transition_date', 'workflow_type',
-            'workflow_name', 'workflow_role_pk', 'employee_action_required'
+            'workflow_name', 'workflow_role_pk', 'employee_action_required',
+            'pis_action_required', 'transition_action_required'
         ]
         depth = 1
     
@@ -348,8 +379,7 @@ class WorkflowInstanceSimpleSerializer(WorkflowInstanceBaseSerializer):
 
 
 class WorkflowInstanceSerializer(WorkflowInstanceBaseSerializer):
-    process_instances = ProcessInstanceSerializer(source='processinstance_set',
-        many=True)
+    process_instances = ProcessInstanceSerializer(source='pis', many=True)
     transition = EmployeeTransitionSerializer()
 
     class Meta:
@@ -357,6 +387,7 @@ class WorkflowInstanceSerializer(WorkflowInstanceBaseSerializer):
         fields = [
             'url', 'pk', 'workflow', 'process_instances', 'transition',
             'active', 'complete', 'percent_complete', 'title_name',
-            'employee_action_required', 'workflow_type', 'workflow_role_pk'
+            'employee_action_required', 'pis_action_required',
+            'transition_action_required', 'workflow_type', 'workflow_role_pk'
         ]
         depth = 1

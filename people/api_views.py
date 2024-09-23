@@ -150,6 +150,9 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         employee.email_opt_out_workflows_transitions = request.data[
             'email_opt_out_workflows_transitions'
         ]
+        employee.email_opt_out_workflows_processes = request.data[
+            'email_opt_out_workflows_processes'
+        ]
         employee.email_opt_out_expenses_all = request.data[
             'email_opt_out_expenses_all'
         ]

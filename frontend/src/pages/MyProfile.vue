@@ -100,6 +100,19 @@
           :disable="emailOptOutAll || emailOptOutWorkflowsAll"
         />
       </div>
+      <div class="row items-center q-gutter-sm">
+        <q-toggle
+          v-model="emailOptOutWorkflowsProcesses"
+          color="negative"
+          checked-icon="clear"
+          unchecked-icon="mail"
+          :label="
+            emailOptOutWorkflowsProcesses ?
+            'Opt out of process email notifications' :
+            'Receive process email notifications'"
+          :disable="emailOptOutAll || emailOptOutWorkflowsAll"
+        />
+      </div>
       <!-- CREDIT CARD EXPENSE EMAILS -->
       <p class="row q-mb-none text-bold">Credit Card Expenses</p>
       <div class="row items-center q-gutter-sm">
@@ -196,6 +209,8 @@ let emailOptOutWorkflowsAllCurrentVal = ref(false)
 let emailOptOutWorkflowsAll = ref(false)
 let emailOptOutWorkflowsTransitionsCurrentVal = ref(false)
 let emailOptOutWorkflowsTransitions = ref(false)
+let emailOptOutWorkflowsProcessesCurrentVal = ref(false)
+let emailOptOutWorkflowsProcesses = ref(false)
 
 let emailOptOutExpensesAllCurrentVal = ref(false)
 let emailOptOutExpensesAll = ref(false)
@@ -230,6 +245,10 @@ function retrieveProfile(): Promise<EmployeeRetrieve> {
           employee.email_opt_out_workflows_transitions
         emailOptOutWorkflowsTransitionsCurrentVal.value =
           emailOptOutWorkflowsTransitions.value
+        emailOptOutWorkflowsProcesses.value =
+          employee.email_opt_out_workflows_processes
+        emailOptOutWorkflowsProcessesCurrentVal.value =
+          emailOptOutWorkflowsProcesses.value
         emailOptOutExpensesAll.value = employee.email_opt_out_expenses_all
         emailOptOutExpensesAllCurrentVal.value = emailOptOutExpensesAll.value
         workflows.value = employee.workflow_display_options
@@ -297,6 +316,7 @@ function submitProfileForm(): void {
     email_opt_out_timeoff_daily: emailOptOutTimeOffDaily.value,
     email_opt_out_workflows_all: emailOptOutWorkflowsAll.value,
     email_opt_out_workflows_transitions: emailOptOutWorkflowsTransitions.value,
+    email_opt_out_workflows_processes: emailOptOutWorkflowsProcesses.value,
     email_opt_out_expenses_all: emailOptOutExpensesAll.value,
     workflow_display_options: workflows.value
   })
@@ -309,6 +329,8 @@ function submitProfileForm(): void {
       emailOptOutWorkflowsAllCurrentVal.value = p.email_opt_out_workflows_all
       emailOptOutWorkflowsTransitionsCurrentVal.value =
         p.email_opt_out_workflows_transitions
+      emailOptOutWorkflowsProcessesCurrentVal.value =
+        p.email_opt_out_workflows_processes
       emailOptOutExpensesAllCurrentVal.value = p.email_opt_out_expenses_all
       workflows.value = JSON.parse(JSON.stringify(
         p.workflow_display_options

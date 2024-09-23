@@ -19,9 +19,10 @@ from timeoff.helpers import (
 )
 from workflows.helpers import (
     create_process_instances, send_early_hr_email,
-    send_gas_pin_notification_email, send_transition_fiscal_email,
-    send_transition_hr_email, send_transition_sds_hiring_leads_email,
-    send_transition_stn_email, send_transition_submitter_email
+    send_gas_pin_notification_email, send_step_completion_email,
+    send_transition_fiscal_email, send_transition_hr_email,
+    send_transition_sds_hiring_leads_email, send_transition_stn_email,
+    send_transition_submitter_email
 )
 from workflows.models import (
     EmployeeTransition, Process, ProcessInstance, Role, Step, StepChoice,
@@ -133,7 +134,7 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
                     workflow__id__in=wfs_can_view_ids
                 ).select_related(
                     'transition', 'workflow', 'workflow__role'
-                ).prefetch_related('processinstance_set')
+                ).prefetch_related('pis')
             elif archived is not None and not is_true_string(archived):
                 complete = self.request.query_params.get('complete', None)
                 if complete is not None and is_true_string(complete):
@@ -142,14 +143,14 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
                         workflow__id__in=wfs_can_view_ids, complete=True
                     ).select_related(
                         'transition', 'workflow', 'workflow__role'
-                    ).prefetch_related('processinstance_set')
+                    ).prefetch_related('pis')
                 elif complete is not None and not is_true_string(complete):
                     # Current active WFIs
                     return WorkflowInstance.active_objects.filter(
                         workflow__id__in=wfs_can_view_ids, complete=False
                     ).select_related(
                         'transition', 'workflow', 'workflow__role'
-                    ).prefetch_related('processinstance_set')
+                    ).prefetch_related('pis')
             return WorkflowInstance.objects.all()
         else:
             return WorkflowInstance.objects.none()
@@ -760,9 +761,6 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
             stepinstance.completed_by = request.user.employee
             stepinstance.save()
             
-            # TODO: Do anything that needs to be done to prep the next step
-            # like email people
-            
             # Update the process instance
             processinstance = stepinstance.process_instance
             if stepinstance.step.end:
@@ -781,6 +779,11 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
                     process_instance=processinstance
                 )
                 processinstance.current_step_instance = new_stepinstance
+                # Notify responsible parties of the new step instance if
+                # they're different from the current step instance
+                if new_stepinstance.step.role != stepinstance.step.role:
+                    send_step_completion_email(new_stepinstance, stepinstance)
+
             processinstance.update_percent_complete()
             processinstance.save()
             workflowinstance = processinstance.workflow_instance

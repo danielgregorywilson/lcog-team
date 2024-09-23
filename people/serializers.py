@@ -100,9 +100,10 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             'email_opt_out_timeoff_all', 'email_opt_out_timeoff_weekly',
             'email_opt_out_timeoff_daily', 'email_opt_out_workflows_all',
             'email_opt_out_workflows_transitions',
-            'email_opt_out_expenses_all', 'is_all_workflows_admin',
-            'admin_of_workflows', 'admin_of_processes', 'workflow_roles',
-            'is_expense_submitter', 'is_expense_approver', 'can_view_mow_routes',
+            'email_opt_out_workflows_processes', 'email_opt_out_expenses_all',
+            'is_all_workflows_admin', 'admin_of_workflows',
+            'admin_of_processes', 'workflow_roles', 'is_expense_submitter',
+            'is_expense_approver', 'can_view_mow_routes',
             'can_manage_mow_stops', 'workflow_display_options'
         ]
 

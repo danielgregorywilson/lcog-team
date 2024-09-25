@@ -588,7 +588,7 @@
         />
       </div>
     </div>
-    <div class="text-h6 transition-form-section-heading">Business Cards</div>
+    <div class="text-h6 transition-form-section-heading">ID Cards</div>
     <div class="row">
       <q-checkbox
         id="business-cards"
@@ -596,23 +596,11 @@
         label="Order Business Cards"
         :disable="!canEditOtherFields()"
       />
-    </div>
-    <div class="text-h6 transition-form-section-heading">
-      Proxy Card/Photo ID
-    </div>
-    <div class="row">
       <q-checkbox
         v-if="type!='Exit'"
         id="prox-card-needed"
         v-model="proxCardNeeded"
-        label="Needed"
-        :disable="!canEditOtherFields()"
-      />
-      <q-checkbox
-        v-if="type=='Exit'"
-        id="prox-card-returned"
-        v-model="proxCardReturned"
-        label="Turned In"
+        label="Proxy Card Needed"
         :disable="!canEditOtherFields()"
       />
     </div>

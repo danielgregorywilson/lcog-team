@@ -2,34 +2,18 @@
   <div class="q-pt-md">
     <div class="text-h6 transition-form-section-heading">Transition Type</div>
     <div class="row items-center">
+      <q-radio v-model="type" val="New" id="type-new" disable label="New" />
       <q-radio
-        v-model="type"
-        val="New"
-        id="type-new"
-        :disable="!canEditOtherFields()"
-        label="New"
-      />
-      <q-radio
-        v-model="type"
-        val="Return"
-        id="type-return"
-        :disable="!canEditOtherFields()"
-        label="Return"
+        v-model="type" val="Return" id="type-return" disable label="Return"
       />
       <q-radio
         v-model="type"
         val="Change/Modify"
         id="type-change"
-        :disable="!canEditOtherFields()"
+        disable
         label="Change/Modify"
       />
-      <q-radio
-        v-model="type"
-        val="Exit"
-        id="type-exit"
-        :disable="!canEditOtherFields()"
-        label="Exit"
-      />
+      <q-radio v-model="type" val="Exit" id="type-exit" disable label="Exit" />
     </div>
     <div class="text-h6 transition-form-section-heading row">
       <div>Worker Type</div>

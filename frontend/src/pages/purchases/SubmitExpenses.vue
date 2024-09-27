@@ -137,15 +137,30 @@
                   v-slot="scope"
                   @save="(val) => updateExpense(props.row.pk, 'amount', val)"
                 >
-                  <q-input
-                    v-model="scope.value"
-                    mask="#.##"
-                    fill-mask="0"
-                    reverse-fill-mask
-                    dense
-                    autofocus
-                    @keyup.enter="scope.set()"
-                  />
+                  <div class="row items-center">  
+                    <q-btn
+                      color="primary"
+                      label="+/-"
+                      size="md"
+                      class="q-mr-sm"
+                      padding="xs"
+                      @click="invertRowAmount(props.row, scope)"
+                      help="Click to invert the amount"
+                    >
+                    <q-tooltip>
+                      Negative indicates a refund.
+                    </q-tooltip>
+                    </q-btn>
+                    <q-input
+                      v-model="scope.value"
+                      :mask="scope.value < 0 ? '-#.##' : '#.##'"
+                      fill-mask="0"
+                      reverse-fill-mask
+                      dense
+                      autofocus
+                      @keyup.enter="scope.set()"
+                    />
+                  </div>  
                 </q-popup-edit>
               </q-td>
               <q-td key="job" :props="props">
@@ -203,7 +218,7 @@
                           v-model="gl.amount"
                           class="gl-amount q-pa-none"
                           outlined dense
-                          mask="#.##"
+                          :mask="props.row.amount < 0 ? '-#.##' : '#.##'"
                           fill-mask="0"
                           reverse-fill-mask
                           @keyup.enter="scope.set()"
@@ -872,9 +887,9 @@ function formErrorItems() {
     if (!exp.name) {
       errorItems.push(`Provide a name for the expense on ${exp.date}`)
     }
-    if (parseFloat(exp.amount) <= 0) {
+    if (parseFloat(exp.amount) == 0) {
       errorItems.push(
-        `Provide an amount for ${exp.name} ${typeof parseFloat(exp.amount)}`
+        `Provide an amount for ${exp.name}`
       )
     }
     if (!exp.job) {
@@ -1150,6 +1165,25 @@ function createExpenseMonth(): Promise<ExpenseMonth> {
         reject()
       })
   })
+}
+
+function invertRowAmount(row: Expense, scope: any) {
+  if (monthLocked()) {
+    return
+  }
+  // If there are already GLs entered, invert them, and also set the scope value
+  // because we don't want to allow cancelling the action and leaving the user
+  // with GLs of inverse sign.
+  if (row.gls.length) {
+    for (let gl of row.gls) {
+      gl.amount = (-1 * parseFloat(gl.amount)).toFixed(2)
+    }
+    scope.value = (-1 * parseFloat(scope.value)).toFixed(2)
+    scope.set()
+  } else {
+    scope.value = (-1 * parseFloat(scope.value)).toFixed(2)
+  }
+  return 
 }
 
 onMounted(() => {

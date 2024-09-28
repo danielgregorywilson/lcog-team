@@ -58,6 +58,12 @@
                 name="cancel"
                 size="lg"
               />
+              <q-icon
+                v-else
+                color="warning"
+                name="radio_button_unchecked"
+                size="lg"
+              />
             </q-td>
           </q-tr>
         </template>

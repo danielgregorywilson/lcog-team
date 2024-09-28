@@ -441,24 +441,37 @@ def create_process_instances(transition):
     # Create process instances for staff transition workflows. Triggered when
     # a transition form is sent to Staff Transition News.
     onboarding_processes_start = [
-        'HR Onboarding', 'HR Onboarding Backgorund Check', 'IS Onboarding',
-        'IS Telecom Onboarding', 'SDS Facilities Onboarding', 'SDS Onboarding',
-        'SDS Phone Onboarding'
+        'HR Onboarding', 'HR Onboarding Background Check', 'IS Onboarding',
+        'IS Telecom Onboarding',
+    ]
+    onboarding_processes_start_sds = [
+        'SDS Facilities Onboarding', 'SDS Onboarding', 'SDS Phone Onboarding'
     ]
     returning_processes_start = []
-    changing_processes_start = [
-        'SDS Phone Changing'
-    ]
+    returning_processes_start_sds = []
+    changing_processes_start = []
+    changing_processes_start_sds = ['SDS Phone Changing']
     exiting_processes_start = []
+    exiting_processes_start_sds = []
     wfi = transition.workflowinstance
     # Set the process names based on the transition type
-    transition_process_names = onboarding_processes_start
-    if (transition.type == EmployeeTransition.TRANSITION_TYPE_RETURN):
-        transition_process_names = returning_processes_start
+    transition_process_names = []
+    if (transition.type == EmployeeTransition.TRANSITION_TYPE_NEW):
+        transition_process_names += onboarding_processes_start
+        if (transition.is_sds):
+            transition_process_names += onboarding_processes_start_sds
+    elif (transition.type == EmployeeTransition.TRANSITION_TYPE_RETURN):
+        transition_process_names += returning_processes_start
+        if (transition.is_sds):
+            transition_process_names += returning_processes_start_sds
     elif (transition.type == EmployeeTransition.TRANSITION_TYPE_CHANGE):
-        transition_process_names = changing_processes_start
+        transition_process_names += changing_processes_start
+        if (transition.is_sds):
+            transition_process_names += changing_processes_start_sds
     elif (transition.type == EmployeeTransition.TRANSITION_TYPE_EXIT):
-        transition_process_names = exiting_processes_start
+        transition_process_names += exiting_processes_start
+        if (transition.is_sds):
+            transition_process_names += exiting_processes_start_sds
     # Create process instances for each process in the list
     for process in wfi.workflow.processes.filter(
         name__in=transition_process_names

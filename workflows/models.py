@@ -285,6 +285,10 @@ class EmployeeTransition(models.Model):
 
     __original_values = {}
 
+    @property
+    def is_sds(self):
+        return self.employee_id == self.EMPLOYEE_ID_CLSD
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.__original_values = self.__dict__.copy()

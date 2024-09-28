@@ -4,6 +4,25 @@
 
 export const releases = [
   {
+    version: '0.37.1',
+    date: new Date(2024, 8, 27),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Allow negative values for credit card expenses.'
+      },
+      {
+        type: 'improved',
+        description: 'Better indicate to directors and fiscal the need to ' +
+          'approve expenses.'
+      },
+      {
+        type: 'improved',
+        description: 'Minor changes to employee transitions workflows.'
+      }
+    ]
+  },
+  {
     version: '0.37.0',
     date: new Date(2024, 8, 23),
     changes: [

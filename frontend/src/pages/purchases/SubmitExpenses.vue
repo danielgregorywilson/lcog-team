@@ -135,29 +135,21 @@
                   v-model="props.row.amount"
                   buttons
                   v-slot="scope"
-                  @save="(val) => updateExpense(props.row.pk, 'amount', val)"
+                  :validate="amountValidation"
+                  @update:model-value="(val) => {
+                    props.row.amount = parseFloat(val).toFixed(2).toString()
+                  }"
+                  @save="(val) => {
+                    updateExpense(props.row.pk, 'amount', props.row.amount)
+                  }"
                 >
                   <div class="row items-center">  
-                    <q-btn
-                      color="primary"
-                      label="+/-"
-                      size="md"
-                      class="q-mr-sm"
-                      padding="xs"
-                      @click="invertRowAmount(props.row, scope)"
-                      help="Click to invert the amount"
-                    >
-                    <q-tooltip>
-                      Negative indicates a refund.
-                    </q-tooltip>
-                    </q-btn>
                     <q-input
                       v-model="scope.value"
-                      :mask="scope.value < 0 ? '-#.##' : '#.##'"
-                      fill-mask="0"
-                      reverse-fill-mask
                       dense
                       autofocus
+                      :error="errorAmount"
+                      :error-message="errorMessageAmount"
                       @keyup.enter="scope.set()"
                     />
                   </div>  
@@ -194,7 +186,10 @@
                   v-model="props.row.gls"
                   buttons
                   v-slot="scope"
-                  @save="(val) => updateExpense(props.row.pk, 'gls', val)"
+                  :validate="GLValidation"
+                  @save="(val) => {
+                    updateExpense(props.row.pk, 'gls', val)
+                  }"
                 >
                   <div class="gl-popup-edit">
                     <div
@@ -217,10 +212,10 @@
                         <q-input
                           v-model="gl.amount"
                           class="gl-amount q-pa-none"
-                          outlined dense
-                          :mask="props.row.amount < 0 ? '-#.##' : '#.##'"
-                          fill-mask="0"
-                          reverse-fill-mask
+                          outlined
+                          dense
+                          :error="errorAmount"
+                          :error-message="errorMessageAmount"
                           @keyup.enter="scope.set()"
                           :rules="[
                             val => !!val || '* Required',
@@ -670,6 +665,9 @@ let deleteDialogVisible = ref(false)
 let expensePkToDelete = ref(-1)
 let deleteDialogExpenseName = ref('')
 let deleteDialogExpenseDate = ref('')
+
+let errorAmount = ref(false)
+let errorMessageAmount = ref('')
 
 function viewingThisMonth() {
   return purchaseStore.firstOfSelectedMonth.getTime() ===
@@ -1167,23 +1165,28 @@ function createExpenseMonth(): Promise<ExpenseMonth> {
   })
 }
 
-function invertRowAmount(row: Expense, scope: any) {
-  if (monthLocked()) {
-    return
+function amountValidation (val: any) {
+  if (isNaN(parseFloat(val))) {
+    errorAmount.value = true
+    errorMessageAmount.value = 'The value must be a number!'
+    return false
   }
-  // If there are already GLs entered, invert them, and also set the scope value
-  // because we don't want to allow cancelling the action and leaving the user
-  // with GLs of inverse sign.
-  if (row.gls.length) {
-    for (let gl of row.gls) {
-      gl.amount = (-1 * parseFloat(gl.amount)).toFixed(2)
+  errorAmount.value = false
+  errorMessageAmount.value = ''
+  return true
+}
+
+function GLValidation (val: any) {
+  for (let gl of val) {
+    if (isNaN(parseFloat(gl.amount))) {
+      errorAmount.value = true
+      errorMessageAmount.value = 'The value must be a number!'
+      return false
     }
-    scope.value = (-1 * parseFloat(scope.value)).toFixed(2)
-    scope.set()
-  } else {
-    scope.value = (-1 * parseFloat(scope.value)).toFixed(2)
   }
-  return 
+  errorAmount.value = false
+  errorMessageAmount.value = ''
+  return true
 }
 
 onMounted(() => {

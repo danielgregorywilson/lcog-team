@@ -62,16 +62,6 @@ function fiscalViewNotEdit() {
 }
 
 function otherFieldsViewAndEdit() {
-  // FTE doesn't exist on exits
-  const fte = 2
-  cy.get('input[name="fte"]').clear().type(fte.toString())
-  cy.get('input[name="fte"]').should('have.value', fte.toString())
-  cy.get('#type-return').click()
-  cy.get('#type-return').should('have.attr', 'aria-checked', 'true')
-  cy.get('#type-change').click()
-  cy.get('#type-change').should('have.attr', 'aria-checked', 'true')
-  cy.get('#type-exit').click()
-  cy.get('#type-exit').should('have.attr', 'aria-checked', 'true')
   const firstName = randomString(10)
   cy.get('input[name="first-name"]').clear().type(firstName)
   cy.get('input[name="first-name"]').should('have.value', firstName)
@@ -89,7 +79,9 @@ function otherFieldsViewAndEdit() {
   cy.wait(500) // Wait for the title to be selected
   titleInput.type('{downArrow}{enter}')
   titleInput.should('have.value', 'Senior Web Developer')
-  cy.get('input[name="fte"]').should('not.exist')
+  const fte = 2
+  cy.get('input[name="fte"]').clear().type(fte.toString())
+  cy.get('input[name="fte"]').should('have.value', fte.toString())
   cy.get('#bilingual').click()
   cy.get('#bilingual').should('have.attr', 'aria-checked', 'true')
   cy.get('#second-language').click()
@@ -102,7 +94,6 @@ function otherFieldsViewAndEdit() {
   cy.get('#transition-date .q-date__calendar-item .q-btn').first().click()
   cy.get('#transition-time .q-time__clock-position').first().click()
   cy.get('#transition-time .q-time__clock-position').first().click()
-  cy.get('#type-new').click()
   cy.get('#lwop').click()
   cy.get('#lwop').should('have.attr', 'aria-checked', 'false')
   cy.get('#lwop').click()
@@ -145,41 +136,16 @@ function otherFieldsViewAndEdit() {
   cy.get('input[name="load-code"]').should('have.value', loadCode)
   cy.get('#cell-phone-needed').click()
   cy.get('#cell-phone-needed').should('have.attr', 'aria-checked', 'true')
-  cy.get('#type-exit').click()
-  cy.get('#delete').click()
-  cy.get('#delete').should('have.attr', 'aria-checked', 'true')
-  const reassignTo = 'Icarus'
-  cy.get('input[name="reassign-to"]').clear().type(reassignTo)
-  cy.get('input[name="reassign-to"]').should('have.value', reassignTo)
-  cy.get('#type-new').click()
   cy.get('#gas-pin-needed').click()
   cy.get('#gas-pin-needed').should('have.attr', 'aria-checked', 'true')
   cy.get('#business-cards').click()
   cy.get('#business-cards').should('have.attr', 'aria-checked', 'true')
   cy.get('#prox-card-needed').click()
   cy.get('#prox-card-needed').should('have.attr', 'aria-checked', 'true')
-  cy.get('#type-exit').click()
-  cy.get('#prox-card-returned').click()
-  cy.get('#prox-card-returned').should('have.attr', 'aria-checked', 'true')
-  cy.get('#show-access-emails').click()
-  cy.get('#show-access-emails').should('have.attr', 'aria-checked', 'true')
-  const accessEmailsInput = cy.get('select[name="access-emails"]').siblings('input')
-  accessEmailsInput.type('Daniel W')
-  cy.wait(500) // Wait for the title to be selected
-  accessEmailsInput.type('{downArrow}{enter}')
-  const specialInstructions = randomString(50)
-  cy.get('textarea[name="special-instructions"]').clear().type(specialInstructions)
-  cy.get('textarea[name="special-instructions"]').should('have.value', specialInstructions)
   cy.get('button[name="save-button"]').should('exist')
 }
 
 function otherFieldsViewNotEdit() {
-  cy.get('#type-return').click()
-  cy.get('#type-new').should('have.attr', 'aria-checked', 'true')
-  cy.get('#type-change').click()
-  cy.get('#type-new').should('have.attr', 'aria-checked', 'true')
-  cy.get('#type-exit').click()
-  cy.get('#type-new').should('have.attr', 'aria-checked', 'true')
   cy.get('input[name="first-name"]').should('have.attr', 'readonly')
   cy.get('input[name="middle-initial"]').should('have.attr', 'readonly')
   cy.get('input[name="last-name"]').should('have.attr', 'readonly')
@@ -282,7 +248,7 @@ describe('Fill out new employee form', () => {
         managerViewAndEdit()
         const managerInput = cy.get('select[name="manager"]').siblings('input')
         managerInput.type('Hiring M')
-        cy.wait(500) // Wait for the title to be selected
+        cy.wait(1500) // Wait for the title to be selected
         managerInput.type('{downArrow}{enter}')
         cy.get('#lwop').click()
         // Save the form

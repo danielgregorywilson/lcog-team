@@ -135,17 +135,24 @@
                   v-model="props.row.amount"
                   buttons
                   v-slot="scope"
-                  @save="(val) => updateExpense(props.row.pk, 'amount', val)"
+                  :validate="amountValidation"
+                  @update:model-value="(val) => {
+                    props.row.amount = parseFloat(val).toFixed(2).toString()
+                  }"
+                  @save="(val) => {
+                    updateExpense(props.row.pk, 'amount', props.row.amount)
+                  }"
                 >
-                  <q-input
-                    v-model="scope.value"
-                    mask="#.##"
-                    fill-mask="0"
-                    reverse-fill-mask
-                    dense
-                    autofocus
-                    @keyup.enter="scope.set()"
-                  />
+                  <div class="row items-center">  
+                    <q-input
+                      v-model="scope.value"
+                      dense
+                      autofocus
+                      :error="errorAmount"
+                      :error-message="errorMessageAmount"
+                      @keyup.enter="scope.set()"
+                    />
+                  </div>  
                 </q-popup-edit>
               </q-td>
               <q-td key="job" :props="props">
@@ -179,7 +186,10 @@
                   v-model="props.row.gls"
                   buttons
                   v-slot="scope"
-                  @save="(val) => updateExpense(props.row.pk, 'gls', val)"
+                  :validate="GLValidation"
+                  @save="(val) => {
+                    updateExpense(props.row.pk, 'gls', val)
+                  }"
                 >
                   <div class="gl-popup-edit">
                     <div
@@ -202,10 +212,10 @@
                         <q-input
                           v-model="gl.amount"
                           class="gl-amount q-pa-none"
-                          outlined dense
-                          mask="#.##"
-                          fill-mask="0"
-                          reverse-fill-mask
+                          outlined
+                          dense
+                          :error="errorAmount"
+                          :error-message="errorMessageAmount"
                           @keyup.enter="scope.set()"
                           :rules="[
                             val => !!val || '* Required',
@@ -656,6 +666,9 @@ let expensePkToDelete = ref(-1)
 let deleteDialogExpenseName = ref('')
 let deleteDialogExpenseDate = ref('')
 
+let errorAmount = ref(false)
+let errorMessageAmount = ref('')
+
 function viewingThisMonth() {
   return purchaseStore.firstOfSelectedMonth.getTime() ===
     purchaseStore.firstOfThisMonth.getTime()
@@ -872,9 +885,9 @@ function formErrorItems() {
     if (!exp.name) {
       errorItems.push(`Provide a name for the expense on ${exp.date}`)
     }
-    if (parseFloat(exp.amount) <= 0) {
+    if (parseFloat(exp.amount) == 0) {
       errorItems.push(
-        `Provide an amount for ${exp.name} ${typeof parseFloat(exp.amount)}`
+        `Provide an amount for ${exp.name}`
       )
     }
     if (!exp.job) {
@@ -1150,6 +1163,30 @@ function createExpenseMonth(): Promise<ExpenseMonth> {
         reject()
       })
   })
+}
+
+function amountValidation (val: any) {
+  if (isNaN(parseFloat(val))) {
+    errorAmount.value = true
+    errorMessageAmount.value = 'The value must be a number!'
+    return false
+  }
+  errorAmount.value = false
+  errorMessageAmount.value = ''
+  return true
+}
+
+function GLValidation (val: any) {
+  for (let gl of val) {
+    if (isNaN(parseFloat(gl.amount))) {
+      errorAmount.value = true
+      errorMessageAmount.value = 'The value must be a number!'
+      return false
+    }
+  }
+  errorAmount.value = false
+  errorMessageAmount.value = ''
+  return true
 }
 
 onMounted(() => {

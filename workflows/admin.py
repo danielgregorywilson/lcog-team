@@ -96,7 +96,9 @@ class StepInline(admin.TabularInline):
 
     def next_step_choices(self, instance):
         choices_text = ''
-        for idx, choice in enumerate(instance.next_step_choices.all()):
+        for idx, choice in enumerate(
+            instance.next_step_choices.all().order_by('order')
+        ):
             if idx != 0:
                 choices_text += " / "
             choices_text += choice.choice_text + ": " + str(choice.next_step.order) + ' - ' + choice.next_step.name

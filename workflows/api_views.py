@@ -786,13 +786,13 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
 
             processinstance.update_percent_complete()
             processinstance.save()
-            workflowinstance = processinstance.workflow_instance
-            workflowinstance.update_percent_complete()
+            wfi = processinstance.workflow_instance
+            wfi.update_percent_complete()
 
             # If step instance completion triggers a new process, start it
             if stepinstance.step.trigger_processes.count():
                 for process in stepinstance.step.trigger_processes.all():
-                    process.create_process_instance(workflow_instance)
+                    process.create_process_instance(wfi)
         
         else:
             # Undo completion of the current step instance

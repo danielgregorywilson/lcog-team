@@ -820,8 +820,18 @@ class StepInstance(HasTimeStampsMixin):
                 completed_at__isnull=True
             ).exists()
         else:
-            # If there is no next step, we can undo
-            return True
+            choices = self.step.next_step_choices.all()
+            if choices.count():
+                # If there are next step choices, we can undo if none of the
+                # next steps are complete
+                return StepInstance.objects.filter(
+                    step__in=[choice.step for choice in choices],
+                    process_instance=self.process_instance,
+                    completed_at__isnull=False
+                ).count() == 0
+            else:
+                # If there is no next step, we can undo
+                return True
 
     #TODO: Complete method fills completed_at, completed_by, and current_step_instance and completed_at on Workflow instance. This is currently done in the view, but maybe it should be here?
 

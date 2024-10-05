@@ -825,7 +825,7 @@ class StepInstance(HasTimeStampsMixin):
                 # If there are next step choices, we can undo if none of the
                 # next steps are complete
                 return StepInstance.objects.filter(
-                    step__in=[choice.step for choice in choices],
+                    step__in=[choice.next_step for choice in choices],
                     process_instance=self.process_instance,
                     completed_at__isnull=False
                 ).count() == 0

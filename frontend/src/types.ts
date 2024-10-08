@@ -976,7 +976,6 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   computer_gl: string
   computer_description: string
   phone_number: string
-  desk_phone: boolean
   phone_request: string
   phone_request_data: string
   load_code: string
@@ -1028,7 +1027,6 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   computer_gl?: string
   computer_description?: string
   phone_number?: string
-  desk_phone?: boolean
   phone_request?: string
   phone_request_data?: string
   load_code?: string

@@ -255,7 +255,6 @@ class EmployeeTransition(models.Model):
     computer_gl = models.CharField(max_length=30, blank=True)
     computer_description = models.CharField(max_length=200, blank=True)
     phone_number = models.CharField(max_length=20, blank=True)
-    desk_phone = models.BooleanField(default=False)
     phone_request = models.CharField(
         max_length=30, choices=PHONE_REQUEST_CHOICES, blank=True
     )

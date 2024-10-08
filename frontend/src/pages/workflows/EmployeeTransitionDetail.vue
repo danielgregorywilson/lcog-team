@@ -500,21 +500,6 @@
         :readonly="!canEditOtherFields()"
       />
     </div>
-    <div class="row items-center">
-      <q-checkbox
-        id="desk-phone-needed"
-        v-model="deskPhone"
-        label="Desk Phone Needed"
-        class="q-mr-md"
-        :disable="!canEditOtherFields()"
-      />
-      <div
-        v-if="deskPhone && officeLocation.indexOf('PPB') != -1"
-        class="text-red"
-      >
-        Telecom: Add to PPB Paging Alert System
-      </div>
-    </div>
     <div class="row">
       <q-input
         name="load-code"
@@ -1210,8 +1195,6 @@ let computerDescriptionCurrentVal = ref('')
 let computerDescription = ref('')
 let phoneNumberCurrentVal = ref('')
 let phoneNumber = ref('')
-let deskPhoneCurrentVal = ref(false)
-let deskPhone = ref(false)
 let phoneRequestCurrentVal = ref('')
 let phoneRequest = ref('')
 let phoneRequestDataCurrentVal = ref('')
@@ -1424,8 +1407,6 @@ function retrieveEmployeeTransition() {
     computerDescriptionCurrentVal.value = computerDescription.value
     phoneNumber.value = t.phone_number
     phoneNumberCurrentVal.value = phoneNumber.value
-    deskPhone.value = t.desk_phone
-    deskPhoneCurrentVal.value = deskPhone.value
     phoneRequest.value = t.phone_request
     phoneRequestCurrentVal.value = phoneRequest.value
     phoneRequestData.value = t.phone_request_data
@@ -1532,7 +1513,6 @@ function valuesAreChanged(): boolean {
     computerGL.value == computerGLCurrentVal.value &&
     computerDescription.value == computerDescriptionCurrentVal.value &&
     phoneNumber.value == phoneNumberCurrentVal.value &&
-    deskPhone.value == deskPhoneCurrentVal.value &&
     phoneRequest.value == phoneRequestCurrentVal.value &&
     phoneRequestData.value == phoneRequestDataCurrentVal.value &&
     loadCode.value == loadCodeCurrentVal.value &&
@@ -1633,7 +1613,6 @@ function updateTransition() {
       computer_gl: computerGL.value,
       computer_description: computerDescription.value,
       phone_number: phoneNumberVal,
-      desk_phone: deskPhone.value,
       phone_request: phoneRequest.value,
       phone_request_data: phoneRequestData.value,
       load_code: loadCode.value,
@@ -1694,7 +1673,6 @@ function updateTransition() {
       computerGLCurrentVal.value = t.computer_gl
       computerDescriptionCurrentVal.value = t.computer_description
       phoneNumberCurrentVal.value = t.phone_number
-      deskPhoneCurrentVal.value = t.desk_phone
       phoneRequestCurrentVal.value = t.phone_request
       phoneRequestDataCurrentVal.value = t.phone_request_data
       loadCodeCurrentVal.value = t.load_code

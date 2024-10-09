@@ -9,7 +9,14 @@ from workflows.models import (
 class RoleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Role
-        fields = ['url', 'pk', 'name', 'description', 'members']
+        fields = ['url', 'pk', 'name', 'description', 'member_names']
+    
+    member_names = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_member_names(role):
+        names = role.members.values_list('user__first_name', 'user__last_name')
+        return [f'{first} {last}' for first, last in names]
 
 
 class StepChoiceSerializer(serializers.HyperlinkedModelSerializer):

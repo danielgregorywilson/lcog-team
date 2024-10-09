@@ -828,7 +828,7 @@ export type Role = {
   pk: number
   name: string
   description: string
-  members: Array<EmployeeRetrieve>
+  member_names: Array<string>
 }
 
 export type Action = {

@@ -197,7 +197,7 @@ export const useWorkflowsStore = defineStore('workflows', {
       return new Promise((resolve, reject) => {
         axios({
           url: `${ apiURL }api/v1/stepinstance/${ stepInstancePk }`,
-          data: {action: 'undo', stepInstancePk, nextStepInstancePk},
+          data: { action: 'undo', stepInstancePk, nextStepInstancePk },
           method: 'PATCH'
         })
           .then(resp => {

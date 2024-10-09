@@ -19,6 +19,14 @@ export const useWorkflowsStore = defineStore('workflows', {
       return state.currentWorkflowInstance.transition ||
         {} as EmployeeTransition
     },
+    currentPIs: state => {
+      const pis = state.currentWorkflowInstance.process_instances || []
+      return pis.sort((a, b) => {
+        // Sort PIs with action_required first
+        return a.action_required == b.action_required ? 0 :
+          a.action_required ? -1 : 1
+      })
+    },
     processInstanceCurrentStepPks: state => {
       const d: {[pk: number]: number} = {}
       if (!state.currentWorkflowInstance.pk) {

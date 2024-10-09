@@ -1,13 +1,13 @@
 <template>
   <div class="q-pt-md">
     <div
-      v-if="currentWorkflowInstance().process_instances.length === 0"
+      v-if="currentPIs().length === 0"
       class="text-h6 text-center q-pa-md"
     >
       No processes have been started yet.	
     </div>
     <div
-      v-for="pi of currentWorkflowInstance().process_instances"
+      v-for="pi of currentPIs()"
       :key="pi.pk"
       class="q-mb-md"
     >
@@ -37,13 +37,13 @@
 <script setup lang="ts">
 import ProcessInstanceDetail from 
   'src/components/workflows/ProcessInstanceDetail.vue'
-import { WorkflowInstance } from 'src/types'
+import { ProcessInstance } from 'src/types'
 
 import { useWorkflowsStore } from 'src/stores/workflows'
 
 const workflowsStore = useWorkflowsStore()
 
-function currentWorkflowInstance(): WorkflowInstance {
-  return workflowsStore.currentWorkflowInstance
+function currentPIs(): ProcessInstance[] {
+  return workflowsStore.currentPIs
 }
 </script>

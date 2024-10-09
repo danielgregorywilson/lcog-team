@@ -438,7 +438,6 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             t.computer_gl = request.data['computer_gl']
             t.computer_description = request.data['computer_description']
             t.phone_number = request.data['phone_number']
-            t.desk_phone = request.data['desk_phone']
             t.phone_request = request.data['phone_request']
             t.phone_request_data = request.data['phone_request_data']
             t.load_code = request.data['load_code']

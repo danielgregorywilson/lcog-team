@@ -235,26 +235,6 @@ export const useWorkflowsStore = defineStore('workflows', {
           })
       })
     },
-    sendGasPINNotificationEmail(pk: string, data: {
-      senderName: string, senderEmail: string, transitionUrl: string
-    }): Promise<boolean> {
-      return new Promise((resolve, reject) => {
-        axios({
-          url: `${ apiURL }api/v1/employeetransition/${ pk }` +
-            '/send_gas_pin_notification_email',
-          data,
-          method: 'POST'
-        })
-          .then(() => {
-            resolve(true)
-          })
-          .catch(e => {
-            handlePromiseError(
-              reject, 'Error sending gas PIN notification email', e
-            )
-          })
-      })
-    },
     sendTransitionToEmailList(pk: string, data: {
       type: 'SDS'|'FI'|'HR'|'STN'|'ASSIGN', reassignTo: string, update: boolean,
       extraMessage: string, senderName: string, senderEmail: string,

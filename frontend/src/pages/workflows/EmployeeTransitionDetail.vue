@@ -1570,12 +1570,6 @@ function updateTransition() {
       systemChangeDateFromForm = new Date(systemChangeDate.value)
     }
 
-    // Mark for sending notifications
-    let gasPINNotificationNeeded = false
-    if (gasPINNeededCurrentVal.value == false && gasPINNeeded.value == true) {
-      gasPINNotificationNeeded = true
-    }
-
     // Update the DB
     workflowsStore.updateEmployeeTransition(transitionPk.value, {
       type: type.value,
@@ -1708,14 +1702,6 @@ function updateTransition() {
 
       if (formErrors()) {
         showErrorButton.value = true
-      }
-
-      // Send notification emails
-      if (
-        gasPINNotificationNeeded &&
-        ['New', 'Return', 'Change/Modify'].indexOf(type.value) != -1
-      ) {
-        sendGasPINNotificationEmail()
       }
 
       // TODO: If a new computer is required, send an email to the IT department
@@ -2021,29 +2007,6 @@ function navigateToMap() {
 ////////////////////////
 // Send notifications //
 ////////////////////////
-
-function sendGasPINNotificationEmail() {
-  workflowsStore.sendGasPINNotificationEmail(transitionPk.value, {
-    senderName: userStore.getEmployeeProfile.name,
-    senderEmail: userStore.getEmployeeProfile.email,
-    transitionUrl: route.fullPath
-  })
-    .then(() => {
-      quasar.notify({
-        message: 'Sent Gas PIN Notification Email',
-        color: 'positive',
-        icon: 'send'
-      })
-    })
-    .catch(e => {
-      console.error('Error sending Gas PIN Notification Email', e)
-      quasar.notify({
-        message: 'Error sending Gas PIN Notification Email',
-        color: 'negative',
-        icon: 'report_problem'
-      })
-    })
-}
 
 function onSubmitSendDialog(type: 'SDS'|'FI'|'HR'|'STN'|'ASSIGN') {
   const extraMessage = type == 'ASSIGN' ? reassignDialogMessage.value : sendDialogMessage.value

@@ -18,8 +18,7 @@ from timeoff.helpers import (
     send_manager_new_timeoff_request_notification
 )
 from workflows.helpers import (
-    create_process_instances, send_early_hr_email,
-    send_gas_pin_notification_email, send_step_completion_email,
+    create_process_instances, send_early_hr_email, send_step_completion_email,
     send_transition_fiscal_email, send_transition_hr_email,
     send_transition_sds_hiring_leads_email, send_transition_stn_email,
     send_transition_submitter_email
@@ -489,24 +488,6 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
     #     serialized_tor = TimeOffRequestSerializer(tor,
     #         context={'request': request})
     #     return Response(serialized_tor.data)
-
-    @action(detail=True, methods=['post'])
-    def send_gas_pin_notification_email(self, request, pk):
-        try:
-            transition = EmployeeTransition.objects.get(pk=pk)
-            send_gas_pin_notification_email(
-                transition,
-                sender_name=request.data['senderName'],
-                sender_email=request.data['senderEmail'],
-                url=request.data['transitionUrl'] )
-            return Response("Gas PIN notification email sent.")
-        except Exception as e:
-            message = 'Error sending Gas PIN notification email.'
-            record_error(message, e, request, traceback.format_exc())
-            return Response(
-                data=message,
-                status=status.HTTP_403_FORBIDDEN
-            )
 
     @action(detail=True, methods=['post'])
     def send_transition_to_email_list(self, request, pk):

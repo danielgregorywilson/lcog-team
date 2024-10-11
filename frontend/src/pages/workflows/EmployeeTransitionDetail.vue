@@ -572,6 +572,13 @@
         label="Proxy Card Needed"
         :disable="!canEditOtherFields()"
       />
+      <q-checkbox
+        v-if="type!='Exit'"
+        id="mailbox-needed"
+        v-model="mailboxNeeded"
+        label="Physical Mailbox Needed"
+        :disable="!canEditOtherFields()"
+      />
     </div>
     <div v-if="type=='Exit'">
       <div class="text-h6 transition-form-section-heading">
@@ -1217,6 +1224,8 @@ let proxCardNeededCurrentVal = ref(false)
 let proxCardNeeded = ref(false)
 let proxCardReturnedCurrentVal = ref(false)
 let proxCardReturned = ref(false)
+let mailboxNeededCurrentVal = ref(false)
+let mailboxNeeded = ref(false)
 let showAccessEmailsCurrentVal = ref(false)
 let showAccessEmails = ref(false)
 let accessEmailsCurrentVal = ref(emptyEmployee)
@@ -1429,6 +1438,8 @@ function retrieveEmployeeTransition() {
     proxCardNeededCurrentVal.value = proxCardNeeded.value
     proxCardReturned.value = t.prox_card_returned
     proxCardReturnedCurrentVal.value = proxCardReturned.value
+    mailboxNeeded.value = t.mailbox_needed
+    mailboxNeededCurrentVal.value = mailboxNeeded.value
     if (t.access_emails_pk != -1) {
       showAccessEmails.value = true
       showAccessEmailsCurrentVal.value = true
@@ -1524,6 +1535,7 @@ function valuesAreChanged(): boolean {
     businessCards.value == businessCardsCurrentVal.value &&
     proxCardNeeded.value == proxCardNeededCurrentVal.value &&
     proxCardReturned.value == proxCardReturnedCurrentVal.value &&
+    mailboxNeeded.value == mailboxNeededCurrentVal.value &&
     showAccessEmails.value == showAccessEmailsCurrentVal.value &&
     accessEmails.value.pk == accessEmailsCurrentVal.value.pk &&
     specialInstructions.value == specialInstructionsCurrentVal.value &&
@@ -1618,6 +1630,7 @@ function updateTransition() {
       business_cards: businessCards.value,
       prox_card_needed: proxCardNeeded.value,
       prox_card_returned: proxCardReturned.value,
+      mailbox_needed: mailboxNeeded.value,
       access_emails_pk: accessEmails.value.pk,
       special_instructions: specialInstructions.value,
       fiscal_field: fiscalField.value
@@ -1678,6 +1691,7 @@ function updateTransition() {
       businessCardsCurrentVal.value = t.business_cards
       proxCardNeededCurrentVal.value = t.prox_card_needed
       proxCardReturnedCurrentVal.value = t.prox_card_returned
+      mailboxNeededCurrentVal.value = t.mailbox_needed
       showAccessEmailsCurrentVal.value = showAccessEmails.value
       accessEmailsCurrentVal.value = {
         pk: t.access_emails_pk, name: '', legal_name: t.access_emails_name
@@ -2008,10 +2022,41 @@ function navigateToMap() {
 // Send notifications //
 ////////////////////////
 
-function onSubmitSendDialog(type: 'SDS'|'FI'|'HR'|'STN'|'ASSIGN') {
-  const extraMessage = type == 'ASSIGN' ? reassignDialogMessage.value : sendDialogMessage.value
+function sendMailboxNotificationEmail() {
+  workflowsStore.sendMailboxNotificationEmail(transitionPk.value, {
+    senderName: userStore.getEmployeeProfile.name,
+    senderEmail: userStore.getEmployeeProfile.email,
+    transitionUrl: route.fullPath
+  })
+    .then(() => {
+      quasar.notify({
+        message: 'Sent Mailbox Notification Email',
+        color: 'positive',
+        icon: 'send'
+      })
+    })
+    .catch(e => {
+      console.error('Error sending Mailbox Notification Email', e)
+      quasar.notify({
+        message: 'Error sending Mailbox Notification Email',
+        color: 'negative',
+        icon: 'report_problem'
+      })
+    })
+}
+
+function onSubmitSendDialog(t: 'SDS'|'FI'|'HR'|'STN'|'ASSIGN') {
+  // Send mailbox notification email if needed
+  if (
+    mailboxNeeded.value == true &&
+    ['New', 'Return', 'Change/Modify'].indexOf(type.value) != -1
+  ) {
+    sendMailboxNotificationEmail()
+  }
+  
+  const extraMessage = t == 'ASSIGN' ? reassignDialogMessage.value : sendDialogMessage.value
   workflowsStore.sendTransitionToEmailList(transitionPk.value, {
-    type: type,
+    type: t,
     reassignTo: assignee.value,
     update: sendDialogUpdate.value,
     extraMessage,

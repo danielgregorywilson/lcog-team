@@ -13,6 +13,40 @@ from workflows.models import (
 )
 
 STAFF_TRANSITION_NEWS_EMAIL = os.environ.get('STAFF_TRANSITION_NEWS_EMAIL')
+STAFF_MAILBOX_EMAIL = os.environ.get('STAFF_MAILBOX_EMAIL')
+
+def send_mailbox_notification_email(
+    t, sender_name='', sender_email='', url=''
+):
+    current_site = Site.objects.get_current()
+    transition_url = current_site.domain + url
+    profile_url = current_site.domain + '/profile'
+
+    first_name = t.employee_first_name if t.employee_first_name else ''
+    last_name = t.employee_last_name if t.employee_last_name else ''
+    name_string = f'{ first_name } { last_name }'
+    if t.type == EmployeeTransition.TRANSITION_TYPE_NEW:
+        type_verb = 'starting'
+    elif t.type == EmployeeTransition.TRANSITION_TYPE_CHANGE:
+        type_verb = 'changing'
+    elif t.type == EmployeeTransition.TRANSITION_TYPE_EXIT:
+        type_verb = 'terminating'
+    else:
+        type_verb = 'changing'
+    date_string = readable_date(t.transition_date) if t.transition_date else ''
+
+    subject = f'New mailbox needed for { name_string }'
+
+    html_template = '../templates/email/employee-transition-mailbox.html'
+    html_message = render_to_string(html_template, {
+        'name_string': name_string, 'type_verb': type_verb,
+        'date_string': date_string, 'transition_url': transition_url,
+        'sender_name': sender_name, 'profile_url': profile_url
+    })
+    plaintext_message = strip_tags(html_message)
+
+    # Send to mailbox admins
+    send_email(STAFF_MAILBOX_EMAIL, subject, plaintext_message, html_message)
 
 def send_transition_submitter_email(
     t, extra_message=None, sender_name='', sender_email='', url='',

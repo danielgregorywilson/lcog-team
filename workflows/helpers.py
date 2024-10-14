@@ -439,7 +439,8 @@ def create_process_instances(transition):
         'IS Telecom Onboarding',
     ]
     onboarding_processes_start_sds = [
-        'SDS Facilities Onboarding', 'SDS Onboarding', 'SDS Phone Onboarding'
+        'SDS Ergo', 'SDS Facilities Onboarding', 'SDS Onboarding',
+        'SDS Phone Onboarding', 'SDS Sub Admin'
     ]
     returning_processes_start = []
     returning_processes_start_sds = []

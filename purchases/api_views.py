@@ -147,11 +147,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
         else: 
             date = datetime.date.today()
-        em = ExpenseMonth.objects.get_or_create(
-            purchaser=request.user.employee,
-            year=date.year,
-            month=date.month
-        )[0]
+        em = ExpenseMonth.objects.get(pk=request.data.get('em_pk'))
         expense = Expense.objects.create(month=em, date=date)
         serialized_expense = ExpenseSerializer(
             expense, context={'request': request})
@@ -402,11 +398,11 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
         month = request.data.get('month', None)
         year = request.data.get('year', None)
         if month is not None and year is not None:
-            em = ExpenseMonth.objects.get_or_create(
+            em = ExpenseMonth.objects.create(
                 purchaser=request.user.employee,
                 year=year,
                 month=month
-            )[0]
+            )
 
         # Create repeated expenses from last month
         last_month = month - 1

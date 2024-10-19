@@ -13,6 +13,7 @@ export const usePurchaseStore = defineStore('purchase', {
     firstOfThisMonth: new Date(),
     firstOfSelectedMonth: new Date(),
     expenseMonths: [] as Array<ExpenseMonth>,
+    selectedExpenseMonth: undefined as ExpenseMonth | undefined,
     expenseMonthLocks: [] as Array<ExpenseMonthLock>,
     myExpenses: [] as Array<Expense>,
     approvalExpenseGLs: [] as Array<GL>,
@@ -34,11 +35,6 @@ export const usePurchaseStore = defineStore('purchase', {
       )
       const y = state.firstOfSelectedMonth.getFullYear()
       return `${m} ${y}`
-    },
-    selectedExpenseMonth(): ExpenseMonth | undefined {
-      return this.expenseMonths.find(em => {
-        return em.month === this.monthInt && em.year === this.yearInt
-      })
     },
     expenseMonthLocked(): boolean {
       return this.expenseMonthLocks.some(eml => {
@@ -289,6 +285,20 @@ export const usePurchaseStore = defineStore('purchase', {
               e
             )
           })
+      })
+    },
+    setDefaultSelectedExpenseMonth(): Promise<null> {
+      return new Promise((resolve) => {
+        this.selectedExpenseMonth = this.expenseMonths.find(em => {
+          return em.month === this.monthInt && em.year === this.yearInt
+        })
+        resolve(null)
+      })
+    },
+    setSelectedExpenseMonth(pk: number): Promise<null> {
+      return new Promise((resolve) => {
+        this.selectedExpenseMonth = this.expenseMonths.find(em => em.pk === pk)
+        resolve(null)
       })
     },
 

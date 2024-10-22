@@ -91,9 +91,11 @@ class StepInstanceForm(ModelForm):
     """Used in StepInstance Admin for process_instance"""
     def __init__(self, *args, **kwargs):
         super(StepInstanceForm, self).__init__(*args, **kwargs)
-        # TODO: This is broken when creating a new StepInstance in the admin
-        self.fields['process_instance'].queryset = \
-            ProcessInstance.objects.filter(process=self.instance.step.process)
+        if hasattr(self.instance, 'step'):
+            self.fields['process_instance'].queryset = \
+                ProcessInstance.objects.filter(
+                    process=self.instance.step.process
+                )
 
 
 class StepInline(admin.TabularInline):

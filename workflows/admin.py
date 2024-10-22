@@ -91,6 +91,12 @@ class StepInstanceForm(ModelForm):
     """Used in StepInstance Admin for process_instance"""
     def __init__(self, *args, **kwargs):
         super(StepInstanceForm, self).__init__(*args, **kwargs)
+        # Filter step based on the process of the step instance
+        if hasattr(self.instance, 'process_instance'):
+            self.fields['step'].queryset = Step.objects.filter(
+                process=self.instance.process_instance.process
+            )
+        # Filter process_instance based on the process of the step
         if hasattr(self.instance, 'step'):
             self.fields['process_instance'].queryset = \
                 ProcessInstance.objects.filter(

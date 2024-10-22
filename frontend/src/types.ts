@@ -828,7 +828,7 @@ export type Role = {
   pk: number
   name: string
   description: string
-  members: Array<EmployeeRetrieve>
+  member_names: Array<string>
 }
 
 export type Action = {
@@ -976,7 +976,6 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   computer_gl: string
   computer_description: string
   phone_number: string
-  desk_phone: boolean
   phone_request: string
   phone_request_data: string
   load_code: string
@@ -988,6 +987,7 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   business_cards: boolean
   prox_card_needed: boolean
   prox_card_returned: boolean
+  mailbox_needed: boolean
   access_emails_pk: number
   access_emails_name: string
   special_instructions: string
@@ -1028,7 +1028,6 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   computer_gl?: string
   computer_description?: string
   phone_number?: string
-  desk_phone?: boolean
   phone_request?: string
   phone_request_data?: string
   load_code?: string
@@ -1040,6 +1039,7 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   business_cards?: boolean
   prox_card_needed?: boolean
   prox_card_returned?: boolean
+  mailbox_needed?: boolean
   access_emails_pk?: number
   special_instructions?: string
   fiscal_field?: string

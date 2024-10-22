@@ -9,7 +9,14 @@ from workflows.models import (
 class RoleSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Role
-        fields = ['url', 'pk', 'name', 'description', 'members']
+        fields = ['url', 'pk', 'name', 'description', 'member_names']
+    
+    member_names = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_member_names(role):
+        names = role.members.values_list('user__first_name', 'user__last_name')
+        return [f'{first} {last}' for first, last in names]
 
 
 class StepChoiceSerializer(serializers.HyperlinkedModelSerializer):
@@ -176,10 +183,10 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
             'schedule', 'lwop', 'lwop_details', 'preliminary_hire',
             'delete_profile', 'office_location', 'cubicle_number',
             'union_affiliation', 'teleworking', 'computer_type', 'computer_gl',
-            'computer_description', 'phone_number', 'desk_phone',
-            'phone_request', 'phone_request_data', 'load_code', 'cell_phone',
-            'should_delete', 'reassign_to', 'gas_pin_needed', 'oregon_access',
-            'business_cards', 'prox_card_needed', 'prox_card_returned',
+            'computer_description', 'phone_number', 'phone_request',
+            'phone_request_data', 'load_code', 'cell_phone', 'should_delete',
+            'reassign_to', 'gas_pin_needed', 'oregon_access', 'business_cards',
+            'prox_card_needed', 'prox_card_returned', 'mailbox_needed',
             'access_emails_pk', 'access_emails_name', 'special_instructions',
             'fiscal_field', 'assignee', 'changes'
         ]
@@ -263,10 +270,10 @@ class EmployeeTransitionRedactedSerializer(EmployeeTransitionSerializer):
             'system_change_date', 'lwop', 'lwop_details', 'preliminary_hire',
             'delete_profile', 'office_location', 'cubicle_number',
             'union_affiliation', 'teleworking', 'computer_type', 'computer_gl',
-            'computer_description', 'phone_number', 'desk_phone',
-            'phone_request', 'phone_request_data', 'load_code', 'cell_phone',
-            'should_delete', 'reassign_to', 'gas_pin_needed', 'oregon_access',
-            'business_cards', 'prox_card_needed', 'prox_card_returned',
+            'computer_description', 'phone_number', 'phone_request',
+            'phone_request_data', 'load_code', 'cell_phone', 'should_delete',
+            'reassign_to', 'gas_pin_needed', 'oregon_access', 'business_cards',
+            'prox_card_needed', 'prox_card_returned', 'mailbox_needed',
             'access_emails_pk', 'access_emails_name', 'special_instructions',
             'changes'
         ]

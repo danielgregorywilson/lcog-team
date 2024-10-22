@@ -19,7 +19,7 @@ from timeoff.helpers import (
 )
 from workflows.helpers import (
     create_process_instances, send_early_hr_email,
-    send_gas_pin_notification_email, send_step_completion_email,
+    send_mailbox_notification_email, send_step_completion_email,
     send_transition_fiscal_email, send_transition_hr_email,
     send_transition_sds_hiring_leads_email, send_transition_stn_email,
     send_transition_submitter_email
@@ -438,7 +438,6 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             t.computer_gl = request.data['computer_gl']
             t.computer_description = request.data['computer_description']
             t.phone_number = request.data['phone_number']
-            t.desk_phone = request.data['desk_phone']
             t.phone_request = request.data['phone_request']
             t.phone_request_data = request.data['phone_request_data']
             t.load_code = request.data['load_code']
@@ -450,6 +449,7 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             t.business_cards = request.data['business_cards']
             t.prox_card_needed = request.data['prox_card_needed']
             t.prox_card_returned = request.data['prox_card_returned']
+            t.mailbox_needed = request.data['mailbox_needed']
             
             if prop_in_obj(request.data, 'access_emails_pk', -1):
                 t.access_emails = Employee.objects.get(
@@ -492,17 +492,17 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
     #     return Response(serialized_tor.data)
 
     @action(detail=True, methods=['post'])
-    def send_gas_pin_notification_email(self, request, pk):
+    def send_mailbox_notification_email(self, request, pk):
         try:
             transition = EmployeeTransition.objects.get(pk=pk)
-            send_gas_pin_notification_email(
+            send_mailbox_notification_email(
                 transition,
                 sender_name=request.data['senderName'],
                 sender_email=request.data['senderEmail'],
                 url=request.data['transitionUrl'] )
-            return Response("Gas PIN notification email sent.")
+            return Response("Mailbox notification email sent.")
         except Exception as e:
-            message = 'Error sending Gas PIN notification email.'
+            message = 'Error sending mailbox notification email.'
             record_error(message, e, request, traceback.format_exc())
             return Response(
                 data=message,
@@ -786,13 +786,13 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
 
             processinstance.update_percent_complete()
             processinstance.save()
-            workflowinstance = processinstance.workflow_instance
-            workflowinstance.update_percent_complete()
+            wfi = processinstance.workflow_instance
+            wfi.update_percent_complete()
 
             # If step instance completion triggers a new process, start it
             if stepinstance.step.trigger_processes.count():
                 for process in stepinstance.step.trigger_processes.all():
-                    process.create_process_instance(workflow_instance)
+                    process.create_process_instance(wfi)
         
         else:
             # Undo completion of the current step instance

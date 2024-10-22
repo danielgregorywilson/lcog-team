@@ -500,21 +500,6 @@
         :readonly="!canEditOtherFields()"
       />
     </div>
-    <div class="row items-center">
-      <q-checkbox
-        id="desk-phone-needed"
-        v-model="deskPhone"
-        label="Desk Phone Needed"
-        class="q-mr-md"
-        :disable="!canEditOtherFields()"
-      />
-      <div
-        v-if="deskPhone && officeLocation.indexOf('PPB') != -1"
-        class="text-red"
-      >
-        Telecom: Add to PPB Paging Alert System
-      </div>
-    </div>
     <div class="row">
       <q-input
         name="load-code"
@@ -585,6 +570,13 @@
         id="prox-card-needed"
         v-model="proxCardNeeded"
         label="Proxy Card Needed"
+        :disable="!canEditOtherFields()"
+      />
+      <q-checkbox
+        v-if="type!='Exit'"
+        id="mailbox-needed"
+        v-model="mailboxNeeded"
+        label="Physical Mailbox Needed"
         :disable="!canEditOtherFields()"
       />
     </div>
@@ -1210,8 +1202,6 @@ let computerDescriptionCurrentVal = ref('')
 let computerDescription = ref('')
 let phoneNumberCurrentVal = ref('')
 let phoneNumber = ref('')
-let deskPhoneCurrentVal = ref(false)
-let deskPhone = ref(false)
 let phoneRequestCurrentVal = ref('')
 let phoneRequest = ref('')
 let phoneRequestDataCurrentVal = ref('')
@@ -1234,6 +1224,8 @@ let proxCardNeededCurrentVal = ref(false)
 let proxCardNeeded = ref(false)
 let proxCardReturnedCurrentVal = ref(false)
 let proxCardReturned = ref(false)
+let mailboxNeededCurrentVal = ref(false)
+let mailboxNeeded = ref(false)
 let showAccessEmailsCurrentVal = ref(false)
 let showAccessEmails = ref(false)
 let accessEmailsCurrentVal = ref(emptyEmployee)
@@ -1424,8 +1416,6 @@ function retrieveEmployeeTransition() {
     computerDescriptionCurrentVal.value = computerDescription.value
     phoneNumber.value = t.phone_number
     phoneNumberCurrentVal.value = phoneNumber.value
-    deskPhone.value = t.desk_phone
-    deskPhoneCurrentVal.value = deskPhone.value
     phoneRequest.value = t.phone_request
     phoneRequestCurrentVal.value = phoneRequest.value
     phoneRequestData.value = t.phone_request_data
@@ -1448,6 +1438,8 @@ function retrieveEmployeeTransition() {
     proxCardNeededCurrentVal.value = proxCardNeeded.value
     proxCardReturned.value = t.prox_card_returned
     proxCardReturnedCurrentVal.value = proxCardReturned.value
+    mailboxNeeded.value = t.mailbox_needed
+    mailboxNeededCurrentVal.value = mailboxNeeded.value
     if (t.access_emails_pk != -1) {
       showAccessEmails.value = true
       showAccessEmailsCurrentVal.value = true
@@ -1532,7 +1524,6 @@ function valuesAreChanged(): boolean {
     computerGL.value == computerGLCurrentVal.value &&
     computerDescription.value == computerDescriptionCurrentVal.value &&
     phoneNumber.value == phoneNumberCurrentVal.value &&
-    deskPhone.value == deskPhoneCurrentVal.value &&
     phoneRequest.value == phoneRequestCurrentVal.value &&
     phoneRequestData.value == phoneRequestDataCurrentVal.value &&
     loadCode.value == loadCodeCurrentVal.value &&
@@ -1544,6 +1535,7 @@ function valuesAreChanged(): boolean {
     businessCards.value == businessCardsCurrentVal.value &&
     proxCardNeeded.value == proxCardNeededCurrentVal.value &&
     proxCardReturned.value == proxCardReturnedCurrentVal.value &&
+    mailboxNeeded.value == mailboxNeededCurrentVal.value &&
     showAccessEmails.value == showAccessEmailsCurrentVal.value &&
     accessEmails.value.pk == accessEmailsCurrentVal.value.pk &&
     specialInstructions.value == specialInstructionsCurrentVal.value &&
@@ -1590,12 +1582,6 @@ function updateTransition() {
       systemChangeDateFromForm = new Date(systemChangeDate.value)
     }
 
-    // Mark for sending notifications
-    let gasPINNotificationNeeded = false
-    if (gasPINNeededCurrentVal.value == false && gasPINNeeded.value == true) {
-      gasPINNotificationNeeded = true
-    }
-
     // Update the DB
     workflowsStore.updateEmployeeTransition(transitionPk.value, {
       type: type.value,
@@ -1633,7 +1619,6 @@ function updateTransition() {
       computer_gl: computerGL.value,
       computer_description: computerDescription.value,
       phone_number: phoneNumberVal,
-      desk_phone: deskPhone.value,
       phone_request: phoneRequest.value,
       phone_request_data: phoneRequestData.value,
       load_code: loadCode.value,
@@ -1645,6 +1630,7 @@ function updateTransition() {
       business_cards: businessCards.value,
       prox_card_needed: proxCardNeeded.value,
       prox_card_returned: proxCardReturned.value,
+      mailbox_needed: mailboxNeeded.value,
       access_emails_pk: accessEmails.value.pk,
       special_instructions: specialInstructions.value,
       fiscal_field: fiscalField.value
@@ -1694,7 +1680,6 @@ function updateTransition() {
       computerGLCurrentVal.value = t.computer_gl
       computerDescriptionCurrentVal.value = t.computer_description
       phoneNumberCurrentVal.value = t.phone_number
-      deskPhoneCurrentVal.value = t.desk_phone
       phoneRequestCurrentVal.value = t.phone_request
       phoneRequestDataCurrentVal.value = t.phone_request_data
       loadCodeCurrentVal.value = t.load_code
@@ -1706,6 +1691,7 @@ function updateTransition() {
       businessCardsCurrentVal.value = t.business_cards
       proxCardNeededCurrentVal.value = t.prox_card_needed
       proxCardReturnedCurrentVal.value = t.prox_card_returned
+      mailboxNeededCurrentVal.value = t.mailbox_needed
       showAccessEmailsCurrentVal.value = showAccessEmails.value
       accessEmailsCurrentVal.value = {
         pk: t.access_emails_pk, name: '', legal_name: t.access_emails_name
@@ -1730,14 +1716,6 @@ function updateTransition() {
 
       if (formErrors()) {
         showErrorButton.value = true
-      }
-
-      // Send notification emails
-      if (
-        gasPINNotificationNeeded &&
-        ['New', 'Return', 'Change/Modify'].indexOf(type.value) != -1
-      ) {
-        sendGasPINNotificationEmail()
       }
 
       // TODO: If a new computer is required, send an email to the IT department
@@ -2044,33 +2022,41 @@ function navigateToMap() {
 // Send notifications //
 ////////////////////////
 
-function sendGasPINNotificationEmail() {
-  workflowsStore.sendGasPINNotificationEmail(transitionPk.value, {
+function sendMailboxNotificationEmail() {
+  workflowsStore.sendMailboxNotificationEmail(transitionPk.value, {
     senderName: userStore.getEmployeeProfile.name,
     senderEmail: userStore.getEmployeeProfile.email,
     transitionUrl: route.fullPath
   })
     .then(() => {
       quasar.notify({
-        message: 'Sent Gas PIN Notification Email',
+        message: 'Sent Mailbox Notification Email',
         color: 'positive',
         icon: 'send'
       })
     })
     .catch(e => {
-      console.error('Error sending Gas PIN Notification Email', e)
+      console.error('Error sending Mailbox Notification Email', e)
       quasar.notify({
-        message: 'Error sending Gas PIN Notification Email',
+        message: 'Error sending Mailbox Notification Email',
         color: 'negative',
         icon: 'report_problem'
       })
     })
 }
 
-function onSubmitSendDialog(type: 'SDS'|'FI'|'HR'|'STN'|'ASSIGN') {
-  const extraMessage = type == 'ASSIGN' ? reassignDialogMessage.value : sendDialogMessage.value
+function onSubmitSendDialog(t: 'SDS'|'FI'|'HR'|'STN'|'ASSIGN') {
+  // Send mailbox notification email if needed
+  if (
+    mailboxNeeded.value == true &&
+    ['New', 'Return', 'Change/Modify'].indexOf(type.value) != -1
+  ) {
+    sendMailboxNotificationEmail()
+  }
+  
+  const extraMessage = t == 'ASSIGN' ? reassignDialogMessage.value : sendDialogMessage.value
   workflowsStore.sendTransitionToEmailList(transitionPk.value, {
-    type: type,
+    type: t,
     reassignTo: assignee.value,
     update: sendDialogUpdate.value,
     extraMessage,

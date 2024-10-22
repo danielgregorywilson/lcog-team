@@ -129,8 +129,6 @@ function otherFieldsViewAndEdit() {
   const phoneRequestData = 'Machiavelli'
   cy.get('input[name="phone-request-data"]').clear().type(phoneRequestData)
   cy.get('input[name="phone-request-data"]').should('have.value', phoneRequestData)
-  cy.get('#desk-phone-needed').click()
-  cy.get('#desk-phone-needed').should('have.attr', 'aria-checked', 'true')
   const loadCode = '21421'
   cy.get('input[name="load-code"]').clear().type(loadCode)
   cy.get('input[name="load-code"]').should('have.value', loadCode)
@@ -178,8 +176,6 @@ function otherFieldsViewNotEdit() {
   cy.get('input[name="phone-number"]').should('have.attr', 'readonly')
   cy.get('select[name="phone-request"]').should('not.exist')
   cy.get('input[name="phone-request-data"]').should('not.exist')
-  cy.get('#desk-phone-needed').click()
-  cy.get('#desk-phone-needed').should('have.attr', 'aria-checked', 'false')
   cy.get('input[name="load-code"]').should('have.attr', 'readonly')
   cy.get('#cell-phone-needed').click()
   cy.get('#cell-phone-needed').should('have.attr', 'aria-checked', 'false')

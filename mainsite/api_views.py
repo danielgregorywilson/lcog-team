@@ -153,7 +153,7 @@ class FileUploadViewSet(viewsets.ViewSet):
                         desc = row_items[4].replace('\"','').rstrip()
                         amt = row_items[5]
                         items.append({
-                            'card': int(acct[-4:]),
+                            'card': acct[-4:],
                             'date':
                                 datetime.strptime(t_date, '%m/%d/%Y').date(),
                             'description': desc,

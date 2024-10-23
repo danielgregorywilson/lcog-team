@@ -92,10 +92,7 @@ class ExpenseGLViewSet(viewsets.ModelViewSet):
             gl = ExpenseGL.objects.get(pk=pk)
             expense = gl.expense
             approve = request.data.get('approve', True)
-            em = ExpenseMonth.objects.get_or_create(
-                purchaser=expense.month.purchaser, year=expense.date.year,
-                month=expense.date.month
-            )[0]
+            em = expense.month
             gl.approved_at = timezone.now()
             if approve:
                 gl.approved = True
@@ -445,12 +442,14 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
         """
         year = request.data['yearInt']
         month = request.data['monthInt']
+        cardPK = request.data['cardPK']
         note = request.data.get('note', '')
         unsubmit = request.data.get('unsubmit', False)
         try:
-            em = ExpenseMonth.objects.get_or_create(
-                purchaser=request.user.employee, year=year, month=month
-            )[0]
+            em = ExpenseMonth.objects.filter(
+                purchaser=request.user.employee, year=year, month=month,
+                card__pk=cardPK
+            ).first()
 
             # MONTH
             if unsubmit:

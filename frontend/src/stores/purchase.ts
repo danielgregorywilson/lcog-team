@@ -198,7 +198,6 @@ export const usePurchaseStore = defineStore('purchase', {
           .then(resp => {
             let ems = resp.data.results as Array<ExpenseMonth>
             this.expenseMonths = ems
-            
             if (!!yearInt && !!monthInt) {
               // Set active month: The first month that is not yet submitted
               ems = ems.sort(
@@ -266,7 +265,8 @@ export const usePurchaseStore = defineStore('purchase', {
     },
     submitExpenseMonth(
       data: {
-        yearInt: number, monthInt: number, note?: string, unsubmit?: boolean
+        yearInt: number, monthInt: number, cardPK: number, note?: string,
+        unsubmit?: boolean
       }
     ): Promise<null> {
       return new Promise((resolve, reject) => {
@@ -298,6 +298,14 @@ export const usePurchaseStore = defineStore('purchase', {
     setSelectedExpenseMonth(pk: number): Promise<null> {
       return new Promise((resolve) => {
         this.selectedExpenseMonth = this.expenseMonths.find(em => em.pk === pk)
+        resolve(null)
+      })
+    },
+    updateSelectedExpenseMonth(): Promise<null> {
+      return new Promise((resolve) => {
+        this.selectedExpenseMonth = this.expenseMonths.find(
+          em => em.pk === this.selectedExpenseMonth?.pk
+        )
         resolve(null)
       })
     },

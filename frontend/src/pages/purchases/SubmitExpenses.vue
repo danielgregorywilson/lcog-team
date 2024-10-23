@@ -34,7 +34,6 @@
         <div v-if="expenseMonthChoices().length > 1">
           <q-select
             v-if="thisMonthLoaded"
-            :disable="monthLocked() || monthSubmitted()"
             v-model="selectedMonth"
             :options="expenseMonthChoices()"
             label="Select Expense Month"
@@ -985,11 +984,12 @@ function monthLocked() {
 }
 
 function onSubmitDialog() {
-  if (monthLocked()) {
+  if (monthLocked() || !purchaseStore.selectedExpenseMonth?.card) {
     return
   }
   purchaseStore.submitExpenseMonth({
     yearInt: purchaseStore.yearInt, monthInt: purchaseStore.monthInt,
+    cardPK: purchaseStore.selectedExpenseMonth.card.pk,
     note: submitterNote.value
   })
     .then(() => {
@@ -1007,12 +1007,12 @@ function onSubmitDialog() {
 }
 
 function onUnsubmitDialog() {
-  if (monthLocked()) {
+  if (monthLocked() || !purchaseStore.selectedExpenseMonth?.card) {
     return
   }
   purchaseStore.submitExpenseMonth({
     yearInt: purchaseStore.yearInt, monthInt: purchaseStore.monthInt,
-    unsubmit: true
+    cardPK: purchaseStore.selectedExpenseMonth.card.pk, unsubmit: true
   })
     .then(() => {
       showUnsubmitDialog.value = false
@@ -1062,7 +1062,7 @@ function retrieveAllMyExpenses(): Promise<void> {
   return new Promise((resolve, reject) => {
     purchaseStore.getExpenseMonths()
     .then(() => {
-      debugger
+      purchaseStore.updateSelectedExpenseMonth()
       allExpensesLoaded.value = true
       resolve()
     })
@@ -1120,12 +1120,14 @@ function updateSelectedEMStore(pk?: number) {
   if (pk) {
     purchaseStore.setSelectedExpenseMonth(pk)
       .then(() => {
+        setStatement()
         retrieveAllMyExpenses()
       })
   } else if (selectedMonth.value) {
     purchaseStore.setSelectedExpenseMonth(
       selectedMonth.value.value.pk
     ).then(() => {
+      setStatement()
       retrieveAllMyExpenses()
     })
   }
@@ -1257,14 +1259,18 @@ function statementSelected(): boolean {
   return selectedStatement.value !== null
 }
 
+function setStatement(): void {
+  selectedStatement.value = statementChoices().find(
+    sc => sc.value.card.pk === purchaseStore.selectedExpenseMonth?.card?.pk
+  ) || null
+}
+
 function setDefaultMonthAndStatement() {
   purchaseStore.setDefaultSelectedExpenseMonth().then(() => {
     selectedMonth.value = expenseMonthChoices().find(
       em => em.value.pk === purchaseStore.selectedExpenseMonth?.pk
     ) || null
-    selectedStatement.value = statementChoices().find(
-      sc => sc.value.card.pk === purchaseStore.selectedExpenseMonth?.card?.pk
-    ) || null
+    setStatement()
   })
 }
 

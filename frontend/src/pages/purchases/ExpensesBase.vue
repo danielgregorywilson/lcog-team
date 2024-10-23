@@ -72,7 +72,7 @@
       </q-btn>
     </q-btn-group>  
   </div>
-  <div class="q-gutter-md">
+  <div v-if="route.meta.allowMonthNav" class="q-gutter-md">
     <q-btn @click="purchaseStore.setThisMonth()">This Month</q-btn>
     <q-btn-group>
       <q-btn
@@ -142,13 +142,14 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { usePurchaseStore } from 'src/stores/purchase'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from 'src/stores/user'
 
 const purchaseStore = usePurchaseStore()
 const userStore = useUserStore()
 
 const router = useRouter()
+const route = useRoute()
 
 let showHelp = ref(false)
 

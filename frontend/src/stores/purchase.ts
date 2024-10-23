@@ -459,15 +459,15 @@ export const usePurchaseStore = defineStore('purchase', {
     getFiscalExpenseMonths(
       yearInt: number | null = null,
       monthInt: number | null = null,
-      employeePK: number | null = null 
+      cardPK: number | null = null
     ): Promise<null> {
       return new Promise((resolve, reject) => {
         let params = '?fiscal=true'
         if (!!yearInt && !!monthInt) {
           params += `&year=${ yearInt }&month=${ monthInt }`
         }
-        if (!!employeePK) {
-          params += `&employee=${ employeePK }`
+        if (!!cardPK) {
+          params += `&card=${ cardPK }`
         }
         axios({
           url: `${ apiURL }api/v1/expense-month${ params }`

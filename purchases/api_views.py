@@ -321,43 +321,42 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
             
             year = self.request.query_params.get('year', None)
             month = self.request.query_params.get('month', None)
+            cardPK = self.request.query_params.get('cardPK', None)
 
             fiscal = self.request.query_params.get('fiscal', None)
             director = self.request.query_params.get('director', None)
             
-            # Fiscal getting all expense months
+            # Fiscal expense months
             if fiscal:
-                employeePK = self.request.query_params.get('employeePK', None)
                 if year and month:
-                    if employeePK:
+                    if cardPK:
                         return ExpenseMonth.objects.filter(
-                            purchaser__pk=employeePK, year=year, month=month,
+                            card__pk=cardPK, year=year, month=month,
                         )
                     return ExpenseMonth.objects.filter(year=year, month=month)
-                if employeePK:
+                if cardPK:
                     return ExpenseMonth.objects.filter(
-                        purchaser__pk=employeePK
+                        card__pk=cardPK
                     )
                 return ExpenseMonth.objects.all()
             
-            # Division Director getting all expense months
+            # Division Director getting expense months
             if director:
-                employeePK = self.request.query_params.get('employeePK', None)
                 if year and month:
-                    if employeePK:
+                    if cardPK:
                         return ExpenseMonth.objects.filter(
                             card__requires_director_approval=True,
                             card__director=user.employee,
-                            purchaser__pk=employeePK, year=year, month=month
+                            card__pk=cardPK, year=year, month=month
                         )
                     return ExpenseMonth.objects.filter(
                         card__requires_director_approval=True,
                         card__director=user.employee, year=year, month=month
                     )
-                if employeePK:
+                if cardPK:
                     return ExpenseMonth.objects.filter(
                         card__requires_director_approval=True,
-                        card__director=user.employee, purchaser__pk=employeePK
+                        card__director=user.employee, card__pk=cardPK
                     )
                 return ExpenseMonth.objects.filter(
                     card__requires_director_approval=True,

@@ -222,7 +222,7 @@
     </div>
   </div>
   <div v-else class="text-h5">
-    No expenses entered by {{ routeEmployeeName }} in
+    No such expenses entered by {{ routeEmployeeName }} in
     {{ purchaseStore.monthDisplay }}
   </div>
 
@@ -325,7 +325,8 @@ let denyDialogMessage = ref('')
 let card = ref(null) as Ref<ExpenseCard | null>
 let statement = ref(null) as Ref<ExpenseStatement | null>
 
-let routeEmployeePK = ref(-1)
+// let routeEmployeePK = ref(-1)
+let expenseMonthPK = ref(-1)
 let routeEmployeeName = ref('')
 
 let thisMonthLoaded = ref(false)
@@ -389,7 +390,7 @@ function selectedMonthCardExpenseMonths(): Array<ExpenseMonth> {
   let ems: Array<ExpenseMonth> = []
   if (allEMs.length) {
     const selectedEmployeeEM = allEMs.filter(em => {
-      return em.purchaser.pk === routeEmployeePK.value
+      return em.pk === expenseMonthPK.value
     })[0]
     if (selectedEmployeeEM) {
       currentCard = selectedEmployeeEM.card
@@ -401,18 +402,7 @@ function selectedMonthCardExpenseMonths(): Array<ExpenseMonth> {
   }
   card.value = currentCard
   statement.value = currentStatement
-  if (!ems.length) {
-    setEmployeeName()
-  }
   return ems
-}
-
-function setEmployeeName() {
-  peopleStore.getSimpleEmployeeDetail(
-    { pk: routeEmployeePK.value }
-  ).then((employee) => {
-    routeEmployeeName.value = employee.name
-  })
 }
 
 function fiscalCanApprove(expenseMonth: ExpenseMonth) {
@@ -433,14 +423,13 @@ function EMDenied(em: ExpenseMonth): boolean {
   return em.status === 'fiscal_denied'
 }
 
-function retrieveThisMonthEmployeeExpenses(): Promise<void> {
+function retrieveExpenseMonthCardExpenseMonths(): Promise<void> {
   return new Promise((resolve, reject) => {
-    const employeePK = routeEmployeePK.value
-    if (!employeePK) {
+    if (!expenseMonthPK.value) {
       return
     }
     purchaseStore.getFiscalExpenseMonths(
-      purchaseStore.yearInt, purchaseStore.monthInt, employeePK
+      purchaseStore.yearInt, purchaseStore.monthInt, expenseMonthPK.value
     )
       .then(() => {
         thisMonthLoaded.value = true
@@ -451,20 +440,6 @@ function retrieveThisMonthEmployeeExpenses(): Promise<void> {
         reject()
       })
   })
-}
-
-function retrieveAllEmployeeExpenses() {
-  const employeePK = routeEmployeePK.value
-  if (!employeePK) {
-    return
-  }
-  purchaseStore.getFiscalExpenseMonths(null, null, employeePK)
-    .then(() => {
-      allExpensesLoaded.value = true
-    })
-    .catch((error) => {
-      console.log('Error retrieving expenses', error)
-    })
 }
 
 function onShowApproveDialog(em: ExpenseMonth) {
@@ -490,7 +465,7 @@ function onSubmitApproveDialog() {
   } else {
     purchaseStore.approveExpenseMonth(emToApprovePK.value, true)
       .then(() => {
-        retrieveAllEmployeeExpenses()
+        retrieveExpenseMonthCardExpenseMonths()
         showApproveDialog.value = false
         quasar.notify({
           message: 'Approved',
@@ -521,7 +496,7 @@ function onSubmitDenyDialog() {
       emToApprovePK.value, false, denyDialogMessage.value
     )
       .then(() => {
-        retrieveAllEmployeeExpenses()
+        retrieveExpenseMonthCardExpenseMonths()
         showDenyDialog.value = false
         denyDialogMessage.value = ''
         quasar.notify({
@@ -541,14 +516,13 @@ function onSubmitDenyDialog() {
 }
 
 function navigateToPrintView() {
-  const employeePK = routeEmployeePK.value
-  if (!employeePK) {
+  if (!expenseMonthPK.value) {
     return
   }
   router.push({
     name: 'expense-month-print',
     params: {
-      employeePK: employeePK,
+      employeePK: expenseMonthPK.value,
     }
   })
 }
@@ -594,21 +568,19 @@ function handlePrint() {
     return em.month === purchaseStore.monthInt &&
     em.year === purchaseStore.yearInt
   }).length == 0) {
-    retrieveThisMonthEmployeeExpenses()
+    retrieveExpenseMonthCardExpenseMonths()
   } else {
     allExpensesLoaded.value = true
   }
 }
 
 onMounted(() => {
-  const employeePK = getRouteParam(route, 'employeePK')
-  routeEmployeePK.value = parseInt(employeePK ? employeePK : '-1')
+  const pk = getRouteParam(route, 'expenseMonthPK')
+  expenseMonthPK.value = parseInt(pk ? pk : '-1')
   if (props.print) {
     handlePrint()
   } else {
-    retrieveThisMonthEmployeeExpenses().then(() => {
-      retrieveAllEmployeeExpenses()
-    })
+    retrieveExpenseMonthCardExpenseMonths()
   }
 })
 

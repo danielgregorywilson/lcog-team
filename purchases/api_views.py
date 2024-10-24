@@ -321,47 +321,62 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
             
             year = self.request.query_params.get('year', None)
             month = self.request.query_params.get('month', None)
-            cardPK = self.request.query_params.get('cardPK', None)
+            expenseMonthPK = self.request.query_params.get('em', None)
 
             fiscal = self.request.query_params.get('fiscal', None)
             director = self.request.query_params.get('director', None)
             
+            if (fiscal or director) and expenseMonthPK:
+                try:
+                    cardPK = ExpenseMonth.objects.get(
+                        pk=expenseMonthPK
+                    ).card.pk
+                except ExpenseMonth.DoesNotExist:
+                    return ExpenseMonth.objects.none()
+
             # Fiscal expense months
             if fiscal:
-                if year and month:
-                    if cardPK:
+                if expenseMonthPK:
+                    if year and month:
                         return ExpenseMonth.objects.filter(
-                            card__pk=cardPK, year=year, month=month,
+                            card__pk=cardPK, year=year, month=month
                         )
-                    return ExpenseMonth.objects.filter(year=year, month=month)
-                if cardPK:
-                    return ExpenseMonth.objects.filter(
-                        card__pk=cardPK
-                    )
-                return ExpenseMonth.objects.all()
+                    else:
+                        return ExpenseMonth.objects.filter(card__pk=cardPK)
+                else:
+                    if year and month:
+                        return ExpenseMonth.objects.filter(
+                            year=year, month=month
+                        )
+                    else:
+                        return ExpenseMonth.objects.all()
             
             # Division Director getting expense months
             if director:
-                if year and month:
-                    if cardPK:
+                if expenseMonthPK:
+                    if year and month:
+                        return ExpenseMonth.objects.filter(
+                            card__requires_director_approval=True,
+                            card__director=user.employee, card__pk=cardPK,
+                            year=year, month=month
+                        )
+                    else:
+                        return ExpenseMonth.objects.filter(
+                            card__requires_director_approval=True,
+                            card__director=user.employee, card__pk=cardPK
+                        )
+                else:
+                    if year and month:
                         return ExpenseMonth.objects.filter(
                             card__requires_director_approval=True,
                             card__director=user.employee,
-                            card__pk=cardPK, year=year, month=month
+                            year=year, month=month
                         )
-                    return ExpenseMonth.objects.filter(
-                        card__requires_director_approval=True,
-                        card__director=user.employee, year=year, month=month
-                    )
-                if cardPK:
-                    return ExpenseMonth.objects.filter(
-                        card__requires_director_approval=True,
-                        card__director=user.employee, card__pk=cardPK
-                    )
-                return ExpenseMonth.objects.filter(
-                    card__requires_director_approval=True,
-                    card__director=user.employee
-                )
+                    else:
+                        return ExpenseMonth.objects.filter(
+                            card__requires_director_approval=True,
+                            card__director=user.employee
+                        )
 
             # Employee getting own expense months
             if year and month:

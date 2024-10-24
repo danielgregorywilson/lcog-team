@@ -81,7 +81,7 @@ const routes: RouteRecordRaw[] = [
             },
           },
           {
-            path: 'director/:employeePK',
+            path: 'director/:expenseMonthPK',
             name: 'director-approve-expenses-detail',
             component: () => {
               return import('src/pages/purchases/DirectorApproveDetail.vue')

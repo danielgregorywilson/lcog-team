@@ -33,7 +33,7 @@
   
   <!-- Expense Months -->
   <q-spinner-grid
-    v-if="!expensesLoaded()"
+    v-if="!thisMonthLoaded"
     class="spinner"
     color="primary"
     size="xl"
@@ -221,10 +221,7 @@
 
     </div>
   </div>
-  <div v-else class="text-h5">
-    No such expenses entered by {{ routeEmployeeName }} in
-    {{ purchaseStore.monthDisplay }}
-  </div>
+  <div v-else class="text-h5">No such expense month.</div>
 
   <!-- Approve Dialog -->
   <q-dialog v-model="showApproveDialog">
@@ -300,7 +297,6 @@ import DocumentViewer from 'src/components/DocumentViewer.vue'
 import StatementTable from 'src/components/purchases/StatementTable.vue'
 import { readableDateNEW, readableDateTime } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
-import { usePeopleStore } from 'src/stores/people'
 import { usePurchaseStore } from 'src/stores/purchase'
 import { ExpenseCard, ExpenseMonth, ExpenseStatement } from 'src/types'
 import { getRouteParam } from 'src/utils'
@@ -309,7 +305,6 @@ import { getRouteParam } from 'src/utils'
 const route = useRoute()
 const router = useRouter()
 const quasar = useQuasar()
-const peopleStore = usePeopleStore()
 const purchaseStore = usePurchaseStore()
 
 const props = defineProps<{
@@ -325,21 +320,12 @@ let denyDialogMessage = ref('')
 let card = ref(null) as Ref<ExpenseCard | null>
 let statement = ref(null) as Ref<ExpenseStatement | null>
 
-// let routeEmployeePK = ref(-1)
 let expenseMonthPK = ref(-1)
-let routeEmployeeName = ref('')
-
 let thisMonthLoaded = ref(false)
-let allExpensesLoaded = ref(false)
 
 function viewingThisMonth() {
   return purchaseStore.firstOfSelectedMonth.getTime() ===
     purchaseStore.firstOfThisMonth.getTime()
-}
-
-function expensesLoaded() {
-  return (viewingThisMonth() && thisMonthLoaded.value) ||
-    allExpensesLoaded.value
 }
 
 const pagination = {

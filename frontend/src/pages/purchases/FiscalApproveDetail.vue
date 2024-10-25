@@ -33,7 +33,7 @@
   
   <!-- Expense Months -->
   <q-spinner-grid
-    v-if="!thisMonthLoaded"
+    v-if="!thisMonthLoaded && !allExpensesLoaded"
     class="spinner"
     color="primary"
     size="xl"
@@ -300,6 +300,7 @@ import { handlePromiseError } from 'src/stores'
 import { usePurchaseStore } from 'src/stores/purchase'
 import { ExpenseCard, ExpenseMonth, ExpenseStatement } from 'src/types'
 import { getRouteParam } from 'src/utils'
+import { all } from 'cypress/types/bluebird'
 
 
 const route = useRoute()
@@ -322,6 +323,7 @@ let statement = ref(null) as Ref<ExpenseStatement | null>
 
 let expenseMonthPK = ref(-1)
 let thisMonthLoaded = ref(false)
+let allExpensesLoaded = ref(false)
 
 function viewingThisMonth() {
   return purchaseStore.firstOfSelectedMonth.getTime() ===

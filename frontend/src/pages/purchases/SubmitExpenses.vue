@@ -73,6 +73,9 @@
       <div v-else>
         <div class="row justify-between">
           <div class="text-h6">Submitted Total: ${{ expensesTotal() }}</div>
+          <div v-if="largeExpense()" class="text-h6 text-warning">
+            Expenses of $1000 or more must be approved by a Program Manager
+          </div>
           <div v-if="monthLocked()" class="text-h6 text-negative">
             Month locked by fiscal
           </div>
@@ -838,6 +841,10 @@ function selectedMonthNotes(): Array<{
     }
   }
   return notes
+}
+
+function largeExpense() {
+  return selectedMonthExpenses().some(exp => parseFloat(exp.amount) >= 1000)
 }
 
 function expensesTotal() {

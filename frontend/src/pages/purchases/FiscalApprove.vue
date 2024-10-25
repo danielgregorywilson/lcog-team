@@ -27,7 +27,10 @@
             @click="navigateToDetail(props.row.pk)"
           >
             <q-td key="employee" :props="props">
-              {{ props.row.purchaser.name }} - {{  props.row.card.display }}
+              {{ props.row.purchaser.name }}
+              <span
+                v-if="props.row.card"
+              > - {{  props.row.card.display }}</span>
             </q-td>
             <q-td key="status" :props="props">
               <q-linear-progress

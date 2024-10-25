@@ -44,6 +44,9 @@
         Submitted Total: ${{ expenseMonthTotal(em) }}
       </div>
       <div class="q-mt-sm">
+        <div v-if="largeExpense(em)" class="text-h6 text-warning">
+          Take Note! Expense of $1000 or more
+        </div>
         <q-table
           flat bordered
           :title="tableTitleDisplay(em)"
@@ -70,6 +73,16 @@
           <template v-slot:body-cell-vendor="props">
             <q-td key="vendor" :props="props" style="white-space: normal;">
               {{ props.row.vendor }}
+            </q-td>
+          </template>
+          <template v-slot:body-cell-amount="props">
+            <q-td
+              key="expense_amount"
+              :props="props"
+              style="white-space: normal;"
+              :class="props.row.amount >= 1000 ? 'bg-yellow' : ''"
+            >
+              ${{ props.row.amount }}
             </q-td>
           </template>
           <template v-slot:body-cell-gls="props">
@@ -114,6 +127,13 @@
                         v-if="col.label == 'Date'"
                       >
                         {{ readableDateNEW(col.value) }}
+                      </div>
+                      <div
+                        class="q-table__grid-item-value"
+                        v-if="col.label == 'Amount'"
+                        :class="props.row.amount >= 1000 ? 'bg-yellow' : ''"
+                      >
+                        ${{ col.value }}
                       </div>
                       <div
                         class="q-table__grid-item-value"
@@ -465,6 +485,10 @@ function expenseMonthTotal(em: ExpenseMonth) {
   return em.expenses.reduce(
     (acc, expense) => acc + parseFloat(expense.amount), 0
   ).toFixed(2)
+}
+
+function largeExpense(em: ExpenseMonth) {
+  return em.expenses.some(expense => parseFloat(expense.amount) >= 1000)
 }
 
 function expensesTotal() {

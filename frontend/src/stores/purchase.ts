@@ -459,15 +459,15 @@ export const usePurchaseStore = defineStore('purchase', {
     getFiscalExpenseMonths(
       yearInt: number | null = null,
       monthInt: number | null = null,
-      cardPK: number | null = null
-    ): Promise<null> {
+      expenseMonthPK: number | null = null
+    ): Promise<ExpenseMonth[]> {
       return new Promise((resolve, reject) => {
         let params = '?fiscal=true'
         if (!!yearInt && !!monthInt) {
           params += `&year=${ yearInt }&month=${ monthInt }`
         }
-        if (!!cardPK) {
-          params += `&card=${ cardPK }`
+        if (!!expenseMonthPK) {
+          params += `&em=${ expenseMonthPK }`
         }
         axios({
           url: `${ apiURL }api/v1/expense-month${ params }`
@@ -501,7 +501,7 @@ export const usePurchaseStore = defineStore('purchase', {
             
             this.fiscalExpenseMonths = ems
             this.numExpensesFiscalToApprove = emsFiscalToApprove.length
-            resolve(resp.data.results)
+            resolve(ems)
           })
           .catch(e => {
             handlePromiseError(reject, 'Error getting fiscal expense months', e)

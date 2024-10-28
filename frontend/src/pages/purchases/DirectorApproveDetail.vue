@@ -309,11 +309,6 @@ let statement = ref(null) as Ref<ExpenseStatement | null>
 let expenseMonthPK = ref(-1)
 let thisMonthLoaded = ref(false)
 
-function viewingThisMonth() {
-  return purchaseStore.firstOfSelectedMonth.getTime() ===
-    purchaseStore.firstOfThisMonth.getTime()
-}
-
 const pagination = {
   rowsPerPage: '50'
 }

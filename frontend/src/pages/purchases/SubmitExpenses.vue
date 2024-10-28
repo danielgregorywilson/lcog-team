@@ -1,33 +1,54 @@
 <template>
 <div class="q-mt-md">
   <div v-if="purchaseStore.selectedExpenseMonth">
-    <div v-if="!monthLocked()" class="row q-gutter-md">
-      <q-btn
-        v-if="!monthSubmitted()"
-        @click="showSubmitDialog = true"
-        :disabled="formErrors() || !statementSelected()"
-      >
-        Submit for Approval
-      </q-btn>
-      <q-btn v-if="canUnsubmitMonth()" @click="showUnsubmitDialog = true">
-        Unsubmit
-      </q-btn>
-      <q-btn v-if="formErrors()" @click="showErrorsDialog = true">
-        <div>Correct Errors</div>
-        <q-icon color="orange" name="warning" size="md" />
-      </q-btn>
-      <q-btn v-if="!statementSelected()" flat class="no-pointer-events">
-        <div>Select a CC statement</div>
-        <q-icon color="orange" name="warning" size="md" />
-      </q-btn>
-      <q-btn
-        v-else-if="!expensesMatchStatment()"
-        flat
-        class="no-pointer-events"
-      >
-        <div>Entered expenses do not match statement</div>
-        <q-icon color="orange" name="warning" size="md" />
-      </q-btn>
+    <div v-if="!monthLocked()" class="row justify-between">
+      <div class="row q-gutter-md">
+        <q-btn
+          v-if="!monthSubmitted()"
+          @click="showSubmitDialog = true"
+          :disabled="formErrors() || !statementSelected()"
+        >
+          Submit for Approval
+        </q-btn>
+        <q-btn v-if="canUnsubmitMonth()" @click="showUnsubmitDialog = true">
+          Unsubmit
+        </q-btn>
+        <q-btn v-if="formErrors()" @click="showErrorsDialog = true">
+          <div>Correct Errors</div>
+          <q-icon color="orange" name="warning" size="md" />
+        </q-btn>
+        <q-btn v-if="!statementSelected()" flat class="no-pointer-events">
+          <div>Select a CC statement</div>
+          <q-icon color="orange" name="warning" size="md" />
+        </q-btn>
+        <q-btn
+          v-else-if="!expensesMatchStatment()"
+          flat
+          class="no-pointer-events"
+        >
+          <div>Entered expenses do not match statement</div>
+          <q-icon color="orange" name="warning" size="md" />
+        </q-btn>
+      </div>
+      <div class="row q-gutter-sm">
+        <div v-if="expenseMonthChoices().length > 1">
+          <q-select
+            v-if="thisMonthLoaded"
+            v-model="selectedMonth"
+            :options="expenseMonthChoices()"
+            label="Select Expense Month"
+            dense
+            outlined
+            @update:model-value="updateSelectedEMStore()"
+          />
+        </div>
+        <q-btn
+          @click="showAddExpenseMonthDialog = true"
+        >
+          +<q-icon name="credit_card" />
+          <q-tooltip>Add a credit card</q-tooltip>
+        </q-btn>
+      </div>
     </div>
     <div v-if="selectedMonthNotes().length">
       <ul id="denial-notes" class="q-mt-md q-pa-sm q-pl-lg bg-info font-bold">
@@ -52,6 +73,9 @@
       <div v-else>
         <div class="row justify-between">
           <div class="text-h6">Submitted Total: ${{ expensesTotal() }}</div>
+          <div v-if="largeExpense()" class="text-h6 text-warning">
+            Expenses of $1000 or more must be approved by a Program Manager
+          </div>
           <div v-if="monthLocked()" class="text-h6 text-negative">
             Month locked by fiscal
           </div>
@@ -431,7 +455,7 @@
             color="primary"
             v-if="!monthLocked()"
             class="q-ml-sm"
-            @click="createExpenseMonth().then(() => retrieveAllMyExpenses())"
+            @click="createExpenseMonth()"
           >
             Get started
           </q-btn>
@@ -606,6 +630,31 @@
       </q-form>
     </q-card>
   </q-dialog>
+
+  <!-- Add Expense Month Dialog -->
+  <q-dialog v-model="showAddExpenseMonthDialog">
+    <q-card class="q-pa-md" style="width: 400px">
+      <div class="text-h6">
+        Are you sure you want to add a credit card for this month?
+      </div>
+      <div class="text-h6">
+        Most people
+        do not need to do this.
+      </div>
+      <q-form
+        @submit='onAddExpenseMonthDialog()'
+        class="q-gutter-md"
+      >
+        <q-btn
+          name="add-expense-month-dialog-button"
+          label="Add credit card"
+          icon-right="credit_card"
+          type="submit"
+          color="primary"
+        />
+      </q-form>
+    </q-card>
+  </q-dialog>
 </div>
 </template>
 
@@ -649,17 +698,21 @@ const purchaseStore = usePurchaseStore()
 
 let thisMonthLoaded = ref(false)
 let allExpensesLoaded = ref(false)
+// SelectedMonth is a q-select option, so it has a label and a value.
+let selectedMonth = ref(null) as
+  Ref<{label: string, value: ExpenseMonth} | null>
 
 let thisMonthStatementsLoaded = ref(false)
 let allStatementsLoaded = ref(false)
 // SelectedStatement is a q-select option, so it has a label and a value.
-let selectedStatement = ref(null) as 
+let selectedStatement = ref(null) as
   Ref<{label: string, value: ExpenseStatement} | null>
 
 let showErrorsDialog = ref(false)
 let showSubmitDialog = ref(false)
 let submitterNote = ref('')
 let showUnsubmitDialog = ref(false)
+let showAddExpenseMonthDialog = ref(false)
 
 let deleteDialogVisible = ref(false)
 let expensePkToDelete = ref(-1)
@@ -790,6 +843,10 @@ function selectedMonthNotes(): Array<{
   return notes
 }
 
+function largeExpense() {
+  return selectedMonthExpenses().some(exp => parseFloat(exp.amount) >= 1000)
+}
+
 function expensesTotal() {
   return selectedMonthExpenses().reduce(
     (acc, exp) => acc + parseFloat(exp.amount), 0
@@ -822,12 +879,9 @@ function expensesMatchStatment(): boolean {
 }
 
 function monthSubmitted() {
-  const ems = purchaseStore.expenseMonths
-  return ems.some(em => {
-    return em.month === purchaseStore.monthInt &&
-      em.year === purchaseStore.yearInt &&
-      em.status !== 'draft'
-  })
+  const em = purchaseStore.selectedExpenseMonth
+  if (!em) return false
+  return em.status !== 'draft'
 }
 
 function expenseApproved(expense: Expense) {
@@ -863,8 +917,9 @@ function expenseClass(expense: Expense) {
 }
 
 function clickAddExpense(): void {
-
+  if (!purchaseStore.selectedExpenseMonth) return
   purchaseStore.createExpense({
+    em_pk: purchaseStore.selectedExpenseMonth.pk,
     name: '',
     date: `${ purchaseStore.yearInt }-${ purchaseStore.monthInt }-` +
       `${ purchaseStore.dayInt }`,
@@ -936,11 +991,12 @@ function monthLocked() {
 }
 
 function onSubmitDialog() {
-  if (monthLocked()) {
+  if (monthLocked() || !purchaseStore.selectedExpenseMonth?.card) {
     return
   }
   purchaseStore.submitExpenseMonth({
     yearInt: purchaseStore.yearInt, monthInt: purchaseStore.monthInt,
+    cardPK: purchaseStore.selectedExpenseMonth.card.pk,
     note: submitterNote.value
   })
     .then(() => {
@@ -958,12 +1014,12 @@ function onSubmitDialog() {
 }
 
 function onUnsubmitDialog() {
-  if (monthLocked()) {
+  if (monthLocked() || !purchaseStore.selectedExpenseMonth?.card) {
     return
   }
   purchaseStore.submitExpenseMonth({
     yearInt: purchaseStore.yearInt, monthInt: purchaseStore.monthInt,
-    unsubmit: true
+    cardPK: purchaseStore.selectedExpenseMonth.card.pk, unsubmit: true
   })
     .then(() => {
       showUnsubmitDialog.value = false
@@ -976,6 +1032,19 @@ function onUnsubmitDialog() {
     })
     .catch((error) => {
       console.log('Error unsubmitting expenses', error)
+    })
+}
+
+function onAddExpenseMonthDialog() {
+  if (monthLocked()) {
+    return
+  }
+  createExpenseMonth()
+    .then(() => {
+      showAddExpenseMonthDialog.value = false
+    })
+    .catch((error) => {
+      console.log('Error adding expense month', error)
     })
 }
 
@@ -996,14 +1065,79 @@ function retrieveRecentExpenseMonths(): Promise<void> {
   })
 }
 
-function retrieveAllMyExpenses() {
-  purchaseStore.getExpenseMonths()
+function retrieveAllMyExpenses(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    purchaseStore.getExpenseMonths()
     .then(() => {
+      purchaseStore.updateSelectedExpenseMonth()
       allExpensesLoaded.value = true
+      resolve()
     })
     .catch((error) => {
-      console.log('Error retrieving expenses', error)
+      handlePromiseError(reject, 'Error retrieving expenses', error)
     })
+  })
+}
+
+function thisMonthExpenseMonths(): Array<ExpenseMonth> {
+  return purchaseStore.expenseMonths.filter(em => {
+    return em.month === purchaseStore.monthInt &&
+      em.year === purchaseStore.yearInt
+  })
+}
+
+function createExpenseMonth(): Promise<ExpenseMonth> {
+  if (monthLocked()) {
+    return Promise.reject()
+  }
+  return new Promise ((resolve, reject) => {
+    purchaseStore.createExpenseMonth({
+      month: purchaseStore.monthInt,
+      year: purchaseStore.yearInt
+    })
+      .then((em) => {
+        retrieveAllMyExpenses().then(() => {
+          updateSelectedEMStore(em.pk)
+          selectedMonth.value = expenseMonthChoices().find(
+            em => em.value.pk === purchaseStore.selectedExpenseMonth?.pk
+          ) || null
+          resolve(em)
+        })
+      })
+      .catch((error) => {
+        handlePromiseError(reject, 'Error creating expense month', error)
+        reject()
+      })
+  })
+}
+
+function expenseMonthChoices(): Array<{label: string, value: ExpenseMonth}> {
+  return thisMonthExpenseMonths().map(em => {
+    return {
+      label: em.card ? em.card.display : 'No card selected',
+      value: em
+    }
+  })
+}
+
+function updateSelectedEMStore(pk?: number) {
+  if (monthLocked()) {
+    return
+  }
+  if (pk) {
+    purchaseStore.setSelectedExpenseMonth(pk)
+      .then(() => {
+        setStatement()
+        retrieveAllMyExpenses()
+      })
+  } else if (selectedMonth.value) {
+    purchaseStore.setSelectedExpenseMonth(
+      selectedMonth.value.value.pk
+    ).then(() => {
+      setStatement()
+      retrieveAllMyExpenses()
+    })
+  }
 }
 
 function updateExpense(
@@ -1111,18 +1245,10 @@ function updateSelectedStatement() {
   if (monthLocked()) {
     return
   }
-  new Promise((resolve) => {
+  new Promise((resolve, reject) => {
     const em = purchaseStore.selectedExpenseMonth
     if (!em) {
-      createExpenseMonth().then((newEM) => {
-        if (selectedStatement.value) {
-          purchaseStore.setExpenseMonthCard(
-            newEM.pk, selectedStatement.value.value.card.pk
-          ).then(() => {
-            resolve(newEM)
-          })
-        }
-      })
+      reject('Could not update statement because no expense month selected.')
     }
     if (em && selectedStatement.value) {
       purchaseStore.setExpenseMonthCard(
@@ -1140,28 +1266,18 @@ function statementSelected(): boolean {
   return selectedStatement.value !== null
 }
 
-function setSelectedStatement() {
+function setStatement(): void {
   selectedStatement.value = statementChoices().find(
     sc => sc.value.card.pk === purchaseStore.selectedExpenseMonth?.card?.pk
   ) || null
 }
 
-function createExpenseMonth(): Promise<ExpenseMonth> {
-  if (monthLocked()) {
-    return Promise.reject()
-  }
-  return new Promise ((resolve, reject) => {
-    purchaseStore.createExpenseMonth({
-      month: purchaseStore.monthInt,
-      year: purchaseStore.yearInt
-    })
-      .then((em) => {
-        resolve(em)
-      })
-      .catch((error) => {
-        handlePromiseError(reject, 'Error creating expense month', error)
-        reject()
-      })
+function setDefaultMonthAndStatement() {
+  purchaseStore.setDefaultSelectedExpenseMonth().then(() => {
+    selectedMonth.value = expenseMonthChoices().find(
+      em => em.value.pk === purchaseStore.selectedExpenseMonth?.pk
+    ) || null
+    setStatement()
   })
 }
 
@@ -1196,7 +1312,7 @@ onMounted(() => {
     // so we can set selected expense card.
     retrieveThisMonthStatements().then(() => {
       retrieveAllStatements().then(() => {
-        setSelectedStatement()
+        setDefaultMonthAndStatement()
       })
     })
   })
@@ -1204,7 +1320,7 @@ onMounted(() => {
 
 watch(() => purchaseStore.monthInt, (first, second) => {
   if (first !== second) {
-    setSelectedStatement()
+    setDefaultMonthAndStatement()
   }
 })
 

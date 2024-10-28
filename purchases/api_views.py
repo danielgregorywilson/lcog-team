@@ -92,10 +92,7 @@ class ExpenseGLViewSet(viewsets.ModelViewSet):
             gl = ExpenseGL.objects.get(pk=pk)
             expense = gl.expense
             approve = request.data.get('approve', True)
-            em = ExpenseMonth.objects.get_or_create(
-                purchaser=expense.month.purchaser, year=expense.date.year,
-                month=expense.date.month
-            )[0]
+            em = expense.month
             gl.approved_at = timezone.now()
             if approve:
                 gl.approved = True
@@ -147,11 +144,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
         else: 
             date = datetime.date.today()
-        em = ExpenseMonth.objects.get_or_create(
-            purchaser=request.user.employee,
-            year=date.year,
-            month=date.month
-        )[0]
+        em = ExpenseMonth.objects.get(pk=request.data.get('em_pk'))
         expense = Expense.objects.create(month=em, date=date)
         serialized_expense = ExpenseSerializer(
             expense, context={'request': request})
@@ -328,48 +321,55 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
             
             year = self.request.query_params.get('year', None)
             month = self.request.query_params.get('month', None)
+            expenseMonthPK = self.request.query_params.get('em', None)
 
             fiscal = self.request.query_params.get('fiscal', None)
             director = self.request.query_params.get('director', None)
+            cardPK = None
             
-            # Fiscal getting all expense months
+            if (fiscal or director) and expenseMonthPK:
+                try:
+                    em = ExpenseMonth.objects.get(pk=expenseMonthPK)
+                    year = em.year
+                    month = em.month
+                    cardPK = em.card.pk
+                except ExpenseMonth.DoesNotExist:
+                    return ExpenseMonth.objects.none()
+
+            # Fiscal expense months
             if fiscal:
-                employeePK = self.request.query_params.get('employeePK', None)
-                if year and month:
-                    if employeePK:
-                        return ExpenseMonth.objects.filter(
-                            purchaser__pk=employeePK, year=year, month=month,
-                        )
-                    return ExpenseMonth.objects.filter(year=year, month=month)
-                if employeePK:
+                if expenseMonthPK:
                     return ExpenseMonth.objects.filter(
-                        purchaser__pk=employeePK
+                        card__pk=cardPK, year=year, month=month
                     )
-                return ExpenseMonth.objects.all()
+                else:
+                    if year and month:
+                        return ExpenseMonth.objects.filter(
+                            year=year, month=month
+                        )
+                    else:
+                        return ExpenseMonth.objects.all()
             
-            # Division Director getting all expense months
+            # Division Director getting expense months
             if director:
-                employeePK = self.request.query_params.get('employeePK', None)
-                if year and month:
-                    if employeePK:
+                if expenseMonthPK:
+                    return ExpenseMonth.objects.filter(
+                        card__requires_director_approval=True,
+                        card__director=user.employee, card__pk=cardPK,
+                        year=year, month=month
+                    )
+                else:
+                    if year and month:
                         return ExpenseMonth.objects.filter(
                             card__requires_director_approval=True,
                             card__director=user.employee,
-                            purchaser__pk=employeePK, year=year, month=month
+                            year=year, month=month
                         )
-                    return ExpenseMonth.objects.filter(
-                        card__requires_director_approval=True,
-                        card__director=user.employee, year=year, month=month
-                    )
-                if employeePK:
-                    return ExpenseMonth.objects.filter(
-                        card__requires_director_approval=True,
-                        card__director=user.employee, purchaser__pk=employeePK
-                    )
-                return ExpenseMonth.objects.filter(
-                    card__requires_director_approval=True,
-                    card__director=user.employee
-                )
+                    else:
+                        return ExpenseMonth.objects.filter(
+                            card__requires_director_approval=True,
+                            card__director=user.employee
+                        )
 
             # Employee getting own expense months
             if year and month:
@@ -402,11 +402,11 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
         month = request.data.get('month', None)
         year = request.data.get('year', None)
         if month is not None and year is not None:
-            em = ExpenseMonth.objects.get_or_create(
+            em = ExpenseMonth.objects.create(
                 purchaser=request.user.employee,
                 year=year,
                 month=month
-            )[0]
+            )
 
         # Create repeated expenses from last month
         last_month = month - 1
@@ -449,12 +449,14 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
         """
         year = request.data['yearInt']
         month = request.data['monthInt']
+        cardPK = request.data['cardPK']
         note = request.data.get('note', '')
         unsubmit = request.data.get('unsubmit', False)
         try:
-            em = ExpenseMonth.objects.get_or_create(
-                purchaser=request.user.employee, year=year, month=month
-            )[0]
+            em = ExpenseMonth.objects.filter(
+                purchaser=request.user.employee, year=year, month=month,
+                card__pk=cardPK
+            ).first()
 
             # MONTH
             if unsubmit:

@@ -57,41 +57,57 @@ const routes: RouteRecordRaw[] = [
             path: 'submit',
             name: 'submit-expenses',
             component: () => import('src/pages/purchases/SubmitExpenses.vue'),
-            meta: { requiresAuth: true, requiresExpenseSubmitter: true },
+            meta: {
+              requiresAuth: true, requiresExpenseSubmitter: true,
+              allowMonthNav: true
+            },
           },
           {
             path: 'approve',
             name: 'approve-expenses',
             component: () => import('src/pages/purchases/ApproveExpenses.vue'),
-            meta: { requiresAuth: true, requiresExpenseApprover: true },
+            meta: {
+              requiresAuth: true, requiresExpenseApprover: true,
+              allowMonthNav: true
+            },
           },
           {
             path: 'director',
             name: 'director-approve-expenses',
             component: () => import('src/pages/purchases/DirectorApprove.vue'),
-            meta: { requiresAuth: true, requiresDivisionDirector: true },
+            meta: {
+              requiresAuth: true, requiresDivisionDirector: true,
+              allowMonthNav: true
+            },
           },
           {
-            path: 'director/:employeePK',
+            path: 'director/:expenseMonthPK',
             name: 'director-approve-expenses-detail',
             component: () => {
               return import('src/pages/purchases/DirectorApproveDetail.vue')
             },
-            meta: { requiresAuth: true, requiresDivisionDirector: true },
+            meta: {
+              requiresAuth: true, requiresDivisionDirector: true,
+              allowMonthNav: false
+            },
           },
           {
             path: 'fiscal',
             name: 'fiscal-approve-expenses',
             component: () => import('src/pages/purchases/FiscalApprove.vue'),
-            meta: { requiresAuth: true, requiresFiscal: true },
+            meta: {
+              requiresAuth: true, requiresFiscal: true, allowMonthNav: true
+            },
           },
           {
-            path: 'fiscal/:employeePK',
+            path: 'fiscal/:expenseMonthPK',
             name: 'fiscal-approve-expenses-detail',
             component: () => {
               return import('src/pages/purchases/FiscalApproveDetail.vue')
             },
-            meta: { requiresAuth: true, requiresFiscal: true },
+            meta: {
+              requiresAuth: true, requiresFiscal: true, allowMonthNav: false
+            },
           },
         ]
       },
@@ -479,7 +495,7 @@ const routes: RouteRecordRaw[] = [
         }
       },
       {
-        path: 'expenses/fiscal/:employeePK',
+        path: 'expenses/fiscal/:expenseMonthPK',
         name: 'expense-month-print',
         component: () => {
           return import('src/pages/purchases/FiscalApproveDetail.vue')

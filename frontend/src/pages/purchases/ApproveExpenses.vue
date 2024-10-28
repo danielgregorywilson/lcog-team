@@ -7,165 +7,190 @@
       color="primary"
       size="xl"
     />
-    <q-table
-      v-else
-      flat bordered
-      :title="tableTitleDisplay()"
-      :rows="selectedMonthExpenseGLs()"
-      :columns="columns"
-      :dense="$q.screen.lt.lg"
-      :grid="$q.screen.lt.md"
-      row-key="name"
-      binary-state-sort
-      :pagination="pagination"
-      class="expense-table"
-      no-data-label="No expenses entered this month"
-    >
-      <template v-slot:body-cell-expense_name="props">
-        <q-td key="expense_name" :props="props" style="white-space: normal;">
-          {{ props.row.expense_name }}
-        </q-td>
-      </template>
-      <template v-slot:body-cell-expense_date="props">
-        <q-td key="expense_date" :props="props">
-          {{ readableDateNEW(props.row.expense_date) }}
-        </q-td>
-      </template>
-      <template v-slot:body-cell-expense_vendor="props">
-        <q-td key="expense_vendor" :props="props" style="white-space: normal;">
-          {{ props.row.expense_vendor }}
-        </q-td>
-      </template>
-      <template v-slot:body-cell-gl="props">
-        <q-td key="gl" :props="props">
-          {{ props.row.code }}: ${{ props.row.amount }}
-        </q-td>
-      </template>
-      <template v-slot:body-cell-receipt="props">
-        <q-td key="receipt" :props="props">
-          <DocumentViewer
-            v-if="props.row.expense_receipt"
-            :documentUrl="props.row.expense_receipt"
-            iconButton
-            flat
-          />
-        </q-td>
-      </template>
-      <template v-slot:body-cell-note="props">
-        <q-td key="em_note" :props="props">
-          <q-icon v-if="props.row.em_note" name="note" size="md">
-            <q-tooltip class="text-body2 bg-info text-black">
-              {{ props.row.em_note }}
-            </q-tooltip>
-          </q-icon>
-        </q-td>
-      </template>
-      <template v-slot:body-cell-approve="props">
-        <q-td :props="props" style="min-width: 100px;">
-          <div class="row justify-center">
-            {{ props.row.status }}
-            <q-btn 
-              dense round color="red" icon="close"
-              :outline="!props.row.approved_at ||
-                (props.row.approved_at && props.row.approved)"
-              :disable="!canApprove ||
-                (props.row.approved_at && !props.row.approved)"
-              class="q-mr-sm"
-              @click="openDenyGLDialog(
-                props.row.pk,
-                props.row.expense_name,
-                props.row.expense_purchaser
-              )"
+    <div v-else>
+      <div v-if="largeExpense()" class="text-h6 text-warning">
+        Take Note! Expense of $1000 or more
+      </div>
+      <q-table
+        flat bordered
+        :title="tableTitleDisplay()"
+        :rows="selectedMonthExpenseGLs()"
+        :columns="columns"
+        :dense="$q.screen.lt.lg"
+        :grid="$q.screen.lt.md"
+        row-key="name"
+        binary-state-sort
+        :pagination="pagination"
+        class="expense-table"
+        no-data-label="No expenses entered this month"
+      >
+        <template v-slot:body-cell-expense_name="props">
+          <q-td key="expense_name" :props="props" style="white-space: normal;">
+            {{ props.row.expense_name }}
+          </q-td>
+        </template>
+        <template v-slot:body-cell-expense_date="props">
+          <q-td key="expense_date" :props="props">
+            {{ readableDateNEW(props.row.expense_date) }}
+          </q-td>
+        </template>
+        <template v-slot:body-cell-expense_vendor="props">
+          <q-td
+            key="expense_vendor"
+            :props="props"
+            style="white-space: normal;"
+          >
+            {{ props.row.expense_vendor }}
+          </q-td>
+        </template>
+        <template v-slot:body-cell-expense_amount="props">
+          <q-td
+            key="expense_amount"
+            :props="props"
+            style="white-space: normal;"
+            :class="props.row.amount >= 1000 ? 'bg-yellow' : ''"
+          >
+            ${{ props.row.amount }}
+          </q-td>
+        </template>
+        <template v-slot:body-cell-gl="props">
+          <q-td key="gl" :props="props">
+            {{ props.row.code }}: ${{ props.row.amount }}
+          </q-td>
+        </template>
+        <template v-slot:body-cell-receipt="props">
+          <q-td key="receipt" :props="props">
+            <DocumentViewer
+              v-if="props.row.expense_receipt"
+              :documentUrl="props.row.expense_receipt"
+              iconButton
+              flat
             />
-            <q-btn
-              dense round color="green" icon="check"
-              :outline="!props.row.approved_at ||
-                (props.row.approved_at && !props.row.approved)"
-              :disable="!canApprove ||
-                (props.row.approved_at && props.row.approved)"
-              @click="approveGL(props.row.pk, true)"
-            />
-          </div>
-        </q-td>
-      </template>
-      <!-- GRID MODE -->
-      <template v-slot:item="props">
-        <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
-          <q-card class="q-py-sm">
-            <q-list dense>
-              <q-item v-for="col in props.cols" :key="col.name">
-                <div class="q-table__grid-item-row">
-                  <div class="q-table__grid-item-title">{{ col.label }}</div>
-                  <div
-                    class="q-table__grid-item-value"
-                    v-if="col.label == 'Purchaser'"
-                  >
-                    {{ col.value.name }}
-                  </div>
-                  <div
-                    class="q-table__grid-item-value"
-                    v-else-if="col.label == 'Date'"
-                  >
-                    {{ readableDateNEW(col.value) }}
-                  </div>
-                  <div
-                    class="q-table__grid-item-value"
-                    v-else-if="col.label == 'GL Codes'"
-                  >
+          </q-td>
+        </template>
+        <template v-slot:body-cell-note="props">
+          <q-td key="em_note" :props="props">
+            <q-icon v-if="props.row.em_note" name="note" size="md">
+              <q-tooltip class="text-body2 bg-info text-black">
+                {{ props.row.em_note }}
+              </q-tooltip>
+            </q-icon>
+          </q-td>
+        </template>
+        <template v-slot:body-cell-approve="props">
+          <q-td :props="props" style="min-width: 100px;">
+            <div class="row justify-center">
+              {{ props.row.status }}
+              <q-btn 
+                dense round color="red" icon="close"
+                :outline="!props.row.approved_at ||
+                  (props.row.approved_at && props.row.approved)"
+                :disable="!canApprove ||
+                  (props.row.approved_at && !props.row.approved)"
+                class="q-mr-sm"
+                @click="openDenyGLDialog(
+                  props.row.pk,
+                  props.row.expense_name,
+                  props.row.expense_purchaser
+                )"
+              />
+              <q-btn
+                dense round color="green" icon="check"
+                :outline="!props.row.approved_at ||
+                  (props.row.approved_at && !props.row.approved)"
+                :disable="!canApprove ||
+                  (props.row.approved_at && props.row.approved)"
+                @click="approveGL(props.row.pk, true)"
+              />
+            </div>
+          </q-td>
+        </template>
+        <!-- GRID MODE -->
+        <template v-slot:item="props">
+          <div class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3">
+            <q-card class="q-py-sm">
+              <q-list dense>
+                <q-item v-for="col in props.cols" :key="col.name">
+                  <div class="q-table__grid-item-row">
+                    <div class="q-table__grid-item-title">{{ col.label }}</div>
                     <div
-                      class="text-pre-wrap"
-                      v-for="gl in props.row.gls"
-                      :key="props.row.gls.indexOf(gl)"
+                      class="q-table__grid-item-value"
+                      v-if="col.label == 'Purchaser'"
                     >
-                      {{ gl.gl }}: ${{ gl.amount }}
+                      {{ col.value.name }}
+                    </div>
+                    <div
+                      class="q-table__grid-item-value"
+                      v-else-if="col.label == 'Date'"
+                    >
+                      {{ readableDateNEW(col.value) }}
+                    </div>
+                    <div
+                      class="q-table__grid-item-value"
+                      v-else-if="col.label == 'Amount'"
+                      :class="props.row.amount >= 1000 ? 'bg-yellow' : ''"
+                    >
+                      ${{ col.value }}
+                    </div>
+                    <div
+                      class="q-table__grid-item-value"
+                      v-else-if="col.label == 'GL Codes'"
+                    >
+                      <div
+                        class="text-pre-wrap"
+                        v-for="gl in props.row.gls"
+                        :key="props.row.gls.indexOf(gl)"
+                      >
+                        {{ gl.gl }}: ${{ gl.amount }}
+                      </div>
+                    </div>
+                    <div
+                      class="q-table__grid-item-value"
+                      v-else-if="col.label == 'Receipt'"
+                    >
+                      <DocumentViewer
+                        v-if="col.value"
+                        :documentUrl="col.value"
+                        :iconButton="true"
+                      />
+                    </div>
+                    <div
+                      v-else-if="col.label == 'Approve?'"  
+                      class="q-table__grid-item-value row q-gutter-sm"  
+                    >
+                      <q-btn 
+                        dense round color="red" icon="close"
+                        :outline="!props.row.approved_at ||
+                          (props.row.approved_at && props.row.approved)"
+                        :disable="!canApprove ||
+                          (props.row.approved_at && !props.row.approved)"
+                        class="q-mr-sm"
+                        @click="openDenyGLDialog(
+                          props.row.pk,
+                          props.row.expense_name,
+                          props.row.expense_purchaser
+                        )"
+                      />
+                      <q-btn
+                        dense round color="green" icon="check"
+                        :outline="!props.row.approved_at ||
+                          (props.row.approved_at && !props.row.approved)"
+                        :disable="!canApprove ||
+                          (props.row.approved_at && props.row.approved)"
+                        @click="approveGL(props.row.pk, true)"
+                      />
+                    </div>
+                    <div class="q-table__grid-item-value" v-else>
+                      {{ col.value }}
                     </div>
                   </div>
-                  <div
-                    class="q-table__grid-item-value"
-                    v-else-if="col.label == 'Receipt'"
-                  >
-                    <DocumentViewer
-                      v-if="col.value"
-                      :documentUrl="col.value"
-                      :iconButton="true"
-                    />
-                  </div>
-                  <div
-                    v-else-if="col.label == 'Approve?'"  
-                    class="q-table__grid-item-value row q-gutter-sm"  
-                  >
-                    <q-btn 
-                      dense round color="red" icon="close"
-                      :outline="!props.row.approved_at ||
-                        (props.row.approved_at && props.row.approved)"
-                      :disable="!canApprove ||
-                        (props.row.approved_at && !props.row.approved)"
-                      class="q-mr-sm"
-                      @click="openDenyGLDialog(
-                        props.row.pk,
-                        props.row.expense_name,
-                        props.row.expense_purchaser
-                      )"
-                    />
-                    <q-btn
-                      dense round color="green" icon="check"
-                      :outline="!props.row.approved_at ||
-                        (props.row.approved_at && !props.row.approved)"
-                      :disable="!canApprove ||
-                        (props.row.approved_at && props.row.approved)"
-                      @click="approveGL(props.row.pk, true)"
-                    />
-                  </div>
-                  <div class="q-table__grid-item-value" v-else>
-                    {{ col.value }}
-                  </div>
-                </div>
-              </q-item>
-            </q-list>
-          </q-card>
-        </div>
-      </template>
-    </q-table>
+                </q-item>
+              </q-list>
+            </q-card>
+          </div>
+        </template>
+      </q-table>
+    </div>
   </div>
 
   <!-- Deny ExpenseGL Dialog -->
@@ -272,6 +297,10 @@ function viewingThisMonth() {
 function expensesLoaded() {
   return (viewingThisMonth() && thisMonthLoaded.value) ||
     allExpensesLoaded.value
+}
+
+function largeExpense() {
+  return selectedMonthExpenseGLs().some(gl => parseFloat(gl.amount) >= 1000)
 }
 
 function tableTitleDisplay(): string {

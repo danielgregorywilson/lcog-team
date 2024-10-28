@@ -51,7 +51,7 @@ class ExpenseAdmin(admin.ModelAdmin):
 @admin.register(ExpenseMonth)
 class ExpenseMonthAdmin(admin.ModelAdmin):
     list_display = (
-        'id', 'purchaser', 'year', 'month', 'status'
+        'id', 'purchaser', 'year', 'month', 'card', 'status'
     )
     list_filter = ('year', 'status',)
 

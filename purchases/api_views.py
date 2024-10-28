@@ -205,8 +205,8 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             expense_fields_changed = False
             if (
                 expense.name != request.data.get('name') or
-                expense.date != request.data.get('date') or
-                expense.amount != request.data.get('amount') or
+                str(expense.date) != request.data.get('date') or
+                str(expense.amount) != request.data.get('amount') or
                 expense.vendor != request.data.get('vendor') or
                 expense.job != request.data.get('job')
             ):

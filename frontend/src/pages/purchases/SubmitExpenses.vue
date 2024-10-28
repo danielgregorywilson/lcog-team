@@ -164,7 +164,7 @@
                     props.row.amount = parseFloat(val).toFixed(2).toString()
                   }"
                   @save="(val) => {
-                    updateExpense(props.row.pk, 'amount', props.row.amount)
+                    updateExpense(props.row.pk, 'amount', val)
                   }"
                 >
                   <div class="row items-center">  

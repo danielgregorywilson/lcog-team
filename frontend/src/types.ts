@@ -400,6 +400,7 @@ export interface Expense extends ExpenseBase {
 }
 
 export interface ExpenseCreate {
+  em_pk: number
   name?: string
   date?: string
   job?: string

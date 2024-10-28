@@ -161,7 +161,7 @@ class Expense(ExpenseBaseModel):
 class ExpenseMonth(ExpenseBaseModel):
     class Meta:
         ordering = ["pk",]
-        unique_together = ['purchaser', 'month', 'year']
+        unique_together = ['purchaser', 'month', 'year', 'card']
 
     def __str__(self):
         return f'{self.month}/{self.year} for {self.purchaser}'

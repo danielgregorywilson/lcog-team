@@ -1,10 +1,12 @@
 from datetime import datetime, timedelta, timezone
 import json
+import traceback
 
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext as _
 
+from mainsite.helpers import record_error
 from mainsite.models import ActiveManager, InactiveManager, LANGUAGE_CHOICES
 from people.middleware import get_current_employee
 from people.models import Employee, JobTitle, UnitOrProgram
@@ -649,7 +651,9 @@ class Step(models.Model):
                         step=current_step
                     ).first()
                     if not step_choice:
-                        raise Exception("Couldn't find a next step.")
+                        m = "Couldn't find a next step."
+                        record_error(m, None, None, traceback.format_exc())
+                        raise Exception(m)
                     current_step = step_choice.next_step
                 num_steps += 1
         return num_steps

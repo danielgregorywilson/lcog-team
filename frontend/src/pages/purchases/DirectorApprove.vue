@@ -24,10 +24,10 @@
             :props="props"
             :no-hover="!expenseMonthManagerApproved(props.row)"
             class="cursor-pointer"
-            @click="navigateToDetail(props.row.purchaser.pk)"
+            @click="navigateToDetail(props.row.pk)"
           >
             <q-td key="employee" :props="props">
-              {{ props.row.purchaser.name }}
+              {{ props.row.purchaser.name }} - {{  props.row.card.display }}
             </q-td>
             <q-td key="status" :props="props">
               <q-linear-progress
@@ -232,11 +232,11 @@ function retrieveAllEMs(): Promise<void> {
   })
 }
 
-function navigateToDetail(employeePk: number) {
+function navigateToDetail(expenseMonthPK: number) {
   router.push({
     name: 'director-approve-expenses-detail',
     params: {
-      employeePK: employeePk.toString()
+      expenseMonthPK: expenseMonthPK.toString()
     }
   })
   .catch(e => {

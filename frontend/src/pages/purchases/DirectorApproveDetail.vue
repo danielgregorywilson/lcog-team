@@ -32,7 +32,7 @@
   
   <!-- Expense Months -->
   <q-spinner-grid
-    v-if="!expensesLoaded()"
+    v-if="!thisMonthLoaded"
     class="spinner"
     color="primary"
     size="xl"
@@ -44,6 +44,9 @@
         Submitted Total: ${{ expenseMonthTotal(em) }}
       </div>
       <div class="q-mt-sm">
+        <div v-if="largeExpense(em)" class="text-h6 text-warning">
+          Take Note! Expense of $1000 or more
+        </div>
         <q-table
           flat bordered
           :title="tableTitleDisplay(em)"
@@ -70,6 +73,16 @@
           <template v-slot:body-cell-vendor="props">
             <q-td key="vendor" :props="props" style="white-space: normal;">
               {{ props.row.vendor }}
+            </q-td>
+          </template>
+          <template v-slot:body-cell-amount="props">
+            <q-td
+              key="expense_amount"
+              :props="props"
+              style="white-space: normal;"
+              :class="props.row.amount >= 1000 ? 'bg-yellow' : ''"
+            >
+              ${{ props.row.amount }}
             </q-td>
           </template>
           <template v-slot:body-cell-gls="props">
@@ -114,6 +127,13 @@
                         v-if="col.label == 'Date'"
                       >
                         {{ readableDateNEW(col.value) }}
+                      </div>
+                      <div
+                        class="q-table__grid-item-value"
+                        v-if="col.label == 'Amount'"
+                        :class="props.row.amount >= 1000 ? 'bg-yellow' : ''"
+                      >
+                        ${{ col.value }}
                       </div>
                       <div
                         class="q-table__grid-item-value"
@@ -192,10 +212,7 @@
       </div>
     </div>
   </div>
-  <div v-else class="text-h5">
-    No expenses entered by {{ routeEmployeeName }} in
-    {{ purchaseStore.monthDisplay }}
-  </div>
+  <div v-else class="text-h5">No such expense month.</div>
 
   <!-- Approve Dialog -->
   <q-dialog v-model="showApproveDialog">
@@ -271,7 +288,6 @@ import DocumentViewer from 'src/components/DocumentViewer.vue'
 import StatementTable from 'src/components/purchases/StatementTable.vue'
 import { readableDateNEW, readableDateTime } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
-import { usePeopleStore } from 'src/stores/people'
 import { usePurchaseStore } from 'src/stores/purchase'
 import { ExpenseCard, ExpenseMonth, ExpenseStatement } from 'src/types'
 import { getRouteParam } from 'src/utils'
@@ -279,7 +295,6 @@ import { getRouteParam } from 'src/utils'
 
 const route = useRoute()
 const quasar = useQuasar()
-const peopleStore = usePeopleStore()
 const purchaseStore = usePurchaseStore()
 
 let emToApprovePK = ref(-1)
@@ -291,20 +306,12 @@ let denyDialogMessage = ref('')
 let card = ref(null) as Ref<ExpenseCard | null>
 let statement = ref(null) as Ref<ExpenseStatement | null>
 
-let routeEmployeePK = ref(-1)
-let routeEmployeeName = ref('')
-
+let expenseMonthPK = ref(-1)
 let thisMonthLoaded = ref(false)
-let allExpensesLoaded = ref(false)
 
 function viewingThisMonth() {
   return purchaseStore.firstOfSelectedMonth.getTime() ===
     purchaseStore.firstOfThisMonth.getTime()
-}
-
-function expensesLoaded() {
-  return (viewingThisMonth() && thisMonthLoaded.value) ||
-    allExpensesLoaded.value
 }
 
 const pagination = {
@@ -351,7 +358,7 @@ function selectedMonthCardExpenseMonths(): Array<ExpenseMonth> {
   let ems: Array<ExpenseMonth> = []
   if (allEMs.length) {
     const selectedEmployeeEM = allEMs.filter(em => {
-      return em.purchaser.pk === routeEmployeePK.value
+      return em.pk === expenseMonthPK.value
     })[0]
     if (selectedEmployeeEM) {
       currentCard = selectedEmployeeEM.card
@@ -363,21 +370,7 @@ function selectedMonthCardExpenseMonths(): Array<ExpenseMonth> {
   }
   card.value = currentCard
   statement.value = currentStatement
-  if (!ems.length) {
-    setEmployeeName()
-  }
   return ems
-}
-
-function setEmployeeName() {
-  if (routeEmployeePK.value == -1) {
-    return
-  }
-  peopleStore.getSimpleEmployeeDetail(
-    { pk: routeEmployeePK.value }
-  ).then((employee) => {
-    routeEmployeeName.value = employee.name
-  })
 }
 
 function directorCanApprove(expenseMonth: ExpenseMonth) {
@@ -396,16 +389,16 @@ function EMDenied(em: ExpenseMonth): boolean {
   return !em.director_approved && em.director_approved_at != null
 }
 
-function retrieveThisMonthEmployeeExpenses(): Promise<void> {
+function retrieveExpenseMonthCardExpenseMonths(): Promise<void> {
   return new Promise((resolve, reject) => {
-    const employeePK = routeEmployeePK.value
-    if (!employeePK) {
+    if (!expenseMonthPK.value) {
       return
     }
     purchaseStore.getDirectorExpenseMonths(
-      purchaseStore.yearInt, purchaseStore.monthInt, employeePK
+      null, null, expenseMonthPK.value
     )
-      .then(() => {
+      .then((ems) => {
+        purchaseStore.setMonth(ems[0].month, ems[0].year)
         thisMonthLoaded.value = true
         resolve()
       })
@@ -414,20 +407,6 @@ function retrieveThisMonthEmployeeExpenses(): Promise<void> {
         reject()
       })
   })
-}
-
-function retrieveAllEmployeeExpenses() {
-  const employeePK = routeEmployeePK.value
-  if (!employeePK) {
-    return
-  }
-  purchaseStore.getDirectorExpenseMonths(null, null, employeePK)
-    .then(() => {
-      allExpensesLoaded.value = true
-    })
-    .catch((error) => {
-      console.log('Error retrieving expenses', error)
-    })
 }
 
 function onShowApproveDialog(em: ExpenseMonth) {
@@ -453,7 +432,7 @@ function onSubmitApproveDialog() {
   } else {
     purchaseStore.directorApproveExpenseMonth(emToApprovePK.value, true)
       .then(() => {
-        retrieveAllEmployeeExpenses()
+        retrieveExpenseMonthCardExpenseMonths()
         showApproveDialog.value = false
         quasar.notify({
           message: 'Approved',
@@ -484,7 +463,7 @@ function onSubmitDenyDialog() {
       emToApprovePK.value, false, denyDialogMessage.value
     )
       .then(() => {
-        retrieveAllEmployeeExpenses()
+        retrieveExpenseMonthCardExpenseMonths()
         showDenyDialog.value = false
         denyDialogMessage.value = ''
         quasar.notify({
@@ -507,6 +486,10 @@ function expenseMonthTotal(em: ExpenseMonth) {
   return em.expenses.reduce(
     (acc, expense) => acc + parseFloat(expense.amount), 0
   ).toFixed(2)
+}
+
+function largeExpense(em: ExpenseMonth) {
+  return em.expenses.some(expense => parseFloat(expense.amount) >= 1000)
 }
 
 function expensesTotal() {
@@ -539,11 +522,9 @@ function expensesMatchStatment(): boolean {
 }
 
 onMounted(() => {
-  const employeePK = getRouteParam(route, 'employeePK')
-  routeEmployeePK.value = parseInt(employeePK ? employeePK : '-1')
-  retrieveThisMonthEmployeeExpenses().then(() => {
-    retrieveAllEmployeeExpenses()
-  })
+  const pk = getRouteParam(route, 'expenseMonthPK')
+  expenseMonthPK.value = parseInt(pk ? pk : '-1')
+  retrieveExpenseMonthCardExpenseMonths()
 })
 
 </script>

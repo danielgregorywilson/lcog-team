@@ -269,7 +269,7 @@
                     </div>
                     <div class="row justify-center q-mt-sm">
                       <q-btn class="col-6" @click="scope.value.push(
-                        {code: '', amount: 0, approver: emptyEmployee}
+                        {code: '', amount: '', approver: emptyEmployee}
                       )">
                         Add a GL
                       </q-btn>
@@ -692,7 +692,6 @@ import {
   SimpleEmployeeRetrieve 
 } from 'src/types'
 
-
 const quasar = useQuasar()
 const purchaseStore = usePurchaseStore()
 
@@ -849,7 +848,11 @@ function largeExpense() {
 
 function expensesTotal() {
   return selectedMonthExpenses().reduce(
-    (acc, exp) => acc + parseFloat(exp.amount), 0
+    (acc, exp) => {
+      const amt = exp.amount ? parseFloat(exp.amount) : 0
+      return acc + amt
+    },
+    0
   ).toFixed(2)
 }
 
@@ -940,7 +943,7 @@ function formErrorItems() {
     if (!exp.name) {
       errorItems.push(`Provide a name for the expense on ${exp.date}`)
     }
-    if (parseFloat(exp.amount) == 0) {
+    if (!exp.amount || parseFloat(exp.amount) == 0) {
       errorItems.push(
         `Provide an amount for ${exp.name}`
       )

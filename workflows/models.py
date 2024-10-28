@@ -1,10 +1,12 @@
 from datetime import datetime, timedelta, timezone
 import json
+import traceback
 
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext as _
 
+from mainsite.helpers import record_error
 from mainsite.models import ActiveManager, InactiveManager, LANGUAGE_CHOICES
 from people.middleware import get_current_employee
 from people.models import Employee, JobTitle, UnitOrProgram
@@ -255,7 +257,6 @@ class EmployeeTransition(models.Model):
     computer_gl = models.CharField(max_length=30, blank=True)
     computer_description = models.CharField(max_length=200, blank=True)
     phone_number = models.CharField(max_length=20, blank=True)
-    desk_phone = models.BooleanField(default=False)
     phone_request = models.CharField(
         max_length=30, choices=PHONE_REQUEST_CHOICES, blank=True
     )
@@ -272,6 +273,7 @@ class EmployeeTransition(models.Model):
     business_cards = models.BooleanField(default=False)
     prox_card_needed = models.BooleanField(default=False)
     prox_card_returned = models.BooleanField(default=False)
+    mailbox_needed = models.BooleanField(default=False)
     access_emails = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name="access_emails_after_transitions"
@@ -649,7 +651,9 @@ class Step(models.Model):
                         step=current_step
                     ).first()
                     if not step_choice:
-                        raise Exception("Couldn't find a next step.")
+                        m = "Couldn't find a next step."
+                        record_error(m, None, None, traceback.format_exc())
+                        raise Exception(m)
                     current_step = step_choice.next_step
                 num_steps += 1
         return num_steps
@@ -820,8 +824,18 @@ class StepInstance(HasTimeStampsMixin):
                 completed_at__isnull=True
             ).exists()
         else:
-            # If there is no next step, we can undo
-            return True
+            choices = self.step.next_step_choices.all()
+            if choices.count():
+                # If there are next step choices, we can undo if none of the
+                # next steps are complete
+                return StepInstance.objects.filter(
+                    step__in=[choice.next_step for choice in choices],
+                    process_instance=self.process_instance,
+                    completed_at__isnull=False
+                ).count() == 0
+            else:
+                # If there is no next step, we can undo
+                return True
 
     #TODO: Complete method fills completed_at, completed_by, and current_step_instance and completed_at on Workflow instance. This is currently done in the view, but maybe it should be here?
 

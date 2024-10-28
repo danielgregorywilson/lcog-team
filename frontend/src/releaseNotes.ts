@@ -4,6 +4,30 @@
 
 export const releases = [
   {
+    version: '0.39.0',
+    date: new Date(2024, 9, 28),
+    changes: [
+      {
+        type: 'new',
+        description: 'Credit card submitters can now submit to multiple cards.'
+      }
+    ]
+  },
+  {
+    version: '0.38.0',
+    date: new Date(2024, 9, 22),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Improvements to process completion.'
+      },
+      {
+        type: 'improved',
+        description: 'Updates to employee transition forms.'
+      }
+    ]
+  },
+  {
     version: '0.37.1',
     date: new Date(2024, 8, 27),
     changes: [

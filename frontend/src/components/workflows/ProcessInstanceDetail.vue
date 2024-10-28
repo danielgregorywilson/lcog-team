@@ -28,9 +28,9 @@
           {{ formatDate(si.completed_at, 'dddd, M/D/YY [at] HH:MM') }}
         </div>
         <q-stepper-navigation v-if="stepInstanceIsComplete(si)">
-          <div v-if="si.undo_completion_possible">
+          <div v-if="canUndoStepCompletion(si) && si.undo_completion_possible">
             <q-btn
-              :disable="!canUndoStepCompletion(si) || disableCompletions"
+              :disable="disableCompletions"
               @click="undoStepCompletion(si.pk)"
               color="warning"
               label="Undo Completion"
@@ -38,33 +38,38 @@
           </div>
         </q-stepper-navigation>
         <q-stepper-navigation v-else>
-          <div v-if="si.step.next_step">
-            <q-btn
-              :disable="!canCompleteStepInstance(si) || disableCompletions"
-              @click="completeStep(si.pk)"
-              color="primary"
-              label="Mark as Complete"
-            >
-              <q-badge
-                v-if="pi.action_required" color="orange" rounded floating
-              />
-            </q-btn>
+          <div v-if="canCompleteStepInstance(si)">
+            <div v-if="si.step.next_step">
+              <q-btn
+                :disable="disableCompletions"
+                @click="completeStep(si.pk)"
+                color="primary"
+                label="Mark as Complete"
+              >
+                <q-badge
+                  v-if="pi.action_required" color="orange" rounded floating
+                />
+              </q-btn>
+            </div>
+            <div v-else>
+              {{si.step.choices_prompt}}
+              <q-btn
+                v-for="choice of si.step.next_step_choices"
+                class="q-ml-sm"
+                :key="choice.pk"
+                @click="completeStep(si.pk, choice.next_step_pk)"
+                color="primary"
+                :label="choice.choice_text"
+                :disable="disableCompletions"
+              >
+                <q-badge
+                  v-if="pi.action_required" color="orange" rounded floating
+                />
+              </q-btn>
+            </div>
           </div>
-          <div v-else>
-            {{si.step.choices_prompt}}
-            <q-btn
-              v-for="choice of si.step.next_step_choices"
-              class="q-ml-sm"
-              :key="choice.pk"
-              @click="completeStep(si.pk, choice.next_step_pk)"
-              color="primary"
-              :label="choice.choice_text"
-              :disable="!canCompleteStepInstance(si) || disableCompletions"
-            >
-              <q-badge
-                v-if="pi.action_required" color="orange" rounded floating
-              />
-            </q-btn>
+          <div v-else-if="si.step.role">
+            Assigned to: {{ si.step.role?.member_names.join(', ') }}
           </div>
         </q-stepper-navigation>
       </q-step>
@@ -114,14 +119,7 @@ function stepInstanceIsComplete(stepInstance: StepInstance): boolean {
 
 function userMayCompleteStepInstance(stepInstance: StepInstance): boolean {
   const step = stepInstance.step
-  if (userStore.getEmployeeProfile.is_all_workflows_admin) {
-    // If they are an All-Workflows-Admin, allow completion
-    return true
-  } else if (step.workflow_role_pk) {
-    // If they are an admin of the workflow, allow completion
-    return userStore.getEmployeeProfile.workflow_roles
-      .indexOf(step.workflow_role_pk) != -1
-  } else if (step.process_role_pk) {
+  if (step.process_role_pk) {
     // If they are an admin of the process, allow completion
     return userStore.getEmployeeProfile.workflow_roles
       .indexOf(step.process_role_pk) != -1
@@ -132,7 +130,7 @@ function userMayCompleteStepInstance(stepInstance: StepInstance): boolean {
   } else {
     // TODO: What should happen if no role assigned? Only admins? Everyone?
     // Require all steps to have roles?
-    return true
+    return false
   }
 }
 

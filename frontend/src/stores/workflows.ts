@@ -19,6 +19,14 @@ export const useWorkflowsStore = defineStore('workflows', {
       return state.currentWorkflowInstance.transition ||
         {} as EmployeeTransition
     },
+    currentPIs: state => {
+      const pis = state.currentWorkflowInstance.process_instances || []
+      return pis.sort((a, b) => {
+        // Sort PIs with action_required first
+        return a.action_required == b.action_required ? 0 :
+          a.action_required ? -1 : 1
+      })
+    },
     processInstanceCurrentStepPks: state => {
       const d: {[pk: number]: number} = {}
       if (!state.currentWorkflowInstance.pk) {
@@ -197,7 +205,7 @@ export const useWorkflowsStore = defineStore('workflows', {
       return new Promise((resolve, reject) => {
         axios({
           url: `${ apiURL }api/v1/stepinstance/${ stepInstancePk }`,
-          data: {action: 'undo', stepInstancePk, nextStepInstancePk},
+          data: { action: 'undo', stepInstancePk, nextStepInstancePk },
           method: 'PATCH'
         })
           .then(resp => {
@@ -227,13 +235,13 @@ export const useWorkflowsStore = defineStore('workflows', {
           })
       })
     },
-    sendGasPINNotificationEmail(pk: string, data: {
+    sendMailboxNotificationEmail(pk: string, data: {
       senderName: string, senderEmail: string, transitionUrl: string
     }): Promise<boolean> {
       return new Promise((resolve, reject) => {
         axios({
           url: `${ apiURL }api/v1/employeetransition/${ pk }` +
-            '/send_gas_pin_notification_email',
+            '/send_mailbox_notification_email',
           data,
           method: 'POST'
         })
@@ -242,7 +250,7 @@ export const useWorkflowsStore = defineStore('workflows', {
           })
           .catch(e => {
             handlePromiseError(
-              reject, 'Error sending gas PIN notification email', e
+              reject, 'Error sending mailbox notification email', e
             )
           })
       })

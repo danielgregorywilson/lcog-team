@@ -531,7 +531,10 @@ function navigateToPrintView() {
 
 function expenseMonthTotal(em: ExpenseMonth) {
   return em.expenses.reduce(
-    (acc, expense) => acc + parseFloat(expense.amount), 0
+    (acc, expense) => {
+      const amt = expense.amount ? parseFloat(expense.amount) : 0
+      return acc + amt
+    }, 0
   ).toFixed(2)
 }
 
@@ -543,7 +546,10 @@ function expensesTotal() {
   let total = 0
   for (let em of selectedMonthCardExpenseMonths()) {
     total += em.expenses.reduce(
-      (acc, expense) => acc + parseFloat(expense.amount), 0
+      (acc, expense) => {
+        const amt = expense.amount ? parseFloat(expense.amount) : 0
+        return acc + amt
+      }, 0
     )
   }
   return total.toFixed(2)

@@ -153,7 +153,7 @@ def send_submitter_denial_notification(submitter: Employee):
 
 
 def send_approver_weekly_approve_reminders():
-    # Every week on Friday at 3PM
+    # Every week on Monday, Wednesday, and Friday at 3PM
     # Approver has GLs to approve
     current_site = Site.objects.get_current()
     expenses_url = current_site.domain + '/expenses/approve'

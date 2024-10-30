@@ -160,7 +160,6 @@ function completeStep(
     .then(() => {
       setCurrentStepInstance()
       bus.emit('completedStep', Math.random())
-      disableCompletions.value = false
     })
     .catch(e => {
       console.error('Error completing step instance', e)
@@ -176,7 +175,6 @@ function undoStepCompletion(stepInstancePk: number): void {
     .then(() => {
       setCurrentStepInstance()
       bus.emit('completedStep', Math.random())
-      disableCompletions.value = false
     })
     .catch(e => {
       console.error('Error undoing step instance completion', e)
@@ -187,6 +185,11 @@ function undoStepCompletion(stepInstancePk: number): void {
 // we complete a step and reload it.
 watch(() => bus.bus.value.get('updateProcessInstances'), () => {
   setCurrentStepInstance()
+})
+
+// Wait until the WFI is retrieved before allowing clicking more buttons
+watch(() => bus.bus.value.get('workflowInstanceRetrieved'), () => {
+  disableCompletions.value = false
 })
 
 onMounted(() => {

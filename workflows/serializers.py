@@ -21,13 +21,19 @@ class RoleSerializer(serializers.HyperlinkedModelSerializer):
 
 class StepChoiceSerializer(serializers.HyperlinkedModelSerializer):
     next_step_pk = serializers.IntegerField(source="next_step.pk")
+    trigger_processes_pks = serializers.SerializerMethodField()
     
     class Meta:
         model = StepChoice
         fields = '__all__'
         fields = [
-            'pk', 'order', 'choice_text', 'step', 'next_step', 'next_step_pk'
+            'pk', 'order', 'choice_text', 'step', 'next_step', 'next_step_pk',
+            'trigger_processes_pks'
         ]
+
+    @staticmethod
+    def get_trigger_processes_pks(stepchoice):
+        return [process.pk for process in stepchoice.trigger_processes.all()]
 
 
 class ActionSerializer(serializers.HyperlinkedModelSerializer):

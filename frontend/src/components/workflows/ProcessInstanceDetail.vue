@@ -57,7 +57,9 @@
                 v-for="choice of si.step.next_step_choices"
                 class="q-ml-sm"
                 :key="choice.pk"
-                @click="completeStep(si.pk, choice.next_step_pk)"
+                @click="completeStep(
+                  si.pk, choice.next_step_pk, choice.trigger_processes_pks
+                )"
                 color="primary"
                 :label="choice.choice_text"
                 :disable="disableCompletions"
@@ -148,9 +150,13 @@ function canUndoStepCompletion(stepInstance: StepInstance): boolean {
   return userMayCompleteStepInstance(stepInstance)
 }
 
-function completeStep(stepInstancePk: number, nextStepPk?: number): void {
+function completeStep(
+  stepInstancePk: number, nextStepPk?: number, triggerProcessesPks?: number[]
+): void {
   disableCompletions.value = true
-  workflowsStore.completeStepInstance(stepInstancePk, nextStepPk)
+  workflowsStore.completeStepInstance(
+    stepInstancePk, nextStepPk, triggerProcessesPks
+  )
     .then(() => {
       setCurrentStepInstance()
       bus.emit('completedStep', Math.random())

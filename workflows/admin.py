@@ -126,14 +126,14 @@ class StepInline(admin.TabularInline):
         for idx, choice in enumerate(
             instance.next_step_choices.all().order_by('order')
         ):
+            triggered_processes = choice.trigger_processes.all()
             if idx != 0:
                 choices_text += " / "
             choices_text += choice.choice_text + ": " + \
-                str(choice.next_step.order) + ' - ' + choice.next_step.name + \
-                ' (' + \
-                ', '.join( # Triggered process
-                    [p.name for p in choice.trigger_processes.all()]
-                ) + ')'
+                str(choice.next_step.order) + ' - ' + choice.next_step.name
+            if triggered_processes.count():
+                choices_text += " -> " + \
+                    ', '.join([p.name for p in triggered_processes])
         return choices_text
 
 

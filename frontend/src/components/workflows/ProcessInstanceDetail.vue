@@ -34,7 +34,9 @@
               @click="undoStepCompletion(si.pk)"
               color="warning"
               label="Undo Completion"
-            />
+            >
+              <q-spinner v-if="disableCompletions" class="q-ml-sm" />
+            </q-btn>
           </div>
         </q-stepper-navigation>
         <q-stepper-navigation v-else>
@@ -46,6 +48,7 @@
                 color="primary"
                 label="Mark as Complete"
               >
+                <q-spinner v-if="disableCompletions" class="q-ml-sm" />
                 <q-badge
                   v-if="pi.action_required" color="orange" rounded floating
                 />
@@ -64,6 +67,7 @@
                 :label="choice.choice_text"
                 :disable="disableCompletions"
               >
+                <q-spinner v-if="disableCompletions" class="q-ml-sm" />
                 <q-badge
                   v-if="pi.action_required" color="orange" rounded floating
                 />

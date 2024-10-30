@@ -129,7 +129,11 @@ class StepInline(admin.TabularInline):
             if idx != 0:
                 choices_text += " / "
             choices_text += choice.choice_text + ": " + \
-                str(choice.next_step.order) + ' - ' + choice.next_step.name
+                str(choice.next_step.order) + ' - ' + choice.next_step.name + \
+                ' (' + \
+                ', '.join( # Triggered process
+                    [p.name for p in choice.trigger_processes.all()]
+                ) + ')'
         return choices_text
 
 

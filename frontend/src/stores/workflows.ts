@@ -182,11 +182,16 @@ export const useWorkflowsStore = defineStore('workflows', {
         })
       })
     },
-    completeStepInstance(stepInstancePk: number, nextStepPk?: number) {
+    completeStepInstance(
+      stepInstancePk: number, nextStepPk?: number,
+      triggerProcessesPks?: number[]
+    ) {
       return new Promise((resolve, reject) => {
         axios({
           url: `${ apiURL }api/v1/stepinstance/${ stepInstancePk }`,
-          data: {action: 'complete', stepInstancePk, nextStepPk},
+          data: {
+            action: 'complete', stepInstancePk, nextStepPk, triggerProcessesPks
+          },
           method: 'PATCH'
         })
           .then(resp => {

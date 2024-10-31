@@ -44,6 +44,9 @@ class HasCreatorMixin(models.Model):
 
 
 class Role(models.Model):
+    class Meta:
+        ordering = ["name"]
+    
     def __str__(self):
         return self.name
 
@@ -492,6 +495,13 @@ class Process(models.Model):
         send_step_completion_email(si)
         pi.current_step_instance = si
         pi.save()
+    
+    def delete_process_instances(self, wfi):
+        pis = ProcessInstance.objects.filter(
+            process=self, workflow_instance=wfi
+        )
+        for pi in pis:
+            pi.delete()
 
     #TODO: Complete when step marked "end" is completed
     #TODO: On save, make sure there is a start and end step if there are any steps
@@ -672,6 +682,9 @@ class StepChoice(models.Model):
     choice_text = models.CharField(max_length=100)
     next_step = models.ForeignKey(
         Step, blank=True, null=True, on_delete=models.SET_NULL
+    )
+    trigger_processes = models.ManyToManyField(
+        Process, related_name="triggering_step_choices", blank=True
     )
 
 

@@ -34,7 +34,9 @@
               @click="undoStepCompletion(si.pk)"
               color="warning"
               label="Undo Completion"
-            />
+            >
+              <q-spinner v-if="disableCompletions" class="q-ml-sm" />
+            </q-btn>
           </div>
         </q-stepper-navigation>
         <q-stepper-navigation v-else>
@@ -46,6 +48,7 @@
                 color="primary"
                 label="Mark as Complete"
               >
+                <q-spinner v-if="disableCompletions" class="q-ml-sm" />
                 <q-badge
                   v-if="pi.action_required" color="orange" rounded floating
                 />
@@ -57,11 +60,14 @@
                 v-for="choice of si.step.next_step_choices"
                 class="q-ml-sm"
                 :key="choice.pk"
-                @click="completeStep(si.pk, choice.next_step_pk)"
+                @click="completeStep(
+                  si.pk, choice.next_step_pk, choice.trigger_processes_pks
+                )"
                 color="primary"
                 :label="choice.choice_text"
                 :disable="disableCompletions"
               >
+                <q-spinner v-if="disableCompletions" class="q-ml-sm" />
                 <q-badge
                   v-if="pi.action_required" color="orange" rounded floating
                 />
@@ -148,13 +154,16 @@ function canUndoStepCompletion(stepInstance: StepInstance): boolean {
   return userMayCompleteStepInstance(stepInstance)
 }
 
-function completeStep(stepInstancePk: number, nextStepPk?: number): void {
+function completeStep(
+  stepInstancePk: number, nextStepPk?: number, triggerProcessesPks?: number[]
+): void {
   disableCompletions.value = true
-  workflowsStore.completeStepInstance(stepInstancePk, nextStepPk)
+  workflowsStore.completeStepInstance(
+    stepInstancePk, nextStepPk, triggerProcessesPks
+  )
     .then(() => {
       setCurrentStepInstance()
       bus.emit('completedStep', Math.random())
-      disableCompletions.value = false
     })
     .catch(e => {
       console.error('Error completing step instance', e)
@@ -170,7 +179,6 @@ function undoStepCompletion(stepInstancePk: number): void {
     .then(() => {
       setCurrentStepInstance()
       bus.emit('completedStep', Math.random())
-      disableCompletions.value = false
     })
     .catch(e => {
       console.error('Error undoing step instance completion', e)
@@ -181,6 +189,11 @@ function undoStepCompletion(stepInstancePk: number): void {
 // we complete a step and reload it.
 watch(() => bus.bus.value.get('updateProcessInstances'), () => {
   setCurrentStepInstance()
+})
+
+// Wait until the WFI is retrieved before allowing clicking more buttons
+watch(() => bus.bus.value.get('workflowInstanceRetrieved'), () => {
+  disableCompletions.value = false
 })
 
 onMounted(() => {

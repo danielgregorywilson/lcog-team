@@ -748,6 +748,14 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
         """
         stepinstance = StepInstance.objects.get(pk=pk)
 
+        # If step instance or step choice completion triggers a new
+        # process, create a list for creation
+        trigger_processes = []
+        # StepInstance ProcessInstance triggers
+        if stepinstance.step.trigger_processes.count():
+            trigger_processes += list(stepinstance.step.trigger_processes.all())
+
+        # COMPLETION
         if (request.data['action'] == 'complete'):
             # Complete the current step instance  
             if stepinstance.completed_at:
@@ -760,7 +768,7 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
             stepinstance.completed_at = timezone.now()
             stepinstance.completed_by = request.user.employee
             stepinstance.save()
-            
+
             # Update the process instance
             processinstance = stepinstance.process_instance
             if stepinstance.step.end:
@@ -789,11 +797,15 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
             wfi = processinstance.workflow_instance
             wfi.update_percent_complete()
 
-            # If step instance completion triggers a new process, start it
-            if stepinstance.step.trigger_processes.count():
-                for process in stepinstance.step.trigger_processes.all():
-                    process.create_process_instance(wfi)
+            # Delete triggered processes
+            # StepChoice ProcessInstance triggers
+            if 'triggerProcessesPks' in request.data:
+                for pk in request.data['triggerProcessesPks']:
+                    trigger_processes.append(Process.objects.get(pk=pk))
+            for process in trigger_processes:
+                process.create_process_instance(wfi)
         
+        # UNCOMPLETION
         else:
             # Undo completion of the current step instance
             if not stepinstance.completed_at:
@@ -826,6 +838,15 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
 
             # Delete next SI
             nextStepInstance.delete()
+
+            # Delete triggered processes
+            # StepChoice ProcessInstance triggers
+            for step_choice in stepinstance.step.next_step_choices.all():
+                for process in step_choice.trigger_processes.all():
+                    trigger_processes.append(process)
+
+            for process in trigger_processes:
+                process.delete_process_instances(workflowinstance)
 
         serialized_stepinstance = StepInstanceSerializer(stepinstance,
             context={'request': request})

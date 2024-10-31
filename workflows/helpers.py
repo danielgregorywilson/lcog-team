@@ -440,12 +440,12 @@ def create_process_instances(transition):
     ]
     onboarding_processes_start_sds = [
         'SDS Ergo', 'SDS Facilities Onboarding', 'SDS Onboarding',
-        'SDS Phone Onboarding', 'SDS Sub Admin'
+        'SDS Sub Admin'
     ]
     returning_processes_start = []
     returning_processes_start_sds = []
     changing_processes_start = []
-    changing_processes_start_sds = []
+    changing_processes_start_sds = ['SDS Changing', 'SDS Phone Changing']
     exiting_processes_start = []
     exiting_processes_start_sds = []
     wfi = transition.workflowinstance

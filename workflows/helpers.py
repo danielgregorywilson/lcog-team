@@ -445,7 +445,7 @@ def create_process_instances(transition):
     returning_processes_start = []
     returning_processes_start_sds = []
     changing_processes_start = []
-    changing_processes_start_sds = []
+    changing_processes_start_sds = ['SDS Changing', 'SDS Phone Changing']
     exiting_processes_start = []
     exiting_processes_start_sds = []
     wfi = transition.workflowinstance

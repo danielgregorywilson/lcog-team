@@ -175,6 +175,11 @@ class ExpenseMonth(ExpenseBaseModel):
         super().save(*args, **kwargs)
         # If this is a new month, set the card to the submitter's default card
         if set_card:
+            # Don't set the card if this would create a duplicate
+            if ExpenseMonth.objects.filter(
+                purchaser=self.purchaser, month=self.month, year=self.year
+            ).count() > 1:
+                return
             card = self.purchaser.expense_cards.first()
             if card:
                 self.card = card

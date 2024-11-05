@@ -298,7 +298,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: '/workflows',
         name: 'workflows',
-        component: () => import('pages/workflows/Workflows.vue'),
+        component: () => import('pages/workflows/WorkflowsBase.vue'),
         meta: { requiresAuth: true },
         children: [
           {

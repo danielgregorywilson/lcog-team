@@ -415,11 +415,9 @@ def send_employee_transition_report():
     plaintext_message = strip_tags(html_message)
 
     # Send to the appropriate workflow admins
-    aw_admins = Role.objects.get(name='All Workflows Admins').members.all()
-    et_admins = Role.objects.get(
-        name='Employee Transition Admins'
+    to_employees = Role.objects.get(
+        name='Employee Transition Management'
     ).members.all()
-    to_employees = (aw_admins | et_admins).distinct()
     to_addresses = [
         e.user.email for e in to_employees if \
         e.should_receive_email_of_type('workflows', 'transitions')

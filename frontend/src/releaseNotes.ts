@@ -4,6 +4,34 @@
 
 export const releases = [
   {
+    version: '0.41.2',
+    date: new Date(2024, 10, 5),
+    changes: [
+      {
+        type: 'new',
+        description: 'Add a workflows app help page.'
+      },
+      {
+        type: 'improved',
+        description: 'Backend improvements to the workflows app.'
+      }
+    ]
+  },
+  {
+    version: '0.41.1',
+    date: new Date(2024, 10, 1),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Backend improvements to the workflows app.'
+      },
+      {
+        type: 'improved',
+        description: 'Backend improvements to the CC expenses app.'
+      }
+    ]
+  },
+  {
     version: '0.41.0',
     date: new Date(2024, 9, 30),
     changes: [

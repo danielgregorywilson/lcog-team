@@ -90,7 +90,13 @@
     <q-card id="help-dialog">
       <q-card-section class="q-ma-lg">
         <div class="row items-center q-gutter-lg">
-          <q-avatar icon="credit_card" size="60px" font-size="36px" color="primary" text-color="white" />
+          <q-avatar
+            icon="credit_card"
+            size="60px"
+            font-size="36px"
+            color="primary"
+            text-color="white"
+          />
           <div class="text-h6">
             <div v-if="router.currentRoute.value.name == 'submit-expenses'">
               <div>1) Click "Get Started" to start a new month.</div>
@@ -98,7 +104,9 @@
               <div>3) Enter expenses by clicking "New Expense".</div>
               <div>4) Once you're ready, click "Submit for Approval".</div>
             </div>
-            <div v-else-if="router.currentRoute.value.name == 'approve-expenses'">
+            <div
+              v-else-if="router.currentRoute.value.name == 'approve-expenses'"
+            >
               <div>1) Approve or deny all pending expenses.</div>
             </div>
             <div

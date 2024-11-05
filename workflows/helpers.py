@@ -171,7 +171,8 @@ def send_transition_fiscal_email(
     })
     plaintext_message = strip_tags(html_message)
 
-    # Send to fiscal employees and copy hiring manager and tammy/lori
+    # Send to fiscal employees.
+    # Copy hiring manager and, if SDS, SDS hiring leads.
     to_users = Group.objects.get(name='Fiscal Employee').user_set.all()
     to_addresses = [
         user.email for user in to_users if \
@@ -180,15 +181,19 @@ def send_transition_fiscal_email(
     cc_addresses = []
     if t.manager and t.manager.user.email:
         cc_addresses.append(t.manager.user.email)
-    sds_hiring_leads_users = Group.objects.get(
-        name='SDS Hiring Lead'
-    ).user_set.all()
-    sds_hiring_leads_emails = [
-        user.email for user in sds_hiring_leads_users if \
-        user.employee.should_receive_email_of_type('workflows', 'transitions')
-    ]
-    for email in sds_hiring_leads_emails:
-        cc_addresses.append(email)
+    
+    if t.is_sds:
+        sds_hiring_leads_users = Group.objects.get(
+            name='SDS Hiring Lead'
+        ).user_set.all()
+        sds_hiring_leads_emails = [
+            user.email for user in sds_hiring_leads_users if \
+            user.employee.should_receive_email_of_type(
+                'workflows', 'transitions'
+            )
+        ]
+        for email in sds_hiring_leads_emails:
+            cc_addresses.append(email)
 
     send_email_multiple(
         to_addresses, cc_addresses, subject, plaintext_message, html_message

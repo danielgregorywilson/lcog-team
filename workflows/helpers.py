@@ -385,16 +385,27 @@ def send_employee_transition_report():
             'employee-new', 'employee-change', 'employee-return',
             'employee-exit'
         ]
-    ).prefetch_related('pis')
+    ).order_by('workflow__type').prefetch_related('pis')
     current_wfis = [
         {
-            'wfi': wfi,
+            'pk': wfi.pk,
+            'percent_complete': wfi.percent_complete,
+            't': {
+                'type': wfi.transition.type,
+                'assignee': wfi.transition.assignee,
+                'employee_first_name': wfi.transition.employee_first_name,
+                'employee_last_name': wfi.transition.employee_last_name,
+                'title_name': wfi.transition.title.name if wfi.transition.title else 'Title not set',
+            },
             'pis': [
                 {
-                    'pi': pi,
+                    'name': pi.process.name,
+                    'current_step_name': pi.current_step_instance.step.name if pi.current_step_instance else '',
+                    'percent_complete': pi.percent_complete,
+                    'assigned_ago': pi.current_step_instance.duration.days if pi.current_step_instance else None,
                     'assignees': [
-                        member.name for member in pi.process.role.members.all()
-                    ] if pi.process.role else ['No one!']
+                        member.name for member in pi.current_step_instance.step.role.members.all()
+                    ] if pi.current_step_instance and pi.current_step_instance.step and pi.current_step_instance.step.role else ['No one!']
                 } for pi in wfi.pis.all()
             ]
         } for wfi in current_wfis

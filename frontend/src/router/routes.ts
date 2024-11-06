@@ -25,6 +25,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('src/pages/help/HelpBase.vue'),
         children: [
           {
+            path: 'workflows',
+            name: 'help-workflows',
+            component: () => import('src/pages/help/Workflows.vue')
+          },
+          {
             path: 'cc-expenses',
             name: 'help-cc-expenses',
             component: () => import('src/pages/help/CCExpenses.vue')
@@ -293,7 +298,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: '/workflows',
         name: 'workflows',
-        component: () => import('pages/workflows/Workflows.vue'),
+        component: () => import('pages/workflows/WorkflowsBase.vue'),
         meta: { requiresAuth: true },
         children: [
           {

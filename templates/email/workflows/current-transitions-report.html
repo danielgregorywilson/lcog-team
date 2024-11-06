@@ -9,33 +9,29 @@
         
         <ul>
         {% for wfi in current_wfis %}
-          {% with t=wfi.wfi.transition %}
-            {% if t.assignee == 'Complete' %}
-              <li>
-                <a href="{{ domain }}/wf/{{ wfi.wfi.pk}}/processes">{{ t.type }}: {{ t.employee_first_name }} {{ t.employee_last_name }}, {{ t.title.name }}</a>, Form complete. Processes {{ wfi.wfi.percent_complete }}% complete.
-                <ul>
-                  {% for pi in wfi.pis %}
-                    {% if pi.pi.percent_complete != 100 %}
-                      {% with p=pi.pi.process assignees=pi.pi.process.role.members ago=pi.pi.current_step_instance.duration.days %}
-                        <li>
-                          {{ p.name }}: {{ pi.pi.current_step_instance.step.name }} assigned to {{ pi.assignees | join:', ' }}
-                          {% if ago > 2 %}<strong>{% endif %}
-                          {{ ago }} day{% if ago != 1 %}s{% endif %} ago
-                          {% if ago > 2 %}</strong>{% endif %}
-                        </li>
-                      {% endwith %}
-                    {% endif %}
-                  {% endfor %}
-                </ul>
-              </li>  
+          {% if wfi.t.assignee == 'Complete' %}
+            <li>
+              <a href="{{ domain }}/wf/{{ wfi.pk}}/processes">{{ wfi.t.type }}: {{ wfi.t.employee_first_name }} {{ wfi.t.employee_last_name }}, {{ wfi.t.title_name }}</a>, Form complete. Processes {{ wfi.percent_complete }}% complete.
+              <ul>
+                {% for pi in wfi.pis %}
+                  {% if pi.percent_complete != 100 %}
+                    <li>
+                      {{ pi.name }}: {{ pi.current_step_name }} assigned to {{ pi.assignees | join:', ' }}
+                      {% if pi.assigned_ago > 2 %}<strong>{% endif %}
+                      {{ pi.assigned_ago }} day{% if pi.assigned_ago != 1 %}s{% endif %} ago
+                      {% if pi.assigned_ago > 2 %}</strong>{% endif %}
+                    </li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            </li>  
+          
             
-              
-            {% else %}
-              <li>
-                <a href="{{ domain }}/wf/{{ wfi.wfi.pk}}/transition">{{ t.type }}: {{ t.employee_first_name }} {{ t.employee_last_name }}, {{ t.title.name }}</a>, Form assigned to {{ t.assignee }}
-              </li>
-            {% endif %}
-          {% endwith %}
+          {% else %}
+            <li>
+              <a href="{{ domain }}/wf/{{ wfi.pk}}/transition">{{ wfi.t.type }}: {{ wfi.t.employee_first_name }} {{ wfi.t.employee_last_name }}, {{ wfi.t.title_name }}</a>, Form assigned to {{ wfi.t.assignee }}
+            </li>
+          {% endif %}
         {% endfor %}
         </ul>
 
@@ -45,7 +41,7 @@
           {% for wfi in last_week_wfis %}
             {% with t=wfi.transition %}
               <li>
-                <a href="{{ domain }}/wf/{{ wfi.wfi.pk}}/transition">{{ t.type }}: {{ t.employee_first_name }} {{ t.employee_last_name }}, {{ t.title.name }}</a>, Completed on {{ wfi.completed_at }}
+                <a href="{{ domain }}/wf/{{ wfi.pk}}/transition">{{ wfi.t.type }}: {{ wfi.t.employee_first_name }} {{ wfi.t.employee_last_name }}, {{ wfi.t.title_name }}</a>, Completed on {{ wfi.completed_at }}
               </li>  
             {% endwith %}
           {% endfor %}

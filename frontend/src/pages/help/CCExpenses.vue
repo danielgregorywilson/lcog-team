@@ -13,7 +13,11 @@
 
   <div class="anchor" id="submitters"></div>
   <div class="text-h6 q-mb-md">Submitters</div>
-  <q-video src="https://www.youtube.com/embed/HxIp_AObFAM?si=GSsYi51eApHN63lx" :ratio="16/9" class="q-mb-md" />
+  <q-video
+    src="https://www.youtube.com/embed/HxIp_AObFAM?si=GSsYi51eApHN63lx"
+    :ratio="16/9"
+    class="q-mb-md"
+  />
   <p>You have three tasks here:</p>
   <ol>
     <li>Enter expenses as you make them! Click the “+ New Expense” button on the table. You should get feedback (shown) to correct errors where information is missing or incorrect.</li>
@@ -26,7 +30,11 @@
 
   <div class="anchor" id="approvers"></div>
   <div class="text-h6 q-mb-md">Approvers</div>
-  <q-video src="https://www.youtube.com/embed/7nj4D18Fy2Y?si=94PqEvRRDnazkN4b" :ratio="16/9" class="q-mb-md" />
+  <q-video
+    src="https://www.youtube.com/embed/7nj4D18Fy2Y?si=94PqEvRRDnazkN4b"
+    :ratio="16/9"
+    class="q-mb-md"
+  />
   <p>You have one task:</p>
   <ol>
     <li>Approve or Reject expenses! These have been assigned to you by the submitter. Review the details and either select approve or deny (with a note explaining why). Note that you may have to re-approve expenses that are changed if, say, fiscal rejects them back to the submitter.</li>
@@ -36,7 +44,11 @@
 
   <div class="anchor" id="directors"></div>
   <div class="text-h6 q-mb-md">Directors</div>
-  <q-video src="https://www.youtube.com/embed/ehnKRPkAcbg?si=XS-MGd89lae-cbXc" :ratio="16/9" class="q-mb-md" />
+  <q-video
+    src="https://www.youtube.com/embed/ehnKRPkAcbg?si=XS-MGd89lae-cbXc"
+    :ratio="16/9"
+    class="q-mb-md"
+  />
   <p>You have one task:</p>
   <ol>
     <li>Approve or Reject the month! You will see all the cards assigned to you for review. Note that there may be multiple people submitting for the same card!</li>
@@ -46,7 +58,11 @@
 
   <div class="anchor" id="fiscal"></div>
   <div class="text-h6 q-mb-md">Fiscal</div>
-  <q-video src="https://www.youtube.com/embed/MpmlLw0Yj0o?si=Tw8gPuJIpLCywV_W" :ratio="16/9" class="q-mb-md" />
+  <q-video
+    src="https://www.youtube.com/embed/MpmlLw0Yj0o?si=Tw8gPuJIpLCywV_W"
+    :ratio="16/9"
+    class="q-mb-md"
+  />
   <p>You have two tasks:</p>
   <ol>
     <li>At the end of the month, upload bank statements for each credit card. You can do this on the first screen at the bottom.</li>

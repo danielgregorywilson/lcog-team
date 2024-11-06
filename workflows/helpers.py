@@ -171,7 +171,8 @@ def send_transition_fiscal_email(
     })
     plaintext_message = strip_tags(html_message)
 
-    # Send to fiscal employees and copy hiring manager and tammy/lori
+    # Send to fiscal employees.
+    # Copy hiring manager and, if SDS, SDS hiring leads.
     to_users = Group.objects.get(name='Fiscal Employee').user_set.all()
     to_addresses = [
         user.email for user in to_users if \
@@ -180,15 +181,19 @@ def send_transition_fiscal_email(
     cc_addresses = []
     if t.manager and t.manager.user.email:
         cc_addresses.append(t.manager.user.email)
-    sds_hiring_leads_users = Group.objects.get(
-        name='SDS Hiring Lead'
-    ).user_set.all()
-    sds_hiring_leads_emails = [
-        user.email for user in sds_hiring_leads_users if \
-        user.employee.should_receive_email_of_type('workflows', 'transitions')
-    ]
-    for email in sds_hiring_leads_emails:
-        cc_addresses.append(email)
+    
+    if t.is_sds:
+        sds_hiring_leads_users = Group.objects.get(
+            name='SDS Hiring Lead'
+        ).user_set.all()
+        sds_hiring_leads_emails = [
+            user.email for user in sds_hiring_leads_users if \
+            user.employee.should_receive_email_of_type(
+                'workflows', 'transitions'
+            )
+        ]
+        for email in sds_hiring_leads_emails:
+            cc_addresses.append(email)
 
     send_email_multiple(
         to_addresses, cc_addresses, subject, plaintext_message, html_message
@@ -380,16 +385,27 @@ def send_employee_transition_report():
             'employee-new', 'employee-change', 'employee-return',
             'employee-exit'
         ]
-    ).prefetch_related('pis')
+    ).order_by('workflow__type').prefetch_related('pis')
     current_wfis = [
         {
-            'wfi': wfi,
+            'pk': wfi.pk,
+            'percent_complete': wfi.percent_complete,
+            't': {
+                'type': wfi.transition.type,
+                'assignee': wfi.transition.assignee,
+                'employee_first_name': wfi.transition.employee_first_name,
+                'employee_last_name': wfi.transition.employee_last_name,
+                'title_name': wfi.transition.title.name if wfi.transition.title else 'Title not set',
+            },
             'pis': [
                 {
-                    'pi': pi,
+                    'name': pi.process.name,
+                    'current_step_name': pi.current_step_instance.step.name if pi.current_step_instance else '',
+                    'percent_complete': pi.percent_complete,
+                    'assigned_ago': pi.current_step_instance.duration.days if pi.current_step_instance else None,
                     'assignees': [
-                        member.name for member in pi.process.role.members.all()
-                    ] if pi.process.role else ['No one!']
+                        member.name for member in pi.current_step_instance.step.role.members.all()
+                    ] if pi.current_step_instance and pi.current_step_instance.step and pi.current_step_instance.step.role else ['No one!']
                 } for pi in wfi.pis.all()
             ]
         } for wfi in current_wfis
@@ -415,11 +431,9 @@ def send_employee_transition_report():
     plaintext_message = strip_tags(html_message)
 
     # Send to the appropriate workflow admins
-    aw_admins = Role.objects.get(name='All Workflows Admins').members.all()
-    et_admins = Role.objects.get(
-        name='Employee Transition Admins'
+    to_employees = Role.objects.get(
+        name='Employee Transition Management'
     ).members.all()
-    to_employees = (aw_admins | et_admins).distinct()
     to_addresses = [
         e.user.email for e in to_employees if \
         e.should_receive_email_of_type('workflows', 'transitions')

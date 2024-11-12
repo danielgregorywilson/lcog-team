@@ -159,8 +159,12 @@ class FileUploadViewSet(viewsets.ViewSet):
                             'description': desc,
                             'amount': float(amt)
                         })
-                    except IndexError:
-                        pass
+                    except Exception as e:
+                        m = 'Error processing an expense statement'
+                        if acct:
+                            m += ' for account ending in {}'.format(acct[-4:])
+                        record_error(m, e, request, traceback.format_exc())
+                        return Response(data=m, status=400)
                 if len(items):
                     ec = ExpenseCard.objects.get_or_create(
                         last4=items[0]['card']

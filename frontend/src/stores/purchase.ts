@@ -20,6 +20,7 @@ export const usePurchaseStore = defineStore('purchase', {
     directorExpenseMonths: [] as Array<ExpenseMonth>,
     fiscalExpenseMonths: [] as Array<ExpenseMonth>,
     expenseStatements: [] as Array<ExpenseStatement>,
+    numExpensesToSubmit: 0,
     numExpenseGLsToApprove: 0,
     numExpensesDirectorToApprove: 0,
     numExpensesFiscalToApprove: 0
@@ -200,6 +201,7 @@ export const usePurchaseStore = defineStore('purchase', {
             this.expenseMonths = ems
             if (!!yearInt && !!monthInt) {
               // Set active month: The first month that is not yet submitted
+              // or has been denied.
               ems = ems.sort(
                 (a: ExpenseMonth, b: ExpenseMonth) => {
                   if (a.year !== b.year) return a.year - b.year

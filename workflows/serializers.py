@@ -192,9 +192,9 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
             'computer_description', 'phone_number', 'phone_request',
             'phone_request_data', 'load_code', 'cell_phone', 'should_delete',
             'reassign_to', 'gas_pin_needed', 'oregon_access', 'business_cards',
-            'prox_card_needed', 'prox_card_returned', 'mailbox_needed',
-            'access_emails_pk', 'access_emails_name', 'special_instructions',
-            'fiscal_field', 'assignee', 'changes'
+            'prox_card_needed', 'mailbox_needed', 'access_emails_pk',
+            'access_emails_name', 'special_instructions', 'fiscal_field',
+            'assignee', 'changes'
         ]
 
     @staticmethod
@@ -279,9 +279,8 @@ class EmployeeTransitionRedactedSerializer(EmployeeTransitionSerializer):
             'computer_description', 'phone_number', 'phone_request',
             'phone_request_data', 'load_code', 'cell_phone', 'should_delete',
             'reassign_to', 'gas_pin_needed', 'oregon_access', 'business_cards',
-            'prox_card_needed', 'prox_card_returned', 'mailbox_needed',
-            'access_emails_pk', 'access_emails_name', 'special_instructions',
-            'changes'
+            'prox_card_needed', 'mailbox_needed', 'access_emails_pk',
+            'access_emails_name', 'special_instructions', 'changes'
         ]
 
 class WorkflowInstanceBaseSerializer(serializers.ModelSerializer):

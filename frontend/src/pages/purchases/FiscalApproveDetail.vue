@@ -528,12 +528,24 @@ function navigateToPrintView() {
   if (!expenseMonthPK.value) {
     return
   }
-  router.push({
-    name: 'expense-month-print',
-    params: {
-      employeePK: expenseMonthPK.value,
-    }
-  })
+  // router.push({
+  //   name: 'expense-month-print',
+  //   params: {
+  //     employeePK: employeePK,
+  //   }
+  // })
+  if (card.value) {
+    purchaseStore.generateExpenseMonthPDF(
+      expenseMonthPK.value
+    ).then((printOut) => {
+      const blob = new Blob([printOut], { type: 'application/pdf' })
+      const link = document.createElement('a')
+      link.href = URL.createObjectURL(blob)
+      link.download = 'print.pdf'
+      link.click()
+      URL.revokeObjectURL(link.href)
+    })
+  }
 }
 
 function expenseMonthTotal(em: ExpenseMonth) {

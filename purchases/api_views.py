@@ -1,7 +1,9 @@
 import datetime
+import io
 import traceback
 
 from django.db.models import Q
+from django.http import FileResponse
 from django.utils import timezone
 
 from rest_framework import status, viewsets
@@ -10,6 +12,7 @@ from rest_framework.response import Response
 
 from mainsite.helpers import record_error
 from people.models import Employee
+from purchases.fiscal_report import generate_fiscal_report
 from purchases.helpers import (
     send_submitter_denial_notification,
     send_submitter_monthly_expenses_reminders
@@ -669,6 +672,28 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
 
         except Exception as e:
             message = 'Error approving expense month.'
+            record_error(message, e, request, traceback.format_exc())
+            return Response(
+                data=message,
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    @action(detail=True, methods=['get'])
+    def generate_pdf(self, request, pk):
+        """
+        Generate a pdf with the expense month details:
+        bank statement, reported expenses, and receipts.
+        """
+        try:
+            # Create a file-like buffer to receive PDF data.
+            buffer = io.BytesIO()
+            generate_fiscal_report(buffer, pk)
+            # FileResponse sets the Content-Disposition header so that browsers
+            # present the option to save the file.
+            buffer.seek(0)
+            return FileResponse(buffer)
+        except Exception as e:
+            message = 'Error generating expense month PDF.'
             record_error(message, e, request, traceback.format_exc())
             return Response(
                 data=message,

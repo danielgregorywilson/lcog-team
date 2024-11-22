@@ -629,8 +629,21 @@ export const usePurchaseStore = defineStore('purchase', {
               handlePromiseError(reject, 'Error unlocking expense month', e)
             })
         }
-        
-        
+      })
+    },
+
+    generateExpenseMonthPDF(pk: number): Promise<Blob> {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/expense-month/${ pk }/generate_pdf`,
+          method: 'GET',
+        })
+          .then((resp) => {
+            resolve(resp.data)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error generating expense month PDF', e)
+          })
       })
     },
 

@@ -20,7 +20,7 @@ export const usePurchaseStore = defineStore('purchase', {
     directorExpenseMonths: [] as Array<ExpenseMonth>,
     fiscalExpenseMonths: [] as Array<ExpenseMonth>,
     expenseStatements: [] as Array<ExpenseStatement>,
-    numExpensesToSubmit: 0,
+    numEMsToResubmit: 0,
     numExpenseGLsToApprove: 0,
     numExpensesDirectorToApprove: 0,
     numExpensesFiscalToApprove: 0
@@ -223,9 +223,16 @@ export const usePurchaseStore = defineStore('purchase', {
             }
 
             let expenses = [] as Array<Expense>
+            let numRejectedEMs = 0
             for (const em of ems) {
               expenses = expenses.concat(em.expenses)
+              if ([
+                'approver_denied', 'director_denied', 'fiscal_denied'
+              ].indexOf(em.status) != -1) {
+                numRejectedEMs += 1
+              }
             }
+            this.numEMsToResubmit = numRejectedEMs
             this.myExpenses = expenses
             resolve(resp.data.results)
           })

@@ -13,6 +13,8 @@ Pillow==10.3.0               # For image uploads
 psycopg==3.1.10              # Postgres adapter for Python
 python-dateutil==2.8.2
 psycopg2-binary==2.9.10      # Postgres driver - binary to install correctly
+# pypdf==5.1.0                 # PDF generation - for generating fiscal printouts of CC expense reports
+pdfmerge==1.0.0              # PDF generation - for generating fiscal printouts of CC expense reports
 python-dotenv==0.18.0        # Secrets manager
 pytz==2021.1                 # Timezone support
 reportlab==4.2.5             # PDF generation - for generating fiscal printouts of CC expense reports

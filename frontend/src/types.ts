@@ -461,6 +461,7 @@ export interface ExpenseStatement {
   month: number
   year: number
   items: Array<ExpenseStatementItem>
+  total: number
 }
 
 export interface ExpenseMonthLock {

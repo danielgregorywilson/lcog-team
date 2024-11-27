@@ -123,11 +123,15 @@ class ExpenseStatementSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ExpenseStatement
         fields = [
-            'pk', 'card', 'month', 'year', 'items', 'all_cleared'
+            'pk', 'card', 'month', 'year', 'items', 'total', 'all_cleared'
         ]
 
     card = ExpenseCardSerializer(required=False)
     items = ExpenseStatementItemSerializer(many=True, read_only=True)
+    total = serializers.SerializerMethodField()
+
+    def get_total(self, obj):
+        return obj.total
 
     def get_all_cleared(self, obj):
         return obj.all_cleared()

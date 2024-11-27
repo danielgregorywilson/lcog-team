@@ -1,9 +1,7 @@
 import datetime
-import io
 import traceback
 
 from django.db.models import Q
-from django.http import FileResponse
 from django.utils import timezone
 
 from rest_framework import status, viewsets
@@ -685,13 +683,8 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
         bank statement, reported expenses, and receipts.
         """
         try:
-            # Create a file-like buffer to receive PDF data.
-            buffer = io.BytesIO()
-            generate_fiscal_report(buffer, pk)
-            # FileResponse sets the Content-Disposition header so that browsers
-            # present the option to save the file.
-            buffer.seek(0)
-            return FileResponse(buffer)
+            filename = f'expense_month_{pk}.pdf'
+            return generate_fiscal_report(filename, pk)
         except Exception as e:
             message = 'Error generating expense month PDF.'
             record_error(message, e, request, traceback.format_exc())

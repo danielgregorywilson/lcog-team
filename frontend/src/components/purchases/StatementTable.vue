@@ -1,7 +1,7 @@
 <template>
 <div>
   <div v-if="statement" class="q-mt-md">
-    <div class="text-h6">Statement Total: ${{ statementTotal() }}</div>
+    <div class="text-h6">Statement Total: ${{ props.statement?.total }}</div>
     <q-markup-table>
       <thead>
         <tr>
@@ -34,11 +34,4 @@ import { ExpenseStatement } from 'src/types'
 const props = defineProps<{
   statement: ExpenseStatement | undefined
 }>()
-
-const statementTotal = () => {
-  if (!props.statement) return 0
-  return props.statement.items.reduce(
-    (acc, item) => acc + parseFloat(item.amount), 0
-  ).toFixed(2)
-}
 </script>

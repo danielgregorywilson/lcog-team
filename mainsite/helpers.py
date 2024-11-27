@@ -1,15 +1,29 @@
 import datetime
+import io
 import logging
 import os
+from pypdf import PdfWriter, PdfReader
 import pytz
+import requests
+import tempfile
+import urllib.parse
 
 from django.apps import apps
 from django.contrib.sites.models import Site
+from django.core.files import File
 from django.core.mail import EmailMultiAlternatives, send_mail
+from django.http import FileResponse, HttpResponse
 from django.urls import reverse
 
-import requests
-import urllib.parse
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import inch, cm, mm
+from reportlab.lib.utils import ImageReader
+from reportlab.pdfgen import canvas
+from reportlab.platypus import Image, SimpleDocTemplate, Paragraph, Spacer, TableStyle
+from reportlab.rl_config import defaultPageSize
+
 
 error_logger = logging.getLogger('watchtower-error-logger')
 email_logger = logging.getLogger('watchtower-email-logger')
@@ -441,3 +455,119 @@ def get_lat_long(address, city, state, zip):
     if response:
         return response[0]["lat"], response[0]["lon"]
     return None, None
+
+
+class NumberedCanvas(canvas.Canvas):
+    """
+    https://code.activestate.com/recipes/576832/
+    """
+
+    def __init__(self, *args, **kwargs):
+        canvas.Canvas.__init__(self, *args, **kwargs)
+        self._saved_page_states = []
+
+    def showPage(self):
+        self._saved_page_states.append(dict(self.__dict__))
+        self._startPage()
+
+    def save(self):
+        """add page info to each page (page x of y)"""
+        num_pages = len(self._saved_page_states)
+        for state in self._saved_page_states:
+            self.__dict__.update(state)
+            self.draw_page_number(num_pages)
+            canvas.Canvas.showPage(self)
+        canvas.Canvas.save(self)
+
+    def draw_page_number(self, page_count):
+        self.setFont("Helvetica", 7)
+        self.drawString(inch, 0.75 * inch,
+            "Page %d of %d" % (self._pageNumber, page_count))
+
+
+reportlab_table_style = TableStyle([
+    ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+    ('TOPPADDING', (0,0), (-1,0), 6), # 6 = 6 pixels
+    ('BOTTOMPADDING', (0,0), (-1,0), 6),
+    ('BOX', (0,0), (-1,-1), 0.25, colors.black), # 0.25 = 1/4 point
+    ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+])
+
+
+def reportlab_get_image(path, width=1*cm):
+    img = ImageReader(path)
+    iw, ih = img.getSize()
+    aspect = ih / float(iw)
+    return Image(path, width=width, height=(width * aspect))
+
+
+def generate_pdf_report_download_response(filename, title, flowables, extra_pdfs=[]):
+    # Create a PDF download response.
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="${filename}"'
+    # Create a file-like buffer to receive PDF data.
+    # buffer = io.BytesIO()
+
+    # Use a tempfile instead of a buffer to avoid memory issues with large PDFs.
+    temp_base = tempfile.NamedTemporaryFile()
+    temp_final = tempfile.NamedTemporaryFile()
+    
+    # Write the file to the buffer.
+    PAGE_HEIGHT=defaultPageSize[1]
+    PAGE_WIDTH=defaultPageSize[0]
+    styles = getSampleStyleSheet()
+
+    doc = SimpleDocTemplate(temp_base)
+    Story = [Paragraph(title, styles['Title'])]
+    for flowable in flowables:
+        Story.append(flowable)
+    # import pdb; pdb.set_trace()
+    doc.build(Story, canvasmaker=NumberedCanvas)
+
+    # Merge the generated report with any PDF receipts.
+    merger = PdfWriter()
+    merger.append(temp_base)
+    for extra_pdf in extra_pdfs:
+        # extra_pdf.merge_page(merger)
+        merger.append(extra_pdf)
+    # input3 = open("/Users/danielwilson/Development/lcog-team/code/mainsite/test-doc-2.pdf", "rb")
+    
+    # reader = PdfReader("/Users/danielwilson/Development/lcog-team/code/mainsite/test-doc-2.pdf")
+    # merger.append("/Users/danielwilson/Development/lcog-team/code/mainsite/test-doc-2.pdf")
+    # with open("/Users/danielwilson/Development/lcog-team/code/mainsite/test-doc-2.pdf", "rb") as input2:
+    #     merger.append(input2)
+    
+    # with open(temp_final, 'wb') as output:
+    #     merger.write(output)
+    
+
+    # input2 = open("mainsite/Heidi_Leyba.pdf", "rb")
+    # merger.append(input2)
+    # output = open(temp_final.name, 'wb')
+    # merger.write(output)
+    # merger.close()
+    # output.close()
+
+    
+    output = open("document-output.pdf", "wb")
+    merger.write(output)
+    merger.close()
+    output.close()
+
+
+    # Write the final file in the HTTP response
+    django_file = File(output)
+    import pdb; pdb.set_trace()
+    resp = HttpResponse(django_file, content_type='application/pdf')
+    resp['Content-Disposition'] = f'attachment; filename="${filename}"'
+    # if django_file.size is not None:
+    #     resp['Content-Length'] = django_file.size
+
+    # response.write(buffer.getvalue())
+    # buffer.close()
+    return resp
+    # return FileResponse(report)
+    # FileResponse sets the Content-Disposition header so that browsers
+    # present the option to save the file.
+    # buffer.seek(0)
+    # return FileResponse(buffer)

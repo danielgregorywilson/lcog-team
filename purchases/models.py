@@ -248,6 +248,13 @@ class ExpenseStatement(models.Model):
     )
     month = models.IntegerField()
     year = models.IntegerField()
+    
+    @property
+    def total(self):
+        total = 0
+        for item in self.items.all():
+            total += item.amount
+        return total
 
 
 class ExpenseStatementItem(models.Model):

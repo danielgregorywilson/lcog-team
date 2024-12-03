@@ -389,7 +389,6 @@ export interface Expense extends ExpenseBase {
   date: string
   vendor: string
   amount: string
-  job: string
   gls: Array<GL>
   purchaser: SimpleEmployeeRetrieve
   approver: SimpleEmployeeRetrieve
@@ -403,7 +402,6 @@ export interface ExpenseCreate {
   em_pk: number
   name?: string
   date?: string
-  job?: string
   gls?: Array<GL>
   approver?: SimpleEmployeeRetrieve
   receipt_link?: string
@@ -412,7 +410,6 @@ export interface ExpenseCreate {
 export interface ExpenseUpdate extends ExpenseBase {
   name?: string
   date?: string
-  job?: string
   gls?: Array<GL>
   approver?: SimpleEmployeeRetrieve
   receipt_link?: string
@@ -420,6 +417,7 @@ export interface ExpenseUpdate extends ExpenseBase {
 
 export interface GL {
   code: string
+  job: string
   amount: string
   approver?: SimpleEmployeeRetrieve
   approved: boolean

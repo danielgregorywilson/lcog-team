@@ -55,7 +55,7 @@
         </template>
         <template v-slot:body-cell-gl="props">
           <q-td key="gl" :props="props">
-            {{ props.row.code }}: ${{ props.row.amount }}
+            {{ props.row.code }} ({{ props.row.job }}): ${{ props.row.amount }}
           </q-td>
         </template>
         <template v-slot:body-cell-receipt="props">
@@ -275,10 +275,6 @@ const columns = [
   {
     name: 'expense_amount', field: 'expense_amount', label: 'Amount',
     align: 'center'
-  },
-  {
-    name: 'expense_job', field: 'expense_job', label: 'Job #', align: 'center',
-    sortable: true
   },
   {
     name: 'gl', field: 'gl', label: 'GL Code', align: 'center',

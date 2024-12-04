@@ -389,7 +389,6 @@ export interface Expense extends ExpenseBase {
   date: string
   vendor: string
   amount: string
-  job: string
   gls: Array<GL>
   purchaser: SimpleEmployeeRetrieve
   approver: SimpleEmployeeRetrieve
@@ -403,7 +402,6 @@ export interface ExpenseCreate {
   em_pk: number
   name?: string
   date?: string
-  job?: string
   gls?: Array<GL>
   approver?: SimpleEmployeeRetrieve
   receipt_link?: string
@@ -412,7 +410,6 @@ export interface ExpenseCreate {
 export interface ExpenseUpdate extends ExpenseBase {
   name?: string
   date?: string
-  job?: string
   gls?: Array<GL>
   approver?: SimpleEmployeeRetrieve
   receipt_link?: string
@@ -420,6 +417,7 @@ export interface ExpenseUpdate extends ExpenseBase {
 
 export interface GL {
   code: string
+  job: string
   amount: string
   approver?: SimpleEmployeeRetrieve
   approved: boolean
@@ -987,7 +985,6 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   oregon_access: string
   business_cards: boolean
   prox_card_needed: boolean
-  prox_card_returned: boolean
   mailbox_needed: boolean
   access_emails_pk: number
   access_emails_name: string
@@ -1039,7 +1036,6 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   oregon_access?: string
   business_cards?: boolean
   prox_card_needed?: boolean
-  prox_card_returned?: boolean
   mailbox_needed?: boolean
   access_emails_pk?: number
   special_instructions?: string

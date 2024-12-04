@@ -92,7 +92,7 @@
                 v-for="gl in props.row.gls"
                 :key="props.row.gls.indexOf(gl)"
               >
-                <div>{{ gl.code }}: ${{ gl.amount }}</div>
+                <div>{{ gl.code }} ({{ gl.job }}): ${{ gl.amount }}</div>
                 <div v-if="gl.approved_at">
                   Approved by {{ gl.approver.name }}
                   ({{ readableDateTime(gl.approved_at) }})
@@ -328,9 +328,6 @@ const columns = [
   {
     name: 'amount', field: 'amount', label: 'Amount', align: 'center',
     sortable: true
-  },
-  {
-    name: 'job', field: 'job', label: 'Job #', align: 'center', sortable: true
   },
   {
     name: 'gls', field: 'gls', label: 'GL Codes', align: 'center',

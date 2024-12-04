@@ -448,7 +448,6 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
             t.oregon_access = request.data['oregon_access']
             t.business_cards = request.data['business_cards']
             t.prox_card_needed = request.data['prox_card_needed']
-            t.prox_card_returned = request.data['prox_card_returned']
             t.mailbox_needed = request.data['mailbox_needed']
             
             if prop_in_obj(request.data, 'access_emails_pk', -1):

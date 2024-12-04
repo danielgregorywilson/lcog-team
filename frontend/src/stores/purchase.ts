@@ -20,6 +20,7 @@ export const usePurchaseStore = defineStore('purchase', {
     directorExpenseMonths: [] as Array<ExpenseMonth>,
     fiscalExpenseMonths: [] as Array<ExpenseMonth>,
     expenseStatements: [] as Array<ExpenseStatement>,
+    numEMsToResubmit: 0,
     numExpenseGLsToApprove: 0,
     numExpensesDirectorToApprove: 0,
     numExpensesFiscalToApprove: 0
@@ -200,6 +201,7 @@ export const usePurchaseStore = defineStore('purchase', {
             this.expenseMonths = ems
             if (!!yearInt && !!monthInt) {
               // Set active month: The first month that is not yet submitted
+              // or has been denied.
               ems = ems.sort(
                 (a: ExpenseMonth, b: ExpenseMonth) => {
                   if (a.year !== b.year) return a.year - b.year
@@ -221,9 +223,16 @@ export const usePurchaseStore = defineStore('purchase', {
             }
 
             let expenses = [] as Array<Expense>
+            let numRejectedEMs = 0
             for (const em of ems) {
               expenses = expenses.concat(em.expenses)
+              if ([
+                'approver_denied', 'director_denied', 'fiscal_denied'
+              ].indexOf(em.status) != -1) {
+                numRejectedEMs += 1
+              }
             }
+            this.numEMsToResubmit = numRejectedEMs
             this.myExpenses = expenses
             resolve(resp.data.results)
           })

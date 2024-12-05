@@ -1222,8 +1222,6 @@ let businessCardsCurrentVal = ref(false)
 let businessCards = ref(false)
 let proxCardNeededCurrentVal = ref(false)
 let proxCardNeeded = ref(false)
-let proxCardReturnedCurrentVal = ref(false)
-let proxCardReturned = ref(false)
 let mailboxNeededCurrentVal = ref(false)
 let mailboxNeeded = ref(false)
 let showAccessEmailsCurrentVal = ref(false)
@@ -1436,8 +1434,6 @@ function retrieveEmployeeTransition() {
     businessCardsCurrentVal.value = businessCards.value
     proxCardNeeded.value = t.prox_card_needed
     proxCardNeededCurrentVal.value = proxCardNeeded.value
-    proxCardReturned.value = t.prox_card_returned
-    proxCardReturnedCurrentVal.value = proxCardReturned.value
     mailboxNeeded.value = t.mailbox_needed
     mailboxNeededCurrentVal.value = mailboxNeeded.value
     if (t.access_emails_pk != -1) {
@@ -1534,7 +1530,6 @@ function valuesAreChanged(): boolean {
     oregonAccess.value == oregonAccessCurrentVal.value &&
     businessCards.value == businessCardsCurrentVal.value &&
     proxCardNeeded.value == proxCardNeededCurrentVal.value &&
-    proxCardReturned.value == proxCardReturnedCurrentVal.value &&
     mailboxNeeded.value == mailboxNeededCurrentVal.value &&
     showAccessEmails.value == showAccessEmailsCurrentVal.value &&
     accessEmails.value.pk == accessEmailsCurrentVal.value.pk &&
@@ -1629,7 +1624,6 @@ function updateTransition() {
       oregon_access: oregonAccess.value,
       business_cards: businessCards.value,
       prox_card_needed: proxCardNeeded.value,
-      prox_card_returned: proxCardReturned.value,
       mailbox_needed: mailboxNeeded.value,
       access_emails_pk: accessEmails.value.pk,
       special_instructions: specialInstructions.value,
@@ -1690,7 +1684,6 @@ function updateTransition() {
       oregonAccessCurrentVal.value = t.oregon_access
       businessCardsCurrentVal.value = t.business_cards
       proxCardNeededCurrentVal.value = t.prox_card_needed
-      proxCardReturnedCurrentVal.value = t.prox_card_returned
       mailboxNeededCurrentVal.value = t.mailbox_needed
       showAccessEmailsCurrentVal.value = showAccessEmails.value
       accessEmailsCurrentVal.value = {

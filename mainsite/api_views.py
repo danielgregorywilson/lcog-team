@@ -1,4 +1,6 @@
+import csv
 from datetime import datetime
+from io import StringIO
 from ipaddress import ip_address
 import json
 import traceback
@@ -147,7 +149,14 @@ class FileUploadViewSet(viewsets.ViewSet):
                 items = []
                 for row in rows[1:]:
                     try: 
-                        row_items = row.split(',')
+                        if row == '':
+                            continue
+                        # Parse CSV row with python in case there are commas
+                        # in the description, e.g.
+                        s_row=StringIO(row)
+                        row_items=list(
+                            csv.reader(s_row, skipinitialspace=True)
+                        )[0]
                         acct = row_items[0].replace('\"','')
                         t_date = row_items[2]
                         desc = row_items[4].replace('\"','').rstrip()
@@ -159,8 +168,12 @@ class FileUploadViewSet(viewsets.ViewSet):
                             'description': desc,
                             'amount': float(amt)
                         })
-                    except IndexError:
-                        pass
+                    except Exception as e:
+                        m = 'Error processing an expense statement'
+                        if acct:
+                            m += ' for account ending in {}'.format(acct[-4:])
+                        record_error(m, e, request, traceback.format_exc())
+                        return Response(data=m, status=400)
                 if len(items):
                     ec = ExpenseCard.objects.get_or_create(
                         last4=items[0]['card']

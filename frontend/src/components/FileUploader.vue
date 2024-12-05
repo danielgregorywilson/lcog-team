@@ -110,6 +110,10 @@ function uploadFile() {
     fileSuccessfullyUploaded.value = true
     setTimeout(() => fileSuccessfullyUploaded.value = false, 5000)
     emit('uploaded', url)
+  }).catch((err) => {
+    fileRejectReason.value = err
+    fileRejected.value = true
+    setTimeout(() => fileRejected.value = false, 5000)
   })
 }
 

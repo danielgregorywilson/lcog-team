@@ -20,7 +20,11 @@
         color="primary"
         icon="book"
         :label="$q.screen.xs ? 'Submit' : 'Submit Expenses'"
-      />
+      >
+        <q-badge v-if="numEMsToResubmit()" rounded color="red" floating>
+          {{ numEMsToResubmit() }}
+        </q-badge>
+      </q-btn> 
       <q-btn
         v-if="isExpenseApprover()"
         :to="{ name: 'approve-expenses' }"
@@ -175,6 +179,10 @@ function isDirector() {
 
 function isFiscal() {
   return userStore.isFiscal
+}
+
+function numEMsToResubmit(): number {
+  return purchaseStore.numEMsToResubmit
 }
 
 function numExpenseGLsToApprove(): number {

@@ -275,7 +275,6 @@ class EmployeeTransition(models.Model):
     )
     business_cards = models.BooleanField(default=False)
     prox_card_needed = models.BooleanField(default=False)
-    prox_card_returned = models.BooleanField(default=False)
     mailbox_needed = models.BooleanField(default=False)
     access_emails = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,

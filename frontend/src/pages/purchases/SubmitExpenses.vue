@@ -179,31 +179,14 @@
                   </div>  
                 </q-popup-edit>
               </q-td>
-              <q-td key="job" :props="props">
-                <div class="text-pre-wrap">{{ props.row.job }}</div>
-                <q-popup-edit
-                  v-if="!monthLocked() && !monthSubmitted()"
-                  v-model="props.row.job"
-                  buttons
-                  v-slot="scope"
-                  @save="(val) => updateExpense(props.row.pk, 'job', val)"
-                >
-                  <q-input
-                    v-model="scope.value"
-                    maxlength="255"
-                    dense
-                    autofocus
-                    @keyup.enter="scope.set()"
-                  />
-                </q-popup-edit>
-              </q-td>
               <q-td key="gls" :props="props">
                 <div
                   class="text-pre-wrap"
                   v-for="gl in props.row.gls"
                   :key="props.row.gls.indexOf(gl)"
                 >
-                  {{ gl.code }}: ${{ gl.amount }} – {{ gl.approver?.name }}
+                  {{ gl.code }} ({{ gl.job }}): ${{ gl.amount }} –
+                  {{ gl.approver?.name }}
                 </div>
                 <q-popup-edit
                   v-if="!monthLocked() && !monthSubmitted()"
@@ -229,6 +212,15 @@
                         fill-mask="___-__-____-_____"
                         :rules="[
                           val => !!val || 'Required',
+                        ]"
+                      />
+                      <q-input
+                        v-model="gl.job"
+                        label="Job #" stack-label
+                        class="q-mr-sm q-pa-none"
+                        outlined dense autofocus
+                        :rules="[
+                          val => !!val || 'Required or \'None\'',
                         ]"
                       />
                       <div class="row q-mr-sm">
@@ -269,7 +261,7 @@
                     </div>
                     <div class="row justify-center q-mt-sm">
                       <q-btn class="col-6" @click="scope.value.push(
-                        {code: '', amount: '', approver: emptyEmployee}
+                        {code: '', job: '', amount: '', approver: emptyEmployee}
                       )">
                         Add a GL
                       </q-btn>
@@ -375,7 +367,7 @@
                           v-for="gl in props.row.gls"
                           :key="props.row.gls.indexOf(gl)"
                         >
-                          {{ gl.code }}: ${{ gl.amount }} –
+                          {{ gl.code }} ({{ gl.job }}): ${{ gl.amount }} –
                           {{ gl.approver?.name }}
                         </div>
                       </div>
@@ -664,7 +656,8 @@
 }
 
 .gl-popup-edit {
-  min-width: 500px;
+  min-width: 790px;
+  
 }
 
 .gl-amount {
@@ -748,9 +741,6 @@ const columns = [
     sortable: true
   },
   { name: 'amount', field: 'amount', label: 'Amount', align: 'center' },
-  {
-    name: 'job', field: 'job', label: 'Job #', align: 'center', sortable: true
-  },
   {
     name: 'gls', field: 'gls', label: 'GL Codes – Approver', align: 'center',
     sortable: true, style: 'width: 10px'
@@ -926,7 +916,6 @@ function clickAddExpense(): void {
     name: '',
     date: `${ purchaseStore.yearInt }-${ purchaseStore.monthInt }-` +
       `${ purchaseStore.dayInt }`,
-    job: '',
     gls: [],
   })
     .then(() => {
@@ -947,9 +936,6 @@ function formErrorItems() {
       errorItems.push(
         `Provide an amount for ${exp.name}`
       )
-    }
-    if (!exp.job) {
-      errorItems.push(`Provide a job number for ${exp.name}, or enter 'None'`)
     }
     for (let gl of exp.gls) {
       if (!gl.code || gl.code.length !== 17) {
@@ -1145,7 +1131,7 @@ function updateSelectedEMStore(pk?: number) {
 
 function updateExpense(
   pk: number,
-  field: 'name' | 'date' | 'amount' | 'vendor' | 'job' | 'gls' | 'repeat',
+  field: 'name' | 'date' | 'amount' | 'vendor' | 'gls' | 'repeat',
   val: string | Array<GL> | boolean
 ) {
   if (monthLocked()) {

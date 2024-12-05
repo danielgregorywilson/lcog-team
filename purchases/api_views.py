@@ -207,8 +207,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                 expense.name != request.data.get('name') or
                 str(expense.date) != request.data.get('date') or
                 str(expense.amount) != request.data.get('amount') or
-                expense.vendor != request.data.get('vendor') or
-                expense.job != request.data.get('job')
+                expense.vendor != request.data.get('vendor')
             ):
                 expense_fields_changed = True
             
@@ -216,7 +215,6 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             expense.date = request.data.get('date', expense.date)
             expense.amount = request.data.get('amount', expense.amount)
             expense.vendor = request.data.get('vendor', expense.vendor)
-            expense.job = request.data.get('job', expense.job)
             expense.repeat = request.data.get('repeat', expense.repeat)
             
             gl_pks = []
@@ -225,6 +223,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
             for gl in request.data.get('gls'):
                 pk = gl.get('pk', None)
                 code = gl.get('code', None)
+                job = gl.get('job', None)
                 amount = gl.get('amount', None)
                 approver_obj = gl.get('approver')
                 if not approver_obj:
@@ -241,6 +240,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                     gl_changed = False
                     if (
                         expense_gl.code != code or
+                        expense_gl.job != job or
                         expense_gl.amount != amount or
                         expense_gl.approver != approver
                     ):
@@ -251,6 +251,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                 else:
                     expense_gl = ExpenseGL.objects.create(expense=expense)
                 expense_gl.code = code
+                expense_gl.job = job
                 expense_gl.amount = amount
                 expense_gl.approver = approver
 
@@ -427,13 +428,13 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
                     date=expense.date.replace(year=year, month=month),
                     amount=expense.amount,
                     vendor=expense.vendor,
-                    job=expense.job,
                     repeat=True
                 )
                 for gl in expense.gls.all():
                     ExpenseGL.objects.create(
                         expense=new_expense,
                         code=gl.code,
+                        job=gl.job,
                         amount=gl.amount,
                         approver=gl.approver
                     )

@@ -218,7 +218,7 @@
                         v-model="gl.job"
                         label="Job #" stack-label
                         class="q-mr-sm q-pa-none"
-                        outlined dense autofocus
+                        outlined dense
                         :rules="[
                           val => !!val || 'Required or \'None\'',
                         ]"

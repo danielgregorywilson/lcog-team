@@ -308,8 +308,8 @@ function selectedMonthExpenseGLs(): GL[] {
   let gls: GL[] = []
   if (apiResults) {
     gls = apiResults.filter(gl => {
-      let [y, m] = gl.expense_date.split('-').map(s => parseInt(s))
-      return m === purchaseStore.monthInt && y === purchaseStore.yearInt
+      return gl.em_month === purchaseStore.monthInt && 
+        gl.em_year === purchaseStore.yearInt
     })
   }
   return gls

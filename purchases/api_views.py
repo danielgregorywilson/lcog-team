@@ -41,7 +41,7 @@ def all_month_expenses_approved(em):
 
 class ExpenseGLViewSet(viewsets.ModelViewSet):
     """
-    API endpoint for credit card expense general ledger entries.
+    API endpoint for credit card Expense GLs
     """
     queryset = ExpenseGL.objects.all()
     serializer_class = ExpenseGLSerializer
@@ -86,7 +86,7 @@ class ExpenseGLViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['put'])
     def approver_approve(self, request, pk=None):
         """
-        Approver approves an Expense GL.
+        Approver approves an Expense GL
         """
         try:
             gl = ExpenseGL.objects.get(pk=pk)
@@ -197,7 +197,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
     def update(self, request, pk):
         """
-        Submitter updates an expense.
+        Submitter updates an expense
         """
         try:
             expense = Expense.objects.get(pk=pk)

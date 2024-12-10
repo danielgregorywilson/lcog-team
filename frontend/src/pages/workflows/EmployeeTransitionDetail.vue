@@ -619,7 +619,13 @@
       Special Instructions
     </div>
     <div class="row">
+      <div
+        v-if="props.print"
+        class="print-text-area"
+        v-html="specialInstructions"
+      ></div>
       <q-input
+        v-else
         name="special-instructions"
         v-model="specialInstructions"
         autogrow
@@ -631,7 +637,13 @@
       Fiscal Use Only
     </div>
     <div class="row">
+      <div
+        v-if="props.print"
+        class="print-text-area"
+        v-html="fiscalField"
+      ></div>
       <q-input
+        v-else
         v-model="fiscalField"
         name="fiscal-field"
         autogrow
@@ -1035,6 +1047,9 @@
 }
 .language-select {
   width: 221px
+}
+.print-text-area {
+  white-space: pre-line;
 }
 #sticky-footer {
   padding: 10px;

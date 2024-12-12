@@ -954,6 +954,11 @@ function formErrorItems() {
           `Provide a valid GL code for each GL row in ${exp.name}`
         )
       }
+      if (!gl.job) {
+        errorItems.push(
+          `Provide a valid Job number for each GL row in ${exp.name} or enter 'None'`
+        )
+      }
       if (!gl.amount) {
         errorItems.push(
           `Provide a GL amount for each GL row in ${exp.name}`

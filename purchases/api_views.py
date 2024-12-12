@@ -224,6 +224,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                 pk = gl.get('pk', None)
                 code = gl.get('code', None)
                 job = gl.get('job', None)
+                activity = gl.get('activity', None)
                 amount = gl.get('amount', None)
                 approver_obj = gl.get('approver')
                 if not approver_obj:
@@ -241,6 +242,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                     if (
                         expense_gl.code != code or
                         expense_gl.job != job or
+                        expense_gl.activity != activity or
                         expense_gl.amount != amount or
                         expense_gl.approver != approver
                     ):
@@ -252,6 +254,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                     expense_gl = ExpenseGL.objects.create(expense=expense)
                 expense_gl.code = code
                 expense_gl.job = job
+                expense_gl.activity = activity
                 expense_gl.amount = amount
                 expense_gl.approver = approver
 
@@ -435,6 +438,7 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
                         expense=new_expense,
                         code=gl.code,
                         job=gl.job,
+                        activity=gl.activity,
                         amount=gl.amount,
                         approver=gl.approver
                     )

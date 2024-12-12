@@ -128,6 +128,7 @@ class ExpenseGL(models.Model):
     )
     code = models.CharField(max_length=255, blank=True)
     job = models.CharField(max_length=255, blank=True)
+    activity = models.CharField(max_length=7, blank=True)
     amount = models.DecimalField(
         _("dollar amount"), max_digits=10, decimal_places=2, blank=True,
         null=True

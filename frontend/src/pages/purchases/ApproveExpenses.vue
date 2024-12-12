@@ -55,7 +55,9 @@
         </template>
         <template v-slot:body-cell-gl="props">
           <q-td key="gl" :props="props">
-            {{ props.row.code }} ({{ props.row.job }}): ${{ props.row.amount }}
+            <span>{{ props.row.code }} (Job: {{ props.row.job }}</span>
+            <span v-if="props.row.activity">, Activity: {{ props.row.activity }}</span>
+            <span>): ${{ props.row.amount }}</span>
           </q-td>
         </template>
         <template v-slot:body-cell-receipt="props">

@@ -92,7 +92,11 @@
                 v-for="gl in props.row.gls"
                 :key="props.row.gls.indexOf(gl)"
               >
-                <div>{{ gl.code }} ({{ gl.job }}): ${{ gl.amount }}</div>
+                <div>
+                  <span>{{ gl.code }} (Job: {{ gl.job }}</span>
+                  <span v-if="gl.activity">, Activity: {{ gl.activity }}</span>
+                  <span>): ${{ gl.amount }}</span>
+                </div>
                 <div v-if="gl.approved_at">
                   Approved by {{ gl.approver.name }}
                   ({{ readableDateTime(gl.approved_at) }})

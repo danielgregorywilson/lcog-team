@@ -185,8 +185,9 @@
                   v-for="gl in props.row.gls"
                   :key="props.row.gls.indexOf(gl)"
                 >
-                  {{ gl.code }} ({{ gl.job }}): ${{ gl.amount }} –
-                  {{ gl.approver?.name }}
+                  <span>{{ gl.code }} (Job: {{ gl.job }}</span>
+                  <span v-if="gl.activity">, Activity: {{ gl.activity }}</span>
+                  <span>): ${{ gl.amount }} – {{ gl.approver?.name }}</span>
                 </div>
                 <q-popup-edit
                   v-if="!monthLocked() && !monthSubmitted()"
@@ -222,6 +223,13 @@
                         :rules="[
                           val => !!val || 'Required or \'None\'',
                         ]"
+                      />
+                      <q-input
+                        v-model="gl.activity"
+                        label="Activity #" stack-label
+                        class="q-mr-sm q-pa-none"
+                        outlined dense
+                        maxlength="7"
                       />
                       <div class="row q-mr-sm">
                         <div class="gl-dollar-symbol">$</div>
@@ -260,9 +268,10 @@
                       />
                     </div>
                     <div class="row justify-center q-mt-sm">
-                      <q-btn class="col-6" @click="scope.value.push(
-                        {code: '', job: '', amount: '', approver: emptyEmployee}
-                      )">
+                      <q-btn class="col-6" @click="scope.value.push({
+                        code: '', job: '', activity: '', amount: '',
+                        approver: emptyEmployee
+                      })">
                         Add a GL
                       </q-btn>
                     </div>
@@ -367,7 +376,9 @@
                           v-for="gl in props.row.gls"
                           :key="props.row.gls.indexOf(gl)"
                         >
-                          {{ gl.code }} ({{ gl.job }}): ${{ gl.amount }} –
+                          <span>{{ gl.code }} (Job: {{ gl.job }}</span>
+                          <span v-if="gl.activity">, Activity: {{ gl.activity }}</span>
+                          <span>): ${{ gl.amount }} –</span>
                           {{ gl.approver?.name }}
                         </div>
                       </div>
@@ -656,7 +667,7 @@
 }
 
 .gl-popup-edit {
-  min-width: 790px;
+  min-width: 993px;
   
 }
 

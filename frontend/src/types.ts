@@ -418,6 +418,7 @@ export interface ExpenseUpdate extends ExpenseBase {
 export interface GL {
   code: string
   job: string
+  activity: string
   amount: string
   approver?: SimpleEmployeeRetrieve
   approved: boolean

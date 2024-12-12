@@ -105,7 +105,8 @@
                   v-model="props.row.name"
                   buttons
                   v-slot="scope"
-                  @save="(val) => updateExpense(props.row.pk, 'name', val)"
+                  @save="(val: string) => 
+                    updateExpense(props.row.pk, 'name', val)"
                 >
                   <q-input
                     v-model="scope.value"
@@ -123,7 +124,8 @@
                   v-model="props.row.date"
                   buttons
                   v-slot="scope"
-                  @save="(val) => updateExpense(props.row.pk, 'date', val)"
+                  @save="(val: string) =>
+                    updateExpense(props.row.pk, 'date', val)"
                 >
                   <q-input
                     type="date"
@@ -141,7 +143,8 @@
                   v-model="props.row.vendor"
                   buttons
                   v-slot="scope"
-                  @save="(val) => updateExpense(props.row.pk, 'vendor', val)"
+                  @save="(val: string) =>
+                    updateExpense(props.row.pk, 'vendor', val)"
                 >
                   <q-input
                     v-model="scope.value"
@@ -160,10 +163,10 @@
                   buttons
                   v-slot="scope"
                   :validate="amountValidation"
-                  @update:model-value="(val) => {
+                  @update:model-value="(val: string) => {
                     props.row.amount = parseFloat(val).toFixed(2).toString()
                   }"
-                  @save="(val) => {
+                  @save="(val: string) => {
                     updateExpense(props.row.pk, 'amount', val)
                   }"
                 >
@@ -195,7 +198,7 @@
                   buttons
                   v-slot="scope"
                   :validate="GLValidation"
-                  @save="(val) => {
+                  @save="(val: Array<GL>) => {
                     updateExpense(props.row.pk, 'gls', val)
                   }"
                 >
@@ -212,7 +215,7 @@
                         mask="###-##-####-#####"
                         fill-mask="___-__-____-_____"
                         :rules="[
-                          val => !!val || 'Required',
+                          (val: string) => !!val || 'Required',
                         ]"
                       />
                       <q-input
@@ -221,7 +224,7 @@
                         class="q-mr-sm q-pa-none"
                         outlined dense
                         :rules="[
-                          val => !!val || 'Required or \'None\'',
+                          (val: string) => !!val || 'Required or \'None\'',
                         ]"
                       />
                       <q-input
@@ -242,7 +245,7 @@
                           :error-message="errorMessageAmount"
                           @keyup.enter="scope.set()"
                           :rules="[
-                            val => !!val || '* Required',
+                            (val: string) => !!val || '* Required',
                           ]"
                         />
                       </div>

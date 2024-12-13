@@ -671,7 +671,6 @@
 
 .gl-popup-edit {
   min-width: 993px;
-  
 }
 
 .gl-amount {
@@ -1150,7 +1149,7 @@ function updateSelectedEMStore(pk?: number) {
 
 function updateExpense(
   pk: number,
-  field: 'name' | 'date' | 'amount' | 'vendor' | 'gls' | 'repeat',
+  field: 'name' | 'date' | 'vendor' | 'amount' | 'gls' | 'repeat',
   val: string | Array<GL> | boolean
 ) {
   if (monthLocked()) {

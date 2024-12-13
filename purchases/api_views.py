@@ -83,6 +83,51 @@ class ExpenseGLViewSet(viewsets.ModelViewSet):
         else:
             return ExpenseGL.objects.none()
 
+    def update(self, request, pk):
+        """
+        Approver updates an expense from a GL row.
+        """
+        try:
+            gl = ExpenseGL.objects.get(pk=pk)
+            expense = gl.expense
+
+            field = request.data.get('field', None)
+            val = request.data.get('val', None)
+            if not field:
+                return Response(
+                    data='Field and value required.',
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            if field in ['name', 'date', 'vendor']:
+                setattr(expense, field, val)
+                expense.save()
+            elif field == 'gl':
+                setattr(gl, 'code', val['code'])
+                setattr(gl, 'job', val['job'])
+                setattr(gl, 'activity', val['activity'])
+                
+                approver_obj = val['approver']
+                if not approver_obj or not approver_obj['pk']:
+                    raise Exception('Approver must be set.')
+                else:
+                    approver = Employee.objects.get(pk=approver_obj['pk'])
+                    setattr(gl, 'approver', approver)
+                gl.save()
+            
+            serialized_gl = ExpenseGLSerializer(
+                gl, context={'request': request}
+            )
+            return Response(serialized_gl.data)
+
+        except Exception as e:
+            message = 'Error updating expense GL.'
+            record_error(message, e, request, traceback.format_exc())
+            return Response(
+                data=message,
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
     @action(detail=True, methods=['put'])
     def approver_approve(self, request, pk=None):
         """

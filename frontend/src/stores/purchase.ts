@@ -4,8 +4,7 @@ import { defineStore } from 'pinia'
 import { apiURL, handlePromiseError } from 'src/stores/index'
 import {
   Expense, ExpenseCreate, ExpenseMonth, ExpenseMonthCreate, ExpenseMonthLock,
-  ExpenseMonthLockCreate,
-  ExpenseStatement, GL
+  ExpenseMonthLockCreate, ExpenseStatement, GL, SimpleEmployeeRetrieve
 } from 'src/types'
 
 export const usePurchaseStore = defineStore('purchase', {
@@ -363,6 +362,29 @@ export const usePurchaseStore = defineStore('purchase', {
           })
           .catch(e => {
             handlePromiseError(reject, 'Error getting approval expense GLs', e)
+          })
+      })
+    },
+
+    updateGL(
+      pk: number,
+      field: 'name' | 'date' | 'vendor' | 'gl',
+      val: string | {
+        'code': string, 'job': string, 'activity': string,
+        'approver': SimpleEmployeeRetrieve
+      }
+    ): Promise<Expense> {
+      // Approver updates an expense from a GL row
+      const data = { field, val }
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/expense-gl/${ pk }`, method: 'PUT', data
+        })
+          .then((resp) => {
+            resolve(resp.data)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error updating expense GL', e)
           })
       })
     },

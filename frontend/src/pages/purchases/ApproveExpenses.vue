@@ -27,11 +27,41 @@
         <template v-slot:body-cell-expense_name="props">
           <q-td key="expense_name" :props="props" style="white-space: normal;">
             {{ props.row.expense_name }}
+            <q-popup-edit
+              v-if="!monthLocked()"
+              v-model="props.row.expense_name"
+              buttons
+              v-slot="scope"
+              @save="(val: string) => updateGL(props.row.pk, 'name', val)"
+            >
+              <q-input
+                v-model="scope.value"
+                maxlength="255"
+                dense
+                autofocus
+                @keyup.enter="scope.set()"
+              />
+            </q-popup-edit>
           </q-td>
         </template>
         <template v-slot:body-cell-expense_date="props">
           <q-td key="expense_date" :props="props">
             {{ readableDateNEW(props.row.expense_date) }}
+            <q-popup-edit
+              v-if="!monthLocked()"
+              v-model="props.row.expense_date"
+              buttons
+              v-slot="scope"
+              @save="(val: string) => updateGL(props.row.pk, 'date', val)"
+            >
+              <q-input
+                type="date"
+                v-model="scope.value"
+                dense
+                autofocus
+                @keyup.enter="scope.set()"
+              />
+            </q-popup-edit>
           </q-td>
         </template>
         <template v-slot:body-cell-expense_vendor="props">
@@ -41,6 +71,21 @@
             style="white-space: normal;"
           >
             {{ props.row.expense_vendor }}
+            <q-popup-edit
+              v-if="!monthLocked()"
+              v-model="props.row.expense_vendor"
+              buttons
+              v-slot="scope"
+              @save="(val: string) => updateGL(props.row.pk, 'vendor', val)"
+            >
+              <q-input
+                v-model="scope.value"
+                maxlength="255"
+                dense
+                autofocus
+                @keyup.enter="scope.set()"
+              />
+            </q-popup-edit>
           </q-td>
         </template>
         <template v-slot:body-cell-expense_amount="props">
@@ -58,6 +103,78 @@
             <span>{{ props.row.code }} (Job: {{ props.row.job }}</span>
             <span v-if="props.row.activity">, Activity: {{ props.row.activity }}</span>
             <span>): ${{ props.row.amount }}</span>
+            <q-popup-edit
+              v-if="!monthLocked()"
+              v-model="props.row"
+              buttons
+              v-slot="scope"
+              :validate="GLValidation"
+              @save="(val: GLWithApprover) => {updateGL(props.row.pk, 'gl', {
+                'code': val.code,
+                'job': val.job,
+                'activity': val.activity,
+                'approver': val.approver
+              })}"
+            >
+              <div class="gl-popup-edit">
+                <q-input
+                  v-model="scope.value.code"
+                  class="q-mr-sm q-pa-none"
+                  outlined dense autofocus
+                  mask="###-##-####-#####"
+                  fill-mask="___-__-____-_____"
+                  :rules="[
+                    (val: string) => !!val || 'Required',
+                  ]"
+                />
+                <q-input
+                  v-model="scope.value.job"
+                  label="Job #" stack-label
+                  class="q-mr-sm q-pa-none"
+                  outlined dense
+                  :rules="[
+                    (val: string) => !!val || 'Required or \'None\'',
+                  ]"
+                />
+                <q-input
+                  v-model="scope.value.activity"
+                  label="Activity #" stack-label
+                  class="q-mr-sm q-pa-none"
+                  outlined dense
+                  maxlength="7"
+                />
+                <div class="row q-mr-sm">
+                  ${{  scope.value.amount }}
+                  <!-- <div class="gl-dollar-symbol">$</div>
+                  <q-input
+                    v-model="gl.amount"
+                    class="gl-amount q-pa-none"
+                    outlined
+                    dense
+                    :error="errorAmount"
+                    :error-message="errorMessageAmount"
+                    @keyup.enter="scope.set()"
+                    :rules="[
+                      (val: string) => !!val || '* Required',
+                    ]"
+                  /> -->
+                </div>
+                <EmployeeSelect
+                  name="approver"
+                  label="Approver"
+                  :employee="scope.value.approver"
+                  :useLegalName="true"
+                  v-on:input="scope.value.approver=$event"
+                  v-on:clear="scope.value.approver=emptyEmployee"
+                  :readOnly=false
+                  :employeeFilterFn="
+                    (employee: SimpleEmployeeRetrieve) => {
+                      return employee.is_expense_approver
+                    }
+                  "
+                />
+              </div>
+            </q-popup-edit>
           </q-td>
         </template>
         <template v-slot:body-cell-receipt="props">
@@ -228,17 +345,22 @@
 </template>
 
 <style scoped lang="scss">
-
+.gl-popup-edit {
+  min-width: 993px;
+}
 </style>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 
 import DocumentViewer from 'src/components/DocumentViewer.vue'
+import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import { readableDateNEW } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
 import { usePurchaseStore } from 'src/stores/purchase'
-import { GL } from 'src/types'
+import {
+  emptyEmployee, GL, GLWithApprover, SimpleEmployeeRetrieve
+} from 'src/types'
 
 const purchaseStore = usePurchaseStore()
 
@@ -250,6 +372,9 @@ let deniedGLPK = ref(0)
 let deniedGLExpenseName = ref('')
 let deniedGLPurchaserName = ref('')
 let denyDialogMessage = ref('')
+
+let errorAmount = ref(false)
+let errorMessageAmount = ref('')
 
 const canApprove = ref(true)
 
@@ -345,6 +470,30 @@ function retrieveAllExpenseGLsToApprove(): Promise<void> {
   })
 }
 
+function monthLocked() {
+  return purchaseStore.expenseMonthLocked
+}
+
+function updateGL(
+  pk: number,
+  field: 'name' | 'date' | 'vendor' | 'gl',
+  val: string | {
+    'code': string, 'job': string, 'activity': string,
+    'approver': SimpleEmployeeRetrieve
+  }
+) {
+  if (monthLocked()) {
+    return
+  }
+  purchaseStore.updateGL(pk, field, val)
+    .then(() => {
+      retrieveThisMonthExpenseGLsToApprove()
+    })
+    .catch((error) => {
+      console.log('Error updating expense GL', error)
+    })
+}
+
 function approveGL(pk: number, approved: boolean) {
   canApprove.value = false
   setTimeout(() => {
@@ -368,6 +517,17 @@ function  openDenyGLDialog(
   deniedGLExpenseName.value = expenseName
   deniedGLPurchaserName.value = purchaserName
   showDenyDialog.value = true
+}
+
+function GLValidation (gl: any) {
+  if (isNaN(parseFloat(gl.amount))) {
+    errorAmount.value = true
+    errorMessageAmount.value = 'The value must be a number!'
+    return false
+  }
+  errorAmount.value = false
+  errorMessageAmount.value = ''
+  return true
 }
 
 onMounted(() => {

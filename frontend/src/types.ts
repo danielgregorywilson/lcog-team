@@ -431,6 +431,10 @@ export interface GL {
   em_note: string
 }
 
+export interface GLWithApprover extends GL {
+  approver: SimpleEmployeeRetrieve  
+}
+
 export interface ExpenseCard {
   pk: number
   last4: number

@@ -98,7 +98,12 @@
               :props="props"
               :class="expenseClass(props.row)"
             >
-              <q-td key="name" :props="props" style="white-space: normal;">
+              <q-td
+                key="name"
+                :props="props"
+                style="white-space: normal;"
+                :class="!monthLocked() && !monthSubmitted() ? 'editable' : ''"
+              >
                 {{ props.row.name }}
                 <q-popup-edit
                   v-if="!monthLocked() && !monthSubmitted()"
@@ -117,7 +122,11 @@
                   />
                 </q-popup-edit>
               </q-td>
-              <q-td key="date" :props="props">
+              <q-td
+                key="date"
+                :props="props"
+                :class="!monthLocked() && !monthSubmitted() ? 'editable' : ''"
+              >
                 {{ readableDateNEW(props.row.date) }}
                 <q-popup-edit
                   v-if="!monthLocked() && !monthSubmitted()"
@@ -136,7 +145,12 @@
                   />
                 </q-popup-edit>
               </q-td>
-              <q-td key="vendor" :props="props" style="white-space: normal;">
+              <q-td
+                key="vendor"
+                :props="props"
+                style="white-space: normal;"
+                :class="!monthLocked() && !monthSubmitted() ? 'editable' : ''"
+              >
                 <div class="text-pre-wrap">{{ props.row.vendor }}</div>
                 <q-popup-edit
                   v-if="!monthLocked() && !monthSubmitted()"
@@ -155,7 +169,11 @@
                   />
                 </q-popup-edit>
               </q-td>
-              <q-td key="amount" :props="props">
+              <q-td
+                key="amount"
+                :props="props"
+                :class="!monthLocked() && !monthSubmitted() ? 'editable' : ''"
+              >
                 {{ props.row.amount }}
                 <q-popup-edit
                   v-if="!monthLocked() && !monthSubmitted()"
@@ -182,7 +200,11 @@
                   </div>  
                 </q-popup-edit>
               </q-td>
-              <q-td key="gls" :props="props">
+              <q-td
+                key="gls"
+                :props="props"
+                :class="!monthLocked() && !monthSubmitted() ? 'editable' : ''"
+              >
                 <div
                   class="text-pre-wrap"
                   v-for="gl in props.row.gls"
@@ -667,6 +689,14 @@
 <style scoped lang="scss">
 #denial-notes {
   font-size: 1.2em;
+}
+
+.editable {
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .gl-popup-edit {

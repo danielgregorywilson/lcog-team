@@ -25,14 +25,25 @@
         no-data-label="No expenses entered this month"
       >
         <template v-slot:body-cell-expense_name="props">
-          <q-td key="expense_name" :props="props" style="white-space: normal;">
+          <q-td
+            key="expense_name"
+            :props="props"
+            style="white-space: normal;"
+            :class="!monthLocked() ? 'editable' : ''"
+            >
             {{ props.row.expense_name }}
             <q-popup-edit
               v-if="!monthLocked()"
               v-model="props.row.expense_name"
               buttons
               v-slot="scope"
-              @save="(val: string) => updateGL(props.row.pk, 'name', val)"
+              :validate="requiredFieldValidation"
+              @save="(val: string) => {
+                if (!requiredFieldValidation(val)) {
+                  return
+                }
+                updateGL(props.row.pk, 'name', val)
+              }"
             >
               <q-input
                 v-model="scope.value"
@@ -40,19 +51,34 @@
                 dense
                 autofocus
                 @keyup.enter="scope.set()"
+                :rules="[
+                  (val: string) => {
+                    return !!val || 'Required'
+                  }
+                ]"
               />
             </q-popup-edit>
           </q-td>
         </template>
         <template v-slot:body-cell-expense_date="props">
-          <q-td key="expense_date" :props="props">
+          <q-td
+            key="expense_date"
+            :props="props"
+            :class="!monthLocked() ? 'editable' : ''"  
+          >
             {{ readableDateNEW(props.row.expense_date) }}
             <q-popup-edit
               v-if="!monthLocked()"
               v-model="props.row.expense_date"
               buttons
               v-slot="scope"
-              @save="(val: string) => updateGL(props.row.pk, 'date', val)"
+              :validate="requiredFieldValidation"
+              @save="(val: string) => {
+                if (!val) {
+                  return
+                }
+                updateGL(props.row.pk, 'date', val)
+              }"
             >
               <q-input
                 type="date"
@@ -60,6 +86,11 @@
                 dense
                 autofocus
                 @keyup.enter="scope.set()"
+                :rules="[
+                  (val: string) => {
+                    return !!val || 'Required'
+                  }
+                ]"
               />
             </q-popup-edit>
           </q-td>
@@ -69,6 +100,7 @@
             key="expense_vendor"
             :props="props"
             style="white-space: normal;"
+            :class="!monthLocked() ? 'editable' : ''"
           >
             {{ props.row.expense_vendor }}
             <q-popup-edit
@@ -76,6 +108,7 @@
               v-model="props.row.expense_vendor"
               buttons
               v-slot="scope"
+              :validate="requiredFieldValidation"
               @save="(val: string) => updateGL(props.row.pk, 'vendor', val)"
             >
               <q-input
@@ -84,6 +117,11 @@
                 dense
                 autofocus
                 @keyup.enter="scope.set()"
+                :rules="[
+                  (val: string) => {
+                    return !!val || 'Required'
+                  }
+                ]"
               />
             </q-popup-edit>
           </q-td>
@@ -99,7 +137,11 @@
           </q-td>
         </template>
         <template v-slot:body-cell-gl="props">
-          <q-td key="gl" :props="props">
+          <q-td
+            key="gl"
+            :props="props"
+            :class="!monthLocked() ? 'editable' : ''"
+          >
             <span>{{ props.row.code }} (Job: {{ props.row.job }}</span>
             <span v-if="props.row.activity">, Activity: {{ props.row.activity }}</span>
             <span>): ${{ props.row.amount }}</span>
@@ -109,14 +151,19 @@
               buttons
               v-slot="scope"
               :validate="GLValidation"
-              @save="(val: GLWithApprover) => {updateGL(props.row.pk, 'gl', {
-                'code': val.code,
-                'job': val.job,
-                'activity': val.activity,
-                'approver': val.approver
-              })}"
+              @save="(val: GLWithApprover) => {
+                if (!GLValidation(val)) {
+                  return
+                }
+                updateGL(props.row.pk, 'gl', {
+                  'code': val.code,
+                  'job': val.job,
+                  'activity': val.activity,
+                  'approver': val.approver
+                })
+              }"
             >
-              <div class="gl-popup-edit">
+              <div class="gl-popup-edit row items-center">
                 <q-input
                   v-model="scope.value.code"
                   class="q-mr-sm q-pa-none"
@@ -124,7 +171,12 @@
                   mask="###-##-####-#####"
                   fill-mask="___-__-____-_____"
                   :rules="[
-                    (val: string) => !!val || 'Required',
+                    (val: string) => {
+                      if (val[val.length-1] === '_') {
+                        return 'Required'
+                      }
+                      return !!val || 'Required'
+                    }
                   ]"
                 />
                 <q-input
@@ -143,21 +195,8 @@
                   outlined dense
                   maxlength="7"
                 />
-                <div class="row q-mr-sm">
+                <div class="row q-mr-md q-ml-sm">
                   ${{  scope.value.amount }}
-                  <!-- <div class="gl-dollar-symbol">$</div>
-                  <q-input
-                    v-model="gl.amount"
-                    class="gl-amount q-pa-none"
-                    outlined
-                    dense
-                    :error="errorAmount"
-                    :error-message="errorMessageAmount"
-                    @keyup.enter="scope.set()"
-                    :rules="[
-                      (val: string) => !!val || '* Required',
-                    ]"
-                  /> -->
                 </div>
                 <EmployeeSelect
                   name="approver"
@@ -345,8 +384,12 @@
 </template>
 
 <style scoped lang="scss">
-.gl-popup-edit {
-  min-width: 993px;
+.editable {
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 </style>
 
@@ -519,14 +562,19 @@ function  openDenyGLDialog(
   showDenyDialog.value = true
 }
 
-function GLValidation (gl: any) {
-  if (isNaN(parseFloat(gl.amount))) {
-    errorAmount.value = true
-    errorMessageAmount.value = 'The value must be a number!'
+function requiredFieldValidation (val: string) {
+  if (!val) {
     return false
   }
-  errorAmount.value = false
-  errorMessageAmount.value = ''
+  return true
+}
+
+function GLValidation (gl: any) {
+  if (gl.code[gl.code.length-1] === '_') {
+    return false
+  } else if (!gl.job) {
+    return false
+  }
   return true
 }
 

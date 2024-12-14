@@ -520,15 +520,22 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
                         # If expense month has been approved by director,
                         # mark as such.
                         em.status = ExpenseMonth.STATUS_DIRECTOR_APPROVED
-                        em.fiscal_approved_at = None # Reset fiscal approval
+                        # Reset any fiscal approval
+                        em.fiscal_approved_at = None
+                        em.fiscal_approver = None
                     else:
                         # If all expenses are approved by approver,
                         # mark as such.
                         em.status = ExpenseMonth.STATUS_APPROVER_APPROVED
-                        # Reset director approval
+                        # Reset any director approval
                         em.director_approved_at = None
+                        em.director_approved = False
                 else:
+                    # Some expenses are not approved, mark as submitted.
                     em.status = ExpenseMonth.STATUS_SUBMITTED
+                    # Clear any director approval
+                    em.director_approved_at = None
+                    em.director_approved = False
                 em.submitter_note = note
             em.save()
             

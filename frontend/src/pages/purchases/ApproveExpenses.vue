@@ -273,44 +273,51 @@
                     <div class="q-table__grid-item-title">{{ col.label }}</div>
                     <div
                       class="q-table__grid-item-value"
-                      v-if="col.label == 'Purchaser'"
+                      v-if="col.name == 'expense_purchaser'"
                     >
-                      {{ col.value.name }}
+                      {{ col.value }}
                     </div>
                     <div
                       class="q-table__grid-item-value"
-                      v-else-if="col.label == 'Date'"
+                      v-else-if="col.name == 'expense_date'"
                     >
                       {{ readableDateNEW(col.value) }}
                     </div>
                     <div
                       class="q-table__grid-item-value"
-                      v-else-if="col.label == 'Amount'"
+                      v-else-if="col.name == 'expense_amount'"
                       :class="props.row.amount >= 1000 ? 'bg-yellow' : ''"
                     >
                       ${{ col.value }}
                     </div>
                     <div
                       class="q-table__grid-item-value"
-                      v-else-if="col.label == 'GL Codes'"
+                      v-else-if="col.name == 'gl'"
                     >
-                      <div
-                        class="text-pre-wrap"
-                        v-for="gl in props.row.gls"
-                        :key="props.row.gls.indexOf(gl)"
-                      >
-                        {{ gl.gl }}: ${{ gl.amount }}
-                      </div>
+                      <span>{{ props.row.code }} (Job: {{ props.row.job }}</span>
+                      <span v-if="props.row.activity">, Activity: {{ props.row.activity }}</span>
+                      <span>): ${{ props.row.amount }}</span>
                     </div>
                     <div
                       class="q-table__grid-item-value"
-                      v-else-if="col.label == 'Receipt'"
+                      v-else-if="col.name == 'receipt'"
                     >
                       <DocumentViewer
-                        v-if="col.value"
-                        :documentUrl="col.value"
-                        :iconButton="true"
+                        v-if="props.row.expense_receipt"
+                        :documentUrl="props.row.expense_receipt"
+                        iconButton
+                        flat
                       />
+                    </div>
+                    <div
+                      class="q-table__grid-item-value"
+                      v-else-if="col.name == 'note'"
+                    >
+                      <q-icon v-if="props.row.em_note" name="note" size="md">
+                        <q-tooltip class="text-body2 bg-info text-black">
+                          {{ props.row.em_note }}
+                        </q-tooltip>
+                      </q-icon>
                     </div>
                     <div
                       v-else-if="col.label == 'Approve?'"  

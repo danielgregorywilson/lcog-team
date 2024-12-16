@@ -309,10 +309,12 @@
                     v-if="props.row.receipt"
                     :documentUrl="props.row.receipt"
                     iconButton
+                    dense
                     flat
                   />
                   <!-- Button to upload file -->
                   <q-btn icon="cloud_upload"
+                    dense  
                     flat
                     :disable="monthLocked() || monthSubmitted()"
                   >
@@ -347,7 +349,6 @@
                   v-if="!monthSubmitted()"
                   class="col"
                   dense
-                  round
                   flat
                   @click="updateExpense(
                     props.row.pk, 'repeat', !props.row.repeat
@@ -365,7 +366,6 @@
                   :disable="monthLocked() || monthSubmitted()"
                   class="col"
                   dense
-                  round
                   flat
                   @click="showDeleteDialog(props.row)"
                   icon="delete"
@@ -446,6 +446,34 @@
                             </div>
                           </q-popup-edit>
                         </q-btn>
+                      </div>
+                      <div
+                        class="q-table__grid-item-value row"
+                        v-else-if="col.name == 'actions'"
+                      >
+                      <q-btn
+                        v-if="!monthSubmitted()"
+                        class="col"
+                        flat
+                        @click="updateExpense(
+                          props.row.pk, 'repeat', !props.row.repeat
+                        )"
+                        :icon="props.row.repeat ? 'repeat_on' : 'repeat'"
+                      >
+                        <q-tooltip>
+                          <div v-if="props.row.repeat">
+                            Expense will repeat next month
+                          </div>
+                          <div v-else>Click to repeat expense next month</div>
+                        </q-tooltip>
+                      </q-btn>
+                      <q-btn
+                        :disable="monthLocked() || monthSubmitted()"
+                        class="col"
+                        flat
+                        @click="showDeleteDialog(props.row)"
+                        icon="delete"
+                      />
                       </div>
                       <div class="q-table__grid-item-value" v-else>
                         {{ col.value }}

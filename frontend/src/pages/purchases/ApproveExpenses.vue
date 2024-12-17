@@ -423,9 +423,6 @@ let deniedGLExpenseName = ref('')
 let deniedGLPurchaserName = ref('')
 let denyDialogMessage = ref('')
 
-let errorAmount = ref(false)
-let errorMessageAmount = ref('')
-
 const canApprove = ref(true)
 
 const pagination = {

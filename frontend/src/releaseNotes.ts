@@ -4,6 +4,28 @@
 
 export const releases = [
   {
+    version: '0.43.0',
+    date: new Date(2024, 11, 17),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Add activity field to CC expenses.'
+      },
+      {
+        type: 'improved',
+        description: 'Approvers can edit some CC expense fields.'
+      },
+      {
+        type: 'improved',
+        description: 'Minor improvements to employee onboarding process.'
+      },
+      {
+        type: 'improved',
+        description: 'Minor improvements to the CC expenses app.'
+      }
+    ]
+  },
+  {
     version: '0.42.0',
     date: new Date(2024, 11, 4),
     changes: [

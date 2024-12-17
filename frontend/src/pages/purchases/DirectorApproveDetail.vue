@@ -92,7 +92,11 @@
                 v-for="gl in props.row.gls"
                 :key="props.row.gls.indexOf(gl)"
               >
-                <div>{{ gl.code }} ({{ gl.job }}): ${{ gl.amount }}</div>
+                <div>
+                  <span>{{ gl.code }} (Job: {{ gl.job }}</span>
+                  <span v-if="gl.activity">, Activity: {{ gl.activity }}</span>
+                  <span>): ${{ gl.amount }}</span>
+                </div>
                 <div v-if="gl.approved_at">
                   Approved by {{ gl.approver.name }}
                   ({{ readableDateTime(gl.approved_at) }})
@@ -109,6 +113,7 @@
                 v-if="props.row.receipt"
                 :documentUrl="props.row.receipt"
                 iconButton
+                flat
               />
             </q-td>
           </template>
@@ -124,35 +129,39 @@
                       </div>
                       <div
                         class="q-table__grid-item-value"
-                        v-if="col.label == 'Date'"
+                        v-if="col.name == 'date'"
                       >
                         {{ readableDateNEW(col.value) }}
                       </div>
                       <div
                         class="q-table__grid-item-value"
-                        v-if="col.label == 'Amount'"
+                        v-else-if="col.name == 'amount'"
                         :class="props.row.amount >= 1000 ? 'bg-yellow' : ''"
                       >
                         ${{ col.value }}
                       </div>
                       <div
                         class="q-table__grid-item-value"
-                        v-else-if="col.label == 'GL Codes'"
+                        v-else-if="col.name == 'gls'"
                       >
                         <div
                           class="text-pre-wrap"
                           v-for="gl in props.row.gls"
                           :key="props.row.gls.indexOf(gl)"
                         >
-                          {{ gl.code }}: ${{ gl.amount }} –
-                          {{ gl.approver.name }}
+                          <div>
+                            <span>{{ gl.code }} (Job: {{ gl.job }}</span>
+                            <span v-if="gl.activity">, Activity: {{ gl.activity }}</span>
+                            <span>): ${{ gl.amount }}</span>
+                          </div>
+                          <div v-if="gl.approved_at">
+                            Approved by {{ gl.approver.name }}
+                            ({{ readableDateTime(gl.approved_at) }})
+                          </div>
+                          <div v-else class="text-bold">
+                            Not yet approved by {{ gl.approver.name }}
+                          </div>
                         </div>
-                      </div>
-                      <div
-                        class="q-table__grid-item-value"
-                        v-else-if="col.label == 'Approved At'"
-                      >
-                        {{ readableDateTime(col.value) }}
                       </div>
                       <div
                         class="q-table__grid-item-value"
@@ -162,6 +171,7 @@
                           v-if="col.value"
                           :documentUrl="col.value"
                           iconButton
+                          flat
                         />
                       </div>
                       <div class="q-table__grid-item-value" v-else>

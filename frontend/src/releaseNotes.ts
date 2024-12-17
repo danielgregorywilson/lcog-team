@@ -8,7 +8,7 @@ export const releases = [
     date: new Date(2024, 11, 17),
     changes: [
       {
-        type: 'improved',
+        type: 'new',
         description: 'Add activity field to CC expenses.'
       },
       {

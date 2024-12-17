@@ -573,7 +573,7 @@
         :disable="!canEditOtherFields()"
       />
       <q-checkbox
-        v-if="type!='Exit'"
+        v-if="type!='Exit' && employeeID == 'CLSD'"
         id="mailbox-needed"
         v-model="mailboxNeeded"
         label="Physical Mailbox Needed"
@@ -2056,6 +2056,7 @@ function sendMailboxNotificationEmail() {
 function onSubmitSendDialog(t: 'SDS'|'FI'|'HR'|'STN'|'ASSIGN') {
   // Send mailbox notification email if needed
   if (
+    employeeID.value == 'CLSD' &&
     mailboxNeeded.value == true &&
     ['New', 'Return', 'Change/Modify'].indexOf(type.value) != -1
   ) {

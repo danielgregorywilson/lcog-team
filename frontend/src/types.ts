@@ -418,6 +418,7 @@ export interface ExpenseUpdate extends ExpenseBase {
 export interface GL {
   code: string
   job: string
+  activity: string
   amount: string
   approver?: SimpleEmployeeRetrieve
   approved: boolean
@@ -428,6 +429,10 @@ export interface GL {
   em_month: number
   em_year: number
   em_note: string
+}
+
+export interface GLWithApprover extends GL {
+  approver: SimpleEmployeeRetrieve  
 }
 
 export interface ExpenseCard {

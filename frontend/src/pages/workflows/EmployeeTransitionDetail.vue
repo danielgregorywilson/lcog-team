@@ -440,6 +440,7 @@
           label="GL Code"
           style="width: 250px;"
           :readonly="!canEditOtherFields()"
+          maxlength="30"
         />
         <q-input
           v-else

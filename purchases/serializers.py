@@ -12,11 +12,11 @@ class ExpenseGLSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ExpenseGL
         fields = [
-            'url', 'pk', 'code', 'job', 'amount', 'approver', 'approved',
-            'approved_at', 'approver_note', 'expense_name', 'expense_date',
-            'expense_amount', 'expense_description', 'expense_vendor',
-            'expense_receipt', 'expense_purchaser', 'expense_status',
-            'em_month', 'em_year', 'em_note'
+            'url', 'pk', 'code', 'job', 'activity', 'amount', 'approver',
+            'approved', 'approved_at', 'approver_note', 'expense_name',
+            'expense_date', 'expense_amount', 'expense_description',
+            'expense_vendor', 'expense_receipt', 'expense_purchaser',
+            'expense_status', 'em_month', 'em_year', 'em_note'
         ]
 
     approver = SimpleEmployeeSerializer(required=False)

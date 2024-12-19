@@ -25,13 +25,74 @@
         no-data-label="No expenses entered this month"
       >
         <template v-slot:body-cell-expense_name="props">
-          <q-td key="expense_name" :props="props" style="white-space: normal;">
+          <q-td
+            key="expense_name"
+            :props="props"
+            style="white-space: normal;"
+            :class="!monthLocked() ? 'editable' : ''"
+            >
             {{ props.row.expense_name }}
+            <q-popup-edit
+              v-if="!monthLocked()"
+              v-model="props.row.expense_name"
+              buttons
+              v-slot="scope"
+              :validate="requiredFieldValidation"
+              @save="(val: string) => {
+                if (!requiredFieldValidation(val)) {
+                  return
+                }
+                updateGL(props.row.pk, 'name', val)
+              }"
+            >
+              <q-input
+                v-model="scope.value"
+                maxlength="255"
+                dense
+                autofocus
+                @keyup.enter="scope.set()"
+                :rules="[
+                  (val: string) => {
+                    return !!val || 'Required'
+                  }
+                ]"
+              />
+            </q-popup-edit>
           </q-td>
         </template>
         <template v-slot:body-cell-expense_date="props">
-          <q-td key="expense_date" :props="props">
+          <q-td
+            key="expense_date"
+            :props="props"
+            :class="!monthLocked() ? 'editable' : ''"  
+          >
             {{ readableDateNEW(props.row.expense_date) }}
+            <q-popup-edit
+              v-if="!monthLocked()"
+              v-model="props.row.expense_date"
+              buttons
+              v-slot="scope"
+              :validate="requiredFieldValidation"
+              @save="(val: string) => {
+                if (!val) {
+                  return
+                }
+                updateGL(props.row.pk, 'date', val)
+              }"
+            >
+              <q-input
+                type="date"
+                v-model="scope.value"
+                dense
+                autofocus
+                @keyup.enter="scope.set()"
+                :rules="[
+                  (val: string) => {
+                    return !!val || 'Required'
+                  }
+                ]"
+              />
+            </q-popup-edit>
           </q-td>
         </template>
         <template v-slot:body-cell-expense_vendor="props">
@@ -39,8 +100,30 @@
             key="expense_vendor"
             :props="props"
             style="white-space: normal;"
+            :class="!monthLocked() ? 'editable' : ''"
           >
             {{ props.row.expense_vendor }}
+            <q-popup-edit
+              v-if="!monthLocked()"
+              v-model="props.row.expense_vendor"
+              buttons
+              v-slot="scope"
+              :validate="requiredFieldValidation"
+              @save="(val: string) => updateGL(props.row.pk, 'vendor', val)"
+            >
+              <q-input
+                v-model="scope.value"
+                maxlength="255"
+                dense
+                autofocus
+                @keyup.enter="scope.set()"
+                :rules="[
+                  (val: string) => {
+                    return !!val || 'Required'
+                  }
+                ]"
+              />
+            </q-popup-edit>
           </q-td>
         </template>
         <template v-slot:body-cell-expense_amount="props">
@@ -54,8 +137,83 @@
           </q-td>
         </template>
         <template v-slot:body-cell-gl="props">
-          <q-td key="gl" :props="props">
-            {{ props.row.code }} ({{ props.row.job }}): ${{ props.row.amount }}
+          <q-td
+            key="gl"
+            :props="props"
+            :class="!monthLocked() ? 'editable' : ''"
+          >
+            <span>{{ props.row.code }} (Job: {{ props.row.job }}</span>
+            <span v-if="props.row.activity">, Activity: {{ props.row.activity }}</span>
+            <span>): ${{ props.row.amount }}</span>
+            <q-popup-edit
+              v-if="!monthLocked()"
+              v-model="props.row"
+              buttons
+              v-slot="scope"
+              :validate="GLValidation"
+              @save="(val: GLWithApprover) => {
+                if (!GLValidation(val)) {
+                  return
+                }
+                updateGL(props.row.pk, 'gl', {
+                  'code': val.code,
+                  'job': val.job,
+                  'activity': val.activity,
+                  'approver': val.approver
+                })
+              }"
+            >
+              <div class="gl-popup-edit row items-center">
+                <q-input
+                  v-model="scope.value.code"
+                  class="q-mr-sm q-pa-none"
+                  outlined dense autofocus
+                  mask="###-##-####-#####"
+                  fill-mask="___-__-____-_____"
+                  :rules="[
+                    (val: string) => {
+                      if (val[val.length-1] === '_') {
+                        return 'Required'
+                      }
+                      return !!val || 'Required'
+                    }
+                  ]"
+                />
+                <q-input
+                  v-model="scope.value.job"
+                  label="Job #" stack-label
+                  class="q-mr-sm q-pa-none"
+                  outlined dense
+                  :rules="[
+                    (val: string) => !!val || 'Required or \'None\'',
+                  ]"
+                />
+                <q-input
+                  v-model="scope.value.activity"
+                  label="Activity #" stack-label
+                  class="q-mr-sm q-pa-none"
+                  outlined dense
+                  maxlength="7"
+                />
+                <div class="row q-mr-md q-ml-sm">
+                  ${{  scope.value.amount }}
+                </div>
+                <EmployeeSelect
+                  name="approver"
+                  label="Approver"
+                  :employee="scope.value.approver"
+                  :useLegalName="true"
+                  v-on:input="scope.value.approver=$event"
+                  v-on:clear="scope.value.approver=emptyEmployee"
+                  :readOnly=false
+                  :employeeFilterFn="
+                    (employee: SimpleEmployeeRetrieve) => {
+                      return employee.is_expense_approver
+                    }
+                  "
+                />
+              </div>
+            </q-popup-edit>
           </q-td>
         </template>
         <template v-slot:body-cell-receipt="props">
@@ -115,44 +273,51 @@
                     <div class="q-table__grid-item-title">{{ col.label }}</div>
                     <div
                       class="q-table__grid-item-value"
-                      v-if="col.label == 'Purchaser'"
+                      v-if="col.name == 'expense_purchaser'"
                     >
-                      {{ col.value.name }}
+                      {{ col.value }}
                     </div>
                     <div
                       class="q-table__grid-item-value"
-                      v-else-if="col.label == 'Date'"
+                      v-else-if="col.name == 'expense_date'"
                     >
                       {{ readableDateNEW(col.value) }}
                     </div>
                     <div
                       class="q-table__grid-item-value"
-                      v-else-if="col.label == 'Amount'"
+                      v-else-if="col.name == 'expense_amount'"
                       :class="props.row.amount >= 1000 ? 'bg-yellow' : ''"
                     >
                       ${{ col.value }}
                     </div>
                     <div
                       class="q-table__grid-item-value"
-                      v-else-if="col.label == 'GL Codes'"
+                      v-else-if="col.name == 'gl'"
                     >
-                      <div
-                        class="text-pre-wrap"
-                        v-for="gl in props.row.gls"
-                        :key="props.row.gls.indexOf(gl)"
-                      >
-                        {{ gl.gl }}: ${{ gl.amount }}
-                      </div>
+                      <span>{{ props.row.code }} (Job: {{ props.row.job }}</span>
+                      <span v-if="props.row.activity">, Activity: {{ props.row.activity }}</span>
+                      <span>): ${{ props.row.amount }}</span>
                     </div>
                     <div
                       class="q-table__grid-item-value"
-                      v-else-if="col.label == 'Receipt'"
+                      v-else-if="col.name == 'receipt'"
                     >
                       <DocumentViewer
-                        v-if="col.value"
-                        :documentUrl="col.value"
-                        :iconButton="true"
+                        v-if="props.row.expense_receipt"
+                        :documentUrl="props.row.expense_receipt"
+                        iconButton
+                        flat
                       />
+                    </div>
+                    <div
+                      class="q-table__grid-item-value"
+                      v-else-if="col.name == 'note'"
+                    >
+                      <q-icon v-if="props.row.em_note" name="note" size="md">
+                        <q-tooltip class="text-body2 bg-info text-black">
+                          {{ props.row.em_note }}
+                        </q-tooltip>
+                      </q-icon>
                     </div>
                     <div
                       v-else-if="col.label == 'Approve?'"  
@@ -226,17 +391,26 @@
 </template>
 
 <style scoped lang="scss">
+.editable {
+  cursor: pointer;
 
+  &:hover {
+    text-decoration: underline;
+  }
+}
 </style>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 
 import DocumentViewer from 'src/components/DocumentViewer.vue'
+import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import { readableDateNEW } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
 import { usePurchaseStore } from 'src/stores/purchase'
-import { GL } from 'src/types'
+import {
+  emptyEmployee, GL, GLWithApprover, SimpleEmployeeRetrieve
+} from 'src/types'
 
 const purchaseStore = usePurchaseStore()
 
@@ -343,6 +517,30 @@ function retrieveAllExpenseGLsToApprove(): Promise<void> {
   })
 }
 
+function monthLocked() {
+  return purchaseStore.expenseMonthLocked
+}
+
+function updateGL(
+  pk: number,
+  field: 'name' | 'date' | 'vendor' | 'gl',
+  val: string | {
+    'code': string, 'job': string, 'activity': string,
+    'approver': SimpleEmployeeRetrieve
+  }
+) {
+  if (monthLocked()) {
+    return
+  }
+  purchaseStore.updateGL(pk, field, val)
+    .then(() => {
+      retrieveThisMonthExpenseGLsToApprove()
+    })
+    .catch((error) => {
+      console.log('Error updating expense GL', error)
+    })
+}
+
 function approveGL(pk: number, approved: boolean) {
   canApprove.value = false
   setTimeout(() => {
@@ -366,6 +564,22 @@ function  openDenyGLDialog(
   deniedGLExpenseName.value = expenseName
   deniedGLPurchaserName.value = purchaserName
   showDenyDialog.value = true
+}
+
+function requiredFieldValidation (val: string) {
+  if (!val) {
+    return false
+  }
+  return true
+}
+
+function GLValidation (gl: any) {
+  if (gl.code[gl.code.length-1] === '_') {
+    return false
+  } else if (!gl.job) {
+    return false
+  }
+  return true
 }
 
 onMounted(() => {

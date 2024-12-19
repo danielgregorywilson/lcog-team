@@ -98,14 +98,20 @@
               :props="props"
               :class="expenseClass(props.row)"
             >
-              <q-td key="name" :props="props" style="white-space: normal;">
+              <q-td
+                key="name"
+                :props="props"
+                style="white-space: normal;"
+                :class="!monthLocked() && !monthSubmitted() ? 'editable' : ''"
+              >
                 {{ props.row.name }}
                 <q-popup-edit
                   v-if="!monthLocked() && !monthSubmitted()"
                   v-model="props.row.name"
                   buttons
                   v-slot="scope"
-                  @save="(val) => updateExpense(props.row.pk, 'name', val)"
+                  @save="(val: string) => 
+                    updateExpense(props.row.pk, 'name', val)"
                 >
                   <q-input
                     v-model="scope.value"
@@ -116,14 +122,19 @@
                   />
                 </q-popup-edit>
               </q-td>
-              <q-td key="date" :props="props">
+              <q-td
+                key="date"
+                :props="props"
+                :class="!monthLocked() && !monthSubmitted() ? 'editable' : ''"
+              >
                 {{ readableDateNEW(props.row.date) }}
                 <q-popup-edit
                   v-if="!monthLocked() && !monthSubmitted()"
                   v-model="props.row.date"
                   buttons
                   v-slot="scope"
-                  @save="(val) => updateExpense(props.row.pk, 'date', val)"
+                  @save="(val: string) =>
+                    updateExpense(props.row.pk, 'date', val)"
                 >
                   <q-input
                     type="date"
@@ -134,14 +145,20 @@
                   />
                 </q-popup-edit>
               </q-td>
-              <q-td key="vendor" :props="props" style="white-space: normal;">
+              <q-td
+                key="vendor"
+                :props="props"
+                style="white-space: normal;"
+                :class="!monthLocked() && !monthSubmitted() ? 'editable' : ''"
+              >
                 <div class="text-pre-wrap">{{ props.row.vendor }}</div>
                 <q-popup-edit
                   v-if="!monthLocked() && !monthSubmitted()"
                   v-model="props.row.vendor"
                   buttons
                   v-slot="scope"
-                  @save="(val) => updateExpense(props.row.pk, 'vendor', val)"
+                  @save="(val: string) =>
+                    updateExpense(props.row.pk, 'vendor', val)"
                 >
                   <q-input
                     v-model="scope.value"
@@ -152,7 +169,11 @@
                   />
                 </q-popup-edit>
               </q-td>
-              <q-td key="amount" :props="props">
+              <q-td
+                key="amount"
+                :props="props"
+                :class="!monthLocked() && !monthSubmitted() ? 'editable' : ''"
+              >
                 {{ props.row.amount }}
                 <q-popup-edit
                   v-if="!monthLocked() && !monthSubmitted()"
@@ -160,10 +181,10 @@
                   buttons
                   v-slot="scope"
                   :validate="amountValidation"
-                  @update:model-value="(val) => {
+                  @update:model-value="(val: string) => {
                     props.row.amount = parseFloat(val).toFixed(2).toString()
                   }"
-                  @save="(val) => {
+                  @save="(val: string) => {
                     updateExpense(props.row.pk, 'amount', val)
                   }"
                 >
@@ -179,14 +200,19 @@
                   </div>  
                 </q-popup-edit>
               </q-td>
-              <q-td key="gls" :props="props">
+              <q-td
+                key="gls"
+                :props="props"
+                :class="!monthLocked() && !monthSubmitted() ? 'editable' : ''"
+              >
                 <div
                   class="text-pre-wrap"
                   v-for="gl in props.row.gls"
                   :key="props.row.gls.indexOf(gl)"
                 >
-                  {{ gl.code }} ({{ gl.job }}): ${{ gl.amount }} –
-                  {{ gl.approver?.name }}
+                  <span>{{ gl.code }} (Job: {{ gl.job }}</span>
+                  <span v-if="gl.activity">, Activity: {{ gl.activity }}</span>
+                  <span>): ${{ gl.amount }} – {{ gl.approver?.name }}</span>
                 </div>
                 <q-popup-edit
                   v-if="!monthLocked() && !monthSubmitted()"
@@ -194,7 +220,7 @@
                   buttons
                   v-slot="scope"
                   :validate="GLValidation"
-                  @save="(val) => {
+                  @save="(val: Array<GL>) => {
                     updateExpense(props.row.pk, 'gls', val)
                   }"
                 >
@@ -211,7 +237,7 @@
                         mask="###-##-####-#####"
                         fill-mask="___-__-____-_____"
                         :rules="[
-                          val => !!val || 'Required',
+                          (val: string) => !!val || 'Required',
                         ]"
                       />
                       <q-input
@@ -220,8 +246,15 @@
                         class="q-mr-sm q-pa-none"
                         outlined dense
                         :rules="[
-                          val => !!val || 'Required or \'None\'',
+                          (val: string) => !!val || 'Required or \'None\'',
                         ]"
+                      />
+                      <q-input
+                        v-model="gl.activity"
+                        label="Activity #" stack-label
+                        class="q-mr-sm q-pa-none"
+                        outlined dense
+                        maxlength="7"
                       />
                       <div class="row q-mr-sm">
                         <div class="gl-dollar-symbol">$</div>
@@ -234,7 +267,7 @@
                           :error-message="errorMessageAmount"
                           @keyup.enter="scope.set()"
                           :rules="[
-                            val => !!val || '* Required',
+                            (val: string) => !!val || '* Required',
                           ]"
                         />
                       </div>
@@ -260,9 +293,10 @@
                       />
                     </div>
                     <div class="row justify-center q-mt-sm">
-                      <q-btn class="col-6" @click="scope.value.push(
-                        {code: '', job: '', amount: '', approver: emptyEmployee}
-                      )">
+                      <q-btn class="col-6" @click="scope.value.push({
+                        code: '', job: '', activity: '', amount: '',
+                        approver: emptyEmployee
+                      })">
                         Add a GL
                       </q-btn>
                     </div>
@@ -275,10 +309,12 @@
                     v-if="props.row.receipt"
                     :documentUrl="props.row.receipt"
                     iconButton
+                    dense
                     flat
                   />
                   <!-- Button to upload file -->
                   <q-btn icon="cloud_upload"
+                    dense  
                     flat
                     :disable="monthLocked() || monthSubmitted()"
                   >
@@ -313,7 +349,6 @@
                   v-if="!monthSubmitted()"
                   class="col"
                   dense
-                  round
                   flat
                   @click="updateExpense(
                     props.row.pk, 'repeat', !props.row.repeat
@@ -331,7 +366,6 @@
                   :disable="monthLocked() || monthSubmitted()"
                   class="col"
                   dense
-                  round
                   flat
                   @click="showDeleteDialog(props.row)"
                   icon="delete"
@@ -367,7 +401,9 @@
                           v-for="gl in props.row.gls"
                           :key="props.row.gls.indexOf(gl)"
                         >
-                          {{ gl.code }} ({{ gl.job }}): ${{ gl.amount }} –
+                          <span>{{ gl.code }} (Job: {{ gl.job }}</span>
+                          <span v-if="gl.activity">, Activity: {{ gl.activity }}</span>
+                          <span>): ${{ gl.amount }} –</span>
                           {{ gl.approver?.name }}
                         </div>
                       </div>
@@ -410,6 +446,34 @@
                             </div>
                           </q-popup-edit>
                         </q-btn>
+                      </div>
+                      <div
+                        class="q-table__grid-item-value row"
+                        v-else-if="col.name == 'actions'"
+                      >
+                      <q-btn
+                        v-if="!monthSubmitted()"
+                        class="col"
+                        flat
+                        @click="updateExpense(
+                          props.row.pk, 'repeat', !props.row.repeat
+                        )"
+                        :icon="props.row.repeat ? 'repeat_on' : 'repeat'"
+                      >
+                        <q-tooltip>
+                          <div v-if="props.row.repeat">
+                            Expense will repeat next month
+                          </div>
+                          <div v-else>Click to repeat expense next month</div>
+                        </q-tooltip>
+                      </q-btn>
+                      <q-btn
+                        :disable="monthLocked() || monthSubmitted()"
+                        class="col"
+                        flat
+                        @click="showDeleteDialog(props.row)"
+                        icon="delete"
+                      />
                       </div>
                       <div class="q-table__grid-item-value" v-else>
                         {{ col.value }}
@@ -655,9 +719,16 @@
   font-size: 1.2em;
 }
 
+.editable {
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .gl-popup-edit {
-  min-width: 790px;
-  
+  min-width: 993px;
 }
 
 .gl-amount {
@@ -943,6 +1014,11 @@ function formErrorItems() {
           `Provide a valid GL code for each GL row in ${exp.name}`
         )
       }
+      if (!gl.job) {
+        errorItems.push(
+          `Provide a valid Job number for each GL row in ${exp.name} or enter 'None'`
+        )
+      }
       if (!gl.amount) {
         errorItems.push(
           `Provide a GL amount for each GL row in ${exp.name}`
@@ -1131,7 +1207,7 @@ function updateSelectedEMStore(pk?: number) {
 
 function updateExpense(
   pk: number,
-  field: 'name' | 'date' | 'amount' | 'vendor' | 'gls' | 'repeat',
+  field: 'name' | 'date' | 'vendor' | 'amount' | 'gls' | 'repeat',
   val: string | Array<GL> | boolean
 ) {
   if (monthLocked()) {

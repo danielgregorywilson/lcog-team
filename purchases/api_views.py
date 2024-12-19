@@ -83,6 +83,51 @@ class ExpenseGLViewSet(viewsets.ModelViewSet):
         else:
             return ExpenseGL.objects.none()
 
+    def update(self, request, pk):
+        """
+        Approver updates an expense from a GL row.
+        """
+        try:
+            gl = ExpenseGL.objects.get(pk=pk)
+            expense = gl.expense
+
+            field = request.data.get('field', None)
+            val = request.data.get('val', None)
+            if not field:
+                return Response(
+                    data='Field and value required.',
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            if field in ['name', 'date', 'vendor']:
+                setattr(expense, field, val)
+                expense.save()
+            elif field == 'gl':
+                setattr(gl, 'code', val['code'])
+                setattr(gl, 'job', val['job'])
+                setattr(gl, 'activity', val['activity'])
+                
+                approver_obj = val['approver']
+                if not approver_obj or not approver_obj['pk']:
+                    raise Exception('Approver must be set.')
+                else:
+                    approver = Employee.objects.get(pk=approver_obj['pk'])
+                    setattr(gl, 'approver', approver)
+                gl.save()
+            
+            serialized_gl = ExpenseGLSerializer(
+                gl, context={'request': request}
+            )
+            return Response(serialized_gl.data)
+
+        except Exception as e:
+            message = 'Error updating expense GL.'
+            record_error(message, e, request, traceback.format_exc())
+            return Response(
+                data=message,
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
     @action(detail=True, methods=['put'])
     def approver_approve(self, request, pk=None):
         """
@@ -224,6 +269,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                 pk = gl.get('pk', None)
                 code = gl.get('code', None)
                 job = gl.get('job', None)
+                activity = gl.get('activity', None)
                 amount = gl.get('amount', None)
                 approver_obj = gl.get('approver')
                 if not approver_obj:
@@ -241,6 +287,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                     if (
                         expense_gl.code != code or
                         expense_gl.job != job or
+                        expense_gl.activity != activity or
                         expense_gl.amount != amount or
                         expense_gl.approver != approver
                     ):
@@ -252,6 +299,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                     expense_gl = ExpenseGL.objects.create(expense=expense)
                 expense_gl.code = code
                 expense_gl.job = job
+                expense_gl.activity = activity
                 expense_gl.amount = amount
                 expense_gl.approver = approver
 
@@ -435,6 +483,7 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
                         expense=new_expense,
                         code=gl.code,
                         job=gl.job,
+                        activity=gl.activity,
                         amount=gl.amount,
                         approver=gl.approver
                     )
@@ -471,15 +520,22 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
                         # If expense month has been approved by director,
                         # mark as such.
                         em.status = ExpenseMonth.STATUS_DIRECTOR_APPROVED
-                        em.fiscal_approved_at = None # Reset fiscal approval
+                        # Reset any fiscal approval
+                        em.fiscal_approved_at = None
+                        em.fiscal_approver = None
                     else:
                         # If all expenses are approved by approver,
                         # mark as such.
                         em.status = ExpenseMonth.STATUS_APPROVER_APPROVED
-                        # Reset director approval
+                        # Reset any director approval
                         em.director_approved_at = None
+                        em.director_approved = False
                 else:
+                    # Some expenses are not approved, mark as submitted.
                     em.status = ExpenseMonth.STATUS_SUBMITTED
+                    # Clear any director approval
+                    em.director_approved_at = None
+                    em.director_approved = False
                 em.submitter_note = note
             em.save()
             

@@ -23,8 +23,12 @@
           <q-tr
             :props="props"
             :no-hover="!expenseMonthManagerApproved(props.row)"
-            class="cursor-pointer"
-            @click="navigateToDetail(props.row.pk)"
+            :class="canViewDetail(props.row.status) ? 'cursor-pointer' : ''"
+            @click="() => {
+              if (canViewDetail(props.row.status)) {
+                navigateToDetail(props.row.pk)
+              }
+            }"
           >
             <q-td key="employee" :props="props">
               {{ props.row.purchaser.name }} - {{  props.row.card.display }}
@@ -200,6 +204,10 @@ function progressBarColor(status: string) {
     default:
       return 'grey'
   }
+}
+
+function canViewDetail(status: string) {
+  return status !== 'draft'
 }
 
 function retrieveThisMonthEMs(): Promise<void> {

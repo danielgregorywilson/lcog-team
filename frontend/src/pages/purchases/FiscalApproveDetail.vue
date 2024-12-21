@@ -437,7 +437,7 @@ function retrieveExpenseMonthCardExpenseMonths(): Promise<void> {
       return
     }
     purchaseStore.getFiscalExpenseMonths(
-      null, null, expenseMonthPK.value
+      true, null, null, expenseMonthPK.value
     )
       .then((ems) => {
         purchaseStore.setMonth(ems[0].month, ems[0].year)

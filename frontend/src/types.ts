@@ -361,20 +361,23 @@ interface ExpenseBase {
     'fiscal_denied'
 }
 
-export interface ExpenseMonth extends ExpenseBase {
+export interface SimpleExpenseMonth extends ExpenseBase {
   pk: number
   month: number
   year: number
   purchaser: SimpleEmployeeRetrieve
   card: ExpenseCard
+  director_approved: boolean
+  director_approved_at: string
+  fiscal_approver: SimpleEmployeeRetrieve
+  fiscal_approved_at: string
+}
+
+export interface ExpenseMonth extends SimpleExpenseMonth {
   statement: ExpenseStatement
   expenses: Array<Expense>
   submitter_note: string
-  director_approved: boolean
-  director_approved_at: string
   director_note: string
-  fiscal_approver: SimpleEmployeeRetrieve
-  fiscal_approved_at: string
   fiscal_note: string
 }
 

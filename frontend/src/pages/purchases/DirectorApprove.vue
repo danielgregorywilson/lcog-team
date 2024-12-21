@@ -23,8 +23,12 @@
           <q-tr
             :props="props"
             :no-hover="!expenseMonthManagerApproved(props.row)"
-            class="cursor-pointer"
-            @click="navigateToDetail(props.row.pk)"
+            :class="canViewDetail(props.row.status) ? 'cursor-pointer' : ''"
+            @click="() => {
+              if (canViewDetail(props.row.status)) {
+                navigateToDetail(props.row.pk)
+              }
+            }"
           >
             <q-td key="employee" :props="props">
               {{ props.row.purchaser.name }} - {{  props.row.card.display }}
@@ -202,10 +206,14 @@ function progressBarColor(status: string) {
   }
 }
 
+function canViewDetail(status: string) {
+  return status !== 'draft'
+}
+
 function retrieveThisMonthEMs(): Promise<void> {
   return new Promise((resolve, reject) => {
     purchaseStore.getDirectorExpenseMonths(
-      purchaseStore.yearInt, purchaseStore.monthInt
+      false, purchaseStore.yearInt, purchaseStore.monthInt
     )
       .then(() => {
         thisMonthEMsLoaded.value = true
@@ -220,7 +228,7 @@ function retrieveThisMonthEMs(): Promise<void> {
 
 function retrieveAllEMs(): Promise<void> {
   return new Promise((resolve, reject) => {
-    purchaseStore.getDirectorExpenseMonths()
+    purchaseStore.getDirectorExpenseMonths(false)
       .then(() => {
         allEMsLoaded.value = true
         resolve()

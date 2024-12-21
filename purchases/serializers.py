@@ -157,6 +157,23 @@ class ExpenseMonthSerializer(serializers.HyperlinkedModelSerializer):
             ).data
 
 
+class SimpleExpenseMonthSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    Suitable for list views
+    """
+
+    class Meta:
+        model = ExpenseMonth
+        fields = [
+            'url', 'pk', 'purchaser', 'month', 'year', 'card',
+            'director_approved', 'director_approved_at', 'fiscal_approved_at',
+            'status'
+        ]
+
+    purchaser = SimpleEmployeeSerializer(required=False)
+    card = ExpenseCardSerializer(required=False)
+
+
 class ExpenseMonthLockSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:

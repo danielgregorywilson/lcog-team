@@ -213,7 +213,7 @@ function canViewDetail(status: string) {
 function retrieveThisMonthEMs(): Promise<void> {
   return new Promise((resolve, reject) => {
     purchaseStore.getDirectorExpenseMonths(
-      purchaseStore.yearInt, purchaseStore.monthInt
+      false, purchaseStore.yearInt, purchaseStore.monthInt
     )
       .then(() => {
         thisMonthEMsLoaded.value = true
@@ -228,7 +228,7 @@ function retrieveThisMonthEMs(): Promise<void> {
 
 function retrieveAllEMs(): Promise<void> {
   return new Promise((resolve, reject) => {
-    purchaseStore.getDirectorExpenseMonths()
+    purchaseStore.getDirectorExpenseMonths(false)
       .then(() => {
         allEMsLoaded.value = true
         resolve()

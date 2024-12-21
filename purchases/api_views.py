@@ -20,7 +20,7 @@ from purchases.models import (
 )
 from purchases.serializers import (
     ExpenseGLSerializer, ExpenseMonthSerializer, ExpenseMonthLockSerializer,
-    ExpenseSerializer, ExpenseStatementSerializer
+    ExpenseSerializer, ExpenseStatementSerializer, SimpleExpenseMonthSerializer
 )
 
 def all_expense_gls_approved(expense):
@@ -361,6 +361,12 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 class ExpenseMonthViewSet(viewsets.ModelViewSet):
     queryset = ExpenseMonth.objects.all()
     serializer_class = ExpenseMonthSerializer
+
+    def get_serializer_class(self):
+        detail = self.request.query_params.get('detail', None)
+        if detail and detail == 'false':
+            return SimpleExpenseMonthSerializer
+        return super().get_serializer_class()
 
     def get_queryset(self):
         user = self.request.user

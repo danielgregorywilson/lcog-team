@@ -506,7 +506,7 @@ function canViewDetail(status: string) {
 function retrieveThisMonthEMs(): Promise<void> {
   return new Promise((resolve, reject) => {
     purchaseStore.getFiscalExpenseMonths(
-      purchaseStore.yearInt, purchaseStore.monthInt
+      false, purchaseStore.yearInt, purchaseStore.monthInt
     )
       .then(() => {
         thisMonthExpensesLoaded.value = true
@@ -521,7 +521,7 @@ function retrieveThisMonthEMs(): Promise<void> {
 
 function retrieveAllEMs(): Promise<void> {
   return new Promise((resolve, reject) => {
-    purchaseStore.getFiscalExpenseMonths()
+    purchaseStore.getFiscalExpenseMonths(false)
       .then(() => {
         allExpensesLoaded.value = true
         resolve()

@@ -38,7 +38,7 @@
     </template>
     <template v-slot:body-cell-createdBy="props">
       <q-td key="createdBy" :props="props">
-        {{ props.row.created_by.display_name }}
+        {{ props.row.created_by?.display_name }}
       </q-td>
     </template>
     <template v-slot:body-cell-createdAt="props">

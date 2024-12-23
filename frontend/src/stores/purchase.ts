@@ -4,7 +4,8 @@ import { defineStore } from 'pinia'
 import { apiURL, handlePromiseError } from 'src/stores/index'
 import {
   Expense, ExpenseCreate, ExpenseMonth, ExpenseMonthCreate, ExpenseMonthLock,
-  ExpenseMonthLockCreate, ExpenseStatement, GL, SimpleEmployeeRetrieve
+  ExpenseMonthLockCreate, ExpenseStatement, GL, SimpleEmployeeRetrieve,
+  SimpleExpenseMonth
 } from 'src/types'
 
 export const usePurchaseStore = defineStore('purchase', {
@@ -412,12 +413,13 @@ export const usePurchaseStore = defineStore('purchase', {
     /////////////////////////
 
     getDirectorExpenseMonths(
+      detail = true,
       yearInt: number | null = null,
       monthInt: number | null = null,
       expenseMonthPK: number | null = null
     ): Promise<ExpenseMonth[]> {
       return new Promise((resolve, reject) => {
-        let params = '?director=true'
+        let params = `?director=true&detail=${ detail }`
         if (!!yearInt && !!monthInt) {
           params += `&year=${ yearInt }&month=${ monthInt }`
         }
@@ -440,7 +442,7 @@ export const usePurchaseStore = defineStore('purchase', {
 
             // Set active month: The first month that is not yet approved
             emsDirectorToApprove = emsDirectorToApprove.sort(
-              (a: ExpenseMonth, b: ExpenseMonth) => {
+              (a, b) => {
                 if (a.year !== b.year) return a.year - b.year
                 return a.month - b.month
               }
@@ -488,12 +490,13 @@ export const usePurchaseStore = defineStore('purchase', {
     //////////////
 
     getFiscalExpenseMonths(
+      detail = true,
       yearInt: number | null = null,
       monthInt: number | null = null,
       expenseMonthPK: number | null = null
     ): Promise<ExpenseMonth[]> {
       return new Promise((resolve, reject) => {
-        let params = '?fiscal=true'
+        let params = `?fiscal=true&detail=${ detail }`
         if (!!yearInt && !!monthInt) {
           params += `&year=${ yearInt }&month=${ monthInt }`
         }
@@ -520,7 +523,7 @@ export const usePurchaseStore = defineStore('purchase', {
             
             // Set active month: The first month that is not yet approved
             emsFiscalToApprove = emsFiscalToApprove.sort(
-              (a: ExpenseMonth, b: ExpenseMonth) => {
+              (a, b) => {
                 if (a.year !== b.year) return a.year - b.year
                 return a.month - b.month
               }

@@ -153,7 +153,7 @@
                   class="q-table__grid-item-value"
                   v-if="col.name == 'createdBy'"
                 >
-                  {{ col.value.display_name }}
+                  {{ col.value?.display_name }}
                 </div>
                 <div
                   class="q-table__grid-item-value"

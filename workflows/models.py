@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 import json
+import requests
 import traceback
 
 from django.core.exceptions import ValidationError
@@ -535,6 +536,18 @@ class Action(models.Model):
         elif self.type == self.API:
             # TODO
             pass
+        elif self.type == self.EMAIL:
+            # TODO
+            pass
+    
+    def trigger(self):
+        if self.type == self.LINK:
+            # TODO
+            pass
+        elif self.type == self.API:
+            # Make an http request to the url
+            response = requests.get(self.url)
+            import pdb; pdb.set_trace()
         elif self.type == self.EMAIL:
             # TODO
             pass

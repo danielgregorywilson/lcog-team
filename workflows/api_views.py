@@ -768,6 +768,10 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
             stepinstance.completed_by = request.user.employee
             stepinstance.save()
 
+            # Trigger any completion actions
+            if stepinstance.step.completion_action:
+                stepinstance.step.completion_action.trigger()
+
             # Update the process instance
             processinstance = stepinstance.process_instance
             if stepinstance.step.end:

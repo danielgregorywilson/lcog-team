@@ -24,7 +24,10 @@ class Desk(models.Model):
     objects = models.Manager()
     active_objects = ActiveManager()
 
-    building = models.CharField(_("building"), max_length=1, choices=BUILDING_CHOICE, default=SCHAEFERS)
+    building = models.CharField(
+        _("building"), max_length=1, choices=BUILDING_CHOICE,
+        default=SCHAEFERS
+    )
     floor = models.PositiveSmallIntegerField(default=1)
     number = models.CharField(max_length=10, unique=True)
     active = models.BooleanField(default=True)
@@ -34,6 +37,7 @@ class Desk(models.Model):
     @property
     def held_today(self):
         # Return true if there is a hold on a desk today
+        # Check day of week
         day_of_week = datetime.now(tz=get_current_timezone()).weekday()
         day = None
         if day_of_week == 0:
@@ -48,11 +52,19 @@ class Desk(models.Model):
             day = DeskHold.FRIDAY
         if DeskHold.active_objects.filter(desk=self, day=day).count():
             return True
+        # Check dates
+        for hold in DeskHold.active_objects.filter(desk=self):
+            if hold.dates and isinstance(hold.dates, list) and datetime.now(
+                tz=get_current_timezone()
+            ).date().isoformat() in hold.dates:
+                return True
         return False
     
     @property
-    def todays_hold(self):
-        # Return today's hold if there is a hold on a desk today
+    def todays_holds(self):
+        # Return today's holds if there are any holds on a desk today.
+        # Check day of week
+        holds = []
         day_of_week = datetime.now(tz=get_current_timezone()).weekday()
         if day_of_week == 0:
             day = DeskHold.MONDAY
@@ -65,7 +77,17 @@ class Desk(models.Model):
         elif day_of_week == 4:
             day = DeskHold.FRIDAY
         if DeskHold.active_objects.filter(desk=self, day=day).count():
-            return DeskHold.active_objects.filter(desk=self, day=day).first()
+            hold = DeskHold.active_objects.filter(desk=self, day=day).first()
+            if hold:
+                holds.append(hold)
+        # Check dates
+        for hold in DeskHold.active_objects.filter(desk=self):
+            if hold.dates and isinstance(hold.dates, list) and datetime.now(
+                tz=get_current_timezone()
+            ).date().isoformat() in hold.dates:
+                holds.append(hold)
+        if holds:
+            return holds
         return None
 
 
@@ -93,10 +115,22 @@ class DeskHold(models.Model):
     active_objects = ActiveManager()
 
     active = models.BooleanField(default=True)
-    desk = models.ForeignKey("deskreservation.Desk", related_name="holds", on_delete=models.CASCADE)
-    employees = models.ManyToManyField("people.Employee", related_name="desk_holds")
-    day = models.CharField(_("day"), max_length=1, choices=DAY_CHOICE)
-
+    desk = models.ForeignKey(
+        "deskreservation.Desk", related_name="holds", on_delete=models.CASCADE
+    )
+    employees = models.ManyToManyField(
+        "people.Employee", related_name="desk_holds"
+    )
+    day = models.CharField(
+        _("day"), max_length=1, choices=DAY_CHOICE, blank=True, null=True
+    )
+    dates = models.JSONField(
+        _("dates"),
+        blank=True,
+        null=True,
+        default=list,
+        help_text="Format: YYYY-MM-DD. e.g. [\"2025-01-30\", \"2025-01-31\"]",
+    )
 
 class CurrentlyReservedManager(models.Manager):
     def get_queryset(self):
@@ -115,7 +149,19 @@ class DeskReservation(models.Model):
     objects = models.Manager()
     currently_reserved_objects = CurrentlyReservedManager()
 
-    employee = models.ForeignKey("people.Employee", related_name="desk_reservations", on_delete=models.CASCADE)
-    desk = models.ForeignKey("deskreservation.Desk", related_name="reservations", on_delete=models.CASCADE)
-    check_in = models.DateTimeField(_("check-in datetime"), auto_now=False, auto_now_add=True)
-    check_out = models.DateTimeField(_("check-out datetime"), null=True, auto_now=False, auto_now_add=False)
+    employee = models.ForeignKey(
+        "people.Employee",
+        related_name="desk_reservations",
+        on_delete=models.CASCADE
+    )
+    desk = models.ForeignKey(
+        "deskreservation.Desk",
+        related_name="reservations",
+        on_delete=models.CASCADE
+    )
+    check_in = models.DateTimeField(
+        _("check-in datetime"), auto_now=False, auto_now_add=True
+    )
+    check_out = models.DateTimeField(
+        _("check-out datetime"), null=True, auto_now=False, auto_now_add=False
+    )

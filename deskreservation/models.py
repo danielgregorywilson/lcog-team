@@ -54,7 +54,7 @@ class Desk(models.Model):
             return True
         # Check dates
         for hold in DeskHold.active_objects.filter(desk=self):
-            if datetime.now(
+            if hold.dates and isinstance(hold.dates, list) and datetime.now(
                 tz=get_current_timezone()
             ).date().isoformat() in hold.dates:
                 return True
@@ -82,7 +82,7 @@ class Desk(models.Model):
                 holds.append(hold)
         # Check dates
         for hold in DeskHold.active_objects.filter(desk=self):
-            if datetime.now(
+            if hold.dates and isinstance(hold.dates, list) and datetime.now(
                 tz=get_current_timezone()
             ).date().isoformat() in hold.dates:
                 holds.append(hold)

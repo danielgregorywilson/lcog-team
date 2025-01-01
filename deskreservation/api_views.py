@@ -64,7 +64,7 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
                 context={'request': request})
             return Response({**serialized_reservation.data, 'created': False})
         else:
-            if desk.held_today and employee not in desk.todays_hold.employees.all():
+            if desk.held_today and not any([employee in hold.employees.all() for hold in desk.todays_holds]):
                 # Check to see if the desk is held for other employees today.
                 return Response({'desk_number': request.data['desk_number'], 'desk_held': True})
             else:

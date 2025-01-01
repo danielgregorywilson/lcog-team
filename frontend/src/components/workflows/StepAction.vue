@@ -1,5 +1,6 @@
 <template>
 <div>
+  {{ action }}
   <div v-if="action.type == 'LINK'">
     <q-btn
       @click="navigateToURL(action.url.toString())"

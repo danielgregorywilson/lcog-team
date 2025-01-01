@@ -4,8 +4,7 @@ import { defineStore } from 'pinia'
 import { apiURL, handlePromiseError } from 'src/stores/index'
 import {
   Expense, ExpenseCreate, ExpenseMonth, ExpenseMonthCreate, ExpenseMonthLock,
-  ExpenseMonthLockCreate, ExpenseStatement, GL, SimpleEmployeeRetrieve,
-  SimpleExpenseMonth
+  ExpenseMonthLockCreate, ExpenseStatement, GL, SimpleEmployeeRetrieve
 } from 'src/types'
 
 export const usePurchaseStore = defineStore('purchase', {

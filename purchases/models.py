@@ -155,7 +155,6 @@ class Expense(ExpenseBaseModel):
         max_digits=10, decimal_places=2, blank=True, null=True
     )
     vendor = models.CharField(max_length=255, blank=True)
-    job = models.CharField(max_length=255, blank=True)
     receipt = models.FileField(
         _("receipt"), upload_to="uploads/expenses", blank=True, null=True
     )

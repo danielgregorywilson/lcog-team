@@ -5,7 +5,9 @@ import {
 
 let routes: RouteRecordRaw[] = []
 
-if (import.meta.env.VITE_APP_MAINTENANCE_MODE === 'True') {
+const maintenanceMode = false
+
+if (maintenanceMode) {
   routes = [
     {
       path: '/:pathMatch(.*)*',

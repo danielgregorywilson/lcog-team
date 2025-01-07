@@ -38,6 +38,7 @@ class Command(BaseCommand):
                     'putting her in for this pay period (as of 6/2/19) as a 2-step increase, and I am asking Payroll to process retroactive pay for her for the period of 1/1/18 to 12/31/18 (which includes a COLA at 7/1/18) at Step 6 and for the period 1/1/19 to 6/1/19 at Step 7.\n\n06/12/2019 05:57 PM - clid1559',
                     '4.\n10/26/2024 12:15 PM - clid1559',
                     '2024\n04/12/2024 03:10 PM - clid1559',
+                    'received.\n\n03/17/2024 01:33 PM - clid1559'
                 ]:
                     continue
                 if row[0]:

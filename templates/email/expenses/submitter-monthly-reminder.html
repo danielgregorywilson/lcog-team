@@ -6,16 +6,16 @@
     </head>
     <body style="margin: 15px;">
         <h1>Credit Card Expenses</h1>
-        
         <p>It's time to submit your credit card expenses for the month of {{ context.curr_month_name }}.</p>
-        {% if context.message_type == 'last_month' %}
+        {% if context.message_type == 'draft' %}
+        <p><a href="{{context.expenses_url}}">Please finalize them</a>, select your credit card statement, and submit as soon as you can.</p>
+        {% elif context.message_type == 'statement' %}
+        <p><a href="{{context.expenses_url}}">Please enter them</a>, select your credit card statement, and submit as soon as you can.</p>
+        {% elif context.message_type == 'last_month' %}
         <p>If you have any, <a href="{{context.expenses_url}}">please enter them</a>, select your credit card statement, and submit as soon as you can.</p>
         <p>If not, you can ignore this message.</p>
-        {% elif context.message_type == 'draft' %}
-        <p><a href="{{context.expenses_url}}">Please finalize them</a>, select your credit card statement, and submit as soon as you can.</p>
         {% endif %}
         <p>Thank you!</p>
-
         <p>View all your expenses: <a href="{{context.expenses_url}}">{{context.expenses_url}}</a></p>
         <p>View and update your email preferences: <a href="{{context.profile_url}}">{{context.profile_url}}</a></p>
     </body>

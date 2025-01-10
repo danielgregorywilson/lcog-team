@@ -10,7 +10,7 @@ export const releases = [
       {
         type: 'improved',
         description: 'Improve Credit Card submitter notifications.'
-      }
+      },
       {
         type: 'improved',
         description: 'Display Credit Card statement cleared statuses.'

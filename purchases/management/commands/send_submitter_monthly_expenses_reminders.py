@@ -11,6 +11,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         num_employees = send_submitter_monthly_expenses_reminders()
         dt = datetime.now()
-        message = f'{dt} - Sent end-of-month CC expense notifications to \
-            {num_employees} submitters.'
+        message = f'{dt} - Sent end-of-month CC expense notifications to ' + \
+            f'{num_employees} submitters.'
         self.stdout.write(self.style.SUCCESS(message))

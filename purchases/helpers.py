@@ -8,7 +8,7 @@ from django.utils.html import strip_tags
 
 from mainsite.helpers import send_email, send_email_multiple
 from people.models import Employee
-from purchases.models import ExpenseMonth
+from purchases.models import ExpenseMonth, ExpenseStatement
 
 
 def send_submitter_monthly_expenses_reminders():
@@ -44,24 +44,33 @@ def send_submitter_monthly_expenses_reminders():
             if em:
                 recipients.append([sub.user.email, 'draft'])
             else:
-                # Did they submit last month or the month before,
-                # but not this month?
-                em_last_month = ExpenseMonth.objects.filter(
-                    purchaser=sub, year=prev_month_date.year,
-                    month=prev_month_date.month
-                ).exists()
-                em_month_before_that = ExpenseMonth.objects.filter(
-                    purchaser=sub, year=month_before_that_date.year,
-                    month=month_before_that_date.month
-                ).exists()
-                em_this_month = ExpenseMonth.objects.filter(
-                    purchaser=sub, year=curr_month_date.year,
+                # Is there a statement for a card of theirs this month?
+                es = ExpenseStatement.objects.filter(
+                    card__assignee=sub,
+                    year=curr_month_date.year,
                     month=curr_month_date.month
                 ).exists()
-                if (
-                    em_last_month or em_month_before_that
-                ) and not em_this_month:
-                    recipients.append([sub.user.email, 'last_month'])
+                if es:
+                    recipients.append([sub.user.email, 'statement'])
+                else:
+                    # Did they submit last month or the month before,
+                    # but not this month?
+                    em_last_month = ExpenseMonth.objects.filter(
+                        purchaser=sub, year=prev_month_date.year,
+                        month=prev_month_date.month
+                    ).exists()
+                    em_month_before_that = ExpenseMonth.objects.filter(
+                        purchaser=sub, year=month_before_that_date.year,
+                        month=month_before_that_date.month
+                    ).exists()
+                    em_this_month = ExpenseMonth.objects.filter(
+                        purchaser=sub, year=curr_month_date.year,
+                        month=curr_month_date.month
+                    ).exists()
+                    if (
+                        em_last_month or em_month_before_that
+                    ) and not em_this_month:
+                        recipients.append([sub.user.email, 'last_month'])
     for recipient in recipients:
         html_message = render_to_string(html_template, { 'context': {
             'curr_month_name': curr_month_name,

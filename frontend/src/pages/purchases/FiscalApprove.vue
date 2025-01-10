@@ -121,6 +121,22 @@
                   {{ props.row.card.display }}
                 </q-td>
               </template>
+              <template v-slot:body-cell-allCleared="props">
+                <q-td key="card" :props="props">
+                  <q-icon
+                    v-if="props.row.all_cleared"
+                    color="green"
+                    name="check_circle"
+                    size="lg"
+                  />
+                  <q-icon
+                    v-else
+                    color="warning"
+                    name="radio_button_unchecked"
+                    size="lg"
+                  />
+                </q-td>
+              </template>
               <template v-slot:body-cell-actions="props">
                 <q-td key="actions" :props="props">
                   <q-btn
@@ -393,6 +409,10 @@ const columns = [
 const statementCols = [
   {
     name: 'card', required: true, label: 'Card', field: 'card', sortable: true,
+    align: 'center'
+  },
+  {
+    name: 'allCleared', label: 'All Cleared', field: 'all_cleared',
     align: 'center'
   },
   { name: 'actions', label: 'Actions', field: 'actions', align: 'center' }

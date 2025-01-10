@@ -1,5 +1,6 @@
 from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models import Count
 from django.utils.translation import gettext_lazy as _
 
 from people.models import Employee
@@ -249,6 +250,30 @@ class ExpenseStatement(models.Model):
     )
     month = models.IntegerField()
     year = models.IntegerField()
+
+    def all_cleared(self):
+        """
+        Return true if all items in the statement have been approved by fiscal
+        in one or more ExpenseMonths.
+        """
+        if self.card.shared:
+            # If the card is shared, the number of expenses in fiscal approved
+            # expense months for the card need to match the number of items in
+            # the statement.
+            card_ems = ExpenseMonth.objects.filter(
+                month=self.month, year=self.year, card=self.card,
+                status=ExpenseMonth.STATUS_FISCAL_APPROVED,
+            ).annotate(Count('expenses'))
+            # Add up all ems expenses
+            total_expenses = sum([em.expenses__count for em in card_ems])
+            return total_expenses == self.items.count()
+        else:
+            # If the card is not shared, just verify that there is an approved
+            # Expense Month
+            return ExpenseMonth.objects.filter(
+                month=self.month, year=self.year, card=self.card,
+                status=ExpenseMonth.STATUS_FISCAL_APPROVED
+            ).exists()
 
 
 class ExpenseStatementItem(models.Model):

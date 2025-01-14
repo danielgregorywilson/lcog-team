@@ -6,8 +6,9 @@
       <q-btn push color="secondary" glossy label="Deleted" :to="{ name: 'workflows-archived' }"  />
     </q-btn-group>
   </div>
-  <div class="row items-center q-mb-md">
+  <div class="row items-center justify-between">
     <div class="text-h5">Deleted</div>
+    <div>Only the 100 most recently created workflows are shown.</div>
   </div>
   <WorkflowTable
     :archived="true"

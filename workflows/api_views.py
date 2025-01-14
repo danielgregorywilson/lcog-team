@@ -132,7 +132,7 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
                 # Archived WFIs
                 return WorkflowInstance.inactive_objects.filter(
                     workflow__id__in=wfs_can_view_ids
-                ).select_related(
+                ).order_by('-started_at').select_related(
                     'transition', 'workflow', 'workflow__role'
                 ).prefetch_related('pis')
             elif archived is not None and not is_true_string(archived):
@@ -141,14 +141,14 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
                     # Complete WFIs
                     return WorkflowInstance.active_objects.filter(
                         workflow__id__in=wfs_can_view_ids, complete=True
-                    ).select_related(
+                    ).order_by('-completed_at').select_related(
                         'transition', 'workflow', 'workflow__role'
                     ).prefetch_related('pis')
                 elif complete is not None and not is_true_string(complete):
                     # Current active WFIs
                     return WorkflowInstance.active_objects.filter(
                         workflow__id__in=wfs_can_view_ids, complete=False
-                    ).select_related(
+                    ).order_by('started_at').select_related(
                         'transition', 'workflow', 'workflow__role'
                     ).prefetch_related('pis')
             return WorkflowInstance.objects.all()

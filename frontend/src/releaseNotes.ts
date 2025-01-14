@@ -4,6 +4,20 @@
 
 export const releases = [
   {
+    version: '0.45.1',
+    date: new Date(2025, 0, 9),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Improve Credit Card submitter notifications.'
+      },
+      {
+        type: 'improved',
+        description: 'Display Credit Card statement cleared statuses.'
+      }
+    ]
+  },
+  {
     version: '0.45.0',
     date: new Date(2025, 0, 7),
     changes: [

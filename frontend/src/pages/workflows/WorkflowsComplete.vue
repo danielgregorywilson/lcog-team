@@ -6,9 +6,9 @@
       <q-btn push color="primary" glossy label="Deleted" :to="{ name: 'workflows-archived' }"  />
     </q-btn-group>
   </div>
-
-  <div class="row items-center q-mb-md">
+  <div class="row items-center justify-between">
     <div class="text-h5">Complete</div>
+    <div>Only the 100 most recently completed workflows are shown.</div>
   </div>
   <WorkflowTable
     :archived="false"
@@ -18,7 +18,6 @@
     :workflowsLoaded="workflowsLoaded"
     v-on:retrieve="retrieveWorkflows"
   />
-
   <!-- TODO: For now we just have one complete page/table -->
   <!-- <router-view /> -->
 </template>

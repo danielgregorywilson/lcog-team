@@ -4,6 +4,20 @@
 
 export const releases = [
   {
+    version: '0.45.2',
+    date: new Date(2025, 0, 14),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Improve workflow deleted and completed views.'
+      },
+      {
+        type: 'improved',
+        description: 'Fiscal can download zip files of ExpenseMonth receipts.'
+      }
+    ]
+  },
+  {
     version: '0.45.1',
     date: new Date(2025, 0, 9),
     changes: [

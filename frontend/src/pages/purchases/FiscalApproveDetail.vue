@@ -21,6 +21,11 @@
           <q-icon color="green" name="check" size="md" />
         </q-btn>
         <q-btn @click="navigateToPrintView()" label="Print" />
+        <q-btn
+          @click="downloadReceipts()"
+          label="Download Receipts"
+          class="q-ml-sm"
+        />
       </div>
     </div>
     <StatementTable :statement="statement" />
@@ -322,6 +327,7 @@
 import { useQuasar } from 'quasar'
 import { onMounted, Ref, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import JSZip from 'jszip'
 
 import DocumentViewer from 'src/components/DocumentViewer.vue'
 import StatementTable from 'src/components/purchases/StatementTable.vue'
@@ -534,6 +540,58 @@ function navigateToPrintView() {
       employeePK: expenseMonthPK.value,
     }
   })
+}
+
+function downloadReceipts() {
+  if (!expenseMonthPK.value) {
+    return
+  }
+  purchaseStore.downloadReceipts(expenseMonthPK.value)
+    .then((urls: Array<string>) => {
+      // Create a link to click and download the zip file
+      const link = document.createElement('a');
+      link.setAttribute('download', null);
+      link.style.display = 'none';
+      document.body.appendChild(link);
+
+      // Create a zip file and add the receipts to it
+      const zip = new JSZip()
+      let devPrefix = ''
+      if (process.env.NODE_ENV === 'development') {
+        devPrefix = process.env.API_URL ? process.env.API_URL : ''
+      }
+      Promise.all(urls.map(u=>fetch(`${devPrefix}${u}`)))
+        .then(responses => {
+          console.log(responses)
+          return Promise.all(responses.map(res => res.blob()))
+        })
+        .then(blobs => {
+          // Add each file blob to the zip
+          blobs.forEach((blob, i) => {
+            zip.file(urls[i].split('/').pop() || '', blob)
+          })
+          // Generate the zip file and download it
+          zip.generateAsync({type: 'blob'}).then((content) => {
+            const url = URL.createObjectURL(content)
+            link.href = url
+            link.click()
+          })
+          // Clean up the DOM
+          document.body.removeChild(link);
+          quasar.notify({
+            message: 'Receipts downloaded',
+            color: 'positive',
+            icon: 'cloud_download'
+          })
+        })
+        // window.open(`${process.env.API_URL}${link}`, '_blank')
+      }).catch(() => {
+        quasar.notify({
+          message: 'Error downloading receipts',
+          color: 'negative',
+          icon: 'cancel'
+        })
+      })
 }
 
 function expenseMonthTotal(em: ExpenseMonth) {

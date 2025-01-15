@@ -674,6 +674,27 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
                 data=message,
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+        
+    @action(detail=True, methods=['get'])
+    def download_receipts(self, request, pk):
+        """
+        Download all receipts for a month of expenses.
+        """
+        try:
+            em = ExpenseMonth.objects.get(pk=pk)
+            receipts = []
+            for expense in em.expenses.all():
+                if expense.receipt:
+                    receipts.append(expense.receipt.url)
+            return Response(receipts)
+        except Exception as e:
+            message = 'Error downloading receipts for expense month.'
+            record_error(message, e, request, traceback.format_exc())
+            return Response(
+                data=message,
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
 
 
 class ExpenseMonthLockViewSet(viewsets.ModelViewSet):

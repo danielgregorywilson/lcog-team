@@ -556,8 +556,15 @@ function downloadReceipts() {
 
       // Create a zip file and add the receipts to it
       const zip = new JSZip()
-      Promise.all(urls.map(u=>fetch(`${process.env.API_URL}${u}`)))
-        .then(responses => Promise.all(responses.map(res => res.blob())))
+      let devPrefix = ''
+      if (process.env.NODE_ENV === 'development') {
+        devPrefix = process.env.API_URL ? process.env.API_URL : ''
+      }
+      Promise.all(urls.map(u=>fetch(`${devPrefix}${u}`)))
+        .then(responses => {
+          console.log(responses)
+          return Promise.all(responses.map(res => res.blob()))
+        })
         .then(blobs => {
           // Add each file blob to the zip
           blobs.forEach((blob, i) => {

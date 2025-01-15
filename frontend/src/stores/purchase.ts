@@ -600,6 +600,21 @@ export const usePurchaseStore = defineStore('purchase', {
       })
     },
 
+    downloadReceipts(pk: number): Promise<ExpenseMonth> {
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/expense-month/${ pk }/download_receipts`,
+          method: 'GET',
+        })
+          .then(resp => {
+            resolve(resp.data)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error downloading receipts', e)
+          })
+      })
+    },
+
     lockCurrentExpenseMonth(
       lock: boolean, data?: ExpenseMonthLockCreate
     ): Promise<null> {

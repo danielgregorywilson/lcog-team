@@ -391,6 +391,7 @@ def send_employee_transition_report():
         {
             'pk': wfi.pk,
             'percent_complete': wfi.percent_complete,
+            'percent_incomplete': 100 - wfi.percent_complete,
             't': {
                 'type': wfi.transition.type,
                 'date': wfi.transition.transition_date,

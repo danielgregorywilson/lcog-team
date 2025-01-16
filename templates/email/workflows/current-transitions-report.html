@@ -6,35 +6,6 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     </head>
     <style>
-      progress {
-        text-align: center;
-        height: 1.5em;
-        -webkit-appearance: none;
-        border: none;
-        position:relative;
-        width: 250px;
-      }
-      progress:before {
-        content: attr(data-label);
-        font-size: 0.8em;
-        vertical-align: 0;
-        
-        /*Position text over the progress bar */
-        position:absolute;
-        left:0;
-        right:0;
-        top:3px;
-      }
-      progress::-webkit-progress-bar {
-        background-color: #c9c9c9;
-      }
-      progress::-webkit-progress-value {
-        background-color: #7cc4ff;
-      }
-      progress::-moz-progress-bar {
-        background-color: #7cc4ff;
-      }
-
       .avatar {
         background-color: #7cc4ff;
         border-radius: 50%;
@@ -52,6 +23,19 @@
           padding-inline-start: 40px;
         }
       }
+
+      .progress {
+        td {
+          float: left;
+          height: 1.5em;
+        }
+        .complete {
+          background-color: #7cc4ff;
+        }
+        .incomplete {
+          background-color: #c9c9c9;
+        }
+      }
     </style>
     <body style="margin: 15px;">
         <h1>Current Employee Transitions</h1>
@@ -60,7 +44,6 @@
         {% for wfi in current_wfis %}
           {% if wfi.t.assignee == 'Complete' %}
             <li>
-              {% comment %} ICON {% endcomment %}
               {% if wfi.t.type == 'New' %}
                 <img class="avatar" src="https://api.team.lcog.org/material-person-add" />
               {% elif wfi.t.type == 'Return' %}
@@ -70,13 +53,20 @@
               {% elif wfi.t.type == 'Exit' %}
                 <img class="avatar" src="https://api.team.lcog.org/material-person-remove" />
               {% endif %}
-              {% comment %} Vertically align div content {% endcomment %}
               <a href="{{ domain }}/wf/{{ wfi.pk}}/processes">
                 {{ wfi.t.type }}: {{ wfi.t.employee_first_name }} {{ wfi.t.employee_last_name }}, {{ wfi.t.title_name }}
               </a>, Form complete.
               <ul>
                 {% if wfi.t.date %}<li {% if wfi.t.past_date %}style="color: red"{% endif %}>Transition Date: {{ wfi.t.date|date:"n/j/Y" }}</li>{% endif %}
-                <li><progress max="100" value="{{ wfi.percent_complete }}" data-label="Processes {{ wfi.percent_complete }}% Complete"></progress></li>
+                <li>
+                  <div>Processes {{ wfi.percent_complete }}% Complete</div>
+                  <table style="border:0;" cellpadding="0" cellspacing="0" width="250">
+                    <tr class="progress">
+                      <td class="complete" style="width:{{ wfi.percent_complete }}%;"></td>
+                      <td class="incomplete" style="width:{{ wfi.percent_incomplete }}%;"></td>
+                    </tr>
+                  </table>
+                </li>
                 {% for pi in wfi.pis %}
                   {% if pi.percent_complete != 100 %}
                     <li>
@@ -93,7 +83,6 @@
             
           {% else %}
             <li>
-              {% comment %} ICON {% endcomment %}
               {% if wfi.t.type == 'New' %}
                 <img class="avatar" src="https://api.team.lcog.org/material-person-add" />
               {% elif wfi.t.type == 'Return' %}

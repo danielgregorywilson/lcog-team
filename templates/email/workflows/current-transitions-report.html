@@ -57,7 +57,7 @@
                 {{ wfi.t.type }}: {{ wfi.t.employee_first_name }} {{ wfi.t.employee_last_name }}, {{ wfi.t.title_name }}
               </a>, Form complete.
               <ul>
-                {% if wfi.t.date %}<li {% if wfi.t.past_date %}style="color: red"{% endif %}>Transition Date: {{ wfi.t.date|date:"n/j/Y" }}</li>{% endif %}
+                {% if wfi.t.date %}<li {% if wfi.t.past_date %}style="color: red;"{% endif %}>Transition Date: {{ wfi.t.date|date:"n/j/Y" }}</li>{% endif %}
                 <li>
                   <div>Processes {{ wfi.percent_complete }}% Complete</div>
                   <table style="border:0;" cellpadding="0" cellspacing="0" width="250">
@@ -71,9 +71,9 @@
                   {% if pi.percent_complete != 100 %}
                     <li>
                       {{ pi.name }} assigned to {{ pi.assignees | join:', ' }}
-                      {% if pi.assigned_ago > 2 %}<strong>{% endif %}
+                      {% if pi.assigned_ago > 2 %}<span style="color: red;">{% endif %}
                       {{ pi.assigned_ago }} day{% if pi.assigned_ago != 1 %}s{% endif %} ago
-                      {% if pi.assigned_ago > 2 %}</strong>{% endif %}
+                      {% if pi.assigned_ago > 2 %}</span>{% endif %}
                     </li>
                   {% endif %}
                 {% endfor %}

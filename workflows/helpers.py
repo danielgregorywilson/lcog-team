@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import os
+import pytz
 
 from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
@@ -392,6 +393,8 @@ def send_employee_transition_report():
             'percent_complete': wfi.percent_complete,
             't': {
                 'type': wfi.transition.type,
+                'date': wfi.transition.transition_date,
+                'past_date': wfi.transition.transition_date < datetime.now(pytz.utc) if wfi.transition.transition_date else False,
                 'assignee': wfi.transition.assignee,
                 'employee_first_name': wfi.transition.employee_first_name,
                 'employee_last_name': wfi.transition.employee_last_name,

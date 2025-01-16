@@ -40,7 +40,8 @@
         border-radius: 50%;
         padding: 5px;
         position: relative;
-        top: 6px;
+        top: 12px;
+        overflow: visible;
       }
 
       ul {
@@ -50,10 +51,6 @@
         ul {
           padding-inline-start: 40px;
         }
-      }
-
-      li {
-        padding-bottom: 2px;
       }
     </style>
     <body style="margin: 15px;">
@@ -65,13 +62,13 @@
             <li>
               {% comment %} ICON {% endcomment %}
               {% if wfi.t.type == 'New' %}
-                <i class="material-icons avatar">person_add</i>
+                <img class="avatar" src="https://api.team.lcog.org/material-person-add" />
               {% elif wfi.t.type == 'Return' %}
-                <i class="material-icons avatar">hail</i>
+                <img class="avatar" src="https://api.team.lcog.org/material-hail" />
               {% elif wfi.t.type == 'Change/Modify' %}
-                <i class="material-icons avatar">directions_bike</i>
+                <img class="avatar" src="https://api.team.lcog.org/material-directions-bike" />
               {% elif wfi.t.type == 'Exit' %}
-                <i class="material-icons avatar">person_remove</i>
+                <img class="avatar" src="https://api.team.lcog.org/material-person-remove" />
               {% endif %}
               {% comment %} Vertically align div content {% endcomment %}
               <a href="{{ domain }}/wf/{{ wfi.pk}}/processes">
@@ -98,13 +95,13 @@
             <li>
               {% comment %} ICON {% endcomment %}
               {% if wfi.t.type == 'New' %}
-                <i class="material-icons avatar">person_add</i>
+                <img class="avatar" src="https://api.team.lcog.org/material-person-add" />
               {% elif wfi.t.type == 'Return' %}
-                <i class="material-icons avatar">hail</i>
+                <img class="avatar" src="https://api.team.lcog.org/material-hail" />
               {% elif wfi.t.type == 'Change/Modify' %}
-                <i class="material-icons avatar">directions_bike</i>
+                <img class="avatar" src="https://api.team.lcog.org/material-directions-bike" />
               {% elif wfi.t.type == 'Exit' %}
-                <i class="material-icons avatar">person_remove</i>
+                <img class="avatar" src="https://api.team.lcog.org/material-person-remove" />
               {% endif %}
               <a href="{{ domain }}/wf/{{ wfi.pk}}/transition">{{ wfi.t.type }}: {{ wfi.t.employee_first_name }} {{ wfi.t.employee_last_name }}, {{ wfi.t.title_name }}</a>, Form assigned to {{ wfi.t.assignee }}
               {% if wfi.t.date %}

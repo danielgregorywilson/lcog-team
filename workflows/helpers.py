@@ -386,34 +386,32 @@ def send_employee_transition_report():
             'employee-new', 'employee-change', 'employee-return',
             'employee-exit'
         ]
-    ).order_by('workflow__type').prefetch_related('pis')
-    current_wfis = [
-        {
-            'pk': wfi.pk,
-            'percent_complete': wfi.percent_complete,
-            'percent_incomplete': 100 - wfi.percent_complete,
-            't': {
-                'type': wfi.transition.type,
-                'date': wfi.transition.transition_date,
-                'past_date': wfi.transition.transition_date < datetime.now(pytz.utc) if wfi.transition.transition_date else False,
-                'assignee': wfi.transition.assignee,
-                'employee_first_name': wfi.transition.employee_first_name,
-                'employee_last_name': wfi.transition.employee_last_name,
-                'title_name': wfi.transition.title.name if wfi.transition.title else 'Title not set',
-            },
-            'pis': [
-                {
-                    'name': pi.process.name,
-                    'current_step_name': pi.current_step_instance.step.name if pi.current_step_instance else '',
-                    'percent_complete': pi.percent_complete,
-                    'assigned_ago': pi.current_step_instance.duration.days if pi.current_step_instance else None,
-                    'assignees': [
-                        member.name for member in pi.current_step_instance.step.role.members.all()
-                    ] if pi.current_step_instance and pi.current_step_instance.step and pi.current_step_instance.step.role else ['No one!']
-                } for pi in wfi.pis.all()
-            ]
-        } for wfi in current_wfis
-    ]
+    ).order_by('transition__transition_date').prefetch_related('pis')
+    current_wfis = [{
+        'pk': wfi.pk,
+        'percent_complete': wfi.percent_complete,
+        'percent_incomplete': 100 - wfi.percent_complete,
+        't': {
+            'type': wfi.transition.type,
+            'date': wfi.transition.transition_date,
+            'past_date': wfi.transition.transition_date < datetime.now(pytz.utc) if wfi.transition.transition_date else False,
+            'assignee': wfi.transition.assignee,
+            'employee_first_name': wfi.transition.employee_first_name,
+            'employee_last_name': wfi.transition.employee_last_name,
+            'title_name': wfi.transition.title.name if wfi.transition.title else 'Title not set',
+        },
+        'pis': [
+            {
+                'name': pi.process.name,
+                'current_step_name': pi.current_step_instance.step.name if pi.current_step_instance else '',
+                'percent_complete': pi.percent_complete,
+                'assigned_ago': pi.current_step_instance.duration.days if pi.current_step_instance else None,
+                'assignees': [
+                    member.name for member in pi.current_step_instance.step.role.members.all()
+                ] if pi.current_step_instance and pi.current_step_instance.step and pi.current_step_instance.step.role else ['No one!']
+            } for pi in wfi.pis.all()
+        ]
+    } for wfi in current_wfis]
     last_week_wfis = WorkflowInstance.objects.filter(
         active=True,
         complete=True,
@@ -421,9 +419,21 @@ def send_employee_transition_report():
             'employee-new', 'employee-change', 'employee-return',
             'employee-exit'
         ],
-        completed_at__gte=datetime.now() - timedelta(days=7),
+        completed_at__gte=datetime.now() - timedelta(days=10),
         completed_at__lt=datetime.now()
     )
+    last_week_wfis = [{
+        'pk': wfi.pk,
+        'completed_at': wfi.completed_at,
+        't': {
+            'type': wfi.transition.type,
+            'date': wfi.transition.transition_date,
+            'past_date': wfi.transition.transition_date < datetime.now(pytz.utc) if wfi.transition.transition_date else False,
+            'employee_first_name': wfi.transition.employee_first_name,
+            'employee_last_name': wfi.transition.employee_last_name,
+            'title_name': wfi.transition.title.name if wfi.transition.title else 'Title not set',
+        }  
+    } for wfi in last_week_wfis]
     subject = 'Weekly Employee Transition Report'
     html_template = \
         '../templates/email/workflows/current-transitions-report.html'

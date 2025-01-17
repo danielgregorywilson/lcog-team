@@ -3,7 +3,49 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     </head>
+    <style>
+      .avatar {
+        background-color: #7cc4ff;
+        border-radius: 50%;
+        padding: 5px;
+        position: relative;
+        top: 12px;
+        overflow: visible;
+      }
+      .checkmark {
+        color: green;
+        font-weight: bolder;
+        margin-left: 3px;
+        border-radius: 50%;
+        padding: 3px 0 0 6px; 
+        border: 2px green solid;
+        display: inline-block;
+        width: 16px;
+        height: 18px;
+      }
+      ul {
+        list-style-type: none;
+        padding-inline-start: 0;
+
+        ul {
+          padding-inline-start: 40px;
+        }
+      }
+      .progress {
+        td {
+          float: left;
+          height: 1.5em;
+        }
+        .complete {
+          background-color: #7cc4ff;
+        }
+        .incomplete {
+          background-color: #c9c9c9;
+        }
+      }
+    </style>
     <body style="margin: 15px;">
         <h1>Current Employee Transitions</h1>
         
@@ -11,15 +53,40 @@
         {% for wfi in current_wfis %}
           {% if wfi.t.assignee == 'Complete' %}
             <li>
-              <a href="{{ domain }}/wf/{{ wfi.pk}}/processes">{{ wfi.t.type }}: {{ wfi.t.employee_first_name }} {{ wfi.t.employee_last_name }}, {{ wfi.t.title_name }}</a>, Form complete. Processes {{ wfi.percent_complete }}% complete.
+              {% if wfi.t.type == 'New' %}
+                <img class="avatar" src="https://api.team.lcog.org/material-person-add" />
+              {% elif wfi.t.type == 'Return' %}
+                <img class="avatar" src="https://api.team.lcog.org/material-hail" />
+              {% elif wfi.t.type == 'Change/Modify' %}
+                <img class="avatar" src="https://api.team.lcog.org/material-directions-bike" />
+              {% elif wfi.t.type == 'Exit' %}
+                <img class="avatar" src="https://api.team.lcog.org/material-person-remove" />
+              {% endif %}
+              <a href="{{ domain }}/wf/{{ wfi.pk}}/processes">
+                {{ wfi.t.type }}: {{ wfi.t.employee_first_name }} {{ wfi.t.employee_last_name }}, {{ wfi.t.title_name }}
+              </a>, Form complete<span class="checkmark">√</span>
               <ul>
+                {% if wfi.t.date %}
+                  <li {% if wfi.t.past_date %}style="color: red;"{% endif %}>Transition Date: {{ wfi.t.date|date:"n/j/Y" }}</li>
+                {% else %}
+                  <li style="color: red;">Transition Date: Not Set</li>
+                {% endif %}
+                <li>
+                  <div>Processes {{ wfi.percent_complete }}% Complete</div>
+                  <table style="border:0;" cellpadding="0" cellspacing="0" width="250">
+                    <tr class="progress">
+                      <td class="complete" style="width:{{ wfi.percent_complete }}%;"></td>
+                      <td class="incomplete" style="width:{{ wfi.percent_incomplete }}%;"></td>
+                    </tr>
+                  </table>
+                </li>
                 {% for pi in wfi.pis %}
                   {% if pi.percent_complete != 100 %}
                     <li>
-                      {{ pi.name }}: {{ pi.current_step_name }} assigned to {{ pi.assignees | join:', ' }}
-                      {% if pi.assigned_ago > 2 %}<strong>{% endif %}
+                      {{ pi.name }} assigned to {{ pi.assignees | join:', ' }}
+                      {% if pi.assigned_ago > 2 %}<span style="color: red;">{% endif %}
                       {{ pi.assigned_ago }} day{% if pi.assigned_ago != 1 %}s{% endif %} ago
-                      {% if pi.assigned_ago > 2 %}</strong>{% endif %}
+                      {% if pi.assigned_ago > 2 %}</span>{% endif %}
                     </li>
                   {% endif %}
                 {% endfor %}
@@ -29,24 +96,49 @@
             
           {% else %}
             <li>
+              {% if wfi.t.type == 'New' %}
+                <img class="avatar" src="https://api.team.lcog.org/material-person-add" />
+              {% elif wfi.t.type == 'Return' %}
+                <img class="avatar" src="https://api.team.lcog.org/material-hail" />
+              {% elif wfi.t.type == 'Change/Modify' %}
+                <img class="avatar" src="https://api.team.lcog.org/material-directions-bike" />
+              {% elif wfi.t.type == 'Exit' %}
+                <img class="avatar" src="https://api.team.lcog.org/material-person-remove" />
+              {% endif %}
               <a href="{{ domain }}/wf/{{ wfi.pk}}/transition">{{ wfi.t.type }}: {{ wfi.t.employee_first_name }} {{ wfi.t.employee_last_name }}, {{ wfi.t.title_name }}</a>, Form assigned to {{ wfi.t.assignee }}
+              <ul>
+                {% if wfi.t.date %}
+                  <li {% if wfi.t.past_date %}style="color: red;"{% endif %}>Transition Date: {{ wfi.t.date|date:"n/j/Y" }}</li>
+                {% else %}
+                  <li style="color: red;">Transition Date: Not Set</li>
+                {% endif %}
+              </ul>
             </li>
           {% endif %}
         {% endfor %}
         </ul>
 
-        <h1>Transitions Completed Last Week</h1
+        <h1>Recently Completed Transitions</h1>
 
         <ul>
           {% for wfi in last_week_wfis %}
-            {% with t=wfi.transition %}
-              <li>
-                <a href="{{ domain }}/wf/{{ wfi.pk}}/transition">{{ wfi.t.type }}: {{ wfi.t.employee_first_name }} {{ wfi.t.employee_last_name }}, {{ wfi.t.title_name }}</a>, Completed on {{ wfi.completed_at }}
-              </li>  
-            {% endwith %}
+            <li>
+              {% if wfi.t.type == 'New' %}
+                <img class="avatar" src="https://api.team.lcog.org/material-person-add" />
+              {% elif wfi.t.type == 'Return' %}
+                <img class="avatar" src="https://api.team.lcog.org/material-hail" />
+              {% elif wfi.t.type == 'Change/Modify' %}
+                <img class="avatar" src="https://api.team.lcog.org/material-directions-bike" />
+              {% elif wfi.t.type == 'Exit' %}
+                <img class="avatar" src="https://api.team.lcog.org/material-person-remove" />
+              {% endif %}
+              <a href="{{ domain }}/wf/{{ wfi.pk}}/transition">{{ wfi.t.type }}: {{ wfi.t.employee_first_name }} {{ wfi.t.employee_last_name }}, {{ wfi.t.title_name }}</a>, Completed on {{ wfi.completed_at|date:"n/j/Y" }}
+              {% if wfi.t.date %}<ul><li>
+                <div>Transition Date: {{ wfi.t.date|date:"n/j/Y" }}</div>
+              </li></ul>{% endif %}
+            </li>  
           {% endfor %}
         </ul>
-
 
         <p>View all transitions: <a href="{{ workflows_url }}">{{ workflows_url }}</a></p>
         <p>View and update your email preferences: <a href="{{ profile_url }}">{{ profile_url }}</a></p>

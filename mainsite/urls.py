@@ -29,7 +29,12 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('favicon.ico', RedirectView.as_view(url='%sfavicon.ico' % settings.STATIC_URL)),
     # Elastic beanstalk ELB requires trailing slash for health check
-    path('health/', health_check_view, name='health_check_view')
+    path('health/', health_check_view, name='health_check_view'),
+    # Material icons
+    path('material-person-add', RedirectView.as_view(url='%simg/material-person-add.svg' % settings.STATIC_URL)),
+    path('material-person-remove', RedirectView.as_view(url='%simg/material-person-remove.svg' % settings.STATIC_URL)),
+    path('material-directions-bike', RedirectView.as_view(url='%simg/material-directions-bike.svg' % settings.STATIC_URL)),
+    path('material-hail', RedirectView.as_view(url='%simg/material-hail.svg' % settings.STATIC_URL)),
 ]
 
 if settings.DEBUG:

@@ -428,7 +428,6 @@ def send_employee_transition_report():
         't': {
             'type': wfi.transition.type,
             'date': wfi.transition.transition_date,
-            'past_date': wfi.transition.transition_date < datetime.now(pytz.utc) if wfi.transition.transition_date else False,
             'employee_first_name': wfi.transition.employee_first_name,
             'employee_last_name': wfi.transition.employee_last_name,
             'title_name': wfi.transition.title.name if wfi.transition.title else 'Title not set',

@@ -62,6 +62,17 @@ def record_email_sent(subject='', body='', to_addresses=[], cc_addresses=[]):
     email_logger.info(message)
 
 def send_email(to_address, subject, body, html_body):
+    env = os.getenv('ENVIRONMENT')
+    if env == 'DEV':
+        subject = f'TEST FROM DEV: {subject}'
+        body = f'THIS IS A TEST EMAIL\n{body}'
+        html_body = \
+            f'<div style="color: red;">THIS IS A TEST EMAIL</div>{html_body}'
+    elif env == 'STAGING':
+        subject = f'TEST FROM STAGING: {subject}'
+        body = f'THIS IS A TEST EMAIL\n{body}'
+        html_body = \
+            f'<div style="color: red;">THIS IS A TEST EMAIL</div>{html_body}'
     try:
         sent_email = send_mail(
             subject,
@@ -80,6 +91,17 @@ def send_email(to_address, subject, body, html_body):
 def send_email_multiple(
     to_addresses=[], cc_addresses=[], subject='', text_body='', html_body=''
 ):
+    env = os.getenv('ENVIRONMENT')
+    if env == 'DEV':
+        subject = f'TEST FROM DEV: {subject}'
+        text_body = f'THIS IS A TEST EMAIL\n{text_body}'
+        html_body = \
+            f'<div style="color: red;">THIS IS A TEST EMAIL</div>{html_body}'
+    elif env == 'STAGING':
+        subject = f'TEST FROM STAGING: {subject}'
+        text_body = f'THIS IS A TEST EMAIL\n{text_body}'
+        html_body = \
+            f'<div style="color: red;">THIS IS A TEST EMAIL</div>{html_body}'
     email = EmailMultiAlternatives(
         subject=subject, body=text_body,
         from_email=os.environ.get('FROM_EMAIL'), to=to_addresses,

@@ -16,6 +16,7 @@
         <p>If not, you can ignore this message.</p>
         {% endif %}
         <p>Thank you!</p>
+        <p>{{context.sender_name}}</p>
         <p>View all your expenses: <a href="{{context.expenses_url}}">{{context.expenses_url}}</a></p>
         <p>View and update your email preferences: <a href="{{context.profile_url}}">{{context.profile_url}}</a></p>
     </body>

@@ -46,12 +46,17 @@ def send_submitter_monthly_expenses_reminders(sending_user: User):
                 recipients.append([sub.user.email, 'draft'])
             else:
                 # Is there a statement for a card of theirs this month?
+                # Don't send if they have a submitted ExpenseMonth this month.
                 es = ExpenseStatement.objects.filter(
                     card__assignee=sub,
                     year=curr_month_date.year,
                     month=curr_month_date.month
                 ).exists()
-                if es:
+                em_this_month = ExpenseMonth.objects.filter(
+                    purchaser=sub, year=curr_month_date.year,
+                    month=curr_month_date.month
+                ).exists()
+                if es and not em_this_month:
                     recipients.append([sub.user.email, 'statement'])
                 else:
                     # Did they submit last month or the month before,
@@ -63,10 +68,6 @@ def send_submitter_monthly_expenses_reminders(sending_user: User):
                     em_month_before_that = ExpenseMonth.objects.filter(
                         purchaser=sub, year=month_before_that_date.year,
                         month=month_before_that_date.month
-                    ).exists()
-                    em_this_month = ExpenseMonth.objects.filter(
-                        purchaser=sub, year=curr_month_date.year,
-                        month=curr_month_date.month
                     ).exists()
                     if (
                         em_last_month or em_month_before_that

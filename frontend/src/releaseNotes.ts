@@ -4,6 +4,21 @@
 
 export const releases = [
   {
+    version: '0.45.3',
+    date: new Date(2025, 0, 28),
+    changes: [
+      {
+        type: 'fix',
+        description: 'Fix a bug where notifications can get sent to credit ' +
+          'card submitters incorrectly.'
+      },
+      {
+        type: 'improved',
+        description: 'Improvements to credit card fiscal view.'
+      }
+    ]
+  },
+  {
     version: '0.45.2',
     date: new Date(2025, 0, 14),
     changes: [

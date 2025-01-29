@@ -146,6 +146,7 @@
                     @click="showStatmentDialog(props.row)"
                   />
                   <q-btn
+                    v-if="!purchaseStore.expenseMonthLocked"
                     icon="delete"
                     round
                     flat
@@ -154,7 +155,10 @@
                 </q-td>
               </template>
             </q-table>
-            <div class="row justify-center q-mt-md">
+            <div
+              v-if="!purchaseStore.expenseMonthLocked"
+              class="row justify-center q-mt-md"
+            >
               <q-btn
                 :disabled="selectedMonthStatements().length === 0"  
                 label="Send notification to card holders"
@@ -205,9 +209,6 @@
             Notification will be sent to all card holders. Please do not send
             multiple notifications unless you really need to.
           </span>
-        </div>
-        <div class="row justify-center text-center q-mt-sm">
-          Month: {{ purchaseStore.monthDisplay }}
         </div>
       </q-card-section>
 
@@ -304,6 +305,7 @@
       <q-card-actions class="row justify-around">
         <q-btn flat label="Close" color="primary" v-close-popup />
         <q-btn
+          v-if="!purchaseStore.expenseMonthLocked"
           flat
           label="Delete"
           color="primary"

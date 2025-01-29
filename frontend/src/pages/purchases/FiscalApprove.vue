@@ -210,9 +210,6 @@
             multiple notifications unless you really need to.
           </span>
         </div>
-        <div class="row justify-center text-center q-mt-sm">
-          Month: {{ purchaseStore.monthDisplay }}
-        </div>
       </q-card-section>
 
       <q-card-actions class="row justify-around">

@@ -312,7 +312,6 @@ export interface PerformanceReviewUpdate {
   evaluation_opportunities: string
   evaluation_goals_manager: string
   evaluation_comments_employee: string
-  description_reviewed_employee: boolean
 }
 
 export interface PerformanceReviewUpdatePartial {
@@ -337,7 +336,6 @@ export interface PerformanceReviewUpdatePartial {
   evaluation_opportunities?: string
   evaluation_goals_manager?: string
   evaluation_comments_employee?: string
-  description_reviewed_employee?: boolean
 }
 
 export interface SignedPositionDescriptionUpload {

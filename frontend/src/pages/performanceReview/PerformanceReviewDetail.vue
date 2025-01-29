@@ -721,67 +721,6 @@
       :disable="!employeeCommentsIsChanged()"
     />
 
-    <div id="position-description-section">
-      <h5 class="text-uppercase text-bold q-my-md">
-        <u>VI. Position Description Review</u>
-      </h5>
-      <div class="q-my-md" id="position-description-review">
-        <div>
-          Position Description:
-          <a
-            v-if="positionDescriptionLink"
-            :href="positionDescriptionLink"
-            target="_blank"
-          >
-            {{ positionDescriptionLink }}
-          </a>
-          <span v-else>No link provided</span>
-        </div>
-        <div>
-          <q-checkbox
-            v-model="descriptionReviewedEmployee"
-            :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
-          />
-          Position Description has been reviewed and signed by employee and
-          manager
-        </div>
-        <div
-          v-if="
-            descriptionReviewedEmployee && uploadedPositionDescriptionUrl &&
-            !uploadingAnother
-          "
-          class="row"
-        >
-          <DocumentViewer
-            :documentUrl="uploadedPositionDescriptionUrl"
-            :buttonText="`View Signed Position Description`"
-            iconButton
-          />
-          <q-btn class="q-ml-md">
-            <q-icon name="restart_alt" class="q-mr-sm" />
-            <div @click="uploadingAnother = true">Upload Another</div>
-          </q-btn>
-        </div>
-        <FileUploader
-          v-if="
-            currentUserIsManagerOfEmployee() && descriptionReviewedEmployee &&
-            (!uploadedPositionDescriptionUrl || uploadingAnother)
-          "
-          :file=selectedFile
-          contentTypeAppLabel="people"
-          contentTypeModel="performancereview"
-          :objectPk=prPk
-          :readOnly=false
-          v-on="{
-            'uploaded': (url: string) => {
-              uploadedPositionDescriptionUrl = url
-              uploadingAnother = false
-            }
-          }"
-        />
-      </div>
-    </div>
-
     <div
       v-for="(signature, index) in signatures"
       :key="index"
@@ -1257,13 +1196,6 @@ let evaluationGoalsManager = ref('')
 let evaluationCommentsEmployeeCurrentVal = ref('')
 let evaluationCommentsEmployee = ref('')
 
-let positionDescriptionLink = ref('')
-let descriptionReviewedEmployeeCurrentVal = ref(false)
-let descriptionReviewedEmployee = ref(false)
-let uploadedPositionDescriptionUrl = ref('')
-let selectedFile = ref(new File([''], ''))
-let uploadingAnother = ref(false)
-
 let signatures: Ref<PRSignatures> = ref([['', '', new Date(), -1, false]])
 
 let showErrorButton = ref(false)
@@ -1334,9 +1266,7 @@ function valuesAreChanged(): boolean {
     evaluationOpportunities.value == evaluationOpportunitiesCurrentVal.value &&
     evaluationGoalsManager.value == evaluationGoalsManagerCurrentVal.value &&
     evaluationCommentsEmployee.value ==
-      evaluationCommentsEmployeeCurrentVal.value &&
-    descriptionReviewedEmployee.value ==
-      descriptionReviewedEmployeeCurrentVal.value
+      evaluationCommentsEmployeeCurrentVal.value
   ) {
     return false
   } else {
@@ -1420,22 +1350,6 @@ function formErrorItems(): Array<[string, string]> {
   }
   if (!evaluationGoalsManagerCurrentVal.value) {
     errorItems.push(['evaluation-goals', 'Write Goals for the Coming Year'])
-  }
-  if (!descriptionReviewedEmployeeCurrentVal.value) {
-    errorItems.push(
-      [
-        'position-description-review',
-        'Review and Sign Position Description with Employee'
-      ]
-    )
-  }
-  if (
-    descriptionReviewedEmployeeCurrentVal.value &&
-      !uploadedPositionDescriptionUrl.value
-  ) {
-    errorItems.push(
-      ['position-description-review', 'Upload Signed Position Description']
-    )
   }
   return errorItems
 }
@@ -1523,12 +1437,6 @@ function retrievePerformanceReview() {
           evaluationCommentsEmployeeCurrentVal.value =
             evaluationCommentsEmployee.value
 
-          positionDescriptionLink.value = pr.position_description_link
-          descriptionReviewedEmployee.value = pr.description_reviewed_employee
-          descriptionReviewedEmployeeCurrentVal.value =
-            descriptionReviewedEmployee.value
-          uploadedPositionDescriptionUrl.value = pr.signed_position_description
-
           signatures.value = pr.all_required_signatures
 
           resolve('Got PR')
@@ -1576,8 +1484,7 @@ function updatePerformanceReview() {
       evaluation_successes: evaluationSuccesses.value,
       evaluation_opportunities: evaluationOpportunities.value,
       evaluation_goals_manager: evaluationGoalsManager.value,
-      evaluation_comments_employee: evaluationCommentsEmployee.value,
-      description_reviewed_employee: descriptionReviewedEmployee.value
+      evaluation_comments_employee: evaluationCommentsEmployee.value
     })
     .then((pr) => {
       status.value = pr.status
@@ -1607,9 +1514,6 @@ function updatePerformanceReview() {
       evaluationGoalsManagerCurrentVal.value = pr.evaluation_goals_manager
       evaluationCommentsEmployeeCurrentVal.value =
         pr.evaluation_comments_employee
-
-      descriptionReviewedEmployeeCurrentVal.value =
-        pr.description_reviewed_employee
 
       signatures.value = pr.all_required_signatures
 

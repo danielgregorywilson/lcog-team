@@ -68,20 +68,6 @@
                 Print Performance Review Form
               </q-tooltip>
             </q-btn>
-            <q-btn
-              v-if="props.row.signed_position_description"
-              class="col print-button"
-              dense
-              round
-              flat
-              color="grey"
-              @click="printEvaluationPositionDescription(props)"
-              icon="print"
-            >
-              <q-tooltip content-style="font-size: 16px">
-                Print Signed Position Description
-              </q-tooltip>
-            </q-btn>
           </div>
         </q-td>
       </template>

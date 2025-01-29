@@ -343,8 +343,6 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
         pr.evaluation_goals_manager = request.data['evaluation_goals_manager']
         pr.evaluation_comments_employee = \
             request.data['evaluation_comments_employee']
-        pr.description_reviewed_employee = \
-            request.data['description_reviewed_employee']
         if pr.status == PerformanceReview.NEEDS_EVALUATION and all([
             (pr.evaluation_type == 'A' or
                 (pr.evaluation_type == 'P' and
@@ -368,7 +366,6 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
             len(pr.evaluation_successes) > 0,
             len(pr.evaluation_opportunities) > 0,
             len(pr.evaluation_goals_manager) > 0,
-            pr.description_reviewed_employee,
 
             # TODO: Add this back once uploader done
             # pr.signed_position_description.name != ''

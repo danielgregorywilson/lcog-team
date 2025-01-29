@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import os
 
+from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.db.models import Q
 from django.template.loader import render_to_string
@@ -11,7 +12,7 @@ from people.models import Employee
 from purchases.models import ExpenseMonth, ExpenseStatement
 
 
-def send_submitter_monthly_expenses_reminders():
+def send_submitter_monthly_expenses_reminders(sending_user: User):
     # Once fiscal has uploaded the previous month's statements.
     # Submitter submitted last month and there's no draft for this month.
     # Submitter has an unsubmitted draft for this month.
@@ -45,12 +46,17 @@ def send_submitter_monthly_expenses_reminders():
                 recipients.append([sub.user.email, 'draft'])
             else:
                 # Is there a statement for a card of theirs this month?
+                # Don't send if they have a submitted ExpenseMonth this month.
                 es = ExpenseStatement.objects.filter(
                     card__assignee=sub,
                     year=curr_month_date.year,
                     month=curr_month_date.month
                 ).exists()
-                if es:
+                em_this_month = ExpenseMonth.objects.filter(
+                    purchaser=sub, year=curr_month_date.year,
+                    month=curr_month_date.month
+                ).exists()
+                if es and not em_this_month:
                     recipients.append([sub.user.email, 'statement'])
                 else:
                     # Did they submit last month or the month before,
@@ -63,18 +69,18 @@ def send_submitter_monthly_expenses_reminders():
                         purchaser=sub, year=month_before_that_date.year,
                         month=month_before_that_date.month
                     ).exists()
-                    em_this_month = ExpenseMonth.objects.filter(
-                        purchaser=sub, year=curr_month_date.year,
-                        month=curr_month_date.month
-                    ).exists()
                     if (
                         em_last_month or em_month_before_that
                     ) and not em_this_month:
                         recipients.append([sub.user.email, 'last_month'])
     for recipient in recipients:
+        sender = sending_user.employee.name if \
+            sending_user.employee and sending_user.employee.name else \
+            sending_user.username
         html_message = render_to_string(html_template, { 'context': {
             'curr_month_name': curr_month_name,
             'message_type': recipient[1],
+            'sender_name': sender,
             'expenses_url': expenses_url,
             'profile_url': profile_url,
             'from_email': os.environ.get('FROM_EMAIL')

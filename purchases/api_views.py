@@ -809,7 +809,9 @@ class ExpenseStatementViewSet(viewsets.ModelViewSet):
         Send notifications to cardholders that statements have been uploaded.
         """
         try:
-            num_recipients = send_submitter_monthly_expenses_reminders()
+            num_recipients = send_submitter_monthly_expenses_reminders(
+                request.user
+            )
             return Response(
                 f'Sent notifications to {num_recipients} cardholders.'
             )

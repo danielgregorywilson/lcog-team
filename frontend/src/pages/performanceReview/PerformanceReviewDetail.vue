@@ -1115,8 +1115,6 @@ import { scroll, useQuasar } from 'quasar'
 import { onMounted, ref, Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import DocumentViewer from 'src/components/DocumentViewer.vue'
-import FileUploader from 'src/components/FileUploader.vue'
 import { readableDate } from 'src/filters'
 import { usePerformanceReviewStore } from 'src/stores/performancereview'
 import { useUserStore } from 'src/stores/user'

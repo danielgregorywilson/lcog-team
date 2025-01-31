@@ -321,7 +321,7 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
       })
     },
 
-    getAllManagerNotesForEmployee(pk: string): Promise<Array<ReviewNoteRetrieve>> {
+    getAllRecentNotesForEmployee(pk: string): Promise<Array<ReviewNoteRetrieve>> {
       return new Promise((resolve, reject) => {
         axios({ url: `${ apiURL }api/v1/reviewnote/${pk}/notes_for_employee` })
           .then(resp => {

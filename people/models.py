@@ -522,7 +522,7 @@ class Employee(models.Model):
     
     def notes_can_view(self):
         # You can view all notes you wrote.
-        note_ids = map(lambda note: note.id, ReviewNote.objects.filter(manager=self))
+        note_ids = map(lambda note: note.id, ReviewNote.objects.filter(author=self))
         return list(note_ids)
 
     def telework_applications_can_view(self):
@@ -1045,12 +1045,7 @@ class ReviewNote(models.Model):
     def get_absolute_url(self):
         return reverse("note-update", kwargs={"pk": self.pk})
 
-    def save(self, *args, **kwargs):
-        if not hasattr(self, 'manager'):
-            self.manager = self.employee.manager
-        super().save(*args, **kwargs)
-
-    manager = models.ForeignKey("Employee", related_name="notes_written", verbose_name=_("manager"), on_delete=models.CASCADE)
+    author = models.ForeignKey("Employee", related_name="notes_written", verbose_name=_("author"), on_delete=models.CASCADE)
     employee = models.ForeignKey("Employee", related_name="notes", verbose_name=_("employee"), on_delete=models.CASCADE)
     date = models.DateField(_("review note date"), auto_now=False, auto_now_add=True)
     note = models.TextField(_("review note"))

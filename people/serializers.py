@@ -355,12 +355,16 @@ class ReviewNoteSerializer(serializers.HyperlinkedModelSerializer):
     pk = serializers.IntegerField()
     employee_pk = serializers.IntegerField(source='employee.pk')
     employee_name = serializers.CharField(source='employee.name')
+    author_name = serializers.CharField(source='author.name')
     date = serializers.DateField()
     note = serializers.CharField()
     
     class Meta:
         model = ReviewNote
-        fields = ['url', 'pk', 'employee_pk', 'employee_name', 'date', 'note']
+        fields = [
+            'url', 'pk', 'employee_pk', 'employee_name', 'author_name', 'date',
+            'note'
+        ]
 
 
 class ViewedSecurityMessageSerializer(serializers.HyperlinkedModelSerializer):

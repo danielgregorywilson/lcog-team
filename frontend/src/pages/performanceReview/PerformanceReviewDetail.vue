@@ -167,22 +167,19 @@
     >
       <hr />
       <h5 class="text-h5 text-uppercase text-bold q-my-md">
-        <u>Your Notes for {{ employeeName }}</u>
+        <u>Peer Feedback</u>
       </h5>
       <div class="q-pa-md row items-start q-gutter-md">
         <q-card
           v-for="note in reviewNotes"
           :key="note.pk"
           class="note-card"
-          @click="onClickNoteCard(note.pk)"
         >
           <q-card-section>
             <div class="text-bold">
-              {{ readableDate(note.date) }}
+              {{ note.author_name }} - {{ readableDate(note.date) }}
             </div>
-            <div>
-              {{ note.note }}
-            </div>
+            <div class="read-only-text-area" v-html="note.note"></div>
           </q-card-section>
         </q-card>
       </div>
@@ -852,10 +849,6 @@
   max-width: 300px;
   display: none;
 }
-.note-card:hover {
-  background-color: lightgray;
-  cursor: pointer;
-}
 .eval-grid-container {
   display: grid;
   background-color: black;
@@ -1448,7 +1441,7 @@ function retrievePerformanceReview() {
 }
 
 function retrieveReviewNotes(): void {
-  performanceReviewStore.getAllManagerNotesForEmployee(
+  performanceReviewStore.getAllRecentNotesForEmployee(
     employeePk.value.toString()
   )
     .then((notes: Array<ReviewNoteRetrieve>) => {
@@ -1572,13 +1565,6 @@ function signPerformanceReview(): void {
 //   const day = quasarDate.getDayOfWeek(new Date(date))
 //   return day !== 6 && day !== 7
 // }
-
-function onClickNoteCard(pk: number): void {
-  router.push(`/note/${ pk }`)
-    .catch(e => {
-      console.error('Error navigating to PR note detail:', e)
-    })
-}
 
 function openErrorDialog(position: PositionType) {
   errorDialogPosition.value = position

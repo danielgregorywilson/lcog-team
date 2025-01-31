@@ -126,7 +126,7 @@ class PerformanceReviewAdmin(admin.ModelAdmin):
 
 @admin.register(ReviewNote)
 class ReviewNoteAdmin(admin.ModelAdmin):
-    list_display = ("manager", "employee", "date")
+    list_display = ("author", "employee", "date")
     readonly_fields = ("date",)
 
     def get_form(self, request, obj=None, **kwargs):

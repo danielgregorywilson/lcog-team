@@ -1,20 +1,24 @@
 <template>
   <q-page>
     <div class="q-px-md">
-      <h4>Edit this Note</h4>
+      <h4>Edit Feedback</h4>
       <p>
         Notes are visible to you when completing an evalutation for the
         employee. They are not visible to anyone else.
       </p>
-      <q-select
-        v-model="employee" :options="options" label="Employee" class="q-pb-md"
+      <EmployeeSelect
+        name="employee"
+        label="Employee"
+        :employeePk="employeePk"
+        :useLegalName="false"
+        v-on:input="employeePk = $event.pk"
+        :readOnly=false
+        :fooBar="100"
       />
-      <q-input
-        input-class="review-note"
+      <q-editor
         v-model="note"
-        label="Review Note"
-        type="textarea"
-        class="q-pb-md"
+        :toolbar="editorToolbar"
+        class="q-my-md"
       />
       <q-btn
         color="white"
@@ -29,46 +33,43 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, Ref } from 'vue'
+import { useQuasar } from 'quasar'
+import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-import { usePeopleStore } from 'src/stores/people'
-import { useUserStore } from 'src/stores/user'
+import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import { usePerformanceReviewStore } from 'src/stores/performancereview'
 import { getRoutePk } from 'src/utils'
 
-interface EmployeeOption {
-  label: string;
-  pk: number;
-}
-
+const $q = useQuasar()
 const route = useRoute()
-const peopleStore = usePeopleStore()
 const performanceReviewStore = usePerformanceReviewStore()
-const userStore = useUserStore()
 
 const notePk = ref('')
-let options = ref([]) as Ref<Array<EmployeeOption>>
-let employee = ref({label: '', pk: -1}) as Ref<EmployeeOption>
-let employeeCurrentVal = ref({label: '', pk: -1}) as Ref<EmployeeOption>
+let employeePk = ref(-1)
+let employeePkCurrentVal = ref(-1)
 let note = ref('')
 let noteCurrentVal = ref('')
 
-function getOptions(): void {
-  peopleStore.getDirectReports(userStore.getEmployeeProfile.employee_pk)
-    .then((employees) => {
-      options.value = employees.map(obj => {
-        return {label: obj.name, pk: obj.pk}
-      })
-    })
-    .catch(e => {
-      console.error('Error getting direct reports:', e)
-    })
-}
+let editorToolbar = [
+  [
+    {
+      label: $q.lang.editor.align,
+      icon: $q.iconSet.editor.align,
+      fixedLabel: true,
+      options: ['left', 'center', 'right', 'justify']
+    }
+  ],
+  ['bold', 'italic', 'underline', 'removeFormat'],
+  ['hr', 'link'],
+  ['fullscreen'],
+  ['quote', 'unordered', 'ordered', 'outdent', 'indent'],
+  ['undo', 'redo']
+]
 
 function valuesAreChanged(): boolean {
   if (
-    employee.value.pk == employeeCurrentVal.value.pk &&
+    employeePk.value == employeePkCurrentVal.value &&
       note.value == noteCurrentVal.value
   ) {
     return false
@@ -80,13 +81,11 @@ function valuesAreChanged(): boolean {
 function updateReviewNote(): void {
   performanceReviewStore.updateReviewNote({
     pk: parseInt(notePk.value),
-    employee_pk: employee.value.pk,
+    employee_pk: employeePk.value,
     note: note.value
   })
     .then((reviewNote) => {
-      employeeCurrentVal.value = {
-        label: reviewNote.employee_name, pk: reviewNote.employee_pk
-      }
+      employeePkCurrentVal.value = reviewNote.employee_pk
       noteCurrentVal.value = reviewNote.note
     })
 }
@@ -97,11 +96,9 @@ function retrieveReviewNote(): void {
     notePk.value = routePk
     performanceReviewStore.getReviewNote(routePk)
       .then((reviewNote) => {
-        employee.value = {
-          label: reviewNote.employee_name, pk: reviewNote.employee_pk
-        }
+        employeePk.value = reviewNote.employee_pk
         note.value = reviewNote.note
-        employeeCurrentVal.value = employee.value
+        employeePkCurrentVal.value = employeePk.value
         noteCurrentVal.value = note.value
       })
   }
@@ -109,6 +106,5 @@ function retrieveReviewNote(): void {
 
 onMounted(() => {
   retrieveReviewNote();
-  getOptions();
 })
 </script>

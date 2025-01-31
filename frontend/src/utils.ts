@@ -7,21 +7,29 @@ import { useUserStore } from 'src/stores/user'
 const authStore = useAuthStore()
 const userStore = useUserStore()
 
-export function getRouteParam(route: RouteLocationNormalizedLoaded, param = 'pk'): string | null {
+export function getRouteParam(
+  route: RouteLocationNormalizedLoaded, param: string
+): string | null {
   if (!route || route.params[param] == undefined) {
     return null
   } else {
-    return typeof route.params[param] == 'string' ? route.params[param] : route.params[param][0]
+    return typeof route.params[param] == 'string' ? route.params[param] :
+      route.params[param][0]
   }
 }
 
 export function getRoutePk(route: RouteLocationNormalizedLoaded) {
   return getRouteParam(route, 'pk')
-  // if (!route || route.params.pk == undefined) {
-  //   return null
-  // } else {
-  //   return typeof route.params.pk == 'string' ? route.params.pk : route.params.pk[0]
-  // }
+}
+
+export function getRouteQuery(
+  route: RouteLocationNormalizedLoaded, query: string
+): string | null {
+  if (!route || route.query[query] == undefined) {
+    return null
+  } else {
+    return route.query[query] as string
+  }
 }
 
 export function getCurrentUser(): Promise<any> {

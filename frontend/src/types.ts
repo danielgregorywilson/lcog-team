@@ -552,6 +552,7 @@ export interface ReviewNoteRetrieve {
   pk: number
   employee_pk: number
   employee_name: string
+  author_name: string
   date: Date
   note: string
 }

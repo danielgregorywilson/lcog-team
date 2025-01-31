@@ -1,7 +1,10 @@
+from datetime import timedelta
+
 from django.apps import apps
 from django.contrib.auth.models import Group, User
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -532,13 +535,13 @@ class ReviewNoteViewSet(viewsets.ModelViewSet):
         if user.is_anonymous:
             return ReviewNote.objects.all()
         else:
-            return ReviewNote.objects.filter(manager__user=user)
+            return ReviewNote.objects.filter(author__user=user)
 
     def create(self, request):
         employee = Employee.objects.get(pk=request.data['employee_pk'])
-        manager = employee.manager
+        author = request.user.employee  
         note = request.data['note']
-        new_review_note = ReviewNote.objects.create(manager=manager,
+        new_review_note = ReviewNote.objects.create(author=author,
             employee=employee, note=note)
         serialized_note = ReviewNoteSerializer(new_review_note,
             context={'request': request})
@@ -547,7 +550,7 @@ class ReviewNoteViewSet(viewsets.ModelViewSet):
     def update(self, request, pk=None):
         employee = Employee.objects.get(pk=request.data['employee_pk'])
         review_note = ReviewNote.objects.get(pk=pk)
-        review_note.employeee = employee
+        review_note.employee = employee
         review_note.note = request.data['note']
         review_note.save()
         serialized_note = ReviewNoteSerializer(review_note,
@@ -557,8 +560,8 @@ class ReviewNoteViewSet(viewsets.ModelViewSet):
     # TODO: Detail false?
     @action(detail=True, methods=['get'])
     def notes_for_employee(self, request, pk=None):
-        review_notes = ReviewNote.objects.filter(
-            manager=request.user.employee.pk, employee=pk)
+        six_months_ago = timezone.now() - timedelta(days=180)
+        review_notes = ReviewNote.objects.filter(employee=pk, date__gte=six_months_ago)
         serialized_notes = [ReviewNoteSerializer(note,
             context={'request': request}).data for note in review_notes]
         return Response(serialized_notes)

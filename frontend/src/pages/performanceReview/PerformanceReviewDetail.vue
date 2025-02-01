@@ -126,7 +126,42 @@
       </div>
     </div>
 
-    <h5 class="text-uppercase text-center text-bold"><u>Rating Scale</u></h5>
+    <div
+      v-if="currentUserIsManagerOfEmployee()"
+      id="notes"
+    >
+      <h5 class="text-h5 text-uppercase text-bold text-center q-my-md">
+        <u>Peer Feedback</u>
+      </h5>
+      <div class="q-pa-md row items-center q-gutter-md">
+        <q-icon name="forward_to_inbox" size="xl" color="primary" />
+        <div>
+          <div class="text-bold">
+            Link: <a :href="peerFeedbackLink()">{{ peerFeedbackLink() }}</a>
+          </div>
+          <div>
+            Send this link to anyone who may want to submit feedback for {{ employeeName }}.
+          </div>
+        </div>
+      </div>
+      
+      <div class="q-pa-md row items-start q-gutter-md">
+        <q-card
+          v-for="note in reviewNotes"
+          :key="note.pk"
+          class="note-card"
+        >
+          <q-card-section>
+            <div class="text-bold">
+              {{ note.author_name }} - {{ readableDate(note.created_at) }}
+            </div>
+            <div class="read-only-text-area" v-html="note.note"></div>
+          </q-card-section>
+        </q-card>
+      </div>
+    </div>
+
+    <h5 class="text-uppercase text-center text-bold q-mb-sm q-mt-lg"><u>Rating Scale</u></h5>
     <div class="rating-grid-container">
       <div class="rating-box">
         <span class="text-bold">(1)*</span> Needs Improvement
@@ -160,32 +195,6 @@
       *Factors rated <span class="text-bold">(1)</span> Needs improvement must
       be addressed with a plan for improvement.
     </div>
-
-    <div
-      v-if="currentUserIsManagerOfEmployee() && reviewNotes.length"
-      id="notes"
-    >
-      <hr />
-      <h5 class="text-h5 text-uppercase text-bold q-my-md">
-        <u>Peer Feedback</u>
-      </h5>
-      <div class="q-pa-md row items-start q-gutter-md">
-        <q-card
-          v-for="note in reviewNotes"
-          :key="note.pk"
-          class="note-card"
-        >
-          <q-card-section>
-            <div class="text-bold">
-              {{ note.author_name }} - {{ readableDate(note.date) }}
-            </div>
-            <div class="read-only-text-area" v-html="note.note"></div>
-          </q-card-section>
-        </q-card>
-      </div>
-    </div>
-
-    <hr />
 
     <h5 class="text-uppercase text-bold q-my-md">
       <u>I. Performance Factors Reviewed</u>
@@ -1231,6 +1240,10 @@ function nextPersonToSign(): string {
 
 function currentUserIsEmployee(): boolean {
   return employeePk.value == currentUserPk()
+}
+
+function peerFeedbackLink(): string {
+  return `${ window.location.origin }/note/new?employee=${ employeePk.value }`
 }
 
 function valuesAreChanged(): boolean {

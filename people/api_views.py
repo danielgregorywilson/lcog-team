@@ -561,7 +561,9 @@ class ReviewNoteViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['get'])
     def notes_for_employee(self, request, pk=None):
         six_months_ago = timezone.now() - timedelta(days=180)
-        review_notes = ReviewNote.objects.filter(employee=pk, date__gte=six_months_ago)
+        review_notes = ReviewNote.objects.filter(
+            employee=pk, created_at__gte=six_months_ago
+        )
         serialized_notes = [ReviewNoteSerializer(note,
             context={'request': request}).data for note in review_notes]
         return Response(serialized_notes)

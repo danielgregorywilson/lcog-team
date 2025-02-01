@@ -1,7 +1,7 @@
 <template>
   <q-page>
     <div class="q-px-md">
-      <h4>Edit Feedback</h4>
+      <h4 class="q-my-lg">Edit Feedback</h4>
       <p>
         Notes are visible to you when completing an evalutation for the
         employee. They are not visible to anyone else.

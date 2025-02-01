@@ -1,9 +1,9 @@
 <template>
   <q-page>
     <div class="q-px-md">
-      <h4>Add Feedback</h4>
+      <h4 class="q-my-lg">Add Feedback</h4>
       <div v-if="employeeFullName">
-        <p>You are invited to submit feedback for {{ employeeFullName }}’s upcoming performance evaluation.  Feel free to respond with freeform comments or answer the enclosed questions by Friday, 10/25/24.</p>
+        <p>You are invited to submit feedback for {{ employeeFullName }}’s upcoming performance evaluation.  Feel free to respond with freeform comments or answer the following questions.</p>
         <ol>
           <li>What in your judgement are {{ employeeFirstName }}’s strongest performance characteristics?</li>
           <li>Are there any characteristics of {{ employeeFirstName }}’s performance that need strengthening?</li>
@@ -12,9 +12,8 @@
     
         <p>Thank you for your contribution to supporting {{ employeeFirstName }}’s success at LCOG,</p>
       </div>
-      <p>
-        Notes are visible to you when completing an evalutation for the
-        employee. They are not visible to anyone else.
+      <p class="text-bold">
+        Notes are visible ONLY to you and the employee's manager. They are never visible to the employee, or to anyone else.
       </p>
       <EmployeeSelect
         name="employee"

@@ -5,9 +5,9 @@
       :columns="columns"
       row-key="name"
     >
-      <template v-slot:body-cell-date="props">
-        <q-td key="date" :props="props">
-          {{ readableDate(props.row.date) }}
+      <template v-slot:body-cell-created_at="props">
+        <q-td key="created_at" :props="props">
+          {{ readableDate(props.row.created_at) }}
         </q-td>
       </template>
       <template v-slot:body-cell-actions="props">
@@ -73,7 +73,7 @@ let columns: QTableProps['columns'] = [
     name: 'employeeName', label: 'Colleague Name', align: 'left',
     field: 'employee_name', sortable: true
   },
-  { name: 'date', label: 'Date', field: 'date', sortable: true },
+  { name: 'created_at', label: 'Date', field: 'created_at', sortable: true },
   { name: 'actions', label: 'Actions', field: '' },
 ]
 let deleteDialogVisible = ref(false)

@@ -1047,7 +1047,7 @@ class ReviewNote(models.Model):
 
     author = models.ForeignKey("Employee", related_name="notes_written", verbose_name=_("author"), on_delete=models.CASCADE)
     employee = models.ForeignKey("Employee", related_name="notes", verbose_name=_("employee"), on_delete=models.CASCADE)
-    date = models.DateField(_("review note date"), auto_now=False, auto_now_add=True)
+    created_at = models.DateTimeField(_("review note date"), auto_now=False, auto_now_add=True)
     note = models.TextField(_("review note"))
 
 

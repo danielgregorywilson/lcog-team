@@ -365,9 +365,10 @@ export interface SimpleExpenseMonth extends ExpenseBase {
   year: number
   purchaser: SimpleEmployeeRetrieve
   card: ExpenseCard
+  submitted_at: string
   director_approved: boolean
   director_approved_at: string
-  fiscal_approver: SimpleEmployeeRetrieve
+  fiscal_approver_name: string
   fiscal_approved_at: string
 }
 

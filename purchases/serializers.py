@@ -168,13 +168,19 @@ class SimpleExpenseMonthSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ExpenseMonth
         fields = [
-            'url', 'pk', 'purchaser', 'month', 'year', 'card',
-            'director_approved', 'director_approved_at', 'fiscal_approved_at',
-            'status'
+            'url', 'pk', 'purchaser', 'month', 'year', 'card', 'submitted_at',
+            'director_approved', 'director_approved_at',
+            'fiscal_approver_name', 'fiscal_approved_at', 'status'
         ]
 
     purchaser = SimpleEmployeeSerializer(required=False)
     card = ExpenseCardSerializer(required=False)
+    fiscal_approver_name = serializers.SerializerMethodField()
+
+    def get_fiscal_approver_name(self, obj):
+        if obj.fiscal_approver:
+            return obj.fiscal_approver.name
+        return None
 
 
 class ExpenseMonthLockSerializer(serializers.HyperlinkedModelSerializer):

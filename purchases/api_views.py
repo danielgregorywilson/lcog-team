@@ -517,6 +517,7 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
             # MONTH
             if unsubmit:
                 em.status = ExpenseMonth.STATUS_DRAFT
+                em.submitted_at = None
             else:
                 if all_month_expenses_approved(em):
                     if all([
@@ -543,6 +544,7 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
                     em.director_approved_at = None
                     em.director_approved = False
                 em.submitter_note = note
+                em.submitted_at = timezone.now()
             em.save()
             
             # EXPENSES

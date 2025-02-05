@@ -52,6 +52,9 @@
                 </div>
               </q-linear-progress>
             </q-td>
+            <q-td key="date" :props="props">
+              {{ dateLabel(props.row) }}
+            </q-td>
             <q-td key="approved" :props="props">
               <q-icon
                 v-if="expenseMonthFiscalApproved(props.row)"
@@ -363,7 +366,7 @@ import { useQuasar } from 'quasar'
 import { onMounted, Ref, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import FileUploader from 'src/components/FileUploader.vue'
-import { readableDateNEW } from 'src/filters'
+import { readableDateNEW, readableDateTime } from 'src/filters'
 import { handlePromiseError } from 'src/stores'
 import { usePurchaseStore } from 'src/stores/purchase';
 import { ExpenseMonth, ExpenseStatement } from 'src/types';
@@ -401,6 +404,9 @@ const columns = [
   {
     name: 'status', label: 'Status', field: 'status', sortable: true,
     align: 'center'
+  },
+  {
+    name: 'date', label: 'Date', align: 'center'
   },
   {
     name: 'approved', label: 'Fiscal Approved', field: 'approved',
@@ -484,19 +490,19 @@ function progressBarLabel(status: string) {
     case 'draft':
       return 'Not Submitted'
     case 'submitted':
-      return 'Submitted by Employee'
+      return 'Submitted'
     case 'approver_denied':
-      return 'Denied by Manager'
+      return 'Manager Denied'
     case 'approver_approved':
-      return 'Approved by Manager'
+      return 'Manager Approved'
     case 'director_denied':
-      return 'Denied by Director'
+      return 'Director Denied'
     case 'director_approved':
-      return 'Approved by Director'
+      return 'Director Approved'
     case 'fiscal_denied':
-      return 'Denied by Fiscal'
+      return 'Fiscal Denied'
     case 'fiscal_approved':
-      return 'Approved by Fiscal'
+      return 'Fiscal Approved'
     default:
       return 'Unknown'
   }
@@ -518,6 +524,27 @@ function progressBarColor(status: string) {
       return 'green'
     default:
       return 'grey'
+  }
+}
+
+function dateLabel(row: ExpenseMonth) {
+  switch (row.status) {
+    case 'draft':
+    case 'approver_denied':
+    case 'approver_approved':
+      return ''
+    case 'submitted':
+      return `Submitted on ${readableDateTime(row.submitted_at)}`
+    case 'director_denied':
+      return `Denied on ${readableDateTime(row.director_approved_at)}`
+    case 'fiscal_denied':
+      return `Denied by ${row.fiscal_approver_name} on ${readableDateTime(row.fiscal_approved_at)}`
+    case 'director_approved':
+      return `Approved on ${readableDateTime(row.director_approved_at)}`
+    case 'fiscal_approved':
+      return `Approved by ${row.fiscal_approver_name} on ${readableDateTime(row.fiscal_approved_at)}`
+    default:
+      return ''
   }
 }
 

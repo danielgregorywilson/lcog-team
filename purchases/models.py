@@ -197,14 +197,17 @@ class ExpenseMonth(ExpenseBaseModel):
         'ExpenseCard', blank=True, null=True, on_delete=models.SET_NULL,
         related_name='expense_months'
     )
+
+    # Submission info
     submitter_note = models.TextField(blank=True)
+    submitted_at = models.DateTimeField(blank=True, null=True)
     
-    # Division Director approval
+    # Division Director approval info
     director_approved = models.BooleanField(default=False)
     director_approved_at = models.DateTimeField(blank=True, null=True)
     director_note = models.TextField(blank=True)
 
-    # Fiscal approval
+    # Fiscal approval info
     fiscal_approver = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name='approver_of_expense_month',

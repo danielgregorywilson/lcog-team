@@ -511,15 +511,15 @@ function progressBarLabel(status: string) {
 function progressBarColor(status: string) {
   switch (status) {
     case 'draft':
-      return 'grey'
     case 'submitted':
-      return 'blue'
     case 'approver_denied':
     case 'director_denied':
+      return 'blue'
     case 'fiscal_denied':
       return 'red'
     case 'approver_approved':
     case 'director_approved':
+      return 'warning'
     case 'fiscal_approved':
       return 'green'
     default:
@@ -530,15 +530,17 @@ function progressBarColor(status: string) {
 function dateLabel(row: ExpenseMonth) {
   switch (row.status) {
     case 'draft':
-    case 'approver_denied':
-    case 'approver_approved':
       return ''
     case 'submitted':
       return `Submitted on ${readableDateTime(row.submitted_at)}`
+    case 'approver_denied':
+      return `Denied by ${row.denier_name} on ${readableDateTime(row.approved_as_of)}`
     case 'director_denied':
       return `Denied on ${readableDateTime(row.director_approved_at)}`
     case 'fiscal_denied':
       return `Denied by ${row.fiscal_approver_name} on ${readableDateTime(row.fiscal_approved_at)}`
+    case 'approver_approved':
+      return `Approved as of ${readableDateTime(row.approved_as_of)}`
     case 'director_approved':
       return `Approved on ${readableDateTime(row.director_approved_at)}`
     case 'fiscal_approved':

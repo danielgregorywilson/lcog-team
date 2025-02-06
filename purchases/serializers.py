@@ -169,8 +169,9 @@ class SimpleExpenseMonthSerializer(serializers.HyperlinkedModelSerializer):
         model = ExpenseMonth
         fields = [
             'url', 'pk', 'purchaser', 'month', 'year', 'card', 'submitted_at',
-            'director_approved', 'director_approved_at',
-            'fiscal_approver_name', 'fiscal_approved_at', 'status'
+            'denier_name', 'approved_as_of', 'director_approved',
+            'director_approved_at', 'fiscal_approver_name',
+            'fiscal_approved_at', 'status'
         ]
 
     purchaser = SimpleEmployeeSerializer(required=False)

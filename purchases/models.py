@@ -202,6 +202,11 @@ class ExpenseMonth(ExpenseBaseModel):
     submitter_note = models.TextField(blank=True)
     submitted_at = models.DateTimeField(blank=True, null=True)
     
+    # Approval info - Used only for Fiscal view to see who denied most recently
+    # or when it was finally approved.
+    denier_name = models.CharField(max_length=255, blank=True)
+    approved_as_of = models.DateTimeField(blank=True, null=True)
+
     # Division Director approval info
     director_approved = models.BooleanField(default=False)
     director_approved_at = models.DateTimeField(blank=True, null=True)

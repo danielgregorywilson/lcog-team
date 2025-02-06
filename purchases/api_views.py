@@ -149,6 +149,7 @@ class ExpenseGLViewSet(viewsets.ModelViewSet):
                 # If all expenses for the month are approved, approve the month
                 if all_month_expenses_approved(em):
                     em.status = ExpenseMonth.STATUS_APPROVER_APPROVED
+                    em.approved_as_of = timezone.now()
                     em.save()
             else:
                 gl.approved = False
@@ -159,6 +160,8 @@ class ExpenseGLViewSet(viewsets.ModelViewSet):
                 expense.save()
                 # Deny the month
                 em.status = ExpenseMonth.STATUS_APPROVER_DENIED
+                em.denier_name = request.user.employee.name
+                em.approved_as_of = timezone.now()
                 em.save()
                 send_submitter_denial_notification(em.purchaser)
             # Return the updated expense

@@ -1,23 +1,33 @@
 <template>
   <q-page>
     <div class="q-px-md">
-      <h4>Add a New Note</h4>
-      <p>
-        Notes are visible to you when completing an evalutation for the
-        employee. They are not visible to anyone else.
+      <h4 class="q-my-lg">Add Feedback</h4>
+      <div v-if="employeeFullName">
+        <p>You are invited to submit feedback for {{ employeeFullName }}’s upcoming performance evaluation.  Feel free to respond with freeform comments or answer the following questions.</p>
+        <ol>
+          <li>What in your judgement are {{ employeeFirstName }}’s strongest performance characteristics?</li>
+          <li>Are there any characteristics of {{ employeeFirstName }}’s performance that need strengthening?</li>
+          <li>Please share any additional feedback that you think would be helpful.</li>
+        </ol>
+    
+        <p>Thank you for your contribution to supporting {{ employeeFirstName }}’s success at LCOG,</p>
+      </div>
+      <p class="text-bold">
+        Notes are visible ONLY to you and the employee's manager. They are never visible to the employee, or to anyone else.
       </p>
-      <q-select
-        v-model="employee"
-        :options="options"
+      <EmployeeSelect
+        name="employee"
         label="Employee"
-        class="q-pb-md"
+        :employeePk="employeePkFromRoute()"
+        :useLegalName="false"
+        v-on:input="employee=$event"
+        :readOnly=!!employeePkFromRoute()
+        :fooBar="100"
       />
-      <q-input
-        input-class="review-note"
+      <q-editor
         v-model="note"
-        label="Review Note"
-        type="textarea"
-        class="q-pb-md"
+        :toolbar="editorToolbar"
+        class="q-my-md"
       />
       <q-btn
         id="review-note-create-button"
@@ -32,44 +42,71 @@
 </template>
 
 <script setup lang="ts">
-import { Notify } from 'quasar'
-import { onMounted, ref, Ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { Notify, useQuasar } from 'quasar'
+import { onMounted, ref, Ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
-import useEventBus from 'src/eventBus'
+import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import { usePeopleStore } from 'src/stores/people'
 import { usePerformanceReviewStore } from 'src/stores/performancereview'
-import { useUserStore } from 'src/stores/user'
+import { emptyEmployee, SimpleEmployee } from 'src/types'
+import { getRouteQuery } from 'src/utils'
 
-interface EmployeeOption {
-  label: string;
-  pk: number;
-}
-
+const $q = useQuasar()
+const route = useRoute()
 const router = useRouter()
-const { bus } = useEventBus()
 const peopleStore = usePeopleStore()
 const performanceReviewStore = usePerformanceReviewStore()
-const userStore = useUserStore()
 
-let options = ref([]) as Ref<Array<EmployeeOption>>
-let employee = ref({label: '', pk: -1}) as Ref<EmployeeOption>
+// From route query
+let employeeFullName = ref('')
+let employeeFirstName = ref('')
+
+// From form
+let employee = ref(emptyEmployee) as Ref<SimpleEmployee>
 let note = ref('')
 
-function getOptions(): void {
-  peopleStore.getDirectReports(userStore.getEmployeeProfile.employee_pk)
-    .then((employees) => {
-      options.value = employees.map(obj => {
-        return {label: obj.name, pk: obj.pk}
+let editorToolbar = [
+  [
+    {
+      label: $q.lang.editor.align,
+      icon: $q.iconSet.editor.align,
+      fixedLabel: true,
+      options: ['left', 'center', 'right', 'justify']
+    }
+  ],
+  ['bold', 'italic', 'underline', 'removeFormat'],
+  ['hr', 'link'],
+  ['fullscreen'],
+  ['quote', 'unordered', 'ordered', 'outdent', 'indent'],
+  ['undo', 'redo']
+]
+
+function employeePkFromRoute() {
+  const employeePk = getRouteQuery(route, 'employee')
+  if (employeePk) {
+    employee.value.pk = parseInt(employeePk)
+    return parseInt(employeePk)
+  }
+  return undefined
+}
+
+function getEmployeeName(): void {
+  const pk = employeePkFromRoute()
+  if (pk) {
+    peopleStore.getSimpleEmployeeDetail({ pk })
+      .then((employee) => {
+        employeeFullName.value = employee.name
+        employeeFirstName.value = employee.name.split(' ')[0]
       })
-    })
-    .catch(e => {
-      console.error('Error getting direct reports:', e)
-    })
+      .catch(e => {
+        console.error('Error getting employee:', e)
+      })
+  }
 }
 
 function formIsFilled(): boolean {
-  if (!!employee.value.pk && !!note.value) {
+  if (employee.value.pk !== -1 && !!note.value) {
     return true
   } else {
     return false
@@ -97,13 +134,7 @@ function createReviewNote(): void {
     })
 }
 
-watch(() => bus.value.get('gotUserProfile'), () => {
-  getOptions()
-})
-
 onMounted(() => {
-  if (userStore.isProfileLoaded) {
-    getOptions()
-  }
+  getEmployeeName()
 })
 </script>

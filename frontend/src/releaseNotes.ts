@@ -4,6 +4,24 @@
 
 export const releases = [
   {
+    version: '0.46.0',
+    date: new Date(2025, 1, 5),
+    changes: [
+      {
+        type: 'new',
+        description: 'Add peer feedback to performance reviews.'
+      },
+      {
+        type: 'improved',
+        description: 'Improvements to performance review form.'
+      },
+      {
+        type: 'improved',
+        description: 'Minor improvements to the CC app fiscal views.'
+      },
+    ]
+  },
+  {
     version: '0.45.4',
     date: new Date(2025, 0, 28),
     changes: [

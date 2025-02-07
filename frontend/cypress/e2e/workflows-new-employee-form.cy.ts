@@ -75,7 +75,7 @@ function otherFieldsViewAndEdit() {
   cy.get('input[name="preferred-name"]').clear().type(preferredName)
   cy.get('input[name="preferred-name"]').should('have.value', preferredName)
   const titleInput = cy.get('select[name="title"]').siblings('input')
-  titleInput.type('Developer')
+  titleInput.type('Senior Web')
   cy.wait(500) // Wait for the title to be selected
   titleInput.type('{downArrow}{enter}')
   titleInput.should('have.value', 'Senior Web Developer')

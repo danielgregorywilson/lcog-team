@@ -246,10 +246,18 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
         return Response(serialized_wfi.data)
 
     def destroy(self, request, pk=None):
-        instance = self.get_object()
-        if instance.transition:
-            instance.transition.delete()
-        return super().destroy(request, pk)
+        try:
+            instance = self.get_object()
+            if instance.transition:
+                instance.transition.delete()
+            return super().destroy(request, pk)
+        except Exception as e:
+            message = 'Error deleting workflow instance.'
+            record_error(message, e, request, traceback.format_exc())
+            return Response(
+                data=message,
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class EmployeeTransitionViewSet(viewsets.ModelViewSet):

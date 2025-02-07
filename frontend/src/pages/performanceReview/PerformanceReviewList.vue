@@ -58,7 +58,7 @@
           font-size="32px"
           class="q-mr-sm"
         />
-        <div class="text-h4">Review Notes</div>
+        <div class="text-h4">Your Peer Feedback</div>
       </div>
       <ReviewNoteTable />
     </div>

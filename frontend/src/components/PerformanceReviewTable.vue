@@ -54,7 +54,24 @@
               color="grey"
               @click="editEvaluation(props)"
               icon="edit"
-            />
+            >
+              <q-tooltip content-style="font-size: 16px">
+                Edit Performance Review
+              </q-tooltip>
+            </q-btn>
+            <q-btn
+              class="col edit-button"
+              dense
+              round
+              flat
+              color="grey"
+              @click="copyFeedbackLinkToClipboard(props)"
+              icon="link"
+            >
+              <q-tooltip content-style="font-size: 16px">
+                Copy feedback link to clipboard
+              </q-tooltip>
+            </q-btn> 
             <q-btn
               class="col print-button"
               dense
@@ -66,20 +83,6 @@
             >
               <q-tooltip content-style="font-size: 16px">
                 Print Performance Review Form
-              </q-tooltip>
-            </q-btn>
-            <q-btn
-              v-if="props.row.signed_position_description"
-              class="col print-button"
-              dense
-              round
-              flat
-              color="grey"
-              @click="printEvaluationPositionDescription(props)"
-              icon="print"
-            >
-              <q-tooltip content-style="font-size: 16px">
-                Print Signed Position Description
               </q-tooltip>
             </q-btn>
           </div>
@@ -187,7 +190,7 @@
 </style>
 
 <script setup lang="ts">
-import { QTable, QTableProps } from 'quasar'
+import { Notify, QTable, QTableProps } from 'quasar'
 import { onMounted, onUpdated, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -381,6 +384,26 @@ function editEvaluation(
   router.push({ name: 'pr-details', params: { pk: props.row.pk } })
     .catch(e => {
       console.error('Error navigating to PR detail:', e)
+    })
+}
+
+function copyFeedbackLinkToClipboard(
+  props: QuasarPerformanceReviewTableRowClickActionProps
+): void {
+  const origin = window.location.origin
+  const url = `${origin}/note/new?employee=${props.row.employee_pk}`
+  navigator.clipboard.writeText(url)
+    .then(() => {
+      console.log('Feedback link copied to clipboard:', url)
+      Notify.create({
+        message: 'Feedback link copied to clipboard',
+        color: 'green',
+        position: 'top',
+        timeout: 2000,
+      })
+    })
+    .catch(e => {
+      console.error('Error copying feedback link to clipboard:', e)
     })
 }
 

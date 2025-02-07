@@ -5,9 +5,9 @@
       :columns="columns"
       row-key="name"
     >
-      <template v-slot:body-cell-date="props">
-        <q-td key="date" :props="props">
-          {{ readableDate(props.row.date) }}
+      <template v-slot:body-cell-created_at="props">
+        <q-td key="created_at" :props="props">
+          {{ readableDate(props.row.created_at) }}
         </q-td>
       </template>
       <template v-slot:body-cell-actions="props">
@@ -33,7 +33,7 @@
             <span class="q-ml-sm">Are you sure you want to delete this note?</span>
           </div>
           <div class="row justify-center text-center">{{ deleteDialogEmployeeName }}</div>
-          <div class="row justify-center text-center">{{ deleteDialogNoteText }}</div>
+          <div class="row justify-center text-center read-only-text-area" v-html="deleteDialogNoteText"></div>
         </q-card-section>
 
         <q-card-actions class="row justify-around">
@@ -44,6 +44,12 @@
     </q-dialog>
   </div>
 </template>
+
+<style scoped lang="scss">
+.read-only-text-area {
+  white-space: pre-line;
+}
+</style>
 
 <script setup lang="ts">
 import { Notify, QTable, QTableProps } from 'quasar'
@@ -63,9 +69,12 @@ const router = useRouter()
 const performanceReviewStore = usePerformanceReviewStore()
 
 let columns: QTableProps['columns'] = [
-  { name: 'employeeName', label: 'Employee Name', align: 'left', field: 'employee_name', sortable: true },
-  { name: 'date', label: 'Date', field: 'date', sortable: true },
-  { name: 'actions', label: 'Actions', field: null },
+  {
+    name: 'employeeName', label: 'Colleague Name', align: 'left',
+    field: 'employee_name', sortable: true
+  },
+  { name: 'created_at', label: 'Date', field: 'created_at', sortable: true },
+  { name: 'actions', label: 'Actions', field: '' },
 ]
 let deleteDialogVisible = ref(false)
 let deleteDialogEmployeeName = ref('')

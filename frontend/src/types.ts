@@ -312,7 +312,6 @@ export interface PerformanceReviewUpdate {
   evaluation_opportunities: string
   evaluation_goals_manager: string
   evaluation_comments_employee: string
-  description_reviewed_employee: boolean
 }
 
 export interface PerformanceReviewUpdatePartial {
@@ -337,7 +336,6 @@ export interface PerformanceReviewUpdatePartial {
   evaluation_opportunities?: string
   evaluation_goals_manager?: string
   evaluation_comments_employee?: string
-  description_reviewed_employee?: boolean
 }
 
 export interface SignedPositionDescriptionUpload {
@@ -367,9 +365,12 @@ export interface SimpleExpenseMonth extends ExpenseBase {
   year: number
   purchaser: SimpleEmployeeRetrieve
   card: ExpenseCard
+  submitted_at: string
+  denier_name: string
+  approved_as_of: string
   director_approved: boolean
   director_approved_at: string
-  fiscal_approver: SimpleEmployeeRetrieve
+  fiscal_approver_name: string
   fiscal_approved_at: string
 }
 
@@ -554,6 +555,7 @@ export interface ReviewNoteRetrieve {
   pk: number
   employee_pk: number
   employee_name: string
+  author_name: string
   date: Date
   note: string
 }

@@ -13,7 +13,7 @@
         <p><a href="{{context.expenses_url}}">Please enter them</a>, select your credit card statement, and submit as soon as you can.</p>
         {% elif context.message_type == 'last_month' %}
         <p>If you have any, <a href="{{context.expenses_url}}">please enter them</a>, select your credit card statement, and submit as soon as you can.</p>
-        <p>If not, you can ignore this message.</p>
+        <p><strong style="text-decoration: underline;">If not, you can ignore this message.</strong></p>
         {% endif %}
         <p>Thank you!</p>
         <p>{{context.sender_name}}</p>

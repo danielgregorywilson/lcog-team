@@ -126,8 +126,8 @@ class PerformanceReviewAdmin(admin.ModelAdmin):
 
 @admin.register(ReviewNote)
 class ReviewNoteAdmin(admin.ModelAdmin):
-    list_display = ("manager", "employee", "date")
-    readonly_fields = ("date",)
+    list_display = ("author", "employee", "created_at")
+    readonly_fields = ("created_at",)
 
     def get_form(self, request, obj=None, **kwargs):
         note_exists = hasattr(obj, 'pk')

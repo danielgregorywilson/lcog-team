@@ -126,7 +126,42 @@
       </div>
     </div>
 
-    <h5 class="text-uppercase text-center text-bold"><u>Rating Scale</u></h5>
+    <div
+      v-if="currentUserIsManagerOfEmployee()"
+      id="notes"
+    >
+      <h5 class="text-h5 text-uppercase text-bold text-center q-my-md">
+        <u>Peer Feedback</u>
+      </h5>
+      <div class="q-pa-md row items-center q-gutter-md">
+        <q-icon name="forward_to_inbox" size="xl" color="primary" />
+        <div>
+          <div class="text-bold">
+            Link: <a :href="peerFeedbackLink()">{{ peerFeedbackLink() }}</a>
+          </div>
+          <div>
+            Send this link to anyone who may want to submit feedback for {{ employeeName }}.
+          </div>
+        </div>
+      </div>
+      
+      <div class="q-pa-md row items-start q-gutter-md">
+        <q-card
+          v-for="note in reviewNotes"
+          :key="note.pk"
+          class="note-card"
+        >
+          <q-card-section>
+            <div class="text-bold">
+              {{ note.author_name }} - {{ readableDate(note.created_at) }}
+            </div>
+            <div class="read-only-text-area" v-html="note.note"></div>
+          </q-card-section>
+        </q-card>
+      </div>
+    </div>
+
+    <h5 class="text-uppercase text-center text-bold q-mb-sm q-mt-lg"><u>Rating Scale</u></h5>
     <div class="rating-grid-container">
       <div class="rating-box">
         <span class="text-bold">(1)*</span> Needs Improvement
@@ -160,35 +195,6 @@
       *Factors rated <span class="text-bold">(1)</span> Needs improvement must
       be addressed with a plan for improvement.
     </div>
-
-    <div
-      v-if="currentUserIsManagerOfEmployee() && reviewNotes.length"
-      id="notes"
-    >
-      <hr />
-      <h5 class="text-h5 text-uppercase text-bold q-my-md">
-        <u>Your Notes for {{ employeeName }}</u>
-      </h5>
-      <div class="q-pa-md row items-start q-gutter-md">
-        <q-card
-          v-for="note in reviewNotes"
-          :key="note.pk"
-          class="note-card"
-          @click="onClickNoteCard(note.pk)"
-        >
-          <q-card-section>
-            <div class="text-bold">
-              {{ readableDate(note.date) }}
-            </div>
-            <div>
-              {{ note.note }}
-            </div>
-          </q-card-section>
-        </q-card>
-      </div>
-    </div>
-
-    <hr />
 
     <h5 class="text-uppercase text-bold q-my-md">
       <u>I. Performance Factors Reviewed</u>
@@ -721,67 +727,6 @@
       :disable="!employeeCommentsIsChanged()"
     />
 
-    <div id="position-description-section">
-      <h5 class="text-uppercase text-bold q-my-md">
-        <u>VI. Position Description Review</u>
-      </h5>
-      <div class="q-my-md" id="position-description-review">
-        <div>
-          Position Description:
-          <a
-            v-if="positionDescriptionLink"
-            :href="positionDescriptionLink"
-            target="_blank"
-          >
-            {{ positionDescriptionLink }}
-          </a>
-          <span v-else>No link provided</span>
-        </div>
-        <div>
-          <q-checkbox
-            v-model="descriptionReviewedEmployee"
-            :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
-          />
-          Position Description has been reviewed and signed by employee and
-          manager
-        </div>
-        <div
-          v-if="
-            descriptionReviewedEmployee && uploadedPositionDescriptionUrl &&
-            !uploadingAnother
-          "
-          class="row"
-        >
-          <DocumentViewer
-            :documentUrl="uploadedPositionDescriptionUrl"
-            :buttonText="`View Signed Position Description`"
-            iconButton
-          />
-          <q-btn class="q-ml-md">
-            <q-icon name="restart_alt" class="q-mr-sm" />
-            <div @click="uploadingAnother = true">Upload Another</div>
-          </q-btn>
-        </div>
-        <FileUploader
-          v-if="
-            currentUserIsManagerOfEmployee() && descriptionReviewedEmployee &&
-            (!uploadedPositionDescriptionUrl || uploadingAnother)
-          "
-          :file=selectedFile
-          contentTypeAppLabel="people"
-          contentTypeModel="performancereview"
-          :objectPk=prPk
-          :readOnly=false
-          v-on="{
-            'uploaded': (url: string) => {
-              uploadedPositionDescriptionUrl = url
-              uploadingAnother = false
-            }
-          }"
-        />
-      </div>
-    </div>
-
     <div
       v-for="(signature, index) in signatures"
       :key="index"
@@ -912,10 +857,6 @@
 #lcog-logo {
   max-width: 300px;
   display: none;
-}
-.note-card:hover {
-  background-color: lightgray;
-  cursor: pointer;
 }
 .eval-grid-container {
   display: grid;
@@ -1176,8 +1117,6 @@ import { scroll, useQuasar } from 'quasar'
 import { onMounted, ref, Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import DocumentViewer from 'src/components/DocumentViewer.vue'
-import FileUploader from 'src/components/FileUploader.vue'
 import { readableDate } from 'src/filters'
 import { usePerformanceReviewStore } from 'src/stores/performancereview'
 import { useUserStore } from 'src/stores/user'
@@ -1257,13 +1196,6 @@ let evaluationGoalsManager = ref('')
 let evaluationCommentsEmployeeCurrentVal = ref('')
 let evaluationCommentsEmployee = ref('')
 
-let positionDescriptionLink = ref('')
-let descriptionReviewedEmployeeCurrentVal = ref(false)
-let descriptionReviewedEmployee = ref(false)
-let uploadedPositionDescriptionUrl = ref('')
-let selectedFile = ref(new File([''], ''))
-let uploadingAnother = ref(false)
-
 let signatures: Ref<PRSignatures> = ref([['', '', new Date(), -1, false]])
 
 let showErrorButton = ref(false)
@@ -1310,6 +1242,10 @@ function currentUserIsEmployee(): boolean {
   return employeePk.value == currentUserPk()
 }
 
+function peerFeedbackLink(): string {
+  return `${ window.location.origin }/note/new?employee=${ employeePk.value }`
+}
+
 function valuesAreChanged(): boolean {
   if (
     evaluationType.value == evaluationTypeCurrentVal.value &&
@@ -1334,9 +1270,7 @@ function valuesAreChanged(): boolean {
     evaluationOpportunities.value == evaluationOpportunitiesCurrentVal.value &&
     evaluationGoalsManager.value == evaluationGoalsManagerCurrentVal.value &&
     evaluationCommentsEmployee.value ==
-      evaluationCommentsEmployeeCurrentVal.value &&
-    descriptionReviewedEmployee.value ==
-      descriptionReviewedEmployeeCurrentVal.value
+      evaluationCommentsEmployeeCurrentVal.value
   ) {
     return false
   } else {
@@ -1420,22 +1354,6 @@ function formErrorItems(): Array<[string, string]> {
   }
   if (!evaluationGoalsManagerCurrentVal.value) {
     errorItems.push(['evaluation-goals', 'Write Goals for the Coming Year'])
-  }
-  if (!descriptionReviewedEmployeeCurrentVal.value) {
-    errorItems.push(
-      [
-        'position-description-review',
-        'Review and Sign Position Description with Employee'
-      ]
-    )
-  }
-  if (
-    descriptionReviewedEmployeeCurrentVal.value &&
-      !uploadedPositionDescriptionUrl.value
-  ) {
-    errorItems.push(
-      ['position-description-review', 'Upload Signed Position Description']
-    )
   }
   return errorItems
 }
@@ -1523,12 +1441,6 @@ function retrievePerformanceReview() {
           evaluationCommentsEmployeeCurrentVal.value =
             evaluationCommentsEmployee.value
 
-          positionDescriptionLink.value = pr.position_description_link
-          descriptionReviewedEmployee.value = pr.description_reviewed_employee
-          descriptionReviewedEmployeeCurrentVal.value =
-            descriptionReviewedEmployee.value
-          uploadedPositionDescriptionUrl.value = pr.signed_position_description
-
           signatures.value = pr.all_required_signatures
 
           resolve('Got PR')
@@ -1542,7 +1454,7 @@ function retrievePerformanceReview() {
 }
 
 function retrieveReviewNotes(): void {
-  performanceReviewStore.getAllManagerNotesForEmployee(
+  performanceReviewStore.getAllRecentNotesForEmployee(
     employeePk.value.toString()
   )
     .then((notes: Array<ReviewNoteRetrieve>) => {
@@ -1576,8 +1488,7 @@ function updatePerformanceReview() {
       evaluation_successes: evaluationSuccesses.value,
       evaluation_opportunities: evaluationOpportunities.value,
       evaluation_goals_manager: evaluationGoalsManager.value,
-      evaluation_comments_employee: evaluationCommentsEmployee.value,
-      description_reviewed_employee: descriptionReviewedEmployee.value
+      evaluation_comments_employee: evaluationCommentsEmployee.value
     })
     .then((pr) => {
       status.value = pr.status
@@ -1607,9 +1518,6 @@ function updatePerformanceReview() {
       evaluationGoalsManagerCurrentVal.value = pr.evaluation_goals_manager
       evaluationCommentsEmployeeCurrentVal.value =
         pr.evaluation_comments_employee
-
-      descriptionReviewedEmployeeCurrentVal.value =
-        pr.description_reviewed_employee
 
       signatures.value = pr.all_required_signatures
 
@@ -1670,13 +1578,6 @@ function signPerformanceReview(): void {
 //   const day = quasarDate.getDayOfWeek(new Date(date))
 //   return day !== 6 && day !== 7
 // }
-
-function onClickNoteCard(pk: number): void {
-  router.push(`/note/${ pk }`)
-    .catch(e => {
-      console.error('Error navigating to PR note detail:', e)
-    })
-}
 
 function openErrorDialog(position: PositionType) {
   errorDialogPosition.value = position

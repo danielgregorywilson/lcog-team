@@ -31,8 +31,9 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUpdated, ref } from 'vue'
+import { onMounted, onUpdated, ref, Ref } from 'vue'
 
+import { handlePromiseError } from 'src/stores'
 import { usePeopleStore } from 'src/stores/people'
 import { emptyEmployee, SimpleEmployee } from 'src/types'
 
@@ -41,8 +42,9 @@ const peopleStore = usePeopleStore()
 const props = defineProps<{
   label: string,
   employee?: SimpleEmployee,
-  useLegalName: boolean
-  readOnly: boolean
+  employeePk?: number,
+  useLegalName: boolean,
+  readOnly: boolean,
   employeeFilterFn?: (employee: SimpleEmployee) => boolean
 }>()
 
@@ -52,7 +54,7 @@ const emit = defineEmits<{
 }>()
 
 let needle = ref('') // For filtering employee list
-let selectedEmployee = ref(emptyEmployee)
+let selectedEmployee: Ref<SimpleEmployee> = ref(emptyEmployee)
 
 function selectOptionLabel(): string {
   if (props.useLegalName) {
@@ -70,11 +72,16 @@ function selectedEmployeeName(): string {
   }
 }
 
-function retrieveSimpleEmployeeList(): void {
-  peopleStore.getSimpleEmployeeList()
-    .catch(e => {
-      console.error('Error retrieving simple employee list', e)
-    })
+function retrieveSimpleEmployeeList(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    peopleStore.getSimpleEmployeeList()
+      .then(() => {
+        resolve()
+      })
+      .catch((e) => {
+        handlePromiseError(reject, 'Error retrieving simple employee list', e)
+      })
+  })
 }
 
 function employees() {    
@@ -91,10 +98,21 @@ function employees() {
   })
 }
 
-function filterFn (val: string, update: Function) { // eslint-disable-line @typescript-eslint/ban-types
+function filterFn (val: string, update) {
   update(() => {
     needle.value = val.toLowerCase()
   })
+}
+
+function setEmployee() {
+  if (props.employee) {
+    selectedEmployee.value = props.employee
+  }
+  if (props.employeePk) {
+    selectedEmployee.value = peopleStore.simpleEmployeeList.find(
+      (employee) => employee.pk == props.employeePk
+    ) || emptyEmployee
+  }
 }
 
 function clearEmployee() {
@@ -104,12 +122,13 @@ function clearEmployee() {
 
 onMounted(() => {
   if (!employees().length) {
-    retrieveSimpleEmployeeList()
+    retrieveSimpleEmployeeList().then(() => {
+      setEmployee()
+    })
   }
-  selectedEmployee.value = props.employee
 })
 
 onUpdated(() => {
-  selectedEmployee.value = props.employee
+  setEmployee()
 })
 </script>

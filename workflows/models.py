@@ -764,6 +764,14 @@ class WorkflowInstance(HasTimeStampsMixin, HasCreatorMixin):
         else:
             complete_steps = sum([pi.complete_steps for pi in pis])
             self.percent_complete = int((complete_steps / total_steps) * 100)
+        # Trigger completion if all process instances are complete.
+        # If stepping backwards, mark incomplete.
+        if self.percent_complete == 100:
+            self.completed_at = datetime.now(timezone.utc)
+            self.complete = True
+        elif self.complete:
+            self.completed_at = None
+            self.complete = False
         self.save()
 
 
@@ -818,6 +826,11 @@ class ProcessInstance(HasTimeStampsMixin):
                 self.percent_complete = int(
                     (num_steps_before / total_steps) * 100
                 )
+        # Trigger completion. If stepping backwards, mark incomplete.
+        if self.percent_complete == 100:
+            self.completed_at = datetime.now(timezone.utc)
+        elif self.completed_at != None:
+            self.completed_at = None
         self.save()
 
 

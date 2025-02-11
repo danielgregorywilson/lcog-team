@@ -779,32 +779,28 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
             # Trigger any completion actions
             if stepinstance.step.completion_action:
                 stepinstance.step.completion_action.trigger()
-
-            # Update the process instance
+                
+            # Make the next StepInstance
             processinstance = stepinstance.process_instance
-            if stepinstance.step.end:
-                # If this is the last step instance in a process, complete the
-                # process
-                processinstance.completed_at = timezone.now()
-                processinstance.current_step_instance = None
+            if 'nextStepPk' in request.data:
+                next_step = Step.objects.get(pk=request.data['nextStepPk'])
             else:
-                # Make the next StepInstance
-                if 'nextStepPk' in request.data:
-                    next_step = Step.objects.get(pk=request.data['nextStepPk'])
-                else:
-                    next_step=stepinstance.step.next_step
-                new_stepinstance = StepInstance.objects.create(
-                    step=next_step,
-                    process_instance=processinstance
-                )
-                processinstance.current_step_instance = new_stepinstance
-                # Notify responsible parties of the new step instance if
-                # they're different from the current step instance
-                if new_stepinstance.step.role != stepinstance.step.role:
-                    send_step_completion_email(new_stepinstance, stepinstance)
-
-            processinstance.update_percent_complete()
+                next_step=stepinstance.step.next_step
+            new_stepinstance = StepInstance.objects.create(
+                step=next_step,
+                process_instance=processinstance
+            )
+            processinstance.current_step_instance = new_stepinstance
             processinstance.save()
+            # Notify responsible parties of the new step instance if
+            # they're different from the current step instance
+            if new_stepinstance.step.role != stepinstance.step.role:
+                send_step_completion_email(new_stepinstance, stepinstance)
+
+            # Update PI percent complete and completion status
+            processinstance.update_percent_complete()
+            
+            # Update WFI percent complete and completion status
             wfi = processinstance.workflow_instance
             wfi.update_percent_complete()
 

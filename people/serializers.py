@@ -1,10 +1,12 @@
 import datetime
+import traceback
 
 from django.apps import apps
 from django.contrib.auth.models import Group, User
 
 from rest_framework import serializers
 
+from mainsite.helpers import record_error
 from people.models import (
     Employee, JobTitle, PerformanceReview, ReviewNote, Signature,
     TeleworkApplication, TeleworkSignature, UnitOrProgram,
@@ -171,17 +173,23 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
         """
         Returns the name of the next employee who will sign the PR.
         """
-        if employee.is_executive_director:
-            return ""
-        elif employee.is_hr_manager:
-            return Employee.objects.filter(is_executive_director=True)\
-                .first().name
-        elif employee.is_division_director:
-            return Employee.objects.filter(is_hr_manager=True).first().name
-        elif employee.manager:
-            return employee.manager.name
-        else:
-            return ""
+        try:
+            if employee.is_executive_director:
+                return ""
+            elif employee.is_hr_manager:
+                return Employee.objects.filter(is_executive_director=True)\
+                    .first().name
+            elif employee.is_division_director:
+                return Employee.objects.filter(is_hr_manager=True).first().name
+            elif employee.manager:
+                return employee.manager.name
+            else:
+                return ""
+        except Exception as e:
+            record_error(
+                'Error getting next to sign PRs', e, None,
+                traceback.format_exc(), 'Employee: {}'.format(employee)
+            )
     
     @staticmethod
     def get_workflow_roles(employee):

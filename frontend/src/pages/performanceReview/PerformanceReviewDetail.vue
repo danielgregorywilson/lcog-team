@@ -716,8 +716,8 @@
       :toolbar="editorToolbar"
     />
 
-    <h5 class="text-uppercase text-bold q-my-md" id="evaluation-goals">
-      <u>IV. Goals for the Coming Year</u>
+    <h5 class="q-my-md" id="evaluation-goals">
+      <u class="text-uppercase text-bold">IV. Goals for the Coming Year</u> (recommended three)
     </h5>
     <div
       v-if="

@@ -41,16 +41,20 @@ def get_host_url(request):
         return f'http://{ host }/' 
 
 
-def record_error(message, error, request=None, traceback=None):
+def record_error(
+    message, error, request=None, traceback=None, other_info=None
+):
     message = 'Environment: ' + os.environ.get('ENVIRONMENT') + '\n' + message
     message += '\n'
-    message += 'User: ' + str(request.user)
+    message += 'User: ' + str(request.user) if request else 'None'
     message += '\n'
     message += 'Error: ' + str(error)
     message += '\n'
-    message += str(request.__dict__)
+    message += str(request.__dict__) if request else 'None'
     message += '\n'
     message += str(traceback)
+    message += '\n'
+    message += 'Other Info: ' + str(other_info) if other_info else 'None'
     error_logger.error(message)
 
 def record_email_sent(subject='', body='', to_addresses=[], cc_addresses=[]):

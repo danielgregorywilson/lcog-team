@@ -126,6 +126,29 @@
       </div>
     </div>
 
+    <h5 class="text-h5 text-uppercase text-bold text-center q-my-md">
+      <u>Employee Self-Evaluation</u>
+    </h5>
+    <div
+      v-if="!currentUserIsEmployee() || employeeHasSigned() || props.print"
+      class="read-only-text-area" v-html="evaluationCommentsEmployee"
+    ></div>
+    <q-editor
+      v-else
+      v-model="evaluationCommentsEmployee"
+      :toolbar="editorToolbar"
+    />
+    <q-btn
+      v-if="currentUserIsEmployee() && !employeeHasSigned()"
+      id="save-comments-employee"
+      color="white"
+      text-color="black"
+      label="Save comments"
+      @click="updateEmployeeComments()"
+      class="q-mt-sm"
+      :disable="!employeeCommentsIsChanged()"
+    />
+
     <div
       v-if="currentUserIsManagerOfEmployee()"
       id="notes"
@@ -700,32 +723,6 @@
       v-model="evaluationGoalsEmployee"
       type="textarea"
     /> -->
-
-    <h5>
-      <span class="text-uppercase text-bold q-my-md">
-        <u>V. Employee Comments</u>
-      </span>
-      (e.g. self-evaluation and goals)
-    </h5>
-    <div
-      v-if="!currentUserIsEmployee() || employeeHasSigned() || props.print"
-      class="read-only-text-area" v-html="evaluationCommentsEmployee"
-    ></div>
-    <q-editor
-      v-else
-      v-model="evaluationCommentsEmployee"
-      :toolbar="editorToolbar"
-    />
-    <q-btn
-      v-if="currentUserIsEmployee() && !employeeHasSigned()"
-      id="save-comments-employee"
-      color="white"
-      text-color="black"
-      label="Save comments"
-      @click="updateEmployeeComments()"
-      class="q-mt-sm"
-      :disable="!employeeCommentsIsChanged()"
-    />
 
     <div
       v-for="(signature, index) in signatures"

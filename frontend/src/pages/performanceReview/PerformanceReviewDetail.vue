@@ -129,25 +129,38 @@
     <h5 class="text-h5 text-uppercase text-bold text-center q-my-md">
       <u>Employee Self-Evaluation</u>
     </h5>
-    <div
-      v-if="!currentUserIsEmployee() || employeeHasSigned() || props.print"
-      class="read-only-text-area" v-html="evaluationCommentsEmployee"
-    ></div>
-    <q-editor
-      v-else
-      v-model="evaluationCommentsEmployee"
-      :toolbar="editorToolbar"
-    />
-    <q-btn
-      v-if="currentUserIsEmployee() && !employeeHasSigned()"
-      id="save-comments-employee"
-      color="white"
-      text-color="black"
-      label="Save comments"
-      @click="updateEmployeeComments()"
-      class="q-mt-sm"
-      :disable="!employeeCommentsIsChanged()"
-    />
+    <div v-if="currentUserIsEmployee()">
+      <!-- EMPLOYEE -->
+      <div
+        v-if="employeeHasSigned() || props.print"
+        class="read-only-text-area" v-html="evaluationCommentsEmployee"
+      ></div>
+      <div v-else>
+        <q-editor
+          v-model="evaluationCommentsEmployee"
+          :toolbar="editorToolbar"
+        />
+        <q-btn
+          id="save-comments-employee"
+          color="white"
+          text-color="black"
+          label="Save comments"
+          @click="updateEmployeeComments()"
+          class="q-mt-sm"
+          :disable="!employeeCommentsIsChanged()"
+        />
+      </div>
+    </div>
+    <div v-else>
+      <!-- MANAGERS -->
+      <div
+        v-if="evaluationCommentsEmployee.length"
+        class="read-only-text-area" v-html="evaluationCommentsEmployee"
+      ></div>
+      <div v-else class="text-bold text-red text-center">
+        Employee has not yet submitted a self-evaluation.
+      </div>
+    </div>
 
     <div
       v-if="currentUserIsManagerOfEmployee()"

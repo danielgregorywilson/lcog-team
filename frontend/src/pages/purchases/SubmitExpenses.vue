@@ -182,7 +182,9 @@
                   v-slot="scope"
                   :validate="amountValidation"
                   @update:model-value="(val: string) => {
-                    props.row.amount = parseFloat(val).toFixed(2).toString()
+                    let cleanedVal = val.replace(/[^0-9.]/g, '')
+                    props.row.amount = parseFloat(cleanedVal).toFixed(2)
+                      .toString()
                   }"
                   @save="(val: string) => {
                     updateExpense(props.row.pk, 'amount', val)

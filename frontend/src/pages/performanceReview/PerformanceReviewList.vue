@@ -1,5 +1,6 @@
 <template>
   <q-page padding>
+    <!-- REVIEWS TO MANAGE -->
     <div class="q-py-md" v-if="isManager()">
       <div class="row items-center q-mb-md">
         <q-avatar
@@ -9,19 +10,23 @@
           font-size="32px"
           class="q-mr-sm"
         />
-        <div class="text-h4">Current Reviews (For Managers)</div>
+        <div class="text-h4">Reviews to Manage</div>
       </div>
       <div class="text-h6">Action Required</div>
         <PerformanceReviewTable
           :actionRequired="true"
+          :manager="true"
           :pk="userStore.getEmployeeProfile.employee_pk"
         />
       <div class="text-h6">No Action Required</div>
         <PerformanceReviewTable
           :actionRequired="false"
+          :manager="true"
           :pk="userStore.getEmployeeProfile.employee_pk"
         />
     </div>
+
+    <!-- REVIEWS TO SIGN -->
     <div
       class="q-py-md"
       v-if="isUpperManager() || isTheHRManager() || isTheExecutiveDirector()"
@@ -49,7 +54,26 @@
           :pk="userStore.getEmployeeProfile.employee_pk"
         />
     </div>
-    <div class="q-py-md" v-if="isManager()">
+
+    <!-- YOUR REVIEWS -->
+    <div class="q-py-md">
+      <div class="row items-center q-mb-md">
+        <q-avatar
+          icon="assignment_ind"
+          color="primary"
+          text-color="white"
+          font-size="32px"
+          class="q-mr-sm"
+        />
+        <div class="text-h4">Your Reviews</div>
+      </div>
+      <PerformanceReviewTable
+        :employeePk="userStore.getEmployeeProfile.employee_pk"
+      />
+    </div>
+
+    <!-- PEER FEEDBACK -->
+    <div class="q-py-md">
       <div class="row items-center q-mb-md">
         <q-avatar
           icon="insert_chart_outlined"
@@ -58,7 +82,7 @@
           font-size="32px"
           class="q-mr-sm"
         />
-        <div class="text-h4">Your Peer Feedback</div>
+        <div class="text-h4">Peer Feedback</div>
       </div>
       <ReviewNoteTable />
     </div>

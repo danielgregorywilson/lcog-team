@@ -205,11 +205,10 @@ interface QuasarPerformanceReviewTableRowClickActionProps {
 }
 
 const props = defineProps<{
-  pk: number
   signature?: boolean,
   actionRequired?: boolean,
-  employee?: boolean,
-  manager?: boolean,
+  employeePk?: number,
+  managerPk?: number,
 }>()
 
 const router = useRouter()
@@ -220,18 +219,10 @@ let lastPk = ref(-1)
 
 function performanceReviews(): Array<PerformanceReviewRetrieve> {
   let prs = []
-  if (props.employee) {
-    if (props.pk) {
-      prs = performanceReviewStore.allEmployeePerformanceReviews
-    } else {
-      prs = []
-    }
-  } else if (props.manager) {
-    if (props.pk) {
-      prs = performanceReviewStore.allManagerPerformanceReviews
-    } else {
-      prs = []
-    }
+  if (props.employeePk) {
+    prs = performanceReviewStore.allEmployeePerformanceReviews
+  } else if (props.managerPk) {
+    prs = performanceReviewStore.allManagerPerformanceReviews
   } else if (props.signature) {
     if (props.actionRequired) {
       prs = performanceReviewStore.allSignaturePerformanceReviewsActionRequired
@@ -273,7 +264,7 @@ function columns(): QTableProps['columns'] {
         name: 'status', align: 'center', label: 'Status', field: 'status',
         sortable: true
       },
-      { name: 'actions', label: 'Actions', align: 'around', },
+      { name: 'actions', label: 'Actions', align: 'center', field: ''},
     ]
   } else {
     return [
@@ -293,7 +284,7 @@ function columns(): QTableProps['columns'] {
         name: 'status', align: 'center', label: 'Status', field: 'status',
         sortable: true
       },
-      { name: 'actions', label: 'Actions', align: 'around', },
+      { name: 'actions', label: 'Actions', align: 'center', field: ''},
     ]
   }
 }
@@ -318,16 +309,17 @@ function noDataLabel(): string {
 
 function retrievePerformanceReviews(): void {
   // Only get PRs if we haven't done it before
-  if (props.pk == lastPk.value) {
-    return
-  }
-  lastPk.value = props.pk
+  // TODO: Fix this
+  // if (props.pk == lastPk.value) {
+  //   return
+  // }
+  // lastPk.value = props.pk
 
-  if (props.employee && props.pk) {
-    performanceReviewStore.getAllEmployeePerformanceReviews(props.pk)
+  if (props.employeePk) {
+    performanceReviewStore.getAllEmployeePerformanceReviews(props.employeePk)
   }
-  if (props.manager && props.pk) {
-    performanceReviewStore.getAllManagerPerformanceReviews(props.pk)
+  if (props.managerPk) {
+    performanceReviewStore.getAllManagerPerformanceReviews(props.managerPk)
   }
   
   if (props.signature) {
@@ -427,7 +419,7 @@ watch(() => bus.value.get('updateTeleworkApplicationTables'), () => {
 })
 
 onUpdated(() => {
-  retrievePerformanceReviews();
+  // retrievePerformanceReviews();
 })
 
 onMounted(() => {

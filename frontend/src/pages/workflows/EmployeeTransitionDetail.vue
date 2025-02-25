@@ -1469,7 +1469,7 @@ function retrieveEmployeeTransition() {
 
     changes.value = t.changes
 
-    if (formErrors()) {
+    if (formErrors() && dateSubmitted.value) {
       showErrorButton.value = true
     }
     resolve('Retrieved employee transition')

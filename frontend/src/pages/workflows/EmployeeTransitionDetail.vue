@@ -364,7 +364,7 @@
         :disable="!canEditOtherFields()"
       />
     </div>
-    <div class="row">
+    <div class="row" id="office-location">
       <q-btn
         v-if="showMapButton()"
         square
@@ -1756,11 +1756,20 @@ function updateTransition() {
 
 function formErrorItems(): Array<[string, string]> {
   let errorItems: Array<[string, string]> = []
+  // New, returning, and changing employees must have an office location
+  if (
+    ['New', 'Return', 'Change/Modify'].indexOf(typeCurrentVal.value) != -1 &&
+    !officeLocationCurrentVal.value
+  ) {
+    errorItems.push(['office-location', 'Provide an office location'])
+  }
+  // New computers must have a GL code
   if (computerTypeCurrentVal.value == 'New' && !computerGLCurrentVal.value) {
     errorItems.push(
       ['computer-type', 'Provide a valid GL code for computer purchase']
     )
   }
+  // Repurposed computers must have a description
   if (
     computerTypeCurrentVal.value == 'Repurposed' &&
     !computerDescriptionCurrentVal.value

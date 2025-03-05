@@ -260,7 +260,10 @@ class ExpenseViewSet(viewsets.ModelViewSet):
                 expense_fields_changed = True
             
             expense.name = request.data.get('name', expense.name)
-            expense.date = request.data.get('date', expense.date)
+            new_date = request.data.get('date', expense.date)
+            if new_date == '':
+                new_date = None
+            expense.date = new_date
             expense.amount = request.data.get('amount', expense.amount)
             expense.vendor = request.data.get('vendor', expense.vendor)
             expense.repeat = request.data.get('repeat', expense.repeat)

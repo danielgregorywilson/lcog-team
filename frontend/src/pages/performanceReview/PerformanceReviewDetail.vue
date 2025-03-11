@@ -235,31 +235,29 @@
     <h5 class="text-uppercase text-bold q-my-md">
       <u>I. Performance Factors Reviewed</u>
     </h5>
+    
+    <h5>FORM:</h5><div>{{ form }}</div>
+    <h5>DATA:</h5><div>{{ dataThing }}</div>
+    
     <div class="factors-grid-container">
-
       <!-- Desktop/Tablet Headers -->
       <div class="factors-header-box text-bold text-center
         factors-header-desktop factors-header-sticky"
       >
         Performance Factors Reviewed
       </div>
-      <div class="factors-header-box text-bold text-center
+      <div
+        v-for="response in form.factorsResponseSet"
+        :key="form.factorsResponseSet.indexOf(response)"
+        class="factors-header-box text-bold text-center
         factors-header-desktop factors-header-sticky"
       >
-        Needs Improvement
+        {{ response }}
       </div>
-      <div class="factors-header-box text-bold text-center
-        factors-header-desktop factors-header-sticky"
-      >
-        Meets Job Requirements
-      </div>
-      <div class="factors-header-box text-bold text-center
-        factors-header-desktop factors-header-sticky"
-      >
-        Exceeds Job Requirements
-      </div>
-      <div class="factors-header-box text-bold text-center
-        factors-header-desktop factors-header-sticky"
+      <div
+        v-if="form.anyNotApplicable"
+        class="factors-header-box text-bold text-center factors-header-desktop
+        factors-header-sticky"
       >
         Not Applicable
       </div>
@@ -270,59 +268,52 @@
       >
         Performance Factors Reviewed
       </div>
-      <div class="factors-header-box text-bold text-center
-        factors-header-mobile factors-header-sticky"
+      <div v-for="response in form.factorsResponseSet"
+        :key="form.factorsResponseSet.indexOf(response)"
+        class="factors-header-box text-bold text-center factors-header-mobile
+        factors-header-sticky"
       >
-        Needs Improv&shy;ement
+        {{ response }}
       </div>
-      <div class="factors-header-box text-bold text-center
-        factors-header-mobile factors-header-sticky"
-      >
-        Meets Job Require&shy;ments
-      </div>
-      <div class="factors-header-box text-bold text-center
-        factors-header-mobile factors-header-sticky"
-      >
-        Exceeds Job Require&shy;ments
-      </div>
-      <div class="factors-header-box text-bold text-center
-        factors-header-mobile factors-header-sticky"
+      <div
+        v-if="form.anyNotApplicable"
+        class="factors-header-box text-bold text-center factors-header-mobile
+        factors-header-sticky"
       >
         Not Appli&shy;cable
       </div>
 
-      <div class="factors-box" id="factor-job-knowledge">
-          <div class="row text-bold"><u>Job Knowledge</u></div>
-          <div class="row">
-            Present knowledge of techniques, skills, procedures, technologies,
-            equipment, rules and policies of position.
-          </div>
-      </div>
-      <div class="factors-radio-box">
-        <q-radio
-          v-model="factorJobKnowledge"
-          val="N"
-          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
-        />
-      </div>
-      <div class="factors-radio-box">
-        <q-radio
-          v-model="factorJobKnowledge"
-          val="M"
-          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
-        />
-      </div>
-      <div class="factors-radio-box">
-        <q-radio
-          v-model="factorJobKnowledge"
-          val="E"
-          :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
-        />
-      </div>
-      <div class="factors-radio-box">
+      <template v-for="factor in form.factors" :key="form.factors.indexOf(factor)">
+        <div class="factors-box">
+            <div class="row text-bold"><u>{{ factor.name }}</u></div>
+            <div class="row">{{ factor.description }}</div>
+        </div>
+        <div
+          v-for="response in form.factorsResponseSet"
+          :key="form.factorsResponseSet.indexOf(response)"
+          class="factors-radio-box"
+        >
+          <q-radio
+            model-value=data.factors[factor.name]
+            @update:model-value="(val: string) => {
+              dataThing.factors[factor.name] = val
+              console.log(dataThing.factors)
+            }"
+            :val="response"
+            :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+          />
+        </div>
+        <div class="factors-radio-box">
+          <q-radio
+            v-if="factor.notApplicableOption"
+            v-model="factorManagement"
+            val="NA"
+            :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
+          />
+        </div>
+      </template>
 
 
-      </div>
       <div class="factors-box">
           <div class="row text-bold" id="factor-work-quality">
             <u>Quality of Work</u>
@@ -1149,6 +1140,12 @@ type PositionType = 'top' | 'standard' | 'right' | 'bottom' | 'left' | undefined
 
 let prPk = ref('')
 let status = ref('')
+let form = ref({
+  'longResponses': [], 'factorsResponseSet': [], 'factors': [] as [{ name: string, description: string, notApplicableOption: boolean }],
+  'anyNotApplicable': false
+})
+let dataThing = ref({})
+let something = ref('')
 
 let employeePk = ref(-1)
 let managerPk = ref(-1)
@@ -1394,6 +1391,9 @@ function retrievePerformanceReview() {
           retrieveReviewNotes()
 
           prPk.value = pr.pk.toString()
+          form.value = pr.form
+          // data.value = pr.data
+          dataThing.value = {'factors': [{'Job Knowledge': ''}]}
           employeeName.value = pr.employee_name
           managerName.value = pr.manager_name
           periodStartDate.value = pr.period_start_date

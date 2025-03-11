@@ -806,6 +806,11 @@ class PerformanceReview(models.Model):
         (NOT_APPLICABLE, 'Not Applicable'),
     ]
 
+    form = models.ForeignKey(
+        "PRForm", on_delete=models.CASCADE, blank=True, null=True
+    )
+    data = models.JSONField(blank=True, null=True)
+
     status = models.CharField(_("review status"), max_length=2, choices=STATUS_CHOICE, default=NEEDS_EVALUATION)
 
     employee = models.ForeignKey("Employee", verbose_name=_("employee"), on_delete=models.CASCADE)
@@ -950,6 +955,48 @@ class PerformanceReview(models.Model):
             effective_date=self.effective_date + datetime.timedelta(days=365),
             evaluation_type=self.ANNUAL_EVALUATION
         )
+
+
+class PRForm(models.Model):
+    name = models.CharField(max_length=255)
+    version = models.IntegerField(default=1)
+    factors_response_set = models.ForeignKey(
+        "PRFactorResponseSet", on_delete=models.CASCADE, blank=True, null=True
+    )
+    long_responses = models.JSONField(
+        blank=True, null=True, default=list,
+        help_text="Format [[\"Title\", \"Subtitle\"], ...] e.g. [[\"Strengths\", \"\"], [\"Areas for Improvement\", \"Be nice!\"]]"
+    )
+
+    class Meta:
+        unique_together = ("name", "version")
+        ordering = ["-pk"]
+        verbose_name = _("Performance Review Form")
+
+    def __str__(self):
+        return f"{self.name} v{self.version}"
+
+
+class PRFactor(models.Model):
+    form = models.ForeignKey(
+        "PRForm", on_delete=models.CASCADE, related_name="factors"
+    )
+    order = models.IntegerField(default=0)
+    name = models.CharField(max_length=255)
+    description = models.CharField(max_length=255)
+    not_applicable_option = models.BooleanField(default=False)
+
+
+class PRFactorResponseSet(models.Model):
+    class Meta:
+        verbose_name = _("Performance Review Factor Response Set")
+
+    def __str__(self):
+        return str(self.responses)
+
+    responses = models.JSONField(
+        default=list, help_text="Format e.g. [\"Good\", \"Bad\", \"Ugly\"]"
+    )
 
 
 class SignatureReminder(SignatureReminderBase):

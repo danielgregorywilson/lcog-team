@@ -3,12 +3,11 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from .models import (
-    Division, Employee, JobTitle, PerformanceReview,
-    ReviewNote, Signature, SignatureReminder,
+    Division, Employee, JobTitle, PerformanceReview, PRFactor,
+    PRFactorResponseSet, PRForm, ReviewNote, Signature, SignatureReminder,
     TeleworkApplication, TeleworkSignature, UnitOrProgram,
     ViewedSecurityMessage
 )
-from mainsite.admin import EditLinkToInlineObject
 
 
 class EmployeeInline(admin.TabularInline):
@@ -106,6 +105,24 @@ class PerformanceReviewAdmin(admin.ModelAdmin):
             self.exclude = ()
         form = super(PerformanceReviewAdmin, self).get_form(request, obj, **kwargs)
         return form
+
+
+class PRFactorInline(admin.TabularInline):
+    model = PRFactor
+    extra = 0
+
+
+@admin.register(PRForm)
+class PRFormAdmin(admin.ModelAdmin):
+    list_display = ("name", "version")
+    search_fields = ("name", )
+    # exclude = ("factors",)
+    inlines = (PRFactorInline,)
+
+
+@admin.register(PRFactorResponseSet)
+class PRFactorResponseSetAdmin(admin.ModelAdmin):
+    list_display = ("responses",)
 
 
 # class SelfEvaluationSignatureInline(admin.TabularInline):

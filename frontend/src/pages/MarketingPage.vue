@@ -13,18 +13,19 @@
       <q-img
         src="../assets/mountainbkg_right@10x.png"
       />
-      <div id="hero-text" class="row items-center q-pl-xl q-pb-xl q-pr-xl">
+      <div id="hero-text" class="row items-center q-pl-xl q-pb-lg q-pr-xl">
         <div class="col">
           <div class="hero-text-header">Simple Tools for Smoother Operations</div>
           <div class="q-pt-sm">Government teams run on processes—but too often, the software meant to support them is expensive, bloated, or just doesn’t fit. Together, we are building a collection of lightweight, modular apps designed to streamline essential tasks without unnecessary complexity.</div>
           <div class="q-pt-sm">Each app in the suite does one thing well—whether it’s managing employee transitions, reconciling credit card purchases, or automating multi-step approval processes.</div>
         </div>
-        <div id="hero-text-placeholder" class="col">
-          <div class="row items-center justify-center">
-            <!-- <q-btn>Get Involved</q-btn> -->
-          </div>
-        </div>
+        <div id="hero-text-placeholder"></div>
       </div>
+
+      <div class="row items-center justify-center contact-button">
+        <q-btn rounded color="white" text-color="primary" @click="showContactDialog=true">Get Involved</q-btn>
+      </div>
+      
       <div id="hero-subtext" class="row items-center q-py-xl q-pa-xl">
         <div id="hero-subtext-placeholder" class="col"></div>
         <div class="col">
@@ -133,11 +134,53 @@
         </div>
       </div>
 
+      <div class="row items-center justify-center contact-button">
+        <q-btn rounded color="white" text-color="primary" @click="showContactDialog=true">Get Involved</q-btn>
+      </div>
+
       <!-- <div>Next - PRs</div>
       <div>Next - Government Websites</div> -->
     </q-page>
 
-    <q-dialog v-model="showDialog" maximized>
+    <q-dialog v-model="showContactDialog">
+      <q-card class="q-pa-lg">
+        <div class="text-h5">Contact Us</div>
+        <div style="width: 320px;">If you'd like to demo our tools or want to hear more about public-interest software, please reach out!</div>
+
+        <q-card-section>
+          <div class="row no-wrap items-center">
+            <div>
+              <q-avatar square class="q-mr-md">
+                <q-img src="../assets/lcog-logo.png" />
+              </q-avatar>
+            </div>
+            <div class="">
+              <div>Daniel Wilson</div>
+              <div>Principal Web Developer</div>
+              <div><a href="mailto:dwilson@lcog.org">dwilson@lcog.org</a></div>
+            </div>
+          </div>
+        </q-card-section>
+
+        <q-card-section>
+          <div class="row no-wrap items-center">
+            <div>
+              <q-avatar square class="q-mr-md">
+                <q-img src="../assets/lcog-logo.png" />
+              </q-avatar>
+            </div>
+            <div class="">
+              <div>Heidi Leyba</div>
+              <div>Chief Technology Officer</div>
+              <div><a href="mailto:hleyba@lcog.org">hleyba@lcog.org</a></div>
+            </div>
+          </div>
+        </q-card-section>
+
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="showVideoDialog" maximized>
       <q-video
         id="video-player"
         :src="dialogVideoUrl"
@@ -186,6 +229,16 @@ body {
     }
   }
 
+}
+
+.contact-button {
+  background-color: #1D2D3A;
+  padding-bottom: 20px;
+
+  button {
+    font-size: 20px;
+    font-weight: 900;
+  }
 }
 
 #hero-image {
@@ -268,11 +321,12 @@ body {
 import { ref } from 'vue'
 
 let dialogVideoUrl = ref('')
-let showDialog = ref(false)
+let showVideoDialog = ref(false)
+let showContactDialog = ref(false)
 
 function playVideo(url: string) {
   dialogVideoUrl.value = url
-  showDialog.value = true
+  showVideoDialog.value = true
 }
 
 </script>

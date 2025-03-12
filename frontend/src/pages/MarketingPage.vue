@@ -144,7 +144,7 @@
 
     <q-dialog v-model="showContactDialog">
       <q-card class="q-pa-lg">
-        <div class="text-h5">Contact Us</div>
+        <div class="text-h5 q-mb-sm">Contact Us</div>
         <div style="width: 320px;">If you'd like to demo our tools or want to hear more about public-interest software, please reach out!</div>
 
         <q-card-section>
@@ -174,6 +174,12 @@
               <div>Chief Technology Officer</div>
               <div><a href="mailto:hleyba@lcog.org">hleyba@lcog.org</a></div>
             </div>
+          </div>
+        </q-card-section>
+
+        <q-card-section>
+          <div style="width: 270px;">
+            More information about Lane Council of Governments can be found at <a href="https://lcog.org">lcog.org</a>
           </div>
         </q-card-section>
 

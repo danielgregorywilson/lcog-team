@@ -144,18 +144,20 @@
 
     <q-dialog v-model="showContactDialog">
       <q-card class="q-pa-lg">
-        <div class="text-h5 q-mb-sm">Contact Us</div>
-        <div style="width: 320px;">If you'd like to demo our tools or want to hear more about public-interest software, please reach out!</div>
+        <div class="text-h5 q-mb-sm text-center">Contact Us</div>
+        <div class="text-center">If you'd like to demo our tools or want to</div>
+        <div class="text-center">hear more about public-interest software,</div>
+        <div class="text-center">please reach out!</div>
 
         <q-card-section>
-          <div class="row no-wrap items-center">
+          <div class="row no-wrap items-center justify-center">
             <div>
               <q-avatar square class="q-mr-md">
                 <q-img src="../assets/lcog-logo.png" />
               </q-avatar>
             </div>
-            <div class="">
-              <div>Daniel Wilson</div>
+            <div>
+              <div><strong>Daniel Wilson</strong></div>
               <div>Principal Web Developer</div>
               <div><a href="mailto:dwilson@lcog.org">dwilson@lcog.org</a></div>
             </div>
@@ -163,14 +165,14 @@
         </q-card-section>
 
         <q-card-section>
-          <div class="row no-wrap items-center">
+          <div class="row no-wrap items-center justify-center">
             <div>
               <q-avatar square class="q-mr-md">
                 <q-img src="../assets/lcog-logo.png" />
               </q-avatar>
             </div>
-            <div class="">
-              <div>Heidi Leyba</div>
+            <div>
+              <div><strong>Heidi Leyba</strong></div>
               <div>Chief Technology Officer</div>
               <div><a href="mailto:hleyba@lcog.org">hleyba@lcog.org</a></div>
             </div>
@@ -178,9 +180,8 @@
         </q-card-section>
 
         <q-card-section>
-          <div style="width: 270px;">
-            More information about Lane Council of Governments can be found at <a href="https://lcog.org">lcog.org</a>
-          </div>
+          <div class="text-center">More information about Lane Council of</div>
+          <div class="text-center">Governments can be found at <a href="https://lcog.org">lcog.org</a></div>
         </q-card-section>
 
       </q-card>

@@ -8,6 +8,7 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from mainsite.api_views import LargeResultsSetPagination
 from mainsite.helpers import record_error
 from people.models import Employee
 from purchases.helpers import (
@@ -367,6 +368,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 class ExpenseMonthViewSet(viewsets.ModelViewSet):
     queryset = ExpenseMonth.objects.all()
     serializer_class = ExpenseMonthSerializer
+    pagination_class = LargeResultsSetPagination
 
     def get_serializer_class(self):
         detail = self.request.query_params.get('detail', None)

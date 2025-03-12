@@ -1,7 +1,7 @@
 <template>
 <q-layout view="lHh Lpr lFf">
   <q-page-container>
-    <q-page>
+    <q-page class="q-mt-md">
       <div id="title-row" class="row items-center q-pa-sm q-pl-md">
         <q-img
           src="../assets/summit-suite-logo.png"
@@ -14,12 +14,11 @@
         src="../assets/mountainbkg_right@10x.png"
       />
       <div id="hero-text" class="row items-center q-pl-xl q-pb-lg q-pr-xl">
-        <div class="col">
+        <div id="hero-text-container">
           <div class="hero-text-header">Simple Tools for Smoother Operations</div>
           <div class="q-pt-sm">Government teams run on processes—but too often, the software meant to support them is expensive, bloated, or just doesn’t fit. Together, we are building a collection of lightweight, modular apps designed to streamline essential tasks without unnecessary complexity.</div>
           <div class="q-pt-sm">Each app in the suite does one thing well—whether it’s managing employee transitions, reconciling credit card purchases, or automating multi-step approval processes.</div>
         </div>
-        <div id="hero-text-placeholder"></div>
       </div>
 
       <div class="row items-center justify-center contact-button">
@@ -240,7 +239,8 @@ body {
 
 .contact-button {
   background-color: #1D2D3A;
-  padding-bottom: 20px;
+  padding-top: 30px;
+  padding-bottom: 40px;
 
   button {
     font-size: 20px;
@@ -257,16 +257,17 @@ body {
   font-family: 'Raleway';
   font-size: 24px;
   color: #F8F9FF;
- 
-  .hero-text-header {
-    color: #D2E4FF;
-    font-size: 32px;
-  }
 
-  #hero-text-placeholder {
-    @media screen and (max-width: 900px) {
-      display: none;
-    }
+  #hero-text-container {
+      width: 75%;
+      @media screen and (max-width: 900px) {
+        width: 100%;
+      }
+
+      .hero-text-header {
+        color: #D2E4FF;
+        font-size: 32px;
+      }
   }
 }
 

@@ -5,7 +5,7 @@
       <div id="title-row" class="row items-center q-pa-sm q-pl-md">
         <q-img
           src="../assets/summit-suite-logo.png"
-          class="q-mr-md"
+          class="q-mr-sm"
           id="icon"
         />
         <div class="title col column justify-center">Public Interest Software for Governments by LCOG</div>
@@ -214,8 +214,8 @@ body {
   }
 
   #icon {
-    height: 100px;
-    width: 272px;
+    height: 80px;
+    width: 217.6px;
 
     @media screen and (max-width: 724px) {
       height: 33.33px;

@@ -22,7 +22,7 @@
       </div>
 
       <div class="row items-center justify-center contact-button">
-        <q-btn rounded color="white" text-color="primary" @click="showContactDialog=true">Get Involved</q-btn>
+        <q-btn rounded color="white" text-color="primary" @click="showContactDialog=true" class="q-py-md q-px-lg">Get Involved</q-btn>
       </div>
       
       <div id="hero-subtext" class="row items-center q-py-xl q-pa-xl">
@@ -134,7 +134,7 @@
       </div>
 
       <div class="row items-center justify-center contact-button">
-        <q-btn rounded color="white" text-color="primary" @click="showContactDialog=true">Get Involved</q-btn>
+        <q-btn rounded color="white" text-color="primary" @click="showContactDialog=true" class="q-py-md q-px-lg">Get Involved</q-btn>
       </div>
 
       <!-- <div>Next - PRs</div>
@@ -209,13 +209,17 @@ body {
 #title-row {
   height: 100px;
 
+  @media screen and (max-width: 724px) {
+    height: 80px;
+  }
+
   #icon {
     height: 100px;
     width: 272px;
 
     @media screen and (max-width: 724px) {
-      height: 50px;
-      width: 136px;
+      height: 33.33px;
+      width: 90.67px;
     }
   }
 
@@ -229,8 +233,7 @@ body {
     height: 100%;
 
     @media screen and (max-width: 724px) {
-      font-size: 24px;
-      width: 100px;
+      font-size: 18px;
       line-height: normal;
     }
   }
@@ -243,8 +246,9 @@ body {
   padding-bottom: 40px;
 
   button {
-    font-size: 20px;
-    font-weight: 900;
+    font-family: 'Raleway';
+    font-size: 18px;
+    font-weight: 500;
   }
 }
 

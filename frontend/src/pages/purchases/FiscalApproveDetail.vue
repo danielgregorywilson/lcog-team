@@ -197,8 +197,12 @@
           </template>
         </q-table>
 
-        <div v-if="em.submitter_note && !props.print">
-          <div id="submitter-note" class="q-mt-md q-pa-sm bg-info font-bold">
+        <div v-if="em.submitter_note">
+          <div
+            id="submitter-note"
+            class="q-mt-md q-pa-sm font-bold"
+            :class="{'bg-info': !props.print}"
+          >
             <div>Submitter Note:</div>
             <div>{{ em.submitter_note }}</div>
           </div>
@@ -239,6 +243,7 @@
         <div
           v-for="expense in em.expenses"
           :key="expense.pk"
+          class="q-mt-md"
         >
           <q-img v-if="expense.receipt_type == 'image'" :src="expense.receipt" />
           <iframe

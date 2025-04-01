@@ -475,6 +475,11 @@ if (maintenanceMode) {
       meta: { requiresAuth: true, requiresMealsOnWheelsPermission: true }
     },
 
+    ////////////////////
+    // MARKETING PAGE //
+    ////////////////////
+    { path: '/about', component: () => import('pages/MarketingPage.vue') },
+
     ///////////////
     // ZOOM TEST //
     ///////////////

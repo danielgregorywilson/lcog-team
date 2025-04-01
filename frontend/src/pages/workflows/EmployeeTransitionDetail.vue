@@ -313,14 +313,22 @@
         :disable="!canEditOtherFields()"
       />
     </div>
-    <div class="row q-my-sm" v-if="['Change/Modify'].indexOf(type) != -1">
-      <q-checkbox
-        id="system-change-date-different"
-        v-model="systemChangeDateDifferent"
-        label="System changes date different from transition date"
-        class="q-mr-md"
-        :disable="!canEditOtherFields()"
-      />
+    <div class="q-my-sm" v-if="['Change/Modify'].indexOf(type) != -1">
+      <div class="row items-center">
+        <q-checkbox
+          id="system-change-date-different"
+          v-model="systemChangeDateDifferent"
+          label="SDS system changes date different from transition date"
+          class="q-mr-xs"
+          :disable="!canEditOtherFields()"
+        />
+        <div
+          v-if="systemChangeDateDifferent"
+          style="color: red"
+        >
+          – HR and Payroll systems always change on transition date
+        </div>
+      </div>
       <q-date
         id="system-change-date"
         v-model="systemChangeDate"

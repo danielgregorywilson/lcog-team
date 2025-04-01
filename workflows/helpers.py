@@ -14,7 +14,7 @@ from workflows.models import (
 )
 
 STAFF_TRANSITION_NEWS_EMAIL = os.environ.get('STAFF_TRANSITION_NEWS_EMAIL')
-STAFF_MAILBOX_EMAIL = os.environ.get('STAFF_MAILBOX_EMAIL')
+STAFF_MAILBOX_RECIPIENTS = os.environ.get('STAFF_MAILBOX_RECIPIENTS')
 
 def send_mailbox_notification_email(
     t, sender_name='', sender_email='', url=''
@@ -47,7 +47,9 @@ def send_mailbox_notification_email(
     plaintext_message = strip_tags(html_message)
 
     # Send to mailbox admins
-    send_email(STAFF_MAILBOX_EMAIL, subject, plaintext_message, html_message)
+    send_email_multiple(
+        STAFF_MAILBOX_RECIPIENTS, [], subject, plaintext_message, html_message
+    )
 
 def send_transition_submitter_email(
     t, extra_message=None, sender_name='', sender_email='', url='',

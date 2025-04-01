@@ -771,6 +771,7 @@ class ExpenseStatementViewSet(viewsets.ModelViewSet):
     """
     queryset = ExpenseStatement.objects.all()
     serializer_class = ExpenseStatementSerializer
+    pagination_class = LargeResultsSetPagination
 
     def get_queryset(self):
         user = self.request.user

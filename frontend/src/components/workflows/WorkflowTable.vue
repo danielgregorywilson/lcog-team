@@ -342,6 +342,34 @@
       </q-card-actions>
     </q-card>
   </q-dialog>
+
+  <q-dialog v-model="newWorkflowDialogVisible">
+    <q-card>
+      <q-card-section>
+        <div class="row items-center">
+          <q-avatar
+            icon="add_circle_outline"
+            color="primary"
+            text-color="white"
+          />
+          <span class="q-ml-sm">
+            Are you sure you want to start a new workflow?
+          </span>
+        </div>
+      </q-card-section>
+
+      <q-card-actions class="row justify-around">
+        <q-btn flat label="Cancel" color="primary" v-close-popup />
+        <q-btn
+          flat
+          label="Yes, start it"
+          color="primary"
+          @click="startNewWorkflow()"
+          v-close-popup
+        />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </div>
 </template>
 
@@ -384,6 +412,7 @@ let archiveDialogVisible = ref(false)
 let archiveDialogPositionName = ref('Not Set')
 let archiveDialogPercentComplete = ref(0)
 let rowPkToArchive = ref('')
+let newWorkflowDialogVisible = ref(false)
 
 const props = defineProps<{
   archived: boolean,
@@ -721,6 +750,10 @@ function restoreRow(): void {
 }
 
 function clickAddWorkflow(): void {
+  newWorkflowDialogVisible.value = true
+}
+
+function startNewWorkflow(): void {
   workflowsStore.createNewWorkflowInstance(props.type)
     .then((wfi) => {
       if (!!wfi.transition) {

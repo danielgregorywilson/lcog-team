@@ -118,7 +118,11 @@
           color="grey"
           @click="showArchiveDialog(props.row)"
           icon="delete"
-        />
+        >
+          <q-tooltip :delay="400">
+            Delete workflow
+          </q-tooltip>
+        </q-btn>
         <q-btn
           v-if="archived && canArchiveWorkflowInstance(props.row)"
           class="col"
@@ -128,7 +132,11 @@
           color="grey"
           @click="showArchiveDialog(props.row)"
           icon="restore_from_trash"
-        />
+        >
+          <q-tooltip :delay="400">
+            Restore workflow
+          </q-tooltip>
+        </q-btn>
         <q-icon
           v-if="!archived && !complete && props.row.employee_action_required"
           color="orange"
@@ -240,7 +248,11 @@
                     color="grey"
                     @click="showArchiveDialog(props.row)"
                     icon="delete"
-                  />
+                  >
+                    <q-tooltip :delay="400">
+                      Delete workflow
+                    </q-tooltip>
+                  </q-btn>
                   <q-btn
                     v-if="archived && canArchiveWorkflowInstance(props.row)"
                     dense
@@ -249,7 +261,11 @@
                     color="grey"
                     @click="showArchiveDialog(props.row)"
                     icon="restore_from_trash"
-                  />
+                  >
+                    <q-tooltip :delay="400">
+                      Restore workflow
+                    </q-tooltip>
+                  </q-btn>
                   <q-icon
                     v-if="!archived && !complete &&
                       props.row.employee_action_required"

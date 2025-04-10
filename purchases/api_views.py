@@ -183,7 +183,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     """
     API endpoint for credit card expenses.
     """
-    queryset = Expense.objects.all()
+    queryset = Expense.objects.all().order_by('-pk')
     serializer_class = ExpenseSerializer
 
     def create(self, request, *args, **kwargs):
@@ -365,7 +365,7 @@ class ExpenseViewSet(viewsets.ModelViewSet):
 
 
 class ExpenseMonthViewSet(viewsets.ModelViewSet):
-    queryset = ExpenseMonth.objects.all()
+    queryset = ExpenseMonth.objects.all().order_by('-pk')
     serializer_class = ExpenseMonthSerializer
 
     def get_serializer_class(self):
@@ -709,7 +709,7 @@ class ExpenseMonthLockViewSet(viewsets.ModelViewSet):
     """
     API endpoint for locking expense months.
     """
-    queryset = ExpenseMonthLock.objects.all()
+    queryset = ExpenseMonthLock.objects.all().order_by('-pk')
     serializer_class = ExpenseMonthLockSerializer
 
     def get_queryset(self):
@@ -767,7 +767,7 @@ class ExpenseStatementViewSet(viewsets.ModelViewSet):
     """
     API endpoint for credit card expense statements.
     """
-    queryset = ExpenseStatement.objects.all()
+    queryset = ExpenseStatement.objects.all().order_by('-pk')
     serializer_class = ExpenseStatementSerializer
 
     def get_queryset(self):

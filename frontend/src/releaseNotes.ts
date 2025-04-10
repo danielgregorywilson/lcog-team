@@ -4,6 +4,29 @@
 
 export const releases = [
   {
+    version: '0.47.0',
+    date: new Date(2025, 3, 10),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Optimization of how CC expense months and statements ' +
+          'are loaded.'
+      },
+      {
+        type: 'improved',
+        description: 'Add contractors to employee transitions.'
+      },
+      {
+        type: 'improved',
+        description: 'Minor improvements to workflows UI.'
+      },
+      {
+        type: 'improved',
+        description: 'Improved backend filtering.'
+      },
+    ]
+  },
+  {
     version: '0.46.2',
     date: new Date(2025, 2, 5),
     changes: [

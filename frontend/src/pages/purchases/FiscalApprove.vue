@@ -2,7 +2,7 @@
 <div class="q-mt-md">
   <div class="q-mt-md">
     <q-spinner-grid
-      v-if="!expensesLoaded()"
+      v-if="!selectedMonthExpensesLoaded()"
       class="spinner"
       color="primary"
       size="xl"
@@ -104,7 +104,7 @@
       <div class="row justify-between q-gutter-md q-mt-none">
         <div class="col">
           <q-spinner-grid
-            v-if="!statementsLoaded"
+            v-if="!selectedMonthStatementsLoaded()"
             class="spinner"
             color="primary"
             size="xl"
@@ -188,7 +188,10 @@
                 :readOnly=false
                 v-on="{
                   'uploaded': (url: string) => {
-                    retrieveAllStatements()
+                    retrieveMonthStatements(
+                      purchaseStore.yearInt,
+                      purchaseStore.monthInt
+                    )
                   }
                 }"
               />
@@ -363,7 +366,7 @@
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar'
-import { onMounted, Ref, ref } from 'vue'
+import { onMounted, Ref, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import FileUploader from 'src/components/FileUploader.vue'
 import { readableDateNEW, readableDateTime } from 'src/filters'
@@ -374,11 +377,6 @@ import { ExpenseMonth, ExpenseStatement } from 'src/types';
 const quasar = useQuasar()
 const router = useRouter()
 const purchaseStore = usePurchaseStore()
-
-let thisMonthExpensesLoaded = ref(false)
-let allExpensesLoaded = ref(false)
-let thisMonthStatementsLoaded = ref(false)
-let allStatementsLoaded = ref(false)
 
 let sendNotificationDialogVisible = ref(false)
 let lockMonthDialogVisible = ref(false)
@@ -431,30 +429,27 @@ function viewingThisMonth() {
     purchaseStore.firstOfThisMonth.getTime()
 }
 
-function expensesLoaded() {
-  return (viewingThisMonth() && thisMonthExpensesLoaded.value) ||
-    allExpensesLoaded.value
-}
-
-function statementsLoaded() {
-  return (viewingThisMonth() && thisMonthStatementsLoaded.value) ||
-    allStatementsLoaded.value
-}
-
 function selectedMonthExpenseMonths() {
-  return purchaseStore.fiscalExpenseMonths
-    .filter(
-      em => em.month == purchaseStore.monthInt &&
-      em.year == purchaseStore.yearInt
-    )
+  return purchaseStore.fiscalExpenseMonths[purchaseStore.yearInt]
+    [purchaseStore.monthInt]
+}
+
+function selectedMonthExpensesLoaded() {
+  return purchaseStore.fiscalExpenseMonths[purchaseStore.yearInt] &&
+    purchaseStore.fiscalExpenseMonths[purchaseStore.yearInt]
+    [purchaseStore.monthInt]
 }
 
 function selectedMonthStatements() {
-  return purchaseStore.expenseStatements
-    .filter(
-      s => s.month === purchaseStore.monthInt &&
-      s.year == purchaseStore.yearInt
-    )
+  return purchaseStore.expenseStatements[purchaseStore.yearInt] &&
+    purchaseStore.expenseStatements[purchaseStore.yearInt]
+    [purchaseStore.monthInt]
+}
+
+function selectedMonthStatementsLoaded() {
+  return purchaseStore.expenseStatements[purchaseStore.yearInt] &&
+    purchaseStore.expenseStatements[purchaseStore.yearInt]
+    [purchaseStore.monthInt]
 }
 
 function expenseMonthFiscalApproved(expenseMonth: ExpenseMonth) {
@@ -554,13 +549,17 @@ function canViewDetail(status: string) {
   return status !== 'draft'
 }
 
-function retrieveThisMonthEMs(): Promise<void> {
+function retrieveMonthEMs(year: number, month: number): Promise<void> {
+  if (
+    purchaseStore.fiscalExpenseMonths[year] &&
+    purchaseStore.fiscalExpenseMonths[year][month]
+  ) {
+    return Promise.resolve()
+  }
+  // Get a month of EMs 
   return new Promise((resolve, reject) => {
-    purchaseStore.getFiscalExpenseMonths(
-      false, purchaseStore.yearInt, purchaseStore.monthInt
-    )
+    purchaseStore.getFiscalMonthEMs(year, month)
       .then(() => {
-        thisMonthExpensesLoaded.value = true
         resolve()
       })
       .catch((error) => {
@@ -570,41 +569,16 @@ function retrieveThisMonthEMs(): Promise<void> {
   })
 }
 
-function retrieveAllEMs(): Promise<void> {
+function retrieveMonthStatements(year: number, month: number): Promise<void> {
+  if (
+    purchaseStore.expenseStatements[year] &&
+    purchaseStore.expenseStatements[year][month]
+  ) {
+    return Promise.resolve()
+  }
   return new Promise((resolve, reject) => {
-    purchaseStore.getFiscalExpenseMonths(false)
+    purchaseStore.getExpenseStatements(year, month)
       .then(() => {
-        allExpensesLoaded.value = true
-        resolve()
-      })
-      .catch((error) => {
-        handlePromiseError(reject, 'Error retrieving fiscal expenses', error)
-        reject()
-      })
-  })
-}
-
-function retrieveThisMonthStatements(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    purchaseStore.getExpenseStatements(
-      purchaseStore.yearInt, purchaseStore.monthInt
-    )
-      .then(() => {
-        thisMonthStatementsLoaded.value = true
-        resolve()
-      })
-      .catch((error) => {
-        handlePromiseError(reject, 'Error retrieving expense statements', error)
-        reject()
-      })
-  })
-}
-
-function retrieveAllStatements(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    purchaseStore.getExpenseStatements()
-      .then(() => {
-        allStatementsLoaded.value = true
         resolve()
       })
       .catch((error) => {
@@ -652,7 +626,7 @@ function deleteStatement(): void {
     .then(() => {
       statementDialogVisible.value = false
       quasar.notify('Deleted a statement.')
-      retrieveAllStatements()
+      retrieveMonthStatements(purchaseStore.yearInt, purchaseStore.monthInt)
     })
     .catch(e => {
       console.error(e)
@@ -674,12 +648,25 @@ function toggleLockCurrentExpenseMonth() {
 }
 
 onMounted(() => {
-  retrieveThisMonthEMs().then(() => {
-    retrieveAllEMs()
+  // Retrieve this and then last month's EMs to start
+  retrieveMonthEMs(purchaseStore.yearInt, purchaseStore.monthInt).then(() => {
+    let yearInt = purchaseStore.yearInt
+    let lastMonthInt = purchaseStore.monthInt - 1
+    if (lastMonthInt < 1) {
+      lastMonthInt = 12
+      yearInt -= 1
+    }
+    retrieveMonthEMs(yearInt, lastMonthInt)
   })
-  retrieveThisMonthStatements().then(() => {
-    retrieveAllStatements()
-  })
+  retrieveMonthStatements(purchaseStore.yearInt, purchaseStore.monthInt)
+})
+
+watch(() => purchaseStore.firstOfSelectedMonth, (newVal) => {
+  if (viewingThisMonth()) return // Never do this on pageload
+  const year = newVal.getFullYear()
+  const month = newVal.getMonth()
+  retrieveMonthEMs(year, month + 1)
+  retrieveMonthStatements(year, month + 1)
 })
 
 </script>

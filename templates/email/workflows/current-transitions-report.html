@@ -84,9 +84,9 @@
                   {% if pi.percent_complete != 100 %}
                     <li>
                       {{ pi.name }} assigned to {{ pi.assignees | join:', ' }}
-                      {% if pi.assigned_ago > 2 %}<span style="color: red;">{% endif %}
+                      {% if pi.assigned_ago > 7 %}<span style="color: red;">{% endif %}
                       {{ pi.assigned_ago }} day{% if pi.assigned_ago != 1 %}s{% endif %} ago
-                      {% if pi.assigned_ago > 2 %}</span>{% endif %}
+                      {% if pi.assigned_ago > 7 %}</span>{% endif %}
                     </li>
                   {% endif %}
                 {% endfor %}

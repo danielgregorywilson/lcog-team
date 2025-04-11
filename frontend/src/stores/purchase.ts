@@ -17,8 +17,20 @@ export const usePurchaseStore = defineStore('purchase', {
     myExpenses: [] as Array<Expense>,
     approvalExpenseGLs: [] as Array<GL>,
     directorExpenseMonths: [] as Array<ExpenseMonth>,
-    fiscalExpenseMonths: [] as Array<ExpenseMonth>,
-    expenseStatements: [] as Array<ExpenseStatement>,
+    fiscalExpenseMonths: {} as {
+      [year: number]: {
+        [month: number]: Array<ExpenseMonth>
+      }
+    },
+    fiscalEMsDetails: [] as Array<ExpenseMonth>,
+    
+    expenseStatements: {} as {
+      [year: number]: {
+        [month: number]: Array<ExpenseStatement>
+      }
+    },
+    expenseStatementDetails: [] as Array<ExpenseStatement>,
+    
     numEMsToResubmit: 0,
     numExpenseGLsToApprove: 0,
     numExpensesDirectorToApprove: 0,
@@ -146,6 +158,28 @@ export const usePurchaseStore = defineStore('purchase', {
     //////////////////
 
     getExpenseStatements(
+      yearInt: number, monthInt: number
+    ): Promise<ExpenseStatement[]> {
+      return new Promise((resolve, reject) => {
+        const params = `?year=${ yearInt }&month=${ monthInt }`
+        axios({
+          url: `${ apiURL }api/v1/expense-statement${ params }`
+        })
+          .then(resp => {
+            const statements: ExpenseStatement[] = resp.data.results
+            if (!this.expenseStatements[yearInt]) {
+              this.expenseStatements[yearInt] = {}
+            }
+            this.expenseStatements[yearInt][monthInt] = statements
+            resolve(statements)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error getting expense statements', e)
+          })
+      })
+    },
+
+    getExpenseStatementDetails(
       yearInt: number | null = null, monthInt: number | null = null
     ): Promise<null> {
       return new Promise((resolve, reject) => {
@@ -488,26 +522,19 @@ export const usePurchaseStore = defineStore('purchase', {
     /// Fiscal ///
     //////////////
 
-    getFiscalExpenseMonths(
-      detail = true,
-      yearInt: number | null = null,
-      monthInt: number | null = null,
-      expenseMonthPK: number | null = null
+    getFiscalMonthEMs(
+      yearInt: number, monthInt: number
     ): Promise<ExpenseMonth[]> {
       return new Promise((resolve, reject) => {
-        let params = `?fiscal=true&detail=${ detail }`
-        if (!!yearInt && !!monthInt) {
-          params += `&year=${ yearInt }&month=${ monthInt }`
-        }
-        if (!!expenseMonthPK) {
-          params += `&em=${ expenseMonthPK }`
-        }
+        const params = `?fiscal=true&detail=false&year=${ yearInt }&month=${ monthInt }`
         axios({
           url: `${ apiURL }api/v1/expense-month${ params }`
         })
           .then(resp => {
             const ems: ExpenseMonth[] = resp.data.results
-            let emsFiscalToApprove = ems.filter(
+            
+            // Set active month if any ems this month are unapproved.
+            const emsFiscalToApprove = ems.filter(
               em => {
                 if (em.card?.requires_director_approval) {
                   // If director approval required, count if approved
@@ -519,25 +546,39 @@ export const usePurchaseStore = defineStore('purchase', {
                 }
               }
             )
-            
-            // Set active month: The first month that is not yet approved
-            emsFiscalToApprove = emsFiscalToApprove.sort(
-              (a, b) => {
-                if (a.year !== b.year) return a.year - b.year
-                return a.month - b.month
-              }
-            )
             if (emsFiscalToApprove.length > 0) {
-              const activeMonth = emsFiscalToApprove[0]
-              this.setMonth(activeMonth.month, activeMonth.year)
+              this.setMonth(monthInt, yearInt)
             }
             
-            this.fiscalExpenseMonths = ems
+            if (!this.fiscalExpenseMonths[yearInt]) {
+              this.fiscalExpenseMonths[yearInt] = {};
+            }
+            this.fiscalExpenseMonths[yearInt][monthInt] = ems;
+
             this.numExpensesFiscalToApprove = emsFiscalToApprove.length
             resolve(ems)
           })
           .catch(e => {
             handlePromiseError(reject, 'Error getting fiscal expense months', e)
+          })
+      })
+    },
+
+    getFiscalEMDetail(
+      expenseMonthPK: number | null = null
+    ): Promise<ExpenseMonth[]> {
+      return new Promise((resolve, reject) => {
+        const params = `?fiscal=true&detail=true&em=${ expenseMonthPK }`
+        axios({
+          url: `${ apiURL }api/v1/expense-month${ params }`
+        })
+          .then(resp => {
+            const ems: ExpenseMonth[] = resp.data.results
+            this.fiscalEMsDetails = ems
+            resolve(ems)
+          })
+          .catch(e => {
+            handlePromiseError(reject, 'Error getting fiscal EM detail', e)
           })
       })
     },

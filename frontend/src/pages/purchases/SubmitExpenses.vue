@@ -527,12 +527,11 @@
 
   <!-- Statements -->
   <div
-    v-if="purchaseStore.selectedExpenseMonth && thisMonthStatementsLoaded"
+    v-if="purchaseStore.selectedExpenseMonth && selectedMonthStatementsLoaded()"
     class="q-mt-md"
   >
-    <div v-if="statementChoices().length">
+    <div v-if="statementChoices()?.length">
       <q-select
-        v-if="thisMonthStatementsLoaded"
         :bg-color="selectedStatement ? '': 'info'"
         filled
         :disable="monthLocked() || monthSubmitted()"
@@ -767,8 +766,6 @@ let allExpensesLoaded = ref(false)
 let selectedMonth = ref(null) as
   Ref<{label: string, value: ExpenseMonth} | null>
 
-let thisMonthStatementsLoaded = ref(false)
-let allStatementsLoaded = ref(false)
 // SelectedStatement is a q-select option, so it has a label and a value.
 let selectedStatement = ref(null) as
   Ref<{label: string, value: ExpenseStatement} | null>
@@ -858,6 +855,12 @@ function selectedMonthExpenses(): Expense[] {
   } else {
     return []
   }
+}
+
+function selectedMonthStatementsLoaded() {
+  return purchaseStore.expenseStatements[purchaseStore.yearInt] &&
+    purchaseStore.expenseStatements[purchaseStore.yearInt]
+    [purchaseStore.monthInt]
 }
 
 function selectedMonthNotes(): Array<{
@@ -1262,27 +1265,16 @@ function deleteExpense(): void {
     })
 }
 
-function retrieveThisMonthStatements(): Promise<void> {
+function retrieveMonthStatements(year: number, month: number): Promise<void> {
+  if (
+    purchaseStore.expenseStatements[year] &&
+    purchaseStore.expenseStatements[year][month]
+  ) {
+    return Promise.resolve()
+  }
   return new Promise((resolve, reject) => {
-    purchaseStore.getExpenseStatements(
-      purchaseStore.yearInt, purchaseStore.monthInt
-    )
+    purchaseStore.getExpenseStatements(year, month)
       .then(() => {
-        thisMonthStatementsLoaded.value = true
-        resolve()
-      })
-      .catch((error) => {
-        handlePromiseError(reject, 'Error retrieving expense statements', error)
-        reject()
-      })
-  })
-}
-
-function retrieveAllStatements(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    purchaseStore.getExpenseStatements()
-      .then(() => {
-        allStatementsLoaded.value = true
         resolve()
       })
       .catch((error) => {
@@ -1293,14 +1285,13 @@ function retrieveAllStatements(): Promise<void> {
 }
 
 function thisMonthStatements(): Array<ExpenseStatement> {
-  return purchaseStore.expenseStatements.filter(es => {
-    return es.month === purchaseStore.monthInt &&
-      es.year === purchaseStore.yearInt
-  })
+  return purchaseStore.expenseStatements[purchaseStore.yearInt] &&
+    purchaseStore.expenseStatements[purchaseStore.yearInt]
+    [purchaseStore.monthInt]
 }
 
 function statementChoices(): Array<{label: string, value: ExpenseStatement}> {
-  return thisMonthStatements().map(es => {
+  return thisMonthStatements()?.map(es => {
     return {
       label: es.card.display,
       value: es
@@ -1334,7 +1325,7 @@ function statementSelected(): boolean {
 }
 
 function setStatement(): void {
-  selectedStatement.value = statementChoices().find(
+  selectedStatement.value = statementChoices()?.find(
     sc => sc.value.card.pk === purchaseStore.selectedExpenseMonth?.card?.pk
   ) || null
 }
@@ -1377,10 +1368,10 @@ onMounted(() => {
     retrieveAllMyExpenses()
     // Don't retrieve statements until we've gotten expenses
     // so we can set selected expense card.
-    retrieveThisMonthStatements().then(() => {
-      retrieveAllStatements().then(() => {
-        setDefaultMonthAndStatement()
-      })
+    retrieveMonthStatements(
+      purchaseStore.yearInt, purchaseStore.monthInt
+    ).then(() => {
+      setDefaultMonthAndStatement()
     })
   })
 })
@@ -1389,6 +1380,15 @@ watch(() => purchaseStore.monthInt, (first, second) => {
   if (first !== second) {
     setDefaultMonthAndStatement()
   }
+})
+
+watch(() => purchaseStore.firstOfSelectedMonth, (newVal) => {
+  if (viewingThisMonth()) return // Never do this on pageload
+  const year = newVal.getFullYear()
+  const month = newVal.getMonth()
+  retrieveMonthStatements(year, month + 1).then(() => {
+    setDefaultMonthAndStatement()
+  })
 })
 
 </script>

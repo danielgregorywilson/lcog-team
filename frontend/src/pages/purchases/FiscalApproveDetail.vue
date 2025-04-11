@@ -402,7 +402,7 @@ function tableTitleDisplay(em: ExpenseMonth): string {
 function selectedMonthCardExpenseMonths(): Array<ExpenseMonth> {
   let currentCard = null
   let currentStatement = null
-  const allEMs = purchaseStore.fiscalExpenseMonths.filter(em => {
+  const allEMs = purchaseStore.fiscalEMsDetails.filter(em => {
     return em.month === purchaseStore.monthInt &&
     em.year === purchaseStore.yearInt
   })
@@ -447,9 +447,7 @@ function retrieveExpenseMonthCardExpenseMonths(): Promise<void> {
     if (!expenseMonthPK.value) {
       return
     }
-    purchaseStore.getFiscalExpenseMonths(
-      true, null, null, expenseMonthPK.value
-    )
+    purchaseStore.getFiscalEMDetail(expenseMonthPK.value)
       .then((ems) => {
         purchaseStore.setMonth(ems[0].month, ems[0].year)
         thisMonthLoaded.value = true
@@ -542,7 +540,7 @@ function navigateToPrintView() {
   router.push({
     name: 'expense-month-print',
     params: {
-      employeePK: expenseMonthPK.value,
+      expenseMonthPK: expenseMonthPK.value,
     }
   })
 }
@@ -646,7 +644,7 @@ function expensesMatchStatment(): boolean {
 
 function handlePrint() {
   // Load expense month if not already loaded; otherwise mark as loaded
-  if (purchaseStore.fiscalExpenseMonths.filter(em => {
+  if (purchaseStore.fiscalEMsDetails.filter(em => {
     return em.month === purchaseStore.monthInt &&
     em.year === purchaseStore.yearInt
   }).length == 0) {

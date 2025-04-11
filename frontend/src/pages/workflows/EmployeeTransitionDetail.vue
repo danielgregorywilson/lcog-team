@@ -55,6 +55,13 @@
         :disable="!canEditOtherFields()"
         label="Temp Non-Agency"
       />
+      <q-radio
+        v-model="workerType"
+        val="Contractor"
+        id="worker-type-contractor"
+        :disable="!canEditOtherFields()"
+        label="Contractor"
+      />
     </div>
     <div class="text-h6 transition-form-section-heading">Submission Info</div>
     <div class="row items-center">
@@ -164,7 +171,7 @@
           :rules="[val => decimalNumberRegex.test(val) || 'Must be a number']"
         />
         <q-input
-          v-else
+          v-else-if="workerType !== 'Contractor'"
           v-model="hoursPerWeek"
           name="hoursPerWeek"
           label="Hours per week"
@@ -251,12 +258,12 @@
         </template>
       </q-select>
     </div>
-    <div v-else-if="['Intern', 'Volunteer'].indexOf(workerType) != -1">
+    <div v-else-if="['Intern', 'Volunteer', 'Contractor'].indexOf(workerType) != -1">
       <q-input
         v-if="canViewSalaryFields()"
         v-model="stipend"
         name="stipend"
-        label="Stipend"
+        :label="workerType == 'Contractor' ? 'Contractual Maximum Compensation / Not to Exceed Amount' : 'Stipend'"
         class="q-mr-md"
         clearable
       />
@@ -302,7 +309,7 @@
         :readonly="!canEditOtherFields()"
       />
     </div>
-    <div v-if="workerType != 'Employee'" class="row items-center">
+    <div v-if="['Employee', 'Contractor'].indexOf(workerType) == -1" class="row items-center">
       <div class="q-mr-xs text-h6">Schedule</div>
       <q-checkbox
         v-for="(item, index) in scheduleOptions"
@@ -1139,7 +1146,8 @@ const workerTypeTooltipText = `
     <span style="text-decoration: underline;">Intern</span>: This person is coming on as an intern as defined by the Department of Labor. They may or may not receive a stipend (please refer to Department of Labor rules regarding interns and stipends).<br />
     <span style="text-decoration: underline;">Volunteer</span>: This person is volunteering their unpaid time with the agency (please refer to Department of Labor rules regarding volunteers).<br />
     <span style="text-decoration: underline;">Temp Agency</span>: This person is a temporary employee hired through an agency. LCOG pays the agency for their time instead of directly paying the employee.<br />
-    <span style="text-decoration: underline;">Temp Non-Agency</span>: This person is a temporary employee hired directly by LCOG. LCOG directly pays the employee for their time.
+    <span style="text-decoration: underline;">Temp Non-Agency</span>: This person is a temporary employee hired directly by LCOG. LCOG directly pays the employee for their time.<br />
+    <span style="text-decoration: underline;">Contractor</span>: This person is an independent contractor who is providing services to LCOG, but LCOG does not control the means or method by which they perform the work. This person will receive a 1099 and is paid by Accounts Payable upon their submission and the subsequent approval of an invoice.
   </div>
 `
 

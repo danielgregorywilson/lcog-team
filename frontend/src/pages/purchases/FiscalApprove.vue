@@ -189,8 +189,7 @@
                 v-on="{
                   'uploaded': (url: string) => {
                     retrieveMonthStatements(
-                      purchaseStore.yearInt,
-                      purchaseStore.monthInt
+                      purchaseStore.yearInt, purchaseStore.monthInt, true
                     )
                   }
                 }"
@@ -569,9 +568,9 @@ function retrieveMonthEMs(year: number, month: number): Promise<void> {
   })
 }
 
-function retrieveMonthStatements(year: number, month: number): Promise<void> {
+function retrieveMonthStatements(year: number, month: number, refresh=false): Promise<void> {
   if (
-    purchaseStore.expenseStatements[year] &&
+    !refresh && purchaseStore.expenseStatements[year] &&
     purchaseStore.expenseStatements[year][month]
   ) {
     return Promise.resolve()
@@ -626,7 +625,9 @@ function deleteStatement(): void {
     .then(() => {
       statementDialogVisible.value = false
       quasar.notify('Deleted a statement.')
-      retrieveMonthStatements(purchaseStore.yearInt, purchaseStore.monthInt)
+      retrieveMonthStatements(
+        purchaseStore.yearInt, purchaseStore.monthInt, true
+      )
     })
     .catch(e => {
       console.error(e)

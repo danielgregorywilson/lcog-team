@@ -236,6 +236,12 @@ export interface Unit {
 // PerformanceReview Structure from Django Rest Framework //
 ////////////////////////////////////////////////////////////
 
+export type PRFormFactor = {
+  name: string
+  description: string
+  notApplicableOption: boolean
+}
+
 export type PRSignatures = Array<[string, string, Date, number, boolean]>
 
 export interface PerformanceReviewRetrieve {
@@ -258,7 +264,13 @@ export interface PerformanceReviewRetrieve {
   step_increase: string
   top_step_bonus: string
   action_other: string
-
+  form: {
+    'longResponses': [],
+    'factorsResponseSet': [],
+    'factors': PRFormFactor[], 
+    'anyNotApplicable': boolean
+  }
+  data: {'factors': {[name: string]: string}}
   factor_job_knowledge: string
   factor_work_quality: string
   factor_work_quantity: string
@@ -296,6 +308,7 @@ export interface PerformanceReviewUpdate {
   step_increase: string
   top_step_bonus: string
   action_other: string
+  data: {'factors': {[name: string]: string}}
   factor_job_knowledge: string
   factor_work_quality: string
   factor_work_quantity: string
@@ -556,7 +569,7 @@ export interface ReviewNoteRetrieve {
   employee_pk: number
   employee_name: string
   author_name: string
-  date: Date
+  created_at: Date
   note: string
 }
 

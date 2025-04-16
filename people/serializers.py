@@ -297,6 +297,14 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     
     @staticmethod
     def get_form(pr):
+        if not pr.form:
+            return {
+                'longResponses': None,
+                'factorsResponseSet': None,
+                'factors': [],
+                'anyNotApplicable': False
+            }
+        
         any_not_applicable = False
         factors = []
         for factor in pr.form.factors.all().order_by('order'):

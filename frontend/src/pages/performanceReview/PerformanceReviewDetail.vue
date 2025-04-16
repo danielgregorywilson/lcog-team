@@ -7,6 +7,8 @@
       src="../../assets/lcog-banner.png"
     />
     <h4 class="text-bold text-center">Performance Evaluation Report</h4>
+    
+    <!-- Metadata -->
     <div class="eval-grid-container">
       <div class="eval-box eval-box-1">
           <div class="row text-bold">Employee:</div>
@@ -153,6 +155,8 @@
     </div>
     <div v-else>
       <!-- MANAGERS -->
+      
+      <!-- Employee's Self-Evaluation -->
       <div
         v-if="evaluationCommentsEmployee.length"
         class="read-only-text-area" v-html="evaluationCommentsEmployee"
@@ -162,6 +166,7 @@
       </div>
     </div>
 
+    <!-- Peer Feedback -->
     <div
       v-if="currentUserIsManagerOfEmployee()"
       id="notes"
@@ -197,6 +202,8 @@
       </div>
     </div>
 
+    <!-- Multiple choice performance factors -->
+    <!-- TODO: Make generic -->
     <h5 class="text-uppercase text-center text-bold q-mb-sm q-mt-lg"><u>Rating Scale</u></h5>
     <div class="rating-grid-container">
       <div class="rating-box">
@@ -286,7 +293,12 @@
 
       <template v-for="factor in form.factors" :key="form.factors.indexOf(factor)">
         <div class="factors-box">
-            <div class="row text-bold"><u>{{ factor.name }}</u></div>
+            <div
+              class="row text-bold"
+              :id="`factor-${factor.name.toLowerCase().replace(/\s+/g, '-')}`"
+            >
+              <u>{{ factor.name }}</u>
+            </div>
             <div class="row">{{ factor.description }}</div>
         </div>
         <div
@@ -314,50 +326,30 @@
       </template>
     </div>
 
-    <h5 class="text-uppercase text-bold q-my-md" id="evaluation-successes">
-      <u>II. Employee's Successes</u>
-    </h5>
-    <div
-      v-if="
-        !currentUserIsManagerOfEmployee() || employeeHasSigned() || props.print
-      "
-      class="read-only-text-area" v-html="evaluationSuccesses"
-    ></div>
-    <q-editor
-      v-else
-      v-model="evaluationSuccesses"
-      :toolbar="editorToolbar"
-    />
-
-    <h5 class="text-uppercase text-bold q-my-md" id="evaluation-opportunities">
-      <u>III. Opportunities for Growth</u>
-    </h5>
-    <div
-      v-if="
-        !currentUserIsManagerOfEmployee() || employeeHasSigned() || props.print
-      "
-      class="read-only-text-area" v-html="evaluationOpportunities"
-    ></div>
-    <q-editor
-      v-else
-      v-model="evaluationOpportunities"
-      :toolbar="editorToolbar"
-    />
-
-    <h5 class="q-my-md" id="evaluation-goals">
-      <u class="text-uppercase text-bold">IV. Goals for the Coming Year</u> (recommended three)
-    </h5>
-    <div
-      v-if="
-        !currentUserIsManagerOfEmployee() || employeeHasSigned() || props.print
-      "
-      class="read-only-text-area" v-html="evaluationGoalsManager"
-    ></div>
-    <q-editor
-      v-else
-      v-model="evaluationGoalsManager"
-      :toolbar="editorToolbar"
-    />
+    <!-- Long Responses -->
+    <template
+      v-for="response in form.longResponses"
+      :key="form.longResponses.indexOf(response)"
+    >
+      <h5 class="q-my-md" id="evaluation-successes">
+        <u class="text-uppercase text-bold">{{ response[0] }}</u>
+        {{ response[1] }}
+      </h5>
+      <div
+        v-if="
+          !currentUserIsManagerOfEmployee() || employeeHasSigned() || props.print
+        "
+        class="read-only-text-area" v-html="formData.factors[response[0]]"
+      ></div>
+      <q-editor
+        v-else
+        :model-value="formData.factors[response[0]] || ''"
+        @update:model-value="(val: string) => {
+          formData.factors[response[0]] = val
+        }"
+        :toolbar="editorToolbar"
+      />
+    </template>
 
     <!-- <h5 class="text-uppercase">V. Goals for the Coming Year (Employee)</h5>
     <q-input
@@ -913,9 +905,9 @@ function valuesAreChanged(): boolean {
     // factorProfessionalism.value == factorProfessionalismCurrentVal.value &&
     // factorManagement.value == factorManagementCurrentVal.value &&
     // factorSupervision.value == factorSupervisionCurrentVal.value &&
-    evaluationSuccesses.value == evaluationSuccessesCurrentVal.value &&
-    evaluationOpportunities.value == evaluationOpportunitiesCurrentVal.value &&
-    evaluationGoalsManager.value == evaluationGoalsManagerCurrentVal.value &&
+    // evaluationSuccesses.value == evaluationSuccessesCurrentVal.value &&
+    // evaluationOpportunities.value == evaluationOpportunitiesCurrentVal.value &&
+    // evaluationGoalsManager.value == evaluationGoalsManagerCurrentVal.value &&
     evaluationCommentsEmployee.value ==
       evaluationCommentsEmployeeCurrentVal.value
   ) {
@@ -944,64 +936,74 @@ function formErrorItems(): Array<[string, string]> {
   if (!topStepBonusCurrentVal.value) {
     errorItems.push(['top-step-bonus', 'Select Top Step Bonus'])
   }
-  if (!factorJobKnowledgeCurrentVal.value) {
-    errorItems.push(['factor-job-knowledge', 'Evaluate Job Knowledge'])
+
+  for (let factor of form.value.factors) {
+    if (!formDataCurrentVal.value.factors[factor.name]) {
+      errorItems.push([
+        `factor-${factor.name.trim().toLowerCase().replace(/\s+/g, '-')}`,
+        `Evaluate ${factor.name}`
+      ])
+    }
   }
-  if (!factorWorkQualityCurrentVal.value) {
-    errorItems.push(['factor-work-quality', 'Evaluate Quality of Work'])
-  }
-  if (!factorWorkQuantityCurrentVal.value) {
-    errorItems.push(['factor-work-quantity', 'Evaluate Quantity of Work'])
-  }
-  if (!factorWorkHabitsCurrentVal.value) {
-    errorItems.push(['factor-work-habits', 'Evaluate Work Habits'])
-  }
-  if (!factorAnalysisCurrentVal.value) {
-    errorItems.push(
-      ['factor-analysis', 'Evaluate Analysis and Decision-Making']
-    )
-  }
-  if (!factorInitiativeCurrentVal.value) {
-    errorItems.push(['factor-initiative', 'Evaluate Initiative and Creativity'])
-  }
-  if (!factorInterpersonalCurrentVal.value) {
-    errorItems.push(
-      ['factor-interpersonal', 'Evaluate Interpersonal Relations']
-    )
-  }
-  if (!factorCommunicationCurrentVal.value) {
-    errorItems.push(['factor-communication', 'Evaluate Communication'])
-  }
-  if (!factorDependabilityCurrentVal.value) {
-    errorItems.push(
-      ['factor-dependability', 'Evaluate Dependability and Responsibility']
-    )
-  }
-  if (!factorProfessionalismCurrentVal.value) {
-    errorItems.push(
-      [
-        'factor-professionalism',
-        'Evaluate Professionalism and Customer Service'
-      ]
-    )
-  }
-  if (!factorManagementCurrentVal.value) {
-    errorItems.push(['factor-management', 'Evaluate Project Management'])
-  }
-  if (!factorSupervisionCurrentVal.value) {
-    errorItems.push(['factor-supervision', 'Evaluate Supervision'])
-  }
-  if (!evaluationSuccessesCurrentVal.value) {
-    errorItems.push(['evaluation-successes', 'Write Employee Successes'])
-  }
-  if (!evaluationOpportunitiesCurrentVal.value) {
-    errorItems.push(
-      ['evaluation-opportunities', 'Write Opportunities for Growth']
-    )
-  }
-  if (!evaluationGoalsManagerCurrentVal.value) {
-    errorItems.push(['evaluation-goals', 'Write Goals for the Coming Year'])
-  }
+
+  // if (!factorJobKnowledgeCurrentVal.value) {
+  //   errorItems.push(['factor-job-knowledge', 'Evaluate Job Knowledge'])
+  // }
+  // if (!factorWorkQualityCurrentVal.value) {
+  //   errorItems.push(['factor-work-quality', 'Evaluate Quality of Work'])
+  // }
+  // if (!factorWorkQuantityCurrentVal.value) {
+  //   errorItems.push(['factor-work-quantity', 'Evaluate Quantity of Work'])
+  // }
+  // if (!factorWorkHabitsCurrentVal.value) {
+  //   errorItems.push(['factor-work-habits', 'Evaluate Work Habits'])
+  // }
+  // if (!factorAnalysisCurrentVal.value) {
+  //   errorItems.push(
+  //     ['factor-analysis', 'Evaluate Analysis and Decision-Making']
+  //   )
+  // }
+  // if (!factorInitiativeCurrentVal.value) {
+  //   errorItems.push(['factor-initiative', 'Evaluate Initiative and Creativity'])
+  // }
+  // if (!factorInterpersonalCurrentVal.value) {
+  //   errorItems.push(
+  //     ['factor-interpersonal', 'Evaluate Interpersonal Relations']
+  //   )
+  // }
+  // if (!factorCommunicationCurrentVal.value) {
+  //   errorItems.push(['factor-communication', 'Evaluate Communication'])
+  // }
+  // if (!factorDependabilityCurrentVal.value) {
+  //   errorItems.push(
+  //     ['factor-dependability', 'Evaluate Dependability and Responsibility']
+  //   )
+  // }
+  // if (!factorProfessionalismCurrentVal.value) {
+  //   errorItems.push(
+  //     [
+  //       'factor-professionalism',
+  //       'Evaluate Professionalism and Customer Service'
+  //     ]
+  //   )
+  // }
+  // if (!factorManagementCurrentVal.value) {
+  //   errorItems.push(['factor-management', 'Evaluate Project Management'])
+  // }
+  // if (!factorSupervisionCurrentVal.value) {
+  //   errorItems.push(['factor-supervision', 'Evaluate Supervision'])
+  // }
+  // if (!evaluationSuccessesCurrentVal.value) {
+  //   errorItems.push(['evaluation-successes', 'Write Employee Successes'])
+  // }
+  // if (!evaluationOpportunitiesCurrentVal.value) {
+  //   errorItems.push(
+  //     ['evaluation-opportunities', 'Write Opportunities for Growth']
+  //   )
+  // }
+  // if (!evaluationGoalsManagerCurrentVal.value) {
+  //   errorItems.push(['evaluation-goals', 'Write Goals for the Coming Year'])
+  // }
   return errorItems
 }
 

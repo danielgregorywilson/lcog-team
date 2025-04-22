@@ -243,9 +243,9 @@
       <u>I. Performance Factors Reviewed</u>
     </h5>
     
-    <h5>FORM:</h5><div>{{ form }}</div>
+    <!-- <h5>FORM:</h5><div>{{ form }}</div>
     <h5>DATA:</h5><div>{{ formData }}</div>
-    <h5>DATACURRV:</h5><div>{{ formDataCurrentVal }}</div>
+    <h5>DATACURRV:</h5><div>{{ formDataCurrentVal }}</div> -->
     
     <div class="factors-grid-container">
       <!-- Desktop/Tablet Headers -->
@@ -799,37 +799,6 @@ let actionOther = ref('')
 let formDataCurrentVal = ref({'factors': {} as {[name: string]: string}})
 let formData = ref({'factors': {} as {[name: string]: string}})
 
-let factorJobKnowledgeCurrentVal = ref('')
-let factorJobKnowledge = ref('')
-let factorWorkQualityCurrentVal = ref('')
-let factorWorkQuality = ref('')
-let factorWorkQuantityCurrentVal = ref('')
-let factorWorkQuantity = ref('')
-let factorWorkHabitsCurrentVal = ref('')
-let factorWorkHabits = ref('')
-let factorAnalysisCurrentVal = ref('')
-let factorAnalysis = ref('')
-let factorInitiativeCurrentVal = ref('')
-let factorInitiative = ref('')
-let factorInterpersonalCurrentVal = ref('')
-let factorInterpersonal = ref('')
-let factorCommunicationCurrentVal = ref('')
-let factorCommunication = ref('')
-let factorDependabilityCurrentVal = ref('')
-let factorDependability = ref('')
-let factorProfessionalismCurrentVal = ref('')
-let factorProfessionalism = ref('')
-let factorManagementCurrentVal = ref('')
-let factorManagement = ref('')
-let factorSupervisionCurrentVal = ref('')
-let factorSupervision = ref('')
-
-let evaluationSuccessesCurrentVal = ref('')
-let evaluationSuccesses = ref('')
-let evaluationOpportunitiesCurrentVal = ref('')
-let evaluationOpportunities = ref('')
-let evaluationGoalsManagerCurrentVal = ref('')
-let evaluationGoalsManager = ref('')
 let evaluationCommentsEmployeeCurrentVal = ref('')
 let evaluationCommentsEmployee = ref('')
 
@@ -893,21 +862,6 @@ function valuesAreChanged(): boolean {
     actionOther.value == actionOtherCurrentVal.value &&
     JSON.stringify(formData.value) ===
       JSON.stringify(formDataCurrentVal.value) &&
-    // factorJobKnowledge.value == factorJobKnowledgeCurrentVal.value &&
-    // factorWorkQuality.value == factorWorkQualityCurrentVal.value &&
-    // factorWorkQuantity.value == factorWorkQuantityCurrentVal.value &&
-    // factorWorkHabits.value == factorWorkHabitsCurrentVal.value &&
-    // factorAnalysis.value == factorAnalysisCurrentVal.value &&
-    // factorInitiative.value == factorInitiativeCurrentVal.value &&
-    // factorInterpersonal.value == factorInterpersonalCurrentVal.value &&
-    // factorCommunication.value == factorCommunicationCurrentVal.value &&
-    // factorDependability.value == factorDependabilityCurrentVal.value &&
-    // factorProfessionalism.value == factorProfessionalismCurrentVal.value &&
-    // factorManagement.value == factorManagementCurrentVal.value &&
-    // factorSupervision.value == factorSupervisionCurrentVal.value &&
-    // evaluationSuccesses.value == evaluationSuccessesCurrentVal.value &&
-    // evaluationOpportunities.value == evaluationOpportunitiesCurrentVal.value &&
-    // evaluationGoalsManager.value == evaluationGoalsManagerCurrentVal.value &&
     evaluationCommentsEmployee.value ==
       evaluationCommentsEmployeeCurrentVal.value
   ) {
@@ -945,65 +899,6 @@ function formErrorItems(): Array<[string, string]> {
       ])
     }
   }
-
-  // if (!factorJobKnowledgeCurrentVal.value) {
-  //   errorItems.push(['factor-job-knowledge', 'Evaluate Job Knowledge'])
-  // }
-  // if (!factorWorkQualityCurrentVal.value) {
-  //   errorItems.push(['factor-work-quality', 'Evaluate Quality of Work'])
-  // }
-  // if (!factorWorkQuantityCurrentVal.value) {
-  //   errorItems.push(['factor-work-quantity', 'Evaluate Quantity of Work'])
-  // }
-  // if (!factorWorkHabitsCurrentVal.value) {
-  //   errorItems.push(['factor-work-habits', 'Evaluate Work Habits'])
-  // }
-  // if (!factorAnalysisCurrentVal.value) {
-  //   errorItems.push(
-  //     ['factor-analysis', 'Evaluate Analysis and Decision-Making']
-  //   )
-  // }
-  // if (!factorInitiativeCurrentVal.value) {
-  //   errorItems.push(['factor-initiative', 'Evaluate Initiative and Creativity'])
-  // }
-  // if (!factorInterpersonalCurrentVal.value) {
-  //   errorItems.push(
-  //     ['factor-interpersonal', 'Evaluate Interpersonal Relations']
-  //   )
-  // }
-  // if (!factorCommunicationCurrentVal.value) {
-  //   errorItems.push(['factor-communication', 'Evaluate Communication'])
-  // }
-  // if (!factorDependabilityCurrentVal.value) {
-  //   errorItems.push(
-  //     ['factor-dependability', 'Evaluate Dependability and Responsibility']
-  //   )
-  // }
-  // if (!factorProfessionalismCurrentVal.value) {
-  //   errorItems.push(
-  //     [
-  //       'factor-professionalism',
-  //       'Evaluate Professionalism and Customer Service'
-  //     ]
-  //   )
-  // }
-  // if (!factorManagementCurrentVal.value) {
-  //   errorItems.push(['factor-management', 'Evaluate Project Management'])
-  // }
-  // if (!factorSupervisionCurrentVal.value) {
-  //   errorItems.push(['factor-supervision', 'Evaluate Supervision'])
-  // }
-  // if (!evaluationSuccessesCurrentVal.value) {
-  //   errorItems.push(['evaluation-successes', 'Write Employee Successes'])
-  // }
-  // if (!evaluationOpportunitiesCurrentVal.value) {
-  //   errorItems.push(
-  //     ['evaluation-opportunities', 'Write Opportunities for Growth']
-  //   )
-  // }
-  // if (!evaluationGoalsManagerCurrentVal.value) {
-  //   errorItems.push(['evaluation-goals', 'Write Goals for the Coming Year'])
-  // }
   return errorItems
 }
 
@@ -1059,38 +954,6 @@ function retrievePerformanceReview() {
           formData.value = pr.data
           formDataCurrentVal.value = JSON.parse(JSON.stringify(formData.value))
 
-          factorJobKnowledge.value = pr.factor_job_knowledge
-          factorJobKnowledgeCurrentVal.value = factorJobKnowledge.value
-          factorWorkQuality.value = pr.factor_work_quality
-          factorWorkQualityCurrentVal.value = factorWorkQuality.value
-          factorWorkQuantity.value = pr.factor_work_quantity
-          factorWorkQuantityCurrentVal.value = factorWorkQuantity.value
-          factorWorkHabits.value = pr.factor_work_habits
-          factorWorkHabitsCurrentVal.value = factorWorkHabits.value
-          factorAnalysis.value = pr.factor_analysis
-          factorAnalysisCurrentVal.value = factorAnalysis.value
-          factorInitiative.value = pr.factor_initiative
-          factorInitiativeCurrentVal.value = factorInitiative.value
-          factorInterpersonal.value = pr.factor_interpersonal
-          factorInterpersonalCurrentVal.value = factorInterpersonal.value
-          factorCommunication.value = pr.factor_communication
-          factorCommunicationCurrentVal.value = factorCommunication.value
-          factorDependability.value = pr.factor_dependability
-          factorDependabilityCurrentVal.value = factorDependability.value
-          factorProfessionalism.value = pr.factor_professionalism
-          factorProfessionalismCurrentVal.value = factorProfessionalism.value
-          factorManagement.value = pr.factor_management
-          factorManagementCurrentVal.value = factorManagement.value
-          factorSupervision.value = pr.factor_supervision
-          factorSupervisionCurrentVal.value = factorSupervision.value
-
-          evaluationSuccesses.value = pr.evaluation_successes
-          evaluationSuccessesCurrentVal.value = evaluationSuccesses.value
-          evaluationOpportunities.value = pr.evaluation_opportunities
-          evaluationOpportunitiesCurrentVal.value =
-            evaluationOpportunities.value
-          evaluationGoalsManager.value = pr.evaluation_goals_manager
-          evaluationGoalsManagerCurrentVal.value = evaluationGoalsManager.value
           evaluationCommentsEmployee.value = pr.evaluation_comments_employee
           evaluationCommentsEmployeeCurrentVal.value =
             evaluationCommentsEmployee.value
@@ -1128,21 +991,6 @@ function updatePerformanceReview() {
       top_step_bonus: topStepBonus.value,
       action_other: actionOther.value,
       data: formData.value,
-      factor_job_knowledge: factorJobKnowledge.value,
-      factor_work_quality: factorWorkQuality.value,
-      factor_work_quantity: factorWorkQuantity.value,
-      factor_work_habits: factorWorkHabits.value,
-      factor_analysis: factorAnalysis.value,
-      factor_initiative: factorInitiative.value,
-      factor_interpersonal: factorInterpersonal.value,
-      factor_communication: factorCommunication.value,
-      factor_dependability: factorDependability.value,
-      factor_professionalism: factorProfessionalism.value,
-      factor_management: factorManagement.value,
-      factor_supervision: factorSupervision.value,
-      evaluation_successes: evaluationSuccesses.value,
-      evaluation_opportunities: evaluationOpportunities.value,
-      evaluation_goals_manager: evaluationGoalsManager.value,
       evaluation_comments_employee: evaluationCommentsEmployee.value
     })
     .then((pr) => {
@@ -1157,22 +1005,6 @@ function updatePerformanceReview() {
 
       formDataCurrentVal.value = pr.data
 
-      factorJobKnowledgeCurrentVal.value = pr.factor_job_knowledge
-      factorWorkQualityCurrentVal.value = pr.factor_work_quality
-      factorWorkQuantityCurrentVal.value = pr.factor_work_quantity
-      factorWorkHabitsCurrentVal.value = pr.factor_work_habits
-      factorAnalysisCurrentVal.value = pr.factor_analysis
-      factorInitiativeCurrentVal.value = pr.factor_initiative
-      factorInterpersonalCurrentVal.value = pr.factor_interpersonal
-      factorCommunicationCurrentVal.value = pr.factor_communication
-      factorDependabilityCurrentVal.value = pr.factor_dependability
-      factorProfessionalismCurrentVal.value = pr.factor_professionalism
-      factorManagementCurrentVal.value = pr.factor_management
-      factorSupervisionCurrentVal.value = pr.factor_supervision
-
-      evaluationSuccessesCurrentVal.value = pr.evaluation_successes
-      evaluationOpportunitiesCurrentVal.value = pr.evaluation_opportunities
-      evaluationGoalsManagerCurrentVal.value = pr.evaluation_goals_manager
       evaluationCommentsEmployeeCurrentVal.value =
         pr.evaluation_comments_employee
 

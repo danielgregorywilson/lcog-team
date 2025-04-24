@@ -270,7 +270,7 @@ export interface PerformanceReviewRetrieve {
     'factors': PRFormFactor[], 
     'anyNotApplicable': boolean
   }
-  data: {'factors': {[name: string]: string}}
+  data: {[name: string]: string}
   factor_job_knowledge: string
   factor_work_quality: string
   factor_work_quantity: string
@@ -308,7 +308,7 @@ export interface PerformanceReviewUpdate {
   step_increase: string
   top_step_bonus: string
   action_other: string
-  data: {'factors': {[name: string]: string}}
+  data: {[name: string]: string}
   evaluation_comments_employee: string
 }
 

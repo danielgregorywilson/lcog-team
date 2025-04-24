@@ -340,6 +340,10 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
             ),
             pr.step_increase != None,
             pr.top_step_bonus != None,
+            # Make sure all factors are filled out
+            all(pr.data.get(factor) is not None for factor in pr.form.factors.values_list('name', flat=True)),
+            # Make sure all long responses are filled out
+            all(pr.data.get(long_response[0]) is not None for long_response in pr.form.long_responses),
             # TODO: Add this back once uploader done
             # pr.signed_position_description.name != ''
         ]):

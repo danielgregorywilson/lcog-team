@@ -983,7 +983,7 @@ class PRFactor(models.Model):
     )
     order = models.IntegerField(default=0)
     name = models.CharField(max_length=255)
-    description = models.CharField(max_length=255)
+    description = models.CharField(max_length=255, blank=True)
     not_applicable_option = models.BooleanField(default=False)
 
 

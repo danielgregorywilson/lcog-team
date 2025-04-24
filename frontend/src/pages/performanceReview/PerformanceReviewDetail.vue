@@ -243,9 +243,9 @@
       <u>I. Performance Factors Reviewed</u>
     </h5>
     
-    <!-- <h5>FORM:</h5><div>{{ form }}</div>
+    <h5>FORM:</h5><div>{{ form }}</div>
     <h5>DATA:</h5><div>{{ formData }}</div>
-    <h5>DATACURRV:</h5><div>{{ formDataCurrentVal }}</div> -->
+    <h5>DATACURRV:</h5><div>{{ formDataCurrentVal }}</div>
     
     <div class="factors-grid-container">
       <!-- Desktop/Tablet Headers -->
@@ -307,9 +307,9 @@
           class="factors-radio-box"
         >
           <q-radio
-            v-model="formData.factors[factor.name]"
+            v-model="formData[factor.name]"
             @update:model-value="(val: string) => {
-              formData.factors[factor.name] = val
+              formData[factor.name] = val
             }"
             :val="response"
             :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
@@ -318,7 +318,7 @@
         <div class="factors-radio-box">
           <q-radio
             v-if="factor.notApplicableOption"
-            v-model="formData.factors[factor.name]"
+            v-model="formData[factor.name]"
             val="NA"
             :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
           />
@@ -339,13 +339,13 @@
         v-if="
           !currentUserIsManagerOfEmployee() || employeeHasSigned() || props.print
         "
-        class="read-only-text-area" v-html="formData.factors[response[0]]"
+        class="read-only-text-area" v-html="formData[response[0]]"
       ></div>
       <q-editor
         v-else
-        :model-value="formData.factors[response[0]] || ''"
+        :model-value="formData[response[0]] || ''"
         @update:model-value="(val: string) => {
-          formData.factors[response[0]] = val
+          formData[response[0]] = val
         }"
         :toolbar="editorToolbar"
       />
@@ -796,8 +796,8 @@ let topStepBonus = ref('')
 let actionOtherCurrentVal = ref('')
 let actionOther = ref('')
 
-let formDataCurrentVal = ref({'factors': {} as {[name: string]: string}})
-let formData = ref({'factors': {} as {[name: string]: string}})
+let formDataCurrentVal = ref({} as {[name: string]: string})
+let formData = ref({} as {[name: string]: string})
 
 let evaluationCommentsEmployeeCurrentVal = ref('')
 let evaluationCommentsEmployee = ref('')
@@ -892,7 +892,7 @@ function formErrorItems(): Array<[string, string]> {
   }
 
   for (let factor of form.value.factors) {
-    if (!formDataCurrentVal.value.factors[factor.name]) {
+    if (!formDataCurrentVal.value[factor.name]) {
       errorItems.push([
         `factor-${factor.name.trim().toLowerCase().replace(/\s+/g, '-')}`,
         `Evaluate ${factor.name}`
@@ -929,6 +929,7 @@ function retrievePerformanceReview() {
 
           prPk.value = pr.pk.toString()
           form.value = pr.form
+          console.log('FORM:', form.value)
           
           employeeName.value = pr.employee_name
           managerName.value = pr.manager_name
@@ -951,7 +952,7 @@ function retrievePerformanceReview() {
           actionOther.value = pr.action_other
           actionOtherCurrentVal.value = actionOther.value
 
-          formData.value = pr.data
+          if (pr.data) formData.value = pr.data
           formDataCurrentVal.value = JSON.parse(JSON.stringify(formData.value))
 
           evaluationCommentsEmployee.value = pr.evaluation_comments_employee

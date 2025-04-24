@@ -153,12 +153,12 @@ const navLinks: Array<LinkData> = [
     link: '/expenses',
     canViewExpenses: true
   },
-  {
-    title: 'Performance Reviews',
-    icon: 'assignment_turned_in',
-    link: '/reviews',
-    id: 'nav-reviews'
-  },
+  // {
+  //   title: 'Performance Reviews',
+  //   icon: 'assignment_turned_in',
+  //   link: '/reviews',
+  //   id: 'nav-reviews'
+  // },
   {
     title: 'Schaefers Desk Reservation',
     icon: 'laptop',

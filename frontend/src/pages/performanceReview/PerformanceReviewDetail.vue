@@ -243,10 +243,6 @@
       <u>I. Performance Factors Reviewed</u>
     </h5>
     
-    <h5>FORM:</h5><div>{{ form }}</div>
-    <h5>DATA:</h5><div>{{ formData }}</div>
-    <h5>DATACURRV:</h5><div>{{ formDataCurrentVal }}</div>
-    
     <div class="factors-grid-container">
       <!-- Desktop/Tablet Headers -->
       <div class="factors-header-box text-bold text-center

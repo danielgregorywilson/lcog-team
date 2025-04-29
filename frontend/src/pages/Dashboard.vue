@@ -6,11 +6,20 @@
       color="primary"
       size="xl"
     />
-    <div else class="row justify-center">
-      <div class="text-h5">
-        Select a menu item to get started
+    <div v-else class="row">
+      <div class="q-py-md">
+        <div class="text-h4 q-mb-md">Workflows Needing Action</div>
+        <WorkflowTable
+          :archived="false"
+          :complete="false"
+          type="all"
+          :allowAddDelete="false"
+          :workflowsLoaded="workflowsLoaded"
+          filterActionRequired
+        />
       </div>
     </div>
+
     <!-- <div class="q-py-md">
       <div class="text-h4 q-mb-md">Your Next Review</div>
       <div v-if="nextReview().employee_pk">
@@ -98,15 +107,17 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 // import { useRouter } from 'vue-router'
 
 // import PerformanceReviewTable from 'src/components/PerformanceReviewTable.vue'
+import WorkflowTable from 'src/components/workflows/WorkflowTable.vue'
 import useEventBus from 'src/eventBus'
 // import { readableDate } from 'src/filters'
 import { useAuthStore } from 'src/stores/auth'
 import { usePerformanceReviewStore } from 'src/stores/performancereview'
 import { useUserStore } from 'src/stores/user'
+import { useWorkflowsStore } from 'src/stores/workflows'
 // import { PerformanceReviewRetrieve } from 'src/types'
 
 // const router = useRouter()
@@ -114,6 +125,9 @@ const { bus } = useEventBus()
 const authStore = useAuthStore()
 const userStore = useUserStore()
 const performanceReviewStore = usePerformanceReviewStore()
+const workflowsStore = useWorkflowsStore()
+
+let workflowsLoaded = ref(false)
 
 function isAuthenticated(): boolean {
   return authStore.isAuthenticated
@@ -168,6 +182,20 @@ function isProfileLoaded(): boolean {
 //       console.error('Error navigating to PR detail', e)
 //     })
 // }
+
+function retrieveWorkflows(): void {
+  workflowsStore.getWorkflows({archived: false, complete: false})
+    .then(() => {
+      workflowsLoaded.value = true
+    })  
+    .catch(e => {
+      console.error('Error retrieving workflows:', e)
+    })
+}
+
+onMounted(() => {
+  retrieveWorkflows()
+})
 
 watch(() => bus.value.get('gotUserProfile'), () => {
   performanceReviewStore.getNextPerformanceReview(

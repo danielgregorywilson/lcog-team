@@ -420,6 +420,7 @@ const props = defineProps<{
   type: string,
   allowAddDelete: boolean,
   workflowsLoaded: boolean,
+  filterActionRequired: boolean,
   // TODO: Move action required into the table as a column
   // actionRequired?: boolean,
 }>()
@@ -571,7 +572,34 @@ const completedTransitionColumns: QTableProps['columns'] = [
   { name: 'actions', label: 'Actions', align: 'center', field: '' },
 ]
 
+const actionRequiredColumns: QTableProps['columns'] = [
+  {
+    name: 'type',
+    label: 'Type',
+    align: 'center',
+    field: 'workflow_name',
+    sortable: true},
+  { 
+    name: 'createdAt',
+    align: 'center',
+    label: 'Created',
+    field: 'created_at',
+    sortable: true
+  },
+  {
+    name: 'status',
+    align: 'center',
+    label: 'Status',
+    field: 'status',
+    sortable: true
+  },
+  { name: 'actions', label: 'Actions', align: 'center', field: '' },
+]
+
 function columns() {
+  if (props.filterActionRequired) {
+    return actionRequiredColumns
+  }
   if ([
     'employee-new', 'employee-return', 'employee-change', 'employee-exit'
   ].includes(props.type)) {
@@ -642,6 +670,15 @@ function workflows(): Array<WorkflowInstanceSimple> {
     workflows = workflowsStore.workflowsComplete
   } else {
     workflows = workflowsStore.workflowsIncomplete
+  }
+  // If filterActionRequired is true, filter by action required
+  if (props.filterActionRequired) {
+    workflows = workflows.filter((wfi) => {
+      if (wfi.pis_action_required || wfi.transition_action_required) {
+        return true
+      }
+      return false
+    })
   }
   return workflows.filter(
     (wf) => {

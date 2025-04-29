@@ -420,7 +420,7 @@ const props = defineProps<{
   type: string,
   allowAddDelete: boolean,
   workflowsLoaded: boolean,
-  filterActionRequired: boolean,
+  filterActionRequired?: boolean,
   // TODO: Move action required into the table as a column
   // actionRequired?: boolean,
 }>()

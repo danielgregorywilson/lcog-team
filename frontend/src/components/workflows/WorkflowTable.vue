@@ -573,7 +573,8 @@ const completedTransitionColumns: QTableProps['columns'] = [
 
 function columns() {
   if ([
-    'employee-new', 'employee-return', 'employee-change', 'employee-exit'
+    'employee-new', 'employee-return', 'employee-name-change',
+    'employee-change', 'employee-exit'
   ].includes(props.type)) {
     if (props.archived) {
       return archivedTransitionColumns

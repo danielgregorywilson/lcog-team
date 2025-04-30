@@ -936,6 +936,8 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   submitter_pk: number
   submitter_name: string
   submitter_division: string
+  current_employee_pk: number
+  current_employee_name: string
   employee_first_name: string
   employee_middle_initial: string
   employee_last_name: string
@@ -991,6 +993,7 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   type?: string
   worker_type?: string
   submitter_pk: number
+  current_employee_pk: number
   employee_first_name?: string
   employee_middle_initial?: string
   employee_last_name?: string

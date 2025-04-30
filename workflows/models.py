@@ -61,11 +61,13 @@ class Role(models.Model):
 class EmployeeTransition(models.Model):
     TRANSITION_TYPE_NEW = 'New'
     TRANSITION_TYPE_RETURN = 'Return'
+    TRANSITION_TYPE_NAME_CHANGE = 'Name Change'
     TRANSITION_TYPE_CHANGE = 'Change/Modify'
     TRANSITION_TYPE_EXIT = 'Exit'
     TRANSITION_TYPE_CHOICES = [
         (TRANSITION_TYPE_NEW, TRANSITION_TYPE_NEW),
         (TRANSITION_TYPE_RETURN, TRANSITION_TYPE_RETURN),
+        (TRANSITION_TYPE_NAME_CHANGE, TRANSITION_TYPE_NAME_CHANGE),
         (TRANSITION_TYPE_CHANGE, TRANSITION_TYPE_CHANGE),
         (TRANSITION_TYPE_EXIT, TRANSITION_TYPE_EXIT)
     ]
@@ -206,6 +208,10 @@ class EmployeeTransition(models.Model):
     submitter = models.ForeignKey(
         Employee, blank=True, null=True, on_delete=models.SET_NULL,
         related_name="submitter_of_transitions"
+    )
+    current_employee = models.ForeignKey(
+        Employee, blank=True, null=True, on_delete=models.SET_NULL,
+        related_name="current_employee_of_transitions"
     )
     employee_first_name = models.CharField(blank=True, max_length=50)
     employee_middle_initial = models.CharField(blank=True, max_length=5)

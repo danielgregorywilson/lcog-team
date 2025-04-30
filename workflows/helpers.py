@@ -385,8 +385,8 @@ def send_employee_transition_report():
         active=True,
         complete=False,
         workflow__type__in=[
-            'employee-new', 'employee-change', 'employee-return',
-            'employee-exit'
+            'employee-new', 'employee-name-change', 'employee-change',
+            'employee-return', 'employee-exit'
         ]
     ).order_by('transition__transition_date').prefetch_related('pis')
     current_wfis = [{
@@ -418,8 +418,8 @@ def send_employee_transition_report():
         active=True,
         complete=True,
         workflow__type__in=[
-            'employee-new', 'employee-change', 'employee-return',
-            'employee-exit'
+            'employee-new', 'employee-name-change', 'employee-change',
+            'employee-return', 'employee-exit'
         ],
         completed_at__gte=datetime.now() - timedelta(days=10),
         completed_at__lt=datetime.now()

@@ -12,6 +12,6 @@
 
 <script setup lang="ts">
 defineProps<{
-  text: HTMLElement
+  text: string
 }>()
 </script>

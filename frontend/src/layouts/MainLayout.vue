@@ -157,8 +157,7 @@ const navLinks: Array<LinkData> = [
   //   title: 'Performance Reviews',
   //   icon: 'assignment_turned_in',
   //   link: '/reviews',
-  //   id: 'nav-reviews',
-  //   isManager: true
+  //   id: 'nav-reviews'
   // },
   {
     title: 'Schaefers Desk Reservation',

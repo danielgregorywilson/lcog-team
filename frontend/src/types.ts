@@ -236,6 +236,12 @@ export interface Unit {
 // PerformanceReview Structure from Django Rest Framework //
 ////////////////////////////////////////////////////////////
 
+export type PRFormFactor = {
+  name: string
+  description: string
+  notApplicableOption: boolean
+}
+
 export type PRSignatures = Array<[string, string, Date, number, boolean]>
 
 export interface PerformanceReviewRetrieve {
@@ -258,7 +264,13 @@ export interface PerformanceReviewRetrieve {
   step_increase: string
   top_step_bonus: string
   action_other: string
-
+  form: {
+    'longResponses': [],
+    'factorsResponseSet': [],
+    'factors': PRFormFactor[], 
+    'anyNotApplicable': boolean
+  }
+  data: {[name: string]: string}
   factor_job_knowledge: string
   factor_work_quality: string
   factor_work_quantity: string
@@ -296,21 +308,7 @@ export interface PerformanceReviewUpdate {
   step_increase: string
   top_step_bonus: string
   action_other: string
-  factor_job_knowledge: string
-  factor_work_quality: string
-  factor_work_quantity: string
-  factor_work_habits: string
-  factor_analysis: string
-  factor_initiative: string
-  factor_interpersonal: string
-  factor_communication: string
-  factor_dependability: string
-  factor_professionalism: string
-  factor_management: string
-  factor_supervision: string
-  evaluation_successes: string
-  evaluation_opportunities: string
-  evaluation_goals_manager: string
+  data: {[name: string]: string}
   evaluation_comments_employee: string
 }
 
@@ -320,21 +318,6 @@ export interface PerformanceReviewUpdatePartial {
   step_increase?: string
   top_step_bonus?: string
   action_other?: string
-  factor_job_knowledge?: string
-  factor_work_quality?: string
-  factor_work_quantity?: string
-  factor_work_habits?: string
-  factor_analysis?: string
-  factor_initiative?: string
-  factor_interpersonal?: string
-  factor_communication?: string
-  factor_dependability?: string
-  factor_professionalism?: string
-  factor_management?: string
-  factor_supervision?: string
-  evaluation_successes?: string
-  evaluation_opportunities?: string
-  evaluation_goals_manager?: string
   evaluation_comments_employee?: string
 }
 
@@ -556,7 +539,7 @@ export interface ReviewNoteRetrieve {
   employee_pk: number
   employee_name: string
   author_name: string
-  date: Date
+  created_at: Date
   note: string
 }
 
@@ -953,6 +936,8 @@ export interface EmployeeTransition extends EmployeeTransitionBase {
   submitter_pk: number
   submitter_name: string
   submitter_division: string
+  current_employee_pk: number
+  current_employee_name: string
   employee_first_name: string
   employee_middle_initial: string
   employee_last_name: string
@@ -1008,6 +993,7 @@ export interface EmployeeTransitionUpdate extends EmployeeTransitionBase {
   type?: string
   worker_type?: string
   submitter_pk: number
+  current_employee_pk: number
   employee_first_name?: string
   employee_middle_initial?: string
   employee_last_name?: string

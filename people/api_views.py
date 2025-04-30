@@ -329,21 +329,7 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
         pr.step_increase = request.data['step_increase']
         pr.top_step_bonus = request.data['top_step_bonus']
         pr.action_other = request.data['action_other']
-        pr.factor_job_knowledge = request.data['factor_job_knowledge']
-        pr.factor_work_quality = request.data['factor_work_quality']
-        pr.factor_work_quantity = request.data['factor_work_quantity']
-        pr.factor_work_habits = request.data['factor_work_habits']
-        pr.factor_analysis = request.data['factor_analysis']
-        pr.factor_initiative = request.data['factor_initiative']
-        pr.factor_interpersonal = request.data['factor_interpersonal']
-        pr.factor_communication = request.data['factor_communication']
-        pr.factor_dependability = request.data['factor_dependability']
-        pr.factor_professionalism = request.data['factor_professionalism']
-        pr.factor_management = request.data['factor_management']
-        pr.factor_supervision = request.data['factor_supervision']
-        pr.evaluation_successes = request.data['evaluation_successes']
-        pr.evaluation_opportunities = request.data['evaluation_opportunities']
-        pr.evaluation_goals_manager = request.data['evaluation_goals_manager']
+        pr.data = request.data['data']
         pr.evaluation_comments_employee = \
             request.data['evaluation_comments_employee']
         if pr.status == PerformanceReview.NEEDS_EVALUATION and all([
@@ -354,22 +340,10 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
             ),
             pr.step_increase != None,
             pr.top_step_bonus != None,
-            pr.factor_job_knowledge != None,
-            pr.factor_work_quality != None,
-            pr.factor_work_quantity != None,
-            pr.factor_work_habits != None,
-            pr.factor_analysis != None,
-            pr.factor_initiative != None,
-            pr.factor_interpersonal != None,
-            pr.factor_communication != None,
-            pr.factor_dependability != None,
-            pr.factor_professionalism != None,
-            pr.factor_management != None,
-            pr.factor_supervision != None,
-            len(pr.evaluation_successes) > 0,
-            len(pr.evaluation_opportunities) > 0,
-            len(pr.evaluation_goals_manager) > 0,
-
+            # Make sure all factors are filled out
+            all(pr.data.get(factor) is not None for factor in pr.form.factors.values_list('name', flat=True)),
+            # Make sure all long responses are filled out
+            all(pr.data.get(long_response[0]) is not None for long_response in pr.form.long_responses),
             # TODO: Add this back once uploader done
             # pr.signed_position_description.name != ''
         ]):

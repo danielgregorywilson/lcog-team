@@ -175,6 +175,20 @@ if (maintenanceMode) {
           name: 'pr-details',
           component: () => import('pages/performanceReview/PerformanceReviewDetail.vue'),
           // beforeEnter: ifCanViewReview
+          children: [
+            {
+              path: 'self',
+              name: 'pr-self-evaluation',
+              component: () => import('pages/performanceReview/SelfEvaluation.vue'),
+              meta: { requiresAuth: true },
+            }
+          ]
+        },
+        {
+          path: '/pr/:pk/self',
+          name: 'pr-self-evaluation',
+          component: () => import('pages/performanceReview/SelfEvaluation.vue'),
+          // beforeEnter: ifCanViewReview
         },
         {
           path: '/note/new',

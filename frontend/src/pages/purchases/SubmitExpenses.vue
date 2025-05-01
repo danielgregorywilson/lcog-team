@@ -182,12 +182,10 @@
                   v-slot="scope"
                   :validate="amountValidation"
                   @update:model-value="(val: string) => {
-                    let cleanedVal = val.replace(/[^0-9-.]/g, '')
-                    props.row.amount = parseFloat(cleanedVal).toFixed(2)
-                      .toString()
+                    props.row.amount = cleanedAmount(val)
                   }"
                   @save="(val: string) => {
-                    updateExpense(props.row.pk, 'amount', val)
+                    updateExpense(props.row.pk, 'amount', cleanedAmount(val))
                   }"
                 >
                   <div class="row items-center">  
@@ -223,7 +221,7 @@
                   v-slot="scope"
                   :validate="GLValidation"
                   @save="(val: Array<GL>) => {
-                    updateExpense(props.row.pk, 'gls', val)
+                    updateExpense(props.row.pk, 'gls', cleanedGLs(val))
                   }"
                 >
                   <div class="gl-popup-edit">
@@ -1339,6 +1337,11 @@ function setDefaultMonthAndStatement() {
   })
 }
 
+function cleanedAmount(val: string): string {
+  let cleanedVal = val.replace(/[^0-9-.]/g, '')
+  return parseFloat(cleanedVal).toFixed(2).toString()
+}
+
 function amountValidation (val: any) {
   if (isNaN(parseFloat(val))) {
     errorAmount.value = true
@@ -1348,6 +1351,15 @@ function amountValidation (val: any) {
   errorAmount.value = false
   errorMessageAmount.value = ''
   return true
+}
+
+function cleanedGLs(val: Array<GL>) {
+  for (let gl of val) {
+    if (gl.amount) {
+      gl.amount = cleanedAmount(gl.amount)
+    }
+  }
+  return val
 }
 
 function GLValidation (val: any) {

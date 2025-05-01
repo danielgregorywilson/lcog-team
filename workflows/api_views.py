@@ -173,6 +173,11 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
                 type=EmployeeTransition.TRANSITION_TYPE_RETURN,
                 employee_id=employeeID
             )
+        elif wf_type == 'employee-name-change':
+            et = EmployeeTransition.objects.create(
+                type=EmployeeTransition.TRANSITION_TYPE_NAME_CHANGE,
+                employee_id=employeeID
+            )
         elif wf_type == 'employee-change':
             et = EmployeeTransition.objects.create(
                 type=EmployeeTransition.TRANSITION_TYPE_CHANGE,
@@ -330,6 +335,22 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
 
             t.type = request.data['type']
             t.worker_type = request.data['worker_type']
+
+            current_employee = t.current_employee.pk if t.current_employee else -1
+            editing_employee = all([
+                # Employee field is being edited
+                'current_employee_pk' in request.data,
+                # Employee field is being changed
+                request.data['current_employee_pk'] != current_employee
+            ])
+            if editing_employee:
+                if request.data['current_employee_pk'] != -1:
+                    t.current_employee = Employee.objects.get(
+                        pk=request.data['current_employee_pk']
+                    )
+                else:
+                    t.current_employee = None
+
             t.employee_first_name = request.data['employee_first_name']
             t.employee_middle_initial = request.data['employee_middle_initial']
             t.employee_last_name = request.data['employee_last_name']

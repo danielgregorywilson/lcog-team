@@ -385,8 +385,8 @@ def send_employee_transition_report():
         active=True,
         complete=False,
         workflow__type__in=[
-            'employee-new', 'employee-change', 'employee-return',
-            'employee-exit'
+            'employee-new', 'employee-name-change', 'employee-change',
+            'employee-return', 'employee-exit'
         ]
     ).order_by('transition__transition_date').prefetch_related('pis')
     current_wfis = [{
@@ -418,8 +418,8 @@ def send_employee_transition_report():
         active=True,
         complete=True,
         workflow__type__in=[
-            'employee-new', 'employee-change', 'employee-return',
-            'employee-exit'
+            'employee-new', 'employee-name-change', 'employee-change',
+            'employee-return', 'employee-exit'
         ],
         completed_at__gte=datetime.now() - timedelta(days=10),
         completed_at__lt=datetime.now()
@@ -472,6 +472,8 @@ def create_process_instances(transition):
     ]
     returning_processes_start = []
     returning_processes_start_sds = []
+    name_change_processes_start = ['IS Name Change']
+    name_change_processes_start_sds = ['Name Change SDS Sub Admin']
     changing_processes_start = []
     changing_processes_start_sds = ['SDS Changing', 'SDS Phone Changing']
     exiting_processes_start = ['IS Exiting']
@@ -487,6 +489,10 @@ def create_process_instances(transition):
         transition_process_names += returning_processes_start
         if (transition.is_sds):
             transition_process_names += returning_processes_start_sds
+    elif (transition.type == EmployeeTransition.TRANSITION_TYPE_NAME_CHANGE):
+        transition_process_names += name_change_processes_start
+        if (transition.is_sds):
+            transition_process_names += name_change_processes_start_sds
     elif (transition.type == EmployeeTransition.TRANSITION_TYPE_CHANGE):
         transition_process_names += changing_processes_start
         if (transition.is_sds):

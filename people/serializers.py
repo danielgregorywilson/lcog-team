@@ -257,6 +257,7 @@ class EmployeeEmailSerializer(serializers.ModelSerializer):
 
 
 class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
+    form = serializers.SerializerMethodField()
     employee_pk = serializers.CharField(source='employee.pk') #TODO: Make IntegerField
     employee_name = serializers.CharField(source='employee.name')
     employee_division = serializers.SerializerMethodField()
@@ -273,9 +274,10 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = PerformanceReview
         fields = [
-            'url', 'pk', 'employee_pk', 'employee_name', 'employee_division',
-            'employee_unit_or_program', 'employee_job_title', 'manager_pk',
-            'manager_name', 'days_until_review', 'status', 'period_start_date', 
+            'url', 'pk', 'form', 'data', 'employee_pk', 'employee_name',
+            'employee_division', 'employee_unit_or_program',
+            'employee_job_title', 'manager_pk', 'manager_name',
+            'days_until_review', 'status', 'period_start_date',
             'period_end_date', 'effective_date', 'evaluation_type',
             'probationary_evaluation_type', 'step_increase', 'top_step_bonus',
             'action_other',
@@ -293,6 +295,33 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
             'signed_position_description', 'all_required_signatures'
         ]
     
+    @staticmethod
+    def get_form(pr):
+        if not pr.form:
+            return {
+                'longResponses': None,
+                'factorsResponseSet': None,
+                'factors': [],
+                'anyNotApplicable': False
+            }
+        
+        any_not_applicable = False
+        factors = []
+        for factor in pr.form.factors.all().order_by('order'):
+            factors.append({
+                'name': factor.name,
+                'description': factor.description,
+                'notApplicableOption': factor.not_applicable_option
+            })
+            if factor.not_applicable_option:
+                any_not_applicable = True
+        return {
+            'longResponses': pr.form.long_responses,
+            'factorsResponseSet': pr.form.factors_response_set.responses,
+            'factors': factors,
+            'anyNotApplicable': any_not_applicable
+        }
+
     @staticmethod
     def get_employee_division(pr):
         if all([

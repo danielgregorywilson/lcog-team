@@ -224,6 +224,7 @@ describe('Fill out new employee form', () => {
     loginUser(Cypress.env('users').sdsmanager).then(() => {
       visitUrl(Cypress.env('workflows_dashboard_path'))
       cy.get('.workflowtable-employee-new .row-add-new').click()
+      cy.get('.q-dialog .q-btn').contains('Yes, start it').click()
       cy.wait(500) // Wait for the new transition form to load
       cy.url().then((url) => {
         const match = url.match(/wf\/(\d+)\/transition/)

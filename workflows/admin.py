@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.forms import BaseInlineFormSet, ModelForm
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.db import transaction
 
 from workflows.models import (
     Action, EmployeeTransition, Process, ProcessInstance, Role, Step,
@@ -137,12 +138,58 @@ class StepInline(admin.TabularInline):
         return choices_text
 
 
+@admin.action(description="Duplicate selected Processes")
+@transaction.atomic
+def duplicate_process(modeladmin, request, queryset):
+    for process in queryset:
+        original_process_id = process.pk
+        process.pk = None
+        process.name = f"{process.name} (Copy)"
+        process.save()
+
+        # Duplicate Steps
+        original_steps = Step.objects.filter(process_id=original_process_id)
+        step_mapping = {}
+        for step in original_steps:
+            old_pk = step.pk
+            step.pk = None
+            step.process = process
+            step.save()
+            step_mapping[old_pk] = step
+
+        # After all steps are duplicated, update next_step for each new step
+        for old_step_pk, new_step in step_mapping.items():
+            old_step = Step.objects.get(pk=old_step_pk)
+            if old_step.next_step_id:
+                new_next_step = step_mapping.get(old_step.next_step_id)
+                if new_next_step:
+                    new_step.next_step = new_next_step
+                    new_step.save()
+
+        # Duplicate StepChoices
+        for old_step_pk, new_step in step_mapping.items():
+            choices = StepChoice.objects.filter(step_id=old_step_pk)
+            for choice in choices:
+                choice.pk = None
+                choice.step = new_step
+                # Save the original next_step before changing pk
+                original_next_step_id = choice.next_step_id
+                choice.save()
+                # Set the next_step to the duplicated step if it exists
+                if original_next_step_id:
+                    new_next_step = step_mapping.get(original_next_step_id)
+                    if new_next_step:
+                        choice.next_step = new_next_step
+                        choice.save()
+
+
 @admin.register(Process)
 class ProcessAdmin(admin.ModelAdmin):
     list_display = ("name", "workflow", "version")
     list_filter = ("workflow",)
     ordering = ("workflow", "name")
     inlines = (StepInline,)
+    actions = [duplicate_process]
 
 
 class StepChoiceInline(admin.TabularInline):

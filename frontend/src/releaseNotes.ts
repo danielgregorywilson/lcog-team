@@ -4,6 +4,24 @@
 
 export const releases = [
   {
+    version: '0.48.0',
+    date: new Date(2025, 3, 30),
+    changes: [
+      {
+        type: 'new',
+        description: 'PR: Customizable performance review forms.'
+      },
+      {
+        type: 'new',
+        description: 'WF: New name change transition and form.'
+      },
+      {
+        type: 'improved',
+        description: 'CC: Clean up purchase amounts with commas and negatives.'
+      },
+    ]
+  },
+  {
     version: '0.47.0',
     date: new Date(2025, 3, 10),
     changes: [

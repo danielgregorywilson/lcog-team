@@ -165,6 +165,8 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
     submitter_division = serializers.CharField(
         source='submitter.unit_or_program.division.name', required=False
     )
+    current_employee_pk = serializers.SerializerMethodField()
+    current_employee_name = serializers.SerializerMethodField()
     title_pk = serializers.SerializerMethodField()
     title_name = serializers.SerializerMethodField()
     manager_pk = serializers.SerializerMethodField()
@@ -180,6 +182,7 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
         fields = [
             'url', 'pk', 'type', 'worker_type', 'date_submitted',
             'submitter_pk', 'submitter_name', 'submitter_division',
+            'current_employee_pk', 'current_employee_name',
             'employee_first_name', 'employee_middle_initial',
             'employee_last_name', 'employee_preferred_name', 'employee_number',
             'employee_id', 'employee_email', 'title_pk', 'title_name', 'fte',
@@ -196,6 +199,20 @@ class EmployeeTransitionSerializer(serializers.ModelSerializer):
             'access_emails_name', 'special_instructions', 'fiscal_field',
             'assignee', 'changes'
         ]
+
+    @staticmethod
+    def get_current_employee_pk(transition):
+        if transition.current_employee:
+            return transition.current_employee.pk
+        else:
+            return -1
+
+    @staticmethod
+    def get_current_employee_name(transition):
+        if transition.current_employee:
+            return transition.current_employee.legal_name
+        else:
+            return ''
 
     @staticmethod
     def get_manager_pk(transition):

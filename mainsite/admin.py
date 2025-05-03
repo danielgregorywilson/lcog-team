@@ -57,6 +57,14 @@ admin.site.unregister(Group)
 class UserInline(admin.TabularInline):
     model = Group.user_set.through
     extra = 0
+    ordering = ['user__username']
+
+    def user_full_name(self, obj):
+        return f"{obj.user.first_name} {obj.user.last_name}"
+    user_full_name.short_description = "Full Name"
+
+    fields = ['user', 'user_full_name']
+    readonly_fields = ['user_full_name']
 
 
 @admin.register(Group)

@@ -376,7 +376,7 @@ if ENVIRONMENT == 'STAGING':
     FRONTEND_DOMAIN = 'https://team-staging.lcog.org'
 else:
     # Production
-    FRONTEND_DOMAIN = 'https://team.lcog.org'
+    FRONTEND_DOMAIN = 'https://app.team.lcog.org'
 
 # Overwrite production settings with local ones
 try:

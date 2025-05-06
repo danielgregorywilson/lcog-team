@@ -50,7 +50,7 @@ if ENVIRONMENT == 'STAGING':
 else:
     # PRODUCTION
     ALLOWED_HOSTS = [
-        'team.lcog.org', # Prod frontend
+        'app.team.lcog.org', # Prod frontend
         'api.team.lcog.org', # Prod backend
         os.environ.get('EC2_PUBLIC_IP'), # Public IP of EC2 instance
         os.environ.get('EC2_PRIVATE_IP'), # Private IP of EC2 instance
@@ -376,7 +376,7 @@ if ENVIRONMENT == 'STAGING':
     FRONTEND_DOMAIN = 'https://team-staging.lcog.org'
 else:
     # Production
-    FRONTEND_DOMAIN = 'https://team.lcog.org'
+    FRONTEND_DOMAIN = 'https://app.team.lcog.org'
 
 # Overwrite production settings with local ones
 try:

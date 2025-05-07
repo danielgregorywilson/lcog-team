@@ -75,7 +75,7 @@ module.exports = configure(function (ctx) {
         API_URL: ctx.dev ? 'http://localhost:8000/' : (ctx.debug ? 'https://api.team-staging.lcog.org/' : 'https://api.team.lcog.org/'),
         APP_VERSION_TAG: gitDescribeSync().tag,
         DEPLOY_MODE: ctx.dev ? 'DEVELOPMENT' : (ctx.debug ? 'STAGING' : 'PRODUCTION'),
-        DASHBOARD_URL: ctx.dev ? 'http://localhost:9000/dashboard' : (ctx.debug ? 'https://team-staging.lcog.org/dashboard' : 'https://app.team.lcog.org/dashboard'),
+        DASHBOARD_URL: ctx.dev ? 'http://localhost:9000/dashboard' : (ctx.debug ? 'https://app.team-staging.lcog.org/dashboard' : 'https://app.team.lcog.org/dashboard'),
         WEBSOCKET_URL: ctx.dev ? 'ws://localhost:8000/' : (ctx.debug ? 'https://api.team-staging.lcog.org/' : 'ws://api.team.lcog.org/')
       },
       // rawDefine: {}

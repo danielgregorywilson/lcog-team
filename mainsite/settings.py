@@ -41,7 +41,7 @@ ENVIRONMENT = os.environ.get('ENVIRONMENT')
 
 if ENVIRONMENT == 'STAGING': 
     ALLOWED_HOSTS = [
-        'team-staging.lcog.org', # Staging frontend
+        'app.team-staging.lcog.org', # Staging frontend
         'api.team-staging.lcog.org', # Staging backend
         os.environ.get('EC2_PUBLIC_IP'), # Public IP of EC2 instance
         os.environ.get('EC2_PRIVATE_IP'), # Private IP of EC2 instance
@@ -373,7 +373,7 @@ REST_FRAMEWORK_TRUSTED_IPS_LIST = []
 
 # Frontend
 if ENVIRONMENT == 'STAGING': 
-    FRONTEND_DOMAIN = 'https://team-staging.lcog.org'
+    FRONTEND_DOMAIN = 'https://app.team-staging.lcog.org'
 else:
     # Production
     FRONTEND_DOMAIN = 'https://app.team.lcog.org'

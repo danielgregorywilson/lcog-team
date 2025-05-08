@@ -13,10 +13,6 @@ from mainsite.helpers import is_true_string, prop_in_obj, record_error
 
 from people.models import Employee, JobTitle, UnitOrProgram
 
-from timeoff.helpers import (
-    send_employee_manager_acknowledged_timeoff_request_notification,
-    send_manager_new_timeoff_request_notification
-)
 from workflows.helpers import (
     create_process_instances, send_early_hr_email,
     send_mailbox_notification_email, send_step_completion_email,
@@ -47,60 +43,23 @@ class WorkflowViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-
+        This view should return a list of all workflows for which the user has
+        the appropriate role.
         """
         user = self.request.user
         if user.is_authenticated:
             if user.is_superuser:
-                instances = Workflow.objects.all()
+                queryset = Workflow.objects.all()
             else:
-                instances = Workflow.objects.none()
-            return instances
-
-    # def create(self, request):
-    #     if 'from' in request.data['dates']:
-    #         start_date = request.data['dates']['from'].replace('/', '-')
-    #         end_date = request.data['dates']['to'].replace('/', '-')
-    #     else:
-    #         start_date = request.data['dates'].replace('/', '-')
-    #         end_date = request.data['dates'].replace('/', '-')
-    #     note = request.data['note']
-    #     employee = request.user.employee
-    #     timeoffrequest = TimeOffRequest.objects.create(start_date=start_date, end_date=end_date, note=note, employee=employee)
-    #     send_manager_new_timeoff_request_notification(timeoffrequest)
-    #     serialized_timeoffrequest = TimeOffRequestSerializer(timeoffrequest,
-    #         context={'request': request})
-    #     return Response(serialized_timeoffrequest.data)
-
-    # def update(self, request, pk=None):
-    #     tor = TimeOffRequest.objects.get(pk=pk)
-    #     if 'from' in request.data['dates']:
-    #         start_date = request.data['dates']['from'].replace('/', '-')
-    #         end_date = request.data['dates']['to'].replace('/', '-')
-    #     else:
-    #         start_date = request.data['dates'].replace('/', '-')
-    #         end_date = request.data['dates'].replace('/', '-')
-    #     tor.note = request.data['note']
-    #     if start_date != str(tor.start_date) or end_date != str(tor.end_date):
-    #         tor.start_date = start_date
-    #         tor.end_date = end_date
-    #         tor.acknowledged = None # Reset acknowledged status since we are making a change
-    #     tor.save()
-    #     serialized_tor = TimeOffRequestSerializer(tor,
-    #         context={'request': request})
-    #     return Response(serialized_tor.data)
-    
-    # def partial_update(self, request, pk=None):
-    #     """
-    #     Acknowledge a time off request.
-    #     """
-    #     tor = TimeOffRequest.objects.get(pk=pk)
-    #     tor.acknowledged = request.data['acknowledged']
-    #     tor.save()
-    #     send_employee_manager_acknowledged_timeoff_request_notification(tor)
-    #     serialized_tor = TimeOffRequestSerializer(tor,
-    #         context={'request': request})
-    #     return Response(serialized_tor.data)
+                wfs_can_view = filter(
+                    lambda x: x['display'],
+                    user.employee.workflow_display_options()
+                )
+                wfs_can_view_ids = list(map(lambda x: x['id'], wfs_can_view))
+                queryset = Workflow.objects.filter(id__in=wfs_can_view_ids)
+        else:
+            queryset = Workflow.objects.none()
+        return queryset
 
 
 class WorkflowInstanceViewSet(viewsets.ModelViewSet):
@@ -204,24 +163,6 @@ class WorkflowInstanceViewSet(viewsets.ModelViewSet):
             context={'request': request}
         )
         return Response(serialized_wfi.data)
-
-    # def update(self, request, pk=None):
-    #     tor = TimeOffRequest.objects.get(pk=pk)
-    #     if 'from' in request.data['dates']:
-    #         start_date = request.data['dates']['from'].replace('/', '-')
-    #         end_date = request.data['dates']['to'].replace('/', '-')
-    #     else:
-    #         start_date = request.data['dates'].replace('/', '-')
-    #         end_date = request.data['dates'].replace('/', '-')
-    #     tor.note = request.data['note']
-    #     if start_date != str(tor.start_date) or end_date != str(tor.end_date):
-    #         tor.start_date = start_date
-    #         tor.end_date = end_date
-    #         tor.acknowledged = None # Reset acknowledged status since we are making a change
-    #     tor.save()
-    #     serialized_tor = TimeOffRequestSerializer(tor,
-    #         context={'request': request})
-    #     return Response(serialized_tor.data)
     
     def partial_update(self, request, pk=None):
         """
@@ -505,20 +446,6 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-    
-    # def partial_update(self, request, pk=None):
-    #     """
-    #     Acknowledge a time off request.
-    #     """
-    #     import pdb; pdb.set_trace()
-    #     tor = TimeOffRequest.objects.get(pk=pk)
-    #     tor.acknowledged = request.data['acknowledged']
-    #     tor.save()
-    #     send_employee_manager_acknowledged_timeoff_request_notification(tor)
-    #     serialized_tor = TimeOffRequestSerializer(tor,
-    #         context={'request': request})
-    #     return Response(serialized_tor.data)
-
     @action(detail=True, methods=['post'])
     def send_mailbox_notification_email(self, request, pk):
         try:
@@ -662,9 +589,23 @@ class EmployeeTransitionViewSet(viewsets.ModelViewSet):
 class TransitionChangeViewSet(viewsets.ModelViewSet):
     queryset = TransitionChange.objects.all()
     serializer_class = TransitionChangeSerializer
-    # permission_classes = [
-    #     IsAuthenticatedOrReadOnly
-    # ]
+
+    def get_queryset(self):
+        """
+        Block anonymous users and users without access from seeing any
+        transitions. Superusers can see all.
+        """
+        queryset = TransitionChange.objects.none()
+        user = self.request.user
+        if not user.is_anonymous and user.is_authenticated:
+            if user.is_superuser:
+                queryset = TransitionChange.objects.all()
+            elif user.employee:
+                employee = user.employee
+                if employee.can_view_employee_transitions():
+                    # Users who can view employee transitions can see all
+                    queryset = TransitionChange.objects.all()
+        return queryset
 
 
 class ProcessViewSet(viewsets.ModelViewSet):
@@ -681,10 +622,12 @@ class ProcessViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_authenticated:
             if user.is_superuser:
-                instances = Process.objects.all()
+                queryset = Process.objects.all()
             else:
-                instances = Process.objects.none()
-            return instances
+                queryset = Process.objects.none()
+        else:
+            queryset = Process.objects.none()
+        return queryset
 
 
 class ProcessInstanceViewSet(viewsets.ModelViewSet):
@@ -702,10 +645,12 @@ class ProcessInstanceViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_authenticated:
             if user.is_superuser:
-                instances = ProcessInstance.objects.all()
+                queryset = ProcessInstance.objects.all()
             else:
-                instances = ProcessInstance.objects.none()
-            return instances
+                queryset = ProcessInstance.objects.none()
+        else:
+            queryset = ProcessInstance.objects.none()
+        return queryset
 
 
 class StepViewSet(viewsets.ModelViewSet):
@@ -723,10 +668,12 @@ class StepViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_authenticated:
             if user.is_superuser:
-                instances = Step.objects.all()
+                queryset = Step.objects.all()
             else:
-                instances = Step.objects.none()
-            return instances
+                queryset = Step.objects.none()
+        else:
+            queryset = Step.objects.none()
+        return queryset
 
 
 class StepChoiceViewSet(viewsets.ModelViewSet):
@@ -736,18 +683,16 @@ class StepChoiceViewSet(viewsets.ModelViewSet):
     #     IsAuthenticatedOrReadOnly
     # ]
 
-    # def get_queryset(self):
-    #     """
-    #     This view should return a list of all time off requests for which
-    #     the currently authenticated user is the manager.
-    #     """
-    #     user = self.request.user
-    #     if user.is_authenticated:
-    #         if user.is_superuser:
-    #             instances = Step.objects.all()
-    #         else:
-    #             instances = Step.objects.none()
-    #         return instances
+    def get_queryset(self):
+        """
+        This view should return a list of all step choices.
+        """
+        user = self.request.user
+        if user.is_authenticated:
+            queryset = StepChoice.objects.all()
+        else:
+            queryset = StepChoice.objects.none()
+        return queryset
 
 
 class StepInstanceViewSet(viewsets.ModelViewSet):
@@ -757,18 +702,16 @@ class StepInstanceViewSet(viewsets.ModelViewSet):
     #     IsAuthenticatedOrReadOnly
     # ]
 
-    # def get_queryset(self):
-    #     """
-    #     This view should return a list of all time off requests for which
-    #     the currently authenticated user is the manager.
-    #     """
-    #     user = self.request.user
-    #     if user.is_authenticated:
-    #         if user.is_superuser:
-    #             instances = StepInstance.objects.all()
-    #         else:
-    #             instances = StepInstance.objects.none()
-    #         return instances
+    def get_queryset(self):
+        """
+        This view should return a list of all step instances.
+        """
+        user = self.request.user
+        if user.is_authenticated:
+            queryset = StepInstance.objects.all()
+        else:
+            queryset = StepInstance.objects.none()
+        return queryset
     
     def partial_update(self, request, pk=None):
         """
@@ -896,7 +839,9 @@ class RoleViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_authenticated:
             if user.is_superuser:
-                instances = Role.objects.all()
+                queryset = Role.objects.all()
             else:
-                instances = Role.objects.none()
-            return instances
+                queryset = Role.objects.none()
+        else:
+            queryset = Role.objects.none()
+        return queryset

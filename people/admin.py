@@ -12,13 +12,22 @@ from .models import (
 
 class EmployeeInline(admin.TabularInline):
     model = Employee
-    fields = ("edit_link", "active", "temporary", "number", "username", "unit_or_program", "manager")
-    readonly_fields = ("edit_link", "active", "temporary", "number", "username", "unit_or_program", "manager")
+    fields = (
+        "edit_link", "active", "temporary", "number", "username",
+        "unit_or_program", "manager"
+    )
+    readonly_fields = (
+        "edit_link", "active", "temporary", "number", "username",
+        "unit_or_program", "manager"
+    )
     extra = 0
 
     def edit_link(self, instance):
-        url = reverse('admin:%s_%s_change' % (
-            instance._meta.app_label,  instance._meta.model_name),  args=[instance.pk] )
+        url = reverse(
+            'admin:%s_%s_change' %
+                (instance._meta.app_label,  instance._meta.model_name),
+            args=[instance.pk]
+        )
         if instance.pk:
             return mark_safe(u'<a href="{u}">edit</a>'.format(u=url))
         else:
@@ -51,8 +60,11 @@ class WorkflowOptionsInline(admin.TabularInline):
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
-    list_display = ("number", "active", "username", "job_title", "unit_or_program", "manager",)
-    list_filter = ("active", "unit_or_program__division", "unit_or_program",)
+    list_display = (
+        "number", "active", "username", "job_title", "unit_or_program",
+        "manager"
+    )
+    list_filter = ("active", "unit_or_program__division", "unit_or_program")
     search_fields = ("user__username", )
     inlines = [WorkflowOptionsInline]
 
@@ -87,7 +99,8 @@ class PerformanceReviewAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         pr_exists = hasattr(obj, 'pk')
         user_is_superuser = request.user.is_superuser
-        employee_cannot_view_pr = not hasattr(request.user, 'employee') or obj.pk not in request.user.employee.prs_can_view()
+        employee_cannot_view_pr = not hasattr(request.user, 'employee') or \
+            obj.pk not in request.user.employee.prs_can_view()
         if pr_exists and not user_is_superuser and employee_cannot_view_pr:
             self.exclude = (
                 'step_increase', 'top_step_bonus', 'action_other',
@@ -103,7 +116,9 @@ class PerformanceReviewAdmin(admin.ModelAdmin):
             )
         else:
             self.exclude = ()
-        form = super(PerformanceReviewAdmin, self).get_form(request, obj, **kwargs)
+        form = super(PerformanceReviewAdmin, self).get_form(
+            request, obj, **kwargs
+        )
         return form
 
 
@@ -149,7 +164,8 @@ class ReviewNoteAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         note_exists = hasattr(obj, 'pk')
         user_is_superuser = request.user.is_superuser
-        employee_cannot_view_note = not hasattr(request.user, 'employee') or obj.pk not in request.user.employee.notes_can_view()
+        employee_cannot_view_note = not hasattr(request.user, 'employee') or \
+            obj.pk not in request.user.employee.notes_can_view()
         if note_exists and not user_is_superuser and employee_cannot_view_note:
             self.exclude = ('note',)
         else:

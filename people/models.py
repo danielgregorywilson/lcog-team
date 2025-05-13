@@ -24,6 +24,13 @@ class Division(models.Model):
         verbose_name_plural = _("Divisions")
         ordering = ["name"]
 
+    organization = models.ForeignKey(
+        "mainsite.Organization",
+        verbose_name=_("organization"),
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
+    )
     name = models.CharField(_("name"), max_length=100)
 
     def __str__(self):
@@ -95,6 +102,13 @@ class Employee(models.Model):
             "Employee is temporary or exists for test purposes. They are not "
             "present in the payroll system, but should not be deactivated."
         )
+    )
+    organization = models.ForeignKey(
+        "mainsite.Organization",
+        verbose_name=_("organization"),
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True
     )
     user = models.OneToOneField(
         "auth.User", verbose_name=_("user"), on_delete=models.CASCADE,

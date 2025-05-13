@@ -1,4 +1,3 @@
-from mainsite.models import ImageUpload, SecurityMessage, TrustedIPAddress
 from django import forms
 from django.contrib import admin
 from django.contrib.auth import password_validation
@@ -9,7 +8,23 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
-from .models import City, ImageUpload, SecurityMessage, State, ZipCode
+from mainsite.models import ImageUpload, SecurityMessage, TrustedIPAddress
+from people.admin import EmployeeInline
+
+from .models import (
+    City, ImageUpload, Organization, SecurityMessage, State, ZipCode
+)
+
+
+@admin.register(Organization)
+class OrganizationAdmin(admin.ModelAdmin):
+    list_display = ("pk", "name", "description")
+    search_fields = ("name",)
+    ordering = ("pk",)
+    list_filter = ("active",)
+    fields = ("pk", "name", "description", "active")
+    readonly_fields = ("pk",)
+    inlines = [EmployeeInline]
 
 
 @admin.register(ImageUpload)

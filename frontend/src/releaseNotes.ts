@@ -4,6 +4,25 @@
 
 export const releases = [
   {
+    version: '0.49.0',
+    date: new Date(2025, 4, 13),
+    changes: [
+      {
+        type: 'new',
+        description: 'Organizations model for multi-tenant instances.'
+      },
+      {
+        type: 'improved',
+        description: 'CC: Don\'t allow selecting the same card twice in the ' +
+          'same month.'
+      },
+      {
+        type: 'improved',
+        description: 'API security improvements.'
+      },
+    ]
+  },
+  {
     version: '0.48.0',
     date: new Date(2025, 3, 30),
     changes: [

@@ -67,10 +67,32 @@ class JobTitleViewSet(viewsets.ModelViewSet):
     serializer_class = JobTitleSerializer
     pagination_class = LargeResultsSetPagination
 
+    def get_queryset(self):
+        """
+        Show nothing to unauthenticated users.
+        """
+        user = self.request.user
+        if user.is_authenticated:
+            queryset = JobTitle.active_objects.all()
+        else:
+            queryset = JobTitle.objects.none()
+        return queryset
+
 
 class UnitViewSet(viewsets.ModelViewSet):
     queryset = UnitOrProgram.objects.all()
     serializer_class = UnitSerializer
+
+    def get_queryset(self):
+        """
+        Show nothing to unauthenticated users.
+        """
+        user = self.request.user
+        if user.is_authenticated:
+            queryset = UnitOrProgram.objects.all()
+        else:
+            queryset = UnitOrProgram.objects.none()
+        return queryset
 
 
 class CurrentUserView(RetrieveAPIView):
@@ -376,19 +398,40 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
         return Response(serialized_review.data)
 
 
-class TeleworkApplicationFileUploadViewSet(viewsets.ViewSet):
+class TeleworkApplicationFileUploadViewSet(viewsets.ModelViewSet):
+    queryset = TeleworkApplication.objects.all()
     serializer_class = FileUploadSerializer
     # permission_classes = [IsAuthenticated]
 
     def list(self, request):
-        queryset = TeleworkApplication.objects.all()
+        user = self.request.user
+        if user.is_authenticated:
+            if user.is_staff:
+                queryset = TeleworkApplication.objects.all()
+            else:
+                queryset = TeleworkApplication.objects.filter(
+                    Q(employee__manager__user=user) |
+                    Q(employee__user=user)
+                )
+        else:
+            queryset = TeleworkApplication.objects.none()
         serializer = TeleworkApplicationFileUploadSerializer(
             queryset, many=True, context={'request': request}
         )
         return Response(serializer.data)
     
     def retrieve(self, request, pk=None):
-        queryset = TeleworkApplication.objects.all()
+        user = self.request.user
+        if user.is_authenticated:
+            if user.is_staff:
+                queryset = TeleworkApplication.objects.all()
+            else:
+                queryset = TeleworkApplication.objects.filter(
+                    Q(employee__manager__user=user) |
+                    Q(employee__user=user)
+                )
+        else:
+            queryset = TeleworkApplication.objects.none()
         application = get_object_or_404(queryset, pk=pk)
         serializer = TeleworkApplicationFileUploadSerializer(
             application, context={'request': request}
@@ -429,12 +472,15 @@ class SignatureViewSet(viewsets.ModelViewSet):
         This view should return a list of all signatures made by this user.
         """
         user = self.request.user
-        # TODO: Don't do this.
-        # TODO: There is an issue where the detail view doesn't have the user
-        if user.is_anonymous:
-            return Signature.objects.all()
+        if user.is_authenticated:
+            # TODO: Don't do this.
+            # TODO: There is an issue where the detail view doesn't have the user
+            if user.is_anonymous:
+                return Signature.objects.all()
+            else:
+                return Signature.objects.filter(employee__user=user)
         else:
-            return Signature.objects.filter(employee__user=user)
+            return Signature.objects.none()
     
     def create(self, request):
         pr = PerformanceReview.objects.get(pk=request.data['review_pk'])
@@ -506,10 +552,13 @@ class ReviewNoteViewSet(viewsets.ModelViewSet):
         user = self.request.user
         # TODO: Don't do this.
         # There is an issue where the detail view doesn't have the user
-        if user.is_anonymous:
-            return ReviewNote.objects.all()
+        if user.is_authenticated:
+            if user.is_anonymous:
+                return ReviewNote.objects.all()
+            else:
+                return ReviewNote.objects.filter(author__user=user)
         else:
-            return ReviewNote.objects.filter(author__user=user)
+            return ReviewNote.objects.none()
 
     def create(self, request):
         employee = Employee.objects.get(pk=request.data['employee_pk'])
@@ -551,6 +600,22 @@ class ViewedSecurityMessageViewSet(viewsets.ModelViewSet):
     serializer_class = ViewedSecurityMessageSerializer
     # permission_classes = [IsAuthenticated]
     
+    def get_queryset(self):
+        """
+        This view should return a list of all viewed security messages for
+        which the currently authenticated user is the employee.
+        """
+        user = self.request.user
+        if user.is_authenticated:
+            if user.is_staff:
+                queryset = ViewedSecurityMessage.objects.all()
+            else:
+                queryset = ViewedSecurityMessage.objects.filter(
+                    employee__user=user)
+        else:
+            queryset = ViewedSecurityMessage.objects.none()
+        return queryset
+
     @action(detail=False)
     def employee_viewed_latest_security_message(self, request):
         if not SecurityMessage.objects.count():
@@ -774,12 +839,14 @@ class TeleworkSignatureViewSet(viewsets.ModelViewSet):
         This view should return a list of all signatures made by this user.
         """
         user = self.request.user
-        # TODO: Don't do this.
-        # There is an issue where the detail view doesn't have the user
-        if user.is_anonymous:
-            return TeleworkSignature.objects.all()
+        if user.is_authenticated:
+            if user.is_staff:
+                queryset = TeleworkSignature.objects.all()
+            else:
+                queryset = TeleworkSignature.objects.filter(employee__user=user)
         else:
-            return TeleworkSignature.objects.filter(employee__user=user)
+            queryset = TeleworkSignature.objects.none()
+        return queryset
     
     def create(self, request):
         application = TeleworkApplication.objects.get(

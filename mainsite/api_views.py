@@ -92,18 +92,6 @@ class TrustedIPViewSet(viewsets.ViewSet):
 
 class FileUploadViewSet(viewsets.ViewSet):
     serializer_class = FileUploadSerializer
-    # permission_classes = [IsAuthenticated]
-
-    # def list(self, request):
-    #     queryset = PerformanceReview.objects.all()
-    #     serializer = PerformanceReviewFileUploadSerializer(queryset, many=True, context={'request': request})
-    #     return Response(serializer.data)
-    
-    # def retrieve(self, request, pk=None):
-    #     queryset = PerformanceReview.objects.all()
-    #     pr = get_object_or_404(queryset, pk=pk)
-    #     serializer = PerformanceReviewFileUploadSerializer(pr, context={'request': request})
-    #     return Response(serializer.data)
     
     def create(self, request):
         files = request.FILES.values()
@@ -221,10 +209,28 @@ class SecurityMessageViewSet(viewsets.ModelViewSet):
     serializer_class = SecurityMessageSerializer
 
     def retrieve(self, request, pk=None):
-        queryset = SecurityMessage.objects.all()
+        user = request.user
+        if user.is_authenticated:
+            queryset = SecurityMessage.objects.all()
+        else:
+            queryset = SecurityMessage.objects.none()
         security_message = get_object_or_404(queryset, pk=pk)
         serializer = SecurityMessageSerializer(security_message, 
             context={'request': request})
+        return Response(serializer.data)
+    
+    def list(self, request):
+        user = request.user
+        if user.is_authenticated:
+            if user.is_staff:
+                queryset = SecurityMessage.objects.all()
+            else:
+                queryset = SecurityMessage.objects.filter(employee__user=user)
+        else:
+            queryset = SecurityMessage.objects.none()
+        serializer = SecurityMessageSerializer(
+            queryset, many=True, context={'request': request}
+        )
         return Response(serializer.data)
 
     @action(detail=False)

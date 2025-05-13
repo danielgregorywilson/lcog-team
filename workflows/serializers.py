@@ -69,7 +69,7 @@ class StepSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ProcessSerializer(serializers.ModelSerializer):
-    steps = StepSerializer(source='steps', many=True)
+    steps = StepSerializer(many=True)
     
     class Meta:
         model = Process

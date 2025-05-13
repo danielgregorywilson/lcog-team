@@ -35,6 +35,13 @@ class MealStopViewSet(viewsets.ModelViewSet):
     permission_classes = [MealStopPermission]
     pagination_class = LargeResultsSetPagination
 
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_authenticated:
+            return Stop.objects.all()
+        else:
+            return Stop.objects.none()
+
     def create(self, request):
         # TODO: Re-enable this permission check.
         # if not request.user.groups.filter(name='Manage Meals on Wheels Stops').exists():

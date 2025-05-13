@@ -1,0 +1,16 @@
+{
+  "name": "Example Organization",
+  "description": "This is an example organization for demonstration purposes.",
+  "employees": [
+    {
+      "name": "John Doe",
+      "position": "Software Engineer",
+      "email": "john.doe@example.com"
+    },
+    {
+      "name": "Jane Smith",
+      "position": "Product Manager",
+      "email": "jane.smith@example.com"
+    }
+  ]
+}

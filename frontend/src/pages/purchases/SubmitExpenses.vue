@@ -1290,9 +1290,23 @@ function thisMonthStatements(): Array<ExpenseStatement> {
 
 function statementChoices(): Array<{label: string, value: ExpenseStatement}> {
   return thisMonthStatements()?.map(es => {
+    // Disable this statement choice if any other expenseMonthChoices have this card selected
+    let disable = false
+    const cardPk = es.card.pk
+    const isCardSelectedElsewhere = expenseMonthChoices().some(
+      emChoice =>
+      emChoice.value.card &&
+      emChoice.value.card.pk === cardPk &&
+      (!selectedMonth.value ||
+        emChoice.value.pk !== selectedMonth.value.value.pk)
+    )
+    if (isCardSelectedElsewhere) {
+      disable = true
+    }
     return {
       label: es.card.display,
-      value: es
+      value: es,
+      disable
     }
   })
 }

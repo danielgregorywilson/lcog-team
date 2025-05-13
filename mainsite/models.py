@@ -15,6 +15,30 @@ class InactiveManager(models.Manager):
         return super().get_queryset().filter(active=False)
 
 
+class ActiveMixin:
+    class Meta:
+        abstract = True
+    
+    active = models.BooleanField(default=True)
+
+    objects = models.Manager()
+    active_objects = ActiveManager()
+    inactive_objects = InactiveManager()
+
+
+class Organization(models.Model, ActiveMixin):
+    class Meta:
+        verbose_name = _("Organization")
+        verbose_name_plural = _("Organizations")
+
+    def __str__(self):
+        return self.name
+
+    name = models.CharField(_("name"), max_length=255)
+    description = models.TextField(_("description"), blank=True, null=True)
+    active = models.BooleanField(default=True) # Define explicitly here in order to filter in admin
+
+
 class ImageUpload(models.Model):
     description = models.CharField(_("description"), max_length=255)
     image = models.ImageField(upload_to="uploads/image-upload")

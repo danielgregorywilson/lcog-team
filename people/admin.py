@@ -42,6 +42,7 @@ class UnitOrProgramInline(admin.TabularInline):
 @admin.register(Division)
 class DivisionAdmin(admin.ModelAdmin):
     list_display = ("name",)
+    list_filter = ("organization",)
     inlines = (UnitOrProgramInline,)
 
 
@@ -64,7 +65,10 @@ class EmployeeAdmin(admin.ModelAdmin):
         "number", "active", "username", "job_title", "unit_or_program",
         "manager"
     )
-    list_filter = ("active", "unit_or_program__division", "unit_or_program")
+    list_filter = (
+        "active", "organization", "unit_or_program__division",
+        "unit_or_program"
+    )
     search_fields = ("user__username", )
     inlines = [WorkflowOptionsInline]
 

@@ -2,14 +2,14 @@ import datetime
 import logging
 import os
 import pytz
+from rest_framework.test import APIRequestFactory
+import requests
+import urllib.parse
 
 from django.apps import apps
 from django.contrib.sites.models import Site
 from django.core.mail import EmailMultiAlternatives, send_mail
 from django.urls import reverse
-
-import requests
-import urllib.parse
 
 error_logger = logging.getLogger('watchtower-error-logger')
 email_logger = logging.getLogger('watchtower-email-logger')
@@ -467,3 +467,15 @@ def get_lat_long(address, city, state, zip):
     if response:
         return response[0]["lat"], response[0]["lon"]
     return None, None
+
+
+def get_is_trusted_ip():
+    from mainsite.api_views import TrustedIPViewSet
+    factory = APIRequestFactory()
+    trustedip_url = reverse('trustedip-list')
+    trustedip_request = factory.get(trustedip_url)
+    trustedip_view = TrustedIPViewSet.as_view({'get': 'list'})
+    trusted_ip_response = trustedip_view(trustedip_request)
+    is_trusted_ip = trusted_ip_response.data if hasattr(
+        trusted_ip_response, 'data') else False
+    return is_trusted_ip

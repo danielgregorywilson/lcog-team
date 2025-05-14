@@ -470,6 +470,8 @@ def get_lat_long(address, city, state, zip):
 
 
 def get_is_trusted_ip():
+    # TODO: I couldn't get this to work because I don't have access to the
+    # client IP here.
     from mainsite.api_views import TrustedIPViewSet
     factory = APIRequestFactory()
     trustedip_url = reverse('trustedip-list')
@@ -478,11 +480,4 @@ def get_is_trusted_ip():
     trusted_ip_response = trustedip_view(trustedip_request)
     is_trusted_ip = trusted_ip_response.data if hasattr(
         trusted_ip_response, 'data') else False
-    error_logger.error(factory)
-    error_logger.error(trustedip_url)
-    error_logger.error(trustedip_request)
-    error_logger.error(trustedip_view)
-    error_logger.error(trusted_ip_response)
-    error_logger.error(trusted_ip_response.data)
-    error_logger.error(is_trusted_ip)
     return is_trusted_ip

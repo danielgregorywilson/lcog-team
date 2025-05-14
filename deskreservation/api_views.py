@@ -27,16 +27,17 @@ class DeskViewSet(viewsets.ModelViewSet):
         """
         user = self.request.user
         is_trusted_ip = get_is_trusted_ip() == 'true'
-        if user.is_authenticated or is_trusted_ip:
-            queryset = Desk.active_objects.all()
-            building = self.request.query_params.get('building', None)
-            floor = self.request.query_params.get('floor', None)
-            if building is not None:
-                queryset = queryset.filter(building=building)
-            if floor is not None:
-                queryset = queryset.filter(floor=floor)
-        else:
-            queryset = Desk.objects.none()
+        queryset = Desk.active_objects.all()
+        # if user.is_authenticated or is_trusted_ip:
+        #     queryset = Desk.active_objects.all()
+        #     building = self.request.query_params.get('building', None)
+        #     floor = self.request.query_params.get('floor', None)
+        #     if building is not None:
+        #         queryset = queryset.filter(building=building)
+        #     if floor is not None:
+        #         queryset = queryset.filter(floor=floor)
+        # else:
+        #     queryset = Desk.objects.none()
         return queryset
 
 
@@ -55,13 +56,14 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
         """
         user = self.request.user
         is_trusted_ip = get_is_trusted_ip() == 'true'
-        if user.is_authenticated or is_trusted_ip:
-            queryset = DeskReservation.currently_reserved_objects.all()
-            employee = self.request.query_params.get('employee', None)
-            if employee is not None and employee.isdigit():
-                queryset = queryset.filter(employee=employee)
-        else:
-            queryset = DeskReservation.objects.none()
+        queryset = DeskReservation.currently_reserved_objects.all()
+        # if user.is_authenticated or is_trusted_ip:
+        #     queryset = DeskReservation.currently_reserved_objects.all()
+        #     employee = self.request.query_params.get('employee', None)
+        #     if employee is not None and employee.isdigit():
+        #         queryset = queryset.filter(employee=employee)
+        # else:
+        #     queryset = DeskReservation.objects.none()
         return queryset
 
 

@@ -483,5 +483,6 @@ def get_is_trusted_ip():
     error_logger.error(trustedip_request)
     error_logger.error(trustedip_view)
     error_logger.error(trusted_ip_response)
+    error_logger.error(trusted_ip_response.data)
     error_logger.error(is_trusted_ip)
     return is_trusted_ip

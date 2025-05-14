@@ -27,7 +27,6 @@ class DeskViewSet(viewsets.ModelViewSet):
         """
         user = self.request.user
         is_trusted_ip = get_is_trusted_ip()
-        is_trusted_ip = True
         if user.is_authenticated or is_trusted_ip:
             queryset = Desk.active_objects.all()
             building = self.request.query_params.get('building', None)
@@ -56,7 +55,6 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
         """
         user = self.request.user
         is_trusted_ip = get_is_trusted_ip()
-        is_trusted_ip = True
         if user.is_authenticated or is_trusted_ip:
             queryset = DeskReservation.currently_reserved_objects.all()
             employee = self.request.query_params.get('employee', None)

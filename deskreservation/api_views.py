@@ -1,15 +1,15 @@
-from calendar import month
 from datetime import date, datetime, timedelta
 from pytz import timezone
 
 from django.utils.timezone import get_current_timezone
 
-from rest_framework import status, viewsets
+from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from .models import Desk, DeskReservation
 from .serializers import DeskReservationSerializer, DeskSerializer
+from mainsite.helpers import get_is_trusted_ip
 from people.models import Employee
 
 
@@ -20,6 +20,28 @@ class DeskViewSet(viewsets.ModelViewSet):
     queryset = Desk.active_objects.all()
     serializer_class = DeskSerializer
 
+    # TODO: We should only allow trusted IPs to see desks unauthenticated,
+    # but I couldn't get it to work because the server doesn't have the client
+    # IP.
+    # def get_queryset(self):
+    #     """
+    #     Return a list of all desks to any authenticated user.
+    #     Optionally filter by building and/or floor.
+    #     """
+    #     user = self.request.user
+    #     is_trusted_ip = get_is_trusted_ip()
+    #     if user.is_authenticated or is_trusted_ip:
+    #         queryset = Desk.active_objects.all()
+    #         building = self.request.query_params.get('building', None)
+    #         floor = self.request.query_params.get('floor', None)
+    #         if building is not None:
+    #             queryset = queryset.filter(building=building)
+    #         if floor is not None:
+    #             queryset = queryset.filter(floor=floor)
+    #     else:
+    #         queryset = Desk.objects.none()
+    #     return queryset
+
 
 class DeskReservationViewSet(viewsets.ModelViewSet):
     """
@@ -27,6 +49,26 @@ class DeskReservationViewSet(viewsets.ModelViewSet):
     """
     queryset = DeskReservation.currently_reserved_objects.all()
     serializer_class = DeskReservationSerializer
+
+    # TODO: We should only allow trusted IPs to see reservations
+    # unauthenticated, but I couldn't get it to work because the server doesn't
+    # have the client IP.
+    # def get_queryset(self):
+    #     """
+    #     Return a list of all desk reservations to any authenticated user.
+    #     Optionally filter by employee.
+    #     """
+    #     user = self.request.user
+    #     is_trusted_ip = get_is_trusted_ip()
+    #     if user.is_authenticated or is_trusted_ip:
+    #         queryset = DeskReservation.currently_reserved_objects.all()
+    #         employee = self.request.query_params.get('employee', None)
+    #         if employee is not None and employee.isdigit():
+    #             queryset = queryset.filter(employee=employee)
+    #     else:
+    #         queryset = DeskReservation.objects.none()
+    #     return queryset
+
 
     def create(self, request):
         employee = Employee.objects.get(pk=request.data['employee_pk']) if request.data['employee_pk'] != -1 else None

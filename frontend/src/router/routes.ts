@@ -503,6 +503,15 @@ if (maintenanceMode) {
       component: () => import('src/pages/ZoomTest.vue'),
     },
 
+    /////////////////////
+    // OAUTH Callbacks //
+    /////////////////////
+    {
+      path: '/oauth/gta-callback',
+      name: 'oauth-gta-callback',
+      component: () => import('src/pages/OAuthGTACallback.vue'),
+    },
+
     //////////////////
     // PRINT LAYOUT //
     //////////////////

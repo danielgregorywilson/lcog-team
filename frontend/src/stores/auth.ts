@@ -15,6 +15,7 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: localStorage.getItem('user-token') || '',
     status: '',
+    goToAPICode: localStorage.getItem('goToAPICode') || '',
   }),
 
   getters: {
@@ -93,6 +94,18 @@ export const useAuthStore = defineStore('auth', {
           .catch(err => console.log(err))
         
         resolve('Successfully logged user out')
+      })
+    },
+
+    //////////
+    // GoTo //
+    //////////
+
+    setGoToAPICode(code: string): Promise<void> {
+      return new Promise((resolve) => {
+        this.goToAPICode = code
+        localStorage.setItem('goToAPICode', code)
+        resolve()
       })
     }
   }

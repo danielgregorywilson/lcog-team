@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { Buffer } from 'buffer'
 
 import { apiURL } from 'src/stores/index'
 import { useMealsStore } from 'src/stores/meals'
@@ -15,7 +16,8 @@ export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: localStorage.getItem('user-token') || '',
     status: '',
-    goToAPICode: localStorage.getItem('goToAPICode') || '',
+    goToAuthCode: localStorage.getItem('goToAuthCode') || '',
+    goToAccessToken: localStorage.getItem('goToAccessToken') || '',
   }),
 
   getters: {
@@ -101,11 +103,162 @@ export const useAuthStore = defineStore('auth', {
     // GoTo //
     //////////
 
-    setGoToAPICode(code: string): Promise<void> {
+    setGoToAuthCode(authCode: string): Promise<void> {
       return new Promise((resolve) => {
-        this.goToAPICode = code
-        localStorage.setItem('goToAPICode', code)
+        this.goToAuthCode = authCode
+        localStorage.setItem('goToAuthCode', authCode)
         resolve()
+      })
+    },
+
+    getGoToAccessToken(authCode: string): Promise<void> {
+      return new Promise((resolve, reject) => {
+        const clientID = import.meta.env.VITE_GOTO_CLIENT_ID
+        const clientSecret = import.meta.env.VITE_GOTO_CLIENT_SECRET
+        // Import Buffer for base64 encoding
+        const authHeader = Buffer.from(`${clientID}:${clientSecret}`).toString('base64')
+
+        axios.post(
+          `https://authentication.logmeininc.com/oauth/token`,
+          {
+            "grant_type": "authorization_code",
+            "code": authCode,
+            "redirect_uri": "http://localhost:9000/oauth/gta-callback",
+          },
+          { headers: {
+            'Authorization': `Basic ${authHeader}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+          }}
+        )
+        .then((resp) => {
+          this.goToAccessToken = resp.data.access_token
+          localStorage.setItem('goToAccessToken', this.goToAccessToken)
+          resolve()
+        })
+        .catch(err => {
+          reject(err)
+        })
+      })
+    },
+
+    getMe(accessToken: string): Promise<void> {
+      return new Promise((resolve, reject) => {
+        axios.get(
+          `https://api.getgo.com/identity/v1/Users/me`,
+          {
+            headers: {
+              'Accept': 'application/json',
+              'Authorization': `Bearer ${accessToken}`,
+            }
+          }
+        )
+        .then((resp) => {
+          resolve()
+        })
+        .catch(err => {
+          reject(err)
+        })
+      })
+    },
+
+    getIncidents(accessToken: string): Promise<void> {
+      return new Promise((resolve, reject) => {
+        axios.get(
+          `https://api.getgo.com/G2ASD/rest/v2/incidents?accountKey=${import.meta.env.VITE_GOTO_ACCOUNT_KEY}`,
+          {
+            headers: {
+              'Accept': 'application/json',
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            }
+          }
+        )
+        .then((resp) => {
+          debugger
+          resolve()
+        })
+        .catch(err => {
+          reject(err)
+        })
+      })
+    },
+
+    getOneIncident(accessToken: string): Promise<void> {
+      return new Promise((resolve, reject) => {
+        axios.get(
+          `https://api.getgo.com/G2ASD/rest/v2/incidents/412?accountKey=${import.meta.env.VITE_GOTO_ACCOUNT_KEY}`,
+          {
+            headers: {
+              'Accept': 'application/json',
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            }
+          }
+        )
+        .then((resp) => {
+          debugger
+          resolve()
+        })
+        .catch(err => {
+          reject(err)
+        })
+      })
+    },
+
+    createNewIncident(accessToken: string): Promise<void> {
+      return new Promise((resolve, reject) => {
+        axios.post(
+          `https://api.getgo.com/G2ASD/rest/v2/incidents?accountKey=${import.meta.env.VITE_GOTO_ACCOUNT_KEY}`,
+          {
+            // "title": "Dan Wilson's Test Incident",
+            // "description": "This is a test incident created via API through the Team App.",
+            // "priority": "medium",
+            // "category": "Technical Issue",
+            
+
+            "title": "Postman test title",
+            "notify_watchlisted": 1,
+            "notify_customer": 1,
+            "customer": "/customers/1978793872884138217",
+            "customer_viewable": 1,
+            "watching_external_emails": {
+              "add": [
+                "dgw@mac.com",
+              ]
+            },
+            "linkages": {"add": ["/incidents/30792"]},
+            "type": "Feedback",
+            "priority_level": "1",
+            "interesting": "true",
+            "common": "true",
+            "has_agreed_due_date": "true",
+            "due_date": "10/08/2017",
+            "tasks": {"create": [{"title": "task1", "status": "in_progress"}]},
+            "comments": {
+              "create": [
+                {"note": "This is the new comment",},
+                {"note": "This is the second comment"}
+              ]
+            },
+            "symptom": {
+              "note": "This is the symptom",
+            }
+          },  
+          { headers: {
+            'Accept': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          }}
+        )
+        .then(() => {
+          debugger
+          resolve()
+        })
+        .catch(err => {
+          debugger
+          reject(err)
+        })
       })
     }
   }

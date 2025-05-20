@@ -9,8 +9,10 @@ onMounted(() => {
   const code = params.get('code')
   const state = params.get('state')
   if (!!code && !!state) {
-    authStore.setGoToAPICode(code).then(() => {
-      window.location.replace(state)
+    authStore.setGoToAuthCode(code).then(() => {
+      authStore.getGoToAccessToken(code).then(() => {
+        window.location.replace(state)
+      })
     })
   }
 })

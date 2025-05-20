@@ -36,7 +36,7 @@ const props = defineProps<{
 }>()
 
 const statementTotal = () => {
-  if (!props.statement) return 0
+  if (!props.statement || !props.statement.items) return 0
   return props.statement.items.reduce(
     (acc, item) => acc + parseFloat(item.amount), 0
   ).toFixed(2)

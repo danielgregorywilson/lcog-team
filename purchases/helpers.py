@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
-from mainsite.helpers import send_email, send_email_multiple
+from mainsite.helpers import record_error, send_email, send_email_multiple
 from people.models import Employee
 from purchases.models import ExpenseMonth, ExpenseStatement
 
@@ -74,9 +74,22 @@ def send_submitter_monthly_expenses_reminders(sending_user: User):
                     ) and not em_this_month:
                         recipients.append([sub.user.email, 'last_month'])
     for recipient in recipients:
-        sender = sending_user.employee.name if \
-            sending_user.employee and sending_user.employee.name else \
-            sending_user.username
+        if sending_user.is_anonymous:
+            # TODO: Not sure why these are anonymous, but log them for now.
+            # Log error if sending_user is anonymous
+            record_error(
+                'send_submitter_monthly_expenses_reminders',
+                'Anonymous user attempted to send reminders.',
+                other_info={
+                    'sending_user': sending_user,
+                    'recipient': recipient
+                }
+            )
+            sender = 'LCOG Fiscal'
+        else:
+            sender = sending_user.employee.name if \
+                sending_user.employee and sending_user.employee.name else \
+                sending_user.username
         html_message = render_to_string(html_template, { 'context': {
             'curr_month_name': curr_month_name,
             'message_type': recipient[1],

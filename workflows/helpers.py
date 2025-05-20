@@ -48,7 +48,7 @@ def send_mailbox_notification_email(
 
     # Send to mailbox admins
     send_email_multiple(
-        STAFF_MAILBOX_RECIPIENTS, [], subject, plaintext_message, html_message
+        [STAFF_MAILBOX_RECIPIENTS], [], subject, plaintext_message, html_message
     )
 
 def send_transition_submitter_email(

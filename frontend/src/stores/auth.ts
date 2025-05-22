@@ -224,7 +224,7 @@ export const useAuthStore = defineStore('auth', {
             "customer_viewable": 1,
             "watching_external_emails": {
               "add": [
-                "dgw@mac.com",
+                "dgw@mac.com", "dgw@me.com"
               ]
             },
             "linkages": {"add": ["/incidents/30792"]},
@@ -233,7 +233,7 @@ export const useAuthStore = defineStore('auth', {
             "interesting": "true",
             "common": "true",
             "has_agreed_due_date": "true",
-            "due_date": "10/08/2017",
+            "due_date": "10/10/2025",
             "tasks": {"create": [{"title": "task1", "status": "in_progress"}]},
             "comments": {
               "create": [

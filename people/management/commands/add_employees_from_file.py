@@ -168,11 +168,18 @@ class Command(BaseCommand):
                         'Updated user {} {} username to {}'.format(user.first_name, user.last_name, user.username)
                     )
                 if user.email != email:
-                    user.email = email
-                    user.save()
-                    self.stdout.write(
-                        'Updated user {} {} email to {}'.format(user.first_name, user.last_name, user.email)
-                    )
+                    # Don't update email if we're just updating from @lcog-or.gov to @lcog.org
+                    if user.email.endswith('@lcog-or.gov') and email.endswith('@lcog.org'):
+                        self.stdout.write(
+                            'Skipping email update for user {} {} from {} to {}'
+                                .format(user.first_name, user.last_name, user.email, email)
+                        )
+                    else:
+                        user.email = email
+                        user.save()
+                        self.stdout.write(
+                            'Updated user {} {} email to {}'.format(user.first_name, user.last_name, user.email)
+                        )
             except User.DoesNotExist:
                 user = User.objects.create(email=email, username=username, first_name=first_name, last_name=last_name)
                 self.stdout.write(

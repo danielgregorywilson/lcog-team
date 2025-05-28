@@ -17,7 +17,9 @@
           </div>
         </q-toolbar-title>
 
-        <q-btn flat no-caps :to="{ name: 'release-notes'}">{{ appVersionTag() }}</q-btn>
+        <q-btn flat no-caps :to="{ name: 'release-notes'}">
+          {{ appVersionTag() }}
+        </q-btn>
       </q-toolbar>
     </q-header>
 
@@ -207,12 +209,13 @@ const navLinks: Array<LinkData> = [
 const msalConfig: Configuration = {
   auth: {
     clientId: '2c4ec8a0-6be9-4c9c-a6b6-6a40392b8e3e',
-    authority: 'https://login.microsoftonline.com/9a80ddb7-1790-4782-a634-ef32f273169c',
+    authority:
+      'https://login.microsoftonline.com/9a80ddb7-1790-4782-a634-ef32f273169c',
     redirectUri: process.env.DASHBOARD_URL,
   },
   cache: {
-    cacheLocation: 'sessionStorage', // This configures where your cache will be stored
-    storeAuthStateInCookie: false, // Set this to "true" if you are having issues on IE11 or Edge
+    cacheLocation: 'sessionStorage', // Configures where cache will be stored
+    storeAuthStateInCookie: false, // Set to true if having issues on IE11/Edge
   }
 }
 
@@ -243,9 +246,13 @@ function loginWithMicrosoft(): void {
     .then(() => {
       if (myMSALObj.getAccount()) {
         let account = myMSALObj.getAccount()
-        let firstName = account.name.split(' ')[1][0].toUpperCase() + account.name.split(' ')[1].substring(1).toLowerCase()
-        let lastName = account.name.split(' ')[0][0].toUpperCase() + account.name.split(' ')[0].substring(1).toLowerCase()
-        authStore.authWithMicrosoft({ username: account.userName, firstName, lastName })
+        let firstName = account.name.split(' ')[1][0].toUpperCase() +
+          account.name.split(' ')[1].substring(1).toLowerCase()
+        let lastName = account.name.split(' ')[0][0].toUpperCase() +
+          account.name.split(' ')[0].substring(1).toLowerCase()
+        authStore.authWithMicrosoft({
+          username: account.userName, firstName, lastName
+        })
           .then(() => router.push('/'))
           .catch((err) => console.log(err))
       }

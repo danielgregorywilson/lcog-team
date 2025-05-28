@@ -215,7 +215,7 @@ const router = useRouter()
 const { bus } = useEventBus()
 const performanceReviewStore = usePerformanceReviewStore()
 
-let lastPk = ref(-1)
+// let lastPk = ref(-1)
 
 function performanceReviews(): Array<PerformanceReviewRetrieve> {
   let prs = []

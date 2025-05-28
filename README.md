@@ -21,18 +21,18 @@ MacOS `source ./env/bin/activate`
 Windows `.\env_20230705\Scripts\activate`
 4) Install requirements
 MacOS `pip install -r ./code/requirements.txt`
-Windows `python -m pip install -r .\code\requirements.txt`
+Windows `python -m pip install -r .\code\requirements-windows.txt`
 5) Run migrations
 MacOS `./manage.py migrate`
-Windows `.\manage.py migrate`
+Windows `python .\manage.py migrate`
 6) Create a superuser
 MacOS `./manage.py createsuperuser --username=USERNAME`
-Windows `.\code\manage.py createsuperuser --username=USERNAME`
+Windows `python .\manage.py createsuperuser --username=USERNAME`
 7) Run commands to import employees and reviews from Caselle
 8) Add settings_local.py file from an existing install
 9) Run the backend locally
 MacOS `./manage.py runserver`
-Windows `.\manage.py runserver`
+Windows `python .\manage.py runserver`
 
 # Install Elastic Beanstalk CLI
 https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3-install.html

@@ -27,7 +27,9 @@ export const useAuthStore = defineStore('auth', {
       return this.authenticate(user, `${ apiURL }api/api-token-auth-password/`)
     },
     // Log in with Microsoft Azure SSO
-    authWithMicrosoft(user: { username: string, firstName: string, lastName: string }) {
+    authWithMicrosoft(
+      user: { username: string, firstName: string, lastName: string }
+    ) {
       return this.authenticate(user, `${ apiURL }api/api-token-auth/`)
     },
     authenticate(
@@ -61,7 +63,7 @@ export const useAuthStore = defineStore('auth', {
     authLogout() {
       return new Promise((resolve) => {
         this.$reset()
-        localStorage.removeItem('user-token') // clear your user's token from localstorage
+        localStorage.removeItem('user-token')
         const mealsStore = useMealsStore()
         const peopleStore = usePeopleStore()
         const purchaseStore = usePurchaseStore()

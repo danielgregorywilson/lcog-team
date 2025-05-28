@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.schemas import ManualSchema
 from rest_framework.views import APIView
 
+from mainsite.helpers import record_error
 from mainsite.serializers import AuthTokenSerializerWithoutPassword
 from people.models import Employee
 
@@ -45,8 +46,9 @@ class ObtainAuthTokenWithoutPassword(APIView):
             serializer.is_valid(raise_exception=True)
             user = serializer.validated_data['user']
         except User.DoesNotExist:
-            user = User.objects.create(username=serializer.initial_data['username'].split('@')[0], first_name=serializer.initial_data['firstName'], last_name=serializer.initial_data['lastName'], email=serializer.initial_data['username'])
-            Employee.objects.create(user=user)
+            message = f'User {request.data["username"]} does not exist'
+            record_error('Error logging in with MS SSO', message, request)
+            return Response({'error': message}, status=404)
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key})
 

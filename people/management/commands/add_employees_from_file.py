@@ -105,7 +105,7 @@ class Command(BaseCommand):
                 self.stdout.write("^^^^^^^^^^^^ WARNING ^^^^^^^^^^^^")
                 username = first_name[0].lower() + last_name.lower()
             else:
-                username = email.split('@')[0]
+                username = email
             
             numbers_in_file.append(int(number))
             
@@ -161,6 +161,11 @@ class Command(BaseCommand):
                     self.stdout.write(
                         'Updated user {} {} name'.format(user.first_name, user.last_name)
                     )
+                
+                # TEMP: Keep @lcog-or.gov emails until Caselle is updated
+                if user.email.endswith('@lcog-or.gov'):
+                    username = user.email
+
                 if user.username != username:
                     user.username = username
                     user.save()

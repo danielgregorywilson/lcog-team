@@ -82,22 +82,30 @@ export const useUserStore = defineStore('user', {
             this.profile.is_hr_employee = resp.data.is_hr_employee
             this.profile.is_sds_hiring_lead = resp.data.is_sds_hiring_lead
             this.profile.is_fiscal_employee = resp.data.is_fiscal_employee
-            this.profile.is_eligible_for_telework_application = resp.data.is_eligible_for_telework_application
-            this.profile.can_view_seating_charts = resp.data.can_view_seating_charts
-            this.profile.can_edit_seating_charts = resp.data.can_edit_seating_charts
+            this.profile.is_eligible_for_telework_application =
+              resp.data.is_eligible_for_telework_application
+            this.profile.can_view_seating_charts =
+              resp.data.can_view_seating_charts
+            this.profile.can_edit_seating_charts =
+              resp.data.can_edit_seating_charts
             this.profile.is_upper_manager = resp.data.is_upper_manager
             this.profile.is_hr_manager = resp.data.is_hr_manager
             this.profile.is_division_director = resp.data.is_division_director
             this.profile.is_executive_director = resp.data.is_executive_director
-            this.profile.viewed_security_message = resp.data.viewed_security_message
+            this.profile.viewed_security_message =
+              resp.data.viewed_security_message
             this.profile.prs_can_view = resp.data.prs_can_view
             this.profile.notes_can_view = resp.data.notes_can_view
-            this.profile.telework_applications_can_view = resp.data.telework_applications_can_view
-            this.profile.time_off_requests_can_view = resp.data.time_off_requests_can_view
+            this.profile.telework_applications_can_view =
+              resp.data.telework_applications_can_view
+            this.profile.time_off_requests_can_view =
+              resp.data.time_off_requests_can_view
             this.profile.next_to_sign_prs = resp.data.next_to_sign_prs
             this.profile.workflow_roles = resp.data.workflow_roles
-            this.profile.workflow_display_options = resp.data.workflow_display_options
-            this.profile.is_all_workflows_admin = resp.data.is_all_workflows_admin
+            this.profile.workflow_display_options =
+              resp.data.workflow_display_options
+            this.profile.is_all_workflows_admin =
+              resp.data.is_all_workflows_admin
             this.profile.is_expense_submitter = resp.data.is_expense_submitter
             this.profile.is_expense_approver = resp.data.is_expense_approver
             this.profile.can_view_mow_routes = resp.data.can_view_mow_routes
@@ -157,7 +165,10 @@ export const useUserStore = defineStore('user', {
             )
 
             // TODO: Convert this
-            // dispatch('performanceReviewModule/getNextPerformanceReview', {pk: resp.data.pk}, { root: true })
+            // dispatch(
+            //   'performanceReviewModule/getNextPerformanceReview',
+            //   {pk: resp.data.pk}, { root: true }
+            // )
             //   .catch(err => console.log(err))
             const securityMessageStore = useSecurityMessageStore()
             securityMessageStore.getViewedLatestSecurityMessage()
@@ -232,7 +243,9 @@ export const useUserStore = defineStore('user', {
         const client_id = import.meta.env.VITE_ZOOM_CLIENT_ID
         const redirect_uri = import.meta.env.VITE_ZOOM_REDIRECT_URI
         axios({
-          url: `https://zoom.us/oauth/authorize?response_type=code&client_id=${ client_id }&redirect_uri=${ redirect_uri }`,
+          url:
+            'https://zoom.us/oauth/authorize?response_type=code&client_id=' +
+            `${ client_id }&redirect_uri=${ redirect_uri }`,
           method: 'GET'
         })
           .then(resp => {
@@ -284,16 +297,22 @@ export const useUserStore = defineStore('user', {
         //     console.log(resp)
         //     resolve(resp)
         //   })
-        //   .catch(e => {
-        //     handlePromiseError(reject, 'Error authenticating Zoom user: requesting access token', e)
-        //   })
+        // .catch(e => {
+        //   handlePromiseError(
+        //     reject, 'Error authenticating Zoom user: requesting access token',
+        //     e
+        //   )
+        // })
       })
     },
 
     // Create a Zoom meeting link
     createZoomMeeting(userId: string) {
       return new Promise((resolve, reject) => {
-        axios({ url: `https://api.zoom.us/v2/users/${userId}/meetings`, data: { }, method: 'POST' })
+        axios({
+          url: `https://api.zoom.us/v2/users/${userId}/meetings`, data: { },
+          method: 'POST'
+        })
           .then(resp => {
             resolve(resp)
           })

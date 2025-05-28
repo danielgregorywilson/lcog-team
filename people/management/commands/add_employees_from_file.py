@@ -105,7 +105,7 @@ class Command(BaseCommand):
                 self.stdout.write("^^^^^^^^^^^^ WARNING ^^^^^^^^^^^^")
                 username = first_name[0].lower() + last_name.lower()
             else:
-                username = email.split('@')[0]
+                username = email
             
             numbers_in_file.append(int(number))
             

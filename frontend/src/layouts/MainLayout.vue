@@ -98,6 +98,7 @@
 <script setup lang="ts">
 import { Configuration } from 'electron-builder'
 import { UserAgentApplication } from 'msal'
+import { Notify } from 'quasar'
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -254,7 +255,15 @@ function loginWithMicrosoft(): void {
           username: account.userName, firstName, lastName
         })
           .then(() => router.push('/'))
-          .catch((err) => console.log(err))
+          .catch((err) => {
+            console.log(err)
+            // Show an alert
+            Notify.create({
+              message: 'Error logging in: ' + err.response.data.error,
+              color: 'negative',
+              position: 'top',
+            })
+          })
       }
     }).catch(function (error) {
         console.log(error)

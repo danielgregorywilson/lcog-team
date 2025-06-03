@@ -85,11 +85,10 @@ def send_submitter_monthly_expenses_reminders(sending_user: User):
                     'recipient': recipient
                 }
             )
-            sender = 'LCOG Fiscal'
-        else:
-            sender = sending_user.employee.name if \
-                sending_user.employee and sending_user.employee.name else \
-                sending_user.username
+            continue # Continue to next item in loop. Don't send anything.
+        sender = sending_user.employee.name if \
+            sending_user.employee and sending_user.employee.name else \
+            sending_user.username
         html_message = render_to_string(html_template, { 'context': {
             'curr_month_name': curr_month_name,
             'message_type': recipient[1],

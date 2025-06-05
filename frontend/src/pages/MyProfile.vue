@@ -293,6 +293,8 @@ function valuesAreChanged(): boolean {
     emailOptOutWorkflowsAll.value == emailOptOutWorkflowsAllCurrentVal.value &&
     emailOptOutWorkflowsTransitions.value ==
       emailOptOutWorkflowsTransitionsCurrentVal.value &&
+    emailOptOutWorkflowsProcesses.value ==
+      emailOptOutWorkflowsProcessesCurrentVal.value &&
     emailOptOutExpensesAll.value == emailOptOutExpensesAllCurrentVal.value &&
     !workflowOptionsAreChanged()
   ) {

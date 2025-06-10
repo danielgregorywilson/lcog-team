@@ -23,6 +23,8 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
     allSignaturePerformanceReviewsActionNotRequired: [] as
       Array<PerformanceReviewRetrieve>,
     allManagerPerformanceReviews: [] as Array<PerformanceReviewRetrieve>,
+    allManagerPerformanceReviewsActionRequired: [] as Array<PerformanceReviewRetrieve>,
+    allManagerPerformanceReviewsActionNotRequired: [] as Array<PerformanceReviewRetrieve>,
     allEmployeePerformanceReviews: [] as Array<PerformanceReviewRetrieve>,
     allReviewNotes: [] as Array<ReviewNoteRetrieve>
   }),
@@ -161,19 +163,37 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
       })
     },
 
-    getAllManagerPerformanceReviews(managerPk: number) {
+    getAllManagerPerformanceReviewsActionRequired(managerPk: number) {
       // Get all performance reviews (past and present) managed by an employee
       return new Promise((resolve, reject) => {
         axios({
-          url: `${ apiURL }api/v1/performancereview?manager=${ managerPk }`
+          url: `${ apiURL }api/v1/performancereview?manager=${ managerPk }&action_required=True`
         })
           .then(resp => {
-            this.allManagerPerformanceReviews = resp.data.results
+            this.allManagerPerformanceReviewsActionRequired = resp.data.results
             resolve(resp)
           })
           .catch(e => {
             handlePromiseError(
-              reject, 'Error getting all managed performance reviews', e
+              reject, 'Error getting all managed performance reviews action required', e
+            )
+          })
+      })
+    },
+
+    getAllManagerPerformanceReviewsActionNotRequired(managerPk: number) {
+      // Get all performance reviews (past and present) managed by an employee
+      return new Promise((resolve, reject) => {
+        axios({
+          url: `${ apiURL }api/v1/performancereview?manager=${ managerPk }&action_required=False`
+        })
+          .then(resp => {
+            this.allManagerPerformanceReviewsActionNotRequired = resp.data.results
+            resolve(resp)
+          })
+          .catch(e => {
+            handlePromiseError(
+              reject, 'Error getting all managed performance reviews action not required', e
             )
           })
       })

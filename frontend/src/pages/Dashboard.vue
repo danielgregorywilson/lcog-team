@@ -59,12 +59,12 @@
       <div class="text-h6">Action Required</div>
         <PerformanceReviewTable
           :actionRequired="true"
-          :pk="userStore.getEmployeeProfile.employee_pk"
+          :managerPk="userStore.getEmployeeProfile.employee_pk"
         />
       <div class="text-h6">No Action Required</div>
         <PerformanceReviewTable
           :actionRequired="false"
-          :pk="userStore.getEmployeeProfile.employee_pk"
+          :managerPk="userStore.getEmployeeProfile.employee_pk"
         />
     </div>
     <div
@@ -85,13 +85,13 @@
         <PerformanceReviewTable
           :signature="true"
           :actionRequired="true"
-          :pk="userStore.getEmployeeProfile.employee_pk"
+          :managerPk="userStore.getEmployeeProfile.employee_pk"
         />
       <div class="text-h6">Signed</div>
         <PerformanceReviewTable
           :signature="true"
           :actionRequired="false"
-          :pk="userStore.getEmployeeProfile.employee_pk"
+          :managerPk="userStore.getEmployeeProfile.employee_pk"
         />
     </div> -->
   </q-page>

@@ -207,8 +207,8 @@ interface QuasarPerformanceReviewTableRowClickActionProps {
 const props = defineProps<{
   signature?: boolean,
   actionRequired?: boolean,
-  employeePk?: number,
-  managerPk?: number,
+  employeePk?: number, // If provided, show PRs for this employee
+  managerPk?: number, // If provided, show direct report PRs for this manager
 }>()
 
 const router = useRouter()

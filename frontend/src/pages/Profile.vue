@@ -13,11 +13,11 @@
       </div>
       <div class="q-mb-md">
         <div class="text-h5 q-mb-sm">Performance Reviews</div>
-        <PerformanceReviewTable :employee="true" :pk=pk() />
+        <PerformanceReviewTable :employeePk="pk()" />
       </div>
       <div class="q-mb-md">
         <div class="text-h5 q-mb-sm">Managed Performance Reviews</div>
-        <PerformanceReviewTable :manager="true" :pk=pk() />
+        <PerformanceReviewTable :managerPk="pk()" />
       </div>
     </div>
   </q-page>

@@ -61,6 +61,15 @@ class ExpenseGLInline(admin.TabularInline):
     extra = 0
 
 
+class ExpenseInline(admin.TabularInline):
+    model = Expense
+    extra = 0
+    fields = ('id', 'name', 'date', 'vendor', 'amount')
+    readonly_fields = ('id', 'name', 'date', 'vendor', 'amount')
+    # No delete
+    can_delete = False
+
+
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
     list_display = (
@@ -80,6 +89,7 @@ class ExpenseMonthAdmin(admin.ModelAdmin):
         'id', 'purchaser', 'year', 'month', 'card', 'status'
     )
     list_filter = ('status', 'year', 'month', ExpenseSubmitterFilter)
+    inlines = (ExpenseInline,)
     
 
 @admin.register(ExpenseCard)

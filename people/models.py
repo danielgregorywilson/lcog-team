@@ -627,6 +627,11 @@ class Employee(models.Model):
     def is_expense_approver(self):
         return self.user.groups.filter(name='Expense Approver').exists()
 
+    def can_view_reviews(self):
+        return self.user.groups.filter(
+            name='View Performance Reviews'
+        ).exists()
+
     def can_view_mow_routes(self):
         view_mow_routes = self.user.groups.filter(name='View Meals on Wheels Routes').exists()
         if view_mow_routes:

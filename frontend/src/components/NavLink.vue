@@ -73,6 +73,11 @@ export default defineComponent({
       required: false,
       default: false
     },
+    canViewReviews: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
     canViewMOWRoutes: {
       type: Boolean,
       required: false,
@@ -98,7 +103,10 @@ export default defineComponent({
         !this.userStore.getEmployeeProfile.is_expense_approver &&
         !this.userStore.getEmployeeProfile.is_division_director &&
         !this.userStore.getEmployeeProfile.is_fiscal_employee
-      )   
+      )
+      const shouldNotViewBecauseNoReviewRoles =
+        this.canViewReviews &&
+        !this.userStore.getEmployeeProfile.can_view_reviews
       const cannotViewMealsOnWheelsRoutes =
         this.canViewMOWRoutes &&
         !this.userStore.getEmployeeProfile.can_view_mow_routes

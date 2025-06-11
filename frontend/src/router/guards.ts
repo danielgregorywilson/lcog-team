@@ -35,6 +35,15 @@ export function canViewExpenses() {
   }
 }
 
+export function canViewReviews() {
+  if (cookies.get('can_view_reviews') == 'true') {
+    return true
+  } else {
+    console.info('User cannot view Reviews. Redirecting to dashboard.')
+    return false
+  }
+}
+
 export function isDivisionDirector() {
   if (cookies.get('is_division_director') == 'true') {
     return true

@@ -82,6 +82,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     workflow_roles = serializers.SerializerMethodField()
     is_expense_submitter = serializers.SerializerMethodField()
     is_expense_approver = serializers.SerializerMethodField()
+    can_view_reviews = serializers.SerializerMethodField()
     can_view_mow_routes = serializers.SerializerMethodField()
     can_manage_mow_stops = serializers.SerializerMethodField()
     workflow_display_options = serializers.SerializerMethodField()
@@ -105,7 +106,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             'email_opt_out_workflows_processes', 'email_opt_out_expenses_all',
             'is_all_workflows_admin', 'admin_of_workflows',
             'admin_of_processes', 'workflow_roles', 'is_expense_submitter',
-            'is_expense_approver', 'can_view_mow_routes',
+            'is_expense_approver', 'can_view_reviews', 'can_view_mow_routes',
             'can_manage_mow_stops', 'workflow_display_options'
         ]
 
@@ -217,6 +218,10 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     @staticmethod
     def get_is_expense_approver(employee):
         return employee.is_expense_approver()
+
+    @staticmethod
+    def get_can_view_reviews(employee):
+        return employee.can_view_reviews()
 
     @staticmethod
     def get_can_view_mow_routes(employee):

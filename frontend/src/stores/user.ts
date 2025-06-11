@@ -43,6 +43,7 @@ export const useUserStore = defineStore('user', {
       is_all_workflows_admin: false,
       is_expense_submitter: false,
       is_expense_approver: false,
+      can_view_reviews: false,
       can_view_mow_routes: false,
       can_manage_mow_stops: false
     },
@@ -59,6 +60,7 @@ export const useUserStore = defineStore('user', {
     hasWorkflowRoles: state => !!state.profile.workflow_roles.length,
     isExpenseSubmitter: state => state.profile.is_expense_submitter,
     isExpenseApprover: state => state.profile.is_expense_approver,
+    canViewReviews: state => state.profile.can_view_reviews,
     canViewMOWRoutes: state => state.profile.can_view_mow_routes,
     canManageMOWStops: state => state.profile.can_manage_mow_stops
   },
@@ -108,6 +110,7 @@ export const useUserStore = defineStore('user', {
               resp.data.is_all_workflows_admin
             this.profile.is_expense_submitter = resp.data.is_expense_submitter
             this.profile.is_expense_approver = resp.data.is_expense_approver
+            this.profile.can_view_reviews = resp.data.can_view_reviews
             this.profile.can_view_mow_routes = resp.data.can_view_mow_routes
             this.profile.can_manage_mow_stops = resp.data.can_manage_mow_stops
             cookies.set('division', resp.data.division.toString())
@@ -156,6 +159,9 @@ export const useUserStore = defineStore('user', {
             )
             cookies.set(
               'is_expense_approver', resp.data.is_expense_approver.toString()
+            )
+            cookies.set(
+              'can_view_reviews', resp.data.can_view_reviews.toString()
             )
             cookies.set(
               'can_view_mow_routes', resp.data.can_view_mow_routes.toString()
@@ -216,6 +222,7 @@ export const useUserStore = defineStore('user', {
         cookies.remove('workflow_display_options')
         cookies.remove('is_expense_submitter')
         cookies.remove('is_expense_approver')
+        cookies.remove('can_view_reviews')
         cookies.remove('can_view_mow_routes')
         cookies.remove('can_manage_mow_stops')
         resolve('Successfully triggered logout')

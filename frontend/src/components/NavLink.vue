@@ -117,6 +117,7 @@ export default defineComponent({
         shouldNotViewBecauseNotEligibleForTeleworkApplication ||
         shouldNotViewBecauseNoWorkflowRoles ||
         shouldNotViewBecauseNoExpenseRoles ||
+        shouldNotViewBecauseNoReviewRoles ||
         cannotViewMealsOnWheelsRoutes
       ) {
         return false

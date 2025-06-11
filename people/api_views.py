@@ -337,9 +337,38 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
         return queryset
 
     def retrieve(self, request, pk=None):
+        user = self.request.user
+        employee = user.employee if user.is_authenticated else None
+        # If the user is not authenticated, return an empty review
+        if not user.is_authenticated:
+            return Response(status=403)
+
         queryset = PerformanceReview.objects.all()
         pr = get_object_or_404(queryset, pk=pk)
-        serializer = PerformanceReviewSerializer(pr, 
+
+        if user.is_superuser:
+            # Superusers can see all reviews
+            pass
+        else:
+            if employee is None:
+                # If the user is not an employee, return 403
+                return Response(status=403)
+            else:
+                if any([
+                    employee.is_hr_employee,
+                    employee.is_hr_manager,
+                    employee.is_division_director,
+                    employee.is_executive_director
+                ]):
+                    # HR and directors can see all reviews
+                    pass
+                else:
+                    # Check if the user is the employee or manager of the PR
+                    if pr.employee != employee and \
+                        pr.employee.manager != employee:
+                        return Response(status=403)
+
+        serializer = PerformanceReviewSerializer(pr,
             context={'request': request})
         return Response(serializer.data)
 

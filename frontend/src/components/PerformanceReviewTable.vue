@@ -1,6 +1,13 @@
 <template>
   <div class="q-py-sm">
+    <q-spinner-grid
+      v-if="!reviewsLoaded"
+      class="spinner q-mt-lg"
+      color="primary"
+      size="xl"
+    />
     <q-table
+      v-else
       :rows="performanceReviews()"
       :columns="columns()"
       :dense="$q.screen.lt.lg"
@@ -214,6 +221,7 @@ const props = defineProps<{
 const router = useRouter()
 const { bus } = useEventBus()
 const performanceReviewStore = usePerformanceReviewStore()
+let reviewsLoaded = ref(false)
 
 // let lastPk = ref(-1)
 
@@ -327,6 +335,9 @@ function retrievePerformanceReviews(): void {
   if (props.managerPk) {
     if (props.actionRequired) {
       performanceReviewStore.getAllManagerPerformanceReviewsActionRequired(props.managerPk)
+        .then(() => {
+          reviewsLoaded.value = true
+        })
         .catch(e => {
           console.error(
             'Error retrieving getAllManagerPerformanceReviewsActionRequired:',
@@ -335,6 +346,9 @@ function retrievePerformanceReviews(): void {
         })
     } else {
       performanceReviewStore.getAllManagerPerformanceReviewsActionNotRequired(props.managerPk)
+        .then(() => {
+          reviewsLoaded.value = true
+        })
         .catch(e => {
           console.error(
             'Error retrieving getAllManagerPerformanceReviewsActionNotRequired:',
@@ -347,6 +361,9 @@ function retrievePerformanceReviews(): void {
   if (props.signature) {
     if (props.actionRequired) {
       performanceReviewStore.getAllSignaturePerformanceReviewsActionRequired()
+        .then(() => {
+          reviewsLoaded.value = true
+        })
         .catch(e => {
           console.error(
             'Error retrieving getAllSignaturePerformanceReviewsActionRequired:',
@@ -356,6 +373,9 @@ function retrievePerformanceReviews(): void {
     } else {
       performanceReviewStore
         .getAllSignaturePerformanceReviewsActionNotRequired()
+        .then(() => {
+          reviewsLoaded.value = true
+        })
         .catch(e => {
           console.error(
             'Error retrieving',
@@ -367,6 +387,9 @@ function retrievePerformanceReviews(): void {
   } else {
     if (props.actionRequired) {
       performanceReviewStore.getAllPerformanceReviewsActionRequired()
+        .then(() => {
+          reviewsLoaded.value = true
+        })
         .catch(e => {
           console.error(
             'Error retrieving getAllPerformanceReviewsActionRequired:', e
@@ -374,6 +397,9 @@ function retrievePerformanceReviews(): void {
         })
     } else {
       performanceReviewStore.getAllPerformanceReviewsActionNotRequired()
+        .then(() => {
+          reviewsLoaded.value = true
+        })
         .catch(e => {
           console.error(
             'Error retrieving getAllPerformanceReviewsActionNotRequired:', e

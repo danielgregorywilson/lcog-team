@@ -1,6 +1,6 @@
 # LCOG Team App Backend Readme
 
-Python 3.11.2 
+Python 3.12.2 
 
 # Run the backend locally
 # MacOS

@@ -66,7 +66,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { ReviewNoteRetrieve } from '../store/types'
 import { bus } from '../App.vue'
-import { PerformanceReviewRetrieve } from '../store/types'
+import { ReviewRetrieve } from '../store/types'
 import '../filters'
 
 interface EvaluationColumn {
@@ -82,7 +82,7 @@ interface EvaluationColumn {
 
 interface QuasarTeleworkApplicationTableRowClickActionProps {
   evt: MouseEvent;
-  row: PerformanceReviewRetrieve;
+  row: ReviewRetrieve;
 }
 
 @Component

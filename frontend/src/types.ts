@@ -245,7 +245,7 @@ export type PRFormFactor = {
 
 export type PRSignatures = Array<[string, string, Date, number, boolean]>
 
-export interface PerformanceReviewRetrieve {
+export interface ReviewRetrieve {
   url: Url
   pk: number
   employee_pk: number

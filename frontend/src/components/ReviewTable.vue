@@ -203,51 +203,40 @@ import { useRouter } from 'vue-router'
 
 import useEventBus from 'src/eventBus'
 import { readableDate } from 'src/filters'
-import { usePerformanceReviewStore } from 'src/stores/performancereview'
-import { PerformanceReviewRetrieve } from 'src/types'
+import { useReviewStore } from 'src/stores/review'
+import { ReviewRetrieve } from 'src/types'
 
-interface QuasarPerformanceReviewTableRowClickActionProps {
+interface QuasarReviewTableRowClickActionProps {
   evt: MouseEvent;
-  row: PerformanceReviewRetrieve;
+  row: ReviewRetrieve;
 }
 
 const props = defineProps<{
-  signature?: boolean,
-  actionRequired?: boolean,
+  // Provide either employeePk or managerPk
   employeePk?: number, // If provided, show PRs for this employee
+  
   managerPk?: number, // If provided, show direct report PRs for this manager
+  // If managerPk is provided, provide either complete or incomplere
+  complete?: boolean, // Show only completed PRs
+  incomplete?: boolean, // Show only incomplete PRs
 }>()
 
 const router = useRouter()
 const { bus } = useEventBus()
-const performanceReviewStore = usePerformanceReviewStore()
+const reviewStore = useReviewStore()
 let reviewsLoaded = ref(false)
 
 // let lastPk = ref(-1)
 
-function performanceReviews(): Array<PerformanceReviewRetrieve> {
-  let prs = []
+function performanceReviews(): Array<ReviewRetrieve> {
+  let prs = [] as Array<ReviewRetrieve>
   if (props.employeePk) {
-    prs = performanceReviewStore.allEmployeePerformanceReviews
+    prs = reviewStore.employeePRs
   } else if (props.managerPk) {
-    if (props.actionRequired && props.actionRequired === true) {
-      prs = performanceReviewStore.allManagerPerformanceReviewsActionRequired
-    } else if (props.actionRequired && props.actionRequired === false) {
-      prs = performanceReviewStore.allManagerPerformanceReviewsActionNotRequired
-    } else {
-      prs = performanceReviewStore.allManagerPerformanceReviews
-    }
-  } else if (props.signature) {
-    if (props.actionRequired && props.actionRequired === true) {
-      prs = performanceReviewStore.allSignaturePerformanceReviewsActionRequired
-    } else {
-      prs = performanceReviewStore.allSignaturePerformanceReviewsActionNotRequired
-    }
-  } else {
-    if (props.actionRequired && props.actionRequired === true) {
-      prs = performanceReviewStore.allPerformanceReviewsActionRequired
-    } else {
-      prs = performanceReviewStore.allPerformanceReviewsActionNotRequired
+    if (props.complete && props.complete === true) {
+      prs = reviewStore.completePRs
+    } else if (props.incomplete && props.incomplete === true) {
+      prs = reviewStore.incompletePRs
     }
   }
   return prs.sort((a, b) => {
@@ -256,51 +245,25 @@ function performanceReviews(): Array<PerformanceReviewRetrieve> {
 }
 
 function columns(): QTableProps['columns'] {
-  if (props.signature) {
-    return [
-      {
-        name: 'employeeName', label: 'Employee', align: 'center',
-        field: 'employee_name', sortable: true
-      },
-      {
-        name: 'managerName', label: 'Manager', align: 'center',
-        field: 'manager_name', sortable: true
-      },
-      {
-        name: 'performancePeriod', align: 'center', label: 'Performance Period',
-        field: 'performance_period'
-      },
-      {
-        name: 'daysUntilReview', align: 'center', label: 'Days Until Review',
-        field: 'days_until_review', sortable: true
-      },
-      {
-        name: 'status', align: 'center', label: 'Status', field: 'status',
-        sortable: true
-      },
-      { name: 'actions', label: 'Actions', align: 'center', field: ''},
-    ]
-  } else {
-    return [
-      {
-        name: 'employeeName', label: 'Employee', align: 'center',
-        field: 'employee_name', sortable: true
-      },
-      {
-        name: 'performancePeriod', align: 'center', label: 'Performance Period',
-        field: 'performance_period'
-      },
-      {
-        name: 'daysUntilReview', align: 'center', label: 'Days Until Review',
-        field: 'days_until_review', sortable: true
-      },
-      {
-        name: 'status', align: 'center', label: 'Status', field: 'status',
-        sortable: true
-      },
-      { name: 'actions', label: 'Actions', align: 'center', field: ''},
-    ]
-  }
+  return [
+    {
+      name: 'employeeName', label: 'Employee', align: 'center',
+      field: 'employee_name', sortable: true
+    },
+    {
+      name: 'performancePeriod', align: 'center', label: 'Performance Period',
+      field: 'performance_period'
+    },
+    {
+      name: 'daysUntilReview', align: 'center', label: 'Days Until Review',
+      field: 'days_until_review', sortable: true
+    },
+    {
+      name: 'status', align: 'center', label: 'Status', field: 'status',
+      sortable: true
+    },
+    { name: 'actions', label: 'Actions', align: 'center', field: ''},
+  ]
 }
 
 function lateReviewClass(daysUntilReview: number): string {
@@ -314,11 +277,12 @@ function lateReviewClass(daysUntilReview: number): string {
 }
 
 function noDataLabel(): string {
-  if (props.actionRequired) {
-    return 'Great work! All done here.'
-  } else {
-    return 'Nothing to show.'
-  }
+  // if (props.actionRequired) {
+  //   return 'Great work! All done here.'
+  // } else {
+  //   return 'Nothing to show.'
+  // }
+  return 'Nothing to show.'
 }
 
 function retrievePerformanceReviews(): void {
@@ -330,79 +294,35 @@ function retrievePerformanceReviews(): void {
   // lastPk.value = props.pk
 
   if (props.employeePk) {
-    performanceReviewStore.getAllEmployeePerformanceReviews(props.employeePk)
+    reviewStore.getEmployeePRs(props.employeePk)
+      .then(() => {
+        reviewsLoaded.value = true
+      })
+      .catch(e => {
+        console.error('Error retrieving employee PRs:', e)
+      })
   }
-  if (props.managerPk) {
-    if (props.actionRequired) {
-      performanceReviewStore.getAllManagerPerformanceReviewsActionRequired(props.managerPk)
+  else if (props.managerPk) {
+    if (props.complete) {
+      reviewStore.getCompletePRs(props.managerPk)
         .then(() => {
           reviewsLoaded.value = true
         })
         .catch(e => {
           console.error(
-            'Error retrieving getAllManagerPerformanceReviewsActionRequired:',
+            'Error retrieving getCompletePRs:',
             e
           )
         })
-    } else {
-      performanceReviewStore.getAllManagerPerformanceReviewsActionNotRequired(props.managerPk)
+    } else if (props.incomplete) {
+      reviewStore.getIncompletePRs(props.managerPk)
         .then(() => {
           reviewsLoaded.value = true
         })
         .catch(e => {
           console.error(
-            'Error retrieving getAllManagerPerformanceReviewsActionNotRequired:',
+            'Error retrieving getIncompletePRs:',
             e
-          )
-        })
-    }
-  }
-  
-  if (props.signature) {
-    if (props.actionRequired) {
-      performanceReviewStore.getAllSignaturePerformanceReviewsActionRequired()
-        .then(() => {
-          reviewsLoaded.value = true
-        })
-        .catch(e => {
-          console.error(
-            'Error retrieving getAllSignaturePerformanceReviewsActionRequired:',
-            e
-          )
-        })
-    } else {
-      performanceReviewStore
-        .getAllSignaturePerformanceReviewsActionNotRequired()
-        .then(() => {
-          reviewsLoaded.value = true
-        })
-        .catch(e => {
-          console.error(
-            'Error retrieving',
-            'getAllSignaturePerformanceReviewsActionNotRequired:',
-            e
-          )
-        })
-    }
-  } else {
-    if (props.actionRequired) {
-      performanceReviewStore.getAllPerformanceReviewsActionRequired()
-        .then(() => {
-          reviewsLoaded.value = true
-        })
-        .catch(e => {
-          console.error(
-            'Error retrieving getAllPerformanceReviewsActionRequired:', e
-          )
-        })
-    } else {
-      performanceReviewStore.getAllPerformanceReviewsActionNotRequired()
-        .then(() => {
-          reviewsLoaded.value = true
-        })
-        .catch(e => {
-          console.error(
-            'Error retrieving getAllPerformanceReviewsActionNotRequired:', e
           )
         })
     }
@@ -410,7 +330,7 @@ function retrievePerformanceReviews(): void {
 }
 
 function navigateToEmployeeDetail(
-  props: QuasarPerformanceReviewTableRowClickActionProps
+  props: QuasarReviewTableRowClickActionProps
 ): void {
   router.push({ name: 'profile', params: { pk: props.row.employee_pk } })
     .catch(e => {
@@ -419,7 +339,7 @@ function navigateToEmployeeDetail(
 }
 
 function editEvaluation(
-  props: QuasarPerformanceReviewTableRowClickActionProps
+  props: QuasarReviewTableRowClickActionProps
 ): void {
   router.push({ name: 'pr-details', params: { pk: props.row.pk } })
     .catch(e => {
@@ -428,7 +348,7 @@ function editEvaluation(
 }
 
 function copyFeedbackLinkToClipboard(
-  props: QuasarPerformanceReviewTableRowClickActionProps
+  props: QuasarReviewTableRowClickActionProps
 ): void {
   const origin = window.location.origin
   const url = `${origin}/note/new?employee=${props.row.employee_pk}`
@@ -448,7 +368,7 @@ function copyFeedbackLinkToClipboard(
 }
 
 function printEvaluation(
-  props: QuasarPerformanceReviewTableRowClickActionProps
+  props: QuasarReviewTableRowClickActionProps
 ): void {
   router.push({ name: 'pr-print', params: { pk: props.row.pk } })
     .catch(e => {
@@ -457,7 +377,7 @@ function printEvaluation(
 }
 
 function printEvaluationPositionDescription(
-  props: QuasarPerformanceReviewTableRowClickActionProps
+  props: QuasarReviewTableRowClickActionProps
 ): void {
   window.location.href = props.row.signed_position_description
 }

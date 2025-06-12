@@ -172,7 +172,7 @@ export const useUserStore = defineStore('user', {
 
             // TODO: Convert this
             // dispatch(
-            //   'performanceReviewModule/getNextPerformanceReview',
+            //   'performanceReviewModule/getMyNextPR',
             //   {pk: resp.data.pk}, { root: true }
             // )
             //   .catch(err => console.log(err))

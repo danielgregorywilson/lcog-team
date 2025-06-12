@@ -161,17 +161,17 @@ class ManagerWritesEvaluationTestCase(BaseEmailRemindersTestCase):
         #     # top_step_bonus: "Y"
         # }
         # client = APIClient()
-        # client.post(f'/api/v1/performancereview/{pr.pk}', {'factor_initiative': 'N'}, format='json')
+        # client.post(f'/api/v1/review/{pr.pk}', {'factor_initiative': 'N'}, format='json')
         # pr2 = PerformanceReview.objects.get(pk=pr.pk)
         # print("PR2FI", pr2.factor_initiative)
         # self.assertEqual(pr2.factor_initiative, 'N')
         # import pdb; pdb.set_trace()
         
         # headers = {'Authorization': 'Token 05c5ab7d90b00e4278ec37ffb8394953e4a8c97e'}
-        # requests.put(f'http://lcog-team:8000/api/v1/performancereview/{pr.pk}', data=update_data, headers=headers)
+        # requests.put(f'http://lcog-team:8000/api/v1/review/{pr.pk}', data=update_data, headers=headers)
         # import pdb; pdb.set_trace()
 
-        # http.put(`api/v1/performancereview/${pk}`, data)
+        # http.put(`api/v1/review/${pk}`, data)
 
 
         # action_other: null

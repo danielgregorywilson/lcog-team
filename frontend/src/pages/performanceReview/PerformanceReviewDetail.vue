@@ -1097,6 +1097,7 @@ onMounted(() => {
     })
     .catch(e => {
       console.error('Error retrieving PR on PR detail page mount:', e)
+      returnToDashboard()
     })
 })
 </script>

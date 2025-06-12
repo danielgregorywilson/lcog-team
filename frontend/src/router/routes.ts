@@ -168,12 +168,14 @@ if (maintenanceMode) {
           path: '/reviews',
           name: 'reviews',
           component: () => import('pages/performanceReview/PerformanceReviewList.vue'),
+          meta: { requiresAuth: true },
           // beforeEnter: ifManager
         },
         {
           path: '/pr/:pk',
           name: 'pr-details',
           component: () => import('pages/performanceReview/PerformanceReviewDetail.vue'),
+          meta: { requiresAuth: true, },
           // beforeEnter: ifCanViewReview
           children: [
             {
@@ -188,18 +190,21 @@ if (maintenanceMode) {
           path: '/pr/:pk/self',
           name: 'pr-self-evaluation',
           component: () => import('pages/performanceReview/SelfEvaluation.vue'),
+          meta: { requiresAuth: true },
           // beforeEnter: ifCanViewReview
         },
         {
           path: '/note/new',
           name: 'note-create',
           component: () => import('src/pages/performanceReview/ReviewNoteCreate.vue'),
+          meta: { requiresAuth: true },
           // beforeEnter: ifManager
         },
         {
           path: '/note/:pk',
           name: 'note-details',
           component: () => import('src/pages/performanceReview/ReviewNoteDetail.vue'),
+          meta: { requiresAuth: true },
           // beforeEnter: ifCanViewNote
         },
 

@@ -60,7 +60,7 @@ import { useQuasar } from 'quasar'
 import { onMounted, ref, Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { usePerformanceReviewStore } from 'src/stores/performancereview'
+import { useReviewStore } from 'src/stores/review'
 import { useUserStore } from 'src/stores/user'
 import { PRSignatures } from 'src/types'
 import { getRoutePk } from 'src/utils'
@@ -68,7 +68,7 @@ import { getRoutePk } from 'src/utils'
 const $q = useQuasar()
 const route = useRoute()
 const router = useRouter()
-const performanceReviewStore = usePerformanceReviewStore()
+const reviewStore = useReviewStore()
 const userStore = useUserStore()
 
 const props = defineProps<{
@@ -150,7 +150,7 @@ function retrievePerformanceReview() {
   return new Promise((resolve, reject) => {
     const routePk = getRoutePk(route)
     if (routePk) {
-      performanceReviewStore.getPerformanceReview(routePk)
+      reviewStore.getPerformanceReview(routePk)
         .then((pr) => {
           if (!pr) {
             console.log('PR does not seem to exist. Redirecting...')
@@ -208,7 +208,7 @@ function retrievePerformanceReview() {
 }
 
 function updateEmployeeComments(): void {
-  performanceReviewStore.updatePerformanceReviewPartial(prPk.value.toString(), {
+  reviewStore.updatePerformanceReviewPartial(prPk.value.toString(), {
     evaluation_comments_employee: evaluationCommentsEmployee.value,
   })
     .then((pr) => {

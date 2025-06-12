@@ -48,7 +48,7 @@ import { useRoute, useRouter } from 'vue-router'
 
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
 import { usePeopleStore } from 'src/stores/people'
-import { usePerformanceReviewStore } from 'src/stores/performancereview'
+import { useReviewStore } from 'src/stores/review'
 import { emptyEmployee, SimpleEmployee } from 'src/types'
 import { getRouteQuery } from 'src/utils'
 
@@ -56,7 +56,7 @@ const $q = useQuasar()
 const route = useRoute()
 const router = useRouter()
 const peopleStore = usePeopleStore()
-const performanceReviewStore = usePerformanceReviewStore()
+const reviewStore = useReviewStore()
 
 // From route query
 let employeeFullName = ref('')
@@ -114,7 +114,7 @@ function formIsFilled(): boolean {
 }
 
 function createReviewNote(): void {
-  performanceReviewStore.createReviewNote({
+  reviewStore.createReviewNote({
     employee_pk: employee.value.pk,
     note: note.value,
   })

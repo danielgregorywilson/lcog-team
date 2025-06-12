@@ -66,7 +66,7 @@ router.register('v1/expense-month', ExpenseMonthViewSet)
 router.register('v1/expense-month-lock', ExpenseMonthLockViewSet)
 router.register('v1/expense-statement', ExpenseStatementViewSet)
 # Performance Reviews
-router.register('v1/performancereview', PerformanceReviewViewSet)
+router.register('v1/review', PerformanceReviewViewSet)
 router.register('v1/signature', SignatureViewSet)
 router.register('v1/reviewnote', ReviewNoteViewSet)
 # Telework

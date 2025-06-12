@@ -284,10 +284,8 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
             else:
                 employee = self.request.query_params.get('employee', None)
                 manager = self.request.query_params.get('manager', None)
-                signature = self.request.query_params.get('signature', None)
-                action_required = self.request.query_params.get(
-                    'action_required', None
-                )
+                complete = self.request.query_params.get('complete', None)
+                incomplete = self.request.query_params.get('incomplete', None)
                 if employee is not None:
                     # All PRs for a given employee
                     queryset = PerformanceReview.objects.filter(
@@ -298,40 +296,16 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
                     queryset = PerformanceReview.objects.filter(
                         employee__manager__pk=int(manager)
                     )
-                elif is_true_string(signature):
-                    if action_required is not None:
-                        if is_true_string(action_required):
-                            # Signature and action required
-                            queryset = PerformanceReview\
-                                .signature_upcoming_reviews_action_required\
-                                .get_queryset(user)
-                        else:
-                            # Signature and no action required
-                            queryset = PerformanceReview\
-                                .signature_upcoming_reviews_no_action_required\
-                                .get_queryset(user)    
-                    else:
-                        # Signature required
-                        queryset = PerformanceReview\
-                            .signature_all_relevant_upcoming_reviews\
-                            .get_queryset(user)
-                elif action_required is not None:
-                    if is_true_string(action_required):
-                        queryset = PerformanceReview\
-                            .manager_upcoming_reviews_action_required\
-                            .get_queryset(user)
-                    else:
-                        queryset = PerformanceReview\
-                            .manager_upcoming_reviews_no_action_required\
-                            .get_queryset(user)
-                else:
-                    # PRs for which the current user is the manager
-                    manager_prs = PerformanceReview.objects.filter(
-                        employee__manager__user=user)
-                    # PRs for the current user
-                    employee_prs = PerformanceReview.objects.filter(
-                        employee__user=user)
-                    queryset = manager_prs | employee_prs # Default queryset
+                
+                # Filter to either complete or incomplete reviews
+                if is_true_string(complete):
+                    queryset = queryset.filter(
+                        status=PerformanceReview.EVALUATION_ED_APPROVED
+                    )
+                elif is_true_string(incomplete):
+                    queryset = queryset.exclude(
+                        status=PerformanceReview.EVALUATION_ED_APPROVED
+                    )
         else:
             queryset = PerformanceReview.objects.none()
         return queryset

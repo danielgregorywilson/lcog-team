@@ -19,16 +19,27 @@
       />
     </q-btn-group>
   </div>
-  <div class="row items-center justify-between">
-    <div class="text-h5">Complete Reviews</div>
-    <!-- <div>Only the 100 most recently completed reviews are shown.</div> -->
+
+  <!-- REVIEWS MANAGED -->
+  <div v-if="isManager()">
+    <div class="row items-center q-mb-sm q-mt-md">
+      <q-avatar
+        icon="assignment_ind"
+        color="primary"
+        text-color="white"
+        font-size="22px"
+        class="q-mr-sm"
+        size="md"
+      />
+      <div class="text-h5">Complete Reviews</div>
+      <!-- <div>Only the 100 most recently completed reviews are shown.</div> -->
+    </div>
+      <ReviewTable
+        :managerPk="userStore.getEmployeeProfile.employee_pk"
+        :complete="true"
+      />
+      <!-- TODO: For now we just have one complete page/table -->
   </div>
-  <ReviewTable
-    :managerPk="userStore.getEmployeeProfile.employee_pk"
-    :complete="true"
-  />
-  <!-- TODO: For now we just have one complete page/table -->
-  <!-- <router-view /> -->
 </template>
 
 <script setup lang="ts">
@@ -45,5 +56,9 @@ const userStore = useUserStore()
 // const workflowsStore = useWorkflowsStore()
 
 // let workflowsLoaded = ref(false)
+
+function isManager() {
+    return userStore.getEmployeeProfile.is_manager
+}
 
 </script>

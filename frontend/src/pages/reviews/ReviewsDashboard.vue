@@ -20,6 +20,7 @@
     </q-btn-group>
   </div>
 
+  <!-- REVIEWS TO MANAGE -->
   <div v-if="isManager()">
     <div class="row items-center q-mb-sm q-mt-md">
       <q-avatar
@@ -32,10 +33,10 @@
       />
       <div class="text-h5">Current Reviews</div>
     </div>
-    <ReviewTable
-      :managerPk="userStore.getEmployeeProfile.employee_pk"
-      :incomplete="true"
-    />
+      <ReviewTable
+        :managerPk="userStore.getEmployeeProfile.employee_pk"
+        :incomplete="true"
+      />
   </div>
 
   <!-- REVIEWS TO SIGN -->

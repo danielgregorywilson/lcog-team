@@ -97,10 +97,10 @@ export const useReviewStore = defineStore('review', {
     getCompletePRs(managerPk: number) {
       return new Promise((resolve, reject) => {
         axios(
-          { url: `${ apiURL }api/v1/review?action_required=True` }
+          { url: `${ apiURL }api/v1/review?complete=True&manager=${ managerPk }` }
         )
           .then(resp => {
-            this.incompletePRs = resp.data.results
+            this.completePRs = resp.data.results
             resolve(resp)
           })
           .catch(e => {

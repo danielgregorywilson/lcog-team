@@ -878,6 +878,27 @@ class PerformanceReview(models.Model):
             return True
         return False
 
+    def employee_action_required(self, employee):
+        # Return (True, reason) if action is required. Else, return False
+        # Manager might need to complete review
+        if all([
+            self.status == PerformanceReview.NEEDS_EVALUATION,
+            self.employee.manager == employee
+        ]):
+            return True, "Review is ready for completion"
+        # Employee might need to complete self-evaluation
+        if all([
+            self.evaluation_comments_employee == "",
+            self.employee == employee
+        ]):
+            return True, "Please complete your self-evaluation"
+        # Anyone might need to sign the review
+        signatures = self.all_required_signatures()
+        for signature in signatures:
+            if signature[4] and signature[3] == employee.pk:
+                return True, "Your signature is required"
+        return False, ""
+
     def employee_has_signed(self, employee):
         return Signature.objects.filter(review=self, employee=employee).count()
 

@@ -289,6 +289,7 @@ export interface ReviewRetrieve {
   evaluation_goals_manager: string
   evaluation_comments_employee: string
 
+  employee_action_required: [boolean, string]
   position_description_link: string
   description_reviewed_employee: boolean
   signed_position_description: string

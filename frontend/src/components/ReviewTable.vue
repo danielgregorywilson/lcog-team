@@ -32,8 +32,8 @@
       </template>
       <template v-slot:body-cell-performancePeriod="props">
         <q-td key="performancePeriod" :props="props">
-          {{ readableDate(props.row.period_start_date) }} -
-          {{ readableDate(props.row.period_end_date) }}
+          {{ readableDateNEW(props.row.period_start_date) }} -
+          {{ readableDateNEW(props.row.period_end_date) }}
         </q-td>
       </template>
       <template v-slot:body-cell-daysUntilReview="props">
@@ -92,6 +92,16 @@
                 Print Performance Review Form
               </q-tooltip>
             </q-btn>
+            <q-icon
+              v-if="props.row.employee_action_required[0]"
+              color="orange"
+              name="warning"
+              size="md"
+            >
+              <q-tooltip content-style="font-size: 16px">
+                <div>{{ props.row.employee_action_required[1]}}</div>
+              </q-tooltip>
+            </q-icon>
           </div>
         </q-td>
       </template>
@@ -125,8 +135,8 @@
                     class="q-table__grid-item-value"
                     v-else-if="col.label == 'Performance Period'"
                   >
-                    {{ readableDate(props.row.period_start_date) }} -
-                    {{ readableDate(props.row.period_end_date) }}
+                    {{ readableDateNEW(props.row.period_start_date) }} -
+                    {{ readableDateNEW(props.row.period_end_date) }}
                   </div>
                   <div
                     class="q-table__grid-item-value row q-gutter-sm"
@@ -202,7 +212,7 @@ import { onMounted, onUpdated, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 import useEventBus from 'src/eventBus'
-import { readableDate } from 'src/filters'
+import { readableDateNEW } from 'src/filters'
 import { useReviewStore } from 'src/stores/review'
 import { ReviewRetrieve } from 'src/types'
 

@@ -275,6 +275,7 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     all_required_signatures = serializers.SerializerMethodField()
     position_description_link = serializers.SerializerMethodField()
     signed_position_description = serializers.FileField()
+    employee_action_required = serializers.SerializerMethodField()
  
     class Meta:
         model = PerformanceReview
@@ -297,7 +298,8 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
             'evaluation_goals_employee','evaluation_comments_employee',
 
             'position_description_link', 'description_reviewed_employee',
-            'signed_position_description', 'all_required_signatures'
+            'signed_position_description', 'all_required_signatures',
+            'employee_action_required'
         ]
     
     @staticmethod
@@ -371,6 +373,15 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     @staticmethod
     def get_all_required_signatures(pr):
         return pr.all_required_signatures()
+    
+    def get_employee_action_required(self, pr):
+        user = None
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            user = request.user
+        if user and hasattr(user, 'employee'):
+            return pr.employee_action_required(user.employee)
+        return False
 
 
 class PerformanceReviewFileUploadSerializer(

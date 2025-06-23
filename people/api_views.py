@@ -279,7 +279,7 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
         """
         user = self.request.user
         if user.is_authenticated:
-            if user.is_staff:
+            if user.is_superuser:
                 queryset = PerformanceReview.objects.all()
             else:
                 employee = self.request.query_params.get('employee', None)

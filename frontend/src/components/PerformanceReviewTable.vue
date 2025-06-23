@@ -222,15 +222,21 @@ function performanceReviews(): Array<PerformanceReviewRetrieve> {
   if (props.employeePk) {
     prs = performanceReviewStore.allEmployeePerformanceReviews
   } else if (props.managerPk) {
-    prs = performanceReviewStore.allManagerPerformanceReviews
+    if (props.actionRequired && props.actionRequired === true) {
+      prs = performanceReviewStore.allManagerPerformanceReviewsActionRequired
+    } else if (props.actionRequired && props.actionRequired === false) {
+      prs = performanceReviewStore.allManagerPerformanceReviewsActionNotRequired
+    } else {
+      prs = performanceReviewStore.allManagerPerformanceReviews
+    }
   } else if (props.signature) {
-    if (props.actionRequired) {
+    if (props.actionRequired && props.actionRequired === true) {
       prs = performanceReviewStore.allSignaturePerformanceReviewsActionRequired
     } else {
       prs = performanceReviewStore.allSignaturePerformanceReviewsActionNotRequired
     }
   } else {
-    if (props.actionRequired) {
+    if (props.actionRequired && props.actionRequired === true) {
       prs = performanceReviewStore.allPerformanceReviewsActionRequired
     } else {
       prs = performanceReviewStore.allPerformanceReviewsActionNotRequired
@@ -319,7 +325,23 @@ function retrievePerformanceReviews(): void {
     performanceReviewStore.getAllEmployeePerformanceReviews(props.employeePk)
   }
   if (props.managerPk) {
-    performanceReviewStore.getAllManagerPerformanceReviews(props.managerPk)
+    if (props.actionRequired) {
+      performanceReviewStore.getAllManagerPerformanceReviewsActionRequired(props.managerPk)
+        .catch(e => {
+          console.error(
+            'Error retrieving getAllManagerPerformanceReviewsActionRequired:',
+            e
+          )
+        })
+    } else {
+      performanceReviewStore.getAllManagerPerformanceReviewsActionNotRequired(props.managerPk)
+        .catch(e => {
+          console.error(
+            'Error retrieving getAllManagerPerformanceReviewsActionNotRequired:',
+            e
+          )
+        })
+    }
   }
   
   if (props.signature) {

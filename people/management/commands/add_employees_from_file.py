@@ -175,10 +175,11 @@ class Command(BaseCommand):
                 if user.email != email:
                     # Don't update email if we're just updating from @lcog-or.gov to @lcog.org
                     if user.email.endswith('@lcog-or.gov') and email.endswith('@lcog.org'):
-                        self.stdout.write(
-                            'Skipping email update for user {} {} from {} to {}'
-                                .format(user.first_name, user.last_name, user.email, email)
-                        )
+                        pass
+                        # self.stdout.write(
+                        #     'Skipping email update for user {} {} from {} to {}'
+                        #         .format(user.first_name, user.last_name, user.email, email)
+                        # )
                     else:
                         user.email = email
                         user.save()
@@ -284,6 +285,8 @@ class Command(BaseCommand):
                         manager = Employee.objects.get(user__last_name='Campbell', user__first_name='Laura')
                     elif manager_last_name == 'Callister':
                         manager = Employee.objects.get(user__last_name='Callister', user__first_name='Jacob')
+                    elif manager_last_name == 'Wilson':
+                        manager = Employee.objects.get(user__last_name='Wilson', user__first_name='Daniel')
                     else:
                         try:
                             manager = Employee.objects.get(user__last_name=manager_last_name)

@@ -52,10 +52,9 @@
       </template>
       <template v-slot:body-cell-actions="props">
         <q-td :props="props">
-          <div class="row">
+          <div class="row items-center justify-center q-gutter-xs">
             <!-- Edit/detail button -->
             <q-btn
-              class="col edit-button"
               dense
               round
               flat
@@ -70,7 +69,6 @@
             <!-- Feedback link button: Only show to managers -->
             <q-btn
               v-if="managerPk" 
-              class="col edit-button"
               dense
               round
               flat
@@ -85,7 +83,6 @@
             <!-- Print button: Only show to managers -->
             <q-btn
               v-if="managerPk"
-              class="col print-button"
               dense
               round
               flat
@@ -151,12 +148,12 @@
                     {{ props.row.days_until_review }}
                   </div>
                   <div
-                    class="q-table__grid-item-value row q-gutter-sm"
+                    class="q-table__grid-item-value row q-gutter-sm items-center
+                      justify-around"
                     v-else-if="col.label == 'Actions'"
                   >
                     <!-- Edit/detail button -->
                     <q-btn
-                      class="col edit-button"
                       dense
                       round
                       flat
@@ -171,7 +168,6 @@
                     <!-- Feedback link button: Only show to managers -->
                     <q-btn
                       v-if="managerPk" 
-                      class="col edit-button"
                       dense
                       round
                       flat
@@ -186,7 +182,6 @@
                     <!-- Print button: Only show to managers -->
                     <q-btn
                       v-if="managerPk"
-                      class="col print-button"
                       dense
                       round
                       flat

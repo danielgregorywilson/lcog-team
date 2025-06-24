@@ -286,27 +286,49 @@ function performanceReviews(): Array<ReviewRetrieve> {
   })
 }
 
-function columns(): QTableProps['columns'] {
-  return [
-    {
-      name: 'employeeName', label: 'Employee', align: 'center',
-      field: 'employee_name', sortable: true
-    },
-    {
-      name: 'performancePeriod', align: 'center', label: 'Performance Period',
-      field: 'performance_period'
-    },
-    {
-      name: 'daysUntilReview', align: 'center', label: 'Days Until Review',
-      field: 'days_until_review', sortable: true
-    },
-    {
-      name: 'status', align: 'center', label: 'Status', field: 'status',
-      sortable: true
-    },
-    { name: 'actions', label: 'Actions', align: 'center', field: ''},
-  ]
+function columns() {
+  if (props.managerPk) {
+    return managerColumns
+  } else {
+    return employeeColumns
+  }
 }
+
+const managerColumns: QTableProps['columns'] = [
+  {
+    name: 'employeeName', label: 'Employee', align: 'center',
+    field: 'employee_name', sortable: true
+  },
+  {
+    name: 'performancePeriod', align: 'center', label: 'Performance Period',
+    field: 'performance_period'
+  },
+  {
+    name: 'daysUntilReview', align: 'center', label: 'Days Until Review',
+    field: 'days_until_review', sortable: true
+  },
+  {
+    name: 'status', align: 'center', label: 'Status', field: 'status',
+    sortable: true
+  },
+  { name: 'actions', label: 'Actions', align: 'center', field: ''},
+]
+
+const employeeColumns: QTableProps['columns'] = [
+  {
+    name: 'performancePeriod', align: 'center', label: 'Performance Period',
+    field: 'performance_period'
+  },
+  {
+    name: 'daysUntilReview', align: 'center', label: 'Days Until Review',
+    field: 'days_until_review', sortable: true
+  },
+  {
+    name: 'status', align: 'center', label: 'Status', field: 'status',
+    sortable: true
+  },
+  { name: 'actions', label: 'Actions', align: 'center', field: ''},
+]
 
 function lateReviewClass(daysUntilReview: number): string {
   if (daysUntilReview < 0) {

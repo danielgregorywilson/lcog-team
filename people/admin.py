@@ -102,24 +102,25 @@ class PerformanceReviewAdmin(admin.ModelAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
         pr_exists = hasattr(obj, 'pk')
-        user_is_superuser = request.user.is_superuser
-        employee_cannot_view_pr = not hasattr(request.user, 'employee') or \
-            obj.pk not in request.user.employee.prs_can_view()
-        if pr_exists and not user_is_superuser and employee_cannot_view_pr:
-            self.exclude = (
-                'step_increase', 'top_step_bonus', 'action_other',
-                'factor_job_knowledge', 'factor_work_quality',
-                'factor_work_quantity', 'factor_work_habits',
-                'factor_analysis', 'factor_initiative', 'factor_interpersonal',
-                'factor_communication', 'factor_dependability',
-                'factor_professionalism', 'factor_management',
-                'factor_supervision', 'evaluation_successes',
-                'evaluation_opportunities', 'evaluation_goals_manager',
-                'evaluation_goals_employee', 'evaluation_comments_employee',
-                'description_reviewed_employee', 'signed_position_description'
-            )
-        else:
-            self.exclude = ()
+        if pr_exists:
+            user_is_superuser = request.user.is_superuser
+            employee_cannot_view_pr = not hasattr(request.user, 'employee') or \
+                obj.pk not in request.user.employee.prs_can_view()
+            if not user_is_superuser and employee_cannot_view_pr:
+                self.exclude = (
+                    'step_increase', 'top_step_bonus', 'action_other',
+                    'factor_job_knowledge', 'factor_work_quality',
+                    'factor_work_quantity', 'factor_work_habits',
+                    'factor_analysis', 'factor_initiative', 'factor_interpersonal',
+                    'factor_communication', 'factor_dependability',
+                    'factor_professionalism', 'factor_management',
+                    'factor_supervision', 'evaluation_successes',
+                    'evaluation_opportunities', 'evaluation_goals_manager',
+                    'evaluation_goals_employee', 'evaluation_comments_employee',
+                    'description_reviewed_employee', 'signed_position_description'
+                )
+            else:
+                self.exclude = ()
         form = super(PerformanceReviewAdmin, self).get_form(
             request, obj, **kwargs
         )

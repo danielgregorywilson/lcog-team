@@ -38,12 +38,12 @@ import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 import EmployeeSelect from 'src/components/EmployeeSelect.vue'
-import { usePerformanceReviewStore } from 'src/stores/performancereview'
+import { useReviewStore } from 'src/stores/review'
 import { getRoutePk } from 'src/utils'
 
 const $q = useQuasar()
 const route = useRoute()
-const performanceReviewStore = usePerformanceReviewStore()
+const reviewStore = useReviewStore()
 
 const notePk = ref('')
 let employeePk = ref(-1)
@@ -79,7 +79,7 @@ function valuesAreChanged(): boolean {
 }
 
 function updateReviewNote(): void {
-  performanceReviewStore.updateReviewNote({
+  reviewStore.updateReviewNote({
     pk: parseInt(notePk.value),
     employee_pk: employeePk.value,
     note: note.value
@@ -94,7 +94,7 @@ function retrieveReviewNote(): void {
   const routePk = getRoutePk(route)
   if (routePk) {
     notePk.value = routePk
-    performanceReviewStore.getReviewNote(routePk)
+    reviewStore.getReviewNote(routePk)
       .then((reviewNote) => {
         employeePk.value = reviewNote.employee_pk
         note.value = reviewNote.note

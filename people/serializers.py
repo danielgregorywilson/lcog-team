@@ -82,6 +82,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
     workflow_roles = serializers.SerializerMethodField()
     is_expense_submitter = serializers.SerializerMethodField()
     is_expense_approver = serializers.SerializerMethodField()
+    can_view_reviews = serializers.SerializerMethodField()
     can_view_mow_routes = serializers.SerializerMethodField()
     can_manage_mow_stops = serializers.SerializerMethodField()
     workflow_display_options = serializers.SerializerMethodField()
@@ -105,7 +106,7 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
             'email_opt_out_workflows_processes', 'email_opt_out_expenses_all',
             'is_all_workflows_admin', 'admin_of_workflows',
             'admin_of_processes', 'workflow_roles', 'is_expense_submitter',
-            'is_expense_approver', 'can_view_mow_routes',
+            'is_expense_approver', 'can_view_reviews', 'can_view_mow_routes',
             'can_manage_mow_stops', 'workflow_display_options'
         ]
 
@@ -219,6 +220,10 @@ class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
         return employee.is_expense_approver()
 
     @staticmethod
+    def get_can_view_reviews(employee):
+        return employee.can_view_reviews()
+
+    @staticmethod
     def get_can_view_mow_routes(employee):
         return employee.can_view_mow_routes()
 
@@ -270,6 +275,7 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     all_required_signatures = serializers.SerializerMethodField()
     position_description_link = serializers.SerializerMethodField()
     signed_position_description = serializers.FileField()
+    employee_action_required = serializers.SerializerMethodField()
  
     class Meta:
         model = PerformanceReview
@@ -292,7 +298,8 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
             'evaluation_goals_employee','evaluation_comments_employee',
 
             'position_description_link', 'description_reviewed_employee',
-            'signed_position_description', 'all_required_signatures'
+            'signed_position_description', 'all_required_signatures',
+            'employee_action_required'
         ]
     
     @staticmethod
@@ -366,6 +373,15 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     @staticmethod
     def get_all_required_signatures(pr):
         return pr.all_required_signatures()
+    
+    def get_employee_action_required(self, pr):
+        user = None
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            user = request.user
+        if user and hasattr(user, 'employee'):
+            return pr.employee_action_required(user.employee)
+        return False
 
 
 class PerformanceReviewFileUploadSerializer(

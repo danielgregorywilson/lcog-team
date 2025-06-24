@@ -57,12 +57,12 @@
         <div class="text-h4">Reviews for your Direct Reports</div>
       </div>
       <div class="text-h6">Action Required</div>
-        <PerformanceReviewTable
+        <ReviewTable
           :actionRequired="true"
           :managerPk="userStore.getEmployeeProfile.employee_pk"
         />
       <div class="text-h6">No Action Required</div>
-        <PerformanceReviewTable
+        <ReviewTable
           :actionRequired="false"
           :managerPk="userStore.getEmployeeProfile.employee_pk"
         />
@@ -82,13 +82,13 @@
         <div class="text-h4">Reviews to Sign</div>
       </div>
       <div class="text-h6">Signature Required</div>
-        <PerformanceReviewTable
+        <ReviewTable
           :signature="true"
           :actionRequired="true"
           :managerPk="userStore.getEmployeeProfile.employee_pk"
         />
       <div class="text-h6">Signed</div>
-        <PerformanceReviewTable
+        <ReviewTable
           :signature="true"
           :actionRequired="false"
           :managerPk="userStore.getEmployeeProfile.employee_pk"
@@ -101,19 +101,19 @@
 import { watch } from 'vue'
 // import { useRouter } from 'vue-router'
 
-// import PerformanceReviewTable from 'src/components/PerformanceReviewTable.vue'
+// import ReviewTable from 'src/components/ReviewTable.vue'
 import useEventBus from 'src/eventBus'
 // import { readableDate } from 'src/filters'
 import { useAuthStore } from 'src/stores/auth'
-import { usePerformanceReviewStore } from 'src/stores/performancereview'
+import { useReviewStore } from 'src/stores/review'
 import { useUserStore } from 'src/stores/user'
-// import { PerformanceReviewRetrieve } from 'src/types'
+// import { ReviewRetrieve } from 'src/types'
 
 // const router = useRouter()
 const { bus } = useEventBus()
 const authStore = useAuthStore()
 const userStore = useUserStore()
-const performanceReviewStore = usePerformanceReviewStore()
+const reviewStore = useReviewStore()
 
 function isAuthenticated(): boolean {
   return authStore.isAuthenticated
@@ -139,10 +139,10 @@ function isProfileLoaded(): boolean {
 //   return userStore.getEmployeeProfile.is_executive_director
 // }
 
-// function nextReview(): PerformanceReviewRetrieve {
-//   // return {} as PerformanceReviewRetrieve
+// function nextReview(): ReviewRetrieve {
+//   // return {} as ReviewRetrieve
 //   // TODO
-//   return performanceReviewStore.nextPerformanceReview
+//   return reviewStore.nextPerformanceReview
 //   // return this.$store.getters['performanceReviewModule/nextPerformanceReview']
 // }
 
@@ -170,7 +170,7 @@ function isProfileLoaded(): boolean {
 // }
 
 watch(() => bus.value.get('gotUserProfile'), () => {
-  performanceReviewStore.getNextPerformanceReview(
+  reviewStore.getMyNextPR(
     userStore.getEmployeeProfile.employee_pk
   )
     .catch(e => {

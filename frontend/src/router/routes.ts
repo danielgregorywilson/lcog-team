@@ -167,19 +167,37 @@ if (maintenanceMode) {
         {
           path: '/reviews',
           name: 'reviews',
-          component: () => import('pages/performanceReview/PerformanceReviewList.vue'),
-          // beforeEnter: ifManager
+          component: () => import('pages/reviews/ReviewsBase.vue'),
+          meta: { requiresAuth: true },
+          children: [
+            {
+              path: '',
+              name: 'reviews-dashboard-redirect',
+              redirect: { name: 'reviews-dashboard' }
+            },
+            {
+              path: 'dashboard',
+              name: 'reviews-dashboard',
+              component: () => import('pages/reviews/ReviewsDashboard.vue'),
+            },
+            {
+              path: 'complete',
+              name: 'reviews-complete',
+              component: () => import('pages/reviews/ReviewsComplete.vue'),
+            }
+          ]
         },
         {
           path: '/pr/:pk',
           name: 'pr-details',
-          component: () => import('pages/performanceReview/PerformanceReviewDetail.vue'),
+          component: () => import('src/pages/reviews/ReviewDetail.vue'),
+          meta: { requiresAuth: true, },
           // beforeEnter: ifCanViewReview
           children: [
             {
               path: 'self',
               name: 'pr-self-evaluation',
-              component: () => import('pages/performanceReview/SelfEvaluation.vue'),
+              component: () => import('pages/reviews/SelfEvaluation.vue'),
               meta: { requiresAuth: true },
             }
           ]
@@ -187,19 +205,22 @@ if (maintenanceMode) {
         {
           path: '/pr/:pk/self',
           name: 'pr-self-evaluation',
-          component: () => import('pages/performanceReview/SelfEvaluation.vue'),
+          component: () => import('pages/reviews/SelfEvaluation.vue'),
+          meta: { requiresAuth: true },
           // beforeEnter: ifCanViewReview
         },
         {
           path: '/note/new',
           name: 'note-create',
-          component: () => import('src/pages/performanceReview/ReviewNoteCreate.vue'),
+          component: () => import('src/pages/reviews/ReviewNoteCreate.vue'),
+          meta: { requiresAuth: true },
           // beforeEnter: ifManager
         },
         {
           path: '/note/:pk',
           name: 'note-details',
-          component: () => import('src/pages/performanceReview/ReviewNoteDetail.vue'),
+          component: () => import('src/pages/reviews/ReviewNoteDetail.vue'),
+          meta: { requiresAuth: true },
           // beforeEnter: ifCanViewNote
         },
 
@@ -513,7 +534,7 @@ if (maintenanceMode) {
         {
           path: 'pr/:pk',
           name: 'pr-print',
-          component: () => import('pages/performanceReview/PerformanceReviewDetail.vue'),
+          component: () => import('src/pages/reviews/ReviewDetail.vue'),
           meta: { requiresManager: true },
           props: {
             print: true

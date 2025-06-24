@@ -13,11 +13,11 @@
       </div>
       <div class="q-mb-md">
         <div class="text-h5 q-mb-sm">Performance Reviews</div>
-        <PerformanceReviewTable :employeePk="pk()" />
+        <ReviewTable :employeePk="pk()" />
       </div>
       <div class="q-mb-md">
         <div class="text-h5 q-mb-sm">Managed Performance Reviews</div>
-        <PerformanceReviewTable :managerPk="pk()" />
+        <ReviewTable :managerPk="pk()" />
       </div>
     </div>
   </q-page>
@@ -32,7 +32,7 @@ import { onMounted, onUpdated } from 'vue'
 import { useRoute } from 'vue-router';
 
 import EmployeeTable from 'src/components/EmployeeTable.vue'
-import PerformanceReviewTable from 'src/components/PerformanceReviewTable.vue'
+import ReviewTable from 'src/components/ReviewTable.vue'
 import { usePeopleStore } from 'src/stores/people'
 import { EmployeeRetrieve } from 'src/types'
 

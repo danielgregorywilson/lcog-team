@@ -744,7 +744,7 @@ import { onMounted, ref, Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { readableDate } from 'src/filters'
-import { usePerformanceReviewStore } from 'src/stores/performancereview'
+import { useReviewStore } from 'src/stores/review'
 import { useUserStore } from 'src/stores/user'
 import { PRFormFactor, PRSignatures, ReviewNoteRetrieve } from 'src/types'
 import { getRoutePk } from 'src/utils'
@@ -753,7 +753,7 @@ import { getRoutePk } from 'src/utils'
 const $q = useQuasar()
 const route = useRoute()
 const router = useRouter()
-const performanceReviewStore = usePerformanceReviewStore()
+const reviewStore = useReviewStore()
 const userStore = useUserStore()
 const { getScrollTarget, setVerticalScrollPosition } = scroll
 
@@ -902,7 +902,7 @@ function retrievePerformanceReview() {
   return new Promise((resolve, reject) => {
     const routePk = getRoutePk(route)
     if (routePk) {
-      performanceReviewStore.getPerformanceReview(routePk)
+      reviewStore.getCurrentPR(routePk)
         .then((pr) => {
           if (!pr) {
             console.log('PR does not seem to exist. Redirecting...')
@@ -968,7 +968,7 @@ function retrievePerformanceReview() {
 }
 
 function retrieveReviewNotes(): void {
-  performanceReviewStore.getAllRecentNotesForEmployee(
+  reviewStore.getAllRecentNotesForEmployee(
     employeePk.value.toString()
   )
     .then((notes: Array<ReviewNoteRetrieve>) => {
@@ -981,7 +981,7 @@ function retrieveReviewNotes(): void {
 
 function updatePerformanceReview() {
   return new Promise((resolve, reject) => {
-    performanceReviewStore.updatePerformanceReview(prPk.value.toString(), {
+    reviewStore.updatePerformanceReview(prPk.value.toString(), {
       evaluation_type: evaluationType.value,
       probationary_evaluation_type: probationaryEvaluationType.value,
       step_increase: stepIncrease.value,
@@ -1011,8 +1011,8 @@ function updatePerformanceReview() {
         showErrorButton.value = true
       }
 
-      performanceReviewStore.getAllPerformanceReviewsActionRequired()
-      performanceReviewStore.getAllPerformanceReviewsActionNotRequired()
+      reviewStore.getAllPerformanceReviewsActionRequired()
+      reviewStore.getAllPerformanceReviewsActionNotRequired()
 
       resolve('Updated')
     })
@@ -1024,7 +1024,7 @@ function updatePerformanceReview() {
 }
 
 function updateEmployeeComments(): void {
-  performanceReviewStore.updatePerformanceReviewPartial(prPk.value.toString(), {
+  reviewStore.updatePerformanceReviewPartial(prPk.value.toString(), {
     evaluation_comments_employee: evaluationCommentsEmployee.value,
   })
     .then((pr) => {
@@ -1041,7 +1041,7 @@ function userCanSign(
 }
 
 function signPerformanceReview(): void {
-  performanceReviewStore.createSignature({
+  reviewStore.createSignature({
     review_pk: prPk.value,
     employee_pk: currentUserPk()
   })
@@ -1049,8 +1049,8 @@ function signPerformanceReview(): void {
       updatePerformanceReview()
         .then(() => {
           retrievePerformanceReview()
-          performanceReviewStore.getAllPerformanceReviewsActionRequired()
-          performanceReviewStore.getAllPerformanceReviewsActionNotRequired()
+          reviewStore.getAllPerformanceReviewsActionRequired()
+          reviewStore.getAllPerformanceReviewsActionNotRequired()
           showPRSignedAndCompleteDialog.value = true
         })
         .catch(e => {
@@ -1097,6 +1097,7 @@ onMounted(() => {
     })
     .catch(e => {
       console.error('Error retrieving PR on PR detail page mount:', e)
+      returnToDashboard()
     })
 })
 </script>

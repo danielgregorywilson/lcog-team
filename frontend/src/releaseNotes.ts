@@ -4,6 +4,18 @@
 
 export const releases = [
   {
+    version: '0.49.2',
+    date: new Date(2025, 5, 24),
+    changes: [
+      {
+        type: 'improved',
+        description: 'Major overhaul of Performance Reviews module. Update ' +
+          'the dashboard to match the more modern Workflows layout. Refactor ' +
+          'to use the modern Pinia store.'
+      },
+    ]
+  },
+  {
     version: '0.49.1',
     date: new Date(2025, 4, 20),
     changes: [

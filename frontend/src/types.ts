@@ -134,6 +134,7 @@ export interface EmployeeRetrieve {
   workflow_roles: Array<number>
   is_expense_submitter: boolean
   is_expense_approver: boolean
+  can_view_reviews: boolean
   can_view_mow_routes: boolean
   can_manage_mow_stops: boolean
   workflow_display_options: Array<WorkflowOption>
@@ -244,7 +245,7 @@ export type PRFormFactor = {
 
 export type PRSignatures = Array<[string, string, Date, number, boolean]>
 
-export interface PerformanceReviewRetrieve {
+export interface ReviewRetrieve {
   url: Url
   pk: number
   employee_pk: number
@@ -288,6 +289,7 @@ export interface PerformanceReviewRetrieve {
   evaluation_goals_manager: string
   evaluation_comments_employee: string
 
+  employee_action_required: [boolean, string]
   position_description_link: string
   description_reviewed_employee: boolean
   signed_position_description: string

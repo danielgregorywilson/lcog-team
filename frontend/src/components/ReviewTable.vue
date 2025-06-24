@@ -53,6 +53,7 @@
       <template v-slot:body-cell-actions="props">
         <q-td :props="props">
           <div class="row">
+            <!-- Edit/detail button -->
             <q-btn
               class="col edit-button"
               dense
@@ -66,7 +67,9 @@
                 Edit Performance Review
               </q-tooltip>
             </q-btn>
+            <!-- Feedback link button: Only show to managers -->
             <q-btn
+              v-if="managerPk" 
               class="col edit-button"
               dense
               round
@@ -78,8 +81,10 @@
               <q-tooltip content-style="font-size: 16px">
                 Copy feedback link to clipboard
               </q-tooltip>
-            </q-btn> 
+            </q-btn>
+            <!-- Print button: Only show to managers -->
             <q-btn
+              v-if="managerPk"
               class="col print-button"
               dense
               round
@@ -92,6 +97,7 @@
                 Print Performance Review Form
               </q-tooltip>
             </q-btn>
+            <!-- Alert icon: Show if employee action is required -->
             <q-icon
               v-if="props.row.employee_action_required[0]"
               color="orange"
@@ -138,10 +144,17 @@
                     {{ readableDateNEW(props.row.period_start_date) }} -
                     {{ readableDateNEW(props.row.period_end_date) }}
                   </div>
+                  <div class="q-table__grid-item-value"
+                    v-else-if="col.label == 'Days Until Review'"
+                    :class="lateReviewClass(props.row.days_until_review)"
+                  >
+                    {{ props.row.days_until_review }}
+                  </div>
                   <div
                     class="q-table__grid-item-value row q-gutter-sm"
                     v-else-if="col.label == 'Actions'"
                   >
+                    <!-- Edit/detail button -->
                     <q-btn
                       class="col edit-button"
                       dense
@@ -150,8 +163,29 @@
                       color="grey"
                       @click="editEvaluation(props)"
                       icon="edit"
-                    />
+                    >
+                      <q-tooltip content-style="font-size: 16px">
+                        Edit Performance Review
+                      </q-tooltip>
+                    </q-btn>
+                    <!-- Feedback link button: Only show to managers -->
                     <q-btn
+                      v-if="managerPk" 
+                      class="col edit-button"
+                      dense
+                      round
+                      flat
+                      color="grey"
+                      @click="copyFeedbackLinkToClipboard(props)"
+                      icon="link"
+                    >
+                      <q-tooltip content-style="font-size: 16px">
+                        Copy feedback link to clipboard
+                      </q-tooltip>
+                    </q-btn>
+                    <!-- Print button: Only show to managers -->
+                    <q-btn
+                      v-if="managerPk"
                       class="col print-button"
                       dense
                       round
@@ -164,20 +198,17 @@
                         Print Performance Review Form
                       </q-tooltip>
                     </q-btn>
-                    <q-btn
-                      v-if="props.row.signed_position_description"
-                      class="col print-button"
-                      dense
-                      round
-                      flat
-                      color="grey"
-                      @click="printEvaluationPositionDescription(props)"
-                      icon="print"
+                    <!-- Alert icon: Show if employee action is required -->
+                    <q-icon
+                      v-if="props.row.employee_action_required[0]"
+                      color="orange"
+                      name="warning"
+                      size="md"
                     >
                       <q-tooltip content-style="font-size: 16px">
-                        Print Signed Position Description
+                        <div>{{ props.row.employee_action_required[1]}}</div>
                       </q-tooltip>
-                    </q-btn>
+                    </q-icon>
                   </div>
                   <div
                     class="q-table__grid-item-value"

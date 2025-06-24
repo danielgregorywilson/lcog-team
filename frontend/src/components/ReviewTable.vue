@@ -215,6 +215,7 @@ import useEventBus from 'src/eventBus'
 import { readableDateNEW } from 'src/filters'
 import { useReviewStore } from 'src/stores/review'
 import { ReviewRetrieve } from 'src/types'
+import { getCurrentUser } from 'src/utils'
 
 interface QuasarReviewTableRowClickActionProps {
   evt: MouseEvent;
@@ -401,7 +402,10 @@ onUpdated(() => {
 })
 
 onMounted(() => {
-  retrievePerformanceReviews();
+  getCurrentUser()
+    .then(() => {
+      retrievePerformanceReviews()
+    })
 })
 
 </script>

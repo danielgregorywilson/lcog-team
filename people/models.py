@@ -883,7 +883,8 @@ class PerformanceReview(models.Model):
         # Manager might need to complete review
         if all([
             self.status == PerformanceReview.NEEDS_EVALUATION,
-            self.employee.manager == employee
+            self.employee.manager == employee,
+            self.days_until_due() <= 30
         ]):
             return True, "Review is ready for completion"
         # Employee might need to complete self-evaluation

@@ -292,9 +292,13 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
                         employee__pk=int(employee)
                     )
                 elif manager is not None:
-                    # All PRs managed by a given employee
+                    # All PRs managed by a given employee, as well as for all
+                    # direct reports down the chain.
+                    manager_employee = Employee.objects.get(pk=int(manager))
+                    descendant_employees = manager_employee.\
+                        get_direct_reports_descendants(include_self=False)
                     queryset = PerformanceReview.objects.filter(
-                        employee__manager__pk=int(manager)
+                        employee__in=descendant_employees
                     )
                 
                 # Filter to either complete or incomplete reviews
@@ -338,8 +342,11 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
                     pass
                 else:
                     # Check if the user is the employee or manager of the PR
-                    if pr.employee != employee and \
-                        pr.employee.manager != employee:
+                    self_and_descendants = \
+                        employee.get_direct_reports_descendants(
+                            include_self=True
+                        )
+                    if pr.employee not in self_and_descendants:
                         return Response(status=403)
 
         serializer = PerformanceReviewSerializer(pr,

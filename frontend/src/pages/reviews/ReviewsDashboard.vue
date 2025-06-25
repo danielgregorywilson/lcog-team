@@ -68,7 +68,7 @@
       />
   </div> -->
 
-  <!-- YOUR REVIEWS -->
+  <!-- YOUR NEXT REVIEW -->
   <div class="q-py-md">
     <div class="row items-center q-mb-md">
       <q-avatar
@@ -79,7 +79,7 @@
         class="q-mr-sm"
         size="md"
       />
-      <div class="text-h5">Your Reviews</div>
+      <div class="text-h5">Your Next Review</div>
     </div>
     <ReviewTable
       :employeePk="userStore.getEmployeeProfile.employee_pk"

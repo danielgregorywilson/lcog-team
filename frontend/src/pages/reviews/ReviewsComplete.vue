@@ -43,19 +43,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 
 import ReviewTable from 'src/components/ReviewTable.vue'
 import { useUserStore } from 'src/stores/user'
-import { useWorkflowsStore } from 'src/stores/workflows'
-// import { getCurrentUser } from 'src/utils'
 
-// const router = useRouter()
 const userStore = useUserStore()
-// const workflowsStore = useWorkflowsStore()
-
-// let workflowsLoaded = ref(false)
 
 function isManager() {
     return userStore.getEmployeeProfile.is_manager

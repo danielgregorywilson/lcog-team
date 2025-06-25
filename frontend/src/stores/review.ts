@@ -88,7 +88,7 @@ export const useReviewStore = defineStore('review', {
           })
           .catch(e => {
             handlePromiseError(
-              reject, 'Error getting all performance reviews action required', e
+              reject, 'Error getting incomplete reviews', e
             )
           })
       })
@@ -105,7 +105,7 @@ export const useReviewStore = defineStore('review', {
           })
           .catch(e => {
             handlePromiseError(
-              reject, 'Error getting all performance reviews action required', e
+              reject, 'Error getting complete reviews', e
             )
           })
       })

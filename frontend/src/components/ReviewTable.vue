@@ -14,6 +14,7 @@
       :grid="$q.screen.lt.md"
       :no-data-label="noDataLabel()"
       row-key="name"
+      :rows-per-page-options="[0]"
     >
       <!-- Slots for body cells: Show dates in a familiar format; make sure
         status can wrap, and display action buttons -->
@@ -68,7 +69,7 @@
             </q-btn>
             <!-- Feedback link button: Only show to managers -->
             <q-btn
-              v-if="managerPk" 
+              v-if="managerPk && props.row.manager_pk == managerPk" 
               dense
               round
               flat
@@ -167,7 +168,7 @@
                     </q-btn>
                     <!-- Feedback link button: Only show to managers -->
                     <q-btn
-                      v-if="managerPk" 
+                      v-if="managerPk && props.row.manager_pk == managerPk"
                       dense
                       round
                       flat
@@ -276,9 +277,20 @@ function performanceReviews(): Array<ReviewRetrieve> {
       prs = reviewStore.incompletePRs
     }
   }
-  return prs.sort((a, b) => {
+  let sorted_by_days = prs.sort((a, b) => {
     return a.days_until_review - b.days_until_review
   })
+  let sorted_by_action_required = sorted_by_days.sort((a, b) => {
+    // Sort by employee action required first
+    if (a.employee_action_required[0] && !b.employee_action_required[0]) {
+      return -1
+    } else if (!a.employee_action_required[0] && b.employee_action_required[0]) {
+      return 1
+    }
+    // If both have the same action required status, sort by days until review
+    return a.days_until_review - b.days_until_review
+  })
+  return sorted_by_action_required
 }
 
 function columns() {
@@ -435,11 +447,11 @@ function printEvaluation(
     })
 }
 
-function printEvaluationPositionDescription(
-  props: QuasarReviewTableRowClickActionProps
-): void {
-  window.location.href = props.row.signed_position_description
-}
+// function printEvaluationPositionDescription(
+//   props: QuasarReviewTableRowClickActionProps
+// ): void {
+//   window.location.href = props.row.signed_position_description
+// }
 
 watch(() => bus.value.get('updateTeleworkApplicationTables'), () => {
   retrievePerformanceReviews()

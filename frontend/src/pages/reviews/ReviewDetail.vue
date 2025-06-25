@@ -1049,8 +1049,8 @@ function signPerformanceReview(): void {
       updatePerformanceReview()
         .then(() => {
           retrievePerformanceReview()
-          reviewStore.getAllPerformanceReviewsActionRequired()
-          reviewStore.getAllPerformanceReviewsActionNotRequired()
+          // reviewStore.getAllPerformanceReviewsActionRequired()
+          // reviewStore.getAllPerformanceReviewsActionNotRequired()
           showPRSignedAndCompleteDialog.value = true
         })
         .catch(e => {
@@ -1082,7 +1082,7 @@ function clickedErrorItem(item: [string, string]) {
 }
 
 function returnToDashboard(): void {
-  router.push('/')
+  router.push('/reviews/dashboard')
     .catch(e => {
       console.error('Error navigating to dashboard:', e)
     })

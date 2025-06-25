@@ -60,10 +60,10 @@
               flat
               color="grey"
               @click="editEvaluation(props)"
-              icon="edit"
+              icon="assignment"
             >
               <q-tooltip content-style="font-size: 16px">
-                Edit Performance Review
+                View Performance Review
               </q-tooltip>
             </q-btn>
             <!-- Feedback link button: Only show to managers -->
@@ -159,10 +159,10 @@
                       flat
                       color="grey"
                       @click="editEvaluation(props)"
-                      icon="edit"
+                      icon="assignment"
                     >
                       <q-tooltip content-style="font-size: 16px">
-                        Edit Performance Review
+                        View Performance Review
                       </q-tooltip>
                     </q-btn>
                     <!-- Feedback link button: Only show to managers -->

@@ -4,28 +4,37 @@ import { defineStore } from 'pinia'
 import { apiURL, handlePromiseError } from 'src/stores/index'
 import { useUserStore } from 'src/stores/user'
 import {
-  PerformanceReviewRetrieve, PerformanceReviewUpdate,
+  ReviewRetrieve, PerformanceReviewUpdate,
   PerformanceReviewUpdatePartial, ReviewNoteCreate, ReviewNoteRetrieve,
   ReviewNoteUpdate, SignatureCreate
 } from 'src/types'
 
 
-export const usePerformanceReviewStore = defineStore('performancereview', {
+export const useReviewStore = defineStore('review', {
   state: () => ({
-    nextPerformanceReview: {} as PerformanceReviewRetrieve,
-    performanceReviewDetails: {} as PerformanceReviewRetrieve,
-    allPerformanceReviews: [] as Array<PerformanceReviewRetrieve>,
-    allPerformanceReviewsActionRequired: [] as Array<PerformanceReviewRetrieve>,
-    allPerformanceReviewsActionNotRequired: [] as
-      Array<PerformanceReviewRetrieve>,
-    allSignaturePerformanceReviewsActionRequired: [] as
-      Array<PerformanceReviewRetrieve>,
-    allSignaturePerformanceReviewsActionNotRequired: [] as
-      Array<PerformanceReviewRetrieve>,
-    allManagerPerformanceReviews: [] as Array<PerformanceReviewRetrieve>,
-    allManagerPerformanceReviewsActionRequired: [] as Array<PerformanceReviewRetrieve>,
-    allManagerPerformanceReviewsActionNotRequired: [] as Array<PerformanceReviewRetrieve>,
-    allEmployeePerformanceReviews: [] as Array<PerformanceReviewRetrieve>,
+    // Your next PR
+    myNextPR: {} as ReviewRetrieve,
+    // The PR detail we're looking at
+    currentPR: {} as ReviewRetrieve,
+    // Incomplete PRs for your direct reports
+    incompletePRs: [] as Array<ReviewRetrieve>,
+    // Complete PRs for your direct reports
+    completePRs: [] as Array<ReviewRetrieve>,
+    // All PRs for a given employee
+    employeePRs: [] as Array<ReviewRetrieve>,
+    
+    // allPerformanceReviews: [] as Array<ReviewRetrieve>,
+    // allPerformanceReviewsActionRequired: [] as Array<ReviewRetrieve>,
+    // allPerformanceReviewsActionNotRequired: [] as
+    //   Array<ReviewRetrieve>,
+    // allSignaturePerformanceReviewsActionRequired: [] as
+    //   Array<ReviewRetrieve>,
+    // allSignaturePerformanceReviewsActionNotRequired: [] as
+    //   Array<ReviewRetrieve>,
+    // allManagerPerformanceReviews: [] as Array<ReviewRetrieve>,
+    // allManagerPerformanceReviewsActionRequired: [] as Array<ReviewRetrieve>,
+    // allManagerPerformanceReviewsActionNotRequired: [] as Array<ReviewRetrieve>,
+    // allEmployeePerformanceReviews: [] as Array<ReviewRetrieve>,
     allReviewNotes: [] as Array<ReviewNoteRetrieve>
   }),
 
@@ -37,14 +46,14 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
     // Performance Reviews //
     /////////////////////////
 
-    getNextPerformanceReview(employeePk: number) {
+    getMyNextPR(employeePk: number) {
       return new Promise((resolve, reject) => {
         axios({
           url: `${ apiURL }api/v1/employee/${ employeePk }/` +
             'employee_next_performance_review'
         })
           .then(resp => {
-            this.nextPerformanceReview = resp.data
+            this.myNextPR = resp.data
             resolve(resp)
           })
           .catch(e => {
@@ -55,12 +64,11 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
       })
     },
 
-
-    getPerformanceReview(pk: string): Promise<PerformanceReviewRetrieve> {
+    getCurrentPR(pk: string): Promise<ReviewRetrieve> {
       return new Promise((resolve, reject) => {
-        axios({ url: `${ apiURL }api/v1/performancereview/${ pk }` })
+        axios({ url: `${ apiURL }api/v1/review/${ pk }` })
           .then(resp => {
-            this.performanceReviewDetails = resp.data
+            this.currentPR = resp.data
             resolve(resp.data)
           })
           .catch(e => {
@@ -69,35 +77,13 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
       })
     },
 
-    // All performance reviews for your direct reports and their descendants
-    getAllPerformanceReviews(data: {signature: boolean}) {
-      return new Promise((resolve, reject) => {
-        let targetUrl: string
-        if (data.signature) {
-          targetUrl = `${ apiURL }api/v1/performancereview?signature=true`
-        } else {
-          targetUrl = `${ apiURL }api/v1/performancereview`
-        }
-        axios({ url: targetUrl })
-          .then(resp => {
-            this.allPerformanceReviews = resp.data
-            resolve(resp)
-          })
-          .catch(e => {
-            handlePromiseError(
-              reject, 'Error getting all performance reviews', e
-            )
-          })
-      })
-    },
-
-    getAllPerformanceReviewsActionRequired() {
+    getIncompletePRs(managerPk: number) {
       return new Promise((resolve, reject) => {
         axios(
-          { url: `${ apiURL }api/v1/performancereview?action_required=True` }
+          { url: `${ apiURL }api/v1/review?incomplete=True&manager=${ managerPk }` }
         )
           .then(resp => {
-            this.allPerformanceReviewsActionRequired = resp.data.results
+            this.incompletePRs = resp.data.results
             resolve(resp)
           })
           .catch(e => {
@@ -108,105 +94,31 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
       })
     },
 
-    getAllPerformanceReviewsActionNotRequired() {
+    getCompletePRs(managerPk: number) {
       return new Promise((resolve, reject) => {
-        axios({
-          url: `${ apiURL }api/v1/performancereview?action_required=False`
-        })
+        axios(
+          { url: `${ apiURL }api/v1/review?complete=True&manager=${ managerPk }` }
+        )
           .then(resp => {
-            this.allPerformanceReviewsActionNotRequired = resp.data.results
+            this.completePRs = resp.data.results
             resolve(resp)
           })
           .catch(e => {
             handlePromiseError(
-              reject,
-              'Error getting all performance reviews action not required',
-              e
+              reject, 'Error getting all performance reviews action required', e
             )
           })
       })
     },
 
-    getAllSignaturePerformanceReviewsActionRequired() {
-      return new Promise((resolve, reject) => {
-        axios({
-          url: `${ apiURL }api/v1/performancereview?signature=True` +
-            '&action_required=True'
-        })
-          .then(resp => {
-            this.allSignaturePerformanceReviewsActionRequired = resp.data.results
-            resolve(resp)
-          })
-          .catch(e => {
-            handlePromiseError(
-              reject, 'Error getting all signature PRs action required', e
-            )
-          })
-      })
-    },
-
-    getAllSignaturePerformanceReviewsActionNotRequired() {
-      return new Promise((resolve, reject) => {
-        axios({
-          url: `${ apiURL }api/v1/performancereview?signature=True` +
-            '&action_required=False'
-        })
-          .then(resp => {
-            this.allSignaturePerformanceReviewsActionNotRequired = resp.data.results
-            resolve(resp)
-          })
-          .catch(e => {
-            handlePromiseError(
-              reject, 'Error getting all signature PRs action not required', e
-            )
-          })
-      })
-    },
-
-    getAllManagerPerformanceReviewsActionRequired(managerPk: number) {
-      // Get all performance reviews (past and present) managed by an employee
-      return new Promise((resolve, reject) => {
-        axios({
-          url: `${ apiURL }api/v1/performancereview?manager=${ managerPk }&action_required=True`
-        })
-          .then(resp => {
-            this.allManagerPerformanceReviewsActionRequired = resp.data.results
-            resolve(resp)
-          })
-          .catch(e => {
-            handlePromiseError(
-              reject, 'Error getting all managed performance reviews action required', e
-            )
-          })
-      })
-    },
-
-    getAllManagerPerformanceReviewsActionNotRequired(managerPk: number) {
-      // Get all performance reviews (past and present) managed by an employee
-      return new Promise((resolve, reject) => {
-        axios({
-          url: `${ apiURL }api/v1/performancereview?manager=${ managerPk }&action_required=False`
-        })
-          .then(resp => {
-            this.allManagerPerformanceReviewsActionNotRequired = resp.data.results
-            resolve(resp)
-          })
-          .catch(e => {
-            handlePromiseError(
-              reject, 'Error getting all managed performance reviews action not required', e
-            )
-          })
-      })
-    },
-    
-    getAllEmployeePerformanceReviews(employeePk: number) {
+    getEmployeePRs(employeePk: number) {
       // Get all performance reviews (past and present) for an employee
       return new Promise((resolve, reject) => {
         axios({
-          url: `${ apiURL }api/v1/performancereview?employee=${ employeePk }`
+          url: `${ apiURL }api/v1/review?employee=${ employeePk }`
         })
           .then(resp => {
-            this.allEmployeePerformanceReviews = resp.data.results
+            this.employeePRs = resp.data.results
             resolve(resp)
           })
           .catch(e => {
@@ -217,10 +129,158 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
       })
     },
 
-    updatePerformanceReview(pk: string, pr: PerformanceReviewUpdate): Promise<PerformanceReviewRetrieve> {
+    // // All performance reviews for your direct reports and their descendants
+    // getAllPerformanceReviews(data: {signature: boolean}) {
+    //   return new Promise((resolve, reject) => {
+    //     let targetUrl: string
+    //     if (data.signature) {
+    //       targetUrl = `${ apiURL }api/v1/review?signature=true`
+    //     } else {
+    //       targetUrl = `${ apiURL }api/v1/review`
+    //     }
+    //     axios({ url: targetUrl })
+    //       .then(resp => {
+    //         this.allPerformanceReviews = resp.data
+    //         resolve(resp)
+    //       })
+    //       .catch(e => {
+    //         handlePromiseError(
+    //           reject, 'Error getting all performance reviews', e
+    //         )
+    //       })
+    //   })
+    // },
+
+    // getAllPerformanceReviewsActionRequired() {
+    //   return new Promise((resolve, reject) => {
+    //     axios(
+    //       { url: `${ apiURL }api/v1/review?action_required=True` }
+    //     )
+    //       .then(resp => {
+    //         this.allPerformanceReviewsActionRequired = resp.data.results
+    //         resolve(resp)
+    //       })
+    //       .catch(e => {
+    //         handlePromiseError(
+    //           reject, 'Error getting all performance reviews action required', e
+    //         )
+    //       })
+    //   })
+    // },
+
+    // getAllPerformanceReviewsActionNotRequired() {
+    //   return new Promise((resolve, reject) => {
+    //     axios({
+    //       url: `${ apiURL }api/v1/review?action_required=False`
+    //     })
+    //       .then(resp => {
+    //         this.allPerformanceReviewsActionNotRequired = resp.data.results
+    //         resolve(resp)
+    //       })
+    //       .catch(e => {
+    //         handlePromiseError(
+    //           reject,
+    //           'Error getting all performance reviews action not required',
+    //           e
+    //         )
+    //       })
+    //   })
+    // },
+
+    // getAllSignaturePerformanceReviewsActionRequired() {
+    //   return new Promise((resolve, reject) => {
+    //     axios({
+    //       url: `${ apiURL }api/v1/review?signature=True` +
+    //         '&action_required=True'
+    //     })
+    //       .then(resp => {
+    //         this.allSignaturePerformanceReviewsActionRequired = resp.data.results
+    //         resolve(resp)
+    //       })
+    //       .catch(e => {
+    //         handlePromiseError(
+    //           reject, 'Error getting all signature PRs action required', e
+    //         )
+    //       })
+    //   })
+    // },
+
+    // getAllSignaturePerformanceReviewsActionNotRequired() {
+    //   return new Promise((resolve, reject) => {
+    //     axios({
+    //       url: `${ apiURL }api/v1/review?signature=True` +
+    //         '&action_required=False'
+    //     })
+    //       .then(resp => {
+    //         this.allSignaturePerformanceReviewsActionNotRequired = resp.data.results
+    //         resolve(resp)
+    //       })
+    //       .catch(e => {
+    //         handlePromiseError(
+    //           reject, 'Error getting all signature PRs action not required', e
+    //         )
+    //       })
+    //   })
+    // },
+
+    // getAllManagerPerformanceReviewsActionRequired(managerPk: number) {
+    //   // Get all performance reviews (past and present) managed by an employee
+    //   return new Promise((resolve, reject) => {
+    //     axios({
+    //       url: `${ apiURL }api/v1/review?manager=${ managerPk }&action_required=True`
+    //     })
+    //       .then(resp => {
+    //         this.allManagerPerformanceReviewsActionRequired = resp.data.results
+    //         resolve(resp)
+    //       })
+    //       .catch(e => {
+    //         handlePromiseError(
+    //           reject, 'Error getting all managed performance reviews action required', e
+    //         )
+    //       })
+    //   })
+    // },
+
+    // getAllManagerPerformanceReviewsActionNotRequired(managerPk: number) {
+    //   // Get all performance reviews (past and present) managed by an employee
+    //   return new Promise((resolve, reject) => {
+    //     axios({
+    //       url: `${ apiURL }api/v1/review?manager=${ managerPk }&action_required=False`
+    //     })
+    //       .then(resp => {
+    //         this.allManagerPerformanceReviewsActionNotRequired = resp.data.results
+    //         resolve(resp)
+    //       })
+    //       .catch(e => {
+    //         handlePromiseError(
+    //           reject, 'Error getting all managed performance reviews action not required', e
+    //         )
+    //       })
+    //   })
+    // },
+    
+    // getAllEmployeePerformanceReviews(employeePk: number) {
+    //   // Get all performance reviews (past and present) for an employee
+    //   return new Promise((resolve, reject) => {
+    //     axios({
+    //       url: `${ apiURL }api/v1/review?employee=${ employeePk }`
+    //     })
+    //       .then(resp => {
+    //         this.allEmployeePerformanceReviews = resp.data.results
+    //         resolve(resp)
+    //       })
+    //       .catch(e => {
+    //         handlePromiseError(
+    //           reject, 'Error getting all employee performance reviews', e
+    //         )
+    //       })
+    //   })
+    // },
+
+    updatePerformanceReview(pk: string, pr: PerformanceReviewUpdate): Promise<ReviewRetrieve> {
       return new Promise((resolve, reject) => {
         axios({
-          url: `${ apiURL }api/v1/performancereview/${ pk }`,
+          url: `${ apiURL }api/v1/review/${ pk }`,
           data: pr,
           method: 'PUT'
         })
@@ -233,10 +293,10 @@ export const usePerformanceReviewStore = defineStore('performancereview', {
       })
     },
 
-    updatePerformanceReviewPartial(pk: string, pr: PerformanceReviewUpdatePartial): Promise<PerformanceReviewRetrieve> {
+    updatePerformanceReviewPartial(pk: string, pr: PerformanceReviewUpdatePartial): Promise<ReviewRetrieve> {
       return new Promise((resolve, reject) => {
         axios({
-          url: `${ apiURL }api/v1/performancereview/${ pk }`,
+          url: `${ apiURL }api/v1/review/${ pk }`,
           data: pr,
           method: 'PATCH'
         })

@@ -284,10 +284,8 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
             else:
                 employee = self.request.query_params.get('employee', None)
                 manager = self.request.query_params.get('manager', None)
-                signature = self.request.query_params.get('signature', None)
-                action_required = self.request.query_params.get(
-                    'action_required', None
-                )
+                complete = self.request.query_params.get('complete', None)
+                incomplete = self.request.query_params.get('incomplete', None)
                 if employee is not None:
                     # All PRs for a given employee
                     queryset = PerformanceReview.objects.filter(
@@ -298,48 +296,53 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
                     queryset = PerformanceReview.objects.filter(
                         employee__manager__pk=int(manager)
                     )
-                elif is_true_string(signature):
-                    if action_required is not None:
-                        if is_true_string(action_required):
-                            # Signature and action required
-                            queryset = PerformanceReview\
-                                .signature_upcoming_reviews_action_required\
-                                .get_queryset(user)
-                        else:
-                            # Signature and no action required
-                            queryset = PerformanceReview\
-                                .signature_upcoming_reviews_no_action_required\
-                                .get_queryset(user)    
-                    else:
-                        # Signature required
-                        queryset = PerformanceReview\
-                            .signature_all_relevant_upcoming_reviews\
-                            .get_queryset(user)
-                elif action_required is not None:
-                    if is_true_string(action_required):
-                        queryset = PerformanceReview\
-                            .manager_upcoming_reviews_action_required\
-                            .get_queryset(user)
-                    else:
-                        queryset = PerformanceReview\
-                            .manager_upcoming_reviews_no_action_required\
-                            .get_queryset(user)
-                else:
-                    # PRs for which the current user is the manager
-                    manager_prs = PerformanceReview.objects.filter(
-                        employee__manager__user=user)
-                    # PRs for the current user
-                    employee_prs = PerformanceReview.objects.filter(
-                        employee__user=user)
-                    queryset = manager_prs | employee_prs # Default queryset
+                
+                # Filter to either complete or incomplete reviews
+                if is_true_string(complete):
+                    queryset = queryset.filter(
+                        status=PerformanceReview.EVALUATION_ED_APPROVED
+                    )
+                elif is_true_string(incomplete):
+                    queryset = queryset.exclude(
+                        status=PerformanceReview.EVALUATION_ED_APPROVED
+                    )
         else:
             queryset = PerformanceReview.objects.none()
         return queryset
 
     def retrieve(self, request, pk=None):
+        user = self.request.user
+        employee = user.employee if user.is_authenticated else None
+        # If the user is not authenticated, return an empty review
+        if not user.is_authenticated:
+            return Response(status=403)
+
         queryset = PerformanceReview.objects.all()
         pr = get_object_or_404(queryset, pk=pk)
-        serializer = PerformanceReviewSerializer(pr, 
+
+        if user.is_superuser:
+            # Superusers can see all reviews
+            pass
+        else:
+            if employee is None:
+                # If the user is not an employee, return 403
+                return Response(status=403)
+            else:
+                if any([
+                    employee.is_hr_employee,
+                    employee.is_hr_manager,
+                    employee.is_division_director,
+                    employee.is_executive_director
+                ]):
+                    # HR and directors can see all reviews
+                    pass
+                else:
+                    # Check if the user is the employee or manager of the PR
+                    if pr.employee != employee and \
+                        pr.employee.manager != employee:
+                        return Response(status=403)
+
+        serializer = PerformanceReviewSerializer(pr,
             context={'request': request})
         return Response(serializer.data)
 

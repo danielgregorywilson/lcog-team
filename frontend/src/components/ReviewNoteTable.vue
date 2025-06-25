@@ -1,7 +1,7 @@
 <template>
   <div class="q-py-sm">
     <q-table
-      :rows="performanceReviewStore.allReviewNotes"
+      :rows="reviewStore.allReviewNotes"
       :columns="columns"
       row-key="name"
     >
@@ -57,7 +57,7 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 import { readableDate } from 'src/filters'
-import { usePerformanceReviewStore } from 'src/stores/performancereview'
+import { useReviewStore } from 'src/stores/review'
 import { ReviewNoteRetrieve } from 'src/types'
 
 interface QuasarReviewNoteTableRowClickActionProps {
@@ -66,7 +66,7 @@ interface QuasarReviewNoteTableRowClickActionProps {
 }
 
 const router = useRouter()
-const performanceReviewStore = usePerformanceReviewStore()
+const reviewStore = useReviewStore()
 
 let columns: QTableProps['columns'] = [
   {
@@ -96,7 +96,7 @@ function showDeleteDialog(props: QuasarReviewNoteTableRowClickActionProps): void
 }
 
 function deleteRow(): void {
-  performanceReviewStore.deleteReviewNote(rowPkToDelete.value)
+  reviewStore.deleteReviewNote(rowPkToDelete.value)
     .then(() => {
       Notify.create('Deleted a review note.')
     })
@@ -110,6 +110,6 @@ function clickAddNote(): void {
 }
 
 onMounted(() => {
-  performanceReviewStore.getAllReviewNotes()
+  reviewStore.getAllReviewNotes()
 })
 </script>

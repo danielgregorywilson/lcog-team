@@ -126,6 +126,7 @@ interface LinkData {
   eligibleForTeleworkApplicationOnly?: boolean
   hasWorkflowRoles?: boolean
   canViewExpenses?: boolean
+  canViewReviews?: boolean
   canViewMOWRoutes?: boolean
 }
 
@@ -156,12 +157,12 @@ const navLinks: Array<LinkData> = [
     link: '/expenses',
     canViewExpenses: true
   },
-  // {
-  //   title: 'Performance Reviews',
-  //   icon: 'assignment_turned_in',
-  //   link: '/reviews',
-  //   id: 'nav-reviews'
-  // },
+  {
+    title: 'Performance Reviews',
+    icon: 'assignment_turned_in',
+    link: '/reviews',
+    canViewReviews: true
+  },
   {
     title: 'Schaefers Desk Reservation',
     icon: 'laptop',

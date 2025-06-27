@@ -69,7 +69,8 @@
             </q-btn>
             <!-- Feedback link button: Only show to managers -->
             <q-btn
-              v-if="managerPk && props.row.manager_pk == managerPk" 
+              v-if="managerPk && props.row.manager_pk == managerPk"
+              class="feedback-link"
               dense
               round
               flat

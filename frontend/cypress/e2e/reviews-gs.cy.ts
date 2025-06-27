@@ -1,4 +1,3 @@
-import { effect } from 'vue'
 import { loginSuperuser, loginUser, visitUrl } from '../support/helpers'
 
 // Cypress clears localstorage between tests, so use this to store data
@@ -31,6 +30,46 @@ describe('GS employee performance review process', () => {
     })
   })
 
+  it('Manager logs in and copies the link', () => {
+    // Create a new employee workflow
+    loginUser(Cypress.env('users').gsmanager).then(() => {
+      visitUrl(Cypress.env('reviews_dashboard_path'))
+      cy.get('.feedback-link').first().click()
+      cy.window().then((win) => {
+        win.navigator.clipboard.readText().then((text) => {
+          const link = `${ Cypress.env('base_url') }/note/new?employee=${Cypress.env('users').employee.pk}`
+          expect(text).to.eq(link);
+        });
+      });
+    })
+  })
+
+  it('Colleague uses link to submit feedback', () => {
+    // loginUser(Cypress.env('users').employee).then(() => {
+    //   visitUrl(Cypress.env('reviews_dashboard_path'))
+    //   cy.get('.feedback-link').first().click()
+    //   cy.window().then((win) => {
+    //     win.navigator.clipboard.readText().then((text) => {
+    //       const link = `${ Cypress.env('base_url') }/note/new?employee=${Cypress.env('users').employee.pk}`
+    //       expect(text).to.eq(link);
+    //     });
+    //   });
+    // })
+  })
+
+  it('Employee submits self-evaluation', () => {
+  })
+
+  it('Manager submits and signs evaluation', () => {
+    // Colleague feedback should be present
+  })
+
+  it('Employee reviews and signs evaluation', () => {
+  })
+
+  it('All upper managers sign evaluation', () => {
+  })
+
   it('Deletes the review', () => {
     const pk = LOCAL_STORAGE_MEMORY['reviewPK']
     loginSuperuser().then(() => {
@@ -49,48 +88,6 @@ describe('GS employee performance review process', () => {
       }
     })
   })
-
-  // it('Submitter logs in, creates a new employee workflow, and submits it', () => {
-  //   // Create a new employee workflow
-  //   loginUser(Cypress.env('users').gsmanager).then(() => {
-  //     visitUrl(Cypress.env('workflows_dashboard_path'))
-  //     cy.get('.workflowtable-employee-new .row-add-new').click()
-  //     cy.get('.q-dialog .q-btn').contains('Yes, start it').click()
-  //     cy.wait(500) // Wait for the new transition form to load
-  //     cy.url().then((url) => {
-  //       const match = url.match(/wf\/(\d+)\/transition/)
-  //       const pk = match ? match[1] : null
-  //       if (pk) {
-  //         LOCAL_STORAGE_MEMORY['workflowPK'] = pk
-  //       }
-  //       cy.log(`Created workflow pk: ${ pk }`)
-  //       // Enter data into the form
-  //       cy.get('input[name="first-name"]').type('Dustin')
-  //       cy.get('input[name="last-name"]').type('Albrecht')
-  //       // TODO: Try cypress-real-events to focus the email field
-  //       cy.get('input[name="email"]').focus()
-  //       const titleInput = cy.get('select[name="title"]').siblings('input')
-  //       titleInput.type('Case')
-  //       cy.wait(500) // Wait for the title to be selected
-  //       titleInput.type('{downArrow}{enter}')
-  //       const managerInput = cy.get('select[name="manager"]').siblings('input')
-  //       managerInput.type('Hiring M')
-  //       cy.wait(500) // Wait for the title to be selected
-  //       managerInput.type('{downArrow}{enter}')
-  //       const officeInput = cy.get('select[name="office-location"]').siblings('input').click()
-  //       cy.get('span').contains('Cottage Grove').click()
-  //       // Cannot reassign
-  //       cy.get('button[name="reassign-button"]').should('have.attr', 'disabled')
-  //       cy.get('button[name="reassign-button"]').contains('Status: Not submitted')
-  //       // Save the form
-  //       cy.get('button[name="save-button"]').click()
-  //       // Submit the form
-  //       cy.get('button[name="send-fiscal-button"]').click()
-  //       cy.get('button[name="send-fiscal-dialog-button"]').click()
-  //       cy.get('button[name="reassign-button"]').contains('Assigned to: Fiscal')
-  //     })
-  //   })
-  // })
 
   // it('Fiscal reassigns back to submitter', () => {
   //   const pk = LOCAL_STORAGE_MEMORY['workflowPK']

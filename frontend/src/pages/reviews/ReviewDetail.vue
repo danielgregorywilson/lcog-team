@@ -139,6 +139,7 @@
       ></div>
       <div v-else>
         <q-editor
+          id="employee-self-evaluation"
           v-model="evaluationCommentsEmployee"
           :toolbar="editorToolbar"
         />
@@ -301,6 +302,7 @@
           v-for="response in form.factorsResponseSet"
           :key="form.factorsResponseSet.indexOf(response)"
           class="factors-radio-box"
+          :class="`factors-radio-box-${response ? response.toLowerCase().replace(/\s+/g, '-') : 'na'}`"
         >
           <q-radio
             v-model="formData[factor.name]"
@@ -311,7 +313,7 @@
             :disable="!currentUserIsManagerOfEmployee() || employeeHasSigned()"
           />
         </div>
-        <div class="factors-radio-box">
+        <div class="factors-radio-box factors-radio-box-na">
           <q-radio
             v-if="factor.notApplicableOption"
             v-model="formData[factor.name]"
@@ -339,6 +341,7 @@
       ></div>
       <q-editor
         v-else
+        class="long-response-editor"
         :model-value="formData[response[0]] || ''"
         @update:model-value="(val: string) => {
           formData[response[0]] = val
@@ -925,7 +928,6 @@ function retrievePerformanceReview() {
 
           prPk.value = pr.pk.toString()
           form.value = pr.form
-          console.log('FORM:', form.value)
           
           employeeName.value = pr.employee_name
           managerName.value = pr.manager_name
@@ -1011,8 +1013,8 @@ function updatePerformanceReview() {
         showErrorButton.value = true
       }
 
-      reviewStore.getAllPerformanceReviewsActionRequired()
-      reviewStore.getAllPerformanceReviewsActionNotRequired()
+      // reviewStore.getAllPerformanceReviewsActionRequired()
+      // reviewStore.getAllPerformanceReviewsActionNotRequired()
 
       resolve('Updated')
     })

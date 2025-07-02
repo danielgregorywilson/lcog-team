@@ -1,11 +1,38 @@
-import { loginSuperuser, loginUser, visitUrl } from '../support/helpers'
+import {
+  loginSuperuser, loginUser, randomString, visitUrl
+} from '../support/helpers'
 
 // Cypress clears localstorage between tests, so use this to store data
 const LOCAL_STORAGE_MEMORY: { [key: string]: string } = {}
 
+function clearTestData() {
+  cy.writeFile('cypress/fixtures/temp-test-data.json', {})
+}
+
+function saveValue(key: string, value: string) {
+  console.log(`Saving value for key: ${key}, value: ${value}`)
+  cy.readFile('cypress/fixtures/temp-test-data.json')
+    .then((existingData) => {
+      const data = existingData || {}
+      data[key] = value
+      cy.writeFile('cypress/fixtures/temp-test-data.json', data)
+    })
+}
+
+function getValue(key: string): Promise<string> {
+  console.log(`Getting value for key: ${key}`)
+  return new Promise((resolve) => {
+    cy.readFile('cypress/fixtures/temp-test-data.json').then((data) => {
+      debugger
+      resolve(data[key])
+    })
+  })
+}
+
 describe('GS employee performance review process', () => {
 
   it('Creates a review', () => {
+    clearTestData()
     loginSuperuser().then(() => {
       const token = localStorage.getItem('user-token')
       const url = `${ Cypress.env('api_url') }/api/v1/review`
@@ -18,13 +45,15 @@ describe('GS employee performance review process', () => {
         body: {
           employee: Cypress.env('users').employee.pk,
           manager: Cypress.env('users').gsmanager.pk,
+          form_pk: 1,
           period_start_date: '2024-06-30',
           period_end_date: '2025-06-30',
           effective_date: '2024-07-01',
         },
       }).then((resp) => {
         const pk = resp.body.pk
-        LOCAL_STORAGE_MEMORY['reviewPK'] = pk
+        saveValue('reviewPK', pk)
+        // LOCAL_STORAGE_MEMORY['reviewPK'] = pk
         cy.log(`Created review pk: ${ pk }`)
       })
     })
@@ -37,31 +66,76 @@ describe('GS employee performance review process', () => {
       cy.get('.feedback-link').first().click()
       cy.window().then((win) => {
         win.navigator.clipboard.readText().then((text) => {
-          const link = `${ Cypress.env('base_url') }/note/new?employee=${Cypress.env('users').employee.pk}`
-          expect(text).to.eq(link);
+          const route = `/note/new?employee=${Cypress.env('users').employee.pk}`
+          saveValue('feedbackRoute', route)
+          // LOCAL_STORAGE_MEMORY['feedbackRoute'] = route
+          expect(text).to.eq(`${Cypress.env('base_url')}${route}`);
         });
       });
     })
   })
 
   it('Colleague uses link to submit feedback', () => {
-    // loginUser(Cypress.env('users').employee).then(() => {
-    //   visitUrl(Cypress.env('reviews_dashboard_path'))
-    //   cy.get('.feedback-link').first().click()
-    //   cy.window().then((win) => {
-    //     win.navigator.clipboard.readText().then((text) => {
-    //       const link = `${ Cypress.env('base_url') }/note/new?employee=${Cypress.env('users').employee.pk}`
-    //       expect(text).to.eq(link);
-    //     });
-    //   });
-    // })
+    // const route = LOCAL_STORAGE_MEMORY['feedbackRoute']
+    getValue('feedbackRoute').then((route) => {
+      loginUser(Cypress.env('users').colleague).then(() => {
+        console.log("Visiting route: ", route)
+        visitUrl(route)
+        cy.get('.employee-select input')
+          .should('have.value', Cypress.env('users').employee.name)
+        const feedback = randomString(20)
+        cy.wrap(feedback).as('feedback')
+        // LOCAL_STORAGE_MEMORY['feedback'] = feedback
+        cy.get('#review-note-editor').type(feedback)
+        cy.get("#review-note-create-button").click()
+      })
+    })
+    
   })
 
   it('Employee submits self-evaluation', () => {
+    loginUser(Cypress.env('users').employee).then(() => {
+      visitUrl(Cypress.env('reviews_dashboard_path'))
+      // TODO: SHOULD NOT CONTAIN FEEDVBACK
+      cy.contains('Needs evaluation').siblings().last().find('button').click()
+      const selfEvaluation = randomString(20)
+      cy.wrap(selfEvaluation).as('selfEvaluation')
+      // LOCAL_STORAGE_MEMORY['selfEvaluation'] = selfEvaluation
+      cy.get('#employee-self-evaluation').type(selfEvaluation)
+      cy.get('#save-comments-employee').click()
+    })
   })
 
   it('Manager submits and signs evaluation', () => {
-    // Colleague feedback should be present
+    loginUser(Cypress.env('users').gsmanager).then(() => {
+      visitUrl(Cypress.env('reviews_dashboard_path'))
+      cy.contains('Needs evaluation').siblings().last().find('button').first()
+        .click()
+      cy.get('#step-increase').siblings().first().click()
+      cy.get('#top-step-bonus').siblings().first().click()
+      // Self-evaluation should be present
+      cy.get('@selfEvaluation').then((selfEvaluation) => {
+         cy.contains(selfEvaluation)
+      })
+      // Colleague feedback should be present
+      cy.get('@feedback').then((feedback) => {
+         cy.contains(feedback)
+      })
+      cy.get('.factors-radio-box-meets-job-requirements').each(($el) => {
+        cy.wrap($el).click()
+      })
+      const longResponse = randomString(20)
+      cy.wrap(longResponse).as('longResponse')
+      // LOCAL_STORAGE_MEMORY['longResponse'] = longResponse
+      cy.get('.long-response-editor').each(($el) => {
+        cy.wrap($el).type(longResponse)
+      })
+      cy.get('#update-button').click()
+      cy.contains('Click to Sign').click()
+      cy.contains('Your signature has been recorded')
+      cy.contains('Return to Dashboard').click()
+      cy.url().should('include', Cypress.env('reviews_dashboard_path'))
+    })
   })
 
   it('Employee reviews and signs evaluation', () => {
@@ -71,104 +145,24 @@ describe('GS employee performance review process', () => {
   })
 
   it('Deletes the review', () => {
-    const pk = LOCAL_STORAGE_MEMORY['reviewPK']
-    loginSuperuser().then(() => {
-      const token = localStorage.getItem('user-token')
-      const url = `${ Cypress.env('api_url') }/api/v1/review/${ pk }`
-      if (pk) {
-        cy.request({
-          method: 'DELETE',
-          url,
-          headers: {
-            Authorization: `Token ${ token }`,
-          },
-        }).then(() => {
-          cy.log(`Deleted review pk: ${ pk }`)
-        })
-      }
+    // const pk = LOCAL_STORAGE_MEMORY['reviewPK']
+    cy.get('@reviewPK').then((pk) => {
+      loginSuperuser().then(() => {
+        const token = localStorage.getItem('user-token')
+        const url = `${ Cypress.env('api_url') }/api/v1/review/${ pk }`
+        if (pk) {
+          cy.request({
+            method: 'DELETE',
+            url,
+            headers: {
+              Authorization: `Token ${ token }`,
+            },
+          }).then(() => {
+            cy.log(`Deleted review pk: ${ pk }`)
+          })
+        }
+        // Delete most recently created review note
+      })
     })
   })
-
-  // it('Fiscal reassigns back to submitter', () => {
-  //   const pk = LOCAL_STORAGE_MEMORY['workflowPK']
-  //   loginUser(Cypress.env('users').fiscalemployee).then(() => {
-  //     visitUrl(`/wf/${pk}/transition`)
-  //     // Can reassign
-  //     const reassignButton = cy.get('button[name="reassign-button"]')
-  //     reassignButton.should('not.have.attr', 'disabled')
-  //     reassignButton.contains('Assigned to: Fiscal')
-  //     // Reassign to SDS Hiring Lead
-  //     reassignButton.click()
-  //     cy.get('button[name="reassign-dialog-assignee-dropdown"]').click()
-  //     cy.get('.q-menu > .q-list > .q-item').first().click()
-  //     cy.get('textarea[name="reassign-extra-message"]').type('Reassigning to Submitter')
-  //     cy.get('button[name="reassign-dialog-button"]').click()
-  //     // Now cannot reassign
-  //     cy.get('button[name="reassign-button"]').should('have.attr', 'disabled')
-  //     cy.get('button[name="reassign-button"]').contains('Assigned to: GS Manager')
-  //   })
-  // })
-
-  // it ('Submitter sends to fiscal a second time', () => {
-  //   const pk = LOCAL_STORAGE_MEMORY['workflowPK']
-  //   loginUser(Cypress.env('users').gsmanager).then(() => {
-  //     visitUrl(`/wf/${pk}/transition`)
-  //     // Cannot reassign
-  //     cy.get('button[name="reassign-button"]').should('have.attr', 'disabled')
-  //     cy.get('button[name="reassign-button"]').contains('Assigned to: GS Manager')
-  //     // Submit the form
-  //     cy.get('button[name="send-fiscal-button"]').click()
-  //     cy.get('button[name="send-fiscal-dialog-button"]').click()
-  //     cy.get('button[name="reassign-button"]').contains('Assigned to: Fiscal')
-  //   })
-  // })
-
-  // it('Fiscal sends to HR', () => {
-  //   const pk = LOCAL_STORAGE_MEMORY['workflowPK']
-  //   loginUser(Cypress.env('users').fiscalemployee).then(() => {
-  //     visitUrl(`/wf/${pk}/transition`)
-  //     // Can reassign
-  //     const reassignButton = cy.get('button[name="reassign-button"]')
-  //     reassignButton.should('not.have.attr', 'disabled')
-  //     reassignButton.contains('Assigned to: Fiscal')
-  //     // Submit the form
-  //     cy.get('button[name="send-hr-button"]').click()
-  //     cy.get('button[name="send-hr-dialog-button"]').click()
-  //     cy.get('button[name="reassign-button"]').contains('Assigned to: HR')
-  //   })
-  // })
-
-  // it('HR sends to STN', () => {
-  //   const pk = LOCAL_STORAGE_MEMORY['workflowPK']
-  //   loginUser(Cypress.env('users').hremployee).then(() => {
-  //     visitUrl(`/wf/${pk}/transition`)
-  //     // Can reassign
-  //     const reassignButton = cy.get('button[name="reassign-button"]')
-  //     reassignButton.should('not.have.attr', 'disabled')
-  //     reassignButton.contains('Assigned to: HR')
-  //     // Submit the form
-  //     cy.get('button[name="send-stn-button"]').click()
-  //     cy.get('button[name="send-stn-dialog-button"]').click()
-  //     cy.get('button[name="reassign-button"]').contains('Status: Complete')
-  //   })
-  // })
-
-  // it('Deletes the workflow', () => {
-  //   const pk = LOCAL_STORAGE_MEMORY['workflowPK']
-  //   loginSuperuser().then(() => {
-  //     const token = localStorage.getItem('user-token')
-  //     const url = `${ Cypress.env('api_url') }/api/v1/workflowinstance/${ pk }`
-  //     if (pk) {
-  //       cy.request({
-  //         method: 'DELETE',
-  //         url,
-  //         headers: {
-  //           Authorization: `Token ${ token }`,
-  //         },
-  //       }).then(() => {
-  //         cy.log(`Deleted workflow instance pk: ${ pk }`)
-  //       })
-  //     }
-  //   })
-  // })
 })

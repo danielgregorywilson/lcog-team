@@ -8,7 +8,7 @@ from rest_framework import serializers
 
 from mainsite.helpers import record_error
 from people.models import (
-    Employee, JobTitle, PerformanceReview, ReviewNote, Signature,
+    Employee, JobTitle, PRForm, PerformanceReview, ReviewNote, Signature,
     TeleworkApplication, TeleworkSignature, UnitOrProgram,
     ViewedSecurityMessage, WorkflowOptions
 )
@@ -263,7 +263,13 @@ class EmployeeEmailSerializer(serializers.ModelSerializer):
 
 class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     form = serializers.SerializerMethodField()
-    employee_pk = serializers.IntegerField(source='employee.pk', read_only=True) #TODO: Make IntegerField
+    form_pk = serializers.PrimaryKeyRelatedField(
+        source='form', queryset=PRForm.objects.all(), allow_null=True,
+        required=False, write_only=True
+    )
+    employee_pk = serializers.IntegerField(
+        source='employee.pk', read_only=True
+    )
     employee = serializers.PrimaryKeyRelatedField(
         queryset=Employee.objects.all(),
         write_only=True
@@ -292,7 +298,7 @@ class PerformanceReviewSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = PerformanceReview
         fields = [
-            'url', 'pk', 'form', 'data', 'employee_pk', 'employee',
+            'url', 'pk', 'form_pk', 'form', 'data', 'employee_pk', 'employee',
             'employee_name', 'employee_division', 'employee_unit_or_program',
             'employee_job_title', 'manager_pk', 'manager_name',
             'days_until_review', 'status', 'period_start_date',

@@ -112,20 +112,22 @@ import ReviewNoteTable from 'src/components/ReviewNoteTable.vue'
 const userStore = useUserStore()
 
 function isManager() {
-    return userStore.getEmployeeProfile.is_manager
+    return userStore.getEmployeeProfile.is_manager ||
+      userStore.getEmployeeProfile.is_hr_manager ||
+      userStore.getEmployeeProfile.is_executive_director
 }
 
-function isUpperManager() {
-  return userStore.getEmployeeProfile.is_upper_manager
-}
+// function isUpperManager() {
+//   return userStore.getEmployeeProfile.is_upper_manager
+// }
 
-function isTheHRManager(): boolean {
-  return userStore.getEmployeeProfile.is_hr_manager
-}
+// function isTheHRManager(): boolean {
+//   return userStore.getEmployeeProfile.is_hr_manager
+// }
 
-function isTheExecutiveDirector(): boolean {
-  return userStore.getEmployeeProfile.is_executive_director
-}
+// function isTheExecutiveDirector(): boolean {
+//   return userStore.getEmployeeProfile.is_executive_director
+// }
 
 
 </script>

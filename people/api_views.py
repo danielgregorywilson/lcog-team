@@ -284,24 +284,31 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
             else:
                 employee = self.request.query_params.get('employee', None)
                 manager = self.request.query_params.get('manager', None)
-                complete = self.request.query_params.get('complete', None)
-                incomplete = self.request.query_params.get('incomplete', None)
                 if employee is not None:
                     # All PRs for a given employee
                     queryset = PerformanceReview.objects.filter(
                         employee__pk=int(employee)
                     )
                 elif manager is not None:
-                    # All PRs managed by a given employee, as well as for all
-                    # direct reports down the chain.
-                    manager_employee = Employee.objects.get(pk=int(manager))
-                    descendant_employees = manager_employee.\
-                        get_direct_reports_descendants(include_self=False)
-                    queryset = PerformanceReview.objects.filter(
-                        employee__in=descendant_employees
-                    )
+                    employee = user.employee if user.is_authenticated else None
+                    is_ed = employee.is_executive_director if employee else False
+                    is_hrm = employee.is_hr_manager if employee else False
+                    if is_ed or is_hrm:
+                        # Superusers, EDs, and HR managers can see all reviews
+                        queryset = PerformanceReview.objects.all()
+                    else:
+                        # All PRs managed by a given employee, as well as for all
+                        # direct reports down the chain.
+                        manager_employee = Employee.objects.get(pk=int(manager))
+                        descendant_employees = manager_employee.\
+                            get_direct_reports_descendants(include_self=False)
+                        queryset = PerformanceReview.objects.filter(
+                            employee__in=descendant_employees
+                        )
                 
                 # Filter to either complete or incomplete reviews
+                complete = self.request.query_params.get('complete', None)
+                incomplete = self.request.query_params.get('incomplete', None)
                 if is_true_string(complete):
                     queryset = queryset.filter(
                         status=PerformanceReview.EVALUATION_ED_APPROVED
